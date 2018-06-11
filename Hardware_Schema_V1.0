@@ -1,0 +1,22 @@
+3 MAF Sensor (5WK9605)
+
+1 - GND / 0V
+2 - Output Signal (0-5V) - connect to Arduino Analog Pin A0
+3 - 12V
+
+
+3 LED Display (TM1637 - 4 digit 7 segment IC2)
+
+VCC - 5V
+GND - 0V
+DIO - Arduino Digital Pin 3
+CLK - Arduino Digital Pin 2
+
+
+3 Arduino (5v type - Leonardo / Nano / Mega / Whatever)
+
+D2 - LED Pin CLK
+D3 - LED Pin DIO
+AO - MAF Pin 2
+VCC - 5V
+GND - 0V
