@@ -1,0 +1,5 @@
+Bill of materials
+
+MAF Sensor - 5WK9605 - Hot wire MAF
+Arduino - Leonardo (any 5v based arduino will do!)
+4 Digit LED display - TM1637 based Generic display with IC2 serial protocol (4 pin connection)
