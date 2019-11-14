@@ -40,7 +40,9 @@ Project Goals
 Project Status
 ==============
 
-The project is currently working towards a version 1 release. At present there is no stable development version but the original aplha release is available from the master branch.
+The project is currently working towards a version 1 release. At present there is no stable development version but the original alpha release is available from the master branch. 
+
+The current status of the project can be viewed on the Version 1 project page https://github.com/DeeEmm/DIY-Flow-Bench/projects/1
 
 
 Roadmap
