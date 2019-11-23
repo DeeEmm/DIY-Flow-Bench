@@ -15,27 +15,18 @@ The Flow Bench is used as a tool for measuring and quantifying modifications and
 Project Goals
 =============
 
+- Validated software and hardware design
 - Affordable & easy to source components.
 - Can be built & operated by a layman.
 - Generates results comparable with commercial flow bench.
-- Open source.
+- Open source software and hardware design
+
 
 Project Status
 ==============
 
-The project is currently very much in its alpha stage with basic feature development for both hardware and software still in progress.
+For more up to date information including current stable builds and documentation, please visit the WIKI page in our gitgub repository - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
 
-If you want to build the project you can follow the connection schema for the current version in the repository and download the corresponding Arduino sketch.
-
-Roadmap
-=======
-
-A basic outline of what we would like to achieve...
-
-- Integration of the flow measurement sensor and generation of basic CFM readout 
-- Integration of differential pressure sensors for measurement of reference source / Pitot tubes
-- Finalisation of feature-set (calibration / reference pressure conversion / etc)
-- Development of PCB & housing
 
 License
 =======
@@ -46,6 +37,9 @@ This project is released under the GPLV3 license. For details on usage please re
 Further Information
 ===================
 
-Join the project community - https://www.facebook.com/groups/diyflowbench/ 
+
+The latest information can be found in the project WIKI - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+Github repository - https://github.com/DeeEmm/DIY-Flow-Bench
+Join our project community - https://www.facebook.com/groups/diyflowbench/ 
 
 
