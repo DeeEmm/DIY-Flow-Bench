@@ -1,0 +1,20 @@
+Bill of materials
+=================
+
+
+Electrical / electronic
+=======================
+
+QTY			Description
+
+1			MAF Sensor - 5WK9605 - Hot wire MAF - 0-5v sensing range
+1			Arduino - MEGA 2560
+1			RepRapdiscount smart controller - 4 line LCD controller
+1			4 Digit LED display - TM1637 based Generic display with IC2 serial protocol (4 pin connection) (optional)
+
+
+
+Bench construction
+==================
+
+1 mtr		80mm Diameter UPVC Waste pipe
