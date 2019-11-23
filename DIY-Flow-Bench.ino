@@ -2,7 +2,7 @@
  * The DIY Flow Bench project
  * A basic flow bench to measure and display volumetric air flow using an Arduino and common automotive MAF sensor.
  * 
- * For more information please visit our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench
+ * For more information please visit our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
  * Or join our Facebook community: https://www.facebook.com/groups/diyflowbench/
  * 
  * This project and all associated files are provided for use under the GNU GPL3 license:
@@ -15,6 +15,8 @@
  * DEV NOTES
  * 
  * Need to consider & organise variable scope.
+ * Need to determine function scopes 
+ *  
  ***/
 
 
@@ -45,8 +47,9 @@ void loop ()
 
     readSensors ();
     parseControls();
-    calculateFlow();
-    calculatePressures();
+    calculateMafFlow();
+    calculateSensor1Pressure();
+    calculateSensor2Pressure();
     updateDisplays();
     writeOutputs();
 

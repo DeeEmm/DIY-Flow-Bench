@@ -1,5 +1,5 @@
 /****************************************
- * interface.h -  HMI functions - user input and menu system
+ * controls.h -  HMI functions - user input and menu system
  * This file is part of the DIY Flow Bench project. For more information including usage and licensing please refer to: https://github.com/DeeEmm/DIY-Flow-Bench
  ***/
 
@@ -19,26 +19,20 @@ void configureControls ()
 
 }
 
-/****************************************
- * PARSE CONTROLS
- ***/
-void parseControls ()
-{
-
-
-}
 
 /****************************************
  * TEST INPUTS
  ***/
 bool testInputs ()
 {
-    // test for clickwheel / encoder input
-    // test for buttons pressed
-    // if true then inputStatusChanged
-    // return inputStatusChanged
+    // Here we are checking is clickwheel / encoder input / buttons have been operated
+    // if true then return inputStatusChanged
     return true;
+
+    //NOTE: for some inputs an interrupt may be more appropriate (encoder?)
+
 }
+
 
 /****************************************
  * DECODE INPUTS
@@ -48,12 +42,21 @@ void decodeInputs ()
 
 }
 
+
+/****************************************
+ * PARSE CONTROLS
+ ***/
+void parseControls ()
+{
+
+}
+
 /****************************************
  * UPDATE MENU
  ***/
 void updateMenu ()
 {
-
+    //update menu data based on parsed controls data
 }
 
 

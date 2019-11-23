@@ -7,7 +7,26 @@
 /****************************************
  * WRITE CALIBRATION DATA TO NVM
  ***/
-void calibrate ()
+void setCalibration ()
 {
-    
+    //we need to save the calibration data to non-volatile memory on the arduino
+}
+
+
+/****************************************
+ * GET CALIBRATION DATA FROM NVM
+ ***/
+void getCalibration ()
+{
+    //Retrieve calibration data from NVM
+}
+
+
+/****************************************
+ * GET FLOW MAP DATA FROM EXTERNAL LOOKUP TABLE
+ ***/
+void loadMAFLookupTable ()
+{
+    //Retrieve calibration data from external data file
+    //populate array [voltage, cfm]
 }

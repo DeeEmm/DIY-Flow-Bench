@@ -9,7 +9,7 @@
  * CALCULATE FLOW
  * Convert RAW MAF sensor data into flow rate
  ***/
-void calculateFlow()
+void calculateMafFlow()
 {
     // calculate values and update display data:
     // displayData[FLOW_CFM_VAL] = CALCULATED_VALUE;
@@ -17,10 +17,20 @@ void calculateFlow()
 
 
 /****************************************
- * CALCULATE PRESSURES
-Convert RAW sensor data into pressure / vac
+ * CALCULATE Sensor #1 PRESSURE / VAC
+ * Convert RAW sensor data into pressure or vacuum
  ***/
-void calculatePressures()
+void calculateSensor1Pressure()
+{
+
+}
+
+
+/****************************************
+ * CALCULATE Sensor #2 PRESSURE / VAC
+ * Convert RAW sensor data into pressure or vacuum
+ ***/
+void calculateSensor2Pressure()
 {
 
 }

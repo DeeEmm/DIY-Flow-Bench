@@ -9,12 +9,6 @@
  * Default Board - Mega 2560
  ***/
 
-//Displays
-//set pin values for pitot display
-//set pin values for vacuum display
-//set pin values for reference pressure display
-//set pin values for flow display
-//set pin values for main display
 
 // Sensors
 MAF_PIN = 0;
@@ -27,10 +21,19 @@ FOURX7SEG_DISPLAY1_CLK_PIN = 14;
 FOURX7SEG_DISPLAY1_DIO_PIN = 15;
 FOURX7SEG_DISPLAY2_CLK_PIN = 16;
 FOURX7SEG_DISPLAY2_DIO_PIN = 17;
+// set pin values for pitot display
+// set pin values for vacuum display
+// set pin values for reference pressure display
+// set pin values for flow display
+// set pin values for main display
+
 
 // Controls
-// + Clickwheel
-// + Additionall control buttons (functions to be determined)
+// Set pin value for Clickwheel
+// Set pin value for additional control buttons (functions to be determined)
+
+
+
 
 /****************************************
  * CONFIGURE DISPLAYS
@@ -42,17 +45,21 @@ FOURX7SEG_DISPLAY2_DIO_PIN = 17;
  * 
  ***/
 
+//set main display type
 mainDisplayType = FOURX20CHAR_DISPLAY;
+
+// Set secondary display types
 flowDisplayType = FOURX7SEG_DISPLAY;
 refDisplayType = FOURX7SEG_DISPLAY;
 vacDisplayType = FOURX7SEG_DISPLAY;
 pitotDisplayType = FOURX7SEG_DISPLAY;
 
-//enable displays
+// Enable secondary displays
 flowDisplayEnabled = true;
 refDisplayEnabled = false;
 vacDisplayEnabled = false;
 pitotDisplayEnabled = false;
+
 
 
 
@@ -66,6 +73,7 @@ pitotDisplayEnabled = false;
 // + Humidity
 
 
+
 /****************************************
  * CONFIGURE CONTROLS
  ***/
@@ -74,7 +82,7 @@ pitotDisplayEnabled = false;
 // + Rotary encoder
 // + Click button
 
-//Vac source control
+// Vac source control
 // + Bench start
 // + Bench stop
 

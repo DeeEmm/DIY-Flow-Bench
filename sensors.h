@@ -22,7 +22,7 @@ int mafValue = 0;
 void readSensors() 
 {
     //GET SENSOR RAW DATA FROM ASSIGNED PINS
-  //read MAF
-//  mafValue = analogRead(MAF_PIN);
+    //read MAF
+    //  mafValue = analogRead(MAF_PIN);
 
 }

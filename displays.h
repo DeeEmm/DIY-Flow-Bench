@@ -10,51 +10,56 @@
  * GLOBAL VARIABLE DECLARATIONS
  ***/
 
-// Constants
-#define LINE_1 1
-#define LINE_2 2
-#define LINE_3 3
-#define LINE_4 4
-#define FLOW_CFM 1
-#define REF_PRESS 2
-#define VAC 3
-#define PITOT 4
-#define FOURX20CHAR_DISPLAY 1
-#define TFT_DISPLAY 2
-#define OLED_DISPLAY 3
-#define FOURX7SEG_DISPLAY 1
+// Define Constants
+const int LINE_1 = 1;
+const int LINE_2 = 2;
+const int LINE_3 = 3;
+const int LINE_4 = 4;
+const int FLOW_CFM = 1;
+const int REF_PRESS = 2;
+const int VAC = 3;
+const int PITOT = 4; 
+const int FOURX20CHAR_DISPLAY = 1;
+const int TFT_DISPLAY = 2;
+const int OLED_DISPLAY = 3;
+const int FOURX7SEG_DISPLAY = 1;
 
-// Common variables
+// Initialise common variables
 int displayDataCFM = 0;
 int displayDataPressure = 0;
 int displayDataVacuum = 0;
 int displayDataPitot = 0;
+// Initialise array to be passed to display functions
 int displayDataByValue[] = {displayDataCFM, displayDataPressure, displayDataVacuum, displayDataPitot};
 
-// Display types
+// Define main display type
 int mainDisplayType = FOURX20CHAR_DISPLAY;
+
+// Define secondary display types
 int flowDisplayType = FOURX7SEG_DISPLAY;
 int refDisplayType = FOURX7SEG_DISPLAY;
 int vacDisplayType = FOURX7SEG_DISPLAY;
 int pitotDisplayType = FOURX7SEG_DISPLAY;
 
-// Active displays
+// Define Active secondary displays
 bool flowDisplayEnabled = false;
 bool refDisplayEnabled = false;
 bool vacDisplayEnabled = false;
 bool pitotDisplayEnabled = false;
 
-// Define 4x20 char display
+// Initialise 4x20 char display data
 char display4x20DataLine1[] = "";
 char display4x20DataLine2[] = "";
 char display4x20DataLine3[] = "";
 char display4x20DataLine4[] = "";
+// Initialise array to be passed to display function
 char *display4x20DataByLine[] = {display4x20DataLine1, display4x20DataLine2, display4x20DataLine3, display4x20DataLine4};    
 
 // Define 4x7 segment display#1
 int FOURX7SEG_DISPLAY1_CLK_PIN = 14;
 int FOURX7SEG_DISPLAY1_DIO_PIN = 15;
 
+// Define 4x7 segment display#2
 int FOURX7SEG_DISPLAY2_CLK_PIN = 16;
 int FOURX7SEG_DISPLAY2_DIO_PIN = 17;
 
@@ -68,7 +73,6 @@ void initialiseDisplays ()
     if (flowDisplayEnabled)
     {
         // Create new class instance of FOURX7SEG_DISPLAY 
-        //TM1637Display FOURX7SEG_DISPLAY1 = new TM1637Display ();
     }
 
     if (refDisplayEnabled)
