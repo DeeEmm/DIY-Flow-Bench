@@ -4,6 +4,8 @@
  * This file is part of the DIY Flow Bench project. For more information including usage and licensing please refer to: https://github.com/DeeEmm/DIY-Flow-Bench
  ***/
 
+// Define Constants
+
 
 /****************************************
  * CALCULATE FLOW
@@ -34,3 +36,20 @@ void calculateSensor2Pressure()
 {
 
 }
+
+
+/****************************************
+ * CONVERT FLOW
+ * Convert flow values between different reference pressures
+ ***/
+float convertMafFlow(int referencePressure = 28)
+{
+    float convertedFlowValue = 0;
+    
+    //do calculations here
+
+    return convertedFlowValue;
+
+}
+
+

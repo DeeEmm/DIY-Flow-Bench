@@ -3,9 +3,10 @@
  * This file is part of the DIY Flow Bench project. For more information including usage and licensing please refer to: https://github.com/DeeEmm/DIY-Flow-Bench
  ***/
 
-// Define Constants
+
+// Define Constants (add additional sensors incrementally)
 const int SIEMENS_5WK9605 = 1;
-// NITE do not overwrite these - please leave as an example for future use
+// NOTE do not overwrite the following - please leave as an example for future users
 const int SOME_OTHER_LINEAR_SENSOR = 99; 
 const int SOME_OTHER_NON_LINEAR_SENSOR = 100;
 

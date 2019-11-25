@@ -3,11 +3,19 @@
  * This file is part of the DIY Flow Bench project. For more information including usage and licensing please refer to: https://github.com/DeeEmm/DIY-Flow-Bench
  ***/
 
-// pin var declarations
-// rotary encoder
-// click button
-// bench start 
-// bench stop
+
+
+/****************************************
+ * GLOBAL VARIABLE DECLARATIONS
+ * We declare them here but they can be over-written in configuration.h
+ * This allows for user-defined configurations to be maintained within configuration.h
+ ***/
+
+
+// rotary encoder pin
+// click button pin
+// bench start pin
+// bench stop pin
 
 
 
