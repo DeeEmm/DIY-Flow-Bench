@@ -65,6 +65,10 @@ int FOURX7SEG_DISPLAY1_DIO_PIN = 15;
 int FOURX7SEG_DISPLAY2_CLK_PIN = 16;
 int FOURX7SEG_DISPLAY2_DIO_PIN = 17;
 
+// Define 4x7 segment display#3
+int FOURX7SEG_DISPLAY3_CLK_PIN = 18;
+int FOURX7SEG_DISPLAY3_DIO_PIN = 19;
+
 
 /****************************************
  * INITIALISE DISPLAYS

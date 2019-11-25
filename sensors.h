@@ -9,7 +9,7 @@
  * GLOBAL VARIABLE DECLARATIONS
  * We declare them here but they can be over-written in configuration.h
  * This allows for user-defined configurations to be maintained within configuration.h
- ***/
+ ***/   
 
 int MAF_PIN = 0;
 int REF_PRESSURE_PIN = 11;

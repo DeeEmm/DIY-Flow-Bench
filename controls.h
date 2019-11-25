@@ -12,10 +12,12 @@
  ***/
 
 
-// rotary encoder pin
-// click button pin
-// bench start pin
-// bench stop pin
+int ROTARY_ENCODER_PHASE_A_PIN = 20;
+int ROTARY_ENCODER_PHASE_B_PIN = 21;
+int ROTARY_ENCODER_DETENT_PIN = 22;
+
+int ENTER_BUTTON_PIN = 23;
+
 
 
 

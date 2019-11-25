@@ -16,21 +16,24 @@ REF_PRESSURE_PIN = 11;
 REF_VAC_PIN = 12;
 PITOT_PIN = 13;
 
-// Displays
+
+// Flow Display
 FOURX7SEG_DISPLAY1_CLK_PIN = 14;
 FOURX7SEG_DISPLAY1_DIO_PIN = 15;
+// Reference pressure
 FOURX7SEG_DISPLAY2_CLK_PIN = 16;
 FOURX7SEG_DISPLAY2_DIO_PIN = 17;
-// set pin values for pitot display
-// set pin values for vacuum display
-// set pin values for reference pressure display
-// set pin values for flow display
-// set pin values for main display
+// Pitot
+FOURX7SEG_DISPLAY3_CLK_PIN = 18;
+FOURX7SEG_DISPLAY3_DIO_PIN = 19;
 
 
 // Controls
-// Set pin value for Clickwheel
-// Set pin value for additional control buttons (functions to be determined)
+ROTARY_ENCODER_PHASE_A_PIN = 20;
+ROTARY_ENCODER_PHASE_B_PIN = 21;
+ROTARY_ENCODER_DETENT_PIN = 22;
+
+ENTER_BUTTON_PIN = 23;
 
 
 
