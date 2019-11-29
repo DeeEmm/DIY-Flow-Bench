@@ -15,7 +15,7 @@
 
 // ARDUINO MEGA 2560
 // Pins 2+3 reserved for serial comms
-// Pins 20+21 are reseverd for I2C
+// Pins 20+21 are reseverd for I2C 
 #ifdef ARDUINO_MEGA_2560
     #define MAF_PIN A0
     #define REF_PRESSURE_PIN A1
@@ -24,7 +24,7 @@
     #define TEMPERATURE_PIN A4
     #define BAROMETRIC_PIN A5
     #define HUMIDITY_PIN A6
-    // ADD NVM addresses for calibration data
+    //TODO ADD NVM addresses for calibration data
 
 #endif
 
@@ -38,7 +38,7 @@
     #define TEMPERATURE_PIN A4
     #define BAROMETRIC_PIN A5
     #define HUMIDITY_PIN A6
-    // ADD NVM addresses for calibration data
+    //TODO ADD NVM addresses for calibration data
 #endif
 
 
