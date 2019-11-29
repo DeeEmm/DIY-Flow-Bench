@@ -11,6 +11,7 @@
 
 #define ARDUINO_MEGA_2560 //default
 //#define ARDUINO_NANO
+//#define ARDUINO_UNO
 
 
 // ARDUINO MEGA 2560
@@ -24,7 +25,8 @@
     #define TEMPERATURE_PIN A4
     #define BAROMETRIC_PIN A5
     #define HUMIDITY_PIN A6
-    //TODO ADD NVM addresses for calibration data
+    //TODO Add NVM addresses for calibration data
+    //TODO Add comments showing display connection pins
 
 #endif
 
@@ -38,7 +40,22 @@
     #define TEMPERATURE_PIN A4
     #define BAROMETRIC_PIN A5
     #define HUMIDITY_PIN A6
-    //TODO ADD NVM addresses for calibration data
+    //TODO Add NVM addresses for calibration data
+    //TODO Add comments showing display connection pins
+#endif
+
+
+// ARDUINO UNO
+#ifdef ARDUINO_UNO
+    #define MAF_PIN A0
+    #define REF_PRESSURE_PIN A1
+    #define REF_VAC_PIN A2
+    #define PITOT_PIN A3
+    #define TEMPERATURE_PIN A4
+    #define BAROMETRIC_PIN A5
+    #define HUMIDITY_PIN A6
+    //TODO Add NVM addresses for calibration data
+    //TODO Add comments showing display connection pins
 #endif
 
 
