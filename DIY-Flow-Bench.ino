@@ -1,4 +1,3 @@
-
 /****************************************
  * The DIY Flow Bench project
  * A basic flow bench to measure and display volumetric air flow using an Arduino and common automotive MAF sensor.
@@ -12,29 +11,35 @@
  * Version 1.0.0-alpha
  * 
  * Menu system and displays handed by tcMenu library - https://github.com/davetcc/tcMenu
- * If you want to modify the display or menus tcMenu project file located in /tcMenu folder
+ * If you want to modify the display or menus, the tcMenu project file is provided in distro - menu.emf
  * 
  */
 
 // Development and release version
 #define VERSION "V1.0-Alpha"
-#define BUILD "19120101"
+#define BUILD "19120201"
 
 #include "DIY-Flow-Bench_menu.h"
 #include <EEPROM.h>
 #include <Arduino.h>
 
-//#include "controls.h"
 #include "configuration.h"
 
 
 /****************************************
+ * DECLARE CONSTANTS
+ ***/
+
+#define INWG 1
+#define KPA 2
+
+/****************************************
  * DECLARE GLOBALS
  ***/
-int currentVacValue;
-int mafFlowRateCFM;
 
-void calculateMafFlow();
+float startupBaroPressure;
+int mafFlowThresholdCFM;
+
 
 /****************************************
  * INITIALISATION
@@ -42,34 +47,252 @@ void calculateMafFlow();
 void setup ()
 {
     setupMenu();// Set up the menu + display system
+
     //take pressure sensor reading for baro correction if dedicated baro sensor not used
+    int startupBaroPressure = analogRead(REF_PRESSURE_PIN);
 }
 
 
 /****************************************
- * MAIN PROGRAM LOOP
+ * GET BOARD VOLTAGE
  ***/
-void loop ()
+float getSupplyMillivolts()
+{   
+    int rawVoltageValue = analogRead(VOLTAGE_PIN);
+    int supplyMillivolts = rawVoltageValue * (5.0 / 1023.0) * 100;
+
+    return supplyMillivolts;
+}
+
+
+
+
+/****************************************
+ * GET BAROMETRIC CORRECTION
+ ***/
+float getBaroPressure()
+{   
+
+    float baroPressureKpa;
+    int supplyMillivolts = getSupplyMillivolts();
+    int rawBaroValue = analogRead(REF_BARO_PIN);
+    int baroMillivolts = (rawBaroValue * (5.0 / 1023.0)) * 1000;
+
+    #ifdef BARO_MPX4115
+        // Vout = VS (P x 0.009 – 0.095) --- Where VS = Supply Voltage (Formula from Datasheet)
+        // P = ((Vout / VS ) - 0.095) / 0.009 --- Formula transposed for P
+        baroPressureKpa = ((baroMillivolts / supplyMillivolts ) - 0.095) / 0.009; 
+    #elif BARO_BMP280
+        //TODO
+    #else
+        // No baro sensor so use value grabbed at startup from reference pressure sensor
+        // NOTE will only work for absolute style pressure sensor
+        baroPressureKpa = (startupBaroPressure * startupBaroScalingFactor) + startupBaroScalingOffset; 
+    #endif
+
+    return baroPressureKpa;
+}
+
+
+
+
+/****************************************
+ * CALCULATE FLOW in CFM
+ * Convert RAW MAF sensor data into flow rate and display it
+ *
+ * Linear interpolation formula Y=Y1+(X−X1)(Y2−Y1/X2−X1)
+ *
+ * TONYS TEST RESULTS = X:2.2 Y:27.6 | X:3.2 Y:106.9
+ ***/
+float getMafFlowCFM()
+{   
+    float mafFlowRateCFM;
+    int rawMafValue = analogRead(MAF_PIN);
+    int mafMillivolts = (rawMafValue * (5.0 / 1023.0)) * 1000;
+
+    #ifdef SIEMENS__5WK9605
+        
+        mafFlowRateCFM = 27.6 + ((mafMillivolts / 1000)-2.2) * 79.3        
+        mafFlowThresholdCFM = 2;
+    
+    #elif SOME_OTHER_SENSOR
+        //SOME OTHER SENSORS CALCS
+    #elif ADD_YOUR_OWN_SENSOR
+        //YOUR SENSORS CALCS
+    #endif
+
+    return mafFlowRateCFM;
+    
+}
+
+
+
+/****************************************
+ * CALCULATE REFERENCE PRESSURE IN/WG
+ * Convert RAW pressure sensor data
+ ***/
+float getRefPressure (int units) 
+{   
+
+    float refPressureKpa;
+    float refPressureInWg;
+    int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
+    int refPressMillivolts = (rawRefPressValue * (5.0 / 1023.0)) * 1000;
+    int boardMillivolts = getSupplyMillivolts();
+
+    #ifdef REF_MPXV7007
+        // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
+        // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
+        refPressureKpa = ((refPressMillivolts / boardMillivolts ) - 0.5) / 0.057; 
+
+    #elif REF_BMP280
+        //TODO
+    #endif
+
+    switch (units)
+    {
+        case INWG:
+            // convert from kPa to inches Water
+            refPressureInWg = refPressureKpa * 4.0147421331128;
+            return refPressureInWg;
+        break;
+
+        case KPA:
+            return refPressureKpa;
+        break;
+    }
+    
+}
+
+
+
+/****************************************
+ * CALCULATE TEMPERATURE
+ * Convert RAW temperature sensor data
+ ***/
+float getTemperature()
+{   
+    float temperature;
+
+    //TODO - get temperature from sensor
+    temperature = 21;
+
+    return temperature;
+}
+
+
+
+/****************************************
+ * CALCULATE PITOT PROBE
+ * Convert RAW temperature sensor data
+ ***/
+float getPitotPressure(int units)
+{   
+    float refPressureKpa;
+    float refPressureInWg;
+    int rawRefPressValue = analogRead(PITOT_PIN);
+    int refPressMillivolts = (rawRefPressValue * (5.0 / 1023.0)) * 1000;
+    int boardMillivolts = getSupplyMillivolts();
+
+    #ifdef REF_MPXV7007
+        // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
+        // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
+        refPressureKpa = ((refPressMillivolts / boardMillivolts ) - 0.5) / 0.057; 
+
+    #elif REF_BMP280
+        //TODO
+    #endif
+
+    switch (units)
+    {
+        case INWG:
+            // convert from kPa to inches Water
+            refPressureInWg = refPressureKpa * 4.0147421331128;
+            return refPressureInWg;
+        break;
+
+        case KPA:
+            return refPressureKpa;
+        break;
+    }
+    
+}
+
+/****************************************
+ * CONVERT FLOW
+ * Convert flow values between different reference pressures
+ * Flow at the new pressure drop = (the square root of (new pressure drop/old pressure drop)) times CFM at the old pressure drop.
+ ***/
+float convertMafFlowInWg(float inputPressure = 10, int outputPressure = 28, float inputFlow = 0 )
 {
-    taskManager.runLoop(); //run tcMenu
-    calculateMafFlow();
-//    calculateSensor1Pressure();
-//    calculateSensor2Pressure();
-    updateDisplays();
+    float outputFlow;
+    
+        outputFlow = (sqrt(outputPressure / inputPressure) * inputFlow);
+
+    return outputFlow;
+
+}
+
+
+/****************************************
+ * UPDATE DISPLAYS
+ *
+ * Displays driven by tcMenu library
+ ***/
+void updateDisplays()
+{
+
+    int desiredRefPressureInWg = menuDesiredRef.getCurrentValue();
+    
+    // Main Menu
+    // Flow Rate
+    if (mafFlowCFM > mafFlowThresholdCFM)
+    {
+        menuFlowRate.setCurrentValue(getMafFlowCFM());   
+    } else {
+        menuFlowRate.setCurrentValue(0);   
+    }
+    // Reference pressure
+    menuRefPressure.setCurrentValue(getRefPressure(INWG));
+    // Temperature
+    menuTemperature.setCurrentValue(getTemperature());
+    // Pitot
+    menuPitot.setCurrentValue(getPitotPressure());
+    // Adjusted Flow
+    menuAdjustedFlow.setCurrentValue(convertMafFlowInWg(refPressureInWg, desiredRefPressureInWg, mafFlowCFM));
+
+
+    //Settings Menu
+    menuSettingsCodeVersion.setTextValue(VERSION);
+    menuSettingsBuildNumber.setTextValue(BUILD);
+    
+
+    #ifdef CFM_4X7SEG
+        //TODO
+    #endif
+
+    #ifdef PITOT_4X7SEG
+        //TODO
+    #endif
+
+    #ifdef MPXV7007 
+        menuRefPressure.setCurrentValue(refPressureInWg);
+    #elif BMP280
+
+    #endif
+
 
 }
 
 
 
 /****************************************
- * MAIN MENU
- *
- * Based on tcMenu - https://github.com/davetcc/tcMenu
- *
  * MENU CALLBACK FUNCTIONS
+ *
+ * Menus driven by tcMenu library
  * --------------------------------------
  * NOTE: Menu names are used for reference 
- * Spaces are removed and name converted to camel case
+ * Spaces are removed and name converted to camelCase
  * For example:
  * bool changed = menuFlowRefCal.isChanged();
  * 
@@ -79,10 +302,12 @@ void loop ()
  * menuRefPressure
  * menuTemperature
  * menPitot
+ * menuDesiredRef
+ * menuAdjustedFlow
  * menuSettingsCodeVersion
  * menuSettingsBuild
- * menuSettingsFlowRefCal
- * menuSettingsFlowRefCheck
+ * menuSettingsLowFlowCal
+ * menuSettingsHighFlowCal
  * menuSettingsLeakTestCal
  * menuSettingsLeakTestCheck
  *
@@ -103,123 +328,85 @@ void loop ()
  * 
  ***/
 
-//TODO
-void CALLBACK_FUNCTION checkFlowCalibration(int id) {
-    //Retrieve calibration data from NVM
-    //value = EEPROM.read(NVM_FLOW_CAL_ADDR);
-    //compare it to current value
-//    return flowCalibrationValue;
+
+
+/****************************************
+ * MENU CALLBACK FUNCTION
+ * setLowFlowCalibrationValue
+ ***/
+void CALLBACK_FUNCTION setLowFlowCalibrationValue(int id) {
+
+    float MafFlowCFM = getMafFlowCFM();
+    float RefPressure = getRefPressure(INWG);
+    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, 28,  MafFlowCFM);
+    float flowCalibrationValue = calibrationPlateLowCFM - convertedMafFlowCFM;
+    //Store data in EEPROM
+    EEPROM.write(NVM_HIGH_FLOW_CAL_ADDR, flowCalibrationValue);
+
 }
 
-//TODO
+/****************************************
+ * MENU CALLBACK FUNCTION
+ * setHighFlowCalibrationValue
+ ***/
+void CALLBACK_FUNCTION setHighFlowCalibrationValue(int id) {
+
+    float MafFlowCFM = getMafFlowCFM();
+    float RefPressure = getRefPressure(INWG);
+    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, 28,  MafFlowCFM);
+    float flowCalibrationValue = calibrationPlateHighCFM - convertedMafFlowCFM;
+    //Store data in EEPROM
+    EEPROM.write(NVM_LOW_FLOW_CAL_ADDR, flowCalibrationValue);
+
+}
+
+/****************************************
+ * MENU CALLBACK FUNCTION
+ * setLeakCalibrationValue
+ ***/
 void CALLBACK_FUNCTION setLeakCalibrationValue(int id) {
 
-    //we need to save the calibration data to non-volatile memory on the arduino
-    //EEPROM.write(NVM_LEAK_CAL_ADDR,value);
-    // we can return boolean to indicate that write has been successful (error checking)
+    float RefPressure = getRefPressure(INWG);  
+    //Store data in EEPROM
+    EEPROM.write(NVM_LEAK_CAL_ADDR, RefPressure);
 }
 
-//TODO
-void CALLBACK_FUNCTION setFlowCalibrationValue(int id) {
-
-    // we need to save the calibration data to non-volatile memory on the arduino
-    //EEPROM.write(NVM_FLOW_CAL_ADDR,value);
-
-    // we can return boolean to indicate that write has been successful (error checking)
-}
-
-//TODO
+/****************************************
+ * MENU CALLBACK FUNCTION
+ * checkLeakCalibration
+ ***/
 void CALLBACK_FUNCTION checkLeakCalibration(int id) {
 
     int leakCalibrationValue = 0; 
-    int rawvacValue;
-    float vacVoltage;
-    rawvacValue = analogRead(REF_VAC_PIN);
-    leakCalibrationValue = EEPROM.read(NVM_FLOW_CAL_ADDR);
-
-    //TODO
-    //leakCalibrationValue = scaled value from vac signal;
-
-    // lower the test value to define test tolerance
-    // NOTE, this will essentially determine bench accuracy
-    leakCalibrationValue -= calibrationToleranceCFM;
+    leakCalibrationValue = EEPROM.read(NVM_LEAK_CAL_ADDR);
+    int refPressure = getRefPressure(INWG);
 
     //compare calibration data from NVM
-    if (leakCalibrationValue >= currentVacValue )
+    if (leakCalibrationValue < (refPressure - leakTestTolerance))
     {
- //       return true;
+       menuSettingsLeakTestCheck.setTextValue("TEST OK");
     } else {
-//        return false;
+       menuSettingsLeakTestCheck.setTextValue("TEST FAIL");
     }
 
 }
 
 
-
-
 /****************************************
- * CALCULATE FLOW
- * Convert RAW MAF sensor data into flow rate and display it
+ * MAIN PROGRAM LOOP
  ***/
-void calculateMafFlow()
-{   
-    int rawMafValue;
-    float MafVoltage;
-    rawMafValue = analogRead(MAF_PIN);
-    MafVoltage = (rawMafValue * (5.0 / 1023.0))*100;
-
-    #ifdef SIEMENS__5WK9605
-        mafFlowRateCFM = MafVoltage * 0.1821 + 2;
-    #endif
-
-    #ifdef SOME_OTHER_SENSOR
-        //SOME OTHER SENSORS CALCS
-    #endif
-    
-    #ifdef ADD_YOUR_OWN_SENSOR
-        //YOUR SENSORS CALCS
-    #endif
-    
-}
-
-
-/****************************************
- * CONVERT FLOW
- * Convert flow values between different reference pressures
- ***/
-float convertMafFlow(int inputPressure = 10, int outputPressure = 28 , int inputFlow = 0 )
+void loop ()
 {
-    float outputFlow = 0;
-    
-        //TODO
-
-    return outputFlow;
+    taskManager.runLoop(); //run tcMenu
+    updateDisplays();
 
 }
 
 
-/****************************************
- * UPDATE DISPLAYS
- ***/
-void updateDisplays()
-{
-    //Main Menu
-    menuFlowRate.setCurrentValue(mafFlowRateCFM);   
-    //Settings Menu
-    menuSettingsCodeVersion.setTextValue(VERSION);
-    menuSettingsDevBuild.setTextValue(BUILD);
-    
-
-    #ifdef CFM_4X7SEG
-        //TODO
-    #endif
-
-    #ifdef PITOT_4X7SEG
-        //TODO
-    #endif
 
 
-}
+
+
 
 
 

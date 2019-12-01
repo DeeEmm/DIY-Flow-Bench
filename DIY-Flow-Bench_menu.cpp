@@ -18,24 +18,28 @@ LiquidCrystalRenderer renderer(lcd, LCD_WIDTH, LCD_HEIGHT);
 
 // Global Menu Item declarations
 
-const PROGMEM AnyMenuInfo minfoSettingsLeakTestCheck = { "Leak Test Check", 9, 10, 0, checkLeakCalibration };
-ActionMenuItem menuSettingsLeakTestCheck(&minfoSettingsLeakTestCheck, NULL);
-const PROGMEM AnyMenuInfo minfoSettingsLeakTestCal = { "Leak Test Cal", 8, 10, 0, setLeakCalibrationValue };
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLeakTestCheckRtCall, textItemRenderFn, "Leak Test Check", 48, NULL)
+TextMenuItem menuSettingsLeakTestCheck(fnSettingsLeakTestCheckRtCall, 14, 3, NULL);
+const PROGMEM AnyMenuInfo minfoSettingsLeakTestCal = { "Leak Test Cal", 8, 17, 0, setLeakCalibrationValue };
 ActionMenuItem menuSettingsLeakTestCal(&minfoSettingsLeakTestCal, &menuSettingsLeakTestCheck);
-const PROGMEM AnyMenuInfo minfoSettingsFlowRefCheck = { "Flow Ref Check", 7, 10, 0, checkFlowCalibration };
-ActionMenuItem menuSettingsFlowRefCheck(&minfoSettingsFlowRefCheck, &menuSettingsLeakTestCal);
-const PROGMEM AnyMenuInfo minfoSettingsFlowRefCal = { "Flow Ref Cal", 6, 10, 0, setFlowCalibrationValue };
-ActionMenuItem menuSettingsFlowRefCal(&minfoSettingsFlowRefCal, &menuSettingsFlowRefCheck);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsDevBuildRtCall, textItemRenderFn, "Dev Build", -1, NULL)
-TextMenuItem menuSettingsDevBuild(fnSettingsDevBuildRtCall, 11, 8, &menuSettingsFlowRefCal);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsCodeVersionRtCall, textItemRenderFn, "Code Version", 10, NULL)
+const PROGMEM AnyMenuInfo minfoSettingsHighFlowCal = { "High Flow Cal", 7, 14, 0, setHighFlowCalibrationValue };
+ActionMenuItem menuSettingsHighFlowCal(&minfoSettingsHighFlowCal, &menuSettingsLeakTestCal);
+const PROGMEM AnyMenuInfo minfoSettingsLowFlowCal = { "Low Flow Cal", 6, 12, 0, setLowFlowCalibrationValue };
+ActionMenuItem menuSettingsLowFlowCal(&minfoSettingsLowFlowCal, &menuSettingsHighFlowCal);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsDevBuildRtCall, textItemRenderFn, "Dev Build", 30, NULL)
+TextMenuItem menuSettingsDevBuild(fnSettingsDevBuildRtCall, 11, 8, &menuSettingsLowFlowCal);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsCodeVersionRtCall, textItemRenderFn, "Code Version", 20, NULL)
 TextMenuItem menuSettingsCodeVersion(fnSettingsCodeVersionRtCall, 10, 10, &menuSettingsDevBuild);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", 10, NULL)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 10, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsCodeVersion);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, NULL);
+const PROGMEM AnalogMenuInfo minfoAdjustedFlow = { "Adjusted Flow", 13, 40, 255, NO_CALLBACK, 0, 1, "cfm" };
+AnalogMenuItem menuAdjustedFlow(&minfoAdjustedFlow, 0, &menuSettings);
+const PROGMEM AnalogMenuInfo minfoDesiredRef = { "Desired Ref", 12, 38, 28, NO_CALLBACK, 0, 1, "inWg" };
+AnalogMenuItem menuDesiredRef(&minfoDesiredRef, 0, &menuAdjustedFlow);
 const PROGMEM AnalogMenuInfo minfoPitot = { "Pitot", 4, 8, 255, NO_CALLBACK, 0, 1, "inWg" };
-AnalogMenuItem menuPitot(&minfoPitot, 0, &menuSettings);
+AnalogMenuItem menuPitot(&minfoPitot, 0, &menuDesiredRef);
 const PROGMEM AnalogMenuInfo minfoTemperature = { "Temperature", 3, 6, 255, NO_CALLBACK, 0, 1, "DegC" };
 AnalogMenuItem menuTemperature(&minfoTemperature, 0, &menuPitot);
 const PROGMEM AnalogMenuInfo minfoRefPressure = { "Ref Pressure", 2, 4, 255, NO_CALLBACK, 0, 1, "inWg" };
@@ -55,9 +59,16 @@ void setupMenu() {
     menuMgr.initForEncoder(&renderer, &menuFlowRate, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
 
     // Read only and local only function calls
+    menuSettingsDevBuild.setReadOnly(true);
     menuFlowRate.setReadOnly(true);
     menuRefPressure.setReadOnly(true);
     menuTemperature.setReadOnly(true);
+    menuAdjustedFlow.setReadOnly(true);
+    menuSettingsLeakTestCal.setReadOnly(true);
+    menuSettingsLeakTestCheck.setReadOnly(true);
+    menuSettingsLowFlowCal.setReadOnly(true);
     menuPitot.setReadOnly(true);
+    menuSettingsHighFlowCal.setReadOnly(true);
+    menuSettingsCodeVersion.setReadOnly(true);
 }
 

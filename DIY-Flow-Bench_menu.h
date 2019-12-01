@@ -31,14 +31,16 @@ extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 
 // all menu item forward references.
-extern ActionMenuItem menuSettingsLeakTestCheck;
+extern TextMenuItem menuSettingsLeakTestCheck;
 extern ActionMenuItem menuSettingsLeakTestCal;
-extern ActionMenuItem menuSettingsFlowRefCheck;
-extern ActionMenuItem menuSettingsFlowRefCal;
+extern ActionMenuItem menuSettingsHighFlowCal;
+extern ActionMenuItem menuSettingsLowFlowCal;
 extern TextMenuItem menuSettingsDevBuild;
 extern TextMenuItem menuSettingsCodeVersion;
 extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
+extern AnalogMenuItem menuAdjustedFlow;
+extern AnalogMenuItem menuDesiredRef;
 extern AnalogMenuItem menuPitot;
 extern AnalogMenuItem menuTemperature;
 extern AnalogMenuItem menuRefPressure;
@@ -48,10 +50,9 @@ extern const ConnectorLocalInfo applicationInfo;
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION checkFlowCalibration(int id);
-void CALLBACK_FUNCTION checkLeakCalibration(int id);
-void CALLBACK_FUNCTION setFlowCalibrationValue(int id);
+void CALLBACK_FUNCTION setHighFlowCalibrationValue(int id);
 void CALLBACK_FUNCTION setLeakCalibrationValue(int id);
+void CALLBACK_FUNCTION setLowFlowCalibrationValue(int id);
 
 void setupMenu();
 

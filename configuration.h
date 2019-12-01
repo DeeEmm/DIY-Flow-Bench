@@ -45,17 +45,19 @@
     // Pins 20+21 are reseverd for I2C (Interrupts) 
 
     // Define Physical Pins
-    #define MAF_PIN A0
-    #define REF_PRESSURE_PIN A1
-    #define REF_VAC_PIN A2
-    #define PITOT_PIN A3
-    #define TEMPERATURE_PIN A4
-    #define BAROMETRIC_PIN A5
-    #define HUMIDITY_PIN A6
+    #define VOLTAGE_PIN A0
+    #define MAF_PIN A1
+    #define REF_PRESSURE_PIN A2
+    #define REF_VAC_PIN A3
+    #define PITOT_PIN A4
+    #define TEMPERATURE_PIN A5
+    #define REF_BARO_PIN A6
+    #define HUMIDITY_PIN A7
 
     // NVM Addresses (NOTE: 0-99 reserved for menu)
-    #define NVM_FLOW_CAL_ADDR 100 //8 bytes for float
-    #define NVM_LEAK_CAL_ADDR 107 //8 bytes for float
+    #define NVM_HIGH_FLOW_CAL_ADDR 100 //8 bytes for float
+    #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
+    #define NVM_LEAK_CAL_ADDR 115 //8 bytes for float
 
 #endif
 
@@ -64,17 +66,19 @@
 #ifdef ARDUINO_NANO
 
     // Define Physical Pins
-    #define MAF_PIN A0
-    #define REF_PRESSURE_PIN A1
-    #define REF_VAC_PIN A2
-    #define PITOT_PIN A3
-    #define TEMPERATURE_PIN A4
-    #define BAROMETRIC_PIN A5
-    #define HUMIDITY_PIN A6
+    #define VOLTAGE_PIN A0
+    #define MAF_PIN A1
+    #define REF_PRESSURE_PIN A2
+    #define REF_VAC_PIN A3
+    #define PITOT_PIN A4
+    #define TEMPERATURE_PIN A5
+    #define REF_BARO_PIN A6
+    #define HUMIDITY_PIN A7
 
     // NVM Addresses (note 0-99 reserved for menu)
-    #define NVM_FLOW_CAL_ADDR 100 //8 bytes for float
-    #define NVM_LEAK_CAL_ADDR 107 //8 bytes for float
+    #define NVM_HIGH_FLOW_CAL_ADDR 100 //8 bytes for float
+    #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
+    #define NVM_LEAK_CAL_ADDR 115 //8 bytes for float
 
 #endif
 
@@ -85,17 +89,19 @@
     // Pins 20+21 are reseverd for I2C (Interrupts)
 
     // Define Physical Pins
-    #define MAF_PIN A0
-    #define REF_PRESSURE_PIN A1
-    #define REF_VAC_PIN A2
-    #define PITOT_PIN A3
-    #define TEMPERATURE_PIN A4
-    #define BAROMETRIC_PIN A5
-    #define HUMIDITY_PIN A6
+    #define VOLTAGE_PIN A0
+    #define MAF_PIN A1
+    #define REF_PRESSURE_PIN A2
+    #define REF_VAC_PIN A3
+    #define PITOT_PIN A4
+    #define TEMPERATURE_PIN A5
+    #define REF_BARO_PIN A6
+    #define HUMIDITY_PIN A7
 
     // NVM Addresses (note 0-99 reserved for menu)
-    #define NVM_FLOW_CAL_ADDR 100 //8 bytes for float
-    #define NVM_LEAK_CAL_ADDR 107 //8 bytes for float
+    #define NVM_HIGH_FLOW_CAL_ADDR 100 //8 bytes for float
+    #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
+    #define NVM_LEAK_CAL_ADDR 115 //8 bytes for float
 
 #endif
 
@@ -117,7 +123,8 @@
  * CONFIGURE PRESSURE SENSORS
  ***/
 
-
+#define REF_MPXV7007 //default
+//#define REF_BMP280
 
 
 
@@ -125,6 +132,8 @@
  * CONFIGURE TEMPERATURE / BARO SENSORS
  ***/
 
+#define BARO_MPX4115 //default
+//#define BARO_BMP280
 
 
 
@@ -145,6 +154,10 @@
  * CALIBRATION SETTINGS
  ***/
 
-#define calibrationToleranceCFM 0 // accuracy of bench in cfm
-#define calibrationPlateHighCFM 100 // flow rate for large calibration orifice
-#define calibrationPlateLowCFM 10 // flow rate for small calibration orifice
+#define calibrationPlateHighCFM 100 // flow rate for large calibration orifice @ 28"WG
+#define calibrationPlateLowCFM 10 // flow rate for small calibration orifice @ 28"WG
+
+#define leakTestTolerance 0 // tolerance in cfm
+
+#define startupBaroScalingFactor 1 // scaling factor when using reference pressure sensor for baro correction
+#define startupBaroScalingOffset 100 // scaling offset when using reference pressure sensor for baro correction
