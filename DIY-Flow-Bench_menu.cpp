@@ -26,10 +26,10 @@ const PROGMEM AnyMenuInfo minfoSettingsHighFlowCal = { "High Flow Cal", 7, 14, 0
 ActionMenuItem menuSettingsHighFlowCal(&minfoSettingsHighFlowCal, &menuSettingsLeakTestCal);
 const PROGMEM AnyMenuInfo minfoSettingsLowFlowCal = { "Low Flow Cal", 6, 12, 0, setLowFlowCalibrationValue };
 ActionMenuItem menuSettingsLowFlowCal(&minfoSettingsLowFlowCal, &menuSettingsHighFlowCal);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsDevBuildRtCall, textItemRenderFn, "Dev Build", 30, NULL)
-TextMenuItem menuSettingsDevBuild(fnSettingsDevBuildRtCall, 11, 8, &menuSettingsLowFlowCal);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsBuildNumberRtCall, textItemRenderFn, "Build Number", 30, NULL)
+TextMenuItem menuSettingsBuildNumber(fnSettingsBuildNumberRtCall, 11, 8, &menuSettingsLowFlowCal);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsCodeVersionRtCall, textItemRenderFn, "Code Version", 20, NULL)
-TextMenuItem menuSettingsCodeVersion(fnSettingsCodeVersionRtCall, 10, 10, &menuSettingsDevBuild);
+TextMenuItem menuSettingsCodeVersion(fnSettingsCodeVersionRtCall, 10, 10, &menuSettingsBuildNumber);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", 10, NULL)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 10, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsCodeVersion);
@@ -59,9 +59,9 @@ void setupMenu() {
     menuMgr.initForEncoder(&renderer, &menuFlowRate, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
 
     // Read only and local only function calls
-    menuSettingsDevBuild.setReadOnly(true);
     menuFlowRate.setReadOnly(true);
     menuRefPressure.setReadOnly(true);
+    menuSettingsBuildNumber.setReadOnly(true);
     menuTemperature.setReadOnly(true);
     menuAdjustedFlow.setReadOnly(true);
     menuSettingsLeakTestCal.setReadOnly(true);

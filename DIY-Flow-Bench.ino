@@ -112,7 +112,7 @@ float getMafFlowCFM()
 
     #ifdef SIEMENS__5WK9605
         
-        mafFlowRateCFM = 27.6 + ((mafMillivolts / 1000)-2.2) * 79.3        
+        mafFlowRateCFM = 27.6 + ((mafMillivolts / 1000)-2.2) * 79.3;   
         mafFlowThresholdCFM = 2;
     
     #elif SOME_OTHER_SENSOR
@@ -243,23 +243,25 @@ void updateDisplays()
 {
 
     int desiredRefPressureInWg = menuDesiredRef.getCurrentValue();
-    
+    float mafFlowCFM = getMafFlowCFM();
+    float refPressure = getRefPressure(INWG);
+
     // Main Menu
     // Flow Rate
     if (mafFlowCFM > mafFlowThresholdCFM)
     {
-        menuFlowRate.setCurrentValue(getMafFlowCFM());   
+        menuFlowRate.setCurrentValue(mafFlowCFM);   
     } else {
         menuFlowRate.setCurrentValue(0);   
     }
     // Reference pressure
-    menuRefPressure.setCurrentValue(getRefPressure(INWG));
+    menuRefPressure.setCurrentValue(refPressure);
     // Temperature
     menuTemperature.setCurrentValue(getTemperature());
     // Pitot
-    menuPitot.setCurrentValue(getPitotPressure());
+    menuPitot.setCurrentValue(getPitotPressure(INWG));
     // Adjusted Flow
-    menuAdjustedFlow.setCurrentValue(convertMafFlowInWg(refPressureInWg, desiredRefPressureInWg, mafFlowCFM));
+    menuAdjustedFlow.setCurrentValue(convertMafFlowInWg(refPressure, desiredRefPressureInWg, mafFlowCFM));
 
 
     //Settings Menu
@@ -341,7 +343,7 @@ void CALLBACK_FUNCTION setLowFlowCalibrationValue(int id) {
     float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, 28,  MafFlowCFM);
     float flowCalibrationValue = calibrationPlateLowCFM - convertedMafFlowCFM;
     //Store data in EEPROM
-    EEPROM.write(NVM_HIGH_FLOW_CAL_ADDR, flowCalibrationValue);
+    EEPROM.write(NVM_LOW_FLOW_CAL_ADDR, flowCalibrationValue);
 
 }
 
@@ -356,7 +358,7 @@ void CALLBACK_FUNCTION setHighFlowCalibrationValue(int id) {
     float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, 28,  MafFlowCFM);
     float flowCalibrationValue = calibrationPlateHighCFM - convertedMafFlowCFM;
     //Store data in EEPROM
-    EEPROM.write(NVM_LOW_FLOW_CAL_ADDR, flowCalibrationValue);
+    EEPROM.write(NVM_HIGH_FLOW_CAL_ADDR, flowCalibrationValue);
 
 }
 
@@ -401,6 +403,10 @@ void loop ()
     updateDisplays();
 
 }
+
+
+
+
 
 
 

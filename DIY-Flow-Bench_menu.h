@@ -35,7 +35,7 @@ extern TextMenuItem menuSettingsLeakTestCheck;
 extern ActionMenuItem menuSettingsLeakTestCal;
 extern ActionMenuItem menuSettingsHighFlowCal;
 extern ActionMenuItem menuSettingsLowFlowCal;
-extern TextMenuItem menuSettingsDevBuild;
+extern TextMenuItem menuSettingsBuildNumber;
 extern TextMenuItem menuSettingsCodeVersion;
 extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
