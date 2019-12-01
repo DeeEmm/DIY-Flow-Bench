@@ -195,7 +195,7 @@ void updateDisplays()
     menuFlowRate.setCurrentValue(mafFlowRateCFM);   
     //Settings Menu
     menuSettingsCodeVersion.setTextValue(VERSION);
-    menuSettingsBuild.setTextValue(BUILD);
+    menuSettingsDevBuild.setTextValue(BUILD);
     
 
     #ifdef CFM_4X7SEG
