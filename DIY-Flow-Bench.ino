@@ -21,6 +21,7 @@
 #define BUILD "19120101"
 
 #include "DIY-Flow-Bench_menu.h"
+#include <EEPROM.h>
 #include <Arduino.h>
 
 //#include "controls.h"
@@ -41,6 +42,7 @@ void calculateMafFlow();
 void setup ()
 {
     setupMenu();// Set up the menu + display system
+    //take pressure sensor reading for baro correction if dedicated baro sensor not used
 }
 
 
@@ -53,20 +55,26 @@ void loop ()
     calculateMafFlow();
 //    calculateSensor1Pressure();
 //    calculateSensor2Pressure();
+    updateDisplays();
 
 }
 
 
 
 /****************************************
- * MENU CALLBACK FUNCTIONS
+ * MAIN MENU
  *
+ * Based on tcMenu - https://github.com/davetcc/tcMenu
+ *
+ * MENU CALLBACK FUNCTIONS
+ * --------------------------------------
  * NOTE: Menu names are used for reference 
- * bool changed = menuFoo.isChanged();
- * becomes 
+ * Spaces are removed and name converted to camel case
+ * For example:
  * bool changed = menuFlowRefCal.isChanged();
  * 
  * MENU NAMES USED
+ * --------------------------------------
  * menuFlowRate
  * menuRefPressure
  * menuTemperature
@@ -79,10 +87,11 @@ void loop ()
  * menuSettingsLeakTestCheck
  *
  * AVAILABLE METHODS
- * bool changed = menuFoo.isChanged();
+ * --------------------------------------
  * menuFoo.setCurrentValue(newValue);
  * NOTE: You can also set without calling the callback (silent set) like this...
  * menuFoo.setCurrentValue(newValue, true);   
+ * bool changed = menuFoo.isChanged();
  * int val = menuFoo.getCurrentValue();
  * menuFoo.setBoolean(newValue)
  * bool b = menuFoo.getBoolean();
@@ -97,6 +106,8 @@ void loop ()
 //TODO
 void CALLBACK_FUNCTION checkFlowCalibration(int id) {
     //Retrieve calibration data from NVM
+    //value = EEPROM.read(NVM_FLOW_CAL_ADDR);
+    //compare it to current value
 //    return flowCalibrationValue;
 }
 
@@ -104,7 +115,7 @@ void CALLBACK_FUNCTION checkFlowCalibration(int id) {
 void CALLBACK_FUNCTION setLeakCalibrationValue(int id) {
 
     //we need to save the calibration data to non-volatile memory on the arduino
-
+    //EEPROM.write(NVM_LEAK_CAL_ADDR,value);
     // we can return boolean to indicate that write has been successful (error checking)
 }
 
@@ -112,6 +123,7 @@ void CALLBACK_FUNCTION setLeakCalibrationValue(int id) {
 void CALLBACK_FUNCTION setFlowCalibrationValue(int id) {
 
     // we need to save the calibration data to non-volatile memory on the arduino
+    //EEPROM.write(NVM_FLOW_CAL_ADDR,value);
 
     // we can return boolean to indicate that write has been successful (error checking)
 }
@@ -123,9 +135,9 @@ void CALLBACK_FUNCTION checkLeakCalibration(int id) {
     int rawvacValue;
     float vacVoltage;
     rawvacValue = analogRead(REF_VAC_PIN);
+    leakCalibrationValue = EEPROM.read(NVM_FLOW_CAL_ADDR);
 
-    // get value from NVM
-    // (need to add this)
+    //TODO
     //leakCalibrationValue = scaled value from vac signal;
 
     // lower the test value to define test tolerance
