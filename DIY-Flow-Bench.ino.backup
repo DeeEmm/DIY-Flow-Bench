@@ -71,12 +71,10 @@ void loop ()
  * menuRefPressure
  * menuTemperature
  * menPitot
- * menuSettingsCodeVersion
- * menuSettingsBuild
- * menuSettingsFlowRefCal
- * menuSettingsFlowRefCheck
- * menuSettingsLeakTestCal
- * menuSettingsLeakTestCheck
+ * menuFlowRefCal
+ * menuFlowRefCheck
+ * menuLeakTestCal
+ * menuLeakTestCheck
  *
  * AVAILABLE METHODS
  * bool changed = menuFoo.isChanged();
@@ -191,11 +189,9 @@ float convertMafFlow(int inputPressure = 10, int outputPressure = 28 , int input
  ***/
 void updateDisplays()
 {
-    //Main Menu
+    //Main display
     menuFlowRate.setCurrentValue(mafFlowRateCFM);   
-    //Settings Menu
     menuSettingsCodeVersion.setTextValue(VERSION);
-    menuSettingsBuild.setTextValue(BUILD);
     
 
     #ifdef CFM_4X7SEG
@@ -208,8 +204,5 @@ void updateDisplays()
 
 
 }
-
-
-
 
 

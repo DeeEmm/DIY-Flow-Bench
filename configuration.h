@@ -28,6 +28,13 @@
     //TODO Add NVM addresses for calibration data
     //TODO Add comments showing display connection pins
 
+    //ENCODER_PIN_A = 2;
+    //ENCODER_PIN_A = 3;
+    //ENCODER_PIN_A = 4;
+    //LCD_WIDTH = 20;
+    //LCD_HEIGHT = 4;
+    //I2C_ADDRESS = "0x20";
+
 #endif
 
 

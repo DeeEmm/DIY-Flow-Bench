@@ -15,6 +15,7 @@
 #include <IoAbstractionWire.h>
 #include <LiquidCrystalIO.h>
 #include <Wire.h>
+#include <RuntimeMenuItem.h>
 #include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
@@ -34,9 +35,11 @@ extern ActionMenuItem menuSettingsLeakTestCheck;
 extern ActionMenuItem menuSettingsLeakTestCal;
 extern ActionMenuItem menuSettingsFlowRefCheck;
 extern ActionMenuItem menuSettingsFlowRefCal;
+extern TextMenuItem menuSettingsDevBuild;
+extern TextMenuItem menuSettingsCodeVersion;
 extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
-extern AnalogMenuItem menuPitotDiffPres;
+extern AnalogMenuItem menuPitot;
 extern AnalogMenuItem menuTemperature;
 extern AnalogMenuItem menuRefPressure;
 extern AnalogMenuItem menuFlowRate;

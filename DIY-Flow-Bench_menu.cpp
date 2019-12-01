@@ -26,14 +26,18 @@ const PROGMEM AnyMenuInfo minfoSettingsFlowRefCheck = { "Flow Ref Check", 7, 10,
 ActionMenuItem menuSettingsFlowRefCheck(&minfoSettingsFlowRefCheck, &menuSettingsLeakTestCal);
 const PROGMEM AnyMenuInfo minfoSettingsFlowRefCal = { "Flow Ref Cal", 6, 10, 0, setFlowCalibrationValue };
 ActionMenuItem menuSettingsFlowRefCal(&minfoSettingsFlowRefCal, &menuSettingsFlowRefCheck);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsDevBuildRtCall, textItemRenderFn, "Dev Build", -1, NULL)
+TextMenuItem menuSettingsDevBuild(fnSettingsDevBuildRtCall, 11, 8, &menuSettingsFlowRefCal);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsCodeVersionRtCall, textItemRenderFn, "Code Version", 10, NULL)
+TextMenuItem menuSettingsCodeVersion(fnSettingsCodeVersionRtCall, 10, 10, &menuSettingsDevBuild);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", 10, NULL)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 10, 0, NO_CALLBACK };
-BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsFlowRefCal);
+BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsCodeVersion);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, NULL);
-const PROGMEM AnalogMenuInfo minfoPitotDiffPres = { "Pitot (Diff Pres)", 4, 8, 255, NO_CALLBACK, 0, 1, "inWg" };
-AnalogMenuItem menuPitotDiffPres(&minfoPitotDiffPres, 0, &menuSettings);
+const PROGMEM AnalogMenuInfo minfoPitot = { "Pitot", 4, 8, 255, NO_CALLBACK, 0, 1, "inWg" };
+AnalogMenuItem menuPitot(&minfoPitot, 0, &menuSettings);
 const PROGMEM AnalogMenuInfo minfoTemperature = { "Temperature", 3, 6, 255, NO_CALLBACK, 0, 1, "DegC" };
-AnalogMenuItem menuTemperature(&minfoTemperature, 0, &menuPitotDiffPres);
+AnalogMenuItem menuTemperature(&minfoTemperature, 0, &menuPitot);
 const PROGMEM AnalogMenuInfo minfoRefPressure = { "Ref Pressure", 2, 4, 255, NO_CALLBACK, 0, 1, "inWg" };
 AnalogMenuItem menuRefPressure(&minfoRefPressure, 0, &menuTemperature);
 const PROGMEM AnalogMenuInfo minfoFlowRate = { "Flow Rate", 1, 2, 255, NO_CALLBACK, 0, 1, "cfm" };
@@ -54,6 +58,6 @@ void setupMenu() {
     menuFlowRate.setReadOnly(true);
     menuRefPressure.setReadOnly(true);
     menuTemperature.setReadOnly(true);
-    menuPitotDiffPres.setReadOnly(true);
+    menuPitot.setReadOnly(true);
 }
 
