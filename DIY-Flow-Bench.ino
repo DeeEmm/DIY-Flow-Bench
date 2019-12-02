@@ -8,12 +8,11 @@
  * This project and all associated files are provided for use under the GNU GPL3 license:
  * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
  * 
- * Version 1.0.0-alpha
- * 
- * Menu system and displays handed by tcMenu library - https://github.com/davetcc/tcMenu
+ * Menu system and displays handled by tcMenu library - https://github.com/davetcc/tcMenu
  * If you want to modify the display or menus, the tcMenu project file is provided in distro - menu.emf
+ * For more information see - https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Customisation
  * 
- */
+ ***/
 
 // Development and release version
 #define VERSION "V1.0-Alpha"
@@ -22,7 +21,6 @@
 #include "DIY-Flow-Bench_menu.h"
 #include <EEPROM.h>
 #include <Arduino.h>
-
 #include "configuration.h"
 
 
@@ -128,8 +126,8 @@ float getMafFlowCFM()
 
 
 /****************************************
- * CALCULATE REFERENCE PRESSURE IN/WG
- * Convert RAW pressure sensor data
+ * CALCULATE REFERENCE PRESSURE
+ * Convert RAW pressure sensor data to In/WG or kPa
  ***/
 float getRefPressure (int units) 
 {   
@@ -138,12 +136,12 @@ float getRefPressure (int units)
     float refPressureInWg;
     int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
     int refPressMillivolts = (rawRefPressValue * (5.0 / 1023.0)) * 1000;
-    int boardMillivolts = getSupplyMillivolts();
+    int supplyMillivolts = getSupplyMillivolts();
 
     #ifdef REF_MPXV7007
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
-        refPressureKpa = ((refPressMillivolts / boardMillivolts ) - 0.5) / 0.057; 
+        refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
 
     #elif REF_BMP280
         //TODO
@@ -192,12 +190,12 @@ float getPitotPressure(int units)
     float refPressureInWg;
     int rawRefPressValue = analogRead(PITOT_PIN);
     int refPressMillivolts = (rawRefPressValue * (5.0 / 1023.0)) * 1000;
-    int boardMillivolts = getSupplyMillivolts();
+    int supplyMillivolts = getSupplyMillivolts();
 
     #ifdef REF_MPXV7007
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
-        refPressureKpa = ((refPressMillivolts / boardMillivolts ) - 0.5) / 0.057; 
+        refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
 
     #elif REF_BMP280
         //TODO
@@ -403,18 +401,3 @@ void loop ()
     updateDisplays();
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
