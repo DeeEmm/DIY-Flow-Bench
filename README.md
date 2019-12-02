@@ -20,9 +20,10 @@ The Flow Bench is used as a tool for measuring and quantifying modifications and
 Contributors
 ============
 
-Michael Percy AKA DeeEmm
-Tony Donn AKA ModChipMan
-Hans Ake Rahm
+- Michael Percy AKA DeeEmm
+- Tony Donn AKA ModChipMan
+- Hans Ake Rahm
+- Andrew Goodfellow
 
 
 Project Goals
@@ -50,6 +51,6 @@ This project is released under the GPLV3 license. For details on usage please re
 Further Information
 ===================
 
-The latest information can be found in the project WIKI - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
-Github repository - https://github.com/DeeEmm/DIY-Flow-Bench
-Join our project community - https://www.facebook.com/groups/diyflowbench/ 
+- The latest information can be found in the project WIKI - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+- Github repository - https://github.com/DeeEmm/DIY-Flow-Bench
+- Join our project community - https://www.facebook.com/groups/diyflowbench/ 
