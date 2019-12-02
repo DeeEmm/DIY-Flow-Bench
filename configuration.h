@@ -4,14 +4,14 @@
  * 
  * NOTE REGARDING CHANGING BOARDS, DISPLAYS AND INPUT DEVICES
  * Pin defs for displays and input devices are auto-generated in DIY-Flow-Bench_menu.h by the tcMenu app
- * DIY-Flow-Bench_menu.h should not be manually edited
+ * DIY-Flow-Bench_menu.h & DIY-Flow-Bench_menu.cpp should not be manually edited
  * 
  * To change board type, display or input device pins for your project
  * Download and run the tcMenu application and regenerate the tcMenu code files.
  * INSTRUCTIONS: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Customisation
  * 
  * The standard project board is the Arduino Mega 2560 
- * Mega 2560 pins for display and encoder click wheel are listed below for reference only
+ * Mega 2560 pins for display and encoder click wheel are listed below for reference
  * ENCODER_PIN_A = 2;
  * ENCODER_PIN_B = 3;
  * BUTTON = 4;
@@ -110,6 +110,8 @@
 /****************************************
  * CONFIGURE MAF
  * Uncomment active MAF
+ * If you want to modify the code to include additional MAF sensors
+ * You will need to add your volts to cfm algorythm in the function getMafFlowCFM()
  ***/
 
 #define SIEMENS__5WK9605 //default
@@ -120,11 +122,26 @@
 
 
 /****************************************
- * CONFIGURE PRESSURE SENSORS
+ * CONFIGURE REFERENCE PRESSURE SENSORS
+ * If you want to modify the code to include additional reference pressure sensors
+ * You will need to add your volts to kPa algorythm in the function getRefPressure()
  ***/
 
 #define REF_MPXV7007 //default
 //#define REF_BMP280
+
+
+
+
+/****************************************
+ * CONFIGURE PITOT PRESSURE SENSORS
+ * If you want to modify the code to include additional pitot pressure sensors
+ * You will need to add your volts to kPa algorythm in the function getPitotPressure()
+ ***/
+
+#define PITOT_MPXV7007DP //default
+//#define PITOT_BMP280
+
 
 
 
