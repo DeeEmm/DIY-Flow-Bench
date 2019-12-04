@@ -58,6 +58,7 @@
     #define NVM_HIGH_FLOW_CAL_ADDR 100 //8 bytes for float
     #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
     #define NVM_LEAK_CAL_ADDR 115 //8 bytes for float
+    #define NVM_REF_PRESS_CAL_ADDR 123 //8 bytes for float
 
 #endif
 
@@ -101,7 +102,9 @@
     // NVM Addresses (note 0-99 reserved for menu)
     #define NVM_HIGH_FLOW_CAL_ADDR 100 //8 bytes for float
     #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
-    #define NVM_LEAK_CAL_ADDR 115 //8 bytes for float
+    #define NVM_MID_FLOW_CAL_ADDR 115 //8 bytes for float
+    #define NVM_REF_PRESS_CAL_ADDR 123 //8 bytes for float
+    #define NVM_LEAK_CAL_ADDR 131 //8 bytes for float
 
 #endif
 
@@ -169,12 +172,20 @@
 
 /****************************************
  * CALIBRATION SETTINGS
+ *
+ * For a more detailed explaination of these settings
+ * Please refer to the WIKI - https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration
+ *
  ***/
 
-#define calibrationPlateHighCFM 100 // flow rate for large calibration orifice @ 28"WG
-#define calibrationPlateLowCFM 10 // flow rate for small calibration orifice @ 28"WG
+#define calibrationPlateHighCFM 100 // flow rate for large calibration orifice
+#define calibrationPlateMidCFM 50 // flow rate for small calibration orifice
+#define calibrationPlateLowCFM 10 // flow rate for small calibration orifice
+#define calibrationRefPressure 28 //reference pressure orifices were measured at
 
 #define leakTestTolerance 0 // tolerance in cfm
+
+#define minTestPressurePercentage 80 //lowest test pressure bench will generate accurate results. Please see note in wiki
 
 #define startupBaroScalingFactor 1 // scaling factor when using reference pressure sensor for baro correction
 #define startupBaroScalingOffset 100 // scaling offset when using reference pressure sensor for baro correction

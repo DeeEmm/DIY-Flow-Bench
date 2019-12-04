@@ -240,6 +240,8 @@ float convertMafFlowInWg(float inputPressure = 10, int outputPressure = 28, floa
 void updateDisplays()
 {
 
+    //TODO - add capability for error / warning popup
+
     int desiredRefPressureInWg = menuDesiredRef.getCurrentValue();
     float mafFlowCFM = getMafFlowCFM();
     float refPressure = getRefPressure(INWG);
@@ -338,10 +340,25 @@ void CALLBACK_FUNCTION setLowFlowCalibrationValue(int id) {
 
     float MafFlowCFM = getMafFlowCFM();
     float RefPressure = getRefPressure(INWG);
-    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, 28,  MafFlowCFM);
+    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
     float flowCalibrationValue = calibrationPlateLowCFM - convertedMafFlowCFM;
     //Store data in EEPROM
     EEPROM.write(NVM_LOW_FLOW_CAL_ADDR, flowCalibrationValue);
+
+}
+
+/****************************************
+ * MENU CALLBACK FUNCTION
+ * setMidFlowCalibrationValue
+ ***/
+void CALLBACK_FUNCTION setMidFlowCalibrationValue(int id) {
+
+    float MafFlowCFM = getMafFlowCFM();
+    float RefPressure = getRefPressure(INWG);
+    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
+    float flowCalibrationValue = calibrationPlateMidCFM - convertedMafFlowCFM;
+    //Store data in EEPROM
+    EEPROM.write(NVM_MID_FLOW_CAL_ADDR, flowCalibrationValue);
 
 }
 
@@ -353,10 +370,23 @@ void CALLBACK_FUNCTION setHighFlowCalibrationValue(int id) {
 
     float MafFlowCFM = getMafFlowCFM();
     float RefPressure = getRefPressure(INWG);
-    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, 28,  MafFlowCFM);
+    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
     float flowCalibrationValue = calibrationPlateHighCFM - convertedMafFlowCFM;
     //Store data in EEPROM
     EEPROM.write(NVM_HIGH_FLOW_CAL_ADDR, flowCalibrationValue);
+
+}
+
+/****************************************
+ * MENU CALLBACK FUNCTION
+ * setRefPressCalibrationValue
+ ***/
+void CALLBACK_FUNCTION setRefPressCalibrationValue(int id) {
+    // TODO - your menu change code
+}
+    float RefPressure = getRefPressure(INWG);
+    //Store data in EEPROM
+    EEPROM.write(NVM_REF_PRESS_CAL_ADDR, RefPressure);
 
 }
 
@@ -398,6 +428,14 @@ void CALLBACK_FUNCTION checkLeakCalibration(int id) {
 void loop ()
 {
     taskManager.runLoop(); //run tcMenu
+
+    //TODO Error Checking - Ref pressure check - compare actual pressure against ref pressure (ie max flow)
+
     updateDisplays();
 
 }
+
+
+
+
+

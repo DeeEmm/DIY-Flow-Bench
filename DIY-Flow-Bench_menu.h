@@ -31,8 +31,10 @@ extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 
 // all menu item forward references.
+extern ActionMenuItem menuSettingsMidFLowCal;
 extern TextMenuItem menuSettingsLeakTestCheck;
 extern ActionMenuItem menuSettingsLeakTestCal;
+extern ActionMenuItem menuSettingsRefPressCal;
 extern ActionMenuItem menuSettingsHighFlowCal;
 extern ActionMenuItem menuSettingsLowFlowCal;
 extern TextMenuItem menuSettingsBuildNumber;
@@ -53,6 +55,8 @@ extern const ConnectorLocalInfo applicationInfo;
 void CALLBACK_FUNCTION setHighFlowCalibrationValue(int id);
 void CALLBACK_FUNCTION setLeakCalibrationValue(int id);
 void CALLBACK_FUNCTION setLowFlowCalibrationValue(int id);
+void CALLBACK_FUNCTION setMidFlowCalibrationValue(int id);
+void CALLBACK_FUNCTION setRefPressCalibrationValue(int id);
 
 void setupMenu();
 
