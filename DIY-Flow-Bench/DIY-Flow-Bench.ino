@@ -358,7 +358,7 @@ void CALLBACK_FUNCTION setMidFlowCalibrationValue(int id) {
     float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
     float flowCalibrationValue = calibrationPlateMidCFM - convertedMafFlowCFM;
     //Store data in EEPROM
-//    EEPROM.write(NVM_MID_FLOW_CAL_ADDR, flowCalibrationValue);
+   EEPROM.write(NVM_MID_FLOW_CAL_ADDR, flowCalibrationValue);
 
 }
 
@@ -434,8 +434,3 @@ void loop ()
     updateDisplays();
 
 }
-
-
-
-
-

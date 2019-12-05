@@ -56,6 +56,7 @@
 
     // NVM Addresses (NOTE: 0-99 reserved for menu)
     #define NVM_HIGH_FLOW_CAL_ADDR 100 //8 bytes for float
+    #define NVM_MID_FLOW_CAL_ADDR 116 //8 bytes for float
     #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
     #define NVM_LEAK_CAL_ADDR 115 //8 bytes for float
     #define NVM_REF_PRESS_CAL_ADDR 123 //8 bytes for float
@@ -78,6 +79,7 @@
 
     // NVM Addresses (note 0-99 reserved for menu)
     #define NVM_HIGH_FLOW_CAL_ADDR 100 //8 bytes for float
+    #define NVM_MID_FLOW_CAL_ADDR 116 //8 bytes for float
     #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
     #define NVM_LEAK_CAL_ADDR 115 //8 bytes for float
 
@@ -102,9 +104,9 @@
     // NVM Addresses (note 0-99 reserved for menu)
     #define NVM_HIGH_FLOW_CAL_ADDR 100 //8 bytes for float
     #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
-    #define NVM_MID_FLOW_CAL_ADDR 115 //8 bytes for float
     #define NVM_REF_PRESS_CAL_ADDR 123 //8 bytes for float
     #define NVM_LEAK_CAL_ADDR 131 //8 bytes for float
+    #define NVM_MID_FLOW_CAL_ADDR 116 //8 bytes for float
 
 #endif
 
