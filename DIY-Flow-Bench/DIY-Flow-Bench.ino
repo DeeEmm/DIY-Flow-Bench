@@ -16,7 +16,7 @@
 
 // Development and release version
 #define VERSION "V1.0-Alpha"
-#define BUILD "19120201"
+#define BUILD "19120601"
 
 #include "DIY-Flow-Bench_menu.h"
 #include <EEPROM.h>
