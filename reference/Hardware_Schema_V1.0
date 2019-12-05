@@ -9,7 +9,16 @@ NOTE DEFAULT HARDWARE SCHEMA IS FOR ARDUINO MEGA 2560
 2 - Output Signal (0-5V) - connect to Arduino Analog Pin A0
 3 - 12V
 
-#  I2C Devices (4x20 display / 7 seg displays / etc)
+## MAF Sensor (Bosch 5 pin)
+
+1 - Temperature sensor output, not used in ALH engine
+2 - 12V supply input
+3 - Ground
+4 - 5V reference input voltage
+5 - Output voltage
+
+
+##  I2C Devices (4x20 display / 7 seg displays / etc)
 
 VCC - 5V
 GND - 0V

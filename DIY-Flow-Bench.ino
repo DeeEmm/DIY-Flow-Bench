@@ -358,7 +358,7 @@ void CALLBACK_FUNCTION setMidFlowCalibrationValue(int id) {
     float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
     float flowCalibrationValue = calibrationPlateMidCFM - convertedMafFlowCFM;
     //Store data in EEPROM
-    EEPROM.write(NVM_MID_FLOW_CAL_ADDR, flowCalibrationValue);
+//    EEPROM.write(NVM_MID_FLOW_CAL_ADDR, flowCalibrationValue);
 
 }
 
@@ -383,7 +383,7 @@ void CALLBACK_FUNCTION setHighFlowCalibrationValue(int id) {
  ***/
 void CALLBACK_FUNCTION setRefPressCalibrationValue(int id) {
     // TODO - your menu change code
-}
+
     float RefPressure = getRefPressure(INWG);
     //Store data in EEPROM
     EEPROM.write(NVM_REF_PRESS_CAL_ADDR, RefPressure);
