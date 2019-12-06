@@ -65,16 +65,16 @@ void setupMenu() {
     // Read only and local only function calls
     menuFlowRate.setReadOnly(true);
     menuRefPressure.setReadOnly(true);
-    menuSettingsLeakTestCheck.setReadOnly(true);
     menuTemperature.setReadOnly(true);
     menuAdjustedFlow.setReadOnly(true);
     menuSettingsMidFLowCal.setReadOnly(true);
-    menuSettingsCodeVersion.setReadOnly(true);
     menuSettingsRefPressCal.setReadOnly(true);
     menuSettingsLeakTestCal.setReadOnly(true);
+    menuSettingsCodeVersion.setReadOnly(true);
     menuSettingsLowFlowCal.setReadOnly(true);
     menuPitot.setReadOnly(true);
     menuSettingsHighFlowCal.setReadOnly(true);
     menuSettingsBuildNumber.setReadOnly(true);
+    menuSettingsLeakTestCheck.setReadOnly(true);
 }
 

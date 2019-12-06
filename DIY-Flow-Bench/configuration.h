@@ -20,6 +20,19 @@
  * I2C_ADDRESS = "0x20";
  * I2C CLK Pin = 20; (Standard I2C CLK pin for Mega 2560)
  * I2C DIO Pim = 21; (Standard I2C DIO pin for Mega 2560)
+ *
+ * DEPENDENCIES
+ * The program has a number of dependencies that must be available for it to work.
+ * These libraries are provided in the libraries folder 
+ *
+ * /libraries/tcMenu
+ * /libraries/IoAbstraction
+ * /libraries/liquidCrystalIO
+ * /libraries/
+ *
+ * The following libraries are also aneeded and available within the Arduino IDE
+ *
+ * arduino-NVM
  ***/
 
 #pragma once

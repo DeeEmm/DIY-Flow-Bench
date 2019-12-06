@@ -1,0 +1,4 @@
+19120601    - Fixed compile error (extra curly bracket)
+19120701    - Changed directory structure to resolve dependency issue 
+            - Moved libraries into src subfolder folder
+            - Created this changelog file

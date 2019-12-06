@@ -16,7 +16,7 @@
 
 // Development and release version
 #define VERSION "V1.0-Alpha"
-#define BUILD "19120601"
+#define BUILD "19120701"
 
 #include "DIY-Flow-Bench_menu.h"
 #include <EEPROM.h>
@@ -81,7 +81,7 @@ float getBaroPressure()
         // P = ((Vout / VS ) - 0.095) / 0.009 --- Formula transposed for P
         baroPressureKpa = ((baroMillivolts / supplyMillivolts ) - 0.095) / 0.009; 
     #elif BARO_BMP280
-        //TODO
+        //TODO(#4) Add support for stand alone baro sensor
     #else
         // No baro sensor so use value grabbed at startup from reference pressure sensor
         // NOTE will only work for absolute style pressure sensor
@@ -114,6 +114,7 @@ float getMafFlowCFM()
         mafFlowThresholdCFM = 2;
     
     #elif SOME_OTHER_SENSOR
+        //TODO(#3) Add additional MAF sensors
         //SOME OTHER SENSORS CALCS
     #elif ADD_YOUR_OWN_SENSOR
         //YOUR SENSORS CALCS
@@ -144,7 +145,7 @@ float getRefPressure (int units)
         refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
 
     #elif REF_BMP280
-        //TODO
+        //TODO(#1) Add support for additional pressure sensors
     #endif
 
     switch (units)
@@ -172,7 +173,7 @@ float getTemperature()
 {   
     float temperature;
 
-    //TODO - get temperature from sensor
+    //TODO(#2) Add support for temperature sensor
     temperature = 21;
 
     return temperature;
@@ -198,7 +199,7 @@ float getPitotPressure(int units)
         refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
 
     #elif REF_BMP280
-        //TODO
+        //TODO(#1) Add support for additional pressure sensors
     #endif
 
     switch (units)
@@ -240,7 +241,7 @@ float convertMafFlowInWg(float inputPressure = 10, int outputPressure = 28, floa
 void updateDisplays()
 {
 
-    //TODO - add capability for error / warning popup
+//TODO(#5) - add capability for error / warning popup on display
 
     int desiredRefPressureInWg = menuDesiredRef.getCurrentValue();
     float mafFlowCFM = getMafFlowCFM();
@@ -270,11 +271,11 @@ void updateDisplays()
     
 
     #ifdef CFM_4X7SEG
-        //TODO
+        //TODO(#6) Add support for additional displays
     #endif
 
     #ifdef PITOT_4X7SEG
-        //TODO
+        //TODO(#6) Add support for additional displays
     #endif
 
     #ifdef MPXV7007 
@@ -309,6 +310,7 @@ void updateDisplays()
  * menuSettingsCodeVersion
  * menuSettingsBuild
  * menuSettingsLowFlowCal
+ * menuSettingsMidFlowCal
  * menuSettingsHighFlowCal
  * menuSettingsLeakTestCal
  * menuSettingsLeakTestCheck
@@ -330,7 +332,7 @@ void updateDisplays()
  * 
  ***/
 
-
+//TODO(#7) Update calibration functions
 
 /****************************************
  * MENU CALLBACK FUNCTION
@@ -382,7 +384,6 @@ void CALLBACK_FUNCTION setHighFlowCalibrationValue(int id) {
  * setRefPressCalibrationValue
  ***/
 void CALLBACK_FUNCTION setRefPressCalibrationValue(int id) {
-    // TODO - your menu change code
 
     float RefPressure = getRefPressure(INWG);
     //Store data in EEPROM
@@ -421,6 +422,8 @@ void CALLBACK_FUNCTION checkLeakCalibration(int id) {
 
 }
 
+//TODO(#8) - Add menu item to be able to select reference pressure value
+
 
 /****************************************
  * MAIN PROGRAM LOOP
@@ -429,7 +432,7 @@ void loop ()
 {
     taskManager.runLoop(); //run tcMenu
 
-    //TODO Error Checking - Ref pressure check - compare actual pressure against ref pressure (ie max flow)
+    //TODO(#) Error Checking - Ref pressure check - compare actual pressure against ref pressure (ie max flow)
 
     updateDisplays();
 
