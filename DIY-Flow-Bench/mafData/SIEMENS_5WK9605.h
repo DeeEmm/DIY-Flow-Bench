@@ -1,7 +1,7 @@
 // SIEMENS_5WK9605.h
 // Calculated from Tonys test results volts vs cfm
 // millivolts, CFM/1000 
-int mafMapData[][2] = {
+long int mafMapData[][2] = {
 {	10	,	2304	},
 {	20	,	2512	},
 {	30	,	2739	},

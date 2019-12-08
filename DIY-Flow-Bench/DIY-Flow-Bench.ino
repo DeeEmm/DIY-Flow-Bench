@@ -14,7 +14,7 @@
  * 
  ***/
 
-// Development and release version
+// Development and release version - Don't forget to update the changelog!!
 #define VERSION "V1.0-Alpha"
 #define BUILD "19120801"
 
@@ -22,14 +22,22 @@
 #include <EEPROM.h>
 #include <Arduino.h>
 #include "configuration.h"
+#include "EN_Language.h"
 
 
 /****************************************
  * DECLARE CONSTANTS
  ***/
 
+// Pressure units
 #define INWG 1
 #define KPA 2
+
+// Error handler codes
+#define REF_PRESS_LOW 1
+#define LEAK_TEST_FAIL 2
+
+
 
 /****************************************
  * DECLARE GLOBALS
@@ -37,8 +45,11 @@
 
 float startupBaroPressure;
 int mafFlowThresholdCFM;
-//int *mafMapData;
-//float getMafFlowCFM();
+int errorVal = 0;
+
+bool benchIsRunning();
+//void errorHandler();
+//void onDialogFinished();
 
 /****************************************
  * INITIALISATION
@@ -101,7 +112,7 @@ float getBaroPressure()
  ***/
 float getMafFlowCFM ()
 {
-    //NOTE mafMapData is global array declared in mafData files
+    // NOTE mafMapData is global array declared in mafData files
     float mafFlowRateCFM;
     int rawMafValue = analogRead(MAF_PIN);
     int mafMillivolts = (rawMafValue * (5.0 / 1023.0)) * 1000;
@@ -111,25 +122,25 @@ float getMafFlowCFM ()
 
     // determine what kind of array data we have
     if (mafMapDataLength >= 1023) {
-        //we have a raw analog data array so we use the rawMafValue for the lookup
+        // we have a raw analog data array so we use the rawMafValue for the lookup
         int lookupValue = rawMafValue;
     } else {
-        //we have a mV / cfm array so we use the mafMillivolts value for the lookup
+        // we have a mV / cfm array so we use the mafMillivolts value for the lookup
         int lookupValue = mafMillivolts;
     }
 
-    //traverse the array until we find the lookupValue
+    // traverse the array until we find the lookupValue
     for (int loopCount = 0; loopCount < mafMapDataLength; loopCount++) {
 
-        //check to see if exact match is found 
+        // check to see if exact match is found 
         if (lookupValue == mafMapData[loopCount][1]) {
-            //we've got the exact value
+            // we've got the exact value
             mafFlowRateCFM = mafMapData[loopCount][2];
             break;
 
-        //if there is no match we need to interpolate using the next highest / lowest values
+        // if there is no match we need to interpolate using the next highest / lowest values
         } else if ( (lookupValue > mafMapData[loopCount][1])) {
-            //NOTE: Linear interpolation formula Y=Y1+(X-X1)(Y2-Y1/X2-X1)
+            // NOTE: Linear interpolation formula Y=Y1+(X-X1)(Y2-Y1/X2-X1)
 
             mafFlowRateCFM = (mafMapData[loopCount-1][2] + (lookupValue - mafMapData[loopCount-1][1]) * ((mafMapData[loopCount][2] - mafMapData[loopCount-1][2]) / (mafMapData[loopCount][1] - mafMapData[loopCount-1][1])));
             break;
@@ -248,10 +259,52 @@ float convertMafFlowInWg(float inputPressure = 10, int outputPressure = 28, floa
 
 }
 
-bool refPressureOk()
+
+/****************************************
+ * CHECK REFERENCE PRESSURE
+ * Make sure that reference pressure is within limits
+ ***/
+void refPressureCheck()
 {
     float refPressure = getRefPressure(INWG);
-    if (refPressure < (calibrationRefPressure * (minTestPressurePercentage / 100)))
+
+    // Check that pressure does not fall below limit set by minTestPressurePercentage when bench is running
+    if ((refPressure > (calibrationRefPressure * (minTestPressurePercentage / 100))) && (benchIsRunning()))
+    {
+        errorVal = REF_PRESS_LOW;
+    }
+}
+
+
+
+/****************************************
+ * ERROR CHECKING
+ * 
+ * Check for system errors and display message to user on screen
+ ***/
+void errorHandler(int errorVal)
+{
+    switch (errorVal)
+    {
+        case REF_PRESS_LOW:
+            displayDialog(LAN_WARNING, LAN_FLOW_LIMIT_EXCEEDED);
+        break;
+
+        case LEAK_TEST_FAIL:
+            displayDialog(LAN_WARNING, LAN_LEAK_TEST_FAILED);
+        break;
+    }
+
+}
+
+
+/****************************************
+ * BENCH IS RUNNING
+ ***/
+ bool benchIsRunning()
+{
+    float refPressure = getRefPressure(INWG);
+    if (refPressure > minRefPressure)
     {
         return true;
     } else {
@@ -261,14 +314,42 @@ bool refPressureOk()
 
 
 /****************************************
+ * MENU DIALOG RESPONSE HANDLER
+ ***/
+void onDialogFinished(ButtonType btnPressed, void* /*userdata*/) {        
+    if(btnPressed != BTNTYPE_OK) {
+        // do something if OK was pressed.
+        // Reset errorVal
+        errorVal = 0;
+    } else {
+      
+    }
+}
+
+
+
+/****************************************
+ * DISPLAY POPUP DIALOG ON MAIN DISPLAY
+ ***/
+void displayDialog(const char *dialogTitle, const char *dialogMessage)
+{
+        // Display popup dialog on display
+        // https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-menu-item-types-tutorial/
+        BaseDialog* dlg = renderer.getDialog();
+        dlg->setButtons(BTNTYPE_OK, BTNTYPE_CANCEL, 1);
+        dlg->show(dialogTitle, showRemoteDialogs, onDialogFinished);
+        dlg->copyIntoBuffer(dialogMessage);
+}
+
+
+
+/****************************************
  * UPDATE DISPLAYS
  *
  * Displays driven by tcMenu library
  ***/
 void updateDisplays()
 {
-
-//TODO(#5) - add capability for error / warning popup on display
 
     int desiredRefPressureInWg = menuDesiredRef.getCurrentValue();
     float mafFlowCFM = getMafFlowCFM();
@@ -290,7 +371,6 @@ void updateDisplays()
     menuPitot.setCurrentValue(getPitotPressure(INWG));
     // Adjusted Flow
     menuAdjustedFlow.setCurrentValue(convertMafFlowInWg(refPressure, desiredRefPressureInWg, mafFlowCFM));
-
 
     //Settings Menu
     menuSettingsCodeVersion.setTextValue(VERSION);
@@ -360,6 +440,10 @@ void updateDisplays()
  ***/
 
 //TODO(#7) Update calibration functions
+//TODO(#8) - Add menu item to be able to select reference pressure value
+
+
+
 
 /****************************************
  * MENU CALLBACK FUNCTION
@@ -440,16 +524,14 @@ void CALLBACK_FUNCTION checkLeakCalibration(int id) {
     int refPressure = getRefPressure(INWG);
 
     //compare calibration data from NVM
-    if (leakCalibrationValue < (refPressure - leakTestTolerance))
+    if (leakCalibrationValue > (refPressure - leakTestTolerance))
     {
-       menuSettingsLeakTestCheck.setTextValue("TEST OK");
-    } else {
-       menuSettingsLeakTestCheck.setTextValue("TEST FAIL");
+       errorVal = LEAK_TEST_FAIL;
     }
 
 }
 
-//TODO(#8) - Add menu item to be able to select reference pressure value
+
 
 
 /****************************************
@@ -458,9 +540,8 @@ void CALLBACK_FUNCTION checkLeakCalibration(int id) {
 void loop ()
 {
     taskManager.runLoop(); //run tcMenu
-
-    //TODO(#) Error Checking - Ref pressure check - compare actual pressure against ref pressure (ie max flow)
-
+    refPressureCheck();
+    if (errorVal != 0) errorHandler(errorVal);
     updateDisplays();
 
 }

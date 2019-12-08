@@ -186,6 +186,16 @@
 
 
 /****************************************
+ * CONFIGURE COMMUNICATIONS
+ ***/
+ 
+#define showRemoteDialogs true // show menu dialogs on remote displays
+  
+ 
+ 
+ 
+ 
+ /****************************************
  * CALIBRATION SETTINGS
  *
  * For a more detailed explaination of these settings
@@ -198,9 +208,8 @@
 #define calibrationPlateLowCFM 10 // flow rate for small calibration orifice
 #define calibrationRefPressure 28 //reference pressure orifices were measured at
 
-
 #define leakTestTolerance 0 // tolerance in cfm
-
+#define minRefPressure 0 // minimum pressure that we consider the bench is 'operational' / 'running' / vac source is on
 #define minTestPressurePercentage 80 //lowest test pressure bench will generate accurate results. Please see note in wiki
 
 #define startupBaroScalingFactor 1 // scaling factor when using reference pressure sensor for baro correction
