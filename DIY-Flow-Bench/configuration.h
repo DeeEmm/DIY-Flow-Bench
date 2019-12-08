@@ -129,13 +129,13 @@
  * CONFIGURE MAF
  * Uncomment active MAF
  * If you want to modify the code to include additional MAF sensors
- * You will need to add your volts to cfm algorythm in the function getMafFlowCFM()
+ * You will need to create your own MAF data file. Use exampleSensor.h as an example
  ***/
 
-#define SIEMENS__5WK9605 //default
-//#define SOME_OTHER_SENSOR 
-//#define ADD_YOUR_OWN_SENSOR
 
+//char mafDataFile[] =  "mafData/exampleSensor.h" // Example file duplicate this as required
+#include "mafData/SIEMENS_5WK9605.h" // Data from Tonys tests
+//char mafDataFile[] =  "mafData/DELPHI_AF10118." // Data from http://www.efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
 
 
 

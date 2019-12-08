@@ -16,7 +16,7 @@
 
 // Development and release version
 #define VERSION "V1.0-Alpha"
-#define BUILD "19120701"
+#define BUILD "19120801"
 
 #include "DIY-Flow-Bench_menu.h"
 #include <EEPROM.h>
@@ -37,7 +37,8 @@
 
 float startupBaroPressure;
 int mafFlowThresholdCFM;
-
+//int *mafMapData;
+//float getMafFlowCFM();
 
 /****************************************
  * INITIALISATION
@@ -95,32 +96,47 @@ float getBaroPressure()
 
 
 /****************************************
- * CALCULATE FLOW in CFM
- * Convert RAW MAF sensor data into flow rate and display it
- *
- * Linear interpolation formula Y=Y1+(X−X1)(Y2−Y1/X2−X1)
- *
- * TONYS TEST RESULTS = X:2.2 Y:27.6 | X:3.2 Y:106.9
+ * GET MAF FLOW in CFM
+ * Lookup CFM value from MAF data array
  ***/
-float getMafFlowCFM()
-{   
+float getMafFlowCFM ()
+{
+    //NOTE mafMapData is global array declared in mafData files
     float mafFlowRateCFM;
     int rawMafValue = analogRead(MAF_PIN);
     int mafMillivolts = (rawMafValue * (5.0 / 1023.0)) * 1000;
+    int mafMapDataLength = sizeof(mafMapData) / sizeof(int); 
+    int arrayPos;
+    int lookupValue;
 
-    #ifdef SIEMENS__5WK9605
-        
-        mafFlowRateCFM = 27.6 + ((mafMillivolts / 1000)-2.2) * 79.3;   
-        mafFlowThresholdCFM = 2;
-    
-    #elif SOME_OTHER_SENSOR
-        //TODO(#3) Add additional MAF sensors
-        //SOME OTHER SENSORS CALCS
-    #elif ADD_YOUR_OWN_SENSOR
-        //YOUR SENSORS CALCS
-    #endif
+    // determine what kind of array data we have
+    if (mafMapDataLength >= 1023) {
+        //we have a raw analog data array so we use the rawMafValue for the lookup
+        int lookupValue = rawMafValue;
+    } else {
+        //we have a mV / cfm array so we use the mafMillivolts value for the lookup
+        int lookupValue = mafMillivolts;
+    }
 
-    return mafFlowRateCFM;
+    //traverse the array until we find the lookupValue
+    for (int loopCount = 0; loopCount < mafMapDataLength; loopCount++) {
+
+        //check to see if exact match is found 
+        if (lookupValue == mafMapData[loopCount][1]) {
+            //we've got the exact value
+            mafFlowRateCFM = mafMapData[loopCount][2];
+            break;
+
+        //if there is no match we need to interpolate using the next highest / lowest values
+        } else if ( (lookupValue > mafMapData[loopCount][1])) {
+            //NOTE: Linear interpolation formula Y=Y1+(X-X1)(Y2-Y1/X2-X1)
+
+            mafFlowRateCFM = (mafMapData[loopCount-1][2] + (lookupValue - mafMapData[loopCount-1][1]) * ((mafMapData[loopCount][2] - mafMapData[loopCount-1][2]) / (mafMapData[loopCount][1] - mafMapData[loopCount-1][1])));
+            break;
+        }
+    }
+mafFlowRateCFM = (mafFlowRateCFM / 1000); // convert stored CFM datavalue back into cfm
+return mafFlowRateCFM;
     
 }
 
@@ -230,6 +246,17 @@ float convertMafFlowInWg(float inputPressure = 10, int outputPressure = 28, floa
 
     return outputFlow;
 
+}
+
+bool refPressureOk()
+{
+    float refPressure = getRefPressure(INWG);
+    if (refPressure < (calibrationRefPressure * (minTestPressurePercentage / 100)))
+    {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 
