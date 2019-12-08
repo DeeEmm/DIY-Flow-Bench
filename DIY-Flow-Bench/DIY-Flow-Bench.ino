@@ -16,7 +16,7 @@
 
 // Development and release version - Don't forget to update the changelog!!
 #define VERSION "V1.0-Alpha"
-#define BUILD "19120803"
+#define BUILD "19120804"
 
 #include "DIY-Flow-Bench_menu.h"
 #include <EEPROM.h>
@@ -35,7 +35,8 @@
 
 // Error handler codes
 #define REF_PRESS_LOW 1
-#define LEAK_TEST_FAIL 2
+#define LEAK_TEST_FAILED 2
+#define LEAK_TEST_PASS 3
 
 
 
@@ -298,8 +299,12 @@ void errorHandler(int errorVal)
             displayDialog(LANG_WARNING, LANG_FLOW_LIMIT_EXCEEDED);
         break;
 
-        case LEAK_TEST_FAIL:
+        case LEAK_TEST_FAILED:
             displayDialog(LANG_WARNING, LANG_LEAK_TEST_FAILED);
+        break;
+
+        case LEAK_TEST_PASS:
+            displayDialog(LANG_WARNING, LANG_LEAK_TEST_PASS);
         break;
     }
 
@@ -463,9 +468,15 @@ void CALLBACK_FUNCTION setCalibrationOffset(int id) {
     float RefPressure = getRefPressure(INWG);
     float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
     float flowCalibrationOffset = calibrationFlowRate - convertedMafFlowCFM;
-    
+
+    char flowCalibrationOffsetText[12]; // Buffer big enough?
+    dtostrf(flowCalibrationOffset, 6, 2, flowCalibrationOffsetText); // Leave room for too large numbers!
+      
     //Store data in EEPROM
-   EEPROM.write(NVM_CD_CAL_OFFSET_ADDR, flowCalibrationOffset);
+    EEPROM.write(NVM_CD_CAL_OFFSET_ADDR, flowCalibrationOffset);
+
+    // Display the value on the main screen
+    displayDialog(LANG_CAL_OFFET_VALUE, flowCalibrationOffsetText);
 
 }
 
@@ -496,6 +507,7 @@ void CALLBACK_FUNCTION setHighFlowCalibrationValue(int id) {
     float RefPressure = getRefPressure(INWG);
     float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
     float flowCalibrationOffset = calibrationPlateHighCFM - convertedMafFlowCFM;
+
     //Store data in EEPROM
     EEPROM.write(NVM_HIGH_FLOW_CAL_ADDR, flowCalibrationOffset);
 
@@ -508,6 +520,7 @@ void CALLBACK_FUNCTION setHighFlowCalibrationValue(int id) {
 void CALLBACK_FUNCTION setRefPressCalibrationValue(int id) {
 
     float RefPressure = getRefPressure(INWG);
+    
     //Store data in EEPROM
     EEPROM.write(NVM_REF_PRESS_CAL_ADDR, RefPressure);
 
@@ -520,8 +533,14 @@ void CALLBACK_FUNCTION setRefPressCalibrationValue(int id) {
 void CALLBACK_FUNCTION setLeakCalibrationValue(int id) {
 
     float RefPressure = getRefPressure(INWG);  
+    char RefPressureText[12]; // Buffer big enough?
+    dtostrf(RefPressure, 6, 2, RefPressureText); // Leave room for too large numbers!
+    
     //Store data in EEPROM
     EEPROM.write(NVM_LEAK_CAL_ADDR, RefPressure);
+
+    // Display the value on the main screen
+    displayDialog(LANG_LEAK_CAL_VALUE, RefPressureText);    
 }
 
 /****************************************
@@ -537,7 +556,10 @@ void CALLBACK_FUNCTION checkLeakCalibration(int id) {
     //compare calibration data from NVM
     if (leakCalibrationValue > (refPressure - leakTestTolerance))
     {
-       errorVal = LEAK_TEST_FAIL;
+    // Display the value on the main screen
+      errorVal = LEAK_TEST_FAILED;       
+    } else {
+      errorVal = LEAK_TEST_PASS;       
     }
 
 }
