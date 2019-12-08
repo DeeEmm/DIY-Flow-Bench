@@ -2,3 +2,5 @@
 19120701    - Changed directory structure to resolve dependency issue 
             - Moved libraries into src subfolder folder
             - Created this changelog file
+19120701    - Added support for MAF lookup tables via external files
+			- Including support for alternate MAF sensors
