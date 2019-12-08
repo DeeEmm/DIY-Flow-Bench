@@ -1,6 +1,11 @@
-19120601    - Fixed compile error (extra curly bracket)
+19120803    - Display Calibration results on screen 
+19120803    - #7  Update calibration functions 
+19120802    - Added partial support for additional languages
+			- Created function for popover display dialog
+			- Added max-flow error check
+19120801    - Added support for MAF lookup tables via external files
+			- Including support for alternate MAF sensors
 19120701    - Changed directory structure to resolve dependency issue 
             - Moved libraries into src subfolder folder
             - Created this changelog file
-19120701    - Added support for MAF lookup tables via external files
-			- Including support for alternate MAF sensors
+19120601    - Fixed compile error (extra curly bracket)
