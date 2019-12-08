@@ -18,10 +18,10 @@ LiquidCrystalRenderer renderer(lcd, LCD_WIDTH, LCD_HEIGHT);
 
 // Global Menu Item declarations
 
-const PROGMEM AnyMenuInfo minfoSettingsMidFLowCal = { "Mid FLow Cal", 16, 51, 0, setMidFlowCalibrationValue };
-ActionMenuItem menuSettingsMidFLowCal(&minfoSettingsMidFLowCal, NULL);
+const PROGMEM AnyMenuInfo minfoSettingsCalibrateOffset = { "Calibrate Offset", 16, 51, 0, setCalibrationOffset };
+ActionMenuItem menuSettingsCalibrateOffset(&minfoSettingsCalibrateOffset, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLeakTestCheckRtCall, textItemRenderFn, "Leak Test Check", 48, NULL)
-TextMenuItem menuSettingsLeakTestCheck(fnSettingsLeakTestCheckRtCall, 14, 3, &menuSettingsMidFLowCal);
+TextMenuItem menuSettingsLeakTestCheck(fnSettingsLeakTestCheckRtCall, 14, 3, &menuSettingsCalibrateOffset);
 const PROGMEM AnyMenuInfo minfoSettingsLeakTestCal = { "Leak Test Cal", 8, 17, 0, setLeakCalibrationValue };
 ActionMenuItem menuSettingsLeakTestCal(&minfoSettingsLeakTestCal, &menuSettingsLeakTestCheck);
 const PROGMEM AnyMenuInfo minfoSettingsRefPressCal = { "Ref Press Cal", 15, 51, 0, setRefPressCalibrationValue };
@@ -67,14 +67,14 @@ void setupMenu() {
     menuRefPressure.setReadOnly(true);
     menuTemperature.setReadOnly(true);
     menuAdjustedFlow.setReadOnly(true);
-    menuSettingsMidFLowCal.setReadOnly(true);
+    menuSettingsBuildNumber.setReadOnly(true);
+    menuSettingsCalibrateOffset.setReadOnly(true);
+    menuSettingsLeakTestCheck.setReadOnly(true);
     menuSettingsRefPressCal.setReadOnly(true);
     menuSettingsLeakTestCal.setReadOnly(true);
-    menuSettingsCodeVersion.setReadOnly(true);
     menuSettingsLowFlowCal.setReadOnly(true);
     menuPitot.setReadOnly(true);
     menuSettingsHighFlowCal.setReadOnly(true);
-    menuSettingsBuildNumber.setReadOnly(true);
-    menuSettingsLeakTestCheck.setReadOnly(true);
+    menuSettingsCodeVersion.setReadOnly(true);
 }
 

@@ -69,9 +69,9 @@
 
     // NVM Addresses (NOTE: 0-99 reserved for menu)
     #define NVM_HIGH_FLOW_CAL_ADDR 100 //8 bytes for float
-    #define NVM_MID_FLOW_CAL_ADDR 116 //8 bytes for float
     #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
     #define NVM_LEAK_CAL_ADDR 115 //8 bytes for float
+    #define NVM_CD_CAL_OFFSET_ADDR 116 //8 bytes for float
     #define NVM_REF_PRESS_CAL_ADDR 123 //8 bytes for float
 
 #endif
@@ -92,9 +92,10 @@
 
     // NVM Addresses (note 0-99 reserved for menu)
     #define NVM_HIGH_FLOW_CAL_ADDR 100 //8 bytes for float
-    #define NVM_MID_FLOW_CAL_ADDR 116 //8 bytes for float
     #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
     #define NVM_LEAK_CAL_ADDR 115 //8 bytes for float
+    #define NVM_CD_CAL_OFFSET_ADDR 116 //8 bytes for float
+    #define NVM_REF_PRESS_CAL_ADDR 123 //8 bytes for float
 
 #endif
 
@@ -119,7 +120,8 @@
     #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
     #define NVM_REF_PRESS_CAL_ADDR 123 //8 bytes for float
     #define NVM_LEAK_CAL_ADDR 131 //8 bytes for float
-    #define NVM_MID_FLOW_CAL_ADDR 116 //8 bytes for float
+    #define NVM_CD_CAL_OFFSET_ADDR 116 //8 bytes for float
+    #define NVM_REF_PRESS_CAL_ADDR 123 //8 bytes for float
 
 #endif
 
@@ -204,9 +206,11 @@
  ***/
 
 #define calibrationPlateHighCFM 100 // flow rate for large calibration orifice
-#define calibrationPlateMidCFM 50 // flow rate for small calibration orifice
+#define calibrationPlateMidCFM 50 // flow rate for med calibration orifice
 #define calibrationPlateLowCFM 10 // flow rate for small calibration orifice
-#define calibrationRefPressure 28 //reference pressure orifices were measured at
+
+#define calibrationRefPressure 10 //reference pressure orifices were measured at (leave at 10" if calibrating with CD)
+#define calibrationFlowRate 14.4 // standard flow rate for CD @ 10"/wg
 
 #define leakTestTolerance 0 // tolerance in cfm
 #define minRefPressure 0 // minimum pressure that we consider the bench is 'operational' / 'running' / vac source is on

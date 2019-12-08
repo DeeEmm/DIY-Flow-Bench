@@ -16,7 +16,7 @@
 
 // Development and release version - Don't forget to update the changelog!!
 #define VERSION "V1.0-Alpha"
-#define BUILD "19120802"
+#define BUILD "19120803"
 
 #include "DIY-Flow-Bench_menu.h"
 #include <EEPROM.h>
@@ -119,6 +119,8 @@ float getMafFlowCFM ()
     int mafMapDataLength = sizeof(mafMapData) / sizeof(int); 
     int arrayPos;
     int lookupValue;
+    float calibrationOffset;
+    
 
     // determine what kind of array data we have
     if (mafMapDataLength >= 1023) {
@@ -146,8 +148,14 @@ float getMafFlowCFM ()
             break;
         }
     }
-mafFlowRateCFM = (mafFlowRateCFM / 1000); // convert stored CFM datavalue back into cfm
-return mafFlowRateCFM;
+
+    // Get calibration offset from NVM
+    EEPROM.get( NVM_CD_CAL_OFFSET_ADDR, calibrationOffset ); //
+
+    // convert stored CFM datavalue back into cfm
+    mafFlowRateCFM = (mafFlowRateCFM / 1000) + calibrationOffset; 
+    
+    return mafFlowRateCFM;
     
 }
 
@@ -287,11 +295,11 @@ void errorHandler(int errorVal)
     switch (errorVal)
     {
         case REF_PRESS_LOW:
-            displayDialog(LAN_WARNING, LAN_FLOW_LIMIT_EXCEEDED);
+            displayDialog(LANG_WARNING, LANG_FLOW_LIMIT_EXCEEDED);
         break;
 
         case LEAK_TEST_FAIL:
-            displayDialog(LAN_WARNING, LAN_LEAK_TEST_FAILED);
+            displayDialog(LANG_WARNING, LANG_LEAK_TEST_FAILED);
         break;
     }
 
@@ -314,7 +322,7 @@ void errorHandler(int errorVal)
 
 
 /****************************************
- * MENU DIALOG RESPONSE HANDLER
+ * MENU DIALOG CALLBACK HANDLER
  ***/
 void onDialogFinished(ButtonType btnPressed, void* /*userdata*/) {        
     if(btnPressed != BTNTYPE_OK) {
@@ -447,6 +455,23 @@ void updateDisplays()
 
 /****************************************
  * MENU CALLBACK FUNCTION
+ * setFlowOffsetCalibrationValue
+ ***/
+void CALLBACK_FUNCTION setCalibrationOffset(int id) {
+
+    float MafFlowCFM = getMafFlowCFM();
+    float RefPressure = getRefPressure(INWG);
+    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
+    float flowCalibrationOffset = calibrationFlowRate - convertedMafFlowCFM;
+    
+    //Store data in EEPROM
+   EEPROM.write(NVM_CD_CAL_OFFSET_ADDR, flowCalibrationOffset);
+
+}
+
+
+/****************************************
+ * MENU CALLBACK FUNCTION
  * setLowFlowCalibrationValue
  ***/
 void CALLBACK_FUNCTION setLowFlowCalibrationValue(int id) {
@@ -454,26 +479,12 @@ void CALLBACK_FUNCTION setLowFlowCalibrationValue(int id) {
     float MafFlowCFM = getMafFlowCFM();
     float RefPressure = getRefPressure(INWG);
     float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
-    float flowCalibrationValue = calibrationPlateLowCFM - convertedMafFlowCFM;
+    float flowCalibrationOffset = calibrationPlateLowCFM - convertedMafFlowCFM;
     //Store data in EEPROM
-    EEPROM.write(NVM_LOW_FLOW_CAL_ADDR, flowCalibrationValue);
+    EEPROM.write(NVM_LOW_FLOW_CAL_ADDR, flowCalibrationOffset);
 
 }
 
-/****************************************
- * MENU CALLBACK FUNCTION
- * setMidFlowCalibrationValue
- ***/
-void CALLBACK_FUNCTION setMidFlowCalibrationValue(int id) {
-
-    float MafFlowCFM = getMafFlowCFM();
-    float RefPressure = getRefPressure(INWG);
-    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
-    float flowCalibrationValue = calibrationPlateMidCFM - convertedMafFlowCFM;
-    //Store data in EEPROM
-   EEPROM.write(NVM_MID_FLOW_CAL_ADDR, flowCalibrationValue);
-
-}
 
 /****************************************
  * MENU CALLBACK FUNCTION
@@ -484,9 +495,9 @@ void CALLBACK_FUNCTION setHighFlowCalibrationValue(int id) {
     float MafFlowCFM = getMafFlowCFM();
     float RefPressure = getRefPressure(INWG);
     float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
-    float flowCalibrationValue = calibrationPlateHighCFM - convertedMafFlowCFM;
+    float flowCalibrationOffset = calibrationPlateHighCFM - convertedMafFlowCFM;
     //Store data in EEPROM
-    EEPROM.write(NVM_HIGH_FLOW_CAL_ADDR, flowCalibrationValue);
+    EEPROM.write(NVM_HIGH_FLOW_CAL_ADDR, flowCalibrationOffset);
 
 }
 
