@@ -21,8 +21,8 @@ The Flow Bench is used as a tool for measuring and quantifying modifications and
 ## Contributors
 ###
 
-- Michael Percy AKA DeeEmm
-- Tony Donn AKA ModChipMan
+- DeeEmm AKA Michael Percy
+- ModChipMan AKA Tony Donn
 - Hans Ake Rahm
 - Andrew Goodfellow
 
