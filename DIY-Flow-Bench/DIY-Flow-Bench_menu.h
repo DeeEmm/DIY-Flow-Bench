@@ -22,8 +22,8 @@
 #define TCMENU_USING_PROGMEM true
 #define LCD_WIDTH 20
 #define LCD_HEIGHT 4
-#define ENCODER_PIN_A 2
-#define ENCODER_PIN_B 3
+#define ENCODER_PIN_A 20
+#define ENCODER_PIN_B 21
 #define ENCODER_PIN_OK 4
 
 // all variables that need exporting
@@ -31,31 +31,28 @@ extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 
 // all menu item forward references.
-extern ActionMenuItem menuSettingsCalibrateOffset;
-extern TextMenuItem menuSettingsLeakTestCheck;
+extern ActionMenuItem menuSettingsCalFlow;
+extern ActionMenuItem menuSettingsCalRefPress;
+extern TextMenuItem menuSettingsLeakTestChk;
 extern ActionMenuItem menuSettingsLeakTestCal;
-extern ActionMenuItem menuSettingsRefPressCal;
-extern ActionMenuItem menuSettingsHighFlowCal;
-extern ActionMenuItem menuSettingsLowFlowCal;
-extern TextMenuItem menuSettingsBuildNumber;
-extern TextMenuItem menuSettingsCodeVersion;
+extern TextMenuItem menuSettingsBld;
+extern TextMenuItem menuSettingsVer;
 extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
-extern AnalogMenuItem menuAdjustedFlow;
-extern AnalogMenuItem menuDesiredRef;
+extern AnalogMenuItem menuAFlow;
+extern AnalogMenuItem menuARef;
 extern AnalogMenuItem menuPitot;
-extern AnalogMenuItem menuTemperature;
-extern AnalogMenuItem menuRefPressure;
-extern AnalogMenuItem menuFlowRate;
+extern AnalogMenuItem menuTemp;
+extern AnalogMenuItem menuPRef;
+extern AnalogMenuItem menuFlow;
 extern const ConnectorLocalInfo applicationInfo;
 
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
+void CALLBACK_FUNCTION LeakTestCheck(int id);
 void CALLBACK_FUNCTION setCalibrationOffset(int id);
-void CALLBACK_FUNCTION setHighFlowCalibrationValue(int id);
 void CALLBACK_FUNCTION setLeakCalibrationValue(int id);
-void CALLBACK_FUNCTION setLowFlowCalibrationValue(int id);
 void CALLBACK_FUNCTION setRefPressCalibrationValue(int id);
 
 void setupMenu();

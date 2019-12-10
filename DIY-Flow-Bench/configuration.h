@@ -195,7 +195,12 @@
   
  
  
+ /****************************************
+ * CONFIGURE ALARMS
+ ***/
  
+#define showAlarms true 
+
  
  /****************************************
  * CALIBRATION SETTINGS
@@ -214,6 +219,7 @@
 
 #define leakTestTolerance 0 // tolerance in cfm
 #define minRefPressure 0 // minimum pressure that we consider the bench is 'operational' / 'running' / vac source is on
+#define minFlowRate 2 //flow rate at below which bench is considered off
 #define minTestPressurePercentage 80 //lowest test pressure bench will generate accurate results. Please see note in wiki
 
 #define startupBaroScalingFactor 1 // scaling factor when using reference pressure sensor for baro correction

@@ -10,13 +10,13 @@
  * 
  * Menu system and displays handled by tcMenu library - https://github.com/davetcc/tcMenu
  * If you want to modify the display or menus, the tcMenu project file is provided in distro - menu.emf
- * For more information see - https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Customisation
+ * For more information see - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
  * 
  ***/
 
 // Development and release version - Don't forget to update the changelog!!
 #define VERSION "V1.0-Alpha"
-#define BUILD "19120804"
+#define BUILD "19121001"
 
 #include "DIY-Flow-Bench_menu.h"
 #include <EEPROM.h>
@@ -57,7 +57,11 @@ bool benchIsRunning();
  ***/
 void setup ()
 {
-    setupMenu();// Set up the menu + display system
+    // Set up the menu + display system
+    setupMenu(); 
+
+    // set reference pressure to default
+    menuARef.setCurrentValue(calibrationRefPressure); 
 
     //take pressure sensor reading for baro correction if dedicated baro sensor not used
     int startupBaroPressure = analogRead(REF_PRESSURE_PIN);
@@ -111,7 +115,7 @@ float getBaroPressure()
  * GET MAF FLOW in CFM
  * Lookup CFM value from MAF data array
  ***/
-float getMafFlowCFM ()
+float getMafFlowCFM()
 {
     // NOTE mafMapData is global array declared in mafData files
     float mafFlowRateCFM;
@@ -123,7 +127,7 @@ float getMafFlowCFM ()
     float calibrationOffset;
     
 
-    // determine what kind of array data we have
+    // determine what kind of MAF data array we have
     if (mafMapDataLength >= 1023) {
         // we have a raw analog data array so we use the rawMafValue for the lookup
         int lookupValue = rawMafValue;
@@ -141,10 +145,10 @@ float getMafFlowCFM ()
             mafFlowRateCFM = mafMapData[loopCount][2];
             break;
 
+        //TODO() - Make sure that we are reading MAF data array from lowest value to highest
         // if there is no match we need to interpolate using the next highest / lowest values
         } else if ( (lookupValue > mafMapData[loopCount][1])) {
             // NOTE: Linear interpolation formula Y=Y1+(X-X1)(Y2-Y1/X2-X1)
-
             mafFlowRateCFM = (mafMapData[loopCount-1][2] + (lookupValue - mafMapData[loopCount-1][1]) * ((mafMapData[loopCount][2] - mafMapData[loopCount-1][2]) / (mafMapData[loopCount][1] - mafMapData[loopCount-1][1])));
             break;
         }
@@ -219,7 +223,7 @@ float getTemperature()
 
 /****************************************
  * CALCULATE PITOT PROBE
- * Convert RAW temperature sensor data
+ * Convert RAW differential pressure sensor data
  ***/
 float getPitotPressure(int units)
 {   
@@ -270,6 +274,23 @@ float convertMafFlowInWg(float inputPressure = 10, int outputPressure = 28, floa
 
 
 /****************************************
+ * BENCH IS RUNNING
+ ***/
+ bool benchIsRunning()
+{
+    float refPressure = getRefPressure(INWG);
+    float mafFlowRateCFM = getMafFlowCFM();
+
+    if ((refPressure < minRefPressure) && (mafFlowRateCFM > minFlowRate))
+    {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+/****************************************
  * CHECK REFERENCE PRESSURE
  * Make sure that reference pressure is within limits
  ***/
@@ -293,6 +314,8 @@ void refPressureCheck()
  ***/
 void errorHandler(int errorVal)
 {
+    if (!showAlarms) return;
+
     switch (errorVal)
     {
         case REF_PRESS_LOW:
@@ -310,20 +333,6 @@ void errorHandler(int errorVal)
 
 }
 
-
-/****************************************
- * BENCH IS RUNNING
- ***/
- bool benchIsRunning()
-{
-    float refPressure = getRefPressure(INWG);
-    if (refPressure > minRefPressure)
-    {
-        return true;
-    } else {
-        return false;
-    }
-}
 
 
 /****************************************
@@ -364,7 +373,7 @@ void displayDialog(const char *dialogTitle, const char *dialogMessage)
 void updateDisplays()
 {
 
-    int desiredRefPressureInWg = menuDesiredRef.getCurrentValue();
+    int desiredRefPressureInWg = menuARef.getCurrentValue();
     float mafFlowCFM = getMafFlowCFM();
     float refPressure = getRefPressure(INWG);
 
@@ -372,22 +381,23 @@ void updateDisplays()
     // Flow Rate
     if (mafFlowCFM > mafFlowThresholdCFM)
     {
-        menuFlowRate.setCurrentValue(mafFlowCFM);   
+        menuFlow.setCurrentValue(mafFlowCFM);   
     } else {
-        menuFlowRate.setCurrentValue(0);   
+        menuFlow.setCurrentValue(0);   
     }
     // Reference pressure
-    menuRefPressure.setCurrentValue(refPressure);
+    menuPRef.setCurrentValue(refPressure);
     // Temperature
-    menuTemperature.setCurrentValue(getTemperature());
+    menuTemp.setCurrentValue(getTemperature());
     // Pitot
     menuPitot.setCurrentValue(getPitotPressure(INWG));
     // Adjusted Flow
-    menuAdjustedFlow.setCurrentValue(convertMafFlowInWg(refPressure, desiredRefPressureInWg, mafFlowCFM));
+
+    menuAFlow.setCurrentValue(convertMafFlowInWg(refPressure, desiredRefPressureInWg, mafFlowCFM));
 
     //Settings Menu
-    menuSettingsCodeVersion.setTextValue(VERSION);
-    menuSettingsBuildNumber.setTextValue(BUILD);
+    menuSettingsVer.setTextValue(VERSION);
+    menuSettingsBld.setTextValue(BUILD);
     
 
     #ifdef CFM_4X7SEG
@@ -399,7 +409,7 @@ void updateDisplays()
     #endif
 
     #ifdef MPXV7007 
-        menuRefPressure.setCurrentValue(refPressureInWg);
+        menuPRef.setCurrentValue(refPressureInWg);
     #elif BMP280
 
     #endif
@@ -421,19 +431,16 @@ void updateDisplays()
  * 
  * MENU NAMES USED
  * --------------------------------------
- * menuFlowRate
- * menuRefPressure
- * menuTemperature
- * menPitot
- * menuDesiredRef
- * menuAdjustedFlow
- * menuSettingsCodeVersion
+ * menuFlow
+ * menuRefe
+ * menuTemp
+ * menuPitot
+ * menuARef
+ * menuAFlow
+ * menuSettingsVersion
  * menuSettingsBuild
- * menuSettingsLowFlowCal
- * menuSettingsMidFlowCal
- * menuSettingsHighFlowCal
  * menuSettingsLeakTestCal
- * menuSettingsLeakTestCheck
+ * menuSettingsLeakTestChk
  *
  * AVAILABLE METHODS
  * --------------------------------------
@@ -578,3 +585,31 @@ void loop ()
     updateDisplays();
 
 }
+
+
+
+
+
+
+
+
+
+
+void CALLBACK_FUNCTION LeakTestCheck(int id) {
+    // TODO - your menu change code
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
