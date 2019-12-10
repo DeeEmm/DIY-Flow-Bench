@@ -3,7 +3,7 @@
 ## Version Information
 ###
 
-Version 1.0-Alpha
+Version 1.0-Beta.1
 
 This repository contains the hardware schematics and software code needed to build a volumetric flow bench based on an Arduino controller and common automotive MAF sensor
 
@@ -21,8 +21,8 @@ The Flow Bench is used as a tool for measuring and quantifying modifications and
 ## Contributors
 ###
 
-- Michael Percy AKA DeeEmm
-- Tony Donn AKA ModChipMan
+- DeeEmm AKA Michael Percy
+- ModChipMan AKA Tony Donn
 - Hans Ake Rahm
 - Andrew Goodfellow
 
@@ -45,23 +45,45 @@ For more up to date information including current stable builds and documentatio
 
 
 
-## Installing / Getting started
+## 1. Component Selection
 ###
 
-Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/2.-Installation
+Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/1.-Component-selection
 
 
-
-## Configuration
+## 2. Hardware Design
 ###
 
-Please refer to https://github.com/DeeEmm/DIY-Flow-Bench/wiki/3.-Configuration
+Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/2.-Hardware-Design.
 
 
-## Calibration
+## 3. Installing / Getting started
 ###
 
-Please refer to https://github.com/DeeEmm/DIY-Flow-Bench/wiki/4.-Calibration
+Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/3.-Installation
+
+
+
+## 4. Configuration
+###
+
+Please refer to https://github.com/DeeEmm/DIY-Flow-Bench/wiki/4.-Configuration
+
+
+## 5. Calibration
+###
+
+Please refer to https://github.com/DeeEmm/DIY-Flow-Bench/wiki/5.-Calibration
+
+## 6. Operation
+###
+
+Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/6.-Operation
+
+## 7. Customisation
+###
+
+Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/7.-Customisation
 
 
 
