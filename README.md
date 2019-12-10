@@ -3,7 +3,7 @@
 ## Version Information
 ###
 
-Version 1.0-Beta.1
+Version 1.0-Beta.2
 
 This repository contains the hardware schematics and software code needed to build a volumetric flow bench based on an Arduino controller and common automotive MAF sensor
 
@@ -79,6 +79,7 @@ Please refer to https://github.com/DeeEmm/DIY-Flow-Bench/wiki/5.-Calibration
 ###
 
 Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/6.-Operation
+
 
 ## 7. Customisation
 ###
