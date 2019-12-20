@@ -5,8 +5,11 @@
 
 Version 1.0-Alpha
 
-This repository contains the hardware schematics and software code needed to build a volumetric flow bench based on an Arduino controller and common automotive MAF sensor
+This repository contains the hardware schematics and software code needed to build a volumetric flow bench based on an Arduino controller and common automotive MAF sensor.
 
+NOTE: This pre-release alpha version contains very basic code that you can use to display the output from your MAF on a simple display.
+
+For more up to date releases and current development please check the Wiki / releases page
 
 
 ## What is it?
