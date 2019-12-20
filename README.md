@@ -41,27 +41,15 @@ The Flow Bench is used as a tool for measuring and quantifying modifications and
 ## Project Status
 ###
 
-For more up to date information including current stable builds and documentation, please visit the WIKI page in our gitgub repository - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+We are currently in Beta.
 
+If you want to download the current stable beta release, please check out the releases page
 
+https://github.com/DeeEmm/DIY-Flow-Bench/releases
 
-## Installing / Getting started
-###
+For more up to date information including current stable builds and documentation, please visit the WIKI page in our gitgub repository
 
-Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/2.-Installation
-
-
-
-## Configuration
-###
-
-Please refer to https://github.com/DeeEmm/DIY-Flow-Bench/wiki/3.-Configuration
-
-
-## Calibration
-###
-
-Please refer to https://github.com/DeeEmm/DIY-Flow-Bench/wiki/4.-Calibration
+https://github.com/DeeEmm/DIY-Flow-Bench/wiki
 
 
 
