@@ -115,7 +115,7 @@
     #define REF_VAC_PIN A3
     #define PITOT_PIN A4
     #define TEMPERATURE_PIN A5
-    #define REF_BARO_PIN A6
+    #define REF_BARO_PIN A6 //NOTE this cannot be same as REF_PRESSURE_PIN
     #define HUMIDITY_PIN A7
 
     // NVM Addresses (note 0-99 reserved for menu)
@@ -183,7 +183,7 @@
  * CONFIGURE TEMPERATURE SENSOR
  ***/
 
-//#define TEMP_BMP280
+#define TEMP_BMP280
 //#define TEMP_OTHER_TYPE
 
 

@@ -16,7 +16,7 @@
 
 // Development and release version - Don't forget to update the changelog!!
 #define VERSION "V1.0-Alpha"
-#define BUILD "19122001"
+#define BUILD "19122002"
 
 
 /****************************************
@@ -37,8 +37,10 @@
  ***/
 
 // Support for BMP280 temp & pressure sensor
-#include <BMP280_DEV.h> 
-
+#if defined REF_BMP280 || defined TEMP_BMP280 || defined BARO_BMP280
+    #include <BMP280_DEV.h> 
+    BMP280_DEV bmp280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
+#endif
 
 
 /****************************************
@@ -79,7 +81,7 @@ void setup ()
     // Initialise libraries
     
     // BMP Pressure & temp transducer
-    #ifdef REF_BMP280 || TEMP_BMP280 
+    #if defined REF_BMP280 || defined TEMP_BMP280 || defined BARO_BMP280
         bmp280.begin();                                 // Default initialisation, place the BMP280 into SLEEP_MODE 
         //bmp280.setPresOversampling(OVERSAMPLING_X4);    // Set the pressure oversampling to X4
         //bmp280.setTempOversampling(OVERSAMPLING_X1);    // Set the temperature oversampling to X1
@@ -120,21 +122,21 @@ float getBaroPressure()
 {   
 
     float baroPressureKpa;
-    float refPressureHpa;
+    float baroPressureHpa;
     float refTempDegC;
     float refAltM;
     int supplyMillivolts = getSupplyMillivolts();
     int rawBaroValue = analogRead(REF_BARO_PIN);
     int baroMillivolts = (rawBaroValue * (5.0 / 1023.0)) * 1000;
 
-    #ifdef BARO_MPX4115
+    #if defined BARO_MPX4115
         // Vout = VS (P x 0.009 – 0.095) --- Where VS = Supply Voltage (Formula from Datasheet)
         // P = ((Vout / VS ) - 0.095) / 0.009 --- Formula transposed for P
         baroPressureKpa = ((baroMillivolts / supplyMillivolts ) - 0.095) / 0.009; 
 
-    #elif BARO_BMP280
-        bmp280.getMeasurements(refTempDegC, refPressureHpa, refAltM);
-        refPressureKpa = refPressureHpa * 10;
+    #elif defined BARO_BMP280
+        bmp280.getMeasurements(refTempDegC, baroPressureHpa, refAltM);
+        baroPressureKpa = baroPressureHpa * 10;
 
     #else
         // No baro sensor defined so use value grabbed at startup from reference pressure sensor
@@ -218,12 +220,12 @@ float getRefPressure (int units)
     int refPressMillivolts = (rawRefPressValue * (5.0 / 1023.0)) * 1000;
     int supplyMillivolts = getSupplyMillivolts();
 
-    #ifdef REF_MPXV7007
+    #if defined REF_MPXV7007
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
         refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
 
-    #elif REF_BMP280
+    #elif defined REF_BMP280
         bmp280.getMeasurements(refTempDegC, refPressureHpa, refAltM);
         refPressureKpa = refPressureHpa * 10;
 
@@ -261,10 +263,10 @@ float getTemperature()
     float refTempDegC;
 
     //TODO(#2) Add support for temperature sensor
-    #ifdef TEMP_BMP280
+    #if defined TEMP_BMP280
         bmp280.getMeasurements(refTempDegC, refPressureHpa, refAltM);
 
-    #elif TEMP_OTHER_TYPE
+    #elif defined TEMP_OTHER_TYPE
         //define your custom temp sensor here
 
     #else
@@ -289,12 +291,12 @@ float getPitotPressure(int units)
     int pitotPressMillivolts = (rawPitotPressValue * (5.0 / 1023.0)) * 1000;
     int supplyMillivolts = getSupplyMillivolts();
 
-    #ifdef PITOT_MPXV7007DP
+    #if defined PITOT_MPXV7007DP
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
         pitotPressureKpa = ((pitotPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
 
-    #elif PITOT_OTHER_TYPE
+    #elif defined PITOT_OTHER_TYPE
         // add your sensor data here
 
     #else
@@ -462,18 +464,16 @@ void updateDisplays()
     menuSettingsBld.setTextValue(BUILD);
     
 
-    #ifdef CFM_4X7SEG
+    #if defined CFM_4X7SEG
         //TODO(#6) Add support for additional displays
     #endif
 
-    #ifdef PITOT_4X7SEG
+    #if defined PITOT_4X7SEG
         //TODO(#6) Add support for additional displays
     #endif
 
-    #ifdef MPXV7007 
+    #if defined MPXV7007 
         menuPRef.setCurrentValue(refPressureInWg);
-    #elif BMP280
-
     #endif
 
 
