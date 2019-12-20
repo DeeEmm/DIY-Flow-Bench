@@ -13,8 +13,8 @@
 
 // Global variable declarations
 
-LiquidCrystal lcd(2, 1, 0, 4, 5, 6, 7, ioFrom8574(0x20));
-LiquidCrystalRenderer renderer(lcd, LCD_WIDTH, LCD_HEIGHT);
+LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
+LiquidCrystalRenderer renderer(lcd, 16, 2);
 
 // Global Menu Item declarations
 
@@ -22,7 +22,7 @@ const PROGMEM AnyMenuInfo minfoSettingsCalFlow = { "Cal Flow", 16, 55, 0, setCal
 ActionMenuItem menuSettingsCalFlow(&minfoSettingsCalFlow, NULL);
 const PROGMEM AnyMenuInfo minfoSettingsCalRefPress = { "Cal Ref Press", 15, 51, 0, setRefPressCalibrationValue };
 ActionMenuItem menuSettingsCalRefPress(&minfoSettingsCalRefPress, &menuSettingsCalFlow);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLeakTestChkRtCall, textItemRenderFn, "Leak Test Chk", 48, LeakTestCheck)
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLeakTestChkRtCall, textItemRenderFn, "Leak Test Chk", 48, checkLeakCalibrationValue)
 TextMenuItem menuSettingsLeakTestChk(fnSettingsLeakTestChkRtCall, 14, 3, &menuSettingsCalRefPress);
 const PROGMEM AnyMenuInfo minfoSettingsLeakTestCal = { "Leak Test Cal", 8, 17, 0, setLeakCalibrationValue };
 ActionMenuItem menuSettingsLeakTestCal(&minfoSettingsLeakTestCal, &menuSettingsLeakTestChk);
@@ -51,24 +51,24 @@ const PROGMEM ConnectorLocalInfo applicationInfo = { "DIY Flow Bench", "0fc9ae97
 // Set up code
 
 void setupMenu() {
-    Wire.begin();
-    lcd.begin(LCD_WIDTH, LCD_HEIGHT);
-    lcd.configureBacklightPin(3);
+    lcd.begin(16, 2);
+    lcd.configureBacklightPin(10);
     lcd.backlight();
-    switches.initialise(ioUsingArduino(), true);
-    menuMgr.initForEncoder(&renderer, &menuFlow, ENCODER_PIN_A, ENCODER_PIN_B, ENCODER_PIN_OK);
+    pinMode(A0, INPUT);
+    switches.initialise(inputFromDfRobotShield(), false);
+    menuMgr.initForUpDownOk(&renderer, &menuFlow, DF_KEY_DOWN, DF_KEY_UP, DF_KEY_SELECT);
 
     // Read only and local only function calls
     menuFlow.setReadOnly(true);
     menuPRef.setReadOnly(true);
     menuTemp.setReadOnly(true);
+    menuSettingsLeakTestChk.setReadOnly(true);
     menuAFlow.setReadOnly(true);
     menuSettingsCalFlow.setReadOnly(true);
-    menuSettingsBld.setReadOnly(true);
     menuSettingsLeakTestCal.setReadOnly(true);
-    menuSettingsVer.setReadOnly(true);
+    menuSettingsBld.setReadOnly(true);
     menuPitot.setReadOnly(true);
-    menuSettingsLeakTestChk.setReadOnly(true);
+    menuSettingsVer.setReadOnly(true);
     menuSettingsCalRefPress.setReadOnly(true);
 }
 

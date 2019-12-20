@@ -8,7 +8,7 @@
  * 
  * To change board type, display or input device pins for your project
  * Download and run the tcMenu application and regenerate the tcMenu code files.
- * INSTRUCTIONS: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Customisation
+ * INSTRUCTIONS: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/7.-Customisation
  * 
  * The standard project board is the Arduino Mega 2560 
  * Mega 2560 pins for display and encoder click wheel are listed below for reference
@@ -33,6 +33,9 @@
  * The following libraries are also aneeded and available within the Arduino IDE
  *
  * arduino-NVM
+ *
+ * NOTE: you may need to include your library in DIY-Flow-Bench.ino
+ *
  ***/
 
 #pragma once
@@ -135,14 +138,14 @@
  ***/
 
 
-//char mafDataFile[] =  "mafData/exampleSensor.h" // Example file duplicate this as required
+//#include =  "mafData/exampleSensor.h" // Example file duplicate this as required
 #include "mafData/SIEMENS_5WK9605.h" // Data from Tonys tests
-//char mafDataFile[] =  "mafData/DELPHI_AF10118." // Data from http://www.efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
+//#include =  "mafData/DELPHI_AF10118." // Data from http://www.efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
 
 
 
 /****************************************
- * CONFIGURE REFERENCE PRESSURE SENSORS
+ * CONFIGURE REFERENCE PRESSURE SENSOR
  * If you want to modify the code to include additional reference pressure sensors
  * You will need to add your volts to kPa algorythm in the function getRefPressure()
  ***/
@@ -154,24 +157,34 @@
 
 
 /****************************************
- * CONFIGURE PITOT PRESSURE SENSORS
+ * CONFIGURE PITOT PRESSURE SENSOR
  * If you want to modify the code to include additional pitot pressure sensors
  * You will need to add your volts to kPa algorythm in the function getPitotPressure()
+ * Note Pitot sensors need to be a differential pressure sensor (DP)
  ***/
 
 #define PITOT_MPXV7007DP //default
-//#define PITOT_BMP280
+//#define PITOT_OTHER_TYPE //add your own sensor
 
 
 
 
 /****************************************
- * CONFIGURE TEMPERATURE / BARO SENSORS
+ * CONFIGURE BARO SENSOR
  ***/
 
 #define BARO_MPX4115 //default
 //#define BARO_BMP280
 
+
+
+
+/****************************************
+ * CONFIGURE TEMPERATURE SENSOR
+ ***/
+
+//#define TEMP_BMP280
+//#define TEMP_OTHER_TYPE
 
 
 
@@ -206,7 +219,7 @@
  * CALIBRATION SETTINGS
  *
  * For a more detailed explaination of these settings
- * Please refer to the WIKI - https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration
+ * Please refer to the WIKI - https://github.com/DeeEmm/DIY-Flow-Bench/wiki/4.-Configuration
  *
  ***/
 

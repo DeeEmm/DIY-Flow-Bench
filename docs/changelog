@@ -1,3 +1,6 @@
+19122001    - Added support for BMP280
+            - Fixed potential MAF conversion issue
+            - Minor bugfixes
 19120803    - Display Calibration results on screen 
 19120803    - #7  Update calibration functions 
 19120802    - Added partial support for additional languages

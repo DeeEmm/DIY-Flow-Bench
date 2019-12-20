@@ -10,19 +10,35 @@
  * 
  * Menu system and displays handled by tcMenu library - https://github.com/davetcc/tcMenu
  * If you want to modify the display or menus, the tcMenu project file is provided in distro - menu.emf
- * For more information see - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+ * Default display used is DFRobot 1602 LCD Keypad Shield
  * 
  ***/
 
 // Development and release version - Don't forget to update the changelog!!
 #define VERSION "V1.0-Alpha"
-#define BUILD "19121001"
+#define BUILD "19122001"
+
+
+/****************************************
+ * CORE LIBRARIES
+ ***/
 
 #include "DIY-Flow-Bench_menu.h"
 #include <EEPROM.h>
 #include <Arduino.h>
 #include "configuration.h"
 #include "EN_Language.h"
+
+
+
+/****************************************
+ * OPTIONAL LIBRARIES
+ * (comment / uncomment as necessary)
+ ***/
+
+// Support for BMP280 temp & pressure sensor
+#include <BMP280_DEV.h> 
+
 
 
 /****************************************
@@ -52,11 +68,26 @@ bool benchIsRunning();
 //void errorHandler();
 //void onDialogFinished();
 
+// Declared in mafData file
+extern long int mafMapData[][2];
+
 /****************************************
  * INITIALISATION
  ***/
 void setup ()
 {
+    // Initialise libraries
+    
+    // BMP Pressure & temp transducer
+    #ifdef REF_BMP280 || TEMP_BMP280 
+        bmp280.begin();                                 // Default initialisation, place the BMP280 into SLEEP_MODE 
+        //bmp280.setPresOversampling(OVERSAMPLING_X4);    // Set the pressure oversampling to X4
+        //bmp280.setTempOversampling(OVERSAMPLING_X1);    // Set the temperature oversampling to X1
+        //bmp280.setIIRFilter(IIR_FILTER_4);              // Set the IIR filter to setting 4
+        bmp280.setTimeStandby(TIME_STANDBY_2000MS);     // Set the standby time to 2 seconds
+        bmp280.startNormalConversion();  
+    #endif
+
     // Set up the menu + display system
     setupMenu(); 
 
@@ -89,6 +120,9 @@ float getBaroPressure()
 {   
 
     float baroPressureKpa;
+    float refPressureHpa;
+    float refTempDegC;
+    float refAltM;
     int supplyMillivolts = getSupplyMillivolts();
     int rawBaroValue = analogRead(REF_BARO_PIN);
     int baroMillivolts = (rawBaroValue * (5.0 / 1023.0)) * 1000;
@@ -97,11 +131,14 @@ float getBaroPressure()
         // Vout = VS (P x 0.009 – 0.095) --- Where VS = Supply Voltage (Formula from Datasheet)
         // P = ((Vout / VS ) - 0.095) / 0.009 --- Formula transposed for P
         baroPressureKpa = ((baroMillivolts / supplyMillivolts ) - 0.095) / 0.009; 
+
     #elif BARO_BMP280
-        //TODO(#4) Add support for stand alone baro sensor
+        bmp280.getMeasurements(refTempDegC, refPressureHpa, refAltM);
+        refPressureKpa = refPressureHpa * 10;
+
     #else
-        // No baro sensor so use value grabbed at startup from reference pressure sensor
-        // NOTE will only work for absolute style pressure sensor
+        // No baro sensor defined so use value grabbed at startup from reference pressure sensor
+        // NOTE will only work for absolute style pressure sensor else code may need to be changed
         baroPressureKpa = (startupBaroPressure * startupBaroScalingFactor) + startupBaroScalingOffset; 
     #endif
 
@@ -119,13 +156,12 @@ float getMafFlowCFM()
 {
     // NOTE mafMapData is global array declared in mafData files
     float mafFlowRateCFM;
+    float calibrationOffset;
     int rawMafValue = analogRead(MAF_PIN);
     int mafMillivolts = (rawMafValue * (5.0 / 1023.0)) * 1000;
-    int mafMapDataLength = sizeof(mafMapData) / sizeof(int); 
     int arrayPos;
     int lookupValue;
-    float calibrationOffset;
-    
+    int mafMapDataLength = sizeof(mafMapData) / 2;  
 
     // determine what kind of MAF data array we have
     if (mafMapDataLength >= 1023) {
@@ -175,6 +211,9 @@ float getRefPressure (int units)
 
     float refPressureKpa;
     float refPressureInWg;
+    float refPressureHpa;
+    float refTempDegC;
+    float refAltM;
     int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
     int refPressMillivolts = (rawRefPressValue * (5.0 / 1023.0)) * 1000;
     int supplyMillivolts = getSupplyMillivolts();
@@ -185,7 +224,13 @@ float getRefPressure (int units)
         refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
 
     #elif REF_BMP280
-        //TODO(#1) Add support for additional pressure sensors
+        bmp280.getMeasurements(refTempDegC, refPressureHpa, refAltM);
+        refPressureKpa = refPressureHpa * 10;
+
+    #else
+        // No reference pressure sensor used so lets return zero
+        refPressureKpa = 0;
+
     #endif
 
     switch (units)
@@ -211,12 +256,23 @@ float getRefPressure (int units)
  ***/
 float getTemperature()
 {   
-    float temperature;
+    float refAltM;
+    float refPressureHpa;
+    float refTempDegC;
 
     //TODO(#2) Add support for temperature sensor
-    temperature = 21;
+    #ifdef TEMP_BMP280
+        bmp280.getMeasurements(refTempDegC, refPressureHpa, refAltM);
 
-    return temperature;
+    #elif TEMP_OTHER_TYPE
+        //define your custom temp sensor here
+
+    #else
+        // We don't have any temperature input so we will assume ambient
+        refTempDegC = 21;
+    #endif
+
+    return refTempDegC;
 }
 
 
@@ -227,31 +283,36 @@ float getTemperature()
  ***/
 float getPitotPressure(int units)
 {   
-    float refPressureKpa;
-    float refPressureInWg;
-    int rawRefPressValue = analogRead(PITOT_PIN);
-    int refPressMillivolts = (rawRefPressValue * (5.0 / 1023.0)) * 1000;
+    float pitotPressureKpa;
+    float pitotPressureInWg;
+    int rawPitotPressValue = analogRead(PITOT_PIN);
+    int pitotPressMillivolts = (rawPitotPressValue * (5.0 / 1023.0)) * 1000;
     int supplyMillivolts = getSupplyMillivolts();
 
-    #ifdef REF_MPXV7007
+    #ifdef PITOT_MPXV7007DP
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
-        refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
+        pitotPressureKpa = ((pitotPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
 
-    #elif REF_BMP280
-        //TODO(#1) Add support for additional pressure sensors
+    #elif PITOT_OTHER_TYPE
+        // add your sensor data here
+
+    #else
+        // No pitot probe used so lets return a zero value
+        pitotPressureKpa = 0;
+
     #endif
 
     switch (units)
     {
         case INWG:
             // convert from kPa to inches Water
-            refPressureInWg = refPressureKpa * 4.0147421331128;
-            return refPressureInWg;
+            pitotPressureInWg = pitotPressureKpa * 4.0147421331128;
+            return pitotPressureInWg;
         break;
 
         case KPA:
-            return refPressureKpa;
+            return pitotPressureKpa;
         break;
     }
     
@@ -276,7 +337,7 @@ float convertMafFlowInWg(float inputPressure = 10, int outputPressure = 28, floa
 /****************************************
  * BENCH IS RUNNING
  ***/
- bool benchIsRunning()
+bool benchIsRunning()
 {
     float refPressure = getRefPressure(INWG);
     float mafFlowRateCFM = getMafFlowCFM();
@@ -308,34 +369,6 @@ void refPressureCheck()
 
 
 /****************************************
- * ERROR CHECKING
- * 
- * Check for system errors and display message to user on screen
- ***/
-void errorHandler(int errorVal)
-{
-    if (!showAlarms) return;
-
-    switch (errorVal)
-    {
-        case REF_PRESS_LOW:
-            displayDialog(LANG_WARNING, LANG_FLOW_LIMIT_EXCEEDED);
-        break;
-
-        case LEAK_TEST_FAILED:
-            displayDialog(LANG_WARNING, LANG_LEAK_TEST_FAILED);
-        break;
-
-        case LEAK_TEST_PASS:
-            displayDialog(LANG_WARNING, LANG_LEAK_TEST_PASS);
-        break;
-    }
-
-}
-
-
-
-/****************************************
  * MENU DIALOG CALLBACK HANDLER
  ***/
 void onDialogFinished(ButtonType btnPressed, void* /*userdata*/) {        
@@ -362,6 +395,35 @@ void displayDialog(const char *dialogTitle, const char *dialogMessage)
         dlg->show(dialogTitle, showRemoteDialogs, onDialogFinished);
         dlg->copyIntoBuffer(dialogMessage);
 }
+
+
+
+/****************************************
+ * ERROR CHECKING
+ * 
+ * Check for system errors and display message to user on screen
+ ***/
+void errorHandler(int errorVal)
+{
+    if (!showAlarms) return;
+
+    switch (errorVal)
+    {
+        case REF_PRESS_LOW:
+            displayDialog(LANG_WARNING, LANG_FLOW_LIMIT_EXCEEDED);
+        break;
+
+        case LEAK_TEST_FAILED:
+            displayDialog(LANG_WARNING, LANG_LEAK_TEST_FAILED);
+        break;
+
+        case LEAK_TEST_PASS:
+            displayDialog(LANG_WARNING, LANG_LEAK_TEST_PASS);
+        break;
+    }
+
+}
+
 
 
 
@@ -520,6 +582,7 @@ void CALLBACK_FUNCTION setHighFlowCalibrationValue(int id) {
 
 }
 
+
 /****************************************
  * MENU CALLBACK FUNCTION
  * setRefPressCalibrationValue
@@ -532,6 +595,7 @@ void CALLBACK_FUNCTION setRefPressCalibrationValue(int id) {
     EEPROM.write(NVM_REF_PRESS_CAL_ADDR, RefPressure);
 
 }
+
 
 /****************************************
  * MENU CALLBACK FUNCTION
@@ -550,11 +614,12 @@ void CALLBACK_FUNCTION setLeakCalibrationValue(int id) {
     displayDialog(LANG_LEAK_CAL_VALUE, RefPressureText);    
 }
 
+
 /****************************************
  * MENU CALLBACK FUNCTION
  * checkLeakCalibration
  ***/
-void CALLBACK_FUNCTION checkLeakCalibration(int id) {
+void CALLBACK_FUNCTION checkLeakCalibrationValue(int id) {
 
     int leakCalibrationValue = 0; 
     leakCalibrationValue = EEPROM.read(NVM_LEAK_CAL_ADDR);
@@ -573,7 +638,6 @@ void CALLBACK_FUNCTION checkLeakCalibration(int id) {
 
 
 
-
 /****************************************
  * MAIN PROGRAM LOOP
  ***/
@@ -585,31 +649,3 @@ void loop ()
     updateDisplays();
 
 }
-
-
-
-
-
-
-
-
-
-
-void CALLBACK_FUNCTION LeakTestCheck(int id) {
-    // TODO - your menu change code
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
