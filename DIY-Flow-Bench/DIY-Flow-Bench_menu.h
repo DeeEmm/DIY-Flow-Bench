@@ -34,6 +34,7 @@ extern TextMenuItem menuSettingsBld;
 extern TextMenuItem menuSettingsVer;
 extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
+extern FloatMenuItem menuMafVolts;
 extern AnalogMenuItem menuARef;
 extern AnalogMenuItem menuAFlow;
 extern AnalogMenuItem menuPitot;

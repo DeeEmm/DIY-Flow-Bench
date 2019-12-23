@@ -30,7 +30,6 @@
 #include "EN_Language.h"
 
 
-
 /****************************************
  * OPTIONAL LIBRARIES
  * Add pre-directives for all optional libraries to preserve memory
@@ -85,12 +84,12 @@
  ***/
 
 float startupBaroPressure;
-int mafFlowThresholdCFM;
 int errorVal = 0;
-
-extern long int mafMapData[][2];
-
 bool benchIsRunning();
+
+extern long mafMapData[][2];
+
+
 
 
 
@@ -124,9 +123,9 @@ void setup ()
         SimpleDHT11 dht11(HUMIDITY_PIN);
    #endif
  
-
     // Set up the menu + display system
     setupMenu(); 
+    renderer.setResetIntervalTimeSeconds(-1);
 
     // set reference pressure to default
     menuARef.setCurrentValue(calibrationRefPressure); 
@@ -287,7 +286,7 @@ float getRelativeHumidity()
 /****************************************
  * GET VAPOR PRESSURE
  ***/
-float getVaporPressureKpa(int units)
+float getVaporPressure(int units)
 {   
     float airTemp = getTemperature(DEGC);
     float molecularWeightOfDryAir = 28.964;
@@ -318,12 +317,14 @@ float getSpecificGravity()
 {   
     float specificGravity;
     float relativeHumidity = getRelativeHumidity();
-    float vaporPressurePsia = getVaporPressureKpa(PSIA);
-    float baroPressure = getBaroPressure(PSIA);
+    float vaporPressurePsia = getVaporPressure(PSIA);
+    float baroPressurePsia = getBaroPressure(PSIA);
 
-    specificGravity = (1-(0.378 * relativeHumidity * vaporPressurePsia) / baroPressure);
+    specificGravity = (1-(0.378 * relativeHumidity * vaporPressurePsia) / baroPressurePsia);
     
     return specificGravity;
+
+
 }  
     
 
@@ -334,16 +335,18 @@ float getSpecificGravity()
  ***/
 float convertMassFlowToVolumetric(float massFlowKgh)
 {   
-    float mafFlowCFM;
-    float tempInRankine = getTemperature(RANKINE);
-    float specificGravity = getSpecificGravity();
-    float molecularWeight = MOLECULAR_WEIGHT_DRY_AIR * specificGravity;
-    float baroPressure = getBaroPressure(PSIA); 
+  float mafFlowCFM;
+  float tempInRankine = getTemperature(RANKINE); //tested ok
+  float specificGravity = getSpecificGravity(); //tested ok
+  float molecularWeight = MOLECULAR_WEIGHT_DRY_AIR * specificGravity; //tested ok
+  float baroPressure = getBaroPressure(PSIA); 
+  float massFlowLbm = massFlowKgh * 0.03674371036415;
 
-    mafFlowCFM = (massFlowKgh * 1545 * tempInRankine) / (molecularWeight * 144 * baroPressure);
+  mafFlowCFM = ((massFlowLbm * 1545 * tempInRankine) / (molecularWeight * 144 * baroPressure)); 
+
+  return mafFlowCFM;
 
 
-    return mafFlowCFM;
 }  
     
 
@@ -356,52 +359,66 @@ float convertMassFlowToVolumetric(float massFlowKgh)
 float getMafFlowCFM()
 {
     // NOTE mafMapData is global array declared in mafData files
+    float calibrationOffset;
     float mafFlowRateCFM;
     float mafFlowRateKGH;
-    float calibrationOffset;
+    long mafFlowRateKghRAW;
     int mafFlowRaw = analogRead(MAF_PIN);
     int mafMillivolts = (mafFlowRaw * (5.0 / 1023.0)) * 1000;
-    int arrayPos;
     int lookupValue;
-    int mafMapDataLength = sizeof(mafMapData) / 2;  
+    int numRows = sizeof(mafMapData)/sizeof(mafMapData[0]);
+    //int numCols = sizeof(mafMapData[0])/sizeof(mafMapData[0][0]);
 
-    // determine what kind of MAF data array we have
-    if (mafMapDataLength >= 1023) {
+    // determine what kind of MAF data array we have //TODO - DO WE NEED TO KNOW????????
+    if (numRows >= 1023) {
         // we have a raw analog data array so we use the mafFlowRaw for the lookup
-        int lookupValue = mafFlowRaw;
+        lookupValue = mafFlowRaw;
     } else {
         // we have a mV / cfm array so we use the mafMillivolts value for the lookup
-        int lookupValue = mafMillivolts;
+        lookupValue = mafMillivolts;
     }
+
 
     // TODO - Make sure that we are reading MAF data array from lowest value to highest - Add array sort function (qsort?)
     // traverse the array until we find the lookupValue
-    for (int loopCount = 0; loopCount < mafMapDataLength; loopCount++) {
-
+    for (int rowNum = 0; rowNum <= numRows; rowNum++) {
+      
         // check to see if exact match is found 
-        if (lookupValue == mafMapData[loopCount][1]) {
+        if (lookupValue == mafMapData[rowNum][0]) {
             // we've got the exact value
-            mafFlowRateKGH = mafMapData[loopCount][2];
+            mafFlowRateKghRAW = mafMapData[rowNum][1];
             break;
 
         // if there is no match we need to interpolate using the next highest / lowest values
-        } else if ( (lookupValue > mafMapData[loopCount][1])) {
-            // NOTE: Linear interpolation formula Y=Y1+(X-X1)(Y2-Y1/X2-X1)
-            mafFlowRateKGH = (mafMapData[loopCount-1][2] + (lookupValue - mafMapData[loopCount-1][1]) * ((mafMapData[loopCount][2] - mafMapData[loopCount-1][2]) / (mafMapData[loopCount][1] - mafMapData[loopCount-1][1])));
+        } else if ( (mafMapData[rowNum][0]) > lookupValue) {
+            // NOTE: Linear interpolation formula Y=Y0+(((X-X0)(Y1-Y0))/(X1-X0)) where Y = flow and X = Volts
+
+            if (rowNum == 0) {
+              // Flow lower than lowest value in table so we set it to zero and consider it no flow
+              mafFlowRateKghRAW = 0;
+            } else {
+              // Flow value is valid so lets convert it.
+              mafFlowRateKghRAW = mafMapData[rowNum-1][1] + (((lookupValue - mafMapData[rowNum-1][0]) * (mafMapData[rowNum][1] - mafMapData[rowNum-1][1])) / (mafMapData[rowNum][0] - mafMapData[rowNum-1][0]));            
+            }
             break;
         }
+
     }
+
+
 
     // Get calibration offset from NVM
     EEPROM.get( NVM_CD_CAL_OFFSET_ADDR, calibrationOffset ); 
 
-    // convert stored CFM datavalue back into kg/h
-    mafFlowRateKGH = (mafFlowRateKGH / 1000) + calibrationOffset; 
+    // convert RAW datavalue back into kg/h
+    mafFlowRateKGH = float(mafFlowRateKghRAW / 1000); 
 
-    mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH);
+    // convert kg/h into cfm
+    mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH);// + calibrationOffset; // add calibration offset to value //TODO #21 Need to validate and test calibration routine
 
     return mafFlowRateCFM;
-    
+
+
 }
 
 
@@ -439,6 +456,7 @@ float getRefPressure (int units)
 
     #else
         // No reference pressure sensor used so lets return zero
+        //refPressureKpa = 6.97448943333324; //28"
         refPressureKpa = 0;
 
     #endif
@@ -525,7 +543,7 @@ bool benchIsRunning()
     float refPressure = getRefPressure(INWG);
     float mafFlowRateCFM = getMafFlowCFM();
 
-    if ((refPressure < minRefPressure) && (mafFlowRateCFM > minFlowRate))
+    if ((refPressure < MIN_BENCH_PRESSURE) && (mafFlowRateCFM > MIN_FLOW_RATE))
     {
         return true;
     } else {
@@ -614,36 +632,49 @@ void errorHandler(int errorVal)
  * UPDATE DISPLAYS
  *
  * Displays driven by tcMenu library
+ * 
+ * NOTE: display values need to be multiplied by divisor setting in TC menu to display decimal points
  ***/
 void updateDisplays()
 {
 
-    int desiredRefPressureInWg = menuARef.getCurrentValue();
     float mafFlowCFM = getMafFlowCFM();
-    float refPressure = getRefPressure(INWG);
+    float refPressure = getRefPressure(INWG);   
 
     // Main Menu
     // Flow Rate
-    if (mafFlowCFM > mafFlowThresholdCFM)
+    if (mafFlowCFM > MIN_FLOW_RATE)
     {
-        menuFlow.setFromFloatingPointValue(mafFlowCFM);   
+        menuFlow.setCurrentValue(mafFlowCFM * 100);   
     } else {
-        menuFlow.setFromFloatingPointValue(0);   
+        menuFlow.setCurrentValue(0);   
     }
-    // Reference pressure
-    menuPRef.setFromFloatingPointValue(refPressure);
-    // Temperature
-    menuTemp.setFromFloatingPointValue(getTemperature(DEGC));
-    // Pitot
-    menuPitot.setCurrentValue(getPitotPressure(INWG));
-    // Adjusted Flow
 
-    menuAFlow.setFromFloatingPointValue(convertMafFlowInWg(refPressure, desiredRefPressureInWg, mafFlowCFM));
+    // Temperature
+    menuTemp.setCurrentValue(getTemperature(DEGC) * 10);   
+    
+    // Pitot
+    menuPitot.setCurrentValue(getPitotPressure(INWG) * 10);  
+    
+    // Reference pressure
+    menuPRef.setCurrentValue(refPressure * 10);   
+    
+    // Adjusted Flow
+    int desiredRefPressureInWg = menuARef.getCurrentValue();
+    menuAFlow.setCurrentValue(convertMafFlowInWg(refPressure, desiredRefPressureInWg, mafFlowCFM) * 100);    //Scale output for display
+
+    //Maf Voltage
+    int mafFlowRaw = analogRead(MAF_PIN);
+    int mafvolts = (mafFlowRaw * (5.0 / 1023.0));
+    menuMafVolts.setFloatValue(mafvolts);
+
 
     //Settings Menu
     menuSettingsVer.setTextValue(VERSION);
     menuSettingsBld.setTextValue(BUILD);
     
+
+    // Additional Displays
 
     #if defined CFM_4X7SEG
         //TODO(#6) Add support for additional displays

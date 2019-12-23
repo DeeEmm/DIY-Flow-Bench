@@ -34,17 +34,19 @@ RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings"
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 10, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsVer);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, NULL);
+const PROGMEM FloatMenuInfo minfoMafVolts = { "MafVolts", 19, 0xffff, 2, NO_CALLBACK };
+FloatMenuItem menuMafVolts(&minfoMafVolts, &menuSettings);
 const PROGMEM AnalogMenuInfo minfoARef = { "ARef", 12, 38, 28, NO_CALLBACK, 0, 1, " Aq " };
-AnalogMenuItem menuARef(&minfoARef, 0, &menuSettings);
-const PROGMEM AnalogMenuInfo minfoAFlow = { "AFlow", 13, 40, 255, NO_CALLBACK, 0, 10, " CFM" };
+AnalogMenuItem menuARef(&minfoARef, 0, &menuMafVolts);
+const PROGMEM AnalogMenuInfo minfoAFlow = { "AFlow", 13, 40, 255, NO_CALLBACK, 0, 100, " CFM" };
 AnalogMenuItem menuAFlow(&minfoAFlow, 0, &menuARef);
-const PROGMEM AnalogMenuInfo minfoPitot = { "Pitot", 4, 8, 255, NO_CALLBACK, 0, 10, " Aq " };
+const PROGMEM AnalogMenuInfo minfoPitot = { "Pitot", 4, 8, 255, NO_CALLBACK, 0, 100, " Aq " };
 AnalogMenuItem menuPitot(&minfoPitot, 0, &menuAFlow);
 const PROGMEM AnalogMenuInfo minfoTemp = { "Temp", 18, 6, 255, NO_CALLBACK, 0, 10, " Deg" };
 AnalogMenuItem menuTemp(&minfoTemp, 0, &menuPitot);
-const PROGMEM AnalogMenuInfo minfoPRef = { "PRef", 2, 4, 255, NO_CALLBACK, 0, 10, " Aq " };
+const PROGMEM AnalogMenuInfo minfoPRef = { "PRef", 2, 4, 10000, NO_CALLBACK, 0, 10, " Aq " };
 AnalogMenuItem menuPRef(&minfoPRef, 0, &menuTemp);
-const PROGMEM AnalogMenuInfo minfoFlow = { "Flow", 1, 2, 255, NO_CALLBACK, 0, 10, " CFM" };
+const PROGMEM AnalogMenuInfo minfoFlow = { "Flow", 1, 2, 50000, NO_CALLBACK, 0, 100, " CFM" };
 AnalogMenuItem menuFlow(&minfoFlow, 0, &menuPRef);
 const PROGMEM ConnectorLocalInfo applicationInfo = { "DIY Flow Bench", "0fc9ae97-7781-4600-a281-4a3425ce8371" };
 
@@ -59,15 +61,16 @@ void setupMenu() {
     menuMgr.initForUpDownOk(&renderer, &menuFlow, DF_KEY_DOWN, DF_KEY_UP, DF_KEY_SELECT);
 
     // Read only and local only function calls
-    menuPitot.setReadOnly(true);
-    menuFlow.setReadOnly(true);
-    menuSettingsCalFlow.setReadOnly(true);
-    menuSettingsBld.setReadOnly(true);
-    menuSettingsVer.setReadOnly(true);
-    menuSettingsLeakTestCal.setReadOnly(true);
-    menuPRef.setReadOnly(true);
-    menuSettingsCalRefPress.setReadOnly(true);
-    menuAFlow.setReadOnly(true);
     menuSettingsLeakTestChk.setReadOnly(true);
+    menuPRef.setReadOnly(true);
+    menuSettingsCalFlow.setReadOnly(true);
+    menuPitot.setReadOnly(true);
+    menuSettingsLeakTestCal.setReadOnly(true);
+    menuSettingsVer.setReadOnly(true);
+    menuTemp.setReadOnly(true);
+    menuMafVolts.setReadOnly(true);
+    menuSettingsBld.setReadOnly(true);
+    menuAFlow.setReadOnly(true);
+    menuSettingsCalRefPress.setReadOnly(true);
 }
 

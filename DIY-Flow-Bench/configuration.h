@@ -28,6 +28,9 @@
  * /libraries/tcMenu
  * /libraries/IoAbstraction
  * /libraries/liquidCrystalIO
+ * /libraries/SimpleDHT
+ * /libraries/I2C-Sensor-Lib_iLib
+ * /libraries/BMP280_DEV
  * /libraries/
  *
  * The following libraries are also aneeded and available within the Arduino IDE
@@ -44,8 +47,7 @@
 /****************************************
  * SELECT BOARD TYPE 
  ***/
-#define ARDUINO_MEGA_2560 //default
-//#define ARDUINO_NANO
+#define ARDUINO_MEGA_2560                 //default
 //#define ARDUINO_UNO
 
 
@@ -71,34 +73,11 @@
     #define HUMIDITY_PIN A7
 
     // NVM Addresses (NOTE: 0-99 reserved for menu)
-    #define NVM_HIGH_FLOW_CAL_ADDR 100 //8 bytes for float
-    #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
-    #define NVM_LEAK_CAL_ADDR 115 //8 bytes for float
-    #define NVM_CD_CAL_OFFSET_ADDR 116 //8 bytes for float
-    #define NVM_REF_PRESS_CAL_ADDR 123 //8 bytes for float
-
-#endif
-
-
-// ARDUINO NANO
-#ifdef ARDUINO_NANO
-
-    // Define Physical Pins
-    #define VOLTAGE_PIN A0
-    #define MAF_PIN A1
-    #define REF_PRESSURE_PIN A2
-    #define REF_VAC_PIN A3
-    #define PITOT_PIN A4
-    #define TEMPERATURE_PIN A5
-    #define REF_BARO_PIN A6
-    #define HUMIDITY_PIN A7
-
-    // NVM Addresses (note 0-99 reserved for menu)
-    #define NVM_HIGH_FLOW_CAL_ADDR 100 //8 bytes for float
-    #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
-    #define NVM_LEAK_CAL_ADDR 115 //8 bytes for float
-    #define NVM_CD_CAL_OFFSET_ADDR 116 //8 bytes for float
-    #define NVM_REF_PRESS_CAL_ADDR 123 //8 bytes for float
+    #define NVM_HIGH_FLOW_CAL_ADDR 100    //8 bytes for float
+    #define NVM_LOW_FLOW_CAL_ADDR 107     //8 bytes for float
+    #define NVM_LEAK_CAL_ADDR 115         //8 bytes for float
+    #define NVM_CD_CAL_OFFSET_ADDR 116    //8 bytes for float
+    #define NVM_REF_PRESS_CAL_ADDR 123    //8 bytes for float
 
 #endif
 
@@ -115,18 +94,28 @@
     #define REF_VAC_PIN A3
     #define PITOT_PIN A4
     #define TEMPERATURE_PIN A5
-    #define REF_BARO_PIN A6 //NOTE this cannot be same as REF_PRESSURE_PIN
+    #define REF_BARO_PIN A6               //NOTE this cannot be same as REF_PRESSURE_PIN
     #define HUMIDITY_PIN A7
 
     // NVM Addresses (note 0-99 reserved for menu)
-    #define NVM_HIGH_FLOW_CAL_ADDR 100 //8 bytes for float
-    #define NVM_LOW_FLOW_CAL_ADDR 107 //8 bytes for float
-    #define NVM_REF_PRESS_CAL_ADDR 123 //8 bytes for float
-    #define NVM_LEAK_CAL_ADDR 131 //8 bytes for float
-    #define NVM_CD_CAL_OFFSET_ADDR 116 //8 bytes for float
-    #define NVM_REF_PRESS_CAL_ADDR 123 //8 bytes for float
+    #define NVM_HIGH_FLOW_CAL_ADDR 100    //8 bytes for float
+    #define NVM_LOW_FLOW_CAL_ADDR 107     //8 bytes for float
+    #define NVM_REF_PRESS_CAL_ADDR 123    //8 bytes for float
+    #define NVM_LEAK_CAL_ADDR 131         //8 bytes for float
+    #define NVM_CD_CAL_OFFSET_ADDR 116    //8 bytes for float
+    #define NVM_REF_PRESS_CAL_ADDR 123    //8 bytes for float
 
 #endif
+
+
+
+/****************************************
+ * GENERAL SETTINGS
+ ***/
+#define MIN_BENCH_PRESSURE 0              // Minimum pressure that we consider the bench is 'operational' / 'running' / vac source is on
+#define MIN_FLOW_RATE 2                   // Flow rate in cfm below which bench is considered off
+#define CYCLIC_AVERAGE_BUFFER 5           // Number of scans over which to average output (helps stabilise results)
+
 
 
 
@@ -138,10 +127,10 @@
  ***/
 
 
-//#include =  "mafData/exampleSensor.h" // Example file duplicate this as required
-
-#include "mafData/SIEMENS_5WK9605.h" // Data from Tonys tests
-//#include =  "mafData/DELPHI_AF10118." // kg/hr - Data from http://www.efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
+//#include =  "mafData/exampleSensor.h"   // Example file duplicate this as required
+#include "mafData/SIEMENS_5WK9605.h"      // Data from Tonys tests
+//#include "mafData/TEST.h"               // Test Data
+//#include =  "mafData/DELPHI_AF10118."   // kg/hr - Data from http://www.efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
 
 
 
@@ -151,7 +140,8 @@
  * You will need to add your volts to kPa algorythm in the function getRefPressure()
  ***/
 
-#define REF_MPXV7007 //default
+// None - Default
+//#define REF_MPXV7007 //default
 //#define REF_ILIB_BMP280
 //#define REF_ADAFRUIT_BMP280
 
@@ -165,8 +155,8 @@
  * Note Pitot sensors need to be a differential pressure sensor (DP)
  ***/
 
-#define PITOT_MPXV7007DP //default
-//#define PITOT_OTHER_TYPE //add your own sensor
+#define PITOT_MPXV7007DP                  //default
+//#define PITOT_OTHER_TYPE                //add your own sensor
 
 
 
@@ -176,11 +166,13 @@
  ***/
 
 // Default none (defaults to 14.7 psi)
-#define USE_REF_PRESS 
+//#define USE_REF_PRESS 
 //#define BARO_MPX4115 
 //#define BARO_ILIB_BMP280
 //#define BARO_ADAFRUIT_BMP280
 
+#define startupBaroScalingFactor 1        // scaling factor when using reference pressure sensor for baro correction
+#define startupBaroScalingOffset 100      // scaling offset when using reference pressure sensor for baro correction
 
 
 
@@ -190,7 +182,6 @@
 
 // Default none
 //#define RELH_DHT11 
-
 
 
 
@@ -220,15 +211,18 @@
  * CONFIGURE COMMUNICATIONS
  ***/
  
-#define showRemoteDialogs true // show menu dialogs on remote displays
+#define showRemoteDialogs true           // show menu dialogs on remote displays
   
  
+
  
- /****************************************
+/****************************************
  * CONFIGURE ALARMS
  ***/
  
 #define showAlarms true 
+
+ 
 
  
  /****************************************
@@ -239,17 +233,12 @@
  *
  ***/
 
-#define calibrationPlateHighCFM 100 // flow rate for large calibration orifice
-#define calibrationPlateMidCFM 50 // flow rate for med calibration orifice
-#define calibrationPlateLowCFM 10 // flow rate for small calibration orifice
+#define calibrationPlateHighCFM 100       // Flow rate for large calibration orifice
+#define calibrationPlateMidCFM 50         // Flow rate for med calibration orifice
+#define calibrationPlateLowCFM 10         // Flow rate for small calibration orifice
 
-#define calibrationRefPressure 10 //reference pressure orifices were measured at (leave at 10" if calibrating with CD)
-#define calibrationFlowRate 14.4 // standard flow rate for CD @ 10"/wg
+#define calibrationRefPressure 10         // Reference pressure orifices were measured at (leave at 10" if calibrating with CD)
+#define calibrationFlowRate 14.4          // Standard flow rate for CD @ 10"/wg
 
-#define leakTestTolerance 0 // tolerance in cfm
-#define minRefPressure 0 // minimum pressure that we consider the bench is 'operational' / 'running' / vac source is on
-#define minFlowRate 2 //flow rate at below which bench is considered off
-#define minTestPressurePercentage 80 //lowest test pressure bench will generate accurate results. Please see note in wiki
-
-#define startupBaroScalingFactor 1 // scaling factor when using reference pressure sensor for baro correction
-#define startupBaroScalingOffset 100 // scaling offset when using reference pressure sensor for baro correction
+#define leakTestTolerance 0               // Tolerance in cfm
+#define minTestPressurePercentage 80      // Lowest test pressure bench will generate accurate results. Please see note in wiki

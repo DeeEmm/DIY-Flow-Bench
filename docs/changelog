@@ -1,11 +1,17 @@
+19122401    - Bugfix release various display bugs
+			- Validated Mass > Volumetric flow conversion
+			- Validated Flow reference conversion
+			- Disabled menu timeout
+			- Added MafVolts to display for testing / diagnostics
+			- Tidied Display layout
 19122301    - Changed order of display items for better visibility on 2 line Display
             - Added one decimal places to display values value (changed divisor to 10 in tcMenu)
             - Renamed existing BMP280 code references to ADAFRUIT_BMP280
             - Added support for ILIB_BMP280 library
-            - Added support for DHT11 sensors
+            - Added support for DHT11 sensor///////////s
             - Added mass > volumetric flow compensation calculations
             - Remapped Siemens_5WK9605 mafdata from cfm to kg/h
-19122001    - Added support for BMP280
+19122001    - Added support for BMP280//sdfsdfdsfdf////
             - Fixed potential MAF conversion issue
             - Minor bugfixes
 19120803    - Display Calibration results on screen 
