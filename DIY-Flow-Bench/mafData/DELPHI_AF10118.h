@@ -1,4 +1,4 @@
-// array {mV, CFM/1000}
+// array {mV, kgh/1000}
 float mafMapData[][2] = {
 {	0	,	3650	},
 {	60	,	5620	},

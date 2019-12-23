@@ -15,8 +15,8 @@
  ***/
 
 // Development and release version - Don't forget to update the changelog!!
-#define VERSION "V1.0-Alpha"
-#define BUILD "19122002"
+#define VERSION "V1.0-Beta"
+#define BUILD "19122301"
 
 
 /****************************************
@@ -33,13 +33,27 @@
 
 /****************************************
  * OPTIONAL LIBRARIES
- * (comment / uncomment as necessary)
+ * Add pre-directives for all optional libraries to preserve memory
  ***/
 
-// Support for BMP280 temp & pressure sensor
-#if defined REF_BMP280 || defined TEMP_BMP280 || defined BARO_BMP280
+// Support for ADAFRUIT_BMP280 temp & pressure sensor
+// https://www.adafruit.com/product/2651
+#if defined REF_ADAFRUIT_BMP280 || defined TEMP_ADAFRUIT_BMP280 || defined BARO_ADAFRUIT_BMP280
     #include <BMP280_DEV.h> 
-    BMP280_DEV bmp280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
+    BMP280_DEV adafruitBmp280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
+#endif
+
+// Support for ILIB_BMP280 temp & pressure sensors
+// https://github.com/orgua/iLib
+#if defined REF_ILIB_BMP280 || defined TEMP_ILIB_BMP280 || defined BARO_ILIB_BMP280
+    #include <i2c_BMP280.h> 
+    BMP280 ilibBmp280; 
+#endif
+
+// Support for DHT11 humidity / temperature sensors
+// https://github.com/winlinvip/SimpleDHT
+#if defined RELH_DHT11 || defined TEMP_DHT11
+    #include <SimpleDHT.h>  
 #endif
 
 
@@ -47,14 +61,22 @@
  * DECLARE CONSTANTS
  ***/
 
-// Pressure units
+// standard units
 #define INWG 1
 #define KPA 2
+#define PSIA 3
+#define DEGC 4
+#define DEGF 5
+#define RANKINE 6
+
 
 // Error handler codes
 #define REF_PRESS_LOW 1
 #define LEAK_TEST_FAILED 2
 #define LEAK_TEST_PASS 3
+
+// Other constants
+#define MOLECULAR_WEIGHT_DRY_AIR 28.964
 
 
 
@@ -66,12 +88,11 @@ float startupBaroPressure;
 int mafFlowThresholdCFM;
 int errorVal = 0;
 
-bool benchIsRunning();
-//void errorHandler();
-//void onDialogFinished();
-
-// Declared in mafData file
 extern long int mafMapData[][2];
+
+bool benchIsRunning();
+
+
 
 /****************************************
  * INITIALISATION
@@ -80,15 +101,29 @@ void setup ()
 {
     // Initialise libraries
     
-    // BMP Pressure & temp transducer
-    #if defined REF_BMP280 || defined TEMP_BMP280 || defined BARO_BMP280
-        bmp280.begin();                                 // Default initialisation, place the BMP280 into SLEEP_MODE 
-        //bmp280.setPresOversampling(OVERSAMPLING_X4);    // Set the pressure oversampling to X4
-        //bmp280.setTempOversampling(OVERSAMPLING_X1);    // Set the temperature oversampling to X1
-        //bmp280.setIIRFilter(IIR_FILTER_4);              // Set the IIR filter to setting 4
-        bmp280.setTimeStandby(TIME_STANDBY_2000MS);     // Set the standby time to 2 seconds
-        bmp280.startNormalConversion();  
+    // Adafruit or derivative BMP Pressure & temp transducer
+    #if defined REF_ADAFRUIT_BMP280 || defined TEMP_ADAFRUIT_BMP280 || defined BARO_ADAFRUIT_BMP280
+        adafruitBmp280.begin();          
+        //adafruitBmp280.begin(FORCED_MODE, BMP280_I2C_ALT_ADDR);	// Initialise the BMP280 in FORCED_MODE with the alternate I2C address (0x76)                       // Default initialisation, place the BMP280 into SLEEP_MODE 
+        //adafruitBmp280.setPresOversampling(OVERSAMPLING_X4);    // Set the pressure oversampling to X4
+        //adafruitBmp280.setTempOversampling(OVERSAMPLING_X1);    // Set the temperature oversampling to X1
+        //adafruitBmp280.setIIRFilter(IIR_FILTER_4);              // Set the IIR filter to setting 4
+        adafruitBmp280.setTimeStandby(TIME_STANDBY_2000MS);     // Set the standby time to 2 seconds
+        adafruitBmp280.startNormalConversion();  
     #endif
+
+    // ILIB BMP Pressure & temp transducer
+    #if defined REF_ILIB_BMP280 || defined TEMP_ILIB_BMP280 || defined BARO_ILIB_BMP280
+        ilibBmp280.initialize();
+        ilibBmp280.setEnabled(); //TODO - VERIFY - Have removed zero as it appears zero initialises library as a one-shot read - DM 22.12.19
+        ilibBmp280.triggerMeasurement(); 
+    #endif
+
+    // Support for DHT11 humidity / temperature sensors
+    #if defined RELH_DHT11 || defined TEMP_DHT11
+        SimpleDHT11 dht11(HUMIDITY_PIN);
+   #endif
+ 
 
     // Set up the menu + display system
     setupMenu(); 
@@ -116,15 +151,17 @@ float getSupplyMillivolts()
 
 
 /****************************************
- * GET BAROMETRIC CORRECTION
+ * GET BAROMETRIC pressure (kPa)
+ * NOTE: Sensor must return an absolute value
  ***/
-float getBaroPressure()
+float getBaroPressure(int units)
 {   
 
     float baroPressureKpa;
-    float baroPressureHpa;
-    float refTempDegC;
-    float refAltM;
+    float baroPressurePsia;
+    float baroPressureRaw;
+    float refTempRaw;
+    float refAltRaw;
     int supplyMillivolts = getSupplyMillivolts();
     int rawBaroValue = analogRead(REF_BARO_PIN);
     int baroMillivolts = (rawBaroValue * (5.0 / 1023.0)) * 1000;
@@ -134,19 +171,181 @@ float getBaroPressure()
         // P = ((Vout / VS ) - 0.095) / 0.009 --- Formula transposed for P
         baroPressureKpa = ((baroMillivolts / supplyMillivolts ) - 0.095) / 0.009; 
 
-    #elif defined BARO_BMP280
-        bmp280.getMeasurements(refTempDegC, baroPressureHpa, refAltM);
-        baroPressureKpa = baroPressureHpa * 10;
+    #elif defined BARO_ADAFRUIT_BMP280
+        adafruitBmp280.getMeasurements(refTempRaw, baroPressureRaw, refAltRaw); // Deg C | hPa | M
+        baroPressureKpa = baroPressureRaw * 10;
 
-    #else
+    #elif defined BARO_ILIB_BMP280
+//        ilibBmp280.awaitMeasurement();
+        ilibBmp280.getPressure(baroPressureRaw);
+//        ilibBmp280.triggerMeasurement(); 
+        baroPressureKpa = baroPressureRaw / 1000;
+
+    #elif defined USE_REF_PRESS
         // No baro sensor defined so use value grabbed at startup from reference pressure sensor
         // NOTE will only work for absolute style pressure sensor else code may need to be changed
         baroPressureKpa = (startupBaroPressure * startupBaroScalingFactor) + startupBaroScalingOffset; 
+    #else
+        // we dont have any sensor so use standard sealevel baro pressure (14.7 psi)
+        baroPressureKpa = 101.3529;
     #endif
 
-    return baroPressureKpa;
+
+     switch (units)
+    {
+        case KPA:
+            return baroPressureKpa;
+        break;
+
+        case PSIA:
+            baroPressurePsia = baroPressureKpa * 0.145038;
+            return baroPressurePsia;
+        break;
+    }   
+
 }
 
+
+
+/****************************************
+ * CALCULATE TEMPERATURE
+ * Convert RAW temperature sensor data
+ ***/
+float getTemperature(int units)
+{   
+    float refAltRaw;
+    float refPressureRaw;
+    float refTempRaw;
+    float refTempDegC;
+    float refTempDegF;
+    float refTempRankine;
+    float relativeHumidity;
+
+    #if defined TEMP_ADAFRUIT_BMP280
+        adafruitBmp280.getMeasurements(refTempRaw, refPressureRaw, refAltRaw);
+        refTempDegC = roundf(refTempRaw*100.0)/100.0;
+
+    #elif defined TEMP_ILIB_BMP280
+//        bmp280.awaitMeasurement();
+        ilibBmp280.getTemperature(refTempRaw);
+//        bmp280.triggerMeasurement();
+        refTempDegC = roundf(refTempRaw*100.0)/100.0;
+
+    #elif defined TEMP_DHT11
+        // NOTE DHT11 sampling rate is 1HZ. we may need to slow down read rate to every few secs
+        dht11.read(&refTempDegC, &relativeHumidity, NULL)
+
+    #else
+        // We don't have any temperature input so we will assume ambient
+        refTempDegC = 21;
+    #endif
+
+     switch (units)
+    {
+        case DEGC:
+            return refTempDegC;
+        break;
+
+        case DEGF:
+            refTempDegF = refTempDegC * 1.8;
+            return refTempDegF;
+        break;
+
+        case RANKINE:
+            refTempRankine = (refTempDegC + 273.15 ) * 9 / 5;
+            return refTempRankine;
+        break;
+    }   
+}
+
+
+
+/****************************************
+ * GET RELATIVE HUMIDITY %
+ ***/
+float getRelativeHumidity()
+{   
+    float relativeHumidity;
+    float tempDegC;
+
+    #if defined RELH_DHT11
+        // NOTE DHT11 sampling rate is 1HZ. we may need to slow down read rate to every few secs
+        dht11.read(&tempDegC, &relativeHumidity, NULL)
+
+    #else
+        //we dont have any sensor so use standard value
+        relativeHumidity = 0.36;
+    #endif
+
+    return relativeHumidity;
+    
+}  
+    
+
+
+
+/****************************************
+ * GET VAPOR PRESSURE
+ ***/
+float getVaporPressureKpa(int units)
+{   
+    float airTemp = getTemperature(DEGC);
+    float molecularWeightOfDryAir = 28.964;
+    float vapourPressureKpa =(0.61078 * exp((17.27 * airTemp)/(airTemp + 237.3))); // Tetans Equasion
+    float vapourPressurePsia;
+
+     switch (units)
+    {
+        case KPA:
+            return vapourPressureKpa;
+        break;
+
+        case PSIA:
+            vapourPressurePsia = vapourPressureKpa * 0.145038;
+            return vapourPressurePsia;
+        break;
+    }   
+
+}  
+    
+
+
+
+/****************************************
+ * GET SPECIFIC GRAVITY
+ ***/
+float getSpecificGravity()
+{   
+    float specificGravity;
+    float relativeHumidity = getRelativeHumidity();
+    float vaporPressurePsia = getVaporPressureKpa(PSIA);
+    float baroPressure = getBaroPressure(PSIA);
+
+    specificGravity = (1-(0.378 * relativeHumidity * vaporPressurePsia) / baroPressure);
+    
+    return specificGravity;
+}  
+    
+
+
+
+/****************************************
+ * CONVERT MASS FLOW TO VOLUMETRIC FLOW
+ ***/
+float convertMassFlowToVolumetric(float massFlowKgh)
+{   
+    float mafFlowCFM;
+    float tempInRankine = getTemperature(RANKINE);
+    float specificGravity = getSpecificGravity();
+    float molecularWeight = MOLECULAR_WEIGHT_DRY_AIR * specificGravity;
+    float baroPressure = getBaroPressure(PSIA); 
+
+    mafFlowCFM = (massFlowKgh * 1545 * tempInRankine) / (molecularWeight * 144 * baroPressure);
+
+
+    return mafFlowCFM;
+}  
+    
 
 
 
@@ -158,46 +357,49 @@ float getMafFlowCFM()
 {
     // NOTE mafMapData is global array declared in mafData files
     float mafFlowRateCFM;
+    float mafFlowRateKGH;
     float calibrationOffset;
-    int rawMafValue = analogRead(MAF_PIN);
-    int mafMillivolts = (rawMafValue * (5.0 / 1023.0)) * 1000;
+    int mafFlowRaw = analogRead(MAF_PIN);
+    int mafMillivolts = (mafFlowRaw * (5.0 / 1023.0)) * 1000;
     int arrayPos;
     int lookupValue;
     int mafMapDataLength = sizeof(mafMapData) / 2;  
 
     // determine what kind of MAF data array we have
     if (mafMapDataLength >= 1023) {
-        // we have a raw analog data array so we use the rawMafValue for the lookup
-        int lookupValue = rawMafValue;
+        // we have a raw analog data array so we use the mafFlowRaw for the lookup
+        int lookupValue = mafFlowRaw;
     } else {
         // we have a mV / cfm array so we use the mafMillivolts value for the lookup
         int lookupValue = mafMillivolts;
     }
 
+    // TODO - Make sure that we are reading MAF data array from lowest value to highest - Add array sort function (qsort?)
     // traverse the array until we find the lookupValue
     for (int loopCount = 0; loopCount < mafMapDataLength; loopCount++) {
 
         // check to see if exact match is found 
         if (lookupValue == mafMapData[loopCount][1]) {
             // we've got the exact value
-            mafFlowRateCFM = mafMapData[loopCount][2];
+            mafFlowRateKGH = mafMapData[loopCount][2];
             break;
 
-        //TODO() - Make sure that we are reading MAF data array from lowest value to highest
         // if there is no match we need to interpolate using the next highest / lowest values
         } else if ( (lookupValue > mafMapData[loopCount][1])) {
             // NOTE: Linear interpolation formula Y=Y1+(X-X1)(Y2-Y1/X2-X1)
-            mafFlowRateCFM = (mafMapData[loopCount-1][2] + (lookupValue - mafMapData[loopCount-1][1]) * ((mafMapData[loopCount][2] - mafMapData[loopCount-1][2]) / (mafMapData[loopCount][1] - mafMapData[loopCount-1][1])));
+            mafFlowRateKGH = (mafMapData[loopCount-1][2] + (lookupValue - mafMapData[loopCount-1][1]) * ((mafMapData[loopCount][2] - mafMapData[loopCount-1][2]) / (mafMapData[loopCount][1] - mafMapData[loopCount-1][1])));
             break;
         }
     }
 
     // Get calibration offset from NVM
-    EEPROM.get( NVM_CD_CAL_OFFSET_ADDR, calibrationOffset ); //
+    EEPROM.get( NVM_CD_CAL_OFFSET_ADDR, calibrationOffset ); 
 
-    // convert stored CFM datavalue back into cfm
-    mafFlowRateCFM = (mafFlowRateCFM / 1000) + calibrationOffset; 
-    
+    // convert stored CFM datavalue back into kg/h
+    mafFlowRateKGH = (mafFlowRateKGH / 1000) + calibrationOffset; 
+
+    mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH);
+
     return mafFlowRateCFM;
     
 }
@@ -213,9 +415,9 @@ float getRefPressure (int units)
 
     float refPressureKpa;
     float refPressureInWg;
-    float refPressureHpa;
-    float refTempDegC;
-    float refAltM;
+    float refPressureRaw;
+    float refTempDegRaw;
+    float refAltRaw;
     int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
     int refPressMillivolts = (rawRefPressValue * (5.0 / 1023.0)) * 1000;
     int supplyMillivolts = getSupplyMillivolts();
@@ -225,9 +427,15 @@ float getRefPressure (int units)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
         refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
 
-    #elif defined REF_BMP280
-        bmp280.getMeasurements(refTempDegC, refPressureHpa, refAltM);
-        refPressureKpa = refPressureHpa * 10;
+    #elif defined REF_ADAFRUIT_BMP280
+        adafruitBmp280.getMeasurements(refTempDegRaw, refPressureRaw, refAltRaw);
+        refPressureKpa = refPressureRaw * 10;
+
+    #elif defined REF_ILIB_BMP280
+//        ilibBmp280.awaitMeasurement();
+        ilibBmp280.getPressure(refPressureRaw);
+//        ilibBmp280.triggerMeasurement();       
+        refPressureKpa = refPressureRaw / 1000;
 
     #else
         // No reference pressure sensor used so lets return zero
@@ -248,33 +456,6 @@ float getRefPressure (int units)
         break;
     }
     
-}
-
-
-
-/****************************************
- * CALCULATE TEMPERATURE
- * Convert RAW temperature sensor data
- ***/
-float getTemperature()
-{   
-    float refAltM;
-    float refPressureHpa;
-    float refTempDegC;
-
-    //TODO(#2) Add support for temperature sensor
-    #if defined TEMP_BMP280
-        bmp280.getMeasurements(refTempDegC, refPressureHpa, refAltM);
-
-    #elif defined TEMP_OTHER_TYPE
-        //define your custom temp sensor here
-
-    #else
-        // We don't have any temperature input so we will assume ambient
-        refTempDegC = 21;
-    #endif
-
-    return refTempDegC;
 }
 
 
@@ -445,19 +626,19 @@ void updateDisplays()
     // Flow Rate
     if (mafFlowCFM > mafFlowThresholdCFM)
     {
-        menuFlow.setCurrentValue(mafFlowCFM);   
+        menuFlow.setFromFloatingPointValue(mafFlowCFM);   
     } else {
-        menuFlow.setCurrentValue(0);   
+        menuFlow.setFromFloatingPointValue(0);   
     }
     // Reference pressure
-    menuPRef.setCurrentValue(refPressure);
+    menuPRef.setFromFloatingPointValue(refPressure);
     // Temperature
-    menuTemp.setCurrentValue(getTemperature());
+    menuTemp.setFromFloatingPointValue(getTemperature(DEGC));
     // Pitot
     menuPitot.setCurrentValue(getPitotPressure(INWG));
     // Adjusted Flow
 
-    menuAFlow.setCurrentValue(convertMafFlowInWg(refPressure, desiredRefPressureInWg, mafFlowCFM));
+    menuAFlow.setFromFloatingPointValue(convertMafFlowInWg(refPressure, desiredRefPressureInWg, mafFlowCFM));
 
     //Settings Menu
     menuSettingsVer.setTextValue(VERSION);
@@ -470,10 +651,11 @@ void updateDisplays()
 
     #if defined PITOT_4X7SEG
         //TODO(#6) Add support for additional displays
+        //menuPitot.setCurrentValue(getPitotPressure(INWG));
     #endif
 
     #if defined MPXV7007 
-        menuPRef.setCurrentValue(refPressureInWg);
+        //menuPRef.setFromFloatingPointValue(refPressureInWg);
     #endif
 
 

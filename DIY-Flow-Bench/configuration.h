@@ -139,8 +139,9 @@
 
 
 //#include =  "mafData/exampleSensor.h" // Example file duplicate this as required
+
 #include "mafData/SIEMENS_5WK9605.h" // Data from Tonys tests
-//#include =  "mafData/DELPHI_AF10118." // Data from http://www.efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
+//#include =  "mafData/DELPHI_AF10118." // kg/hr - Data from http://www.efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
 
 
 
@@ -151,7 +152,8 @@
  ***/
 
 #define REF_MPXV7007 //default
-//#define REF_BMP280
+//#define REF_ILIB_BMP280
+//#define REF_ADAFRUIT_BMP280
 
 
 
@@ -173,8 +175,21 @@
  * CONFIGURE BARO SENSOR
  ***/
 
-#define BARO_MPX4115 //default
-//#define BARO_BMP280
+// Default none (defaults to 14.7 psi)
+#define USE_REF_PRESS 
+//#define BARO_MPX4115 
+//#define BARO_ILIB_BMP280
+//#define BARO_ADAFRUIT_BMP280
+
+
+
+
+/****************************************
+ * CONFIGURE HUMIDITY SENSOR
+ ***/
+
+// Default none
+//#define RELH_DHT11 
 
 
 
@@ -183,9 +198,10 @@
  * CONFIGURE TEMPERATURE SENSOR
  ***/
 
-#define TEMP_BMP280
-//#define TEMP_OTHER_TYPE
-
+// Default none
+//#define TEMP_ILIB_BMP280
+//#define TEMP_ADAFRUIT_BMP280
+//#define TEMP_DHT11 
 
 
 

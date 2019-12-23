@@ -1,4 +1,10 @@
-19122002    - Bugfix BMP 280 Library
+19122301    - Changed order of display items for better visibility on 2 line Display
+            - Added one decimal places to display values value (changed divisor to 10 in tcMenu)
+            - Renamed existing BMP280 code references to ADAFRUIT_BMP280
+            - Added support for ILIB_BMP280 library
+            - Added support for DHT11 sensors
+            - Added mass > volumetric flow compensation calculations
+            - Remapped Siemens_5WK9605 mafdata from cfm to kg/h
 19122001    - Added support for BMP280
             - Fixed potential MAF conversion issue
             - Minor bugfixes
