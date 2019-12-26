@@ -1,3 +1,7 @@
+19122601	- #23 DHT11 compile issue
+			- #19 Support for RH sensor
+			- Added MIN_MAF_MILLIVOLTS to filter MAF results 
+			- #20 Fixed issue with Pitot sensor decode
 19122401    - Bugfix release various display bugs
 			- Validated Mass > Volumetric flow conversion
 			- Validated Flow reference conversion

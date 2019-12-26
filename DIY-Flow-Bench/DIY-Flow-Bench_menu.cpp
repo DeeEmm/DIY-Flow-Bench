@@ -18,35 +18,39 @@ LiquidCrystalRenderer renderer(lcd, 16, 2);
 
 // Global Menu Item declarations
 
-const PROGMEM AnyMenuInfo minfoSettingsCalFlow = { "Cal Flow", 16, 55, 0, setCalibrationOffset };
+const PROGMEM AnyMenuInfo minfoSettingsCalFlow = { "Cal Flow", 16, 0xffff, 0, setCalibrationOffset };
 ActionMenuItem menuSettingsCalFlow(&minfoSettingsCalFlow, NULL);
-const PROGMEM AnyMenuInfo minfoSettingsCalRefPress = { "Cal Ref Press", 15, 51, 0, setRefPressCalibrationValue };
+const PROGMEM AnyMenuInfo minfoSettingsCalRefPress = { "Cal Ref Press", 15, 0xffff, 0, setRefPressCalibrationValue };
 ActionMenuItem menuSettingsCalRefPress(&minfoSettingsCalRefPress, &menuSettingsCalFlow);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLeakTestChkRtCall, textItemRenderFn, "Leak Test Chk", 48, checkLeakCalibrationValue)
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLeakTestChkRtCall, textItemRenderFn, "Leak Test Chk", -1, checkLeakCalibrationValue)
 TextMenuItem menuSettingsLeakTestChk(fnSettingsLeakTestChkRtCall, 14, 3, &menuSettingsCalRefPress);
-const PROGMEM AnyMenuInfo minfoSettingsLeakTestCal = { "Leak Test Cal", 8, 17, 0, setLeakCalibrationValue };
+const PROGMEM AnyMenuInfo minfoSettingsLeakTestCal = { "Leak Test Cal", 8, 0xffff, 0, setLeakCalibrationValue };
 ActionMenuItem menuSettingsLeakTestCal(&minfoSettingsLeakTestCal, &menuSettingsLeakTestChk);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsBldRtCall, textItemRenderFn, "Bld", 30, NULL)
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsBldRtCall, textItemRenderFn, "Bld", -1, NULL)
 TextMenuItem menuSettingsBld(fnSettingsBldRtCall, 11, 9, &menuSettingsLeakTestCal);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsVerRtCall, textItemRenderFn, "Ver", 20, NULL)
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsVerRtCall, textItemRenderFn, "Ver", -1, NULL)
 TextMenuItem menuSettingsVer(fnSettingsVerRtCall, 10, 12, &menuSettingsBld);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", 10, NULL)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 10, 0, NO_CALLBACK };
 BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsVer);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, NULL);
+const PROGMEM FloatMenuInfo minfoPitotVolts = { "Pitot Volts", 22, 0xffff, 2, NO_CALLBACK };
+FloatMenuItem menuPitotVolts(&minfoPitotVolts, &menuSettings);
 const PROGMEM FloatMenuInfo minfoMafVolts = { "MafVolts", 19, 0xffff, 2, NO_CALLBACK };
-FloatMenuItem menuMafVolts(&minfoMafVolts, &menuSettings);
-const PROGMEM AnalogMenuInfo minfoARef = { "ARef", 12, 38, 28, NO_CALLBACK, 0, 1, " Aq " };
-AnalogMenuItem menuARef(&minfoARef, 0, &menuMafVolts);
-const PROGMEM AnalogMenuInfo minfoAFlow = { "AFlow", 13, 40, 255, NO_CALLBACK, 0, 100, " CFM" };
+FloatMenuItem menuMafVolts(&minfoMafVolts, &menuPitotVolts);
+const PROGMEM AnalogMenuInfo minfoRelH = { "RelH", 20, 0xffff, 65355, NO_CALLBACK, 0, 10, " %  " };
+AnalogMenuItem menuRelH(&minfoRelH, 0, &menuMafVolts);
+const PROGMEM AnalogMenuInfo minfoARef = { "ARef", 12, 0xffff, 28, NO_CALLBACK, 0, 1, " Aq " };
+AnalogMenuItem menuARef(&minfoARef, 0, &menuRelH);
+const PROGMEM AnalogMenuInfo minfoAFlow = { "AFlow", 13, 0xffff, 255, NO_CALLBACK, 0, 100, " CFM" };
 AnalogMenuItem menuAFlow(&minfoAFlow, 0, &menuARef);
-const PROGMEM AnalogMenuInfo minfoPitot = { "Pitot", 4, 8, 255, NO_CALLBACK, 0, 100, " Aq " };
-AnalogMenuItem menuPitot(&minfoPitot, 0, &menuAFlow);
-const PROGMEM AnalogMenuInfo minfoTemp = { "Temp", 18, 6, 255, NO_CALLBACK, 0, 10, " Deg" };
+const PROGMEM FloatMenuInfo minfoPitot = { "Pitot", 21, 0xffff, 2, NO_CALLBACK };
+FloatMenuItem menuPitot(&minfoPitot, &menuAFlow);
+const PROGMEM AnalogMenuInfo minfoTemp = { "Temp", 18, 0xffff, 65355, NO_CALLBACK, 0, 10, " Deg" };
 AnalogMenuItem menuTemp(&minfoTemp, 0, &menuPitot);
-const PROGMEM AnalogMenuInfo minfoPRef = { "PRef", 2, 4, 10000, NO_CALLBACK, 0, 10, " Aq " };
+const PROGMEM AnalogMenuInfo minfoPRef = { "PRef", 2, 0xffff, 65355, NO_CALLBACK, 0, 10, " Aq " };
 AnalogMenuItem menuPRef(&minfoPRef, 0, &menuTemp);
-const PROGMEM AnalogMenuInfo minfoFlow = { "Flow", 1, 2, 50000, NO_CALLBACK, 0, 100, " CFM" };
+const PROGMEM AnalogMenuInfo minfoFlow = { "Flow", 1, 0xffff, 65355, NO_CALLBACK, 0, 100, " CFM" };
 AnalogMenuItem menuFlow(&minfoFlow, 0, &menuPRef);
 const PROGMEM ConnectorLocalInfo applicationInfo = { "DIY Flow Bench", "0fc9ae97-7781-4600-a281-4a3425ce8371" };
 
@@ -62,15 +66,15 @@ void setupMenu() {
 
     // Read only and local only function calls
     menuSettingsLeakTestChk.setReadOnly(true);
+    menuSettingsCalRefPress.setReadOnly(true);
+    menuAFlow.setReadOnly(true);
+    menuSettingsBld.setReadOnly(true);
     menuPRef.setReadOnly(true);
-    menuSettingsCalFlow.setReadOnly(true);
-    menuPitot.setReadOnly(true);
-    menuSettingsLeakTestCal.setReadOnly(true);
     menuSettingsVer.setReadOnly(true);
     menuTemp.setReadOnly(true);
+    menuPitot.setReadOnly(true);
     menuMafVolts.setReadOnly(true);
-    menuSettingsBld.setReadOnly(true);
-    menuAFlow.setReadOnly(true);
-    menuSettingsCalRefPress.setReadOnly(true);
+    menuSettingsLeakTestCal.setReadOnly(true);
+    menuSettingsCalFlow.setReadOnly(true);
 }
 

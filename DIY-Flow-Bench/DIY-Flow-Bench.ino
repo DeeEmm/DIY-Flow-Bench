@@ -51,8 +51,9 @@
 
 // Support for DHT11 humidity / temperature sensors
 // https://github.com/winlinvip/SimpleDHT
-#if defined RELH_DHT11 || defined TEMP_DHT11
+#if defined SIMPLE_RELH_DHT11 || defined SIMPLE_TEMP_DHT11
     #include <SimpleDHT.h>  
+    SimpleDHT11 dht11(HUMIDITY_PIN);    
 #endif
 
 
@@ -73,6 +74,7 @@
 #define REF_PRESS_LOW 1
 #define LEAK_TEST_FAILED 2
 #define LEAK_TEST_PASS 3
+#define DHT11_READ_FAIL 4
 
 // Other constants
 #define MOLECULAR_WEIGHT_DRY_AIR 28.964
@@ -98,6 +100,11 @@ extern long mafMapData[][2];
  ***/
 void setup ()
 {
+
+    #ifdef DEV_MODE 
+        Serial.begin(9600);
+    #endif
+  
     // Initialise libraries
     
     // Adafruit or derivative BMP Pressure & temp transducer
@@ -117,11 +124,6 @@ void setup ()
         ilibBmp280.setEnabled(); //TODO - VERIFY - Have removed zero as it appears zero initialises library as a one-shot read - DM 22.12.19
         ilibBmp280.triggerMeasurement(); 
     #endif
-
-    // Support for DHT11 humidity / temperature sensors
-    #if defined RELH_DHT11 || defined TEMP_DHT11
-        SimpleDHT11 dht11(HUMIDITY_PIN);
-   #endif
  
     // Set up the menu + display system
     setupMenu(); 
@@ -141,7 +143,7 @@ void setup ()
 float getSupplyMillivolts()
 {   
     int rawVoltageValue = analogRead(VOLTAGE_PIN);
-    int supplyMillivolts = rawVoltageValue * (5.0 / 1023.0) * 100;
+    int supplyMillivolts = rawVoltageValue * (5.0 / 1024.0) * 1000;
 
     return supplyMillivolts;
 }
@@ -163,7 +165,7 @@ float getBaroPressure(int units)
     float refAltRaw;
     int supplyMillivolts = getSupplyMillivolts();
     int rawBaroValue = analogRead(REF_BARO_PIN);
-    int baroMillivolts = (rawBaroValue * (5.0 / 1023.0)) * 1000;
+    int baroMillivolts = (rawBaroValue * (5.0 / 1024.0)) * 1000;
 
     #if defined BARO_MPX4115
         // Vout = VS (P x 0.009 – 0.095) --- Where VS = Supply Voltage (Formula from Datasheet)
@@ -175,9 +177,9 @@ float getBaroPressure(int units)
         baroPressureKpa = baroPressureRaw * 10;
 
     #elif defined BARO_ILIB_BMP280
-//        ilibBmp280.awaitMeasurement();
+        ilibBmp280.awaitMeasurement();
         ilibBmp280.getPressure(baroPressureRaw);
-//        ilibBmp280.triggerMeasurement(); 
+        ilibBmp280.triggerMeasurement(); 
         baroPressureKpa = baroPressureRaw / 1000;
 
     #elif defined USE_REF_PRESS
@@ -219,21 +221,29 @@ float getTemperature(int units)
     float refTempDegF;
     float refTempRankine;
     float relativeHumidity;
+    byte refTemp;
+    byte refRelh;
 
     #if defined TEMP_ADAFRUIT_BMP280
         adafruitBmp280.getMeasurements(refTempRaw, refPressureRaw, refAltRaw);
         refTempDegC = roundf(refTempRaw*100.0)/100.0;
 
     #elif defined TEMP_ILIB_BMP280
-//        bmp280.awaitMeasurement();
+        ilibbmp280.awaitMeasurement();
         ilibBmp280.getTemperature(refTempRaw);
-//        bmp280.triggerMeasurement();
+        ilibbmp280.triggerMeasurement();
         refTempDegC = roundf(refTempRaw*100.0)/100.0;
 
-    #elif defined TEMP_DHT11
-        // NOTE DHT11 sampling rate is 1HZ. we may need to slow down read rate to every few secs
-        dht11.read(&refTempDegC, &relativeHumidity, NULL)
-
+    #elif defined SIMPLE_TEMP_DHT11
+        // NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
+        int err = SimpleDHTErrSuccess;
+        if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
+          int errorVal = DHT11_READ_FAIL; // Set error to display on screen
+          refTempDegC = 0;        
+        } else {
+          refTempDegC = refTemp;
+        }
+        
     #else
         // We don't have any temperature input so we will assume ambient
         refTempDegC = 21;
@@ -266,10 +276,18 @@ float getRelativeHumidity()
 {   
     float relativeHumidity;
     float tempDegC;
+    byte refTemp;
+    byte refRelh;
 
-    #if defined RELH_DHT11
-        // NOTE DHT11 sampling rate is 1HZ. we may need to slow down read rate to every few secs
-        dht11.read(&tempDegC, &relativeHumidity, NULL)
+    #if defined SIMPLE_RELH_DHT11
+        // NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
+        int err = SimpleDHTErrSuccess;
+        if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
+          int errorVal = DHT11_READ_FAIL; // Set error to display on screen
+          relativeHumidity = 0;        
+        } else {
+          relativeHumidity = refRelh;
+        }
 
     #else
         //we dont have any sensor so use standard value
@@ -362,15 +380,19 @@ float getMafFlowCFM()
     float calibrationOffset;
     float mafFlowRateCFM;
     float mafFlowRateKGH;
-    long mafFlowRateKghRAW;
+    float mafFlowRateKghRAW;
     int mafFlowRaw = analogRead(MAF_PIN);
-    int mafMillivolts = (mafFlowRaw * (5.0 / 1023.0)) * 1000;
+    int mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
     int lookupValue;
     int numRows = sizeof(mafMapData)/sizeof(mafMapData[0]);
     //int numCols = sizeof(mafMapData[0])/sizeof(mafMapData[0][0]);
 
+    if (mafMillivolts < MIN_MAF_MILLIVOLTS) {
+      return 0;
+    }
+
     // determine what kind of MAF data array we have //TODO - DO WE NEED TO KNOW????????
-    if (numRows >= 1023) {
+    if (numRows >= 1024) {
         // we have a raw analog data array so we use the mafFlowRaw for the lookup
         lookupValue = mafFlowRaw;
     } else {
@@ -435,9 +457,9 @@ float getRefPressure (int units)
     float refPressureRaw;
     float refTempDegRaw;
     float refAltRaw;
-    int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
-    int refPressMillivolts = (rawRefPressValue * (5.0 / 1023.0)) * 1000;
     int supplyMillivolts = getSupplyMillivolts();
+    int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
+    int refPressMillivolts = (rawRefPressValue * (5.0 / 1024.0)) * 1000;
 
     #if defined REF_MPXV7007
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
@@ -449,9 +471,9 @@ float getRefPressure (int units)
         refPressureKpa = refPressureRaw * 10;
 
     #elif defined REF_ILIB_BMP280
-//        ilibBmp280.awaitMeasurement();
+        ilibBmp280.awaitMeasurement();
         ilibBmp280.getPressure(refPressureRaw);
-//        ilibBmp280.triggerMeasurement();       
+        ilibBmp280.triggerMeasurement();       
         refPressureKpa = refPressureRaw / 1000;
 
     #else
@@ -484,16 +506,17 @@ float getRefPressure (int units)
  ***/
 float getPitotPressure(int units)
 {   
-    float pitotPressureKpa;
+    float pitotPressureKpa = 0.00;
     float pitotPressureInWg;
-    int rawPitotPressValue = analogRead(PITOT_PIN);
-    int pitotPressMillivolts = (rawPitotPressValue * (5.0 / 1023.0)) * 1000;
-    int supplyMillivolts = getSupplyMillivolts();
+    int supplyMillivolts = getSupplyMillivolts() / 1000;
+    int rawPitotPressValue = analogRead(PITOT_PIN);     
+    int pitotPressMillivolts = (rawPitotPressValue * (5.0 / 1024.0)) * 1000;
 
     #if defined PITOT_MPXV7007DP
-        // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
-        // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
-        pitotPressureKpa = ((pitotPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
+        // sensor characteristics from datasheet
+        // Vout = VS x (0.057 x P + 0.5)
+
+        pitotPressureKpa = ((float)rawPitotPressValue / (float)1024 - 0.5) / 0.057;
 
     #elif defined PITOT_OTHER_TYPE
         // add your sensor data here
@@ -621,6 +644,12 @@ void errorHandler(int errorVal)
         case LEAK_TEST_PASS:
             displayDialog(LANG_WARNING, LANG_LEAK_TEST_PASS);
         break;
+
+        case DHT11_READ_FAIL:
+            displayDialog(LANG_WARNING, LANG_DHT11_READ_FAIL);
+        break;
+
+       
     }
 
 }
@@ -654,7 +683,7 @@ void updateDisplays()
     menuTemp.setCurrentValue(getTemperature(DEGC) * 10);   
     
     // Pitot
-    menuPitot.setCurrentValue(getPitotPressure(INWG) * 10);  
+    menuPitot.setFloatValue(getPitotPressure(INWG));  
     
     // Reference pressure
     menuPRef.setCurrentValue(refPressure * 10);   
@@ -663,10 +692,18 @@ void updateDisplays()
     int desiredRefPressureInWg = menuARef.getCurrentValue();
     menuAFlow.setCurrentValue(convertMafFlowInWg(refPressure, desiredRefPressureInWg, mafFlowCFM) * 100);    //Scale output for display
 
+    // Relative Humidity
+    menuRelH.setCurrentValue(getRelativeHumidity() * 10);   
+
     //Maf Voltage
     int mafFlowRaw = analogRead(MAF_PIN);
-    int mafvolts = (mafFlowRaw * (5.0 / 1023.0));
-    menuMafVolts.setFloatValue(mafvolts);
+    int mafVolts = (mafFlowRaw * (5.0 / 1024.0));
+    menuMafVolts.setFloatValue(mafVolts);
+
+    //Pitot Voltage
+    int pitotRaw = analogRead(PITOT_PIN);
+    int pitotVolts = (pitotRaw * (5.0 / 1024.0));
+    menuPitotVolts.setFloatValue(pitotVolts);
 
 
     //Settings Menu
@@ -862,3 +899,6 @@ void loop ()
     updateDisplays();
 
 }
+
+
+

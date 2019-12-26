@@ -11,16 +11,22 @@
  * INSTRUCTIONS: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/7.-Customisation
  * 
  * The standard project board is the Arduino Mega 2560 
- * Mega 2560 pins for display and encoder click wheel are listed below for reference
- * ENCODER_PIN_A = 2;
- * ENCODER_PIN_B = 3;
+ * D1 Robot 16x2 Robot LCD keypad is the default input/display combination:
+ * 
+ * D1 Robot 16x2 LCD Keyshield info.
+ * https://wiki.dfrobot.com/Arduino_LCD_KeyPad_Shield__SKU__DFR0009_
+ * D1 Robot reserved pins - A0/4/5/6/7/8/9 - do not assign these other other I/O if using this display                                              
+ *
+ * I2c display and encoder click wheel standard pins
+ * ENCODER_PIN_A = 2; // Interrupt must be used
+ * ENCODER_PIN_B = 3; // Interrupt must be used
  * BUTTON = 4;
  * LCD_WIDTH = 20;
  * LCD_HEIGHT = 4;
  * I2C_ADDRESS = "0x20";
  * I2C CLK Pin = 20; (Standard I2C CLK pin for Mega 2560)
  * I2C DIO Pim = 21; (Standard I2C DIO pin for Mega 2560)
- *
+ * 
  * DEPENDENCIES
  * The program has a number of dependencies that must be available for it to work.
  * These libraries are provided in the libraries folder 
@@ -59,8 +65,9 @@
 
 // ARDUINO MEGA 2560
 #ifdef ARDUINO_MEGA_2560 
-    // Pins 2+3 reserved for serial comms (RX/TX)
+    // Pins 0+1 reserved for serial comms (RX/TX)
     // Pins 20+21 are reseverd for I2C (Interrupts) 
+    // Available interrupt pins - 2/3/6/7/43/44
 
     // Define Physical Pins
     #define VOLTAGE_PIN A0
@@ -112,10 +119,13 @@
 /****************************************
  * GENERAL SETTINGS
  ***/
+
 #define MIN_BENCH_PRESSURE 0              // Minimum pressure that we consider the bench is 'operational' / 'running' / vac source is on
 #define MIN_FLOW_RATE 2                   // Flow rate in cfm below which bench is considered off
 #define CYCLIC_AVERAGE_BUFFER 5           // Number of scans over which to average output (helps stabilise results)
+#define MIN_MAF_MILLIVOLTS 100
 
+#define DEV_MODE
 
 
 
@@ -181,7 +191,7 @@
  ***/
 
 // Default none
-//#define RELH_DHT11 
+//#define SIMPLE_RELH_DHT11 
 
 
 
@@ -192,7 +202,7 @@
 // Default none
 //#define TEMP_ILIB_BMP280
 //#define TEMP_ADAFRUIT_BMP280
-//#define TEMP_DHT11 
+//#define SIMPLE_TEMP_DHT11 
 
 
 
