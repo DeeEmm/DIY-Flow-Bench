@@ -16,7 +16,7 @@
 
 // Development and release version - Don't forget to update the changelog!!
 #define VERSION "V1.0-Beta"
-#define BUILD "19122301"
+#define BUILD "19122601"
 
 
 /****************************************
