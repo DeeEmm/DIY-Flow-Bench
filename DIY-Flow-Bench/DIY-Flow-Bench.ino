@@ -16,7 +16,7 @@
 
 // Development and release version - Don't forget to update the changelog!!
 #define VERSION "V1.0-Beta"
-#define BUILD "19122301"
+#define BUILD "20010101"
 
 
 /****************************************
@@ -170,7 +170,7 @@ float getBaroPressure(int units)
     #if defined BARO_MPX4115
         // Vout = VS (P x 0.009 – 0.095) --- Where VS = Supply Voltage (Formula from Datasheet)
         // P = ((Vout / VS ) - 0.095) / 0.009 --- Formula transposed for P
-        baroPressureKpa = ((baroMillivolts / supplyMillivolts ) - 0.095) / 0.009; 
+        baroPressureKpa = (((float)baroMillivolts / (float)supplyMillivolts ) - 0.095) / 0.009; 
 
     #elif defined BARO_ADAFRUIT_BMP280
         adafruitBmp280.getMeasurements(refTempRaw, baroPressureRaw, refAltRaw); // Deg C | hPa | M
@@ -229,9 +229,9 @@ float getTemperature(int units)
         refTempDegC = roundf(refTempRaw*100.0)/100.0;
 
     #elif defined TEMP_ILIB_BMP280
-        ilibbmp280.awaitMeasurement();
+        ilibBmp280.awaitMeasurement();
         ilibBmp280.getTemperature(refTempRaw);
-        ilibbmp280.triggerMeasurement();
+        ilibBmp280.triggerMeasurement();
         refTempDegC = roundf(refTempRaw*100.0)/100.0;
 
     #elif defined SIMPLE_TEMP_DHT11
@@ -464,7 +464,7 @@ float getRefPressure (int units)
     #if defined REF_MPXV7007
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
-        refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
+        refPressureKpa = (((float)refPressMillivolts / (float)supplyMillivolts ) - 0.5) / 0.057; 
 
     #elif defined REF_ADAFRUIT_BMP280
         adafruitBmp280.getMeasurements(refTempDegRaw, refPressureRaw, refAltRaw);
@@ -899,6 +899,3 @@ void loop ()
     updateDisplays();
 
 }
-
-
-
