@@ -2,3 +2,7 @@
 *.backup
 *.elf
 *.hex
+GUI/.vs
+GUI/*/obj
+GUI/*/bin
+GUI/TestResults

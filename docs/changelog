@@ -1,3 +1,5 @@
+20041701	- Added the Serial API Specification to the doc folder
+			- Added the beginning of the API layer for the GUI
 20041501    - Reorganised project folder structure
 20010101	- Fixed spelling issue for ilib library calls
 			- Fixed load issue for Baro and Pitot 
