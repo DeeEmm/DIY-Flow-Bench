@@ -3,7 +3,9 @@
  * A basic flow bench to measure and display volumetric air flow using an Arduino and common automotive MAF sensor.
  * 
  * For more information please visit our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
- * Or join our Facebook community: https://www.facebook.com/groups/diyflowbench/
+ * Or join our support forums over aat https://diyflowbench.com 
+ *
+ * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
  * 
  * This project and all associated files are provided for use under the GNU GPL3 license:
  * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
@@ -14,9 +16,11 @@
  * 
  ***/
 
-// Development and release version - Don't forget to update the changelog!!
-#define VERSION "V1.0-Beta"
-#define BUILD "20010101"
+// Development and release version - Don't forget to update the changelog & README Versions!!
+
+#define MAJOR_VERSION "1"
+#define MINOR_VERSION "0"
+#define BUILD_NUMBER "20072901"
 
 
 /****************************************
@@ -28,7 +32,6 @@
 #include <Arduino.h>
 #include "configuration.h"
 #include "EN_Language.h"
-
 
 /****************************************
  * OPTIONAL LIBRARIES
@@ -42,11 +45,11 @@
     BMP280_DEV adafruitBmp280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
 #endif
 
-// Support for ILIB_BMP280 temp & pressure sensors
-// https://github.com/orgua/iLib
-#if defined REF_ILIB_BMP280 || defined TEMP_ILIB_BMP280 || defined BARO_ILIB_BMP280
-    #include <i2c_BMP280.h> 
-    BMP280 ilibBmp280; 
+// Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
+// https://github.com/adafruit/Adafruit_BME280_Library
+#if defined REF_ADAFRUIT_BME280 || defined TEMP_ADAFRUIT_BME280 || defined BARO_ADAFRUIT_BME280
+    #include <BMP280_DEV.h> 
+    Adafruit_BME280 adafruitBme280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
 #endif
 
 // Support for DHT11 humidity / temperature sensors
@@ -85,10 +88,11 @@
  * DECLARE GLOBALS
  ***/
 
+bool APIEnabled = true;
 float startupBaroPressure;
 int errorVal = 0;
 bool benchIsRunning();
-
+int serialData = 0;
 extern long mafMapData[][2];
 
 
@@ -101,9 +105,12 @@ extern long mafMapData[][2];
 void setup ()
 {
 
-    #ifdef DEV_MODE 
-        Serial.begin(9600);
-    #endif
+    int startupBaroPressure = 100;
+
+    //Serial API
+    if (APIEnabled) {
+        Serial.begin(9600);      
+    }
   
     // Initialise libraries
     
@@ -118,11 +125,19 @@ void setup ()
         adafruitBmp280.startNormalConversion();  
     #endif
 
-    // ILIB BMP Pressure & temp transducer
-    #if defined REF_ILIB_BMP280 || defined TEMP_ILIB_BMP280 || defined BARO_ILIB_BMP280
-        ilibBmp280.initialize();
-        ilibBmp280.setEnabled(); //TODO - VERIFY - Have removed zero as it appears zero initialises library as a one-shot read - DM 22.12.19
-        ilibBmp280.triggerMeasurement(); 
+    // Adafruit or derivative BME Pressure, humidity & temp transducer
+    #if defined REF_ADAFRUIT_BME280 || defined TEMP_ADAFRUIT_BME280 || defined BARO_ADAFRUIT_BME280 || defined RELH_ADAFRUIT_BME280
+        Adafruit_BME280; // use I2C interface
+        Adafruit_Sensor *bme_temp = adafruitBme280.getTemperatureSensor();
+        Adafruit_Sensor *bme_pressure = adafruitBme280.getPressureSensor();
+        Adafruit_Sensor *bme_humidity = adafruitBme280.getHumiditySensor();
+
+        sensors_event_t temp_event, pressure_event, humidity_event;
+        bme_temp->getEvent(&temp_event);
+        bme_pressure->getEvent(&pressure_event);
+        bme_humidity->getEvent(&humidity_event);
+
+        startupBaroPressure = pressure_event.pressure * 10; //default value from BME is in hPa
     #endif
  
     // Set up the menu + display system
@@ -132,8 +147,7 @@ void setup ()
     // set reference pressure to default
     menuARef.setCurrentValue(calibrationRefPressure); 
 
-    //take pressure sensor reading for baro correction if dedicated baro sensor not used
-    int startupBaroPressure = analogRead(REF_PRESSURE_PIN);
+
 }
 
 
@@ -174,13 +188,14 @@ float getBaroPressure(int units)
 
     #elif defined BARO_ADAFRUIT_BMP280
         adafruitBmp280.getMeasurements(refTempRaw, baroPressureRaw, refAltRaw); // Deg C | hPa | M
+        bme_pressure->getEvent(&pressure_event);
+
         baroPressureKpa = baroPressureRaw * 10;
 
-    #elif defined BARO_ILIB_BMP280
-        ilibBmp280.awaitMeasurement();
-        ilibBmp280.getPressure(baroPressureRaw);
-        ilibBmp280.triggerMeasurement(); 
-        baroPressureKpa = baroPressureRaw / 1000;
+    #elif defined BARO_ADAFRUIT_BME280
+        sensors_event_t temp_event, pressure_event, humidity_event;
+        Adafruit_Sensor *bme_pressure = adafruitBme280.getPressureSensor(); // Deg C | hPa | M
+        baroPressureKpa =  pressure_event.pressure * 10;
 
     #elif defined USE_REF_PRESS
         // No baro sensor defined so use value grabbed at startup from reference pressure sensor
@@ -212,7 +227,7 @@ float getBaroPressure(int units)
  * CALCULATE TEMPERATURE
  * Convert RAW temperature sensor data
  ***/
-float getTemperature(int units)
+float getTemp(int units)
 {   
     float refAltRaw;
     float refPressureRaw;
@@ -228,11 +243,11 @@ float getTemperature(int units)
         adafruitBmp280.getMeasurements(refTempRaw, refPressureRaw, refAltRaw);
         refTempDegC = roundf(refTempRaw*100.0)/100.0;
 
-    #elif defined TEMP_ILIB_BMP280
-        ilibBmp280.awaitMeasurement();
-        ilibBmp280.getTemperature(refTempRaw);
-        ilibBmp280.triggerMeasurement();
-        refTempDegC = roundf(refTempRaw*100.0)/100.0;
+    #elif defined TEMP_ADAFRUIT_BME280
+        sensors_event_t temp_event, pressure_event, humidity_event;
+        bme_temp->getEvent(&temp_event);
+        Adafruit_Sensor *bme_temp = bme.getTemperatureSensor();
+        refTempDegC  =  temp_event.temperature;
 
     #elif defined SIMPLE_TEMP_DHT11
         // NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
@@ -289,6 +304,11 @@ float getRelativeHumidity()
           relativeHumidity = refRelh;
         }
 
+    #elif defined RELH_ADAFRUIT_BME280
+        sensors_event_t temp_event, pressure_event, humidity_event;
+        bme_humidity->getEvent(&humidity_event);
+        relativeHumidity = pressure_event.pressure; //%
+
     #else
         //we dont have any sensor so use standard value
         relativeHumidity = 0.36;
@@ -306,7 +326,7 @@ float getRelativeHumidity()
  ***/
 float getVaporPressure(int units)
 {   
-    float airTemp = getTemperature(DEGC);
+    float airTemp = getTemp(DEGC);
     float molecularWeightOfDryAir = 28.964;
     float vapourPressureKpa =(0.61078 * exp((17.27 * airTemp)/(airTemp + 237.3))); // Tetans Equasion
     float vapourPressurePsia;
@@ -354,7 +374,7 @@ float getSpecificGravity()
 float convertMassFlowToVolumetric(float massFlowKgh)
 {   
   float mafFlowCFM;
-  float tempInRankine = getTemperature(RANKINE); //tested ok
+  float tempInRankine = getTemp(RANKINE); //tested ok
   float specificGravity = getSpecificGravity(); //tested ok
   float molecularWeight = MOLECULAR_WEIGHT_DRY_AIR * specificGravity; //tested ok
   float baroPressure = getBaroPressure(PSIA); 
@@ -384,8 +404,8 @@ float getMafFlowCFM()
     int mafFlowRaw = analogRead(MAF_PIN);
     int mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
     int lookupValue;
-    int numRows = sizeof(mafMapData)/sizeof(mafMapData[0]);
-    //int numCols = sizeof(mafMapData[0])/sizeof(mafMapData[0][0]);
+    //int numRows = sizeof(mafMapData)/sizeof(mafMapData[0]);
+    int numRows = sizeof(mafMapData[0])/sizeof(mafMapData[0][0]);
 
     if (mafMillivolts < MIN_MAF_MILLIVOLTS) {
       return 0;
@@ -449,7 +469,7 @@ float getMafFlowCFM()
  * CALCULATE REFERENCE PRESSURE
  * Convert RAW pressure sensor data to In/WG or kPa
  ***/
-float getRefPressure (int units) 
+float getRefPressure(int units) 
 {   
 
     float refPressureKpa;
@@ -469,12 +489,6 @@ float getRefPressure (int units)
     #elif defined REF_ADAFRUIT_BMP280
         adafruitBmp280.getMeasurements(refTempDegRaw, refPressureRaw, refAltRaw);
         refPressureKpa = refPressureRaw * 10;
-
-    #elif defined REF_ILIB_BMP280
-        ilibBmp280.awaitMeasurement();
-        ilibBmp280.getPressure(refPressureRaw);
-        ilibBmp280.triggerMeasurement();       
-        refPressureKpa = refPressureRaw / 1000;
 
     #else
         // No reference pressure sensor used so lets return zero
@@ -657,6 +671,186 @@ void errorHandler(int errorVal)
 
 
 
+
+
+
+
+/****************************************
+ * CREATE CHECKSUM
+ *
+ * Create checksum from data passed by value
+ * 
+ ***/
+char createChecksum(char data)
+{
+//    byte data[20] = ".M+205".
+//    int length = 6;                    // or strlen(data)
+
+//    int count = sizeof(data);
+//  
+//    byte checksum = 0;
+//    for ( count i=0; i<length; i++) {
+//      checksum += data[i];
+//    }
+//  
+//    byte lowNibble = checksum & 0x0F;                // take the 4 lowest bits
+//    byte highNibble = (checksum >> 4) & 0x0F;   // take the 4 highest bits
+//  
+//    // Convert the lowNibble and highNibble to a readable ascii character
+//    if ( lowNibble >= 0x0A)
+//      lowNibble += ('A' - 0x0A);
+//    else
+//      lowNibble += '0';
+//  
+//    if ( highNibble >= 0x0A)
+//      highNibble += ('A' -  - 0x0A);
+//    else
+//      highNibble += '0';
+//  
+//    // Add them to the end of the data, high nibble first
+//    data[length++] = highNibble;
+//    data[length++] = lowNibble;
+//  
+//    // transmit data with 'length' number of bytes
+//
+//    return 
+//
+//
+////simple method
+//
+//    uint8_t result = 0;
+//    uint16_t sum = 0;
+//    
+//    for(uint8_t i = 0; i < (bufferSize - 1); i++){
+//      sum += buffer[i];
+//    }
+//    result = sum & 0xFF;
+//    
+//    if(originalResult == result){
+//       return 1;
+//    }else{
+//       return 0;
+//    }
+
+return 10;  
+
+}
+
+
+
+/****************************************
+ * PARSE API
+ *
+ * handle API responses:
+ * 
+ * V - Version
+ * L - Perform Leak test calibration [+return ok/nok]
+ * l - Perform leak test [+return ok/nok]
+ * O - Perform offset calibration [+return ok/nok]
+ * F - Flow value in cfm
+ * T - Temperature value in cfm
+ * H - Humidity value in cfm
+ * R - Reference Pressure value in cfm
+ * B - Barometric Pressure in KPa
+ * 
+ ***/
+void parseAPI(byte serialData)
+{
+
+  String serialResponse;
+  char checksum = 0;
+  double flowCFM = 0.01;
+  int intFlowCFM = 0;
+
+
+  switch (serialData)
+  {
+      case 'V': // Get Version 'VMmYYMMDDXX\r\n'
+          Serial.print('V');
+          Serial.print(MAJOR_VERSION);
+          Serial.print(MINOR_VERSION);
+          Serial.print(BUILD_NUMBER);
+          Serial.print("\r\n");
+      break;
+
+      case 'L': // Perform Leak Test Calibration 'L\r\n'
+          setLeakCalibrationValue(0);
+          Serial.print('L');
+          Serial.print("\r\n");
+          // TODO confirm Leak Test Calibration success in response
+      break;
+
+      case 'l': // Perform Leak Test 'l\r\n'      
+          checkLeakCalibrationValue(0);
+          Serial.print('l');
+          Serial.print("\r\n");
+          // TODO confirm Leak Test success in response
+      break;
+
+      case 'O': // Flow Offset Calibration  'O\r\n'        
+          setCalibrationOffset(0);
+          Serial.print('O');
+          Serial.print("\r\n");
+          // TODO confirm Flow Offset Calibration success in response
+      break;
+
+      case 'F': // Get measured Flow 'F123.45\r\n'
+
+//String stringOne =  String(5.698, 3);                                // using a float and the decimal
+      
+          Serial.print('F');
+          // Truncate to 2 decimal places
+          flowCFM = getMafFlowCFM() * 100;
+          intFlowCFM = flowCFM;
+          flowCFM = flowCFM / 100;
+          // Add preceding zeros
+          if (flowCFM < 10) { 
+            Serial.print(0);
+            Serial.print(0);
+          } else if (flowCFM < 100) {
+            Serial.print(0);              
+          } 
+          // Print the value
+          Serial.print(flowCFM);
+          Serial.print("\r\n");
+          // TODO calculate and send checksum
+      break;
+
+      case 'T': // Get measured Temperature 'T123.45\r\n'
+          Serial.print('T');
+          Serial.print(getTemp(DEGC));
+          Serial.print("\r\n");
+      break;
+
+      case 'H': // Get measured Humidity 'H123.45\r\n'
+          Serial.print('H');
+          Serial.print(getRelativeHumidity());
+          Serial.print("\r\n");
+      break;
+
+      case 'R': // Get measured Reference Pressure 'F123.45\r\n'
+          Serial.print('R');
+          Serial.print(getRefPressure(KPA));
+          Serial.print("\r\n");
+      break;
+
+      case 'B': // Get measured Reference Pressure 'F123.45\r\n'
+          Serial.print('B');
+          Serial.print(getBaroPressure(KPA));
+          Serial.print("\r\n");
+      break;
+
+
+     
+  }
+
+
+
+
+}
+
+
+
 /****************************************
  * UPDATE DISPLAYS
  *
@@ -680,7 +874,7 @@ void updateDisplays()
     }
 
     // Temperature
-    menuTemp.setCurrentValue(getTemperature(DEGC) * 10);   
+    menuTemp.setCurrentValue(getTemp(DEGC) * 10);   
     
     // Pitot
     menuPitot.setFloatValue(getPitotPressure(INWG));  
@@ -705,11 +899,13 @@ void updateDisplays()
     int pitotVolts = (pitotRaw * (5.0 / 1024.0));
     menuPitotVolts.setFloatValue(pitotVolts);
 
+const char * versionNumberString = MAJOR_VERSION;// + "." + MINOR_VERSION;
+const char * buildNumberString = BUILD_NUMBER;
+
 
     //Settings Menu
-    menuSettingsVer.setTextValue(VERSION);
-    menuSettingsBld.setTextValue(BUILD);
-    
+    menuSettingsVer.setTextValue(versionNumberString);
+    menuSettingsBld.setTextValue(buildNumberString);    
 
     // Additional Displays
 
@@ -897,5 +1093,14 @@ void loop ()
     refPressureCheck();
     if (errorVal != 0) errorHandler(errorVal);
     updateDisplays();
+
+
+    // If API enabled, read serial data
+    if (APIEnabled) {
+      if (Serial.available() > 0) {
+        serialData = Serial.read();
+        parseAPI(serialData);
+      }
+    }
 
 }

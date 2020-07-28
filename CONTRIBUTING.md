@@ -6,7 +6,7 @@ The following guidelines explain how contributions to the project are managed. T
 
 The project stretches across a number of platforms and disciplines, and so trying to make a one-size-fits-all set of 'rules' is likely impossible as there are many things do not apply equally to all.
 
-So the guidelines seek to set out some basic concepts that can them be implimented in the best manner across each of the platforms.
+So the guidelines seek to set out some basic concepts that can then be implimented in the best manner across each of the platforms.
 
 
 ## Coding standards
@@ -15,7 +15,7 @@ As there is no adopted formal coding standard in use, the style and methods empl
 
 ### Basic guidelines
 
-Whilst we do not emply any specific coding standards, we do however have some very basic guidelines that we ask you to follow if possible.
+Whilst we do not employ any specific coding standards, we do however have some very basic guidelines that we ask you to follow if possible.
 
 - Keep your work neat so that it is easy for others to follow
 - Try to adhere to general good coding practice (no spaghetti logic please)
@@ -25,7 +25,7 @@ Whilst we do not emply any specific coding standards, we do however have some ve
 - Use camelCase for variable / function / class names if possible
 - If you find it difficult to follow, others will too.
 
-Essentially it's all about making the code easy for others to read and follow. Remember that this is an open source project so people of all skill levels will be using it and trying to decypher what's going on. Also, the more help that is provided within the files, the less real-world help will be required to get people up and running which will help minimise the resources needed to support the project
+Essentially it's all about making the code easy for others to read and follow. Remember that this is an open source project so people of all skill levels will be using it and trying to decypher what's going on. Also, please consider that the more help that is provided within the code, the less real-world help will be required to get people up and running, which will help minimise the real-world resources needed to support the project
 
 
 ## Version control
@@ -41,9 +41,9 @@ Essentially you will:
 - Create a 'pull request' to have your changes merged with the main code
 - Your changes will then be reviewed and merged
 
-How to use GIT is a bit outside of the scope of this document but you can find many how-to's online that explain how to use github desktop. We recommend the user guides that are provided with GitHub Desktop - https://help.github.com/en/desktop 
+How to use GIT is a bit outside of the scope of this document but you can find many how-to's online that explain how to use github desktop. We recommend the user guides that are provided with GitHub Desktop as a good starting point 
 
-If you do get stuck, you can also give us a shout out on the #developer channel on Discord. If you don't have access, message the owner of the repository, all contributors are welcomed and encouraged to join.
+If you do get stuck, you can also reach out and give us a shout out on our #developer channel on Discord. If you don't have access, message the owner of the repository or give a shout out on one of the other channels. All contributors are welcomed and encouraged to join the #developer channel.
 
 ### GIT Commit Summaries 
 

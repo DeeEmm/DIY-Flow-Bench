@@ -9,11 +9,11 @@
 // So to populate the table you will probably have to translate your values as follows:
 // millivolts (volts/100), kgh/1000 
 
-// example - the first two entries below are 0.1 volts and 2.304 kg/hr
+// example - the first two entries below are 0.1 volts and 6.226 kg/hr
 // we multiply volts by 100 to get millivolts - 0.1 x 100 = 10
-// we multiply kg/hr by 1000 to provide 3 decimal places in integer format - 2.304 x 1000 = 2304
+// we multiply kg/hr by 1000 to provide 3 decimal places in integer format - 6.226 x 1000 = 6226
 
-int mafMapData[][2] = {
+long mafMapData[][2] = {
 {	10	,	6226	},
 {	20	,	6745	},
 {	30	,	7307	},

@@ -2,3 +2,4 @@
 *.backup
 *.elf
 *.hex
+.DS_Store

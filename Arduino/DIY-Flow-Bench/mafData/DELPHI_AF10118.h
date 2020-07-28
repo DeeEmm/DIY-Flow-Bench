@@ -1,5 +1,5 @@
 // array {mV, kgh/1000}
-float mafMapData[][2] = {
+long mafMapData[][2] = {
 {	0	,	3650	},
 {	60	,	5620	},
 {	80	,	8982	},
