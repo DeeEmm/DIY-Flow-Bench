@@ -20,7 +20,7 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20072901"
+#define BUILD_NUMBER "20080101"
 
 
 /****************************************
@@ -767,8 +767,11 @@ void parseAPI(byte serialData)
   {
       case 'V': // Get Version 'VMmYYMMDDXX\r\n'
           Serial.print('V');
+          Serial.print('.');
           Serial.print(MAJOR_VERSION);
+          Serial.print('.');
           Serial.print(MINOR_VERSION);
+          Serial.print('.');
           Serial.print(BUILD_NUMBER);
           Serial.print("\r\n");
       break;
@@ -776,6 +779,7 @@ void parseAPI(byte serialData)
       case 'L': // Perform Leak Test Calibration 'L\r\n'
           setLeakCalibrationValue(0);
           Serial.print('L');
+          Serial.print('.');
           Serial.print("\r\n");
           // TODO confirm Leak Test Calibration success in response
       break;
@@ -783,6 +787,7 @@ void parseAPI(byte serialData)
       case 'l': // Perform Leak Test 'l\r\n'      
           checkLeakCalibrationValue(0);
           Serial.print('l');
+          Serial.print('.');
           Serial.print("\r\n");
           // TODO confirm Leak Test success in response
       break;
@@ -790,6 +795,7 @@ void parseAPI(byte serialData)
       case 'O': // Flow Offset Calibration  'O\r\n'        
           setCalibrationOffset(0);
           Serial.print('O');
+          Serial.print('.');
           Serial.print("\r\n");
           // TODO confirm Flow Offset Calibration success in response
       break;
@@ -799,6 +805,7 @@ void parseAPI(byte serialData)
 //String stringOne =  String(5.698, 3);                                // using a float and the decimal
       
           Serial.print('F');
+          Serial.print('.');
           // Truncate to 2 decimal places
           flowCFM = getMafFlowCFM() * 100;
           intFlowCFM = flowCFM;
@@ -818,24 +825,28 @@ void parseAPI(byte serialData)
 
       case 'T': // Get measured Temperature 'T123.45\r\n'
           Serial.print('T');
+          Serial.print('.');
           Serial.print(getTemp(DEGC));
           Serial.print("\r\n");
       break;
 
       case 'H': // Get measured Humidity 'H123.45\r\n'
           Serial.print('H');
+          Serial.print('.');
           Serial.print(getRelativeHumidity());
           Serial.print("\r\n");
       break;
 
       case 'R': // Get measured Reference Pressure 'F123.45\r\n'
           Serial.print('R');
+          Serial.print('.');
           Serial.print(getRefPressure(KPA));
           Serial.print("\r\n");
       break;
 
       case 'B': // Get measured Reference Pressure 'F123.45\r\n'
           Serial.print('B');
+          Serial.print('.');
           Serial.print(getBaroPressure(KPA));
           Serial.print("\r\n");
       break;

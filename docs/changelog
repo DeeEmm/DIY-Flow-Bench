@@ -1,3 +1,4 @@
+20080101    - Updated API Responses
 20072901    - Changed format version varables
             - Added basic serial API functions
             - Dropped ilib280 support (depreciated)
