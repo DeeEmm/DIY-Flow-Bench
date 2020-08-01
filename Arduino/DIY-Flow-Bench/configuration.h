@@ -49,17 +49,45 @@
 #pragma once
 
 
+
+
+/****************************************
+ * DEVELOPER SETTINGS
+ ***/
+
+//#define DEBUG_MODE
+
+
+
+/****************************************
+ * DEFINE COMMUNICATIONS 
+ *
+ * Default 9600
+ ***/
+
+//#define SERIAL_BAUD_RATE 1200                
+//#define SERIAL_BAUD_RATE 2400                
+#define SERIAL_BAUD_RATE 9600
+//#define SERIAL_BAUD_RATE 19200
+//#define SERIAL_BAUD_RATE 57600
+//#define SERIAL_BAUD_RATE 115200                 
+
+
+
 /****************************************
  * SELECT BOARD TYPE 
+ *
+ * Default ARDUINO_MEGA_2560 
  ***/
-#define ARDUINO_MEGA_2560                 //default
+
+#define ARDUINO_MEGA_2560
 //#define ARDUINO_UNO
 
 
 
 /****************************************
  * CONFIGURE PINS 
-  ***/
+ ***/
 
 
 // ARDUINO MEGA 2560
@@ -94,7 +122,7 @@
     // Pins 20+21 are reseverd for I2C (Interrupts)
 
     // Define Physical Pins
-    #define VOLTAGE_PIN A0
+    #define VOLTAGE_PIN A0                //IMPORTANT!! - tie A0 to the +5v rail 
     #define MAF_PIN A1
     #define REF_PRESSURE_PIN A2
     #define REF_VAC_PIN A3
@@ -115,6 +143,7 @@
 
 
 
+
 /****************************************
  * GENERAL SETTINGS
  ***/
@@ -124,7 +153,6 @@
 #define CYCLIC_AVERAGE_BUFFER 5           // Number of scans over which to average output (helps stabilise results)
 #define MIN_MAF_MILLIVOLTS 100
 
-#define DEV_MODE
 
 
 
@@ -136,10 +164,10 @@
  ***/
 
 
-//#include =  "mafData/exampleSensor.h"   // Example file duplicate this as required
-#include "mafData/SIEMENS_5WK9605.h"      // Data from Tonys tests
+#include "mafData/exampleSensor.h"   // Example file duplicate this as required
+//#include "mafData/SIEMENS_5WK9605.h"      // Data from Tonys tests
 //#include "mafData/TEST.h"               // Test Data
-//#include =  "mafData/DELPHI_AF10118."   // kg/hr - Data from http://www.efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
+//#include "mafData/DELPHI_AF10118.h"   // kg/hr - Data from efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
 
 
 
@@ -164,7 +192,8 @@
  * Note Pitot sensors need to be a differential pressure sensor (DP)
  ***/
 
-#define PITOT_MPXV7007DP                  //default
+// None - Default
+//#define PITOT_MPXV7007DP                  
 //#define PITOT_OTHER_TYPE                //add your own sensor
 
 
@@ -189,7 +218,7 @@
  * CONFIGURE HUMIDITY SENSOR
  ***/
 
-// Default none
+// Default none (defaults to 0.36)
 //#define SIMPLE_RELH_DHT11 
 //#define RELH_ADAFRUIT_BME280
 
@@ -199,7 +228,7 @@
  * CONFIGURE TEMPERATURE SENSOR
  ***/
 
-// Default none
+// Default none (defaults to 21 degrees)
 //#define TEMP_ADAFRUIT_BMP280
 //#define TEMP_ADAFRUIT_BME280
 //#define SIMPLE_TEMP_DHT11 

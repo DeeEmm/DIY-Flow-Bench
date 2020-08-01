@@ -89,6 +89,7 @@
  ***/
 
 bool APIEnabled = true;
+bool DEBUG_MAF_DATA = false;
 float startupBaroPressure;
 int errorVal = 0;
 bool benchIsRunning();
@@ -109,7 +110,7 @@ void setup ()
 
     //Serial API
     if (APIEnabled) {
-        Serial.begin(9600);      
+        Serial.begin(SERIAL_BAUD_RATE);      
     }
   
     // Initialise libraries
@@ -397,21 +398,22 @@ float convertMassFlowToVolumetric(float massFlowKgh)
 float getMafFlowCFM()
 {
     // NOTE mafMapData is global array declared in mafData files
-    float calibrationOffset;
-    float mafFlowRateCFM;
-    float mafFlowRateKGH;
-    float mafFlowRateKghRAW;
+    long calibrationOffset;
+    long mafFlowRateCFM;
+    long mafFlowRateKGH;
+    long mafFlowRateKghRAW;
     int mafFlowRaw = analogRead(MAF_PIN);
     int mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
     int lookupValue;
-    //int numRows = sizeof(mafMapData)/sizeof(mafMapData[0]);
-    int numRows = sizeof(mafMapData[0])/sizeof(mafMapData[0][0]);
+    int numRows = sizeof(mafMapData)/sizeof(mafMapData[0]);
+//    int numRows = sizeof(mafMapData[0])/sizeof(mafMapData[0][0]);
 
     if (mafMillivolts < MIN_MAF_MILLIVOLTS) {
       return 0;
     }
 
-    // determine what kind of MAF data array we have //TODO - DO WE NEED TO KNOW????????
+    // determine what kind of MAF data array we have 
+    // TODO #29 - MAF Data File configuration variables - add additional decode variables
     if (numRows >= 1024) {
         // we have a raw analog data array so we use the mafFlowRaw for the lookup
         lookupValue = mafFlowRaw;
@@ -421,7 +423,8 @@ float getMafFlowCFM()
     }
 
 
-    // TODO - Make sure that we are reading MAF data array from lowest value to highest - Add array sort function (qsort?)
+    // TODO #14 - Make sure that we are reading MAF data array from lowest value to highest - Add array sort function (qsort?)
+
     // traverse the array until we find the lookupValue
     for (int rowNum = 0; rowNum <= numRows; rowNum++) {
       
@@ -431,23 +434,22 @@ float getMafFlowCFM()
             mafFlowRateKghRAW = mafMapData[rowNum][1];
             break;
 
-        // if there is no match we need to interpolate using the next highest / lowest values
-        } else if ( (mafMapData[rowNum][0]) > lookupValue) {
-            // NOTE: Linear interpolation formula Y=Y0+(((X-X0)(Y1-Y0))/(X1-X0)) where Y = flow and X = Volts
+        // We've overshot so lets use THE previous value
+        } else if ( mafMapData[rowNum][0] > lookupValue ) {
 
             if (rowNum == 0) {
-              // Flow lower than lowest value in table so we set it to zero and consider it no flow
-              mafFlowRateKghRAW = 0;
+              // we was on the first row so lets set the value to zero and consider it no flow
+              return 0;
+
             } else {
               // Flow value is valid so lets convert it.
               mafFlowRateKghRAW = mafMapData[rowNum-1][1] + (((lookupValue - mafMapData[rowNum-1][0]) * (mafMapData[rowNum][1] - mafMapData[rowNum-1][1])) / (mafMapData[rowNum][0] - mafMapData[rowNum-1][0]));            
+              // NOTE: Linear interpolation formula Y=Y0+(((X-X0)(Y1-Y0))/(X1-X0)) where Y = flow and X = Volts
             }
             break;
         }
 
     }
-
-
 
     // Get calibration offset from NVM
     EEPROM.get( NVM_CD_CAL_OFFSET_ADDR, calibrationOffset ); 
@@ -455,12 +457,19 @@ float getMafFlowCFM()
     // convert RAW datavalue back into kg/h
     mafFlowRateKGH = float(mafFlowRateKghRAW / 1000); 
 
-    // convert kg/h into cfm
+    // convert kg/h into cfm (NOTE Approx 0.4803099 cfm per kg/h @ sea level)
     mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH);// + calibrationOffset; // add calibration offset to value //TODO #21 Need to validate and test calibration routine
 
+    if (DEBUG_MAF_DATA == true) {
+        Serial.print(mafMillivolts);
+        Serial.print("mv = ");
+        Serial.print(mafFlowRateKghRAW / 1000);
+        Serial.print("kg/h = ");
+        Serial.print(mafFlowRateCFM );
+        Serial.print("cfm \r\n");
+    }
+
     return mafFlowRateCFM;
-
-
 }
 
 
@@ -823,39 +832,64 @@ void parseAPI(byte serialData)
           // TODO calculate and send checksum
       break;
 
-      case 'T': // Get measured Temperature 'T123.45\r\n'
+      case 'M': // Get MAF output voltage'
+          Serial.print('M');
+          Serial.print('.');
+          Serial.print((analogRead(MAF_PIN) * (5.0 / 1024.0)) * 1000);
+          Serial.print("\r\n");
+      break;
+
+      case 'T': // Get measured Temperature 'T.123.45\r\n'
           Serial.print('T');
           Serial.print('.');
           Serial.print(getTemp(DEGC));
           Serial.print("\r\n");
       break;
 
-      case 'H': // Get measured Humidity 'H123.45\r\n'
+      case 'H': // Get measured Humidity 'H.123.45\r\n'
           Serial.print('H');
           Serial.print('.');
           Serial.print(getRelativeHumidity());
           Serial.print("\r\n");
       break;
 
-      case 'R': // Get measured Reference Pressure 'F123.45\r\n'
+      case 'R': // Get measured Reference Pressure 'R.123.45\r\n'
           Serial.print('R');
           Serial.print('.');
           Serial.print(getRefPressure(KPA));
           Serial.print("\r\n");
       break;
 
-      case 'B': // Get measured Reference Pressure 'F123.45\r\n'
+      case 'B': // Get measured Baro Pressure 'B.123.45\r\n'
           Serial.print('B');
           Serial.print('.');
           Serial.print(getBaroPressure(KPA));
           Serial.print("\r\n");
       break;
 
+      case 'v': // Get board supply voltage (mv) 'v.123.45\r\n'
+          Serial.print('v');
+          Serial.print('.');
+          Serial.print(getSupplyMillivolts());
+          Serial.print("\r\n");
+      break;
+      
+      case 'D': // DEBUG MAF'
+          Serial.print('D');
+          Serial.print('.');
+          DEBUG_MAF_DATA = true;
+          Serial.print("\r\n");
+      break;
+
+      case 'd': // DEBUG OFF'
+          Serial.print('d');
+          Serial.print('.');
+          DEBUG_MAF_DATA = false;
+          Serial.print("\r\n");
+      break;
 
      
   }
-
-
 
 
 }
