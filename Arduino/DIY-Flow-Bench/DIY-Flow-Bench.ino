@@ -20,7 +20,7 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080102"
+#define BUILD_NUMBER "20080201"
 #define RELEASE "V.1.0-beta.10"
 
 
@@ -72,6 +72,14 @@
 #define DEGC 4
 #define DEGF 5
 #define RANKINE 6
+
+// MAF Data Files
+#define VOLTAGE 1
+#define FREQUENCY 2
+#define KEY_VALUE 1
+#define RAW_ANALOG 2
+#define KG_H 1
+#define MG_S 2
 
 
 // Error handler codes
@@ -402,7 +410,7 @@ float getMafFlowCFM()
     long calibrationOffset;
     long mafFlowRateCFM;
     long mafFlowRateKGH;
-    long mafFlowRateKghRAW;
+    long mafFlowRateRAW;
     int mafFlowRaw = analogRead(MAF_PIN);
     int mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
     int lookupValue;
@@ -414,13 +422,17 @@ float getMafFlowCFM()
     }
 
     // determine what kind of MAF data array we have 
-    // TODO #29 - MAF Data File configuration variables - add additional decode variables
-    if (numRows >= 1024) {
+    if (MAFdataFormat == KEY_VALUE) {
+        // we have a mV / flow array so we use the mafMillivolts value for the lookup
+        lookupValue = mafMillivolts;
+    } else {
         // we have a raw analog data array so we use the mafFlowRaw for the lookup
         lookupValue = mafFlowRaw;
-    } else {
-        // we have a mV / cfm array so we use the mafMillivolts value for the lookup
-        lookupValue = mafMillivolts;
+    }
+
+    if (MAFoutputType == FREQUENCY){
+        // TODO #29 - MAF Data File configuration variables - add additional decode variables
+        // Add support for frequency based sensors
     }
 
 
@@ -432,7 +444,7 @@ float getMafFlowCFM()
         // check to see if exact match is found 
         if (lookupValue == mafMapData[rowNum][0]) {
             // we've got the exact value
-            mafFlowRateKghRAW = mafMapData[rowNum][1];
+            mafFlowRateRAW = mafMapData[rowNum][1];
             break;
 
         // We've overshot so lets use THE previous value
@@ -444,7 +456,7 @@ float getMafFlowCFM()
 
             } else {
               // Flow value is valid so lets convert it.
-              mafFlowRateKghRAW = mafMapData[rowNum-1][1] + (((lookupValue - mafMapData[rowNum-1][0]) * (mafMapData[rowNum][1] - mafMapData[rowNum-1][1])) / (mafMapData[rowNum][0] - mafMapData[rowNum-1][0]));            
+              mafFlowRateRAW = mafMapData[rowNum-1][1] + (((lookupValue - mafMapData[rowNum-1][0]) * (mafMapData[rowNum][1] - mafMapData[rowNum-1][1])) / (mafMapData[rowNum][0] - mafMapData[rowNum-1][0]));            
               // NOTE: Linear interpolation formula Y=Y0+(((X-X0)(Y1-Y0))/(X1-X0)) where Y = flow and X = Volts
             }
             break;
@@ -455,16 +467,25 @@ float getMafFlowCFM()
     // Get calibration offset from NVM
     EEPROM.get( NVM_CD_CAL_OFFSET_ADDR, calibrationOffset ); 
 
-    // convert RAW datavalue back into kg/h
-    mafFlowRateKGH = float(mafFlowRateKghRAW / 1000); 
+    if (MAFdataUnit == KG_H) {
 
-    // convert kg/h into cfm (NOTE Approx 0.4803099 cfm per kg/h @ sea level)
+        // convert RAW datavalue back into kg/h
+        mafFlowRateKGH = float(mafFlowRateRAW / 1000); 
+
+    } else if (MAFdataUnit == MG_S) {
+
+        //  convert mg/s value into kg/h
+        mafFlowRateKGH = float(mafFlowRateRAW * 0.0036); 
+    }
+
+
+    // convert kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
     mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH);// + calibrationOffset; // add calibration offset to value //TODO #21 Need to validate and test calibration routine
 
     if (DEBUG_MAF_DATA == true) {
         Serial.print(mafMillivolts);
         Serial.print("mv = ");
-        Serial.print(mafFlowRateKghRAW / 1000);
+        Serial.print(mafFlowRateRAW / 1000);
         Serial.print("kg/h = ");
         Serial.print(mafFlowRateCFM );
         Serial.print("cfm \r\n");

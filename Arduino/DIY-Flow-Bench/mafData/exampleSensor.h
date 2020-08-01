@@ -13,7 +13,23 @@
 // we multiply volts by 1000 to get millivolts - 0.1 x 1000 = 100
 // we multiply kg/hr by 1000 to provide 3 decimal places in integer format - 6.226 x 1000 = 6226
 
+// MAF Output Type
+// 1 = voltage
+// 2 = frequency
+int MAFoutputType = 1;
+
+// MAF Data format
+// 1 = key_value
+// 2 = rawAnalog (1024 data points)
+int MAFdataFormat = 1; 
+
+// MAF Data format
+// 1 = kg_h
+// 2 = mg_s
+int MAFdataUnit = 1;
+
 long mafMapData[][2] = {
+{0,0},
 {100,6226},
 {200,6745},
 {300,7307},

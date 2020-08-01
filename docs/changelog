@@ -1,3 +1,4 @@
+20080201    - Added additional variables to MAF data files #29
 20080102    - #28 fixed incorrect CFM reading...
             - Updated getMafFlowCFM function
             - Corrected mafData files voltage

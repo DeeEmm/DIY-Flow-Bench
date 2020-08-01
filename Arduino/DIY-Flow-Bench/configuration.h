@@ -149,7 +149,7 @@
  ***/
 
 #define MIN_BENCH_PRESSURE 0              // Minimum pressure that we consider the bench is 'operational' / 'running' / vac source is on
-#define MIN_FLOW_RATE 2                   // Flow rate in cfm below which bench is considered off
+#define MIN_FLOW_RATE 3                   // Flow rate in cfm below which bench is considered off
 #define CYCLIC_AVERAGE_BUFFER 5           // Number of scans over which to average output (helps stabilise results)
 #define MIN_MAF_MILLIVOLTS 100
 

@@ -1,6 +1,21 @@
 // SIEMENS_5WK9605.h
 // Calculated from Tonys test results
-// millivolts, KGH/1000 
+
+// MAF Output Type
+// 1 = voltage
+// 2 = frequency
+int MAFoutputType = 1;
+
+// MAF Data format
+// 1 = key_value
+// 2 = rawAnalog (1024 data points)
+int MAFdataFormat = 1; 
+
+// MAF Data format
+// 1 = kg_h
+// 2 = mg_s
+int MAFdataUnit = 1;
+
 long mafMapData[][2] = {
 {100,6226},
 {200,6745},
