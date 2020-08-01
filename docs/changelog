@@ -1,3 +1,8 @@
+20080102    - #28 fixed incorrect CFM reading...
+            - Updated getMafFlowCFM function
+            - Corrected mafData files voltage
+            - Added additional functions to API
+            - Update configuration.h set default values
 20080101    - Updated API Responses
 20072901    - Changed format version varables
             - Added basic serial API functions

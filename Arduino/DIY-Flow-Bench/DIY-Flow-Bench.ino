@@ -20,7 +20,8 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080101"
+#define BUILD_NUMBER "20080102"
+#define RELEASE "V.1.0-beta.10"
 
 
 /****************************************
