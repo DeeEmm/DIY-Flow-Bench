@@ -1,4 +1,5 @@
 *.theia-workspace
+*.theia
 *.backup
 *.elf
 *.hex
