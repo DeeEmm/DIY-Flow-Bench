@@ -1,4 +1,4 @@
-﻿/****************************************
+/****************************************
  * The DIY Flow Bench project
  * A basic flow bench to measure and display volumetric air flow using an Arduino and common automotive MAF sensor.
  * 
@@ -11,19 +11,21 @@
 
 // Development and release version - Don't forget to update the changelog!!
 using DiyFlowBench.Api.Commands;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DiyFlowBench.Api.Test.Commands
 {
-    public class GenericCommand : Command
+    [TestClass]
+    public class GetReferencePressureCommandTests
     {
-        public GenericCommand() : base('V')
+        [TestMethod]
+        public void GetReferencePressureCommand_WhenCreated_TheIdentifierIsCorrect()
         {
+            //Act
+            Command command = new GetReferencePressureCommand();
 
-        }
-
-        public GenericCommand(char identifier) : base(identifier)
-        {
-
+            //Assert
+            Assert.AreEqual('R', command.Identifier);
         }
     }
 }

@@ -10,18 +10,14 @@
  ***/
 
 // Development and release version - Don't forget to update the changelog!!
-using DiyFlowBench.Api.Commands;
-
-namespace DiyFlowBench.Api.Test.Commands
+namespace DiyFlowBench.Api.Commands
 {
-    public class GenericCommand : Command
+    /// <summary>
+    /// Used to get the current humidity in RH from the DIY Flow Bench controller.
+    /// </summary>
+    public class GetHumidityCommand : Command
     {
-        public GenericCommand() : base('V')
-        {
-
-        }
-
-        public GenericCommand(char identifier) : base(identifier)
+        public GetHumidityCommand() : base('H')
         {
 
         }
