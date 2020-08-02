@@ -20,7 +20,7 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080202"
+#define BUILD_NUMBER "20080204"
 #define RELEASE "V.1.0-beta.10"
 
 
@@ -48,6 +48,7 @@
 
 // Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
 // https://github.com/adafruit/Adafruit_BME280_Library
+// https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide?_ga=2.39864294.574007306.1596270790-134320310.1596270790
 #if defined REF_ADAFRUIT_BME280 || defined TEMP_ADAFRUIT_BME280 || defined BARO_ADAFRUIT_BME280
     #include <BMP280_DEV.h> 
     Adafruit_BME280 adafruitBme280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
@@ -485,8 +486,13 @@ float getMafFlowCFM()
     if (DEBUG_MAF_DATA == true) {
         Serial.print(mafMillivolts);
         Serial.print("mv = ");
-        Serial.print(mafFlowRateRAW / 1000);
-        Serial.print("kg/h = ");
+        if (MAFdataUnit == KG_H) {
+            Serial.print(mafFlowRateRAW / 1000);
+            Serial.print("kg/h = ");
+        } else if (MAFdataUnit == MG_S) {
+            Serial.print(mafFlowRateRAW);
+            Serial.print("mg/s = ");
+        }
         Serial.print(mafFlowRateCFM );
         Serial.print("cfm \r\n");
     }
@@ -512,7 +518,12 @@ float getRefPressure(int units)
     int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
     int refPressMillivolts = (rawRefPressValue * (5.0 / 1024.0)) * 1000;
 
-    #if defined REF_MPXV7007
+    #if defined REF_MPX4250
+        // Vout = VS x (0.00369 x P + 0.04) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
+        // P = ((Vout / VS ) - 0.04) / 0.00369 --- Formula transposed for P
+        refPressureKpa = (((float)refPressMillivolts / (float)supplyMillivolts ) - 0.04) / 0.00369; 
+
+    #elif defined REF_MPXV7007
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
         refPressureKpa = (((float)refPressMillivolts / (float)supplyMillivolts ) - 0.5) / 0.057; 
@@ -774,15 +785,27 @@ return 10;
  *
  * handle API responses:
  * 
- * V - Version
- * L - Perform Leak test calibration [+return ok/nok]
- * l - Perform leak test [+return ok/nok]
- * O - Perform offset calibration [+return ok/nok]
- * F - Flow value in cfm
- * T - Temperature value in cfm
- * H - Humidity value in cfm
- * R - Reference Pressure value in cfm
- * B - Barometric Pressure in KPa
+ * General Commmands
+ * 'V' - Return firmware version
+ * 'F' - Return flow value in cfm
+ * 'T' - Return temperature value in deg C
+ * 'H' - Return humidity value in RH
+ * 'R' - Return reference pressure value in in/h2o
+ * 'B' - Return barometric Pressure in KPa
+ * Debug Commands
+ * 'M' - Return MAF Data (NOTE: will only return data if flow > 0)
+ * 'D' - Debug MAF on
+ * 'd' - Debug MAF off
+ * 'v' - System voltage
+ * 'm' - Return MAF sensor voltage
+ * 'b' - Return Baro sensor voltage
+ * 'r' - Return reference pressure sensor voltage
+ * 'h' - Return humidity sensor voltage
+ * 't' - Return temperature sensor voltage
+ * Calibration commands
+ * 'L' - Perform Leak test calibration [+return ok/nok]
+ * 'l' - Perform leak test [+return ok/nok]
+ * 'O' - Perform offset calibration [+return ok/nok]
  * 
  ***/
 void parseAPI(byte serialData)

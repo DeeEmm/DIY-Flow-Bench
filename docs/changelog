@@ -1,3 +1,8 @@
+20080204    - Differentiate between kg/h & mg/s in API MAF Data command.
+            - Added support for MPX4250 reference pressure sensor
+20080203	- Added support for the Generic Commands listed on the API section of the WIKI.  
+        	- Added the Serial API Specification to the doc folder
+			- Added the beginning of the API layer for the GUI
 20080202    - Added additional API debug commands
 20080201    - Added additional variables to MAF data files #29
 20080102    - #28 fixed incorrect CFM reading...

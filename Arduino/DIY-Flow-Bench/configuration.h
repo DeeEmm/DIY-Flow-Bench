@@ -105,6 +105,8 @@
     #define TEMPERATURE_PIN A5
     #define REF_BARO_PIN A6
     #define HUMIDITY_PIN A7
+    #define SCA_PIN 20
+    #define SCL_PIN 21
 
     // NVM Addresses (NOTE: 0-99 reserved for menu)
     #define NVM_HIGH_FLOW_CAL_ADDR 100    //8 bytes for float
@@ -130,6 +132,9 @@
     #define TEMPERATURE_PIN A5
     #define REF_BARO_PIN A6               //NOTE this cannot be same as REF_PRESSURE_PIN
     #define HUMIDITY_PIN A7
+    #define SCA_PIN 20
+    #define SCL_PIN 21
+
 
     // NVM Addresses (note 0-99 reserved for menu)
     #define NVM_HIGH_FLOW_CAL_ADDR 100    //8 bytes for float
@@ -178,7 +183,8 @@
  ***/
 
 // None - Default
-//#define REF_MPXV7007 //default
+//#define REF_MPXV7007 
+//#define REF_MPX4250
 //#define REF_ADAFRUIT_BMP280
 //#define REF_ADAFRUIT_BME280
 
