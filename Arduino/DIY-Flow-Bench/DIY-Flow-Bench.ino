@@ -20,7 +20,7 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080201"
+#define BUILD_NUMBER "20080202"
 #define RELEASE "V.1.0-beta.10"
 
 
@@ -833,7 +833,7 @@ void parseAPI(byte serialData)
 
       case 'F': // Get measured Flow 'F123.45\r\n'
 
-//String stringOne =  String(5.698, 3);                                // using a float and the decimal
+          //String stringOne =  String(5.698, 3);                                // using a float and the decimal
       
           Serial.print('F');
           Serial.print('.');
@@ -854,8 +854,18 @@ void parseAPI(byte serialData)
           // TODO calculate and send checksum
       break;
 
-      case 'M': // Get MAF output voltage'
+      case 'M': // Get MAF sensor data'
           Serial.print('M');
+          Serial.print('.');
+          if (DEBUG_MAF_DATA == false) {
+              DEBUG_MAF_DATA = true;
+              getMafFlowCFM();
+              DEBUG_MAF_DATA = false;         
+          }
+      break;
+
+      case 'm': // Get MAF output voltage'
+          Serial.print('m');
           Serial.print('.');
           Serial.print((analogRead(MAF_PIN) * (5.0 / 1024.0)) * 1000);
           Serial.print("\r\n");
@@ -868,10 +878,24 @@ void parseAPI(byte serialData)
           Serial.print("\r\n");
       break;
 
+      case 't': // Get Temperature sensor output voltage'
+          Serial.print('t');
+          Serial.print('.');
+          Serial.print((analogRead(TEMPERATURE_PIN) * (5.0 / 1024.0)) * 1000);
+          Serial.print("\r\n");
+      break;
+
       case 'H': // Get measured Humidity 'H.123.45\r\n'
           Serial.print('H');
           Serial.print('.');
           Serial.print(getRelativeHumidity());
+          Serial.print("\r\n");
+      break;
+
+      case 'h': // Get Humidity sensor output voltage'
+          Serial.print('h');
+          Serial.print('.');
+          Serial.print((analogRead(HUMIDITY_PIN) * (5.0 / 1024.0)) * 1000);
           Serial.print("\r\n");
       break;
 
@@ -882,10 +906,24 @@ void parseAPI(byte serialData)
           Serial.print("\r\n");
       break;
 
+      case 'r': // Get Reference Pressure sensor output voltage'
+          Serial.print('r');
+          Serial.print('.');
+          Serial.print((analogRead(REF_PRESSURE_PIN) * (5.0 / 1024.0)) * 1000);
+          Serial.print("\r\n");
+      break;
+
       case 'B': // Get measured Baro Pressure 'B.123.45\r\n'
           Serial.print('B');
           Serial.print('.');
           Serial.print(getBaroPressure(KPA));
+          Serial.print("\r\n");
+      break;
+
+      case 'b': // Get Baro Pressure sensor output voltage'
+          Serial.print('b');
+          Serial.print('.');
+          Serial.print((analogRead(REF_BARO_PIN) * (5.0 / 1024.0)) * 1000);
           Serial.print("\r\n");
       break;
 
