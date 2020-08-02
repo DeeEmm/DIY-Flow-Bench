@@ -10,18 +10,14 @@
  ***/
 
 // Development and release version - Don't forget to update the changelog!!
-using DiyFlowBench.Api.Commands;
-
-namespace DiyFlowBench.Api.Test.Commands
+namespace DiyFlowBench.Api.Commands
 {
-    public class GenericCommand : Command
+    /// <summary>
+    /// Used to get the current temperature in degrees C from the DIY Flow Bench controller.
+    /// </summary>
+    public class GetTemperatureCommand : Command
     {
-        public GenericCommand() : base('V')
-        {
-
-        }
-
-        public GenericCommand(char identifier) : base(identifier)
+        public GetTemperatureCommand() : base('T')
         {
 
         }

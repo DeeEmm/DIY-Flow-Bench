@@ -12,6 +12,9 @@
 // Development and release version - Don't forget to update the changelog!!
 namespace DiyFlowBench.Api.Commands
 {
+    /// <summary>
+    /// Used to get the version of the firmware installed on the DIY Flow Bench controller.
+    /// </summary>
     public class GetVersionCommand : Command
     {
         public GetVersionCommand() : base('V')

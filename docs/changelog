@@ -17,6 +17,7 @@
             - #19 Added Adafruit BME280 support
             - Corrected datatypes in mafData files
             - Added website URL in docs
+
 20041501    - Reorganised project folder structure
 20010101	- Fixed spelling issue for ilib library calls
 			- Fixed load issue for Baro and Pitot 

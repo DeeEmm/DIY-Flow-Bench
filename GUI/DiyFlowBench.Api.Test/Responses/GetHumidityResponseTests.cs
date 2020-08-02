@@ -11,19 +11,26 @@
 
 // Development and release version - Don't forget to update the changelog!!
 using DiyFlowBench.Api.Commands;
+using DiyFlowBench.Api.Responses;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace DiyFlowBench.Api.Test.Commands
+namespace DiyFlowBench.Api.Test.Responses
 {
-    public class GenericCommand : Command
+    [TestClass]
+    public class GetHumidityResponseTests
     {
-        public GenericCommand() : base('V')
+        [TestMethod]
+        public void GetHumidityResponse_WhenConstructed_FlowValueIsParsedCorrectly()
         {
+            //Arrange
+            GetHumidityCommand command = new GetHumidityCommand();
+            byte[] data = ResponseHelper.AppendChecksum(new byte[] { 0x48, 0x01 });
 
-        }
+            //Act
+            GetHumidityResponse response = new GetHumidityResponse(command, data);
 
-        public GenericCommand(char identifier) : base(identifier)
-        {
-
+            //Assert
+            Assert.AreEqual(0x01, response.Flow, "The humidity value is not correct.");
         }
     }
 }

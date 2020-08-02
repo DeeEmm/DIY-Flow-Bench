@@ -10,18 +10,14 @@
  ***/
 
 // Development and release version - Don't forget to update the changelog!!
-using DiyFlowBench.Api.Commands;
-
-namespace DiyFlowBench.Api.Test.Commands
+namespace DiyFlowBench.Api.Commands
 {
-    public class GenericCommand : Command
+    /// <summary>
+    /// Used to get the current reference pressure in in/h2o from the DIY Flow Bench controller.
+    /// </summary>
+    public class GetReferencePressureCommand : Command
     {
-        public GenericCommand() : base('V')
-        {
-
-        }
-
-        public GenericCommand(char identifier) : base(identifier)
+        public GetReferencePressureCommand() : base('R')
         {
 
         }

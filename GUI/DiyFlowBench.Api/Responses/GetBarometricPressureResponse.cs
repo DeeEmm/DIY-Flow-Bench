@@ -11,19 +11,23 @@
 
 // Development and release version - Don't forget to update the changelog!!
 using DiyFlowBench.Api.Commands;
+using System;
 
-namespace DiyFlowBench.Api.Test.Commands
+namespace DiyFlowBench.Api.Responses
 {
-    public class GenericCommand : Command
+    /// <summary>
+    /// The <see cref="Response"/> from a <see cref="GetBarometricPressureCommand"/>.
+    /// </summary>
+    public class GetBarometricPressureResponse : Response
     {
-        public GenericCommand() : base('V')
+        internal GetBarometricPressureResponse(Command command, byte[] data) : base(command, data)
         {
-
+            if (data.Length != 3) throw new ArgumentException($"The {GetType().Name} must contain 3 bytes.");
         }
 
-        public GenericCommand(char identifier) : base(identifier)
-        {
-
-        }
+        /// <summary>
+        /// The current flow value as read by the controller in CFM.
+        /// </summary>
+        public int Flow { get { return Data[1]; } }
     }
 }

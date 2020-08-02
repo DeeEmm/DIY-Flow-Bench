@@ -11,19 +11,26 @@
 
 // Development and release version - Don't forget to update the changelog!!
 using DiyFlowBench.Api.Commands;
+using DiyFlowBench.Api.Responses;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace DiyFlowBench.Api.Test.Commands
+namespace DiyFlowBench.Api.Test.Responses
 {
-    public class GenericCommand : Command
+    [TestClass]
+    public class GetFlowResponseTests
     {
-        public GenericCommand() : base('V')
+        [TestMethod]
+        public void GetFlowResponse_WhenConstructed_FlowValueIsParsedCorrectly()
         {
+            //Arrange
+            GetFlowCommand command = new GetFlowCommand();
+            byte[] data = ResponseHelper.AppendChecksum(new byte[] { 0x46, 0x01 });
 
-        }
+            //Act
+            GetFlowResponse response = new GetFlowResponse(command, data);
 
-        public GenericCommand(char identifier) : base(identifier)
-        {
-
+            //Assert
+            Assert.AreEqual(0x01, response.Flow, "The flow value is not correct.");
         }
     }
 }
