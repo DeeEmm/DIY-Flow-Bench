@@ -1,6 +1,18 @@
-20080101	- Added support for the Generic Commands listed on the API section of the WIKI.  
-20041701	- Added the Serial API Specification to the doc folder
-			- Added the beginning of the API layer for the GUI
+20080202    - Added additional API debug commands
+20080201    - Added additional variables to MAF data files #29
+20080102    - #28 fixed incorrect CFM reading...
+            - Updated getMafFlowCFM function
+            - Corrected mafData files voltage
+            - Added additional functions to API
+            - Update configuration.h set default values
+20080101    - Updated API Responses
+20072901    - Changed format version varables
+            - Added basic serial API functions
+            - Dropped ilib280 support (depreciated)
+            - #19 Added Adafruit BME280 support
+            - Corrected datatypes in mafData files
+            - Added website URL in docs
+
 20041501    - Reorganised project folder structure
 20010101	- Fixed spelling issue for ilib library calls
 			- Fixed load issue for Baro and Pitot 

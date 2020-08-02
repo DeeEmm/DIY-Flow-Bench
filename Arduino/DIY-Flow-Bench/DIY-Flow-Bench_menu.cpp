@@ -26,13 +26,13 @@ RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLeakTestChkRtCall, textItemRenderFn, "L
 TextMenuItem menuSettingsLeakTestChk(fnSettingsLeakTestChkRtCall, 14, 3, &menuSettingsCalRefPress);
 const PROGMEM AnyMenuInfo minfoSettingsLeakTestCal = { "Leak Test Cal", 8, 0xffff, 0, setLeakCalibrationValue };
 ActionMenuItem menuSettingsLeakTestCal(&minfoSettingsLeakTestCal, &menuSettingsLeakTestChk);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsBldRtCall, textItemRenderFn, "Bld", -1, NULL)
-TextMenuItem menuSettingsBld(fnSettingsBldRtCall, 11, 9, &menuSettingsLeakTestCal);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsVerRtCall, textItemRenderFn, "Ver", -1, NULL)
-TextMenuItem menuSettingsVer(fnSettingsVerRtCall, 10, 12, &menuSettingsBld);
+TextMenuItem menuSettingsVer(fnSettingsVerRtCall, 28, 256, &menuSettingsLeakTestCal);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsBldRtCall, textItemRenderFn, "Bld", -1, NULL)
+TextMenuItem menuSettingsBld(fnSettingsBldRtCall, 29, 256, &menuSettingsVer);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", 10, NULL)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 10, 0, NO_CALLBACK };
-BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsVer);
+BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsBld);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, NULL);
 const PROGMEM FloatMenuInfo minfoPitotVolts = { "Pitot Volts", 22, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuPitotVolts(&minfoPitotVolts, &menuSettings);
@@ -65,16 +65,16 @@ void setupMenu() {
     menuMgr.initForUpDownOk(&renderer, &menuFlow, DF_KEY_DOWN, DF_KEY_UP, DF_KEY_SELECT);
 
     // Read only and local only function calls
-    menuSettingsLeakTestChk.setReadOnly(true);
     menuSettingsCalRefPress.setReadOnly(true);
     menuAFlow.setReadOnly(true);
-    menuSettingsBld.setReadOnly(true);
-    menuPRef.setReadOnly(true);
     menuSettingsVer.setReadOnly(true);
+    menuPRef.setReadOnly(true);
+    menuSettingsLeakTestChk.setReadOnly(true);
     menuTemp.setReadOnly(true);
     menuPitot.setReadOnly(true);
     menuMafVolts.setReadOnly(true);
     menuSettingsLeakTestCal.setReadOnly(true);
     menuSettingsCalFlow.setReadOnly(true);
+    menuSettingsVer.setLocalOnly(true);
 }
 

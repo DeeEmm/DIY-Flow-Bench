@@ -3,9 +3,9 @@
 ## Version Information
 ###
 
-Version 1.0-Beta.2
+General Version 1.0-Beta
 
-This repository contains the hardware schematics and software code needed to build a volumetric flow bench based on an Arduino controller and common automotive MAF sensor
+For current build version please check the build number in the V1 repo - https://github.com/DeeEmm/DIY-Flow-Bench/tree/V1
 
 
 
@@ -16,6 +16,7 @@ The DIY Flow Bench is a basic system to measure and display volumetric air flow.
 
 The Flow Bench is used as a tool for measuring and quantifying modifications and improvements made to items such as automotive cylinder heads and carburettors by detecting air flow improvements.
 
+This repository contains the hardware schematics and software code needed to build a volumetric flow bench based on an Arduino controller and common automotive MAF sensor
 
 
 ## Contributors
@@ -100,4 +101,6 @@ This project is released under the GPLV3 license. For details on usage please re
 
 - The latest information including usage and installation can be found in the project WIKI - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
 - Github repository - https://github.com/DeeEmm/DIY-Flow-Bench
+- Support forums - https://diyflowbench.com/
+- Discord - https://discord.gg/85uk6dy 
 - Join our project community - https://www.facebook.com/groups/diyflowbench/ 
