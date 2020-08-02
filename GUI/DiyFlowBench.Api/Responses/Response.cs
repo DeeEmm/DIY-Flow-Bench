@@ -15,6 +15,9 @@ using System;
 
 namespace DiyFlowBench.Api.Responses
 {
+    /// <summary>
+    /// The Response that is returned from the DIY Flow Bench controller as a result of a <see cref="Command"/> being executed.
+    /// </summary>
     public class Response
     {
         protected internal Response(Command command, byte[] data)
@@ -53,11 +56,16 @@ namespace DiyFlowBench.Api.Responses
             return checksum == data[data.Length - 1];
         }
 
-
+        /// <summary>
+        /// A reference to the <see cref="Command"/> that was executed.
+        /// </summary>
         public Command Command { get; private set; }
 
         protected byte[] Data { get; private set; }
 
+        /// <summary>
+        /// Indicates if the <see cref="Command"/> was executed successfully.  This value should be checked before any Response is acted upon.
+        /// </summary>
         public bool Success { get { return (Data[0] & 0x80) == 0; } }
     }
 }

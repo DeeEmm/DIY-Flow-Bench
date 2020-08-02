@@ -1,4 +1,4 @@
-/****************************************
+﻿/****************************************
  * The DIY Flow Bench project
  * A basic flow bench to measure and display volumetric air flow using an Arduino and common automotive MAF sensor.
  * 
@@ -11,29 +11,26 @@
 
 // Development and release version - Don't forget to update the changelog!!
 using DiyFlowBench.Api.Commands;
+using DiyFlowBench.Api.Responses;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace DiyFlowBench.Api.Test.Commands
+namespace DiyFlowBench.Api.Test.Responses
 {
     [TestClass]
-    public class CommandTests
+    public class GetTemperatureResponseTests
     {
         [TestMethod]
-        [ExpectedException(typeof(UnsupportedCommandIdentiferException))]
-        public void Command_InvalidIdentifier_UnsupportedCommandIdentifierException()
+        public void GetTemperatureResponse_WhenConstructed_FlowValueIsParsedCorrectly()
         {
-            //Act
-            Command command = new GenericCommand(' ');
-        }
+            //Arrange
+            GetTemperatureCommand command = new GetTemperatureCommand();
+            byte[] data = ResponseHelper.AppendChecksum(new byte[] { 0x54, 0x01 });
 
-        [TestMethod]
-        public void Command_WhenConstructed_IdentifierIsSaveCorrectly()
-        {
             //Act
-            Command command = new GenericCommand('V');
+            GetTemperatureResponse response = new GetTemperatureResponse(command, data);
 
             //Assert
-            Assert.AreEqual('V', command.Identifier, "Unexpected Identifier.");
+            Assert.AreEqual(0x01, response.Flow, "The temperature value is not correct.");
         }
     }
 }

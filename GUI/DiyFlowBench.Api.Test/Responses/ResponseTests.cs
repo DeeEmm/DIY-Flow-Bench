@@ -37,10 +37,10 @@ namespace DiyFlowBench.Api.Test.Responses
         public void Response_NullData_ArguemntNullException()
         {
             //Arrange
-            Command command = new GenericCommand('~');
+            Command command = new GenericCommand();
 
             //Act
-            Response response = new GenericResponse(command, null);
+            new GenericResponse(command, null);
         }
 
         [TestMethod]
@@ -48,11 +48,11 @@ namespace DiyFlowBench.Api.Test.Responses
         public void Response_EmptyData_ArguemntException()
         {
             //Arrange
-            Command command = new GenericCommand('~');
+            Command command = new GenericCommand();
             byte[] data = new byte[] { };
 
             //Act
-            Response response = new GenericResponse(command, data);
+            new GenericResponse(command, data);
         }
 
         [TestMethod]
@@ -60,11 +60,11 @@ namespace DiyFlowBench.Api.Test.Responses
         public void Response_InvalidIdentifier_ArguemntException()
         {
             //Arrange
-            Command command = new GenericCommand('~');
+            Command command = new GenericCommand();
             byte[] data = new byte[] { 0x20 };
 
             //Act
-            Response response = new GenericResponse(command, data);
+            new GenericResponse(command, data);
         }
 
         [TestMethod]
@@ -72,19 +72,19 @@ namespace DiyFlowBench.Api.Test.Responses
         public void Response_FailedBitSet_CommandFailedException()
         {
             //Arrange
-            Command command = new GenericCommand('~');
+            Command command = new GenericCommand();
             byte[] data = new byte[] { 0xA0 };
 
             //Act
-            Response response = new GenericResponse(command, data);
+            new GenericResponse(command, data);
         }
 
         [TestMethod]
         public void Response_WhenConstructed_CommandIsSavedCorrectly()
         {
             //Arrange
-            Command command = new GenericCommand('~');
-            byte[] data = new byte[] { 0x7E };
+            Command command = new GenericCommand();
+            byte[] data = new byte[] { (byte)command.Identifier };
 
             //Act
             Response response = new GenericResponse(command, data);

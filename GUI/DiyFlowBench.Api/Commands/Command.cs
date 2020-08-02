@@ -10,17 +10,28 @@
  ***/
 
 // Development and release version - Don't forget to update the changelog!!
+using System.Linq;
+using System.Linq.Expressions;
+
 namespace DiyFlowBench.Api.Commands
 {
+    /// <summary>
+    /// A command that can be executed on the DIY Flow Bench controller.  See the API section of the WIKI for information on what commands are supported.
+    /// </summary>
     public class Command
     {
         protected Command(char identifier)
         {
-            if (identifier < 0x21 || identifier > 0x7E) throw new UnsupportedCommandIdentiferException(identifier);
+            if (!SupportedCommands.Contains(identifier)) throw new UnsupportedCommandIdentiferException(identifier);
 
             Identifier = identifier;
         }        
 
+        /// <summary>
+        /// The identifier of the command to be executed.  See the API section of the WIKI for a list of command identifiers.
+        /// </summary>
         public char Identifier { get; private set; }
+
+        private static char[] SupportedCommands { get { return new char[] {'V', 'F', 'T', 'H', 'R', 'B' }; } }
     }
 }
