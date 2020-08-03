@@ -1,3 +1,4 @@
+20080302    - Added raw analog decode to getMafflowCFM() function
 20080301    - Added LS2 MAf Data file
             - Updated MAF file format
 20080204    - Differentiate between kg/h & mg/s in API MAF Data command.
