@@ -5,7 +5,7 @@
 
 General Version 1.0-Beta
 
-For current build version please check the build number in the V1 repo - https://github.com/DeeEmm/DIY-Flow-Bench/tree/V1
+For current build version please check the BUILD_NUMBER in the changelog
 
 
 
@@ -19,10 +19,11 @@ The Flow Bench is used as a tool for measuring and quantifying modifications and
 This repository contains the hardware schematics and software code needed to build a volumetric flow bench based on an Arduino controller and common automotive MAF sensor
 
 
-## Contributors
+## Contributors / Testers
 ###
 
 - DeeEmm AKA Michael Percy
+- jwestes
 - ModChipMan AKA Tony Donn
 - Hans Ake Rahm
 - Andrew Goodfellow
