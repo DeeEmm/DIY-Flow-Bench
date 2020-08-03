@@ -1,21 +1,43 @@
-// SIEMENS_5WK9605.h
-// Calculated from Tonys test results
+/****************************************
+ * SIEMENS_5WK9605.h
+ *
+ * Manufacturer: Siemens
+ * Part#: 5WK9605
+ * MAF file for type: 
+ * File units = 1000 * kg/hr
+ * Status: Measured on flow bench but data needs validating
+ ***/
 
-// MAF Output Type
-// 1 = voltage
-// 2 = frequency
+/****************************************
+ * MAF Output Type
+ *
+ * 1 = voltage
+ * 2 = frequency
+ ***/
 int MAFoutputType = 1;
 
-// MAF Data format
-// 1 = key_value
-// 2 = rawAnalog (1024 data points)
+
+/****************************************
+ * MAF Data format
+ * 
+ * 1 = key_value
+ * 2 = rawAnalog (1024 data points)
+ ***/
 int MAFdataFormat = 1; 
 
-// MAF Data format
-// 1 = kg_h
-// 2 = mg_s
+
+/****************************************
+ * MAF Units
+ * 
+ * 1 = kg_h
+ * 2 = mg_s
+ ***/
 int MAFdataUnit = 1;
 
+
+/****************************************
+ * MAF Data
+ ***/
 long mafMapData[][2] = {
 {100,6226},
 {200,6745},

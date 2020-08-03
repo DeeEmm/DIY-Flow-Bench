@@ -1,33 +1,59 @@
-// exampleSensor.h
+/****************************************
+ * exampleSensor.h
+ *
+ * Manufacturer: Manufacturer
+ * Part#: 123456
+ * MAF file for type: Make / Model
+ * File units = 10 * mg/sec
+ * Status: Example Data
+ ***/
 
-// This is an example MAF Data file
-// You can either use volts versus kg/hr as below, or 1024 analog data points versus kg/hr
-// Just change the values below to suit. Array length and voltage intervals are not an issue, add extra items as necessary.
+/****************************************
+ * This is an example MAF Data file
+ * You can either use volts versus kg/hr or ms/sec as below, or 1024 analog data points versus ms/sec or kg/hr
+ * Just change the values below to suit. Array length and voltage intervals are not an issue, add extra items as necessary.
+ * 
+ * NOTE: all data values used for MAF lookup are integers. This is to reduce overheads and simplify code. 
+ * It also allows us to use both millivolts and RAW analog references in the same code without having to worry about changing datatypes
+ * So to populate the table you will probably have to translate your values as follows:
+ * millivolts (volts/100), kgh/1000 
+ * 
+ * example - the first two entries below are 0.1 volts and 6.226 kg/hr
+ * we multiply volts by 1000 to get millivolts - 0.1 x 1000 = 100
+ * we multiply kg/hr by 1000 to provide 3 decimal places in integer format - 6.226 x 1000 = 6226
+ * we multiply mg/sec by 10 to provide 1 decimal place in integer format - 62.6 x 10 = 626
+ ***/
 
-// NOTE: all data values used for MAF lookup are integers. This is to reduce overheads and simplify code. 
-// It also allows us to use both millivolts and RAW analog references in the same code without having to worry about changing datatypes
-// So to populate the table you will probably have to translate your values as follows:
-// millivolts (volts/100), kgh/1000 
 
-// example - the first two entries below are 0.1 volts and 6.226 kg/hr
-// we multiply volts by 1000 to get millivolts - 0.1 x 1000 = 100
-// we multiply kg/hr by 1000 to provide 3 decimal places in integer format - 6.226 x 1000 = 6226
-
-// MAF Output Type
-// 1 = voltage
-// 2 = frequency
+/****************************************
+ * MAF Output Type
+ *
+ * 1 = voltage
+ * 2 = frequency
+ ***/
 int MAFoutputType = 1;
 
-// MAF Data format
-// 1 = key_value
-// 2 = rawAnalog (1024 data points)
-int MAFdataFormat = 1; 
 
-// MAF Data format
-// 1 = kg_h
-// 2 = mg_s
+/****************************************
+ * MAF Data format
+ * 
+ * 1 = key_value
+ * 2 = rawAnalog (1024 data points)
+ ***/
+int MAFdataFormat = 2; 
+
+
+/****************************************
+ * MAF Units
+ * 
+ * 1 = kg_h
+ * 2 = mg_s
+ ***/
 int MAFdataUnit = 1;
 
+/****************************************
+ * MAF Data
+ ***/
 long mafMapData[][2] = {
 {0,0},
 {100,6226},

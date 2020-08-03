@@ -1,20 +1,44 @@
-//DELPHI AF10118
-
-// MAF Output Type
-// 1 = voltage
-// 2 = frequency
+/****************************************
+ * DELPHI_AF10118.h
+ *
+ * Manufacturer: DELPHI
+ * Part#: AF10118
+ * MAF file for type: 
+ * File units = 1000 * kg/hr
+ * Status: Data from Internet / unvalidated
+ ***/
+ 
+ 
+ /****************************************
+ * MAF Output Type
+ *
+ * 1 = voltage
+ * 2 = frequency
+ ***/
 int MAFoutputType = 1;
 
-// MAF Data format
-// 1 = key_value
-// 2 = rawAnalog (1024 data points)
+
+/****************************************
+ * MAF Data format
+ * 
+ * 1 = key_value
+ * 2 = rawAnalog (1024 data points)
+ ***/
 int MAFdataFormat = 1; 
 
-// MAF Data format
-// 1 = kg_h
-// 2 = mg_s
+
+/****************************************
+ * MAF Units
+ * 
+ * 1 = kg_h
+ * 2 = mg_s
+ ***/
 int MAFdataUnit = 1;
 
+
+/****************************************
+ * MAF Data
+ ***/
 long mafMapData[][2] = {
 {0,3650},
 {600,5620},

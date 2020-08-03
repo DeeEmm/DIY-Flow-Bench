@@ -1,3 +1,5 @@
+20080301    - Added LS2 MAf Data file
+            - Updated MAF file format
 20080204    - Differentiate between kg/h & mg/s in API MAF Data command.
             - Added support for MPX4250 reference pressure sensor
 20080203	- Added support for the Generic Commands listed on the API section of the WIKI.  
