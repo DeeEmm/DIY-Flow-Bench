@@ -1,0 +1,57 @@
+#######################################
+# Syntax Coloring Map For The BMP280
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+BMP280	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+reset	KEYWORD2
+startNormalConversion	KEYWORD2
+startForcedConversion	KEYWORD2
+stopConversion	KEYWORD2
+setPresOversampling	KEYWORD2
+setTempOversampling	KEYWORD2
+setIIRFilter	KEYWORD2
+setTimeStandby	KEYWORD2
+getPressure	KEYWORD2
+getTempPres	KEYWORD2
+getAltitude	KEYWORD2
+getMeasurements	KEYWORD2
+setClock	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+BMP280_I2C_ADDR	LITERAL1
+BMP280_I2C_ALT_ADDR	LITERAL1
+
+OVERSAMPLING_SKIP	LITERAL1
+OVERSAMPLING_X1	LITERAL1
+OVERSAMPLING_X2	LITERAL1
+OVERSAMPLING_X4	LITERAL1
+OVERSAMPLING_X8	LITERAL1
+OVERSAMPLING_X16	LITERAL1
+
+IIR_FILTER_OFF	LITERAL1
+IIR_FILTER_2	LITERAL1
+IIR_FILTER_4	LITERAL1
+IIR_FILTER_8	LITERAL1
+IIR_FILTER_16	LITERAL1
+
+TIME_STANDBY_05MS	LITERAL1
+TIME_STANDBY_62MS	LITERAL1
+TIME_STANDBY_125MS	LITERAL1
+TIME_STANDBY_250MS	LITERAL1
+TIME_STANDBY_500MS	LITERAL1
+TIME_STANDBY_1000MS	LITERAL1
+TIME_STANDBY_2000MS	LITERAL1
+TIME_STANDBY_4000MS	LITERAL1

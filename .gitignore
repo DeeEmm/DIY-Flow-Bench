@@ -1,0 +1,6 @@
+*.theia-workspace
+*.theia
+*.backup
+*.elf
+*.hex
+.DS_Store

@@ -3,13 +3,10 @@
 ## Version Information
 ###
 
-Version 1.0-Alpha
+General Version 1.0-Beta
 
-This repository contains the hardware schematics and software code needed to build a volumetric flow bench based on an Arduino controller and common automotive MAF sensor.
+For current build version please check the build number in the V1 repo - https://github.com/DeeEmm/DIY-Flow-Bench/tree/V1
 
-NOTE: This pre-release alpha version contains very basic code that you can use to display the output from your MAF on a simple display.
-
-For more up to date releases and current development please check the Wiki / releases page
 
 
 ## What is it?
@@ -19,13 +16,14 @@ The DIY Flow Bench is a basic system to measure and display volumetric air flow.
 
 The Flow Bench is used as a tool for measuring and quantifying modifications and improvements made to items such as automotive cylinder heads and carburettors by detecting air flow improvements.
 
+This repository contains the hardware schematics and software code needed to build a volumetric flow bench based on an Arduino controller and common automotive MAF sensor
 
 
 ## Contributors
 ###
 
-- Michael Percy AKA DeeEmm
-- Tony Donn AKA ModChipMan
+- DeeEmm AKA Michael Percy
+- ModChipMan AKA Tony Donn
 - Hans Ake Rahm
 - Andrew Goodfellow
 
@@ -44,15 +42,50 @@ The Flow Bench is used as a tool for measuring and quantifying modifications and
 ## Project Status
 ###
 
-We are currently in Beta.
+For more up to date information including current stable builds and documentation, please visit the WIKI page in our gitgub repository - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
 
-If you want to download the current stable beta release, please check out the releases page
 
-https://github.com/DeeEmm/DIY-Flow-Bench/releases
 
-For more up to date information including current stable builds and documentation, please visit the WIKI page in our gitgub repository
+## 1. Component Selection
+###
 
-https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/1.-Component-selection
+
+
+## 2. Hardware Design
+###
+
+Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/2.-Hardware-Design.
+
+
+## 3. Installing / Getting started
+###
+
+Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/3.-Installation
+
+
+
+## 4. Configuration
+###
+
+Please refer to https://github.com/DeeEmm/DIY-Flow-Bench/wiki/4.-Configuration
+
+
+## 5. Calibration
+###
+
+Please refer to https://github.com/DeeEmm/DIY-Flow-Bench/wiki/5.-Calibration
+
+## 6. Operation
+###
+
+Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/6.-Operation
+
+
+## 7. Customisation
+###
+
+Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/7.-Customisation
 
 
 
@@ -68,4 +101,6 @@ This project is released under the GPLV3 license. For details on usage please re
 
 - The latest information including usage and installation can be found in the project WIKI - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
 - Github repository - https://github.com/DeeEmm/DIY-Flow-Bench
+- Support forums - https://diyflowbench.com/
+- Discord - https://discord.gg/85uk6dy 
 - Join our project community - https://www.facebook.com/groups/diyflowbench/ 
