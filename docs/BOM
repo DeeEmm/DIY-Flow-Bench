@@ -2,25 +2,39 @@ Bill of materials
 =================
 
 
-Electrical / electronic
+Electronic
 =======================
 
 QTY			Description
 
-1			MAF Sensor - 5WK9605 - Hot wire MAF - 0-5v sensing range
-1			Arduino - MEGA 2560
-1			RepRapdiscount smart controller - 4 line LCD controller
-1 or 2		4 Digit LED display - TM1637 based Generic display with IC2 serial protocol (4 pin connection) (optional)
-1 or 2      New Red 1.2' 4 Digit 7 Seven Segment LED Display IIC for Arduino
-1 or more   MPX style pressure / vac sensors (TBD)
-                MPXMPXV7007 -7 to + 7kPa (exactly +/- 28"/wg)
-                MPXV7025 -25kPa to +25kPa  
-                MPX5050 -50kPA to +50kPa 
-1           MEGA Sensor Module Shield V1.0 
+1           MAF Sensor - GM_LS2
+1           Arduino - MEGA 2560
+1           MPXMPXV7007 -7 to + 7kPa (exactly +/- 28"/wg) (Optional)
+1           BME280 (Optional)
+1           LCD KeyPad Shield (Optional for V1 without DIYFB shield)
+1           DIYFB MEGA2560 Shield V1.0 (available from V2 onwards)
 
+NOTE: System will work with just a MAF and an Arduino. Control can be made via serial monitor.
+
+
+Electrical
+=======================
+
+QTY			Description
+
+?           Vacuum cleaner motors
+
+NOTE: You can use a shop vac as a very basic vacuum source, however for accurately testing higher 
+flowing components you will ideally need to use a source that flows in excess of your target flow rate. 
+The general choice is to use vacuum cleaner motors from salvaged vacuum cleaners. The number and style 
+of vacuum cleaner motors will depend entirely on the application.
+
+Vacuum cleaner motors can also be purchased from websites such as ali-express and ebay.
 
 
 Bench construction
 ==================
 
 1 mtr		80mm Diameter UPVC Waste pipe
+
+NOTE: Section under construction - see section in WIKI for more info

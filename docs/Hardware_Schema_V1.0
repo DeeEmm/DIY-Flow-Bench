@@ -1,16 +1,33 @@
-NOTE DEFAULT HARDWARE SCHEMA IS FOR ARDUINO MEGA 2560
+/****************************************
+ * Hardware schema for V1
+ *
+ * NOTE: Arduino shield planned for V2 will most likely
+ * follow the pin designations set in configuration.h
+ ***/
+ 
+ 
+ 
+ 
+/****************************************
+* MAF sensors
+***/
 
 
-### FIELD DEVICES
+## GM Style
+A - Low reference
+B - IAT Sensor Signal
+C - Sensor Ground
+D - Sensor Voltage supply
+E - MAF Sensor Signal
 
-## MAF Sensor (5WK9605)
 
+## Siemens
 1 - GND / 0V
 2 - Output Signal (0-5V) - connect to Arduino Analog Pin A0
 3 - 12V
 
-## MAF Sensor (Bosch 5 pin)
 
+## Bosch 5 pin
 1 - Temperature sensor output, not used in ALH engine
 2 - 12V supply input
 3 - Ground
@@ -18,43 +35,20 @@ NOTE DEFAULT HARDWARE SCHEMA IS FOR ARDUINO MEGA 2560
 5 - Output voltage
 
 
-##  I2C Devices (4x20 display / 7 seg displays / etc)
+/****************************************
+* Temp / Humidity / Baro sensors 
+***/
 
-VCC - 5V
+##  BME380 combined sensor
+VCC - 3.3V
 GND - 0V
-CLK - PIN 20
-DIO - PIN 21
+SDA - PIN 20 (for Mega2560)
+SCL - PIN 21 (for Mega2560)
 
 
 
-### ARDUINO PINS
+/****************************************
+* Arduino pin-outs
+***/
 
-## LED Display (Discrete Connections)
-
-PIN 22              LCD_RS              
-PIN 24              LCD_EN              
-PIN 26              LCD_D4              
-PIN 28              LCD_D5              
-PIN 29              LCD_D6              
-PIN 32              LCD_D7              
-
-
-## I2C Devices
-
-PIN 20              CLK
-PIN 21              DIO
-
-
-## Input devices
-
-PIN 4               ENCODER BUTTON   
-
-## Sensors
-
-PIN A0              MAF_PIN             
-PIN A1              REF_PRESSURE_PIN    
-PIN A2              REF_VAC_PIN         
-PIN A3              PITOT_PIN           
-PIN A4              TEMPERATURE_PIN     
-PIN A5              BAROMETRIC_PIN      
-PIN A6              HUMIDITY_PIN        
+For Arduino pinout please see the 'Configure Pins' section in configuration.h

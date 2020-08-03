@@ -3,62 +3,60 @@ Functional description
 
 - Read MAF data from sensor
 - Read test pressure from sensor
+- Read baro pressure from sensor
+- Read temperature from sensor
+- Read humidity from sensor
+- Read MAF Datafile
 - Convert MAF data into cfm 
 - Display flow rate in cfm
-- Display test pressure 
-- Display converted test pressure
-- Calibration 
-
-
-Menu Layout
-===========
- 
-
-Home / info screen 
- 	|
- 	|--Test Pressure
- 	|		|
- 	|		|--Select test pressure (for conversion between test pressures)
- 	|
- 	|--MAF Setup
- 	|		|
- 	|		|--Select MAF Type
- 	|
- 	|
- 	|--Calibrate
- 			|
- 			|--Enter orifice flow rate
- 						|
- 						|--Calibrate
- 						
- 				
- 						
-Home Screen layout
-==================
-
-
-**********************
-* 345 CFM @	10"WG	 *
-* 123 CFM @	28"WG	 *
-* Test Press 1 123   *
-* Test Press 2 456   *
-**********************
+- Display test pressure / Display converted test pressure
 
 
 
-Basic operation
-===============
+API functions
+====================== 
 
-- To Calibrate
+DIY Flow Bench can be controlled via the serial API using Arduino Serial monitor
+Simply type the command as shown below. (Note commands are case sensitive)
 
-Home > Calibrate > Enter orifice data > Click to Save
+General Commmands
+----------------------
+'V' - Return firmware version
 
+'F' - Return flow value in cfm
 
-- To set up MAF sensor
+'T' - Return temperature value in deg C
 
-Home > MAF Setup > [select MAF from list] > Click to save
+'H' - Return humidity value in RH
 
+'R' - Return reference pressure value in in/h2o
 
-- To select test pressure
+'B' - Return barometric Pressure in KPa
 
-Home > Test Pressure > [enter pressure using click wheel] > Click to save
+Debug Commands
+----------------------
+'M' - Return MAF Data (NOTE: will only return data if flow > 0)
+
+'D' - Debug MAF on
+
+'d' - Debug MAF off
+
+'v' - System voltage
+
+'m' - Return MAF sensor voltage
+
+'b' - Return Baro sensor voltage
+
+'r' - Return reference pressure sensor voltage
+
+'h' - Return humidity sensor voltage
+
+'t' - Return temperature sensor voltage
+
+Calibration commands
+----------------------
+'L' - Perform Leak test calibration [+return ok/nok]
+
+'l' - Perform leak test [+return ok/nok]
+
+'O' - Perform offset calibration [+return ok/nok]
