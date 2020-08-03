@@ -5,7 +5,7 @@
 
 General Version 1.0-Beta
 
-For current build version please check the BUILD_NUMBER in the changelog
+For current build version please check the BUILD_NUMBER in  docs/changelog
 
 
 
