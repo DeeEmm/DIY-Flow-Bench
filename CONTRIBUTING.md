@@ -4,26 +4,18 @@
 
 The following guidelines explain how contributions to the project are managed. The reason for having these the guidelines are so that the project is maintained in a well-organised manner and easy to use for both the end user and future developers alike.
 
-The project stretches across a number of platforms and disciplines, and so trying to make a one-size-fits-all set of 'rules' is likely impossible as there are many things do not apply equally to all.
-
-<<<<<<< HEAD
-So the guidelines seek to set out some basic concepts that can them be implimented in the best manner across each of the platforms.
-=======
-So the guidelines seek to set out some basic concepts that can then be implimented in the best manner across each of the platforms.
->>>>>>> V1
+The project stretches across a number of platforms and disciplines, and so trying to make a one-size-fits-all set of 'rules' is likely impossible as there are many things do not apply equally to all. So the guidelines seek to set out some basic concepts that can then be implimented in the best manner across each of the platforms.
 
 
 ## Coding standards
 
 As there is no adopted formal coding standard in use, the style and methods employed are largely at the discretion and experience of the individual coder. We beleive that there is no **ONE** _RIGHT_ way of coding (Give a coding job to 10 softies and you will get 10 solutions) and so there is no expectation that the code is written a certain way. 
 
+
 ### Basic guidelines
 
-<<<<<<< HEAD
-Whilst we do not emply any specific coding standards, we do however have some very basic guidelines that we ask you to follow if possible.
-=======
 Whilst we do not employ any specific coding standards, we do however have some very basic guidelines that we ask you to follow if possible.
->>>>>>> V1
+
 
 - Keep your work neat so that it is easy for others to follow
 - Try to adhere to general good coding practice (no spaghetti logic please)
@@ -33,11 +25,8 @@ Whilst we do not employ any specific coding standards, we do however have some v
 - Use camelCase for variable / function / class names if possible
 - If you find it difficult to follow, others will too.
 
-<<<<<<< HEAD
-Essentially it's all about making the code easy for others to read and follow. Remember that this is an open source project so people of all skill levels will be using it and trying to decypher what's going on. Also, the more help that is provided within the files, the less real-world help will be required to get people up and running which will help minimise the resources needed to support the project
-=======
+
 Essentially it's all about making the code easy for others to read and follow. Remember that this is an open source project so people of all skill levels will be using it and trying to decypher what's going on. Also, please consider that the more help that is provided within the code, the less real-world help will be required to get people up and running, which will help minimise the real-world resources needed to support the project
->>>>>>> V1
 
 
 ## Version control
@@ -53,15 +42,11 @@ Essentially you will:
 - Create a 'pull request' to have your changes merged with the main code
 - Your changes will then be reviewed and merged
 
-<<<<<<< HEAD
-How to use GIT is a bit outside of the scope of this document but you can find many how-to's online that explain how to use github desktop. We recommend the user guides that are provided with GitHub Desktop - https://help.github.com/en/desktop 
 
-If you do get stuck, you can also give us a shout out on the #developer channel on Discord. If you don't have access, message the owner of the repository, all contributors are welcomed and encouraged to join.
-=======
 How to use GIT is a bit outside of the scope of this document but you can find many how-to's online that explain how to use github desktop. We recommend the user guides that are provided with GitHub Desktop as a good starting point 
 
 If you do get stuck, you can also reach out and give us a shout out on our #developer channel on Discord. If you don't have access, message the owner of the repository or give a shout out on one of the other channels. All contributors are welcomed and encouraged to join the #developer channel.
->>>>>>> V1
+
 
 ### GIT Commit Summaries 
 
@@ -74,6 +59,7 @@ Where the number comprises of the current date and a two digit numerical series 
 >YYMMDDXX
 
 NOTE: This is also the same format used in the changelog
+
 
 ### GIT Commit descriptions
 
@@ -110,6 +96,7 @@ The software aspects of the project all follow basic release / build versioning 
 
 Release versioning follows standard **[major].[minor].[build]** numbering Each software change should increment the relevent identifier(s) as follows.
 
+
 ### Build version incrementing 
 
 The build number increments every time that the code is updated. Basically every commit that is made should have a different Build number. Currently this is manually managed.
@@ -118,11 +105,13 @@ The build number follows the same formatting as the commit summaries and changel
 
 >YYMMDDXX
 
+
 ### Major / Minor version incrementing
 
 Each official release published on the GutHub releases page should increment the minor release number **unless** there has been a major code refactoring or major feature changes, in which case the Major version number should be incremented and the minor release number reset to zero.
 
 Generally major releases are planned as projects so major version number changes are known well in advance.
+
 
 ### Development version numbering
 
@@ -138,9 +127,11 @@ Each stage of development is superceded by the next once any pre-agreed testing 
 
 When moving to the actual release, the RC prefix is dropped.
 
+
 ### Acceptance testing
 
 Prior to the code moving into the Release Candidate stage, acceptance tests should be devised so that the functionality of the software can be tested across a range of scenarios by a range of users. Acceptance tests are usually developed as part of each project as the project grows and may be comprised of a number of smaller unit tests.
+
 
 ### Versioning exposed within software
 
