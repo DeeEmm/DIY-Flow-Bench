@@ -105,8 +105,8 @@
     #define TEMPERATURE_PIN A5
     #define REF_BARO_PIN A6
     #define HUMIDITY_PIN A7
-    #define SCA_PIN 20
-    #define SCL_PIN 21
+    #define SCA_PIN 20 // Dedicated SCA pin on Mega2560
+    #define SCL_PIN 21 // Dedicated SCL pin on Mega2560
 
     // NVM Addresses (NOTE: 0-99 reserved for menu)
     #define NVM_HIGH_FLOW_CAL_ADDR 100    //8 bytes for float
@@ -185,8 +185,9 @@
 // None - Default
 //#define REF_MPXV7007 
 //#define REF_MPX4250
-//#define REF_ADAFRUIT_BMP280
+//#define REF_ADAFRUIT_BMP280               //TODO #31 Drop support for BMP sensor
 //#define REF_ADAFRUIT_BME280
+#define REF_SPARKFUN_BME280
 
 
 
@@ -210,9 +211,9 @@
  ***/
 
 // Default none (defaults to 14.7 psi)
-//#define USE_REF_PRESS 
+#define BARO_SPARKFUN_BME280
 //#define BARO_MPX4115 
-//#define BARO_ADAFRUIT_BMP280
+//#define BARO_ADAFRUIT_BMP280             //TODO #31 Drop support for BMP sensor
 //#define BARO_ADAFRUIT_BME280
 
 #define startupBaroScalingFactor 1        // scaling factor when using reference pressure sensor for baro correction
@@ -225,6 +226,7 @@
  ***/
 
 // Default none (defaults to 0.36)
+#define RELH_SPARKFUN_BME280
 //#define SIMPLE_RELH_DHT11 
 //#define RELH_ADAFRUIT_BME280
 
@@ -235,10 +237,10 @@
  ***/
 
 // Default none (defaults to 21 degrees)
+#define TEMP_SPARKFUN_BME280
 //#define TEMP_ADAFRUIT_BMP280
 //#define TEMP_ADAFRUIT_BME280
 //#define SIMPLE_TEMP_DHT11 
-
 
 
 /****************************************

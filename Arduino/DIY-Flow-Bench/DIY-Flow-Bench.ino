@@ -20,7 +20,7 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080306"
+#define BUILD_NUMBER "20080307"
 #define RELEASE "V.1.0-beta.10"
 
 
@@ -39,6 +39,7 @@
  * Add pre-directives for all optional libraries to preserve memory
  ***/
 
+// TODO #31 Drop support for BMP sensor
 // Support for ADAFRUIT_BMP280 temp & pressure sensor
 // https://www.adafruit.com/product/2651
 #if defined REF_ADAFRUIT_BMP280 || defined TEMP_ADAFRUIT_BMP280 || defined BARO_ADAFRUIT_BMP280
@@ -48,10 +49,17 @@
 
 // Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
 // https://github.com/adafruit/Adafruit_BME280_Library
-// https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide?_ga=2.39864294.574007306.1596270790-134320310.1596270790
 #if defined REF_ADAFRUIT_BME280 || defined TEMP_ADAFRUIT_BME280 || defined BARO_ADAFRUIT_BME280
-    #include <BMP280_DEV.h> 
+    #include <Adafruit_BME280_DEV.h> 
     Adafruit_BME280 adafruitBme280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
+#endif
+
+// Support for SPARKFUN_BME280 temp, pressure & Humidity sensors
+// https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide?_ga=2.39864294.574007306.1596270790-134320310.1596270790
+#if defined REF_SPARKFUN_BME280 || defined TEMP_SPARKFUN_BME280 || defined BARO_SPARKFUN_BME280
+    #include "SparkFunBME280.h"
+    #include <Wire.h>
+    BME280 SparkFunBME280;
 #endif
 
 // Support for DHT11 humidity / temperature sensors
@@ -124,32 +132,34 @@ void setup ()
     }
   
     // Initialise libraries
+
+    //Sparkfun BME280 (Testing and working 03.08.20 /DM)
+    #if defined REF_SPARKFUN_BME280 || defined TEMP_SPARKFUN_BME280 || defined BARO_SPARKFUN_BME280
+        Wire.begin();
+        if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
+        {
+            // TODO - need to replace this with error handler
+            Serial.println("The sensor did not respond. Please check wiring.");
+            while(1); //Freeze
+        }
+    #endif
     
+    // Adafruit or derivative BME Pressure, humidity & temp transducer
+    #if defined REF_ADAFRUIT_BME280 || defined TEMP_ADAFRUIT_BME280 || defined BARO_ADAFRUIT_BME280 || defined RELH_ADAFRUIT_BME280
+        if (!adafruitBme280.begin()) {  
+            Serial.println("Could not find a valid BME280 sensor, check wiring!");
+            while (1);
+        }
+    #endif
+   
+    //TODO #31 Drop support for BMP sensor
     // Adafruit or derivative BMP Pressure & temp transducer
     #if defined REF_ADAFRUIT_BMP280 || defined TEMP_ADAFRUIT_BMP280 || defined BARO_ADAFRUIT_BMP280
         adafruitBmp280.begin();          
-        //adafruitBmp280.begin(FORCED_MODE, BMP280_I2C_ALT_ADDR);	// Initialise the BMP280 in FORCED_MODE with the alternate I2C address (0x76)                       // Default initialisation, place the BMP280 into SLEEP_MODE 
-        //adafruitBmp280.setPresOversampling(OVERSAMPLING_X4);    // Set the pressure oversampling to X4
-        //adafruitBmp280.setTempOversampling(OVERSAMPLING_X1);    // Set the temperature oversampling to X1
-        //adafruitBmp280.setIIRFilter(IIR_FILTER_4);              // Set the IIR filter to setting 4
         adafruitBmp280.setTimeStandby(TIME_STANDBY_2000MS);     // Set the standby time to 2 seconds
         adafruitBmp280.startNormalConversion();  
     #endif
 
-    // Adafruit or derivative BME Pressure, humidity & temp transducer
-    #if defined REF_ADAFRUIT_BME280 || defined TEMP_ADAFRUIT_BME280 || defined BARO_ADAFRUIT_BME280 || defined RELH_ADAFRUIT_BME280
-        Adafruit_BME280; // use I2C interface
-        Adafruit_Sensor *bme_temp = adafruitBme280.getTemperatureSensor();
-        Adafruit_Sensor *bme_pressure = adafruitBme280.getPressureSensor();
-        Adafruit_Sensor *bme_humidity = adafruitBme280.getHumiditySensor();
-
-        sensors_event_t temp_event, pressure_event, humidity_event;
-        bme_temp->getEvent(&temp_event);
-        bme_pressure->getEvent(&pressure_event);
-        bme_humidity->getEvent(&humidity_event);
-
-        startupBaroPressure = pressure_event.pressure * 10; //default value from BME is in hPa
-    #endif
  
     // Set up the menu + display system
     setupMenu(); 
@@ -197,6 +207,7 @@ float getBaroPressure(int units)
         // P = ((Vout / VS ) - 0.095) / 0.009 --- Formula transposed for P
         baroPressureKpa = (((float)baroMillivolts / (float)supplyMillivolts ) - 0.095) / 0.009; 
 
+    //TODO #31 Drop support for BMP sensor
     #elif defined BARO_ADAFRUIT_BMP280
         adafruitBmp280.getMeasurements(refTempRaw, baroPressureRaw, refAltRaw); // Deg C | hPa | M
         bme_pressure->getEvent(&pressure_event);
@@ -204,9 +215,10 @@ float getBaroPressure(int units)
         baroPressureKpa = baroPressureRaw * 10;
 
     #elif defined BARO_ADAFRUIT_BME280
-        sensors_event_t temp_event, pressure_event, humidity_event;
-        Adafruit_Sensor *bme_pressure = adafruitBme280.getPressureSensor(); // Deg C | hPa | M
-        baroPressureKpa =  pressure_event.pressure * 10;
+        baroPressureKpa =  adafruitBme280.readPressure() / 1000; //Pa
+
+    #elif defined BARO_SPARKFUN_BME280
+        baroPressureKpa =  SparkFunBME280.readFloatPressure() / 1000; // Pa
 
     #elif defined USE_REF_PRESS
         // No baro sensor defined so use value grabbed at startup from reference pressure sensor
@@ -250,15 +262,16 @@ float getTemp(int units)
     byte refTemp;
     byte refRelh;
 
+    //TODO #31 Drop support for BMP sensor
     #if defined TEMP_ADAFRUIT_BMP280
         adafruitBmp280.getMeasurements(refTempRaw, refPressureRaw, refAltRaw);
         refTempDegC = roundf(refTempRaw*100.0)/100.0;
 
     #elif defined TEMP_ADAFRUIT_BME280
-        sensors_event_t temp_event, pressure_event, humidity_event;
-        bme_temp->getEvent(&temp_event);
-        Adafruit_Sensor *bme_temp = bme.getTemperatureSensor();
-        refTempDegC  =  temp_event.temperature;
+        refTempDegC  =  adafruitBme280.readTemperature();
+
+    #elif defined TEMP_SPARKFUN_BME280
+        refTempDegC =  SparkFunBME280.readTempC();
 
     #elif defined SIMPLE_TEMP_DHT11
         // NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
@@ -316,9 +329,10 @@ float getRelativeHumidity()
         }
 
     #elif defined RELH_ADAFRUIT_BME280
-        sensors_event_t temp_event, pressure_event, humidity_event;
-        bme_humidity->getEvent(&humidity_event);
-        relativeHumidity = pressure_event.pressure; //%
+        relativeHumidity = adafruitBme280.readHumidity(); //%
+
+    #elif defined RELH_SPARKFUN_BME280
+        relativeHumidity =  SparkFunBME280.readFloatHumidity();
 
     #else
         //we dont have any sensor so use standard value

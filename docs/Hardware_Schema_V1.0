@@ -37,13 +37,15 @@ E - MAF Sensor Signal
 
 /****************************************
 * Temp / Humidity / Baro sensors 
+*
+* NOTE Preferred choice is Sparkfun compatible sensor
 ***/
 
-##  BME380 combined sensor
-VCC - 3.3V
+##  BME280 combined sensor (using I2C)
+VCC - 3.3V !!!
 GND - 0V
-SDA - PIN 20 (for Mega2560)
-SCL - PIN 21 (for Mega2560)
+SDA - PIN 20 (Dedicated SCA pin for Mega2560)
+SCL - PIN 21 (Dedicated SCL pin for Mega2560)
 
 
 

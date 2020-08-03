@@ -2,6 +2,7 @@
 Don't forget to update the build number in DIY-Flow-Bench.ino
 =============================================================
 
+20080307    - Added support for Sparkfun BME280 (works with generic 10 pin BME280)
 20080306    - Updated changelog
 20080305    - Updated documentation
 20080304    - Removed redundant Alpha files
