@@ -1,7 +1,12 @@
-=============================================================
-Don't forget to update the build number in DIY-Flow-Bench.ino
-=============================================================
+===================================================================
+!! Don't forget to update the build number in DIY-Flow-Bench.ino !!
+===================================================================
 
+NOTE: Build numbers follow format YY MM DD VV Where VV is incremental version (reset daily) 
+
+Build #     - Description of Change
+
+20080404    - Added comments to changelog file
 20080403    - Added comments to mafData files
 20080402    - Added analog mafData example 
 20080401    - Fixed some typos and reduced program size
