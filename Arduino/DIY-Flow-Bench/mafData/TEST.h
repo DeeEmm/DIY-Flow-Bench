@@ -5,7 +5,9 @@
  * Part#: 
  * MAF file for type: 
  * File units = 1000 * kg/hr
- * Status: Data from Internet / unvalidated
+ * Comments: Basic test data
+ * Status:
+ * Support: https://diyflowbench.com/forum/mafdata/22-selecting-and-decoding-your-maf-sensor
  ***/
  
  

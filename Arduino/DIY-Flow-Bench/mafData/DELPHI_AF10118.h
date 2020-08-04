@@ -5,7 +5,9 @@
  * Part#: AF10118
  * MAF file for type: 
  * File units = 1000 * kg/hr
- * Status: Data from Internet / unvalidated
+ * Comments: Example Data
+ * Status: Unvalidated
+ * Support: https://diyflowbench.com/forum/mafdata/7-delphi-af10118
  ***/
  
  

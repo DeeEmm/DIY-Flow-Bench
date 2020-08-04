@@ -5,7 +5,9 @@
  * Part#: 15900023
  * MAF file for type: Holden VZ / VE LS2
  * File units = 10 * mg/sec
- * Status: OEM Data
+ * Comments: Original data from Megasquirt website - www.microsquirt.info/maffactor_lsx.inc
+ * Status: Validated
+ * Support: https://diyflowbench.com/forum/mafdata/16-gm-ls2
  ***/
 
 

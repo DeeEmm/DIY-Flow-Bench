@@ -5,8 +5,10 @@
  * Part#: 123456
  * MAF file for type: Make / Model
  * File units = 10 * mg/sec
- * Status: Example Data
- ***/
+ * Comments: Example Data
+ * Status: 
+ * Support: https://diyflowbench.com/forum/mafdata/5-creating-your-maf-data-file
+***/
 
 /****************************************
  * This is an example MAF Data file

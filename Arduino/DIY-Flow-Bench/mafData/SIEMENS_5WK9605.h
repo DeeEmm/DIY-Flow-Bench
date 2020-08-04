@@ -5,7 +5,9 @@
  * Part#: 5WK9605
  * MAF file for type: 
  * File units = 1000 * kg/hr
- * Status: Measured on flow bench but data needs validating
+ * Comments:  Data calculated on 3 point data measured on flow bench by Tony Donn. 
+ * Status: Unvalidated.
+ * Support: https://diyflowbench.com/forum/mafdata/6-siemens-5wk9605
  ***/
 
 /****************************************

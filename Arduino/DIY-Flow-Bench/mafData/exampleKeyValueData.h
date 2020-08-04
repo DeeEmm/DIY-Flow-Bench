@@ -5,7 +5,9 @@
  * Part#: 123456
  * MAF file for type: Make / Model
  * File units = 1000 * kg/hr
- * Status: Example Data
+ * Comments: Example Data
+ * Status: 
+ * Support: https://diyflowbench.com/forum/mafdata/5-creating-your-maf-data-file
  ***/
 
 /****************************************
