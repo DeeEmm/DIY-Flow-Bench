@@ -1,16 +1,18 @@
 /****************************************
- * exampleSensor.h
+ * exampleKeyValueData.h
  *
  * Manufacturer: Manufacturer
  * Part#: 123456
  * MAF file for type: Make / Model
- * File units = 10 * mg/sec
+ * File units = 1000 * kg/hr
  * Status: Example Data
  ***/
 
 /****************************************
  * This is an example MAF Data file
  * You can either use volts versus kg/hr or ms/sec as below, or 1024 analog data points versus ms/sec or kg/hr
+ * (refer to mafData/exampleAnalogData.h if yo have 1024 points of analog data)
+ *
  * Just change the values below to suit. Array length and voltage intervals are not an issue, add extra items as necessary.
  * 
  * NOTE: all data values used for MAF lookup are integers. This is to reduce overheads and simplify code. 

@@ -171,7 +171,8 @@
 
 #include "mafData/TEST.h"               // Test Data
 //#include "mafData/GM_LS2.h"              
-//#include "mafData/exampleSensor.h"   // Example file duplicate this as required
+//#include "mafData/exampleKeyValueData.h"   // Example key > value data file (duplicate this as required)
+//#include "mafData/exampleAnalogData.h"   // Example Analog point data file (duplicate this as required)
 //#include "mafData/SIEMENS_5WK9605.h"      // Data from Tonys tests
 //#include "mafData/DELPHI_AF10118.h"   // kg/hr - Data from efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
 
