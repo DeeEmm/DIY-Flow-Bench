@@ -27,6 +27,7 @@ int MAFoutputType = 1;
 int MAFdataFormat = 1; 
 
 
+
 /****************************************
  * MAF Units
  * 
@@ -39,6 +40,7 @@ int MAFdataUnit = 1;
 /****************************************
  * MAF Data
  ***/
+long mafMapAnalogData[] = {0,0}; // Need to declare unused analog array to prevent code breaking
 long mafMapData[][2] = {
 {0,3650},
 {600,5620},
@@ -66,5 +68,6 @@ long mafMapData[][2] = {
 {4000,295631},
 {4250,342461},
 {4500,421040},
-{4750,490925}
+{4750,490925},
+{5000,490925}
 };

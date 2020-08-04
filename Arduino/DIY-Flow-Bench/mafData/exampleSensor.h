@@ -40,7 +40,8 @@ int MAFoutputType = 1;
  * 1 = key_value
  * 2 = rawAnalog (1024 data points)
  ***/
-int MAFdataFormat = 2; 
+int MAFdataFormat = 1; 
+
 
 
 /****************************************
@@ -51,9 +52,11 @@ int MAFdataFormat = 2;
  ***/
 int MAFdataUnit = 1;
 
+
 /****************************************
  * MAF Data
  ***/
+long mafMapAnalogData[] = {0,0}; // Need to declare unused analog array to prevent code breaking
 long mafMapData[][2] = {
 {0,0},
 {100,6226},

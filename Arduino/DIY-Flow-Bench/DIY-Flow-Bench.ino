@@ -20,7 +20,7 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080307"
+#define BUILD_NUMBER "20080401"
 #define RELEASE "V.1.0-beta.10"
 
 
@@ -39,13 +39,6 @@
  * Add pre-directives for all optional libraries to preserve memory
  ***/
 
-// TODO #31 Drop support for BMP sensor
-// Support for ADAFRUIT_BMP280 temp & pressure sensor
-// https://www.adafruit.com/product/2651
-#if defined REF_ADAFRUIT_BMP280 || defined TEMP_ADAFRUIT_BMP280 || defined BARO_ADAFRUIT_BMP280
-    #include <BMP280_DEV.h> 
-    BMP280_DEV adafruitBmp280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
-#endif
 
 // Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
 // https://github.com/adafruit/Adafruit_BME280_Library
@@ -56,7 +49,7 @@
 
 // Support for SPARKFUN_BME280 temp, pressure & Humidity sensors
 // https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide?_ga=2.39864294.574007306.1596270790-134320310.1596270790
-#if defined REF_SPARKFUN_BME280 || defined TEMP_SPARKFUN_BME280 || defined BARO_SPARKFUN_BME280
+#if defined RELH_SPARKFUN_BME280 || defined TEMP_SPARKFUN_BME280 || defined BARO_SPARKFUN_BME280
     #include "SparkFunBME280.h"
     #include <Wire.h>
     BME280 SparkFunBME280;
@@ -112,7 +105,8 @@ float startupBaroPressure;
 int errorVal = 0;
 bool benchIsRunning();
 int serialData = 0;
-extern long mafMapData[][2];
+extern long mafMapData[][2]; // mafData key > value array
+extern long mafMapAnalogData[]; // mafData analog value array
 
 
 
@@ -134,7 +128,7 @@ void setup ()
     // Initialise libraries
 
     //Sparkfun BME280 (Testing and working 03.08.20 /DM)
-    #if defined REF_SPARKFUN_BME280 || defined TEMP_SPARKFUN_BME280 || defined BARO_SPARKFUN_BME280
+    #if defined RELH_SPARKFUN_BME280 || defined TEMP_SPARKFUN_BME280 || defined BARO_SPARKFUN_BME280
         Wire.begin();
         if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
         {
@@ -145,19 +139,11 @@ void setup ()
     #endif
     
     // Adafruit or derivative BME Pressure, humidity & temp transducer
-    #if defined REF_ADAFRUIT_BME280 || defined TEMP_ADAFRUIT_BME280 || defined BARO_ADAFRUIT_BME280 || defined RELH_ADAFRUIT_BME280
+    #if defined TEMP_ADAFRUIT_BME280 || defined BARO_ADAFRUIT_BME280 || defined RELH_ADAFRUIT_BME280
         if (!adafruitBme280.begin()) {  
             Serial.println("Could not find a valid BME280 sensor, check wiring!");
             while (1);
         }
-    #endif
-   
-    //TODO #31 Drop support for BMP sensor
-    // Adafruit or derivative BMP Pressure & temp transducer
-    #if defined REF_ADAFRUIT_BMP280 || defined TEMP_ADAFRUIT_BMP280 || defined BARO_ADAFRUIT_BMP280
-        adafruitBmp280.begin();          
-        adafruitBmp280.setTimeStandby(TIME_STANDBY_2000MS);     // Set the standby time to 2 seconds
-        adafruitBmp280.startNormalConversion();  
     #endif
 
  
@@ -332,11 +318,11 @@ float getRelativeHumidity()
         relativeHumidity = adafruitBme280.readHumidity(); //%
 
     #elif defined RELH_SPARKFUN_BME280
-        relativeHumidity =  SparkFunBME280.readFloatHumidity();
+        relativeHumidity =  SparkFunBME280.readFloatHumidity() / 100;
 
     #else
-        //we dont have any sensor so use standard value
-        relativeHumidity = 0.36;
+        //we dont have any sensor so use standard value 
+        relativeHumidity = 0.36; // (36%)
     #endif
 
     return relativeHumidity;
@@ -429,8 +415,7 @@ float getMafFlowCFM()
     int mafFlowRaw = analogRead(MAF_PIN);
     int mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
     int lookupValue;
-    int numRows = sizeof(mafMapData)/sizeof(mafMapData[0]);
-//    int numRows = sizeof(mafMapData[0])/sizeof(mafMapData[0][0]);
+    int numRows;
 
     if (mafMillivolts < MIN_MAF_MILLIVOLTS) {
       return 0;
@@ -448,9 +433,12 @@ float getMafFlowCFM()
         lookupValue = mafFlowRaw;
 
         // get the value directly from the data array
-        mafFlowRateRAW = mafMapData[mafFlowRaw][1];
+        mafFlowRateRAW = mafMapAnalogData[mafFlowRaw];
 
     } else {
+
+        //Set size of array
+       numRows = sizeof(mafMapData)/sizeof(mafMapData[0]);
 
         // we have a mV / flow array so we use the mafMillivolts value for the lookup
         lookupValue = mafMillivolts;
@@ -547,10 +535,6 @@ float getRefPressure(int units)
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
         refPressureKpa = (((float)refPressMillivolts / (float)supplyMillivolts ) - 0.5) / 0.057; 
-
-    #elif defined REF_ADAFRUIT_BMP280
-        adafruitBmp280.getMeasurements(refTempDegRaw, refPressureRaw, refAltRaw);
-        refPressureKpa = refPressureRaw * 10;
 
     #else
         // No reference pressure sensor used so lets return zero

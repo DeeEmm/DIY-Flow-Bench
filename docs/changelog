@@ -2,6 +2,9 @@
 Don't forget to update the build number in DIY-Flow-Bench.ino
 =============================================================
 
+20080401    - Fixed some typos and reduced program size
+            - #32 Added additional array type for analog mafData files (memory issue)
+            - #33 Fixed humidity correction issue
 20080307    - Added support for Sparkfun BME280 (works with generic 10 pin BME280)
 20080306    - Updated changelog
 20080305    - Updated documentation

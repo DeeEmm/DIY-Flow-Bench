@@ -169,11 +169,11 @@
  ***/
 
 
-#include "mafData/exampleSensor.h"   // Example file duplicate this as required
+#include "mafData/TEST.h"               // Test Data
+//#include "mafData/GM_LS2.h"              
+//#include "mafData/exampleSensor.h"   // Example file duplicate this as required
 //#include "mafData/SIEMENS_5WK9605.h"      // Data from Tonys tests
-//#include "mafData/TEST.h"               // Test Data
 //#include "mafData/DELPHI_AF10118.h"   // kg/hr - Data from efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
-
 
 
 /****************************************
@@ -185,9 +185,6 @@
 // None - Default
 //#define REF_MPXV7007 
 //#define REF_MPX4250
-//#define REF_ADAFRUIT_BMP280               //TODO #31 Drop support for BMP sensor
-//#define REF_ADAFRUIT_BME280
-#define REF_SPARKFUN_BME280
 
 
 
@@ -211,9 +208,8 @@
  ***/
 
 // Default none (defaults to 14.7 psi)
-#define BARO_SPARKFUN_BME280
+//#define BARO_SPARKFUN_BME280
 //#define BARO_MPX4115 
-//#define BARO_ADAFRUIT_BMP280             //TODO #31 Drop support for BMP sensor
 //#define BARO_ADAFRUIT_BME280
 
 #define startupBaroScalingFactor 1        // scaling factor when using reference pressure sensor for baro correction
@@ -226,7 +222,7 @@
  ***/
 
 // Default none (defaults to 0.36)
-#define RELH_SPARKFUN_BME280
+//#define RELH_SPARKFUN_BME280
 //#define SIMPLE_RELH_DHT11 
 //#define RELH_ADAFRUIT_BME280
 
@@ -237,8 +233,7 @@
  ***/
 
 // Default none (defaults to 21 degrees)
-#define TEMP_SPARKFUN_BME280
-//#define TEMP_ADAFRUIT_BMP280
+//#define TEMP_SPARKFUN_BME280
 //#define TEMP_ADAFRUIT_BME280
 //#define SIMPLE_TEMP_DHT11 
 
