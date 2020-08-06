@@ -9,7 +9,7 @@ QTY			Description
 
 1           MAF Sensor - GM_LS2
 1           Arduino - MEGA 2560
-1           MPXMPXV7007 -7 to + 7kPa (exactly +/- 28"/wg) (Optional)
+1           MPXV7007DP -7 to + 7kPa (exactly +/- 28"/wg) (Optional)
 1           BME280 (Optional)
 1           LCD KeyPad Shield (Optional for V1 without DIYFB shield)
 1           DIYFB MEGA2560 Shield V1.0 (available from V2 onwards)
