@@ -27,7 +27,6 @@ extern LiquidCrystalRenderer renderer;
 
 // all menu item forward references.
 extern ActionMenuItem menuSettingsCalFlow;
-extern ActionMenuItem menuSettingsCalRefPress;
 extern TextMenuItem menuSettingsLeakTestChk;
 extern ActionMenuItem menuSettingsLeakTestCal;
 extern TextMenuItem menuSettingsVer;
@@ -48,10 +47,9 @@ extern const ConnectorLocalInfo applicationInfo;
 // Callback functions must always include CALLBACK_FUNCTION after the return type
 #define CALLBACK_FUNCTION
 
-void CALLBACK_FUNCTION checkLeakCalibrationValue(int id);
-void CALLBACK_FUNCTION setCalibrationOffset(int id);
-void CALLBACK_FUNCTION setLeakCalibrationValue(int id);
-void CALLBACK_FUNCTION setRefPressCalibrationValue(int id);
+void CALLBACK_FUNCTION menuCallback_Calibrate(int id);
+void CALLBACK_FUNCTION menuCallback_LeakTest(int id);
+void CALLBACK_FUNCTION menuCallback_leakTestCalibration(int id);
 
 void setupMenu();
 

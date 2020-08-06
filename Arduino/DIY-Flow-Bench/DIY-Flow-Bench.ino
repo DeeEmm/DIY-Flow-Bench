@@ -32,6 +32,7 @@
 #include <EEPROM.h>
 #include <Arduino.h>
 #include "configuration.h"
+#include "pins.h"
 #include "EN_Language.h"
 
 /****************************************
@@ -130,6 +131,7 @@ void setup ()
     //Sparkfun BME280 (Testing and working 03.08.20 /DM)
     #if defined RELH_SPARKFUN_BME280 || defined TEMP_SPARKFUN_BME280 || defined BARO_SPARKFUN_BME280
         Wire.begin();
+        SparkFunBME280.setI2CAddress(0x76); 
         if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
         {
             // TODO - need to replace this with error handler
@@ -539,7 +541,7 @@ float getRefPressure(int units)
     #else
         // No reference pressure sensor used so lets return zero
         //refPressureKpa = 6.97448943333324; //28"
-        refPressureKpa = 0;
+        refPressureKpa = 1;
 
     #endif
 
@@ -695,18 +697,22 @@ void errorHandler(int errorVal)
     {
         case REF_PRESS_LOW:
             displayDialog(LANG_WARNING, LANG_FLOW_LIMIT_EXCEEDED);
+            Serial.write(LANG_FLOW_LIMIT_EXCEEDED);
         break;
 
         case LEAK_TEST_FAILED:
             displayDialog(LANG_WARNING, LANG_LEAK_TEST_FAILED);
+            Serial.write(LANG_LEAK_TEST_FAILED);
         break;
 
         case LEAK_TEST_PASS:
             displayDialog(LANG_WARNING, LANG_LEAK_TEST_PASS);
+            Serial.write(LANG_LEAK_TEST_PASS);
         break;
 
         case DHT11_READ_FAIL:
             displayDialog(LANG_WARNING, LANG_DHT11_READ_FAIL);
+            Serial.write(LANG_DHT11_READ_FAIL);
         break;
 
        
@@ -715,10 +721,79 @@ void errorHandler(int errorVal)
 }
 
 
+/****************************************
+ * SET CALIBRATION OFFSET
+ * 
+ ***/
+ float setCalibrationOffset() {
+
+    float MafFlowCFM = getMafFlowCFM();
+    float RefPressure = getRefPressure(INWG);
+    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
+    float flowCalibrationOffset = calibrationFlowRate - convertedMafFlowCFM;
+
+    char flowCalibrationOffsetText[12]; // Buffer big enough?
+    dtostrf(flowCalibrationOffset, 6, 2, flowCalibrationOffsetText); // Leave room for too large numbers!
+      
+    //Store data in EEPROM
+    EEPROM.write(NVM_CD_CAL_OFFSET_ADDR, flowCalibrationOffset);
+
+    return flowCalibrationOffset;
+}
+
+
+
+/****************************************
+ * GET CALIBRATION OFFSET
+ * 
+ ***/
+ float getCalibrationOffset() {
+
+
+ }
 
 
 
 
+
+
+/****************************************
+ * leakTestCalibration
+ ***/
+float leakTestCalibration() {
+
+    float RefPressure = getRefPressure(INWG);  
+    char RefPressureText[12]; // Buffer big enough?
+    dtostrf(RefPressure, 6, 2, RefPressureText); // Leave room for too large numbers!
+    
+    //Store data in EEPROM
+    EEPROM.write(NVM_LEAK_CAL_ADDR, RefPressure);
+
+    // Display the value on the main screen
+    displayDialog(LANG_LEAK_CAL_VALUE, RefPressureText);  
+
+    return RefPressure;
+}
+
+
+/****************************************
+ * leakTest
+ ***/
+int  leakTest() {
+
+    int leakCalibrationValue = 0; 
+    leakCalibrationValue = EEPROM.read(NVM_LEAK_CAL_ADDR);
+    int refPressure = getRefPressure(INWG);
+
+    //compare calibration data from NVM
+    if (leakCalibrationValue > (refPressure - leakTestTolerance))
+    {   
+       return LEAK_TEST_FAILED;
+    } else {     
+       return LEAK_TEST_PASS;
+    }
+
+}
 
 
 /****************************************
@@ -835,25 +910,25 @@ void parseAPI(byte serialData)
       break;
 
       case 'L': // Perform Leak Test Calibration 'L\r\n'
-          setLeakCalibrationValue(0);
           Serial.print('L');
           Serial.print('.');
+          Serial.print(leakTestCalibration());
           Serial.print("\r\n");
           // TODO confirm Leak Test Calibration success in response
       break;
 
       case 'l': // Perform Leak Test 'l\r\n'      
-          checkLeakCalibrationValue(0);
           Serial.print('l');
           Serial.print('.');
+          Serial.print(leakTest());
           Serial.print("\r\n");
           // TODO confirm Leak Test success in response
       break;
 
       case 'O': // Flow Offset Calibration  'O\r\n'        
-          setCalibrationOffset(0);
           Serial.print('O');
           Serial.print('.');
+          Serial.print(setCalibrationOffset());
           Serial.print("\r\n");
           // TODO confirm Flow Offset Calibration success in response
       break;
@@ -1079,8 +1154,9 @@ const char * buildNumberString = BUILD_NUMBER;
  * menuAFlow
  * menuSettingsVersion
  * menuSettingsBuild
- * menuSettingsLeakTestCal
- * menuSettingsLeakTestChk
+ * menuCallback_Calibrate
+ * menuCallback_leakTestCalibration
+ * menuCallback_LeakTest
  *
  * AVAILABLE METHODS
  * --------------------------------------
@@ -1099,7 +1175,6 @@ const char * buildNumberString = BUILD_NUMBER;
  * 
  ***/
 
-//TODO(#7) Update calibration functions
 //TODO(#8) - Add menu item to be able to select reference pressure value
 
 
@@ -1107,109 +1182,58 @@ const char * buildNumberString = BUILD_NUMBER;
 
 /****************************************
  * MENU CALLBACK FUNCTION
- * setFlowOffsetCalibrationValue
+ * menuCallback_Calibrate
  ***/
-void CALLBACK_FUNCTION setCalibrationOffset(int id) {
+void CALLBACK_FUNCTION menuCallback_Calibrate(int id) {
 
-    float MafFlowCFM = getMafFlowCFM();
-    float RefPressure = getRefPressure(INWG);
-    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
-    float flowCalibrationOffset = calibrationFlowRate - convertedMafFlowCFM;
+    // Perform calibration
+    float flowCalibrationOffset = setCalibrationOffset();
 
     char flowCalibrationOffsetText[12]; // Buffer big enough?
     dtostrf(flowCalibrationOffset, 6, 2, flowCalibrationOffsetText); // Leave room for too large numbers!
-      
-    //Store data in EEPROM
-    EEPROM.write(NVM_CD_CAL_OFFSET_ADDR, flowCalibrationOffset);
 
     // Display the value on the main screen
     displayDialog(LANG_CAL_OFFET_VALUE, flowCalibrationOffsetText);
+}
 
+
+
+
+
+/****************************************
+ * MENU CALLBACK FUNCTION
+ * menuCallback_leakTestCalibration
+ ***/
+void CALLBACK_FUNCTION menuCallback_leakTestCalibration(int id) {
+
+    float calibrationValue = leakTestCalibration();
+
+
+    char calibrationValueText[12]; // Buffer big enough?
+    dtostrf(calibrationValue, 6, 2, calibrationValueText); // Leave room for too large numbers!
+
+    // Display the value on popup on the main screen
+    displayDialog(LANG_LEAK_CAL_VALUE, calibrationValueText);  
+    Serial.print(calibrationValue); 
 }
 
 
 /****************************************
  * MENU CALLBACK FUNCTION
- * setLowFlowCalibrationValue
+ * menuCallback_LeakTest
  ***/
-void CALLBACK_FUNCTION setLowFlowCalibrationValue(int id) {
+void CALLBACK_FUNCTION menuCallback_LeakTest(int id) {
 
-    float MafFlowCFM = getMafFlowCFM();
-    float RefPressure = getRefPressure(INWG);
-    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
-    float flowCalibrationOffset = calibrationPlateLowCFM - convertedMafFlowCFM;
-    //Store data in EEPROM
-    EEPROM.write(NVM_LOW_FLOW_CAL_ADDR, flowCalibrationOffset);
-
-}
-
-
-/****************************************
- * MENU CALLBACK FUNCTION
- * setHighFlowCalibrationValue
- ***/
-void CALLBACK_FUNCTION setHighFlowCalibrationValue(int id) {
-
-    float MafFlowCFM = getMafFlowCFM();
-    float RefPressure = getRefPressure(INWG);
-    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
-    float flowCalibrationOffset = calibrationPlateHighCFM - convertedMafFlowCFM;
-
-    //Store data in EEPROM
-    EEPROM.write(NVM_HIGH_FLOW_CAL_ADDR, flowCalibrationOffset);
-
-}
-
-
-/****************************************
- * MENU CALLBACK FUNCTION
- * setRefPressCalibrationValue
- ***/
-void CALLBACK_FUNCTION setRefPressCalibrationValue(int id) {
-
-    float RefPressure = getRefPressure(INWG);
-    
-    //Store data in EEPROM
-    EEPROM.write(NVM_REF_PRESS_CAL_ADDR, RefPressure);
-
-}
-
-
-/****************************************
- * MENU CALLBACK FUNCTION
- * setLeakCalibrationValue
- ***/
-void CALLBACK_FUNCTION setLeakCalibrationValue(int id) {
-
-    float RefPressure = getRefPressure(INWG);  
-    char RefPressureText[12]; // Buffer big enough?
-    dtostrf(RefPressure, 6, 2, RefPressureText); // Leave room for too large numbers!
-    
-    //Store data in EEPROM
-    EEPROM.write(NVM_LEAK_CAL_ADDR, RefPressure);
-
-    // Display the value on the main screen
-    displayDialog(LANG_LEAK_CAL_VALUE, RefPressureText);    
-}
-
-
-/****************************************
- * MENU CALLBACK FUNCTION
- * checkLeakCalibration
- ***/
-void CALLBACK_FUNCTION checkLeakCalibrationValue(int id) {
-
-    int leakCalibrationValue = 0; 
-    leakCalibrationValue = EEPROM.read(NVM_LEAK_CAL_ADDR);
-    int refPressure = getRefPressure(INWG);
+    int testResult = leakTest();
 
     //compare calibration data from NVM
-    if (leakCalibrationValue > (refPressure - leakTestTolerance))
+    if (testResult == LEAK_TEST_PASS)
     {
-    // Display the value on the main screen
-      errorVal = LEAK_TEST_FAILED;       
+       // Display result on the main screen
+       errorVal = LEAK_TEST_PASS;      
     } else {
-      errorVal = LEAK_TEST_PASS;       
+       // Display result on the main screen 
+       errorVal = LEAK_TEST_FAILED;       
     }
 
 }
@@ -1236,3 +1260,6 @@ void loop ()
     }
 
 }
+
+
+

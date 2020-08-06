@@ -18,13 +18,11 @@ LiquidCrystalRenderer renderer(lcd, 16, 2);
 
 // Global Menu Item declarations
 
-const PROGMEM AnyMenuInfo minfoSettingsCalFlow = { "Cal Flow", 16, 0xffff, 0, setCalibrationOffset };
+const PROGMEM AnyMenuInfo minfoSettingsCalFlow = { "Cal Flow", 16, 0xffff, 0, menuCallback_Calibrate };
 ActionMenuItem menuSettingsCalFlow(&minfoSettingsCalFlow, NULL);
-const PROGMEM AnyMenuInfo minfoSettingsCalRefPress = { "Cal Ref Press", 15, 0xffff, 0, setRefPressCalibrationValue };
-ActionMenuItem menuSettingsCalRefPress(&minfoSettingsCalRefPress, &menuSettingsCalFlow);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLeakTestChkRtCall, textItemRenderFn, "Leak Test Chk", -1, checkLeakCalibrationValue)
-TextMenuItem menuSettingsLeakTestChk(fnSettingsLeakTestChkRtCall, 14, 3, &menuSettingsCalRefPress);
-const PROGMEM AnyMenuInfo minfoSettingsLeakTestCal = { "Leak Test Cal", 8, 0xffff, 0, setLeakCalibrationValue };
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLeakTestChkRtCall, textItemRenderFn, "Leak Test Chk", -1, menuCallback_LeakTest)
+TextMenuItem menuSettingsLeakTestChk(fnSettingsLeakTestChkRtCall, 14, 3, &menuSettingsCalFlow);
+const PROGMEM AnyMenuInfo minfoSettingsLeakTestCal = { "Leak Test Cal", 8, 0xffff, 0, menuCallback_leakTestCalibration };
 ActionMenuItem menuSettingsLeakTestCal(&minfoSettingsLeakTestCal, &menuSettingsLeakTestChk);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsVerRtCall, textItemRenderFn, "Ver", -1, NULL)
 TextMenuItem menuSettingsVer(fnSettingsVerRtCall, 28, 256, &menuSettingsLeakTestCal);
@@ -65,16 +63,15 @@ void setupMenu() {
     menuMgr.initForUpDownOk(&renderer, &menuFlow, DF_KEY_DOWN, DF_KEY_UP, DF_KEY_SELECT);
 
     // Read only and local only function calls
-    menuSettingsCalRefPress.setReadOnly(true);
     menuAFlow.setReadOnly(true);
-    menuSettingsVer.setReadOnly(true);
+    menuSettingsCalFlow.setReadOnly(true);
     menuPRef.setReadOnly(true);
     menuSettingsLeakTestChk.setReadOnly(true);
     menuTemp.setReadOnly(true);
     menuPitot.setReadOnly(true);
     menuMafVolts.setReadOnly(true);
     menuSettingsLeakTestCal.setReadOnly(true);
-    menuSettingsCalFlow.setReadOnly(true);
+    menuSettingsVer.setReadOnly(true);
     menuSettingsVer.setLocalOnly(true);
 }
 

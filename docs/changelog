@@ -6,6 +6,11 @@ NOTE: Build numbers follow format YY MM DD VV Where VV is incremental version (r
 
 Build #     - Description of Change
 
+20080501    - Moved language file call to configation settings
+            - Move pin configuration into pins.h
+            - Refactored menu code and moved calibration into dedicated functions
+            - Removed redundant calibration functions
+            - Rewrote calibration functions
 20080404    - Added comments to changelog file
 20080403    - Added comments to mafData files
 20080402    - Added analog mafData example 
