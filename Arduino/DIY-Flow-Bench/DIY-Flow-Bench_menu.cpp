@@ -50,13 +50,13 @@ const PROGMEM AnalogMenuInfo minfoBaro = { "Baro", 30, 0xffff, 65355, NO_CALLBAC
 AnalogMenuItem menuBaro(&minfoBaro, 0, &menuTemp);
 const PROGMEM AnalogMenuInfo minfoARef = { "ARef", 12, 0xffff, 28, NO_CALLBACK, 0, 1, " Aq " };
 AnalogMenuItem menuARef(&minfoARef, 0, &menuBaro);
-const PROGMEM AnalogMenuInfo minfoAFlow = { "AFlow", 13, 0xffff, 255, NO_CALLBACK, 0, 100, " CFM" };
+const PROGMEM AnalogMenuInfo minfoAFlow = { "AFlow", 13, 0xffff, 65355, NO_CALLBACK, 0, 10, " CFM" };
 AnalogMenuItem menuAFlow(&minfoAFlow, 0, &menuARef);
-const PROGMEM FloatMenuInfo minfoPitot = { "Pitot", 21, 0xffff, 2, NO_CALLBACK };
-FloatMenuItem menuPitot(&minfoPitot, &menuAFlow);
+const PROGMEM AnalogMenuInfo minfoPitot = { "Pitot", 37, 0xffff, 65355, NO_CALLBACK, 0, 10, " %" };
+AnalogMenuItem menuPitot(&minfoPitot, 0, &menuAFlow);
 const PROGMEM AnalogMenuInfo minfoPRef = { "PRef", 2, 0xffff, 65355, NO_CALLBACK, 0, 10, " Aq " };
 AnalogMenuItem menuPRef(&minfoPRef, 0, &menuPitot);
-const PROGMEM AnalogMenuInfo minfoFlow = { "Flow", 1, 0xffff, 65355, NO_CALLBACK, 0, 100, " CFM" };
+const PROGMEM AnalogMenuInfo minfoFlow = { "Flow", 1, 0xffff, 65355, NO_CALLBACK, 0, 10, " CFM" };
 AnalogMenuItem menuFlow(&minfoFlow, 0, &menuPRef);
 const PROGMEM ConnectorLocalInfo applicationInfo = { "DIY Flow Bench", "0fc9ae97-7781-4600-a281-4a3425ce8371" };
 
@@ -71,16 +71,16 @@ void setupMenu() {
     menuMgr.initForUpDownOk(&renderer, &menuFlow, DF_KEY_DOWN, DF_KEY_UP, DF_KEY_SELECT);
 
     // Read only and local only function calls
-    menuSensorTestMAF.setReadOnly(true);
     menuAFlow.setReadOnly(true);
+    menuSensorTestMAF.setReadOnly(true);
     menuCalibrationCalFlow.setReadOnly(true);
     menuBaro.setReadOnly(true);
     menuSensorTestPitot.setReadOnly(true);
     menuPRef.setReadOnly(true);
     menuSensorTestPRef.setReadOnly(true);
-    menuPitot.setReadOnly(true);
     menuTemp.setReadOnly(true);
     menuCalibrationLeakTestChk.setReadOnly(true);
     menuCalibrationLeakTestCal.setReadOnly(true);
+    menuPitot.setReadOnly(true);
 }
 

@@ -44,7 +44,7 @@ extern AnalogMenuItem menuTemp;
 extern AnalogMenuItem menuBaro;
 extern AnalogMenuItem menuARef;
 extern AnalogMenuItem menuAFlow;
-extern FloatMenuItem menuPitot;
+extern AnalogMenuItem menuPitot;
 extern AnalogMenuItem menuPRef;
 extern AnalogMenuItem menuFlow;
 extern const ConnectorLocalInfo applicationInfo;

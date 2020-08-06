@@ -20,7 +20,7 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080601"
+#define BUILD_NUMBER "20080604"
 #define RELEASE "V.1.0-beta.10"
 
 
@@ -78,6 +78,7 @@
 #define DEGF 5
 #define RANKINE 6
 #define PERCENT 7
+#define BAR 8
 
 // MAF Data Files
 #define VOLTAGE 1
@@ -425,13 +426,13 @@ float convertMassFlowToVolumetric(float massFlowKgh)
 float getMafFlowCFM()
 {
     // NOTE mafMapData is global array declared in mafData files
-    long calibrationOffset;
-    long mafFlowRateCFM;
-    long mafFlowRateKGH;
-    long mafFlowRateRAW;
+    double calibrationOffset;
+    double mafFlowRateCFM;
+    double mafFlowRateKGH;
+    double mafFlowRateRAW;
     int mafFlowRaw = analogRead(MAF_PIN);
-    int mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
-    int lookupValue;
+    double mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
+    double lookupValue;
     int numRows;
 
     if (mafMillivolts < MIN_MAF_MILLIVOLTS) {
@@ -548,13 +549,16 @@ float getRefPressure(int units)
         // P = ((Vout / VS ) - 0.04) / 0.00369 --- Formula transposed for P
         refPressureKpa = (((float)refPressMillivolts / (float)supplyMillivolts ) - 0.04) / 0.00369; 
 
+        ResultkPa = ((SensorValue*(.00488)/(.022)+20)) -1.0172 ;
+        
+
     #elif defined REF_MPXV7007
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
         refPressureKpa = (((float)refPressMillivolts / (float)supplyMillivolts ) - 0.5) / 0.057; 
 
     #else
-        // No reference pressure sensor used so lets return zero
+        // No reference pressure sensor used so lets return 1 (so as not to throw maths out)
         //refPressureKpa = 6.97448943333324; //28"
         refPressureKpa = 1;
 
@@ -570,6 +574,11 @@ float getRefPressure(int units)
 
         case KPA:
             return refPressureKpa;
+        break;
+
+        case BAR:
+            // 1kpa = 0.01 bar
+            return refPressureKpa  * 0.01 ;
         break;
     }
     
@@ -1083,14 +1092,14 @@ void parseAPI(byte serialData)
 void updateDisplays()
 {
 
-    float mafFlowCFM = getMafFlowCFM();
-    float refPressure = getRefPressure(INWG);   
+    double mafFlowCFM = getMafFlowCFM();
+    double refPressure = getRefPressure(INWG);   
 
     // Main Menu
     // Flow Rate
     if (mafFlowCFM > MIN_FLOW_RATE)
     {
-        menuFlow.setCurrentValue(mafFlowCFM * 100);   
+        menuFlow.setCurrentValue(mafFlowCFM * 10);   
     } else {
         menuFlow.setCurrentValue(0);   
     }
@@ -1105,36 +1114,42 @@ void updateDisplays()
     menuRelH.setCurrentValue(getRelativeHumidity(PERCENT) * 10);   
 
     // Pitot
-    menuPitot.setFloatValue(getPitotPressure(INWG));  
+    double pitotPressure = getPitotPressure(INWG);
+    // Pitot probe displays as a percentage of the reference pressure
+    double pitotPercentage = ((getPitotPressure(INWG) / refPressure) * 10);
+    menuPitot.setCurrentValue(pitotPercentage);  
     
     // Reference pressure
     menuPRef.setCurrentValue(refPressure * 10);   
     
     // Adjusted Flow
-    int desiredRefPressureInWg = menuARef.getCurrentValue();
-    menuAFlow.setCurrentValue(convertMafFlowInWg(refPressure, desiredRefPressureInWg, mafFlowCFM) * 100);    //Scale output for display
-
-    // MRef Presure Voltage
-    int refPressRaw = analogRead(REF_PRESSURE_PIN);
-    int refMillivolts = (refPressRaw * (5.0 / 1024.0)) * 1000;
-    menuSensorTestPRef.setCurrentValue(refMillivolts);
-
-    // Maf Voltage
-    int mafFlowRaw = analogRead(MAF_PIN);
-    int mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
-    menuSensorTestMAF.setCurrentValue(mafMillivolts);
-
-    // Pitot Voltage
-    int pitotRaw = analogRead(PITOT_PIN);
-    int pitotMillivolts = (pitotRaw * (5.0 / 1024.0)) * 1000;
-    menuSensorTestPitot.setCurrentValue(pitotMillivolts);
-
+    // get the desired bench test pressure
+    double desiredRefPressureInWg = menuARef.getCurrentValue();
+    // convert from the existing bench test
+    double adjustedFlow = convertMafFlowInWg(refPressure, desiredRefPressureInWg, mafFlowCFM);
+    // Send it to the display
+    menuAFlow.setCurrentValue(adjustedFlow * 10); 
 
     // Version and build
     String versionNumberString = String(MAJOR_VERSION) + '.' + String(MINOR_VERSION);
     String buildNumberString = String(BUILD_NUMBER);
     menuVer.setTextValue(versionNumberString.c_str());
     menuBld.setTextValue(buildNumberString.c_str());    
+
+    // Ref Presure Voltage
+    int refPressRaw = analogRead(REF_PRESSURE_PIN);
+    double refMillivolts = (refPressRaw * (5.0 / 1024.0)) * 1000;
+    menuSensorTestPRef.setCurrentValue(refMillivolts);
+
+    // Maf Voltage
+    int mafFlowRaw = analogRead(MAF_PIN);
+    double mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
+    menuSensorTestMAF.setCurrentValue(mafMillivolts);
+
+    // Pitot Voltage
+    int pitotRaw = analogRead(PITOT_PIN);
+    double pitotMillivolts = (pitotRaw * (5.0 / 1024.0)) * 1000;
+    menuSensorTestPitot.setCurrentValue(pitotMillivolts);
 
     // Additional Displays
 
@@ -1144,11 +1159,10 @@ void updateDisplays()
 
     #if defined PITOT_4X7SEG
         //TODO(#6) Add support for additional displays
-        //menuPitot.setCurrentValue(getPitotPressure(INWG));
     #endif
 
     #if defined MPXV7007 
-        //menuPRef.setFromFloatingPointValue(refPressureInWg);
+        //TODO(#6) Add support for additional displays
     #endif
 
 
@@ -1282,6 +1296,46 @@ void loop ()
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

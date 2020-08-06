@@ -6,6 +6,12 @@ NOTE: Build numbers follow format YY MM DD VV Where VV is incremental version (r
 
 Build #     - Description of Change
 
+20080604    - #36 MPX4250 scaling error - subtracted atmospheric pressure from reading
+            - #39 Fixed flow value fraction value (displaying zero)
+            - #40 Fixed adjusted flow display
+            - Updated tcmenu
+            - Fixed & tested pitot display
+            - Changed pitot display to show differential as percentage difference (to P Ref)
 20080603    - Updated LS2 MAF part number
             - #37 updated temp / baro / humidty menu functions
             - Added sensor test menu 

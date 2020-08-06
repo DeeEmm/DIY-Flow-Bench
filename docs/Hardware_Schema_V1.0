@@ -42,15 +42,40 @@ E - MAF Sensor Signal
 ***/
 
 ##  BME280 combined sensor (using I2C)
+Datasheet - https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide/all
+
 VCC - 3.3V !!!
 GND - 0V
 SDA - PIN 20 (Dedicated SCA pin for Mega2560)
 SCL - PIN 21 (Dedicated SCL pin for Mega2560)
 
 
+## MPX4250 Through-hole sensors 
+Datasheet - https://www.nxp.com/docs/en/data-sheet/MPX4250A.pdf
+
+Pin 1 -  Vout (Pin 1 has the notch)
+Pin 2 - Ground
+Pin 3 -  Vcc
+Pin 4 -  V1
+Pin 5 -  V2
+Pin 6 -  Vex
+
+
+## MPXV7007DP DIL Surface mount sensors
+Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
+
+Pin 1 -  N/C
+Pin 2 -  Vs
+Pin 3 -  Ground
+Pin 4 -  Vout
+Pin 5 -  N/C
+Pin 6 -  N/C
+Pin 7 -  N/C
+Pin 8 -  N/C
+
 
 /****************************************
 * Arduino pin-outs
 ***/
 
-For Arduino pinout please see the 'Configure Pins' section in configuration.h
+For Arduino pinout please see pins.h

@@ -111,7 +111,7 @@ char LANGUAGE_FILE = "EN_Language.h";
  * You will need to add your volts to kPa algorythm in the function getRefPressure()
  ***/
 
-// None - Default
+// Default: no selection
 //#define REF_MPXV7007 
 //#define REF_MPX4250
 
@@ -124,7 +124,7 @@ char LANGUAGE_FILE = "EN_Language.h";
  * Note Pitot sensors need to be a differential pressure sensor (DP)
  ***/
 
-// None - Default
+// Default: no selection
 //#define PITOT_MPXV7007DP                  
 //#define PITOT_OTHER_TYPE                //add your own sensor
 
@@ -134,8 +134,8 @@ char LANGUAGE_FILE = "EN_Language.h";
  * CONFIGURE BARO SENSOR
  ***/
 
-// Default none (defaults to 14.7 psi)
-#define BARO_SPARKFUN_BME280
+// Default: no selection (defaults to 14.7 psi (1 bar / 1 atmos))
+//#define BARO_SPARKFUN_BME280 
 //#define BARO_MPX4115 
 //#define BARO_ADAFRUIT_BME280
 
@@ -149,7 +149,7 @@ char LANGUAGE_FILE = "EN_Language.h";
  ***/
 
 // Default none (defaults to 21 degrees)
-#define TEMP_SPARKFUN_BME280
+//#define TEMP_SPARKFUN_BME280
 //#define TEMP_ADAFRUIT_BME280
 //#define SIMPLE_TEMP_DHT11 
 
@@ -159,8 +159,8 @@ char LANGUAGE_FILE = "EN_Language.h";
  * CONFIGURE HUMIDITY SENSOR
  ***/
 
-// Default none (defaults to 0.36)
-#define RELH_SPARKFUN_BME280
+// Default: no selection (defaults to 0.36 RH)
+//#define RELH_SPARKFUN_BME280
 //#define SIMPLE_RELH_DHT11 
 //#define RELH_ADAFRUIT_BME280
 
@@ -170,6 +170,7 @@ char LANGUAGE_FILE = "EN_Language.h";
  * CONFIGURE DISPLAYS
  ***/
 
+// Default: no selection
 //Optional additional displays connected to I2C
 //#define CFM_4X7SEG
 //#define PITOT_4X7SEG
@@ -180,6 +181,7 @@ char LANGUAGE_FILE = "EN_Language.h";
  * CONFIGURE COMMUNICATIONS
  ***/
  
+// default 9600
 #define SERIAL_BAUD_RATE 9600
 #define showRemoteDialogs true           // show menu dialogs on remote displays
   
@@ -203,6 +205,7 @@ char LANGUAGE_FILE = "EN_Language.h";
  /****************************************
  * CALIBRATION SETTINGS
  ***/
+ 
 #define calibrationRefPressure 10         // Reference pressure orifices were measured at (leave at 10" if calibrating with CD)
 #define calibrationFlowRate 14.4          // Standard flow rate for CD @ 10"/wg
 
@@ -216,6 +219,11 @@ char LANGUAGE_FILE = "EN_Language.h";
  *
  ***/
 
+// NOTE: This method is currently unused (also removed from menu)
+// It is not clear if this method would produce usable results for all sensors.
+// Suggest that once project is stable, method is implimented and results compared against known good data to validate 
+
+// generate MAF data dable using three point method
 #define calibrationPlateHighCFM 100       // Flow rate for large calibration orifice
 #define calibrationPlateMidCFM 50         // Flow rate for med calibration orifice
 #define calibrationPlateLowCFM 10         // Flow rate for small calibration orifice
