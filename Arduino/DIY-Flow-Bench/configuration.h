@@ -135,7 +135,7 @@ char LANGUAGE_FILE = "EN_Language.h";
  ***/
 
 // Default none (defaults to 14.7 psi)
-// #define BARO_SPARKFUN_BME280
+#define BARO_SPARKFUN_BME280
 //#define BARO_MPX4115 
 //#define BARO_ADAFRUIT_BME280
 

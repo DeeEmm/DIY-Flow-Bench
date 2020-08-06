@@ -20,7 +20,7 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080404"
+#define BUILD_NUMBER "20080601"
 #define RELEASE "V.1.0-beta.10"
 
 
@@ -136,7 +136,7 @@ void setup ()
         {
             // TODO - need to replace this with error handler
             Serial.println("The sensor did not respond. Please check wiring.");
-            while(1); //Freeze
+            //while(1); //Freeze
         }
     #endif
     
