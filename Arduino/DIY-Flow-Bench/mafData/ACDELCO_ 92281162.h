@@ -1,9 +1,9 @@
 /****************************************
- * GM_LS2.h
+ * ACDELCO_ 92281162.h
  *
- * Manufacturer: GM
- * Part#: 15900023
- * MAF file for type: Holden VZ / VE LS2
+ * Manufacturer: AC Delco
+ * Part#: 92281162
+ * MAF file for type: GM / Holden VZ & VE / Corvette / LS2 engines
  * File units = 10 * mg/sec
  * Comments: Original data from Megasquirt website - www.microsquirt.info/maffactor_lsx.inc
  * Status: Validated

@@ -1098,12 +1098,6 @@ void updateDisplays()
     // Temperature
     menuTemp.setCurrentValue(getTemp(DEGC) * 10);   
     
-    // Baro
-    menuBaro.setCurrentValue(getBaroPressure(KPA) * 10);   
-    
-    // Relative Humidity
-    menuRelH.setCurrentValue(getRelativeHumidity(PERCENT) * 10);   
-
     // Pitot
     menuPitot.setFloatValue(getPitotPressure(INWG));  
     
@@ -1114,27 +1108,26 @@ void updateDisplays()
     int desiredRefPressureInWg = menuARef.getCurrentValue();
     menuAFlow.setCurrentValue(convertMafFlowInWg(refPressure, desiredRefPressureInWg, mafFlowCFM) * 100);    //Scale output for display
 
-    // MRef Presure Voltage
-    int refPressRaw = analogRead(REF_PRESSURE_PIN);
-    int refMillivolts = (refPressRaw * (5.0 / 1024.0)) * 1000;
-    menuSensorTestPRef.setCurrentValue(refMillivolts);
+    // Relative Humidity
+    menuRelH.setCurrentValue(getRelativeHumidity(PERCENT));   
 
-    // Maf Voltage
+    //Maf Voltage
     int mafFlowRaw = analogRead(MAF_PIN);
-    int mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
-    menuSensorTestMAF.setCurrentValue(mafMillivolts);
+    int mafVolts = (mafFlowRaw * (5.0 / 1024.0));
+    menuMafVolts.setFloatValue(mafVolts);
 
-    // Pitot Voltage
+    //Pitot Voltage
     int pitotRaw = analogRead(PITOT_PIN);
-    int pitotMillivolts = (pitotRaw * (5.0 / 1024.0)) * 1000;
-    menuSensorTestPitot.setCurrentValue(pitotMillivolts);
+    int pitotVolts = (pitotRaw * (5.0 / 1024.0));
+    menuPitotVolts.setFloatValue(pitotVolts);
+
+const char * versionNumberString = MAJOR_VERSION;// + "." + MINOR_VERSION;
+const char * buildNumberString = BUILD_NUMBER;
 
 
-    // Version and build
-    String versionNumberString = String(MAJOR_VERSION) + '.' + String(MINOR_VERSION);
-    String buildNumberString = String(BUILD_NUMBER);
-    menuVer.setTextValue(versionNumberString.c_str());
-    menuBld.setTextValue(buildNumberString.c_str());    
+    //Settings Menu
+    menuSettingsVer.setTextValue(versionNumberString);
+    menuSettingsBld.setTextValue(buildNumberString);    
 
     // Additional Displays
 
@@ -1282,80 +1275,6 @@ void loop ()
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

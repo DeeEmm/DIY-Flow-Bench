@@ -96,12 +96,12 @@ char LANGUAGE_FILE = "EN_Language.h";
  ***/
 
 
-#include "mafData/TEST.h"               // Test Data
-//#include "mafData/GM_LS2.h"              
-//#include "mafData/exampleKeyValueData.h"   // Example key > value data file (duplicate this as required)
-//#include "mafData/exampleAnalogData.h"   // Example Analog point data file (duplicate this as required)
+//#include "mafData/TEST.h"                 // Test Data
+#include "mafData/ACDELCO_ 92281162.h"    // GM LS2              
+//#include "mafData/exampleKeyValueData.h"  // Example key > value data file (duplicate this as required)
+//#include "mafData/exampleAnalogData.h"    // Example Analog point data file (duplicate this as required)
 //#include "mafData/SIEMENS_5WK9605.h"      // Data from Tonys tests
-//#include "mafData/DELPHI_AF10118.h"   // kg/hr - Data from efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
+//#include "mafData/DELPHI_AF10118.h"       // kg/hr - Data from efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
 
 
 
@@ -145,24 +145,24 @@ char LANGUAGE_FILE = "EN_Language.h";
 
 
 /****************************************
- * CONFIGURE HUMIDITY SENSOR
- ***/
-
-// Default none (defaults to 0.36)
-//#define RELH_SPARKFUN_BME280
-//#define SIMPLE_RELH_DHT11 
-//#define RELH_ADAFRUIT_BME280
-
-
-
-/****************************************
  * CONFIGURE TEMPERATURE SENSOR
  ***/
 
 // Default none (defaults to 21 degrees)
-//#define TEMP_SPARKFUN_BME280
+#define TEMP_SPARKFUN_BME280
 //#define TEMP_ADAFRUIT_BME280
 //#define SIMPLE_TEMP_DHT11 
+
+
+
+/****************************************
+ * CONFIGURE HUMIDITY SENSOR
+ ***/
+
+// Default none (defaults to 0.36)
+#define RELH_SPARKFUN_BME280
+//#define SIMPLE_RELH_DHT11 
+//#define RELH_ADAFRUIT_BME280
 
 
 
