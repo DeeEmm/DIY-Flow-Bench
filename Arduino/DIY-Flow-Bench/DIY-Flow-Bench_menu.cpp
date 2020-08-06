@@ -18,19 +18,19 @@ LiquidCrystalRenderer renderer(lcd, 16, 2);
 
 // Global Menu Item declarations
 
-const PROGMEM AnyMenuInfo minfoSettingsCalFlow = { "Cal Flow", 16, 0xffff, 0, menuCallback_Calibrate };
-ActionMenuItem menuSettingsCalFlow(&minfoSettingsCalFlow, NULL);
-RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLeakTestChkRtCall, textItemRenderFn, "Leak Test Chk", -1, menuCallback_LeakTest)
-TextMenuItem menuSettingsLeakTestChk(fnSettingsLeakTestChkRtCall, 14, 3, &menuSettingsCalFlow);
-const PROGMEM AnyMenuInfo minfoSettingsLeakTestCal = { "Leak Test Cal", 8, 0xffff, 0, menuCallback_leakTestCalibration };
-ActionMenuItem menuSettingsLeakTestCal(&minfoSettingsLeakTestCal, &menuSettingsLeakTestChk);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsVerRtCall, textItemRenderFn, "Ver", -1, NULL)
-TextMenuItem menuSettingsVer(fnSettingsVerRtCall, 28, 256, &menuSettingsLeakTestCal);
+TextMenuItem menuSettingsVer(fnSettingsVerRtCall, 28, 256, NULL);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsBldRtCall, textItemRenderFn, "Bld", -1, NULL)
 TextMenuItem menuSettingsBld(fnSettingsBldRtCall, 29, 256, &menuSettingsVer);
+const PROGMEM AnyMenuInfo minfoSettingsCalFlow = { "Cal Flow", 16, 0xffff, 0, menuCallback_Calibrate };
+ActionMenuItem menuSettingsCalFlow(&minfoSettingsCalFlow, &menuSettingsBld);
+const PROGMEM AnyMenuInfo minfoSettingsLeakTestCal = { "Leak Test Cal", 8, 0xffff, 0, menuCallback_leakTestCalibration };
+ActionMenuItem menuSettingsLeakTestCal(&minfoSettingsLeakTestCal, &menuSettingsCalFlow);
+RENDERING_CALLBACK_NAME_INVOKE(fnSettingsLeakTestChkRtCall, textItemRenderFn, "Leak Test Chk", -1, menuCallback_LeakTest)
+TextMenuItem menuSettingsLeakTestChk(fnSettingsLeakTestChkRtCall, 14, 3, &menuSettingsLeakTestCal);
 RENDERING_CALLBACK_NAME_INVOKE(fnSettingsRtCall, backSubItemRenderFn, "Settings", 10, NULL)
 const PROGMEM SubMenuInfo minfoSettings = { "Settings", 5, 10, 0, NO_CALLBACK };
-BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsBld);
+BackMenuItem menuBackSettings(fnSettingsRtCall, &menuSettingsLeakTestChk);
 SubMenuItem menuSettings(&minfoSettings, &menuBackSettings, NULL);
 const PROGMEM FloatMenuInfo minfoPitotVolts = { "Pitot Volts", 22, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuPitotVolts(&minfoPitotVolts, &menuSettings);
@@ -38,16 +38,16 @@ const PROGMEM FloatMenuInfo minfoMafVolts = { "MafVolts", 19, 0xffff, 2, NO_CALL
 FloatMenuItem menuMafVolts(&minfoMafVolts, &menuPitotVolts);
 const PROGMEM AnalogMenuInfo minfoRelH = { "RelH", 20, 0xffff, 65355, NO_CALLBACK, 0, 10, " %  " };
 AnalogMenuItem menuRelH(&minfoRelH, 0, &menuMafVolts);
+const PROGMEM AnalogMenuInfo minfoTemp = { "Temp", 18, 0xffff, 65355, NO_CALLBACK, 0, 10, " Deg" };
+AnalogMenuItem menuTemp(&minfoTemp, 0, &menuRelH);
 const PROGMEM AnalogMenuInfo minfoARef = { "ARef", 12, 0xffff, 28, NO_CALLBACK, 0, 1, " Aq " };
-AnalogMenuItem menuARef(&minfoARef, 0, &menuRelH);
+AnalogMenuItem menuARef(&minfoARef, 0, &menuTemp);
 const PROGMEM AnalogMenuInfo minfoAFlow = { "AFlow", 13, 0xffff, 255, NO_CALLBACK, 0, 100, " CFM" };
 AnalogMenuItem menuAFlow(&minfoAFlow, 0, &menuARef);
 const PROGMEM FloatMenuInfo minfoPitot = { "Pitot", 21, 0xffff, 2, NO_CALLBACK };
 FloatMenuItem menuPitot(&minfoPitot, &menuAFlow);
-const PROGMEM AnalogMenuInfo minfoTemp = { "Temp", 18, 0xffff, 65355, NO_CALLBACK, 0, 10, " Deg" };
-AnalogMenuItem menuTemp(&minfoTemp, 0, &menuPitot);
 const PROGMEM AnalogMenuInfo minfoPRef = { "PRef", 2, 0xffff, 65355, NO_CALLBACK, 0, 10, " Aq " };
-AnalogMenuItem menuPRef(&minfoPRef, 0, &menuTemp);
+AnalogMenuItem menuPRef(&minfoPRef, 0, &menuPitot);
 const PROGMEM AnalogMenuInfo minfoFlow = { "Flow", 1, 0xffff, 65355, NO_CALLBACK, 0, 100, " CFM" };
 AnalogMenuItem menuFlow(&minfoFlow, 0, &menuPRef);
 const PROGMEM ConnectorLocalInfo applicationInfo = { "DIY Flow Bench", "0fc9ae97-7781-4600-a281-4a3425ce8371" };
@@ -67,11 +67,11 @@ void setupMenu() {
     menuSettingsCalFlow.setReadOnly(true);
     menuPRef.setReadOnly(true);
     menuSettingsLeakTestChk.setReadOnly(true);
-    menuTemp.setReadOnly(true);
     menuPitot.setReadOnly(true);
+    menuTemp.setReadOnly(true);
     menuMafVolts.setReadOnly(true);
-    menuSettingsLeakTestCal.setReadOnly(true);
     menuSettingsVer.setReadOnly(true);
+    menuSettingsLeakTestCal.setReadOnly(true);
     menuSettingsVer.setLocalOnly(true);
 }
 

@@ -11,35 +11,36 @@
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
+#include <Arduino.h>
 #include <tcMenu.h>
+
 #include <LiquidCrystalIO.h>
-#include <IoAbstraction.h>
+#include "tcMenuLiquidCrystal.h"
 #include <DfRobotInputAbstraction.h>
 #include <RuntimeMenuItem.h>
-#include "tcMenuLiquidCrystal.h"
 
 // all define statements needed
-#define TCMENU_USING_PROGMEM true
+
 
 // all variables that need exporting
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 
 // all menu item forward references.
-extern ActionMenuItem menuSettingsCalFlow;
-extern TextMenuItem menuSettingsLeakTestChk;
-extern ActionMenuItem menuSettingsLeakTestCal;
 extern TextMenuItem menuSettingsVer;
 extern TextMenuItem menuSettingsBld;
+extern ActionMenuItem menuSettingsCalFlow;
+extern ActionMenuItem menuSettingsLeakTestCal;
+extern TextMenuItem menuSettingsLeakTestChk;
 extern BackMenuItem menuBackSettings;
 extern SubMenuItem menuSettings;
 extern FloatMenuItem menuPitotVolts;
 extern FloatMenuItem menuMafVolts;
 extern AnalogMenuItem menuRelH;
+extern AnalogMenuItem menuTemp;
 extern AnalogMenuItem menuARef;
 extern AnalogMenuItem menuAFlow;
 extern FloatMenuItem menuPitot;
-extern AnalogMenuItem menuTemp;
 extern AnalogMenuItem menuPRef;
 extern AnalogMenuItem menuFlow;
 extern const ConnectorLocalInfo applicationInfo;

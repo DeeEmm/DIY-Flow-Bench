@@ -6,6 +6,7 @@ NOTE: Build numbers follow format YY MM DD VV Where VV is incremental version (r
 
 Build #     - Description of Change
 
+20080602    - Update tcmenu layout 
 20080601    - #37 Commented out 'freeze' statement (line 139) - while(1); //Freeze 
 20080501    - Moved language file call to configation settings
             - Move pin configuration into pins.h
