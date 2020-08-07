@@ -26,6 +26,12 @@
  * I2C_ADDRESS = "0x20";
  * I2C CLK Pin = 20; (Standard I2C CLK pin for Mega 2560)
  * I2C DIO Pim = 21; (Standard I2C DIO pin for Mega 2560)
+ *
+ * Default temp / baro / RelH uses BME280 device (Sparkfun / clone)
+ * I2C address for the BME280 is 0x77
+ *
+ * Default MAF unit recommended is the GM LS2 MAF (ACDELCO_ 92281162.h)
+ * This will measure up to approx 277cfm
  * 
  * DEPENDENCIES
  * The program has a number of dependencies that must be available for it to work.
@@ -36,13 +42,14 @@
  * /libraries/liquidCrystalIO
  * /libraries/SimpleDHT
  * /libraries/BMP280_DEV
+ * /libraries/SparkfunBME280
  * /libraries/
  *
- * The following libraries are also aneeded and available within the Arduino IDE
+ * The following libraries are also needed and available within the Arduino IDE
  *
  * arduino-NVM
  *
- * NOTE: you may need to include your library in DIY-Flow-Bench.ino
+ * NOTE: you may need to include your library in DIY-Flow-Bench.ino 
  *
  ***/
 

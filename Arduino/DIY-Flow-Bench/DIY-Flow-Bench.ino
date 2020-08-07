@@ -20,10 +20,8 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080702"
+#define BUILD_NUMBER "20080703"
 #define RELEASE "V.1.0-beta.14"
-
-
 
 /****************************************
  * CORE LIBRARIES
@@ -548,10 +546,7 @@ float getRefPressure(int units)
     #if defined REF_MPX4250
         // Vout = VS x (0.00369 x P + 0.04) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
         // P = ((Vout / VS ) - 0.04) / 0.00369 --- Formula transposed for P
-        refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369; 
-
-        ResultkPa = ((SensorValue*(.00488)/(.022)+20)) -1.0172 ;
-        
+        refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - getBaroPressure(KPA);         
 
     #elif defined REF_MPXV7007
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)

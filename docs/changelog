@@ -6,6 +6,7 @@ NOTE: Build numbers follow format YY MM DD VV Where VV is incremental version (r
 
 Build #     - Description of Change
 
+20080703    - Updated MPX4250 Ref pressure calculations
 20080702    - Added I2C address to Sparkfun BME280 initialisation 
             - Added configuration defaults for baro / temp / relH
             - Fixed bench is running conditions / commented out low reference pressure alarm for testing
