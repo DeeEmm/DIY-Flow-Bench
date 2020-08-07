@@ -38,7 +38,7 @@ E - MAF Sensor Signal
 /****************************************
 * Temp / Humidity / Baro sensors 
 *
-* NOTE Preferred choice is Sparkfun compatible sensor
+* NOTE Preferred choice is Sparkfun compatible sensor - BME280
 ***/
 
 ##  BME280 combined sensor (using I2C)
@@ -50,7 +50,7 @@ SDA - PIN 20 (Dedicated SCA pin for Mega2560)
 SCL - PIN 21 (Dedicated SCL pin for Mega2560)
 
 
-## MPX4250 Through-hole sensors 
+## MPX4250 / 2050 / MPX4250 etc Through-hole style sensors 
 Datasheet - https://www.nxp.com/docs/en/data-sheet/MPX4250A.pdf
 
 Pin 1 -  Vout (Pin 1 has the notch)

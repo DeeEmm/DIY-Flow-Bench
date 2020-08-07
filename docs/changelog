@@ -5,7 +5,11 @@
 NOTE: Build numbers follow format YY MM DD VV Where VV is incremental version (reset daily) 
 
 Build #     - Description of Change
-
+ 
+20080705    - Dropped support for PMX2050 (only posotive range so will not work with vac - D'Oh!)
+            - Updated BOM
+            - Updated hardware schema
+            - Updated readme
 20080704    - Added MPX2050 Reference pressure sensor
             - Improved code for using ref pressure value for baro on system boot
             - Dropped support for BMP280

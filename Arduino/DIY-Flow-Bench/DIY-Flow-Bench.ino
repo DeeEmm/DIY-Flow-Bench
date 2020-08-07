@@ -20,7 +20,7 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080704"
+#define BUILD_NUMBER "20080705"
 #define RELEASE "V.1.0-beta.15"
 
 
@@ -542,13 +542,7 @@ float getRefPressure(int units)
         // Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007DP Datasheet)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
-        refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
-
-
-    #elif defined REF_MPX2050
-        // NOTE: Untested
-        // Datasheet - https://au.mouser.com/datasheet/2/302/MPX2050-1152068.pdf
-        refPressureKpa = (refPressMillivolts / supplyMillivolts ) * 50;         
+        refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057;  
     
 
     #elif defined REF_MPX4250

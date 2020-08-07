@@ -7,17 +7,19 @@ Electronic
 
 QTY			Description
 
-1           MAF Sensor - GM_LS2 (Part No. 92281162)
 1           Arduino - MEGA 2560
-1           Pressure sensor MPXV7007DP -7 to + 7kPa (exactly +/- 28"/wg) (Optional)
-1           BME280 (Optional)
-1           LCD KeyPad Shield (Optional for V1 without DIYFB shield)
-1           DIYFB MEGA2560 Shield V1.0 (available from V2 onwards)
+1           MAF Sensor - GM_LS2 (Part No. 92281162)
+
+2           Ref pressure sensor MPXV7007DP -7 to + 7kPa (exactly +/- 28"/wg) (Optional but recommended)
+1           Temp / Baro /Humidity correction - BME280 (Optional but recommended)
+1           LCD KeyPad Shield (Optional)
+
+1           DIYFB MEGA2560 Shield V1.0 (will be available from V2 onwards)
 
 NOTE: 
 
-- System will work with just a MAF and an Arduino. Control can be made via serial monitor.
-- If you want to run a pitot tube you will need an additional MPXV7007DP sensor
+- System will work with just a MAF and an Arduino. Control can be made via the serial monitor.
+- If you want to run a pitot tube you will need 2 MPXV7007DP sensors - one for ref pressure and one for pitot
 
 
 Electrical
@@ -35,9 +37,12 @@ of vacuum cleaner motors will depend entirely on the application.
 Vacuum cleaner motors can also be purchased from websites such as ali-express and ebay.
 
 
-Bench construction
+Hardware / Bench construction
 ==================
 
-1 mtr		80mm Diameter UPVC Waste pipe
-
-NOTE: Section under construction - see section in WIKI for more info
+1 mtr		100mm diameter UPVC Waste pipe
+1           100mm 90 degree bend
+2           100mm diameter rubber joiner
+1           bleed valve of your own devising to be able to 'dial in / bleed off' vacuum source
+1           reducer / connector of your choice for connecting to your vac source.
+1           test surface 

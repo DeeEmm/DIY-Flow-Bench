@@ -120,7 +120,6 @@ char LANGUAGE_FILE = "EN_Language.h";
 
 // Default: no selection
 //#define REF_MPXV7007                      // -7 / +7 psi
-//#define REF_MPX2050                       // 0-7 psi
 //#define REF_MPX4250                       // 0-36psi (absolute)
 
 

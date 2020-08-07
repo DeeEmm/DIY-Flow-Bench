@@ -39,6 +39,11 @@ This repository contains the hardware schematics and software code needed to bui
 - Open source software and hardware design
 
 
+## Download
+###
+
+You can download the latest version from our githib repository at https://github.com/DeeEmm/DIY-Flow-Bench/releases
+
 
 ## Project Status
 ###
