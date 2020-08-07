@@ -132,9 +132,10 @@ char LANGUAGE_FILE = "EN_Language.h";
 
 /****************************************
  * CONFIGURE BARO SENSOR
+ *
+ * Default Baro 101.3529kpa - standard sealevel baro pressure (14.7 psi) 
  ***/
-
-// Default: no selection (defaults to 14.7 psi (1 bar / 1 atmos))
+#define DEFAULT_BARO 101.3529
 //#define BARO_SPARKFUN_BME280 
 //#define BARO_MPX4115 
 //#define BARO_ADAFRUIT_BME280
@@ -146,8 +147,10 @@ char LANGUAGE_FILE = "EN_Language.h";
 
 /****************************************
  * CONFIGURE TEMPERATURE SENSOR
+ *
+ * Default 21 Degrees Celcius
  ***/
-
+#define DEFAULT_TEMP 21
 // Default none (defaults to 21 degrees)
 //#define TEMP_SPARKFUN_BME280
 //#define TEMP_ADAFRUIT_BME280
@@ -157,9 +160,10 @@ char LANGUAGE_FILE = "EN_Language.h";
 
 /****************************************
  * CONFIGURE HUMIDITY SENSOR
+ *
+ * Default 36% Rel H
  ***/
-
-// Default: no selection (defaults to 0.36 RH)
+#define DEFAULT_RELH 36
 //#define RELH_SPARKFUN_BME280
 //#define SIMPLE_RELH_DHT11 
 //#define RELH_ADAFRUIT_BME280
@@ -171,7 +175,7 @@ char LANGUAGE_FILE = "EN_Language.h";
  ***/
 
 // Default: no selection
-//Optional additional displays connected to I2C
+// Optional additional displays connected to I2C
 //#define CFM_4X7SEG
 //#define PITOT_4X7SEG
 
@@ -181,18 +185,19 @@ char LANGUAGE_FILE = "EN_Language.h";
  * CONFIGURE COMMUNICATIONS
  ***/
  
-// default 9600
-#define SERIAL_BAUD_RATE 9600
-#define showRemoteDialogs true           // show menu dialogs on remote displays
+
+#define SERIAL_BAUD_RATE 9600           // default 9600
+#define showRemoteDialogs true          // show menu dialogs on remote displays
+#define BME280_I2C_ADDR 0x77            // (default 0x77) / Alternate 0x76
   
 
  
 /****************************************
  * CONFIGURE ALARMS
  ***/
- 
 #define showAlarms true 
 
+//TODO - more granular alarm control - need to be able to disable individual alarms
 
 
  /****************************************
@@ -227,3 +232,12 @@ char LANGUAGE_FILE = "EN_Language.h";
 #define calibrationPlateHighCFM 100       // Flow rate for large calibration orifice
 #define calibrationPlateMidCFM 50         // Flow rate for med calibration orifice
 #define calibrationPlateLowCFM 10         // Flow rate for small calibration orifice
+
+
+
+//Test env /DM
+#if defined DM
+    #define BARO_SPARKFUN_BME280
+    #define TEMP_SPARKFUN_BME280
+    #define RELH_SPARKFUN_BME280
+#endif

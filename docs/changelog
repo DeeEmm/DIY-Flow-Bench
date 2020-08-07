@@ -6,7 +6,12 @@ NOTE: Build numbers follow format YY MM DD VV Where VV is incremental version (r
 
 Build #     - Description of Change
 
-20080604    - #36 MPX4250 scaling error - subtracted atmospheric pressure from reading
+20080702    - Added I2C address to Sparkfun BME280 initialisation 
+            - Added configuration defaults for baro / temp / relH
+            - Fixed bench is running conditions / commented out low reference pressure alarm for testing
+            - Added releases to changelog
+20080604    - V.1.0-beta.14
+            - #36 MPX4250 scaling error - subtracted atmospheric pressure from reading
             - #39 Fixed flow value fraction value (displaying zero)
             - #40 Fixed adjusted flow display
             - Updated tcmenu
@@ -27,10 +32,12 @@ Build #     - Description of Change
 20080404    - Added comments to changelog file
 20080403    - Added comments to mafData files
 20080402    - Added analog mafData example 
-20080401    - Fixed some typos and reduced program size
+20080401    - V.1.0-beta.13
+            - Fixed some typos and reduced program size
             - #32 Added additional array type for analog mafData files (memory issue)
             - #33 Fixed humidity correction is
-20080307    - Added support for Sparkfun BME280 (works with generic 10 pin BME280)
+20080307    - V.1.0-beta.12
+            - Added support for Sparkfun BME280 (works with generic 10 pin BME280)
 20080306    - Updated changelog
 20080305    - Updated documentation
 20080304    - Removed redundant Alpha files
@@ -43,46 +50,60 @@ Build #     - Description of Change
 20080203	- Added support for the Generic Commands listed on the API section of the WIKI.  
         	- Added the Serial API Specification to the doc folder
 			- Added the beginning of the API layer for the GUI
-20080202    - Added additional API debug commands
+20080202    - V.1.0-beta.11
+            - Added additional API debug commands
 20080201    - Added additional variables to MAF data files #29
-20080102    - #28 fixed incorrect CFM reading...
+20080102    - V.1.0-beta.10
+            - #28 fixed incorrect CFM reading...
             - Updated getMafFlowCFM function
             - Corrected mafData files voltage
             - Added additional functions to API
             - Update configuration.h set default values
 20080101    - Updated API Responses
-20072901    - Changed format version varables
+20072901    - V.1.0-beta.9
+            - Changed format version varables
             - Added basic serial API functions
             - Dropped ilib280 support (depreciated)
             - #19 Added Adafruit BME280 support
             - Corrected datatypes in mafData files
             - Added website URL in docs
-
 20041501    - Reorganised project folder structure
-20010101	- Fixed spelling issue for ilib library calls
+20010101	- V.1.0-beta.8
+            - Fixed spelling issue for ilib library calls
 			- Fixed load issue for Baro and Pitot 
 19123001 	- Fixed float issue for pRef
-19122601	- #23 DHT11 compile issue
+19122601	- V.1.0-beta.7
+            - #23 DHT11 compile issue
 			- #19 Support for RH sensor
 			- Added MIN_MAF_MILLIVOLTS to filter MAF results 
 			- #20 Fixed issue with Pitot sensor decode
-19122401    - Bugfix release various display bugs
+19122401    - V.1.0-beta.6
+            - Bugfix release various display bugs
 			- Validated Mass > Volumetric flow conversion
 			- Validated Flow reference conversion
 			- Disabled menu timeout
 			- Added MafVolts to display for testing / diagnostics
 			- Tidied Display layout
-19122301    - Changed order of display items for better visibility on 2 line Display
+19122301    - V.1.0-beta.5
+            - Changed order of display items for better visibility on 2 line Display
             - Added one decimal places to display values value (changed divisor to 10 in tcMenu)
             - Renamed existing BMP280 code references to ADAFRUIT_BMP280
             - Added support for ILIB_BMP280 library
             - Added support for DHT11 sensor///////////s
             - Added mass > volumetric flow compensation calculations
             - Remapped Siemens_5WK9605 mafdata from cfm to kg/h
-19122001    - Added support for BMP280//sdfsdfdsfdf////
+19122002    - V.1.0-beta.4
+            - Issue #18 Compile error for BMP280 library
+19122001    - V.1.0-beta.3
+            - Added support for BMP280//sdfsdfdsfdf////
             - Fixed potential MAF conversion issue
             - Minor bugfixes
-19120803    - Display Calibration results on screen 
+19121001    - V.1.0-beta.2
+            - Issue #15 - Shortened menu descriptors
+            - Issue #14 - Sorted data in Delphi MAF file
+            - Issue #16 - Low flow error
+19120804    - V.1.0-beta.1
+            - Display Calibration results on screen 
 19120803    - #7  Update calibration functions 
 19120802    - Added partial support for additional languages
 			- Created function for popover display dialog

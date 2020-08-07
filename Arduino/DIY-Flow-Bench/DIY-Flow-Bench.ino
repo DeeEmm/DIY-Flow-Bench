@@ -20,8 +20,9 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080604"
-#define RELEASE "V.1.0-beta.10"
+#define BUILD_NUMBER "20080702"
+#define RELEASE "V.1.0-beta.14"
+
 
 
 /****************************************
@@ -135,7 +136,7 @@ void setup ()
     //Sparkfun BME280 (Testing and working 03.08.20 /DM)
     #if defined RELH_SPARKFUN_BME280 || defined TEMP_SPARKFUN_BME280 || defined BARO_SPARKFUN_BME280
         Wire.begin();
-        SparkFunBME280.setI2CAddress(0x76); 
+        SparkFunBME280.setI2CAddress(BME280_I2C_ADDR); 
         if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
         {
             // TODO - need to replace this with error handler
@@ -146,8 +147,9 @@ void setup ()
     
     // Adafruit or derivative BME Pressure, humidity & temp transducer
     #if defined TEMP_ADAFRUIT_BME280 || defined BARO_ADAFRUIT_BME280 || defined RELH_ADAFRUIT_BME280
+        //I2C address - BME280_I2C_ADDR
         if (!adafruitBme280.begin()) {  
-            Serial.println("Could not find a valid BME280 sensor, check wiring!");
+            Serial.println("The sensor did not respond. Please check wiring!");
             while (1);
         }
     #endif
@@ -170,7 +172,7 @@ void setup ()
 float getSupplyMillivolts()
 {   
     int rawVoltageValue = analogRead(VOLTAGE_PIN);
-    int supplyMillivolts = rawVoltageValue * (5.0 / 1024.0) * 1000;
+    float supplyMillivolts = rawVoltageValue * (5.0 / 1024.0) * 1000;
 
     return supplyMillivolts;
 }
@@ -217,8 +219,8 @@ float getBaroPressure(int units)
         // NOTE will only work for absolute style pressure sensor else code may need to be changed
         baroPressureKpa = (startupBaroPressure * startupBaroScalingFactor) + startupBaroScalingOffset; 
     #else
-        // we dont have any sensor so use standard sealevel baro pressure (14.7 psi)
-        baroPressureKpa = 101.3529;
+        // we dont have any sensor so use default - standard sealevel baro pressure (14.7 psi)
+        baroPressureKpa = DEFAULT_BARO;
     #endif
 
 
@@ -276,8 +278,8 @@ float getTemp(int units)
         }
         
     #else
-        // We don't have any temperature input so we will assume ambient
-        refTempDegC = 21;
+        // We don't have any temperature input so we will assume default
+        refTempDegC = DEFAULT_TEMP;
     #endif
 
      switch (units)
@@ -328,7 +330,7 @@ float getRelativeHumidity(int units = 0)
 
     #else
         //we dont have any sensor so use standard value 
-        relativeHumidity = 0.36; // (36%)
+        relativeHumidity = DEFAULT_RELH; // (36%)
     #endif
 
 
@@ -426,13 +428,13 @@ float convertMassFlowToVolumetric(float massFlowKgh)
 float getMafFlowCFM()
 {
     // NOTE mafMapData is global array declared in mafData files
-    double calibrationOffset;
-    double mafFlowRateCFM;
-    double mafFlowRateKGH;
-    double mafFlowRateRAW;
+    float calibrationOffset;
+    float mafFlowRateCFM;
+    float mafFlowRateKGH;
+    float mafFlowRateRAW;
     int mafFlowRaw = analogRead(MAF_PIN);
-    double mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
-    double lookupValue;
+    float mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
+    int lookupValue;
     int numRows;
 
     if (mafMillivolts < MIN_MAF_MILLIVOLTS) {
@@ -490,7 +492,6 @@ float getMafFlowCFM()
 
     }
 
-    // TODO #21 Calibration offset giving large negative value
     // Get calibration offset from NVM
     EEPROM.get( NVM_CD_CAL_OFFSET_ADDR, calibrationOffset ); 
 
@@ -540,14 +541,14 @@ float getRefPressure(int units)
     float refPressureRaw;
     float refTempDegRaw;
     float refAltRaw;
-    int supplyMillivolts = getSupplyMillivolts();
+    float supplyMillivolts = getSupplyMillivolts();
     int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
-    int refPressMillivolts = (rawRefPressValue * (5.0 / 1024.0)) * 1000;
+    float refPressMillivolts = (rawRefPressValue * (5.0 / 1024.0)) * 1000;
 
     #if defined REF_MPX4250
         // Vout = VS x (0.00369 x P + 0.04) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
         // P = ((Vout / VS ) - 0.04) / 0.00369 --- Formula transposed for P
-        refPressureKpa = (((float)refPressMillivolts / (float)supplyMillivolts ) - 0.04) / 0.00369; 
+        refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369; 
 
         ResultkPa = ((SensorValue*(.00488)/(.022)+20)) -1.0172 ;
         
@@ -555,7 +556,7 @@ float getRefPressure(int units)
     #elif defined REF_MPXV7007
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
-        refPressureKpa = (((float)refPressMillivolts / (float)supplyMillivolts ) - 0.5) / 0.057; 
+        refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
 
     #else
         // No reference pressure sensor used so lets return 1 (so as not to throw maths out)
@@ -630,14 +631,20 @@ float getPitotPressure(int units)
 
 /****************************************
  * CONVERT FLOW
+ *
  * Convert flow values between different reference pressures
  * Flow at the new pressure drop = (the square root of (new pressure drop/old pressure drop)) times CFM at the old pressure drop.
+ * An example of the above formula would be to convert flow numbers taken at 28" of water to those which would occur at 25" of water.
+ * (25/28) = .89286
+ * Using the square root key on your calculator and inputting the above number gives .94489 which can be rounded off to .945.
+ * We can now multiply our CFM values at 28" of water by .945 to obtain the theoretical CFM values at 25" of water.
+ * Source: http://www.flowspeed.com/cfm-numbers.htm
  ***/
-float convertMafFlowInWg(float inputPressure = 10, int outputPressure = 28, float inputFlow = 0 )
+double convertFlowDepression(float oldPressure = 10, int newPressure = 28, float inputFlow = 0 )
 {
-    float outputFlow;
-    
-        outputFlow = (sqrt(outputPressure / inputPressure) * inputFlow);
+    double outputFlow;
+    double pressureRatio = (newPressure / oldPressure);
+    outputFlow = (sqrt(pressureRatio) * inputFlow);
 
     return outputFlow;
 
@@ -652,7 +659,7 @@ bool benchIsRunning()
     float refPressure = getRefPressure(INWG);
     float mafFlowRateCFM = getMafFlowCFM();
 
-    if ((refPressure < MIN_BENCH_PRESSURE) && (mafFlowRateCFM > MIN_FLOW_RATE))
+    if ((refPressure > MIN_BENCH_PRESSURE) && (mafFlowRateCFM > MIN_FLOW_RATE))
     {
         return true;
     } else {
@@ -720,8 +727,8 @@ void errorHandler(int errorVal)
     switch (errorVal)
     {
         case REF_PRESS_LOW:
-            displayDialog(LANG_WARNING, LANG_FLOW_LIMIT_EXCEEDED);
-            Serial.write(LANG_FLOW_LIMIT_EXCEEDED);
+//            displayDialog(LANG_WARNING, LANG_REF_PRESS_LOW);
+//            Serial.write(LANG_REF_PRESS_LOW);
         break;
 
         case LEAK_TEST_FAILED:
@@ -753,7 +760,7 @@ void errorHandler(int errorVal)
 
     float MafFlowCFM = getMafFlowCFM();
     float RefPressure = getRefPressure(INWG);
-    float convertedMafFlowCFM = convertMafFlowInWg(RefPressure, calibrationRefPressure,  MafFlowCFM);
+    float convertedMafFlowCFM = convertFlowDepression(RefPressure, calibrationRefPressure,  MafFlowCFM);
     float flowCalibrationOffset = calibrationFlowRate - convertedMafFlowCFM;
 
     char flowCalibrationOffsetText[12]; // Buffer big enough?
@@ -1092,8 +1099,8 @@ void parseAPI(byte serialData)
 void updateDisplays()
 {
 
-    double mafFlowCFM = getMafFlowCFM();
-    double refPressure = getRefPressure(INWG);   
+    float mafFlowCFM = getMafFlowCFM();
+    float refPressure = getRefPressure(INWG);   
 
     // Main Menu
     // Flow Rate
@@ -1126,7 +1133,7 @@ void updateDisplays()
     // get the desired bench test pressure
     double desiredRefPressureInWg = menuARef.getCurrentValue();
     // convert from the existing bench test
-    double adjustedFlow = convertMafFlowInWg(refPressure, desiredRefPressureInWg, mafFlowCFM);
+    double adjustedFlow = convertFlowDepression(refPressure, desiredRefPressureInWg, mafFlowCFM);
     // Send it to the display
     menuAFlow.setCurrentValue(adjustedFlow * 10); 
 

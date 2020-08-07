@@ -8,6 +8,7 @@
 //TODO(#12) Translations
 #define LANG_WARNING "Warning!"
 #define LANG_FLOW_LIMIT_EXCEEDED    "Flow Limit Err"
+#define LANG_REF_PRESS_LOW          "Low Ref Press"
 #define LANG_LEAK_TEST_PASS         "Leak test OK"
 #define LANG_LEAK_TEST_FAILED       "Leak test fail"
 //                                  -----------------
