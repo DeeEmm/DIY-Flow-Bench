@@ -6,6 +6,9 @@ NOTE: Build numbers follow format YY MM DD VV Where VV is incremental version (r
 
 Build #     - Description of Change
 
+20080704    - Added MPX2050 Reference pressure sensor
+            - Improved code for using ref pressure value for baro on system boot
+            - Dropped support for BMP280
 20080703    - Updated MPX4250 Ref pressure calculations
 20080702    - Added I2C address to Sparkfun BME280 initialisation 
             - Added configuration defaults for baro / temp / relH

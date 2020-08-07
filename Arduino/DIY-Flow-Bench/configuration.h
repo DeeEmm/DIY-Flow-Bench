@@ -41,7 +41,6 @@
  * /libraries/IoAbstraction
  * /libraries/liquidCrystalIO
  * /libraries/SimpleDHT
- * /libraries/BMP280_DEV
  * /libraries/SparkfunBME280
  * /libraries/
  *
@@ -117,10 +116,12 @@ char LANGUAGE_FILE = "EN_Language.h";
  * If you want to modify the code to include additional reference pressure sensors
  * You will need to add your volts to kPa algorythm in the function getRefPressure()
  ***/
+#define DEFAULT_REF_PRESS 1
 
 // Default: no selection
-//#define REF_MPXV7007 
-//#define REF_MPX4250
+//#define REF_MPXV7007                      // -7 / +7 psi
+//#define REF_MPX2050                       // 0-7 psi
+//#define REF_MPX4250                       // 0-36psi (absolute)
 
 
 
@@ -132,8 +133,9 @@ char LANGUAGE_FILE = "EN_Language.h";
  ***/
 
 // Default: no selection
+
+// Uncomment ONE of the following
 //#define PITOT_MPXV7007DP                  
-//#define PITOT_OTHER_TYPE                //add your own sensor
 
 
 
@@ -143,6 +145,9 @@ char LANGUAGE_FILE = "EN_Language.h";
  * Default Baro 101.3529kpa - standard sealevel baro pressure (14.7 psi) 
  ***/
 #define DEFAULT_BARO 101.3529
+
+// Uncomment ONE of the following
+//#define USE_REF_PRESS_AS_BARO
 //#define BARO_SPARKFUN_BME280 
 //#define BARO_MPX4115 
 //#define BARO_ADAFRUIT_BME280
@@ -158,7 +163,8 @@ char LANGUAGE_FILE = "EN_Language.h";
  * Default 21 Degrees Celcius
  ***/
 #define DEFAULT_TEMP 21
-// Default none (defaults to 21 degrees)
+
+// Uncomment ONE of the following
 //#define TEMP_SPARKFUN_BME280
 //#define TEMP_ADAFRUIT_BME280
 //#define SIMPLE_TEMP_DHT11 
@@ -171,6 +177,8 @@ char LANGUAGE_FILE = "EN_Language.h";
  * Default 36% Rel H
  ***/
 #define DEFAULT_RELH 36
+
+// Uncomment ONE of the following
 //#define RELH_SPARKFUN_BME280
 //#define SIMPLE_RELH_DHT11 
 //#define RELH_ADAFRUIT_BME280

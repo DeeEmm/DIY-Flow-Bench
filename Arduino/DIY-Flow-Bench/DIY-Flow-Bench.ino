@@ -20,8 +20,10 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080703"
+#define BUILD_NUMBER "20080704"
 #define RELEASE "V.1.0-beta.14"
+
+
 
 /****************************************
  * CORE LIBRARIES
@@ -87,7 +89,6 @@
 #define KG_H 1
 #define MG_S 2
 
-
 // Error handler codes
 #define REF_PRESS_LOW 1
 #define LEAK_TEST_FAILED 2
@@ -96,7 +97,7 @@
 
 // Other constants
 #define MOLECULAR_WEIGHT_DRY_AIR 28.964
-
+#define ABS_REF_PRESS_SENSOR
 
 
 /****************************************
@@ -122,7 +123,11 @@ extern long mafMapAnalogData[]; // mafData analog value array
 void setup ()
 {
 
-    int startupBaroPressure = 100;
+    #if defined USE_REF_PRESS_AS_BARO && defined REF_MPX4250
+        startupBaroPressure = getRefPressure(KPA);
+    #else
+        startupBaroPressure = DEFAULT_BARO;
+    #endif
 
     //Serial API
     if (APIEnabled) {
@@ -195,16 +200,10 @@ float getBaroPressure(int units)
     int baroMillivolts = (rawBaroValue * (5.0 / 1024.0)) * 1000;
 
     #if defined BARO_MPX4115
+        // Datasheet - https://html.alldatasheet.es/html-pdf/5178/MOTOROLA/MPX4115/258/1/MPX4115.html
         // Vout = VS (P x 0.009 – 0.095) --- Where VS = Supply Voltage (Formula from Datasheet)
         // P = ((Vout / VS ) - 0.095) / 0.009 --- Formula transposed for P
         baroPressureKpa = (((float)baroMillivolts / (float)supplyMillivolts ) - 0.095) / 0.009; 
-
-    //TODO #31 Drop support for BMP sensor
-    #elif defined BARO_ADAFRUIT_BMP280
-        adafruitBmp280.getMeasurements(refTempRaw, baroPressureRaw, refAltRaw); // Deg C | hPa | M
-        bme_pressure->getEvent(&pressure_event);
-
-        baroPressureKpa = baroPressureRaw * 10;
 
     #elif defined BARO_ADAFRUIT_BME280
         baroPressureKpa =  adafruitBme280.readPressure() / 1000; //Pa
@@ -212,10 +211,10 @@ float getBaroPressure(int units)
     #elif defined BARO_SPARKFUN_BME280
         baroPressureKpa =  SparkFunBME280.readFloatPressure() / 1000; // Pa
 
-    #elif defined USE_REF_PRESS
+    #elif defined USE_REF_PRESS_AS_BARO
         // No baro sensor defined so use value grabbed at startup from reference pressure sensor
-        // NOTE will only work for absolute style pressure sensor else code may need to be changed
-        baroPressureKpa = (startupBaroPressure * startupBaroScalingFactor) + startupBaroScalingOffset; 
+        // NOTE will only work for absolute style pressure sensor like the MPX4250
+        baroPressureKpa = startupBaroPressure; 
     #else
         // we dont have any sensor so use default - standard sealevel baro pressure (14.7 psi)
         baroPressureKpa = DEFAULT_BARO;
@@ -254,12 +253,8 @@ float getTemp(int units)
     byte refTemp;
     byte refRelh;
 
-    //TODO #31 Drop support for BMP sensor
-    #if defined TEMP_ADAFRUIT_BMP280
-        adafruitBmp280.getMeasurements(refTempRaw, refPressureRaw, refAltRaw);
-        refTempDegC = roundf(refTempRaw*100.0)/100.0;
 
-    #elif defined TEMP_ADAFRUIT_BME280
+    #if defined TEMP_ADAFRUIT_BME280
         refTempDegC  =  adafruitBme280.readTemperature();
 
     #elif defined TEMP_SPARKFUN_BME280
@@ -543,20 +538,39 @@ float getRefPressure(int units)
     int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
     float refPressMillivolts = (rawRefPressValue * (5.0 / 1024.0)) * 1000;
 
-    #if defined REF_MPX4250
-        // Vout = VS x (0.00369 x P + 0.04) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
-        // P = ((Vout / VS ) - 0.04) / 0.00369 --- Formula transposed for P
-        refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - getBaroPressure(KPA);         
-
-    #elif defined REF_MPXV7007
-        // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
+    #if defined REF_MPXV7007
+        // Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
+        // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007DP Datasheet)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
         refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057; 
+
+
+    #elif defined REF_MPX2050
+        // NOTE: Untested
+        // Datasheet - https://au.mouser.com/datasheet/2/302/MPX2050-1152068.pdf
+        refPressureKpa = (refPressMillivolts / supplyMillivolts ) * 50;         
+    
+
+    #elif defined REF_MPX4250
+        // NOTE: Untested.  Also not best choice of sensor
+        // Datasheet - https://www.nxp.com/files-static/sensors/doc/data_sheet/MPX4250.pdf
+        // Vout = VS x (0.00369 x P + 0.04) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
+        // P = ((Vout / VS ) - 0.04) / 0.00369 --- Formula transposed for P
+        // Note we use the baro value as this is an absolute sensor, so to prevent circular references we need to know
+        // if we actually have a Baro sensor installed
+        #if defined USE_REF_PRESS_AS_BARO 
+            // we don't have a baro value so use the value hardcoded in the config to offset the sensor value
+            refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - DEFAULT_BARO;  
+  //          ABS_REF_PRESS_SENSOR       
+        #else
+            // use the current baro value to offset the sensor value
+            refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - getBaroPressure(KPA);         
+        #endif
 
     #else
         // No reference pressure sensor used so lets return 1 (so as not to throw maths out)
         //refPressureKpa = 6.97448943333324; //28"
-        refPressureKpa = 1;
+        refPressureKpa = DEFAULT_REF_PRESS;
 
     #endif
 
@@ -599,9 +613,6 @@ float getPitotPressure(int units)
         // Vout = VS x (0.057 x P + 0.5)
 
         pitotPressureKpa = ((float)rawPitotPressValue / (float)1024 - 0.5) / 0.057;
-
-    #elif defined PITOT_OTHER_TYPE
-        // add your sensor data here
 
     #else
         // No pitot probe used so lets return a zero value
@@ -672,6 +683,8 @@ void refPressureCheck()
     float refPressure = getRefPressure(INWG);
 
     // Check that pressure does not fall below limit set by minTestPressurePercentage when bench is running
+    // note alarm commented out in alarm function as 'nag' can get quite annoying
+    // Is this a redundant check?
     if ((refPressure > (calibrationRefPressure * (minTestPressurePercentage / 100))) && (benchIsRunning()))
     {
         errorVal = REF_PRESS_LOW;
