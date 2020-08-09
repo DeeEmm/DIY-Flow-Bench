@@ -20,7 +20,7 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080901"
+#define BUILD_NUMBER "20080902"
 #define RELEASE "V.1.0-beta.16"
 
 
@@ -895,7 +895,7 @@ void parseAPI(byte serialData)
 
     switch (serialData)
     {
-        case 'C': // Test Checksum
+        case 'C': // Test Checksum - somewhere to test custom responses
             messageData = String("V") + API_DELIM + "2" + "." + MAJOR_VERSION + "." + BUILD_NUMBER;
         break;
         
@@ -932,7 +932,7 @@ void parseAPI(byte serialData)
                 messageData += "0";
             } 
             // Print the value
-                messageData += flowCFM;
+            messageData += flowCFM;
         break;
 
         case 'M': // Get MAF sensor data'
@@ -992,6 +992,30 @@ void parseAPI(byte serialData)
         case 'd': // DEBUG OFF'
             messageData = String("d") + API_DELIM;
             DEBUG_MAF_DATA = false;
+        break;
+
+        case 'E': // Enum
+            // Flow
+            messageData = String("E:");        
+            // Truncate to 2 decimal places
+            flowCFM = getMafFlowCFM() * 100;
+            intFlowCFM = flowCFM;
+            flowCFM = flowCFM / 100;
+            // Add preceding zeros
+            if (flowCFM < 10) { 
+                messageData += "00";
+            } else if (flowCFM < 100) {
+                messageData += "0";
+            } 
+            messageData += flowCFM;
+            // Reference Pressure
+            messageData += String(":") + ((analogRead(REF_PRESSURE_PIN) * (5.0 / 1024.0)) * 1000);
+            // Temperature
+            messageData += String(":") + getTemp(DEGC);
+            // Humidity
+            messageData += String(":") + getRelativeHumidity(PERCENT);
+            // Barometric Pressure
+            messageData += String(":") + getBaroPressure(KPA);
         break;
 
         

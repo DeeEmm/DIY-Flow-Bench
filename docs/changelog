@@ -6,6 +6,7 @@ NOTE: Build numbers follow format YY MM DD VV Where VV is incremental version (r
 
 Build #     - Description of Change
  
+20080902    - Added API Enum : Flow:Ref:Temp:Humidity:Baro 
 20080901    - Added CRC Checksum function
 20080705    - Dropped support for PMX2050 (only posotive range so will not work with vac - D'Oh!)
             - Updated BOM
