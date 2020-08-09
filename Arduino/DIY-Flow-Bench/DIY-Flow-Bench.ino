@@ -20,7 +20,7 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080902"
+#define BUILD_NUMBER "20080903"
 #define RELEASE "V.1.0-beta.16"
 
 
@@ -890,7 +890,6 @@ void parseAPI(byte serialData)
     String messageData;
     char serialResponse[30];
     double flowCFM = 0.01;
-    int intFlowCFM = 0;
 
 
     switch (serialData)
@@ -901,30 +900,30 @@ void parseAPI(byte serialData)
         
 
         case 'V': // Get Version 'VMmYYMMDDXX\r\n'
-            messageData = String("V:") + MAJOR_VERSION + "." + MAJOR_VERSION + "." + BUILD_NUMBER;
+            messageData = String("V") + API_DELIM + MAJOR_VERSION + "." + MAJOR_VERSION + "." + BUILD_NUMBER;
         break;
 
         case 'L': // Perform Leak Test Calibration 'L\r\n'
-            messageData = String("L:") + leakTestCalibration();
+            messageData = String("L") + API_DELIM + leakTestCalibration();
             // TODO confirm Leak Test Calibration success in response
         break;
 
         case 'l': // Perform Leak Test 'l\r\n'      
-            messageData = String("l:") + leakTest();
+            messageData = String("l") + API_DELIM + leakTest();
             // TODO confirm Leak Test success in response
         break;
 
         case 'O': // Flow Offset Calibration  'O\r\n'        
-            messageData = String("O:") + setCalibrationOffset();
+            messageData = String("O") + API_DELIM + setCalibrationOffset();
             // TODO confirm Flow Offset Calibration success in response
         break;
 
         case 'F': // Get measured Flow 'F123.45\r\n'
-            messageData = String("F:");        
+            messageData = String("F") + API_DELIM ;        
             // Truncate to 2 decimal places
             flowCFM = getMafFlowCFM() * 100;
-            intFlowCFM = flowCFM;
-            flowCFM = flowCFM / 100;
+            messageData += flowCFM / 100;
+/* this is probably a little redundant / unneeded
             // Add preceding zeros
             if (flowCFM < 10) { 
                 messageData += "00";
@@ -933,10 +932,11 @@ void parseAPI(byte serialData)
             } 
             // Print the value
             messageData += flowCFM;
+ */
         break;
 
         case 'M': // Get MAF sensor data'
-            messageData = String("M:");        
+            messageData = String("M") + API_DELIM ;        
             if (DEBUG_MAF_DATA == false) {
                 DEBUG_MAF_DATA = true;
                 getMafFlowCFM();
@@ -945,47 +945,47 @@ void parseAPI(byte serialData)
         break;
 
         case 'm': // Get MAF output voltage'
-            messageData = String("m:") + ((analogRead(MAF_PIN) * (5.0 / 1024.0)) * 1000);        
+            messageData = String("m") + API_DELIM + ((analogRead(MAF_PIN) * (5.0 / 1024.0)) * 1000);        
         break;
 
         case 'T': // Get measured Temperature 'T.123.45\r\n'
-            messageData = String("T:") + getTemp(DEGC);
+            messageData = String("T") + API_DELIM + getTemp(DEGC);
         break;
 
         case 't': // Get Temperature sensor output voltage'
-            messageData = String("t:") + ((analogRead(TEMPERATURE_PIN) * (5.0 / 1024.0)) * 1000);
+            messageData = String("t") + API_DELIM + ((analogRead(TEMPERATURE_PIN) * (5.0 / 1024.0)) * 1000);
         break;
 
         case 'H': // Get measured Humidity 'H.123.45\r\n'
-            messageData = String("H:") + getRelativeHumidity(PERCENT);
+            messageData = String("H") + API_DELIM + getRelativeHumidity(PERCENT);
         break;
 
         case 'h': // Get Humidity sensor output voltage'
-            messageData = String("h:") + ((analogRead(HUMIDITY_PIN) * (5.0 / 1024.0)) * 1000);
+            messageData = String("h") + API_DELIM + ((analogRead(HUMIDITY_PIN) * (5.0 / 1024.0)) * 1000);
         break;
 
         case 'R': // Get measured Reference Pressure 'R.123.45\r\n'
-            messageData = String("R:") + getRefPressure(KPA);
+            messageData = String("R") + API_DELIM + getRefPressure(KPA);
         break;
 
         case 'r': // Get Reference Pressure sensor output voltage'
-            messageData = String("r:") + ((analogRead(REF_PRESSURE_PIN) * (5.0 / 1024.0)) * 1000);
+            messageData = String("r") + API_DELIM + ((analogRead(REF_PRESSURE_PIN) * (5.0 / 1024.0)) * 1000);
         break;
 
         case 'B': // Get measured Baro Pressure 'B.123.45\r\n'
-            messageData = String("B:") + getBaroPressure(KPA);
+            messageData = String("B") + API_DELIM + getBaroPressure(KPA);
         break;
 
         case 'b': // Get Baro Pressure sensor output voltage'
-            messageData = String("b:") + ((analogRead(REF_BARO_PIN) * (5.0 / 1024.0)) * 1000);
+            messageData = String("b") + API_DELIM + ((analogRead(REF_BARO_PIN) * (5.0 / 1024.0)) * 1000);
         break;
 
         case 'v': // Get board supply voltage (mv) 'v.123.45\r\n'
-            messageData = String("v:") + getSupplyMillivolts();
+            messageData = String("v") + API_DELIM + getSupplyMillivolts();
         break;
         
         case 'D': // DEBUG MAF'
-            messageData = String("D:");
+            messageData = String("D") + API_DELIM ;
             DEBUG_MAF_DATA = true;
         break;
 
@@ -994,28 +994,20 @@ void parseAPI(byte serialData)
             DEBUG_MAF_DATA = false;
         break;
 
-        case 'E': // Enum
+        case 'E': // Enum - Flow:Ref:Temp:Humidity:Baro
             // Flow
-            messageData = String("E:");        
+            messageData = String("E") + API_DELIM ;        
             // Truncate to 2 decimal places
             flowCFM = getMafFlowCFM() * 100;
-            intFlowCFM = flowCFM;
-            flowCFM = flowCFM / 100;
-            // Add preceding zeros
-            if (flowCFM < 10) { 
-                messageData += "00";
-            } else if (flowCFM < 100) {
-                messageData += "0";
-            } 
-            messageData += flowCFM;
+            messageData += (flowCFM / 100) + String(API_DELIM);
             // Reference Pressure
-            messageData += String(":") + ((analogRead(REF_PRESSURE_PIN) * (5.0 / 1024.0)) * 1000);
+            messageData += getRefPressure(KPA) + String(API_DELIM);
             // Temperature
-            messageData += String(":") + getTemp(DEGC);
+            messageData += getTemp(DEGC) + String(API_DELIM);
             // Humidity
-            messageData += String(":") + getRelativeHumidity(PERCENT);
+            messageData += getRelativeHumidity(PERCENT) + String(API_DELIM);
             // Barometric Pressure
-            messageData += String(":") + getBaroPressure(KPA);
+            messageData += getBaroPressure(KPA);
         break;
 
         
