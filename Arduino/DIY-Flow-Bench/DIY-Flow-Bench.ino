@@ -20,9 +20,8 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080705"
-#define RELEASE "V.1.0-beta.15"
-
+#define BUILD_NUMBER "20080901"
+#define RELEASE "V.1.0-beta.16"
 
 
 /****************************************
@@ -35,6 +34,7 @@
 #include "configuration.h"
 #include "pins.h"
 #include "EN_Language.h"
+#include <util/crc16.h>
 
 /****************************************
  * OPTIONAL LIBRARIES
@@ -832,64 +832,20 @@ int  leakTest() {
 /****************************************
  * CREATE CHECKSUM
  *
- * Create checksum from data passed by value
- * 
+ * Source: https://forum.arduino.cc/index.php?topic=311293.msg2158081#msg2158081
+ * Usage: myVar = calcCRC(str);
+ *
  ***/
-char createChecksum(char data)
-{
-//    byte data[20] = ".M+205".
-//    int length = 6;                    // or strlen(data)
-
-//    int count = sizeof(data);
-//  
-//    byte checksum = 0;
-//    for ( count i=0; i<length; i++) {
-//      checksum += data[i];
-//    }
-//  
-//    byte lowNibble = checksum & 0x0F;                // take the 4 lowest bits
-//    byte highNibble = (checksum >> 4) & 0x0F;   // take the 4 highest bits
-//  
-//    // Convert the lowNibble and highNibble to a readable ascii character
-//    if ( lowNibble >= 0x0A)
-//      lowNibble += ('A' - 0x0A);
-//    else
-//      lowNibble += '0';
-//  
-//    if ( highNibble >= 0x0A)
-//      highNibble += ('A' -  - 0x0A);
-//    else
-//      highNibble += '0';
-//  
-//    // Add them to the end of the data, high nibble first
-//    data[length++] = highNibble;
-//    data[length++] = lowNibble;
-//  
-//    // transmit data with 'length' number of bytes
-//
-//    return 
-//
-//
-////simple method
-//
-//    uint8_t result = 0;
-//    uint16_t sum = 0;
-//    
-//    for(uint8_t i = 0; i < (bufferSize - 1); i++){
-//      sum += buffer[i];
-//    }
-//    result = sum & 0xFF;
-//    
-//    if(originalResult == result){
-//       return 1;
-//    }else{
-//       return 0;
-//    }
-
-return 10;  
-
+uint16_t calcCRC(char* str) {
+    // Initialise CRC
+    uint16_t CRC = 0; 
+    // Traverse each character in the string
+    for (int i=0;i<strlen(str);i++) {
+        // update the CRC value using the built in _crc16_update function
+        CRC= _crc16_update (CRC, str[i]); 
+    }
+    return CRC;
 }
-
 
 
 /****************************************
@@ -919,172 +875,139 @@ return 10;
  * 'l' - Perform leak test [+return ok/nok]
  * 'O' - Perform offset calibration [+return ok/nok]
  * 
+ *  Response anatomy:
+ *  API Response format 'V:1.1.20080705:48853'
+ *  Response Code:  'V'
+ *  Delimiter:      ':' 
+ *  Response:       '2.1.20080705'
+ *  Delimiter:      ':' 
+ *  CRC Checksum:   '48853'
+ *  
  ***/
 void parseAPI(byte serialData)
 {
 
-  String serialResponse;
-  char checksum = 0;
-  double flowCFM = 0.01;
-  int intFlowCFM = 0;
+    String messageData;
+    char serialResponse[30];
+    double flowCFM = 0.01;
+    int intFlowCFM = 0;
 
 
-  switch (serialData)
-  {
-      case 'V': // Get Version 'VMmYYMMDDXX\r\n'
-          Serial.print('V');
-          Serial.print('.');
-          Serial.print(MAJOR_VERSION);
-          Serial.print('.');
-          Serial.print(MINOR_VERSION);
-          Serial.print('.');
-          Serial.print(BUILD_NUMBER);
-          Serial.print("\r\n");
-      break;
+    switch (serialData)
+    {
+        case 'C': // Test Checksum
+            messageData = String("V") + API_DELIM + "2" + "." + MAJOR_VERSION + "." + BUILD_NUMBER;
+        break;
+        
 
-      case 'L': // Perform Leak Test Calibration 'L\r\n'
-          Serial.print('L');
-          Serial.print('.');
-          Serial.print(leakTestCalibration());
-          Serial.print("\r\n");
-          // TODO confirm Leak Test Calibration success in response
-      break;
+        case 'V': // Get Version 'VMmYYMMDDXX\r\n'
+            messageData = String("V:") + MAJOR_VERSION + "." + MAJOR_VERSION + "." + BUILD_NUMBER;
+        break;
 
-      case 'l': // Perform Leak Test 'l\r\n'      
-          Serial.print('l');
-          Serial.print('.');
-          Serial.print(leakTest());
-          Serial.print("\r\n");
-          // TODO confirm Leak Test success in response
-      break;
+        case 'L': // Perform Leak Test Calibration 'L\r\n'
+            messageData = String("L:") + leakTestCalibration();
+            // TODO confirm Leak Test Calibration success in response
+        break;
 
-      case 'O': // Flow Offset Calibration  'O\r\n'        
-          Serial.print('O');
-          Serial.print('.');
-          Serial.print(setCalibrationOffset());
-          Serial.print("\r\n");
-          // TODO confirm Flow Offset Calibration success in response
-      break;
+        case 'l': // Perform Leak Test 'l\r\n'      
+            messageData = String("l:") + leakTest();
+            // TODO confirm Leak Test success in response
+        break;
 
-      case 'F': // Get measured Flow 'F123.45\r\n'
+        case 'O': // Flow Offset Calibration  'O\r\n'        
+            messageData = String("O:") + setCalibrationOffset();
+            // TODO confirm Flow Offset Calibration success in response
+        break;
 
-          //String stringOne =  String(5.698, 3);                                // using a float and the decimal
-      
-          Serial.print('F');
-          Serial.print('.');
-          // Truncate to 2 decimal places
-          flowCFM = getMafFlowCFM() * 100;
-          intFlowCFM = flowCFM;
-          flowCFM = flowCFM / 100;
-          // Add preceding zeros
-          if (flowCFM < 10) { 
-            Serial.print(0);
-            Serial.print(0);
-          } else if (flowCFM < 100) {
-            Serial.print(0);              
-          } 
-          // Print the value
-          Serial.print(flowCFM);
-          Serial.print("\r\n");
-          // TODO calculate and send checksum
-      break;
+        case 'F': // Get measured Flow 'F123.45\r\n'
+            messageData = String("F:");        
+            // Truncate to 2 decimal places
+            flowCFM = getMafFlowCFM() * 100;
+            intFlowCFM = flowCFM;
+            flowCFM = flowCFM / 100;
+            // Add preceding zeros
+            if (flowCFM < 10) { 
+                messageData += "00";
+            } else if (flowCFM < 100) {
+                messageData += "0";
+            } 
+            // Print the value
+                messageData += flowCFM;
+        break;
 
-      case 'M': // Get MAF sensor data'
-          Serial.print('M');
-          Serial.print('.');
-          if (DEBUG_MAF_DATA == false) {
-              DEBUG_MAF_DATA = true;
-              getMafFlowCFM();
-              DEBUG_MAF_DATA = false;         
-          }
-      break;
+        case 'M': // Get MAF sensor data'
+            messageData = String("M:");        
+            if (DEBUG_MAF_DATA == false) {
+                DEBUG_MAF_DATA = true;
+                getMafFlowCFM();
+                DEBUG_MAF_DATA = false;         
+            }
+        break;
 
-      case 'm': // Get MAF output voltage'
-          Serial.print('m');
-          Serial.print('.');
-          Serial.print((analogRead(MAF_PIN) * (5.0 / 1024.0)) * 1000);
-          Serial.print("\r\n");
-      break;
+        case 'm': // Get MAF output voltage'
+            messageData = String("m:") + ((analogRead(MAF_PIN) * (5.0 / 1024.0)) * 1000);        
+        break;
 
-      case 'T': // Get measured Temperature 'T.123.45\r\n'
-          Serial.print('T');
-          Serial.print('.');
-          Serial.print(getTemp(DEGC));
-          Serial.print("\r\n");
-      break;
+        case 'T': // Get measured Temperature 'T.123.45\r\n'
+            messageData = String("T:") + getTemp(DEGC);
+        break;
 
-      case 't': // Get Temperature sensor output voltage'
-          Serial.print('t');
-          Serial.print('.');
-          Serial.print((analogRead(TEMPERATURE_PIN) * (5.0 / 1024.0)) * 1000);
-          Serial.print("\r\n");
-      break;
+        case 't': // Get Temperature sensor output voltage'
+            messageData = String("t:") + ((analogRead(TEMPERATURE_PIN) * (5.0 / 1024.0)) * 1000);
+        break;
 
-      case 'H': // Get measured Humidity 'H.123.45\r\n'
-          Serial.print('H');
-          Serial.print('.');
-          Serial.print(getRelativeHumidity(PERCENT));
-          Serial.print("\r\n");
-      break;
+        case 'H': // Get measured Humidity 'H.123.45\r\n'
+            messageData = String("H:") + getRelativeHumidity(PERCENT);
+        break;
 
-      case 'h': // Get Humidity sensor output voltage'
-          Serial.print('h');
-          Serial.print('.');
-          Serial.print((analogRead(HUMIDITY_PIN) * (5.0 / 1024.0)) * 1000);
-          Serial.print("\r\n");
-      break;
+        case 'h': // Get Humidity sensor output voltage'
+            messageData = String("h:") + ((analogRead(HUMIDITY_PIN) * (5.0 / 1024.0)) * 1000);
+        break;
 
-      case 'R': // Get measured Reference Pressure 'R.123.45\r\n'
-          Serial.print('R');
-          Serial.print('.');
-          Serial.print(getRefPressure(KPA));
-          Serial.print("\r\n");
-      break;
+        case 'R': // Get measured Reference Pressure 'R.123.45\r\n'
+            messageData = String("R:") + getRefPressure(KPA);
+        break;
 
-      case 'r': // Get Reference Pressure sensor output voltage'
-          Serial.print('r');
-          Serial.print('.');
-          Serial.print((analogRead(REF_PRESSURE_PIN) * (5.0 / 1024.0)) * 1000);
-          Serial.print("\r\n");
-      break;
+        case 'r': // Get Reference Pressure sensor output voltage'
+            messageData = String("r:") + ((analogRead(REF_PRESSURE_PIN) * (5.0 / 1024.0)) * 1000);
+        break;
 
-      case 'B': // Get measured Baro Pressure 'B.123.45\r\n'
-          Serial.print('B');
-          Serial.print('.');
-          Serial.print(getBaroPressure(KPA));
-          Serial.print("\r\n");
-      break;
+        case 'B': // Get measured Baro Pressure 'B.123.45\r\n'
+            messageData = String("B:") + getBaroPressure(KPA);
+        break;
 
-      case 'b': // Get Baro Pressure sensor output voltage'
-          Serial.print('b');
-          Serial.print('.');
-          Serial.print((analogRead(REF_BARO_PIN) * (5.0 / 1024.0)) * 1000);
-          Serial.print("\r\n");
-      break;
+        case 'b': // Get Baro Pressure sensor output voltage'
+            messageData = String("b:") + ((analogRead(REF_BARO_PIN) * (5.0 / 1024.0)) * 1000);
+        break;
 
-      case 'v': // Get board supply voltage (mv) 'v.123.45\r\n'
-          Serial.print('v');
-          Serial.print('.');
-          Serial.print(getSupplyMillivolts());
-          Serial.print("\r\n");
-      break;
-      
-      case 'D': // DEBUG MAF'
-          Serial.print('D');
-          Serial.print('.');
-          DEBUG_MAF_DATA = true;
-          Serial.print("\r\n");
-      break;
+        case 'v': // Get board supply voltage (mv) 'v.123.45\r\n'
+            messageData = String("v:") + getSupplyMillivolts();
+        break;
+        
+        case 'D': // DEBUG MAF'
+            messageData = String("D:");
+            DEBUG_MAF_DATA = true;
+        break;
 
-      case 'd': // DEBUG OFF'
-          Serial.print('d');
-          Serial.print('.');
-          DEBUG_MAF_DATA = false;
-          Serial.print("\r\n");
-      break;
+        case 'd': // DEBUG OFF'
+            messageData = String("d") + API_DELIM;
+            DEBUG_MAF_DATA = false;
+        break;
 
-     
-  }
+        
+    }
+
+    // Append delimiter to message data
+    messageData += API_DELIM ;
+
+    // Convert message data to char array for CRC function
+    messageData.toCharArray(serialResponse, sizeof(serialResponse));
+    // Send API Response
+    #if defined DISABLE_API_CHECKSUM
+        Serial.print(messageData + "\r\n");
+    #else
+        Serial.print(messageData + calcCRC(serialResponse) + "\r\n");
+    #endif
 
 
 }

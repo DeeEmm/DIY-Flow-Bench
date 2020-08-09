@@ -200,8 +200,10 @@ char LANGUAGE_FILE = "EN_Language.h";
  ***/
  
 
-#define SERIAL_BAUD_RATE 9600           // default 9600
-#define showRemoteDialogs true          // show menu dialogs on remote displays
+#define SERIAL_BAUD_RATE 9600           // default 9600 
+//#define DISABLE_API_CHECKSUM            // Add checksum to serial API response
+#define API_DELIM ':'
+#define showRemoteDialogs true          // show menu dialogs on remote displays (tcmenu global var)
 #define BME280_I2C_ADDR 0x77            // (default 0x77) / Alternate 0x76
   
 
