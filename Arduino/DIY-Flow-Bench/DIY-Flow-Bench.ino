@@ -1,18 +1,17 @@
 /****************************************
  * The DIY Flow Bench project
- * A basic flow bench to measure and display volumetric air flow using an Arduino and common automotive MAF sensor.
+ * https://diyflowbench.com
+ *
+ * Open source flow bench project to measure and display volumetric air flow using an Arduino.
  * 
  * For more information please visit our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
- * Or join our support forums over aat https://diyflowbench.com 
- *
+ * Or join our support forums: https://diyflowbench.com 
  * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
  * 
  * This project and all associated files are provided for use under the GNU GPL3 license:
  * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
  * 
  * Menu system and displays handled by tcMenu library - https://github.com/davetcc/tcMenu
- * If you want to modify the display or menus, the tcMenu project file is provided in distro - menu.emf
- * Default display used is DFRobot 1602 LCD Keypad Shield
  * 
  ***/
 
@@ -20,7 +19,7 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20080903"
+#define BUILD_NUMBER "20081101"
 #define RELEASE "V.1.0-beta.16"
 
 
@@ -32,15 +31,15 @@
 #include <EEPROM.h>
 #include <Arduino.h>
 #include "configuration.h"
-#include "pins.h"
+#include "boards.h"
 #include "EN_Language.h"
 #include <util/crc16.h>
+
 
 /****************************************
  * OPTIONAL LIBRARIES
  * Add pre-directives for all optional libraries to preserve memory
  ***/
-
 
 // Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
 // https://github.com/adafruit/Adafruit_BME280_Library
@@ -94,6 +93,7 @@
 #define LEAK_TEST_FAILED 2
 #define LEAK_TEST_PASS 3
 #define DHT11_READ_FAIL 4
+#define BME280_READ_FAIL 5
 
 // Other constants
 #define MOLECULAR_WEIGHT_DRY_AIR 28.964
@@ -104,12 +104,12 @@
  * DECLARE GLOBALS
  ***/
 
-bool APIEnabled = true;
-bool DEBUG_MAF_DATA = false;
+bool streamMafData = false;
 float startupBaroPressure;
 int errorVal = 0;
 bool benchIsRunning();
 int serialData = 0;
+int serial1Data = 0;
 extern long mafMapData[][2]; // mafData key > value array
 extern long mafMapAnalogData[]; // mafData analog value array
 
@@ -130,11 +130,14 @@ void setup ()
     #endif
 
     //Serial API
-    if (APIEnabled) {
-        Serial.begin(SERIAL_BAUD_RATE);      
-    }
-  
-    // Initialise libraries
+    #if defined API_ENABLED
+        #if defined SERIAL0_ENABLED
+            Serial.begin(SERIAL0_BAUD_RATE);      
+        #endif
+        #if defined SERIAL1_ENABLED
+            Serial1.begin(SERIAL1_BAUD_RATE);      
+        #endif
+    #endif
 
     //Sparkfun BME280 (Testing and working 03.08.20 /DM)
     #if defined RELH_SPARKFUN_BME280 || defined TEMP_SPARKFUN_BME280 || defined BARO_SPARKFUN_BME280
@@ -142,9 +145,7 @@ void setup ()
         SparkFunBME280.setI2CAddress(BME280_I2C_ADDR); 
         if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
         {
-            // TODO - need to replace this with error handler
-            Serial.println("The sensor did not respond. Please check wiring.");
-            //while(1); //Freeze
+            int errorVal = BME280_READ_FAIL;
         }
     #endif
     
@@ -152,11 +153,27 @@ void setup ()
     #if defined TEMP_ADAFRUIT_BME280 || defined BARO_ADAFRUIT_BME280 || defined RELH_ADAFRUIT_BME280
         //I2C address - BME280_I2C_ADDR
         if (!adafruitBme280.begin()) {  
-            Serial.println("The sensor did not respond. Please check wiring!");
-            while (1);
+            int errorVal = BME280_READ_FAIL;
         }
     #endif
 
+     // 4x7 LED display
+    #if defined FLOW_MANOMETER
+        // TODO(#6) Add support for additional displays
+        // Initialise I2C display
+    #endif
+
+    // 4x7 LED display
+    #if defined PITOT_MANOMETER
+        // TODO(#6) Add support for additional displays
+        // Initialise I2C display
+    #endif
+
+    // LED BAR Display
+    #if defined PITOT_BARMETER
+        // TODO(#6) Add support for additional displays
+        // Initialise I2C display
+    #endif   
  
     // Set up the menu + display system
     setupMenu(); 
@@ -165,8 +182,26 @@ void setup ()
     // set reference pressure to default
     menuARef.setCurrentValue(calibrationRefPressure); 
 
+}
+
+
+
+
+/****************************************
+ * Send Serial Message
+ ***/
+void sendSerial(String message)
+{   
+    #if defined SERIAL0_ENABLED
+        Serial.print(message);
+    #endif
+    #if defined SERIAL1_ENABLED
+        Serial1.print(message);
+    #endif
 
 }
+
+
 
 
 /****************************************
@@ -503,18 +538,18 @@ float getMafFlowCFM()
     // convert kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
     mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH);// + calibrationOffset; // add calibration offset to value //TODO #21 Need to validate and test calibration routine
 
-    if (DEBUG_MAF_DATA == true) {
-        Serial.print(mafMillivolts);
-        Serial.print("mv = ");
+    if (streamMafData == true) {
+        sendSerial(String(mafMillivolts));
+        sendSerial("mv = ");
         if (MAFdataUnit == KG_H) {
-            Serial.print(mafFlowRateRAW / 1000);
-            Serial.print("kg/h = ");
+            sendSerial(String(mafFlowRateRAW / 1000));
+            sendSerial("kg/h = ");
         } else if (MAFdataUnit == MG_S) {
-            Serial.print(mafFlowRateRAW);
-            Serial.print("mg/s = ");
+            sendSerial(String(mafFlowRateRAW));
+            sendSerial("mg/s = ");
         }
-        Serial.print(mafFlowRateCFM );
-        Serial.print("cfm \r\n");
+        sendSerial(String(mafFlowRateCFM ));
+        sendSerial("cfm \r\n");
     }
 
     return mafFlowRateCFM;
@@ -629,6 +664,8 @@ float getPitotPressure(int units)
     
 }
 
+
+
 /****************************************
  * CONVERT FLOW
  *
@@ -668,6 +705,7 @@ bool benchIsRunning()
 }
 
 
+
 /****************************************
  * CHECK REFERENCE PRESSURE
  * Make sure that reference pressure is within limits
@@ -678,7 +716,8 @@ void refPressureCheck()
 
     // Check that pressure does not fall below limit set by minTestPressurePercentage when bench is running
     // note alarm commented out in alarm function as 'nag' can get quite annoying
-    // Is this a redundant check?
+    // Is this a redundant check? 
+    // maybe a different alert would be more appropriate
     if ((refPressure > (calibrationRefPressure * (minTestPressurePercentage / 100))) && (benchIsRunning()))
     {
         errorVal = REF_PRESS_LOW;
@@ -707,12 +746,12 @@ void onDialogFinished(ButtonType btnPressed, void* /*userdata*/) {
  ***/
 void displayDialog(const char *dialogTitle, const char *dialogMessage)
 {
-        // Display popup dialog on display
-        // https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-menu-item-types-tutorial/
-        BaseDialog* dlg = renderer.getDialog();
-        dlg->setButtons(BTNTYPE_OK, BTNTYPE_CANCEL, 1);
-        dlg->show(dialogTitle, showRemoteDialogs, onDialogFinished);
-        dlg->copyIntoBuffer(dialogMessage);
+    // Display popup dialog on display
+    // https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-menu-item-types-tutorial/
+    BaseDialog* dlg = renderer.getDialog();
+    dlg->setButtons(BTNTYPE_OK, BTNTYPE_CANCEL, 1);
+    dlg->show(dialogTitle, showRemoteDialogs, onDialogFinished);
+    dlg->copyIntoBuffer(dialogMessage);
 }
 
 
@@ -729,24 +768,32 @@ void errorHandler(int errorVal)
     switch (errorVal)
     {
         case REF_PRESS_LOW:
-//            displayDialog(LANG_WARNING, LANG_REF_PRESS_LOW);
-//            Serial.write(LANG_REF_PRESS_LOW);
+            // This alarm can get really annoying as it pops up every time the bench is off
+            // need to add function to be able to enable / disable from menu
+            // displayDialog(LANG_WARNING, LANG_REF_PRESS_LOW);
+            // Serial.write(LANG_REF_PRESS_LOW);
         break;
 
         case LEAK_TEST_FAILED:
             displayDialog(LANG_WARNING, LANG_LEAK_TEST_FAILED);
-            Serial.write(LANG_LEAK_TEST_FAILED);
+            sendSerial(LANG_LEAK_TEST_FAILED);
         break;
 
         case LEAK_TEST_PASS:
             displayDialog(LANG_WARNING, LANG_LEAK_TEST_PASS);
-            Serial.write(LANG_LEAK_TEST_PASS);
+            sendSerial(LANG_LEAK_TEST_PASS);
         break;
 
         case DHT11_READ_FAIL:
             displayDialog(LANG_WARNING, LANG_DHT11_READ_FAIL);
-            Serial.write(LANG_DHT11_READ_FAIL);
+            sendSerial(LANG_DHT11_READ_FAIL);
         break;
+
+        case BME280_READ_FAIL:
+            displayDialog(LANG_WARNING, LANG_BME280_READ_FAIL);
+            sendSerial(LANG_BME280_READ_FAIL);
+        break;
+        
 
        
     }
@@ -782,6 +829,7 @@ void errorHandler(int errorVal)
  ***/
  float getCalibrationOffset() {
 
+//TODO
 
  }
 
@@ -923,24 +971,14 @@ void parseAPI(byte serialData)
             // Truncate to 2 decimal places
             flowCFM = getMafFlowCFM() * 100;
             messageData += flowCFM / 100;
-/* this is probably a little redundant / unneeded
-            // Add preceding zeros
-            if (flowCFM < 10) { 
-                messageData += "00";
-            } else if (flowCFM < 100) {
-                messageData += "0";
-            } 
-            // Print the value
-            messageData += flowCFM;
- */
         break;
 
         case 'M': // Get MAF sensor data'
             messageData = String("M") + API_DELIM ;        
-            if (DEBUG_MAF_DATA == false) {
-                DEBUG_MAF_DATA = true;
+            if (streamMafData == false) {
+                streamMafData = true;
                 getMafFlowCFM();
-                DEBUG_MAF_DATA = false;         
+                streamMafData = false;         
             }
         break;
 
@@ -986,12 +1024,12 @@ void parseAPI(byte serialData)
         
         case 'D': // DEBUG MAF'
             messageData = String("D") + API_DELIM ;
-            DEBUG_MAF_DATA = true;
+            streamMafData = true;
         break;
 
         case 'd': // DEBUG OFF'
             messageData = String("d") + API_DELIM;
-            DEBUG_MAF_DATA = false;
+            streamMafData = false;
         break;
 
         case 'E': // Enum - Flow:Ref:Temp:Humidity:Baro
@@ -1018,26 +1056,63 @@ void parseAPI(byte serialData)
 
     // Convert message data to char array for CRC function
     messageData.toCharArray(serialResponse, sizeof(serialResponse));
+
     // Send API Response
     #if defined DISABLE_API_CHECKSUM
-        Serial.print(messageData + "\r\n");
+//        Serial.print(messageData + "\r\n");
+        sendSerial(messageData + "\r\n");
     #else
-        Serial.print(messageData + calcCRC(serialResponse) + "\r\n");
+//        Serial.print(messageData + calcCRC(serialResponse) + "\r\n");
+        sendSerial(messageData + calcCRC(serialResponse) +  "\r\n");
     #endif
 
 
 }
 
 
+/****************************************
+ * Digital Manometers
+ *
+ * I2C LED display drivers
+ ***/
+void  updateManometers() {
+
+    // 4x7 LED display
+    #if defined FLOW_MANOMETER
+        // TODO(#6) Add support for additional displays
+        // Send flow value to display
+    #endif
+
+    // 4x7 LED display
+    #if defined PITOT_MANOMETER
+        // TODO(#6) Add support for additional displays
+        // Send Pitot value to display
+    #endif
+
+    // LED BAR Display
+    #if defined PITOT_BARMETER
+        // TODO(#6) Add support for additional displays
+        #if defined PITOT_BARMETER_INVERT
+            // Send Pitot value to display
+        #elif
+            // pitot value = pitot * -1
+            // Send inverted Pitot value to display
+        #endif
+    #endif
+
+}
+
+
+
 
 /****************************************
- * UPDATE DISPLAYS
+ * UPDATE DISPLAY
  *
- * Displays driven by tcMenu library
+ * Display driven by tcMenu library
  * 
  * NOTE: display values need to be multiplied by divisor setting in TC menu to display decimal points
  ***/
-void updateDisplays()
+void updateDisplay()
 {
 
     float mafFlowCFM = getMafFlowCFM();
@@ -1099,67 +1174,8 @@ void updateDisplays()
     double pitotMillivolts = (pitotRaw * (5.0 / 1024.0)) * 1000;
     menuSensorTestPitot.setCurrentValue(pitotMillivolts);
 
-    // Additional Displays
-
-    #if defined CFM_4X7SEG
-        //TODO(#6) Add support for additional displays
-    #endif
-
-    #if defined PITOT_4X7SEG
-        //TODO(#6) Add support for additional displays
-    #endif
-
-    #if defined MPXV7007 
-        //TODO(#6) Add support for additional displays
-    #endif
-
-
 }
 
-
-
-/****************************************
- * MENU CALLBACK FUNCTIONS
- *
- * Menus driven by tcMenu library
- * --------------------------------------
- * NOTE: Menu names are used for reference 
- * Spaces are removed and name converted to camelCase
- * For example:
- * bool changed = menuFlowRefCal.isChanged();
- * 
- * MENU NAMES USED
- * --------------------------------------
- * menuFlow
- * menuRefe
- * menuTemp
- * menuPitot
- * menuARef
- * menuAFlow
- * menuSettingsVersion
- * menuSettingsBuild
- * menuCallback_Calibrate
- * menuCallback_leakTestCalibration
- * menuCallback_LeakTest
- *
- * AVAILABLE METHODS
- * --------------------------------------
- * menuFoo.setCurrentValue(newValue);
- * NOTE: You can also set without calling the callback (silent set) like this...
- * menuFoo.setCurrentValue(newValue, true);   
- * bool changed = menuFoo.isChanged();
- * int val = menuFoo.getCurrentValue();
- * menuFoo.setBoolean(newValue)
- * bool b = menuFoo.getBoolean();
- * menuFloat.setFloatValue(1.23456);
- * float fl = menuFloat.getFloatValue();
- * const char * charString = "Wilma";
- * menuText.setTextValue(charString);
- * const char* text = menuText.getTextValue();
- * 
- ***/
-
-//TODO(#8) - Add menu item to be able to select reference pressure value
 
 
 
@@ -1182,8 +1198,6 @@ void CALLBACK_FUNCTION menuCallback_Calibrate(int id) {
 
 
 
-
-
 /****************************************
  * MENU CALLBACK FUNCTION
  * menuCallback_leakTestCalibration
@@ -1198,8 +1212,9 @@ void CALLBACK_FUNCTION menuCallback_leakTestCalibration(int id) {
 
     // Display the value on popup on the main screen
     displayDialog(LANG_LEAK_CAL_VALUE, calibrationValueText);  
-    Serial.print(calibrationValue); 
+    sendSerial(String(calibrationValue)); 
 }
+
 
 
 /****************************************
@@ -1232,15 +1247,23 @@ void loop ()
     taskManager.runLoop(); //run tcMenu
     refPressureCheck();
     if (errorVal != 0) errorHandler(errorVal);
-    updateDisplays();
-
+    updateManometers();
+    updateDisplay();
 
     // If API enabled, read serial data
-    if (APIEnabled) {
-      if (Serial.available() > 0) {
-        serialData = Serial.read();
-        parseAPI(serialData);
-      }
-    }
+    #if defined API_ENABLED
+        #if defined SERIAL0_ENABLED 
+                if (Serial.available() > 0) {
+                    serialData = Serial.read();
+                    parseAPI(serialData);
+                }                    
+        #endif
+        #if defined SERIAL1_ENABLED 
+                if (Serial1.available() > 0) {
+                    serial1Data = Serial1.read();
+                    parseAPI(serial1Data);
+                }                    
+        #endif
+    #endif
 
 }

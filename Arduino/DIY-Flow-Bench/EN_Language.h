@@ -2,6 +2,7 @@
  * Language Constants
  *
  * NOTE: only 16 chars              "1234567890ABCDEF"
+ *
  ***/
 
 
@@ -15,6 +16,7 @@
 #define LANG_CAL_OFFET_VALUE        "Cal Value: "
 #define LANG_LEAK_CAL_VALUE         "Leak Cal Value: "
 #define LANG_DHT11_READ_FAIL        "DHT11 Read fail"
+#define LANG_BME280_READ_FAIL       "BME280 Read fail"
 #define LANG_LOW_FLOW_CAL_VAL       "Low Cal Value: "
 #define LANG_HIGH_FLOW_CAL_VAL      "High Cal Value: "
 #define LANG_REF_PRESS_VALUE        "Ref Press Val: "

@@ -1,6 +1,8 @@
 /****************************************
- * configurations.h - define variables and configure hardware
- * This file is part of the DIY Flow Bench project. For more information including usage and licensing please refer to: https://github.com/DeeEmm/DIY-Flow-Bench
+ * The DIY Flow Bench project
+ * https://diyflowbench.com
+ *
+ * configuration.h - define variables and configure hardware
  * 
  * NOTE REGARDING CHANGING BOARDS, DISPLAYS AND INPUT DEVICES
  * Pin defs for displays and input devices are auto-generated in DIY-Flow-Bench_menu.h by the tcMenu app
@@ -89,8 +91,65 @@ char LANGUAGE_FILE = "EN_Language.h";
  * Default ARDUINO_MEGA_2560 
  ***/
 
+//#define DIYFB_SHIELD
 #define ARDUINO_MEGA_2560
 //#define ARDUINO_UNO
+
+
+
+/****************************************
+ * CONFIGURE COMMUNICATIONS
+ ***/
+
+#define API_ENABLED                    // enable API
+//#define DISABLE_API_CHECKSUM          // Add checksum to serial API response
+#define API_DELIM ':'
+
+#define SERIAL0_ENABLED                 // Tx / Rx (Pins 1/0 on MEGA + serial monitor)
+#define SERIAL0_BAUD_RATE 9600          // default 9600 
+#define SERIAL1_ENABLED                 // Tx1 / Rx1 (Pins 18/19 on MEGA)
+#define SERIAL1_BAUD_RATE 9600          // default 9600 
+
+#define BME280_I2C_ADDR 0x77            // (default 0x77) / Alternate 0x76
+  
+
+ 
+/****************************************
+ * CONFIGURE ALARMS
+ ***/
+#define showAlarms true 
+
+//TODO - more granular alarm control - need to be able to disable individual alarms
+
+
+
+/****************************************
+ * CONFIGURE MANOMETERS
+ *
+ * Additional I2C LED display drivers 
+ ***/
+
+// Default: no selection
+
+//#define FLOW_MANOMETER
+#define FLOW_MANOMETER_I2C_ADDR
+
+//#define PITOT_MANOMETER
+#define PITOT_MANOMETER_I2C_ADDR
+
+//#define PITOT_BARMETER
+#define PITOT_BARMETER_I2C_ADDR
+#define PITOT_BARMETER_INVERT
+
+
+/****************************************
+ * TC MENU / DISPLAY SETTINGS
+ *
+ * If you want to modify the display or menus, the tcMenu project file is provided in distro - menu(version).emf
+ * Default display used is DFRobot 1602 LCD Keypad Shield
+ * For mroe information please refer to the WIKI - https://github.com/DeeEmm/DIY-Flow-Bench/wiki/7.-Customisation
+ ***/
+#define showRemoteDialogs true          // show menu dialogs on remote displays (tcmenu global var)
 
 
 
@@ -102,12 +161,13 @@ char LANGUAGE_FILE = "EN_Language.h";
  ***/
 
 
-//#include "mafData/TEST.h"                 // Test Data
 #include "mafData/ACDELCO_ 92281162.h"    // GM LS2              
+//#include "mafData/MH95-3000-100.h"        // PMAS MH95-3000 in 100mm housing              
 //#include "mafData/exampleKeyValueData.h"  // Example key > value data file (duplicate this as required)
 //#include "mafData/exampleAnalogData.h"    // Example Analog point data file (duplicate this as required)
 //#include "mafData/SIEMENS_5WK9605.h"      // Data from Tonys tests
 //#include "mafData/DELPHI_AF10118.h"       // kg/hr - Data from efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
+//#include "mafData/TEST.h"                 // Test Data
 
 
 
@@ -182,38 +242,6 @@ char LANGUAGE_FILE = "EN_Language.h";
 //#define SIMPLE_RELH_DHT11 
 //#define RELH_ADAFRUIT_BME280
 
-
-
-/****************************************
- * CONFIGURE DISPLAYS
- ***/
-
-// Default: no selection
-// Optional additional displays connected to I2C
-//#define CFM_4X7SEG
-//#define PITOT_4X7SEG
-
-
-
-/****************************************
- * CONFIGURE COMMUNICATIONS
- ***/
- 
-
-#define SERIAL_BAUD_RATE 9600           // default 9600 
-//#define DISABLE_API_CHECKSUM            // Add checksum to serial API response
-#define API_DELIM ':'
-#define showRemoteDialogs true          // show menu dialogs on remote displays (tcmenu global var)
-#define BME280_I2C_ADDR 0x77            // (default 0x77) / Alternate 0x76
-  
-
- 
-/****************************************
- * CONFIGURE ALARMS
- ***/
-#define showAlarms true 
-
-//TODO - more granular alarm control - need to be able to disable individual alarms
 
 
  /****************************************

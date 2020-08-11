@@ -6,6 +6,13 @@ NOTE: Build numbers follow format YY MM DD VV Where VV is incremental version (r
 
 Build #     - Description of Change
  
+20081101    - Added pins definition for DIYFB shield
+            - Added serial comms handler
+            - Added secondary serial comms for bluetooth
+            - Created digital manometer function (for additional flow / pitot displays)
+            - General code tidying
+            - Renamed pins.h to boards.h
+            - Added PMAS MH95-3000 MAF 
 20080903    - Added delimiter to API responses
             - Tidied API code
 20080902    - Added API Enum : Flow:Ref:Temp:Humidity:Baro 
