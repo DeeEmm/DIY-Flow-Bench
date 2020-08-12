@@ -6,6 +6,7 @@ NOTE: Build numbers follow format YY MM DD VV Where VV is incremental version (r
 
 Build #     - Description of Change
  
+20081201    - #44 Added API call validation
 20081101    - Added pins definition for DIYFB shield
             - Added serial comms handler
             - Added secondary serial comms for bluetooth

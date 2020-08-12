@@ -19,7 +19,7 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20081101"
+#define BUILD_NUMBER "20081201"
 #define RELEASE "V.1.0-beta.16"
 
 
@@ -1046,6 +1046,11 @@ void parseAPI(byte serialData)
             messageData += getRelativeHumidity(PERCENT) + String(API_DELIM);
             // Barometric Pressure
             messageData += getBaroPressure(KPA);
+        break;
+
+        // We've got here without a valid API request so lets get outta here before we send garbage to the serial comms
+        default:
+            return;
         break;
 
         
