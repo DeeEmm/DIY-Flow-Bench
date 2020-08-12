@@ -4,3 +4,8 @@
 *.elf
 *.hex
 .DS_Store
+/GUI/.vs
+/GUI/DiyFlowBench.Api/obj
+/GUI/DiyFlowBench.Api.Test/obj/Debug/netcoreapp3.1
+/GUI/DiyFlowBench.Api.Test/obj
+/.vs

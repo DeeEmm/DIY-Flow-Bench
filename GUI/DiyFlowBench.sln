@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiyFlowBench.Api", "DiyFlowBench.Api\DiyFlowBench.Api.csproj", "{26A12BB3-FDE6-451B-9F9F-B4390166EFF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiyFlowBench.Api", "DiyFlowBench.Api\DiyFlowBench.Api.csproj", "{26A12BB3-FDE6-451B-9F9F-B4390166EFF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiyFlowBench.Api.Test", "DiyFlowBench.Api.Test\DiyFlowBench.Api.Test.csproj", "{124235AB-5244-4612-BDC5-9187B54C580A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiyFlowBench.Api.Test", "DiyFlowBench.Api.Test\DiyFlowBench.Api.Test.csproj", "{124235AB-5244-4612-BDC5-9187B54C580A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
