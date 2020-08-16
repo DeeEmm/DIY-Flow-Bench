@@ -19,8 +19,8 @@
 
 #define MAJOR_VERSION "1"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20081201"
-#define RELEASE "V.1.0-beta.16"
+#define BUILD_NUMBER "20081601"
+#define RELEASE "V.1.0-RC.1"
 
 
 /****************************************
@@ -429,17 +429,24 @@ float getSpecificGravity()
 
 /****************************************
  * CONVERT MASS FLOW TO VOLUMETRIC FLOW
+ *
+ * Calcualted using ideal gas law:
+ * https://www.pdblowers.com/tech-talk/volume-and-mass-flow-calculations-for-gases/
  ***/
 float convertMassFlowToVolumetric(float massFlowKgh)
 {   
   float mafFlowCFM;
+  float gasPressure;
   float tempInRankine = getTemp(RANKINE); //tested ok
   float specificGravity = getSpecificGravity(); //tested ok
   float molecularWeight = MOLECULAR_WEIGHT_DRY_AIR * specificGravity; //tested ok
   float baroPressure = getBaroPressure(PSIA); 
+  float refPressure = getRefPressure(PSIA);
   float massFlowLbm = massFlowKgh * 0.03674371036415;
 
-  mafFlowCFM = ((massFlowLbm * 1545 * tempInRankine) / (molecularWeight * 144 * baroPressure)); 
+  gasPressure = baroPressure + refPressure; // TODO need to validate refPressure (should be a negative number)
+
+  mafFlowCFM = ((massFlowLbm * 1545 * tempInRankine) / (molecularWeight * 144 * gasPressure)); 
 
   return mafFlowCFM;
 
@@ -617,6 +624,11 @@ float getRefPressure(int units)
 
         case BAR:
             // 1kpa = 0.01 bar
+            return refPressureKpa  * 0.01 ; 
+        break;
+
+        case PSIA:
+             refPressureKpa = refPressureKpa * 0.145038;
             return refPressureKpa  * 0.01 ;
         break;
     }
