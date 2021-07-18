@@ -17,10 +17,10 @@
 
 // Development and release version - Don't forget to update the changelog & README Versions!!
 
-#define MAJOR_VERSION "1"
+#define MAJOR_VERSION "ESP"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "20081601"
-#define RELEASE "V.1.0-RC.1"
+#define BUILD_NUMBER "22071801"
+#define RELEASE "V.ESP.0-ALPHA"
 
 
 /****************************************
