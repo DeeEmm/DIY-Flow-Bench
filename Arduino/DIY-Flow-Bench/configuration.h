@@ -4,30 +4,8 @@
  *
  * configuration.h - define variables and configure hardware
  * 
- * NOTE REGARDING CHANGING BOARDS, DISPLAYS AND INPUT DEVICES
- * Pin defs for displays and input devices are auto-generated in DIY-Flow-Bench_menu.h by the tcMenu app
- * DIY-Flow-Bench_menu.h & DIY-Flow-Bench_menu.cpp should not be manually edited
  * 
- * To change board type, display or input device pins for your project
- * Download and run the tcMenu application and regenerate the tcMenu code files.
- * INSTRUCTIONS: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/7.-Customisation
- * 
- * The standard project board is the Arduino Mega 2560 
- * D1 Robot 16x2 Robot LCD keypad is the default input/display combination:
- * 
- * D1 Robot 16x2 LCD Keyshield info.
- * https://wiki.dfrobot.com/Arduino_LCD_KeyPad_Shield__SKU__DFR0009_
- * D1 Robot reserved pins - A0/4/5/6/7/8/9 - do not assign these other other I/O if using this display                                              
- *
- * I2c display and encoder click wheel standard pins
- * ENCODER_PIN_A = 2; // Interrupt must be used
- * ENCODER_PIN_B = 3; // Interrupt must be used
- * BUTTON = 4;
- * LCD_WIDTH = 20;
- * LCD_HEIGHT = 4;
- * I2C_ADDRESS = "0x20";
- * I2C CLK Pin = 20; (Standard I2C CLK pin for Mega 2560)
- * I2C DIO Pim = 21; (Standard I2C DIO pin for Mega 2560)
+ * The standard project board is the ESP32DUINO  
  *
  * Default temp / baro / RelH uses BME280 device (Sparkfun / clone)
  * I2C address for the BME280 is 0x77
@@ -39,9 +17,6 @@
  * The program has a number of dependencies that must be available for it to work.
  * These libraries are provided in the libraries folder 
  *
- * /libraries/tcMenu
- * /libraries/IoAbstraction
- * /libraries/liquidCrystalIO
  * /libraries/SimpleDHT
  * /libraries/SparkfunBME280
  * /libraries/
@@ -61,7 +36,7 @@
  * LANGUAGE SETTINGS
  ***/
 
-char LANGUAGE_FILE = "EN_Language.h";
+const char* LANGUAGE_FILE = "EN_Language.h";
 
 
 
@@ -88,12 +63,13 @@ char LANGUAGE_FILE = "EN_Language.h";
 /****************************************
  * SELECT BOARD TYPE 
  *
- * Default ARDUINO_MEGA_2560 
+ * Default ESP32DUINO 
  ***/
 
 //#define DIYFB_SHIELD
-#define ARDUINO_MEGA_2560
+//#define ARDUINO_MEGA_2560
 //#define ARDUINO_UNO
+#define ESP32DUINO //TODO PINS NEED REVIEW
 
 
 
@@ -102,13 +78,12 @@ char LANGUAGE_FILE = "EN_Language.h";
  ***/
 
 #define API_ENABLED                    // enable API
-//#define DISABLE_API_CHECKSUM          // Add checksum to serial API response
+#define DISABLE_API_CHECKSUM          // Add checksum to serial API response TODO UPDATE CHECKSUM TO NATIVE ESP32 CRC32
 #define API_DELIM ':'
 
-#define SERIAL0_ENABLED                 // Tx / Rx (Pins 1/0 on MEGA + serial monitor)
-#define SERIAL0_BAUD_RATE 9600          // default 9600 
-#define SERIAL1_ENABLED                 // Tx1 / Rx1 (Pins 18/19 on MEGA)
-#define SERIAL1_BAUD_RATE 9600          // default 9600 
+#define SERIAL0_ENABLED                 
+#define SERIAL0_BAUD_RATE 115200                    
+         
 
 #define BME280_I2C_ADDR 0x77            // (default 0x77) / Alternate 0x76
   
@@ -120,36 +95,6 @@ char LANGUAGE_FILE = "EN_Language.h";
 #define showAlarms true 
 
 //TODO - more granular alarm control - need to be able to disable individual alarms
-
-
-
-/****************************************
- * CONFIGURE MANOMETERS
- *
- * Additional I2C LED display drivers 
- ***/
-
-// Default: no selection
-
-//#define FLOW_MANOMETER
-#define FLOW_MANOMETER_I2C_ADDR
-
-//#define PITOT_MANOMETER
-#define PITOT_MANOMETER_I2C_ADDR
-
-//#define PITOT_BARMETER
-#define PITOT_BARMETER_I2C_ADDR
-#define PITOT_BARMETER_INVERT
-
-
-/****************************************
- * TC MENU / DISPLAY SETTINGS
- *
- * If you want to modify the display or menus, the tcMenu project file is provided in distro - menu(version).emf
- * Default display used is DFRobot 1602 LCD Keypad Shield
- * For mroe information please refer to the WIKI - https://github.com/DeeEmm/DIY-Flow-Bench/wiki/7.-Customisation
- ***/
-#define showRemoteDialogs true          // show menu dialogs on remote displays (tcmenu global var)
 
 
 
@@ -268,7 +213,7 @@ char LANGUAGE_FILE = "EN_Language.h";
  *
  ***/
 
-// NOTE: This method is currently unused (also removed from menu)
+// NOTE: This method is currently unused
 // It is not clear if this method would produce usable results for all sensors.
 // Suggest that once project is stable, method is implimented and results compared against known good data to validate 
 

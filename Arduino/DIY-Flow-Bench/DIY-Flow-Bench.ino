@@ -27,13 +27,11 @@
  * CORE LIBRARIES
  ***/
 
-#include "DIY-Flow-Bench_menu.h"
 #include <EEPROM.h>
 #include <Arduino.h>
 #include "configuration.h"
 #include "boards.h"
-#include "EN_Language.h"
-#include <util/crc16.h>
+#include "language/EN_Language.h"
 
 
 /****************************************
@@ -134,9 +132,6 @@ void setup ()
         #if defined SERIAL0_ENABLED
             Serial.begin(SERIAL0_BAUD_RATE);      
         #endif
-        #if defined SERIAL1_ENABLED
-            Serial1.begin(SERIAL1_BAUD_RATE);      
-        #endif
     #endif
 
     //Sparkfun BME280 (Testing and working 03.08.20 /DM)
@@ -157,30 +152,7 @@ void setup ()
         }
     #endif
 
-     // 4x7 LED display
-    #if defined FLOW_MANOMETER
-        // TODO(#6) Add support for additional displays
-        // Initialise I2C display
-    #endif
-
-    // 4x7 LED display
-    #if defined PITOT_MANOMETER
-        // TODO(#6) Add support for additional displays
-        // Initialise I2C display
-    #endif
-
-    // LED BAR Display
-    #if defined PITOT_BARMETER
-        // TODO(#6) Add support for additional displays
-        // Initialise I2C display
-    #endif   
  
-    // Set up the menu + display system
-    setupMenu(); 
-    renderer.setResetIntervalTimeSeconds(-1);
-
-    // set reference pressure to default
-    menuARef.setCurrentValue(calibrationRefPressure); 
 
 }
 
@@ -739,31 +711,11 @@ void refPressureCheck()
 
 
 /****************************************
- * MENU DIALOG CALLBACK HANDLER
- ***/
-void onDialogFinished(ButtonType btnPressed, void* /*userdata*/) {        
-    if(btnPressed != BTNTYPE_OK) {
-        // do something if OK was pressed.
-        // Reset errorVal
-        errorVal = 0;
-    } else {
-      
-    }
-}
-
-
-
-/****************************************
  * DISPLAY POPUP DIALOG ON MAIN DISPLAY
  ***/
 void displayDialog(const char *dialogTitle, const char *dialogMessage)
 {
-    // Display popup dialog on display
-    // https://www.thecoderscorner.com/products/arduino-libraries/tc-menu/tcmenu-menu-item-types-tutorial/
-    BaseDialog* dlg = renderer.getDialog();
-    dlg->setButtons(BTNTYPE_OK, BTNTYPE_CANCEL, 1);
-    dlg->show(dialogTitle, showRemoteDialogs, onDialogFinished);
-    dlg->copyIntoBuffer(dialogMessage);
+  //TODO Need to convert to Websockets / HTML5
 }
 
 
@@ -901,8 +853,8 @@ uint16_t calcCRC(char* str) {
     uint16_t CRC = 0; 
     // Traverse each character in the string
     for (int i=0;i<strlen(str);i++) {
-        // update the CRC value using the built in _crc16_update function
-        CRC= _crc16_update (CRC, str[i]); 
+        // TODO update the CRC value using the built in CRC32 function
+//        CRC= _crc16_update (CRC, str[i]);  // NOTE: OLD CRC16 Library!!
     }
     return CRC;
 }
@@ -941,10 +893,10 @@ uint16_t calcCRC(char* str) {
  *  Delimiter:      ':' 
  *  Response:       '2.1.20080705'
  *  Delimiter:      ':' 
- *  CRC Checksum:   '48853'
+ *  CRC Checksum:   '48853'  
  *  
  ***/
-void parseAPI(byte serialData)
+void parseAPI(char serialData)
 {
 
     String messageData;
@@ -1080,42 +1032,9 @@ void parseAPI(byte serialData)
         sendSerial(messageData + "\r\n");
     #else
 //        Serial.print(messageData + calcCRC(serialResponse) + "\r\n");
-        sendSerial(messageData + calcCRC(serialResponse) +  "\r\n");
+//        sendSerial(messageData + calcCRC(serialResponse) +  "\r\n");
     #endif
 
-
-}
-
-
-/****************************************
- * Digital Manometers
- *
- * I2C LED display drivers
- ***/
-void  updateManometers() {
-
-    // 4x7 LED display
-    #if defined FLOW_MANOMETER
-        // TODO(#6) Add support for additional displays
-        // Send flow value to display
-    #endif
-
-    // 4x7 LED display
-    #if defined PITOT_MANOMETER
-        // TODO(#6) Add support for additional displays
-        // Send Pitot value to display
-    #endif
-
-    // LED BAR Display
-    #if defined PITOT_BARMETER
-        // TODO(#6) Add support for additional displays
-        #if defined PITOT_BARMETER_INVERT
-            // Send Pitot value to display
-        #elif
-            // pitot value = pitot * -1
-            // Send inverted Pitot value to display
-        #endif
-    #endif
 
 }
 
@@ -1125,9 +1044,9 @@ void  updateManometers() {
 /****************************************
  * UPDATE DISPLAY
  *
- * Display driven by tcMenu library
+ * TODO - Adapt old TCmenu data to work with websockets / HTML5
  * 
- * NOTE: display values need to be multiplied by divisor setting in TC menu to display decimal points
+ * NOTE: displayed values need to be multiplied by divisor setting in TC menu to display decimal points
  ***/
 void updateDisplay()
 {
@@ -1139,57 +1058,57 @@ void updateDisplay()
     // Flow Rate
     if (mafFlowCFM > MIN_FLOW_RATE)
     {
-        menuFlow.setCurrentValue(mafFlowCFM * 10);   
+ //       menuFlow.setCurrentValue(mafFlowCFM * 10);   
     } else {
-        menuFlow.setCurrentValue(0);   
+ //       menuFlow.setCurrentValue(0);   
     }
 
     // Temperature
-    menuTemp.setCurrentValue(getTemp(DEGC) * 10);   
+ //   menuTemp.setCurrentValue(getTemp(DEGC) * 10);   
     
     // Baro
-    menuBaro.setCurrentValue(getBaroPressure(KPA) * 10);   
+ //   menuBaro.setCurrentValue(getBaroPressure(KPA) * 10);   
     
     // Relative Humidity
-    menuRelH.setCurrentValue(getRelativeHumidity(PERCENT) * 10);   
+ //   menuRelH.setCurrentValue(getRelativeHumidity(PERCENT) * 10);   
 
     // Pitot
     double pitotPressure = getPitotPressure(INWG);
     // Pitot probe displays as a percentage of the reference pressure
     double pitotPercentage = ((getPitotPressure(INWG) / refPressure) * 10);
-    menuPitot.setCurrentValue(pitotPercentage);  
+ //   menuPitot.setCurrentValue(pitotPercentage);  
     
     // Reference pressure
-    menuPRef.setCurrentValue(refPressure * 10);   
+ //   menuPRef.setCurrentValue(refPressure * 10);   
     
     // Adjusted Flow
     // get the desired bench test pressure
-    double desiredRefPressureInWg = menuARef.getCurrentValue();
+//    double desiredRefPressureInWg = menuARef.getCurrentValue();
     // convert from the existing bench test
-    double adjustedFlow = convertFlowDepression(refPressure, desiredRefPressureInWg, mafFlowCFM);
+//    double adjustedFlow = convertFlowDepression(refPressure, desiredRefPressureInWg, mafFlowCFM);
     // Send it to the display
-    menuAFlow.setCurrentValue(adjustedFlow * 10); 
+ //   menuAFlow.setCurrentValue(adjustedFlow * 10); 
 
     // Version and build
     String versionNumberString = String(MAJOR_VERSION) + '.' + String(MINOR_VERSION);
     String buildNumberString = String(BUILD_NUMBER);
-    menuVer.setTextValue(versionNumberString.c_str());
-    menuBld.setTextValue(buildNumberString.c_str());    
+//    menuVer.setTextValue(versionNumberString.c_str());
+//    menuBld.setTextValue(buildNumberString.c_str());    
 
     // Ref Presure Voltage
     int refPressRaw = analogRead(REF_PRESSURE_PIN);
     double refMillivolts = (refPressRaw * (5.0 / 1024.0)) * 1000;
-    menuSensorTestPRef.setCurrentValue(refMillivolts);
+//    menuSensorTestPRef.setCurrentValue(refMillivolts);
 
     // Maf Voltage
     int mafFlowRaw = analogRead(MAF_PIN);
     double mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
-    menuSensorTestMAF.setCurrentValue(mafMillivolts);
+//    menuSensorTestMAF.setCurrentValue(mafMillivolts);
 
     // Pitot Voltage
     int pitotRaw = analogRead(PITOT_PIN);
     double pitotMillivolts = (pitotRaw * (5.0 / 1024.0)) * 1000;
-    menuSensorTestPitot.setCurrentValue(pitotMillivolts);
+//    menuSensorTestPitot.setCurrentValue(pitotMillivolts);
 
 }
 
@@ -1198,10 +1117,10 @@ void updateDisplay()
 
 
 /****************************************
- * MENU CALLBACK FUNCTION
+ * CALLBACK FUNCTION
  * menuCallback_Calibrate
  ***/
-void CALLBACK_FUNCTION menuCallback_Calibrate(int id) {
+void menuCallback_Calibrate() {
 
     // Perform calibration
     float flowCalibrationOffset = setCalibrationOffset();
@@ -1216,10 +1135,10 @@ void CALLBACK_FUNCTION menuCallback_Calibrate(int id) {
 
 
 /****************************************
- * MENU CALLBACK FUNCTION
+ * CALLBACK FUNCTION
  * menuCallback_leakTestCalibration
  ***/
-void CALLBACK_FUNCTION menuCallback_leakTestCalibration(int id) {
+void menuCallback_leakTestCalibration() {
 
     float calibrationValue = leakTestCalibration();
 
@@ -1235,10 +1154,10 @@ void CALLBACK_FUNCTION menuCallback_leakTestCalibration(int id) {
 
 
 /****************************************
- * MENU CALLBACK FUNCTION
+ * CALLBACK FUNCTION
  * menuCallback_LeakTest
  ***/
-void CALLBACK_FUNCTION menuCallback_LeakTest(int id) {
+void menuCallback_LeakTest() {
 
     int testResult = leakTest();
 
@@ -1261,10 +1180,8 @@ void CALLBACK_FUNCTION menuCallback_LeakTest(int id) {
  ***/
 void loop ()
 {
-    taskManager.runLoop(); //run tcMenu
     refPressureCheck();
     if (errorVal != 0) errorHandler(errorVal);
-    updateManometers();
     updateDisplay();
 
     // If API enabled, read serial data
@@ -1273,12 +1190,6 @@ void loop ()
                 if (Serial.available() > 0) {
                     serialData = Serial.read();
                     parseAPI(serialData);
-                }                    
-        #endif
-        #if defined SERIAL1_ENABLED 
-                if (Serial1.available() > 0) {
-                    serial1Data = Serial1.read();
-                    parseAPI(serial1Data);
                 }                    
         #endif
     #endif

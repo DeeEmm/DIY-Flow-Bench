@@ -136,3 +136,9 @@ Build #     - Description of Change
             - Moved libraries into src subfolder folder
             - Created this changelog file
 19120601    - Fixed compile error (extra curly bracket)
+21071801    - Ported code to ESP32
+            - Removed TC menu support
+            - Removed external display support
+            - Disabled CRC Checksum
+            - Updated pin mapping
+            - Tested via Serial API

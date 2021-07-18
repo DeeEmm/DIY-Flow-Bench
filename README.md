@@ -3,110 +3,25 @@
 ## Version Information
 ###
 
-General Version 1.0-Beta
+General Version ESP.X-Beta
 
 For current build version please check the BUILD_NUMBER in  docs/changelog
 
 
+## Development Info
 
-## What is it?
-###
+This branch contains current development version for the ESP32 port.
 
-The DIY Flow Bench is a basic system to measure and display volumetric air flow.
+There is no official ESP32 release at this stage and whilst commits are undertaken to ensure functional code is uploaded, code may on occasion break.
 
-The Flow Bench is used as a tool for measuring and quantifying modifications and improvements made to items such as automotive cylinder heads and carburettors by detecting air flow improvements.
-
-This repository contains the hardware schematics and software code needed to build a volumetric flow bench based on an Arduino controller and common automotive MAF sensor
-
-
-## Contributors / Testers
-###
-
-- DeeEmm AKA Michael Percy
-- jwestes
-- ModChipMan AKA Tony Donn
-- Hans Ake Rahm
-- Andrew Goodfellow
-
-
-
-## Project Goals
-###
-- Validated software and hardware design
-- Affordable & easy to source components.
-- Can be built & operated by a layman.
-- Generates results comparable with commercial flow bench.
-- Open source software and hardware design
-
-
-## Download
-###
-
-You can download the latest version from our githib repository at https://github.com/DeeEmm/DIY-Flow-Bench/releases
-
-
-## Project Status
-###
-
-For more up to date information including current stable builds and documentation, please visit the WIKI page in our gitgub repository - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
-
-
-
-## 1. Component Selection
-###
-
-Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/1.-Component-selection
-
-
-## 2. Hardware Design
-###
-
-Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/2.-Hardware-Design.
-
-
-## 3. Installing / Getting started
-###
-
-Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/3.-Installation
-
-
-
-## 4. Configuration
-###
-
-Please refer to https://github.com/DeeEmm/DIY-Flow-Bench/wiki/4.-Configuration
-
-
-## 5. Calibration
-###
-
-Please refer to https://github.com/DeeEmm/DIY-Flow-Bench/wiki/5.-Calibration
-
-## 6. Operation
-###
-
-Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/6.-Operation
-
-
-## 7. Customisation
-###
-
-Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/7.-Customisation
-
-
-
-## License
-###
-
-This project is released under the GPLV3 license. For details on usage please refer to the license file included with this project
-
+Goal of project is to develop functional ESP port with WEBUI.
 
 
 ## Further Information
 ###
 
 - The latest information including usage and installation can be found in the project WIKI - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
-- Github repository - https://github.com/DeeEmm/DIY-Flow-Bench
-- Support forums - https://github.com/DeeEmm/DIY-Flow-Bench/discussions
+- Github repository - https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32
+- Discussion for this version - https://github.com/DeeEmm/DIY-Flow-Bench/discussions/49
 - Discord - https://discord.gg/eAbktJj
 - Join our project community - https://www.facebook.com/groups/diyflowbench/ 
