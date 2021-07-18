@@ -6,81 +6,81 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
+#include <Arduino.h>
 #include <tcMenu.h>
 #include "DIY-Flow-Bench_menu.h"
 
 // Global variable declarations
 
+const PROGMEM ConnectorLocalInfo applicationInfo = { "DIY Flow Bench", "0fc9ae97-7781-4600-a281-4a3425ce8371" };
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 LiquidCrystalRenderer renderer(lcd, 16, 2);
 
 // Global Menu Item declarations
 
-const PROGMEM AnalogMenuInfo minfoSensorTestPRef = { "PRef", 36, 0xffff, 65355, NO_CALLBACK, 0, 1, " mv" };
+const AnalogMenuInfo PROGMEM minfoSensorTestPRef = { "PRef", 36, 0xFFFF, 65355, NO_CALLBACK, 0, 1, " mv" };
 AnalogMenuItem menuSensorTestPRef(&minfoSensorTestPRef, 0, NULL);
-const PROGMEM AnalogMenuInfo minfoSensorTestPitot = { "Pitot", 35, 0xffff, 65355, NO_CALLBACK, 0, 1, " mv" };
+const AnalogMenuInfo PROGMEM minfoSensorTestPitot = { "Pitot", 35, 0xFFFF, 65355, NO_CALLBACK, 0, 1, " mv" };
 AnalogMenuItem menuSensorTestPitot(&minfoSensorTestPitot, 0, &menuSensorTestPRef);
-const PROGMEM AnalogMenuInfo minfoSensorTestMAF = { "MAF", 34, 0xffff, 65355, NO_CALLBACK, 0, 1, " mv" };
+const AnalogMenuInfo PROGMEM minfoSensorTestMAF = { "MAF", 34, 0xFFFF, 65355, NO_CALLBACK, 0, 1, " mv" };
 AnalogMenuItem menuSensorTestMAF(&minfoSensorTestMAF, 0, &menuSensorTestPitot);
-RENDERING_CALLBACK_NAME_INVOKE(fnSensorTestRtCall, backSubItemRenderFn, "Sensor Test", -1, NULL)
-const PROGMEM SubMenuInfo minfoSensorTest = { "Sensor Test", 33, 0xffff, 0, NO_CALLBACK };
+const SubMenuInfo PROGMEM minfoSensorTest = { "Sensor Test", 33, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnSensorTestRtCall, backSubItemRenderFn, "Sensor Test", -1, NO_CALLBACK)
 BackMenuItem menuBackSensorTest(fnSensorTestRtCall, &menuSensorTestMAF);
 SubMenuItem menuSensorTest(&minfoSensorTest, &menuBackSensorTest, NULL);
-const PROGMEM AnyMenuInfo minfoCalibrationCalFlow = { "Cal Flow", 16, 0xffff, 0, menuCallback_Calibrate };
+const AnyMenuInfo PROGMEM minfoCalibrationCalFlow = { "Cal Flow", 16, 0xFFFF, 0, menuCallback_Calibrate };
 ActionMenuItem menuCalibrationCalFlow(&minfoCalibrationCalFlow, NULL);
-const PROGMEM AnyMenuInfo minfoCalibrationLeakTestCal = { "Leak Test Cal", 8, 0xffff, 0, menuCallback_leakTestCalibration };
+const AnyMenuInfo PROGMEM minfoCalibrationLeakTestCal = { "Leak Test Cal", 8, 0xFFFF, 0, menuCallback_leakTestCalibration };
 ActionMenuItem menuCalibrationLeakTestCal(&minfoCalibrationLeakTestCal, &menuCalibrationCalFlow);
 RENDERING_CALLBACK_NAME_INVOKE(fnCalibrationLeakTestChkRtCall, textItemRenderFn, "Leak Test Chk", -1, menuCallback_LeakTest)
 TextMenuItem menuCalibrationLeakTestChk(fnCalibrationLeakTestChkRtCall, 14, 3, &menuCalibrationLeakTestCal);
-RENDERING_CALLBACK_NAME_INVOKE(fnCalibrationRtCall, backSubItemRenderFn, "Calibration", -1, NULL)
-const PROGMEM SubMenuInfo minfoCalibration = { "Calibration", 5, 0xffff, 0, NO_CALLBACK };
+const SubMenuInfo PROGMEM minfoCalibration = { "Calibration", 5, 0xFFFF, 0, NO_CALLBACK };
+RENDERING_CALLBACK_NAME_INVOKE(fnCalibrationRtCall, backSubItemRenderFn, "Calibration", -1, NO_CALLBACK)
 BackMenuItem menuBackCalibration(fnCalibrationRtCall, &menuCalibrationLeakTestChk);
 SubMenuItem menuCalibration(&minfoCalibration, &menuBackCalibration, &menuSensorTest);
-RENDERING_CALLBACK_NAME_INVOKE(fnBldRtCall, textItemRenderFn, "Bld", -1, NULL)
-TextMenuItem menuBld(fnBldRtCall, 31, 255, &menuCalibration);
-RENDERING_CALLBACK_NAME_INVOKE(fnVerRtCall, textItemRenderFn, "Ver", -1, NULL)
-TextMenuItem menuVer(fnVerRtCall, 32, 255, &menuBld);
-const PROGMEM AnalogMenuInfo minfoRelH = { "RelH", 20, 0xffff, 65355, NO_CALLBACK, 0, 10, " %  " };
+RENDERING_CALLBACK_NAME_INVOKE(fnBldRtCall, textItemRenderFn, "Bld", -1, NO_CALLBACK)
+TextMenuItem menuBld(fnBldRtCall, 31, 10, &menuCalibration);
+RENDERING_CALLBACK_NAME_INVOKE(fnVerRtCall, textItemRenderFn, "Ver", -1, NO_CALLBACK)
+TextMenuItem menuVer(fnVerRtCall, 32, 8, &menuBld);
+const AnalogMenuInfo PROGMEM minfoRelH = { "RelH", 20, 0xFFFF, 65355, NO_CALLBACK, 0, 10, " %  " };
 AnalogMenuItem menuRelH(&minfoRelH, 0, &menuVer);
-const PROGMEM AnalogMenuInfo minfoTemp = { "Temp", 18, 0xffff, 65355, NO_CALLBACK, 0, 10, " Deg" };
+const AnalogMenuInfo PROGMEM minfoTemp = { "Temp", 18, 0xFFFF, 65355, NO_CALLBACK, 0, 10, " Deg" };
 AnalogMenuItem menuTemp(&minfoTemp, 0, &menuRelH);
-const PROGMEM AnalogMenuInfo minfoBaro = { "Baro", 30, 0xffff, 65355, NO_CALLBACK, 0, 1, " kPa" };
+const AnalogMenuInfo PROGMEM minfoBaro = { "Baro", 30, 0xFFFF, 65355, NO_CALLBACK, 0, 1, " kPa" };
 AnalogMenuItem menuBaro(&minfoBaro, 0, &menuTemp);
-const PROGMEM AnalogMenuInfo minfoARef = { "ARef", 12, 0xffff, 28, NO_CALLBACK, 0, 1, " Aq " };
+const AnalogMenuInfo PROGMEM minfoARef = { "ARef", 12, 0xFFFF, 28, NO_CALLBACK, 0, 1, " Aq " };
 AnalogMenuItem menuARef(&minfoARef, 0, &menuBaro);
-const PROGMEM AnalogMenuInfo minfoAFlow = { "AFlow", 13, 0xffff, 65355, NO_CALLBACK, 0, 10, " CFM" };
+const AnalogMenuInfo PROGMEM minfoAFlow = { "AFlow", 13, 0xFFFF, 65355, NO_CALLBACK, 0, 10, " CFM" };
 AnalogMenuItem menuAFlow(&minfoAFlow, 0, &menuARef);
-const PROGMEM AnalogMenuInfo minfoPitot = { "Pitot", 37, 0xffff, 65355, NO_CALLBACK, 0, 10, " %" };
+const AnalogMenuInfo PROGMEM minfoPitot = { "Pitot", 37, 0xFFFF, 65355, NO_CALLBACK, 0, 10, " %" };
 AnalogMenuItem menuPitot(&minfoPitot, 0, &menuAFlow);
-const PROGMEM AnalogMenuInfo minfoPRef = { "PRef", 2, 0xffff, 65355, NO_CALLBACK, 0, 10, " Aq " };
+const AnalogMenuInfo PROGMEM minfoPRef = { "PRef", 2, 0xFFFF, 65355, NO_CALLBACK, 0, 10, " Aq " };
 AnalogMenuItem menuPRef(&minfoPRef, 0, &menuPitot);
-const PROGMEM AnalogMenuInfo minfoFlow = { "Flow", 1, 0xffff, 65355, NO_CALLBACK, 0, 10, " CFM" };
+const AnalogMenuInfo PROGMEM minfoFlow = { "Flow", 1, 0xFFFF, 65355, NO_CALLBACK, 0, 10, " CFM" };
 AnalogMenuItem menuFlow(&minfoFlow, 0, &menuPRef);
-const PROGMEM ConnectorLocalInfo applicationInfo = { "DIY Flow Bench", "0fc9ae97-7781-4600-a281-4a3425ce8371" };
+
 
 // Set up code
 
 void setupMenu() {
+    menuPRef.setReadOnly(true);
+    menuPitot.setReadOnly(true);
+    menuAFlow.setReadOnly(true);
+    menuBaro.setReadOnly(true);
+    menuTemp.setReadOnly(true);
+    menuCalibrationLeakTestChk.setReadOnly(true);
+    menuCalibrationLeakTestCal.setReadOnly(true);
+    menuCalibrationCalFlow.setReadOnly(true);
+    menuSensorTestMAF.setReadOnly(true);
+    menuSensorTestPitot.setReadOnly(true);
+    menuSensorTestPRef.setReadOnly(true);
+
     lcd.begin(16, 2);
     lcd.configureBacklightPin(10);
     lcd.backlight();
     pinMode(A0, INPUT);
     switches.initialise(inputFromDfRobotShield(), false);
     menuMgr.initForUpDownOk(&renderer, &menuFlow, DF_KEY_DOWN, DF_KEY_UP, DF_KEY_SELECT);
-
-    // Read only and local only function calls
-    menuAFlow.setReadOnly(true);
-    menuSensorTestMAF.setReadOnly(true);
-    menuCalibrationCalFlow.setReadOnly(true);
-    menuBaro.setReadOnly(true);
-    menuSensorTestPitot.setReadOnly(true);
-    menuPRef.setReadOnly(true);
-    menuSensorTestPRef.setReadOnly(true);
-    menuTemp.setReadOnly(true);
-    menuCalibrationLeakTestChk.setReadOnly(true);
-    menuCalibrationLeakTestCal.setReadOnly(true);
-    menuPitot.setReadOnly(true);
 }
-

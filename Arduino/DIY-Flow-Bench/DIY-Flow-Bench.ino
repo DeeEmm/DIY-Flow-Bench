@@ -960,7 +960,7 @@ void parseAPI(byte serialData)
         
 
         case 'V': // Get Version 'VMmYYMMDDXX\r\n'
-            messageData = String("V") + API_DELIM + MAJOR_VERSION + "." + MAJOR_VERSION + "." + BUILD_NUMBER;
+            messageData = String("V") + API_DELIM + MAJOR_VERSION + "." + MINOR_VERSION + "." + BUILD_NUMBER;
         break;
 
         case 'L': // Perform Leak Test Calibration 'L\r\n'

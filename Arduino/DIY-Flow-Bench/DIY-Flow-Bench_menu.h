@@ -6,36 +6,41 @@
 
     All the variables you may need access to are marked extern in this file for easy
     use elsewhere.
- */
+*/
 
 #ifndef MENU_GENERATED_CODE_H
 #define MENU_GENERATED_CODE_H
 
 #include <Arduino.h>
 #include <tcMenu.h>
-
+#include <RuntimeMenuItem.h>
 #include <LiquidCrystalIO.h>
 #include "tcMenuLiquidCrystal.h"
 #include <DfRobotInputAbstraction.h>
-#include <RuntimeMenuItem.h>
 
-// all define statements needed
+void setupMenu();  // forward reference of the menu setup function.
+extern const PROGMEM ConnectorLocalInfo applicationInfo;  // defines the app info to the linker.
 
+// Global variables that need exporting
 
-// all variables that need exporting
 extern LiquidCrystal lcd;
 extern LiquidCrystalRenderer renderer;
 
-// all menu item forward references.
+// Callback functions must always include CALLBACK_FUNCTION after the return type
+#define CALLBACK_FUNCTION
+
+// Global Menu Item exports
+
 extern AnalogMenuItem menuSensorTestPRef;
 extern AnalogMenuItem menuSensorTestPitot;
 extern AnalogMenuItem menuSensorTestMAF;
-extern BackMenuItem menuBackSensorTest;
 extern SubMenuItem menuSensorTest;
+void CALLBACK_FUNCTION menuCallback_Calibrate(int id);
 extern ActionMenuItem menuCalibrationCalFlow;
+void CALLBACK_FUNCTION menuCallback_leakTestCalibration(int id);
 extern ActionMenuItem menuCalibrationLeakTestCal;
+void CALLBACK_FUNCTION menuCallback_LeakTest(int id);
 extern TextMenuItem menuCalibrationLeakTestChk;
-extern BackMenuItem menuBackCalibration;
 extern SubMenuItem menuCalibration;
 extern TextMenuItem menuBld;
 extern TextMenuItem menuVer;
@@ -47,15 +52,5 @@ extern AnalogMenuItem menuAFlow;
 extern AnalogMenuItem menuPitot;
 extern AnalogMenuItem menuPRef;
 extern AnalogMenuItem menuFlow;
-extern const ConnectorLocalInfo applicationInfo;
-
-// Callback functions must always include CALLBACK_FUNCTION after the return type
-#define CALLBACK_FUNCTION
-
-void CALLBACK_FUNCTION menuCallback_Calibrate(int id);
-void CALLBACK_FUNCTION menuCallback_LeakTest(int id);
-void CALLBACK_FUNCTION menuCallback_leakTestCalibration(int id);
-
-void setupMenu();
 
 #endif // MENU_GENERATED_CODE_H

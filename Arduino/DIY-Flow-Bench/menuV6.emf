@@ -1,0 +1,293 @@
+{
+  "lastEdited": {
+    "seconds": 1597790487,
+    "nanos": 0
+  },
+  "codeOptions": {
+    "applicationUUID": "0fc9ae97-7781-4600-a281-4a3425ce8371",
+    "applicationName": "DIY Flow Bench",
+    "lastInputUuid": "7daa6a81-dd09-422e-b83c-bda5045abaef",
+    "lastDisplayUuid": "bcd5fe34-9e9f-4fcb-9edf-f4e3caca0674",
+    "lastRemoteUuid": "2c101fec-1f7d-4ff3-8d2b-992ad41e7fcb",
+    "embeddedPlatform": "ARDUINO_AVR",
+    "namingRecursive": true,
+    "saveToSrc": false,
+    "lastProperties": []
+  },
+  "projectName": "/Users/mick/Documents/Arduino/DIY-Flow-Bench/Arduino/DIY-Flow-Bench/menuV5.emf",
+  "namingRecursive": true,
+  "version": "1.00",
+  "items": [
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Flow",
+        "eepromAddress": -1,
+        "id": 1,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 65355,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": " CFM"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "PRef",
+        "eepromAddress": -1,
+        "id": 2,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 65355,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": " Aq "
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Pitot",
+        "eepromAddress": -1,
+        "id": 37,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 65355,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": " %"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "AFlow",
+        "eepromAddress": -1,
+        "id": 13,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 65355,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": " CFM"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "ARef",
+        "eepromAddress": -1,
+        "id": 12,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 28,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": " Aq "
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Baro",
+        "eepromAddress": -1,
+        "id": 30,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 65355,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": " kPa"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "Temp",
+        "eepromAddress": -1,
+        "id": 18,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 65355,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": " Deg"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "analogItem",
+      "item": {
+        "name": "RelH",
+        "eepromAddress": -1,
+        "id": 20,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 65355,
+        "offset": 0,
+        "divisor": 10,
+        "unitName": " %  "
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "textItem",
+      "item": {
+        "name": "Ver",
+        "eepromAddress": -1,
+        "id": 32,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "PLAIN_TEXT",
+        "textLength": 8
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "textItem",
+      "item": {
+        "name": "Bld",
+        "eepromAddress": -1,
+        "id": 31,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "itemType": "PLAIN_TEXT",
+        "textLength": 10
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Calibration",
+        "eepromAddress": -1,
+        "id": 5,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "textItem",
+      "item": {
+        "name": "Leak Test Chk",
+        "eepromAddress": -1,
+        "id": 14,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "menuCallback_LeakTest",
+        "itemType": "PLAIN_TEXT",
+        "textLength": 3
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "actionMenu",
+      "item": {
+        "name": "Leak Test Cal",
+        "eepromAddress": -1,
+        "id": 8,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "menuCallback_leakTestCalibration"
+      }
+    },
+    {
+      "parentId": 5,
+      "type": "actionMenu",
+      "item": {
+        "name": "Cal Flow",
+        "eepromAddress": -1,
+        "id": 16,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "functionName": "menuCallback_Calibrate"
+      }
+    },
+    {
+      "parentId": 0,
+      "type": "subMenu",
+      "item": {
+        "name": "Sensor Test",
+        "eepromAddress": -1,
+        "id": 33,
+        "readOnly": false,
+        "localOnly": false,
+        "visible": true,
+        "secured": false
+      }
+    },
+    {
+      "parentId": 33,
+      "type": "analogItem",
+      "item": {
+        "name": "MAF",
+        "eepromAddress": -1,
+        "id": 34,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 65355,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": " mv"
+      }
+    },
+    {
+      "parentId": 33,
+      "type": "analogItem",
+      "item": {
+        "name": "Pitot",
+        "eepromAddress": -1,
+        "id": 35,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 65355,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": " mv"
+      }
+    },
+    {
+      "parentId": 33,
+      "type": "analogItem",
+      "item": {
+        "name": "PRef",
+        "eepromAddress": -1,
+        "id": 36,
+        "readOnly": true,
+        "localOnly": false,
+        "visible": true,
+        "maxValue": 65355,
+        "offset": 0,
+        "divisor": 1,
+        "unitName": " mv"
+      }
+    }
+  ]
+}
