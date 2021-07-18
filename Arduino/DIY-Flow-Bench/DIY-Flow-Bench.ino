@@ -19,8 +19,8 @@
 
 #define MAJOR_VERSION "ESP"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "22071801"
-#define RELEASE "V.ESP.0-ALPHA"
+#define BUILD_NUMBER "21071803"
+#define RELEASE "V.ESP.X-ALPHA"
 
 
 /****************************************
@@ -28,10 +28,12 @@
  ***/
 
 #include <EEPROM.h>
-#include <Arduino.h>
+#include <WiFi.h>
+#include <WebServer.h>
+#include <SPIFFS.h>
 #include "configuration.h"
 #include "boards.h"
-#include "language/EN_Language.h"
+#include LANGUAGE_FILE
 
 
 /****************************************
@@ -98,6 +100,8 @@
 #define ABS_REF_PRESS_SENSOR
 
 
+
+
 /****************************************
  * DECLARE GLOBALS
  ***/
@@ -110,51 +114,12 @@ int serialData = 0;
 int serial1Data = 0;
 extern long mafMapData[][2]; // mafData key > value array
 extern long mafMapAnalogData[]; // mafData analog value array
+//const char* LANGUAGE_FILE = "EN_Language.h";
 
+String hostname = HOSTNAME; 
+bool apMode = false;
+WebServer server(80);
 
-
-
-
-/****************************************
- * INITIALISATION
- ***/
-void setup ()
-{
-
-    #if defined USE_REF_PRESS_AS_BARO && defined REF_MPX4250
-        startupBaroPressure = getRefPressure(KPA);
-    #else
-        startupBaroPressure = DEFAULT_BARO;
-    #endif
-
-    //Serial API
-    #if defined API_ENABLED
-        #if defined SERIAL0_ENABLED
-            Serial.begin(SERIAL0_BAUD_RATE);      
-        #endif
-    #endif
-
-    //Sparkfun BME280 (Testing and working 03.08.20 /DM)
-    #if defined RELH_SPARKFUN_BME280 || defined TEMP_SPARKFUN_BME280 || defined BARO_SPARKFUN_BME280
-        Wire.begin();
-        SparkFunBME280.setI2CAddress(BME280_I2C_ADDR); 
-        if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
-        {
-            int errorVal = BME280_READ_FAIL;
-        }
-    #endif
-    
-    // Adafruit or derivative BME Pressure, humidity & temp transducer
-    #if defined TEMP_ADAFRUIT_BME280 || defined BARO_ADAFRUIT_BME280 || defined RELH_ADAFRUIT_BME280
-        //I2C address - BME280_I2C_ADDR
-        if (!adafruitBme280.begin()) {  
-            int errorVal = BME280_READ_FAIL;
-        }
-    #endif
-
- 
-
-}
 
 
 
@@ -164,9 +129,9 @@ void setup ()
  ***/
 void sendSerial(String message)
 {   
-    #if defined SERIAL0_ENABLED
-        Serial.print(message);
-    #endif
+
+    Serial.print(message);
+
     #if defined SERIAL1_ENABLED
         Serial1.print(message);
     #endif
@@ -240,6 +205,79 @@ float getBaroPressure(int units)
         break;
     }   
 
+}
+
+
+
+/****************************************
+ * CALCULATE REFERENCE PRESSURE
+ * Convert RAW pressure sensor data to In/WG or kPa
+ ***/
+float getRefPressure(int units) 
+{   
+
+    float refPressureKpa;
+    float refPressureInWg;
+    float refPressureRaw;
+    float refTempDegRaw;
+    float refAltRaw;
+    float supplyMillivolts = getSupplyMillivolts();
+    int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
+    float refPressMillivolts = (rawRefPressValue * (5.0 / 1024.0)) * 1000;
+
+    #if defined REF_MPXV7007
+        // Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
+        // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007DP Datasheet)
+        // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
+        refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057;  
+    
+
+    #elif defined REF_MPX4250
+        // NOTE: Untested.  Also not best choice of sensor
+        // Datasheet - https://www.nxp.com/files-static/sensors/doc/data_sheet/MPX4250.pdf
+        // Vout = VS x (0.00369 x P + 0.04) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
+        // P = ((Vout / VS ) - 0.04) / 0.00369 --- Formula transposed for P
+        // Note we use the baro value as this is an absolute sensor, so to prevent circular references we need to know
+        // if we actually have a Baro sensor installed
+        #if defined USE_REF_PRESS_AS_BARO 
+            // we don't have a baro value so use the value hardcoded in the config to offset the sensor value
+            refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - DEFAULT_BARO;  
+  //          ABS_REF_PRESS_SENSOR       
+        #else
+            // use the current baro value to offset the sensor value
+            refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - getBaroPressure(KPA);         
+        #endif
+
+    #else
+        // No reference pressure sensor used so lets return 1 (so as not to throw maths out)
+        //refPressureKpa = 6.97448943333324; //28"
+        refPressureKpa = DEFAULT_REF_PRESS;
+
+    #endif
+
+    switch (units)
+    {
+        case INWG:
+            // convert from kPa to inches Water
+            refPressureInWg = refPressureKpa * 4.0147421331128;
+            return refPressureInWg;
+        break;
+
+        case KPA:
+            return refPressureKpa;
+        break;
+
+        case BAR:
+            // 1kpa = 0.01 bar
+            return refPressureKpa  * 0.01 ; 
+        break;
+
+        case PSIA:
+             refPressureKpa = refPressureKpa * 0.145038;
+            return refPressureKpa  * 0.01 ;
+        break;
+    }
+    
 }
 
 
@@ -532,79 +570,6 @@ float getMafFlowCFM()
     }
 
     return mafFlowRateCFM;
-}
-
-
-
-/****************************************
- * CALCULATE REFERENCE PRESSURE
- * Convert RAW pressure sensor data to In/WG or kPa
- ***/
-float getRefPressure(int units) 
-{   
-
-    float refPressureKpa;
-    float refPressureInWg;
-    float refPressureRaw;
-    float refTempDegRaw;
-    float refAltRaw;
-    float supplyMillivolts = getSupplyMillivolts();
-    int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
-    float refPressMillivolts = (rawRefPressValue * (5.0 / 1024.0)) * 1000;
-
-    #if defined REF_MPXV7007
-        // Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
-        // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007DP Datasheet)
-        // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
-        refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057;  
-    
-
-    #elif defined REF_MPX4250
-        // NOTE: Untested.  Also not best choice of sensor
-        // Datasheet - https://www.nxp.com/files-static/sensors/doc/data_sheet/MPX4250.pdf
-        // Vout = VS x (0.00369 x P + 0.04) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
-        // P = ((Vout / VS ) - 0.04) / 0.00369 --- Formula transposed for P
-        // Note we use the baro value as this is an absolute sensor, so to prevent circular references we need to know
-        // if we actually have a Baro sensor installed
-        #if defined USE_REF_PRESS_AS_BARO 
-            // we don't have a baro value so use the value hardcoded in the config to offset the sensor value
-            refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - DEFAULT_BARO;  
-  //          ABS_REF_PRESS_SENSOR       
-        #else
-            // use the current baro value to offset the sensor value
-            refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - getBaroPressure(KPA);         
-        #endif
-
-    #else
-        // No reference pressure sensor used so lets return 1 (so as not to throw maths out)
-        //refPressureKpa = 6.97448943333324; //28"
-        refPressureKpa = DEFAULT_REF_PRESS;
-
-    #endif
-
-    switch (units)
-    {
-        case INWG:
-            // convert from kPa to inches Water
-            refPressureInWg = refPressureKpa * 4.0147421331128;
-            return refPressureInWg;
-        break;
-
-        case KPA:
-            return refPressureKpa;
-        break;
-
-        case BAR:
-            // 1kpa = 0.01 bar
-            return refPressureKpa  * 0.01 ; 
-        break;
-
-        case PSIA:
-             refPressureKpa = refPressureKpa * 0.145038;
-            return refPressureKpa  * 0.01 ;
-        break;
-    }
-    
 }
 
 
@@ -1040,15 +1005,80 @@ void parseAPI(char serialData)
 
 
 
+/****************************************
+ * 404 Error
+ * 
+ ***/
+void error404() {
+  String message = "File Not Found\n\n";
+  message += "URI: ";
+  message += server.uri();
+  message += "\nMethod: ";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += server.args();
+  message += "\n";
+ 
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+  }
+ 
+  server.send(404, "text/plain", message);
+}
+
+
 
 /****************************************
- * UPDATE DISPLAY
+ * Load From SPIFFS
+ ***/
+bool loadFromSPIFFS(String path) {
+  String dataType = "text/html";
+ 
+  Serial.print("Requested page -> ");
+  Serial.println(path);
+  if (SPIFFS.exists(path)){
+      File dataFile = SPIFFS.open(path, "r");
+      if (!dataFile) {
+          error404();
+          return false;
+      }
+ 
+      if (server.streamFile(dataFile, dataType) != dataFile.size()) {
+        Serial.println("Sent less data than expected!");
+      }else{
+          Serial.println("Page served!");
+      }
+ 
+      dataFile.close();
+  }else{
+      error404();
+      return false;
+  }
+  return true;
+}
+
+
+
+
+/****************************************
+ * Load From Server Root
+ ***/
+void handleRoot() {
+    loadFromSPIFFS("/index.html");  
+}
+
+
+
+
+
+/****************************************
+ * Process Request
  *
  * TODO - Adapt old TCmenu data to work with websockets / HTML5
  * 
  * NOTE: displayed values need to be multiplied by divisor setting in TC menu to display decimal points
  ***/
-void updateDisplay()
+void processRequest()
 {
 
     float mafFlowCFM = getMafFlowCFM();
@@ -1175,23 +1205,132 @@ void menuCallback_LeakTest() {
 
 
 
+
+
+
+/****************************************
+ * INITIALISATION
+ ***/
+void setup (void)
+{
+
+    #if defined USE_REF_PRESS_AS_BARO && defined REF_MPX4250
+        startupBaroPressure = getRefPressure(KPA);
+    #else
+        startupBaroPressure = DEFAULT_BARO;
+    #endif
+
+    // Serial
+    Serial.begin(SERIAL_BAUD_RATE);      
+    Serial.println("\r\n");
+    Serial.println("DIY Flow Bench ");
+    Serial.println("Version: " RELEASE);
+    Serial.println("Build: " BUILD_NUMBER);
+
+    // Filesystem
+    Serial.print(F("File System Inizializing "));
+    if (SPIFFS.begin()){
+      Serial.println(F("done."));
+    }else{
+      Serial.println(F("failed."));
+    }
+
+    // API
+    #if defined API_ENABLED
+      Serial.println("Serial API Enabled");
+    #endif
+
+    // WiFi    
+    Serial.println("Connecting to WiFi");
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(WIFI_SSID, WIFI_PSWD);
+ 
+    // Wait for connection
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+    }
+ 
+    Serial.print("Connected to ");
+    Serial.println(WIFI_SSID);
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+
+  
+    server.on("/", []() {
+      loadFromSPIFFS("/index.html");
+    });
+    server.on("/style.css", []() {
+      loadFromSPIFFS("/style.css");
+    });
+
+  
+    // server.on("/inline", []() {
+    //   server.send(200, "text/plain", "this works as well");
+    // });
+  
+    server.onNotFound(error404);
+    server.begin();
+    Serial.println("HTTP server started");
+
+
+
+
+
+
+    
+
+    
+    //Sparkfun BME280 (Testing and working 03.08.20 /DM)
+    #if defined RELH_SPARKFUN_BME280 || defined TEMP_SPARKFUN_BME280 || defined BARO_SPARKFUN_BME280
+        Wire.begin();
+        SparkFunBME280.setI2CAddress(BME280_I2C_ADDR); 
+        if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
+        {
+            int errorVal = BME280_READ_FAIL;
+          Serial.println("Sparkfun BME280 Initialisation failed");      
+        } else {
+          Serial.println("Sparkfun BME280 Initialised");      
+        }
+    #endif
+    
+    // Adafruit or derivative BME Pressure, humidity & temp transducer
+    #if defined TEMP_ADAFRUIT_BME280 || defined BARO_ADAFRUIT_BME280 || defined RELH_ADAFRUIT_BME280
+        //I2C address - BME280_I2C_ADDR
+        if (!adafruitBme280.begin()) {  
+            int errorVal = BME280_READ_FAIL;
+          Serial.println("Adafruit BME280 Initialisation failed");      
+        } else {
+          Serial.println("Adafruit BME280 Initialised");      
+        }
+    #endif
+
+ 
+
+}
+
+
+
+
+
 /****************************************
  * MAIN PROGRAM LOOP
  ***/
 void loop ()
 {
+
+
     refPressureCheck();
     if (errorVal != 0) errorHandler(errorVal);
-    updateDisplay();
 
     // If API enabled, read serial data
-    #if defined API_ENABLED
-        #if defined SERIAL0_ENABLED 
-                if (Serial.available() > 0) {
-                    serialData = Serial.read();
-                    parseAPI(serialData);
-                }                    
-        #endif
+    #if defined API_ENABLED         
+        if (Serial.available() > 0) {
+            serialData = Serial.read();
+            parseAPI(serialData);
+        }                            
     #endif
+
+    server.handleClient();
 
 }

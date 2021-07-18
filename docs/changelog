@@ -142,3 +142,9 @@ Build #     - Description of Change
             - Disabled CRC Checksum
             - Updated pin mapping
             - Tested via Serial API
+21071802    - Added SPIFFS
+            - Added system status message to serial on boot
+            - Serial reporting permanently enabled
+            - Added Wifi Station mode
+            - Added basic web server
+        

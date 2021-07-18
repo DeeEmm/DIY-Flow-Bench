@@ -32,11 +32,22 @@
 #pragma once
 
 
+
+/****************************************
+ * CONFIGURE FILESYSTEM
+ ***/
+
+#define FORMAT_FILESYSTEM_IF_FAILED true
+
+
+
+
+
 /****************************************
  * LANGUAGE SETTINGS
  ***/
 
-const char* LANGUAGE_FILE = "EN_Language.h";
+#define LANGUAGE_FILE "language/EN_Language.h"
 
 
 
@@ -77,16 +88,19 @@ const char* LANGUAGE_FILE = "EN_Language.h";
  * CONFIGURE COMMUNICATIONS
  ***/
 
-#define API_ENABLED                    // enable API
+#define API_ENABLED                   // enable API
 #define DISABLE_API_CHECKSUM          // Add checksum to serial API response TODO UPDATE CHECKSUM TO NATIVE ESP32 CRC32
 #define API_DELIM ':'
 
-#define SERIAL0_ENABLED                 
-#define SERIAL0_BAUD_RATE 115200                    
-         
+#define SERIAL_BAUD_RATE 115200   
+
+#define WIFI_SSID "WIFI-SSID"
+#define WIFI_PSWD "<WIFI-PSWD>"
+#define HOSTNAME "diy_fb"
 
 #define BME280_I2C_ADDR 0x77            // (default 0x77) / Alternate 0x76
   
+
 
  
 /****************************************
