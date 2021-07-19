@@ -4,13 +4,63 @@ html {
   margin: 0px auto;
   text-align: center;
 }
-h1{
-  color: #0F3376;
-  padding: 2vh;
+.topnav {
+	overflow: hidden;
+	background-color: #0A1128;
 }
+
+h1{
+  color: #FFF;
+}
+
 p{
   font-size: 1.5rem;
 }
+
+a:link  {
+  color:#0A1128;
+  text-decoration:none;
+}
+
+a:visited, a:active {
+  color:#0A1128;
+  text-decoration:none;
+}
+
+a:hover {
+  color:#666;
+  text-decoration:none;
+}
+
+.content {
+	padding: 30px;
+}
+.card-grid {
+	max-width: 700px;
+	margin: 0 auto;
+	display: grid;
+	grid-gap: 2rem;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.card {
+	background-color: white;
+	box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+}
+.card-title {
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: #034078
+}
+.state {
+	font-size: 1.2rem;
+	color:#1282A2;
+}
+
+#footer {
+text-align: center;
+}
+
+
 .button {
   display: inline-block;
   background-color: #008CBA;

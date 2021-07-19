@@ -2,14 +2,51 @@
 	<HEAD>
       <title>DIY Flow Bench</title>
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <link rel="icon" href="data:,">
-      <link rel="stylesheet" type="text/css" href="style.css">
+      <link rel="icon" type="image/png" href="favicon.png">
+      <link rel="stylesheet" type="text/css" href="/style.css">    
 	</HEAD>
 	<BODY>
-      <h1>DIY Flow Bench</h1>
-      <p>Reference Pressure: <strong> %REF_PRESS%</strong> In/Aq</p>
-      <p>Flow Rate: <strong> %FLOW_RATE%</strong> cfm</p>
-      <p><a href="/on"><button class="button">ON</button></a></p>
-      <p><a href="/off"><button class="button button2">OFF</button></a></p>
+		  <div class="topnav">
+			    <h1>DIY Flow Bench</h1>
+		  </div>
+
+      <div class="content">
+        <div class="card-grid">
+          <div class="card">
+            <p class="card-title"> Reference Pressure</p>
+            <p>%PREF%</p>
+            <p class="state"><span id="sliderValue1"></span> In/Aq</p>
+          </div>
+          <div class="card">
+            <p class="card-title"> Flow Rate</p>
+            <p>%FLOW%</p>
+            <p class="state"><span id="sliderValue2"></span> cfm</p>
+          </div>
+          <div class="card">
+            <p class="card-title"> Pitot</p>
+            <p>%PITOT%</p>
+            <p class="state"><span id="sliderValue3"></span> In/Aq</p>
+          </div>
+          <div class="card">
+            <p class="card-title"> Temperature</p>
+            <p>%TEMP%</p>
+            <p class="state"><span id="sliderValue1"></span> Deg</p>
+          </div>
+          <div class="card">
+            <p class="card-title"> Baro Pressure</p>
+            <p>%BARO%</p>
+            <p class="state"><span id="sliderValue2"></span> kPa</p>
+          </div>
+          <div class="card">
+            <p class="card-title"> Humidity</p>
+            <p>%RELH%</p>
+            <p class="state"><span id="sliderValue3"></span> &percnt;RH</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="serverData">%STATUS_MESSAGE%</div>      
+      <p><a href="/on"><button class="button">ON</button></a>&nbsp;<a href="/off"><button class="button button2">OFF</button></a></p>
+      <div id="footer"><a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a> | Version: %RELEASE% Build: %BUILD_NUMBER%</div>      
 	</BODY>
 </HTML>

@@ -4,9 +4,13 @@
  *
  * configuration.h - define variables and configure hardware
  * 
- * 
- * The standard project board is the ESP32DUINO  
+ * Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
  *
+ * The standard project board is the ESP32DUINO  
+ *   
+ * Other ESP32 based boards can be made to work. 
+ * You can define custom pin definitions in boards.h
+ * 
  * Default temp / baro / RelH uses BME280 device (Sparkfun / clone)
  * I2C address for the BME280 is 0x77
  *
@@ -15,21 +19,29 @@
  * 
  * DEPENDENCIES
  * The program has a number of dependencies that must be available for it to work.
- * These libraries are provided in the libraries folder 
  *
- * /libraries/SimpleDHT
- * /libraries/SparkfunBME280
- * /libraries/
+ * <EEPROM.h>
+ * <WiFi.h>
+ * <WebServer.h>
+ * <SPIFFS.h>
+ * <Adafruit_BME280_DEV.h> 
+ * "SparkFunBME280.h"
+ * <Wire.h>
+ * <SimpleDHT.h> 
  *
- * The following libraries are also needed and available within the Arduino IDE
- *
- * arduino-NVM
- *
- * NOTE: you may need to include your library in DIY-Flow-Bench.ino 
  *
  ***/
 
 #pragma once
+
+
+// Don't forget to update the changelog & README Versions!!
+
+#define MAJOR_VERSION "ESP"
+#define MINOR_VERSION "0"
+#define BUILD_NUMBER "21071901"
+#define RELEASE "V.ESP.X-ALPHA"
+
 
 
 
@@ -38,8 +50,6 @@
  ***/
 
 #define FORMAT_FILESYSTEM_IF_FAILED true
-
-
 
 
 
@@ -56,6 +66,7 @@
  ***/
 
 //#define DEBUG_MODE             
+//#define DM
 
 
 
@@ -77,10 +88,8 @@
  * Default ESP32DUINO 
  ***/
 
-//#define DIYFB_SHIELD
-//#define ARDUINO_MEGA_2560
-//#define ARDUINO_UNO
-#define ESP32DUINO //TODO PINS NEED REVIEW
+//#define DIYFB_SHIELD                    // In development
+#define ESP32DUINO                        // Wemos D1 R32
 
 
 
@@ -88,17 +97,18 @@
  * CONFIGURE COMMUNICATIONS
  ***/
 
-#define API_ENABLED                   // enable API
-#define DISABLE_API_CHECKSUM          // Add checksum to serial API response TODO UPDATE CHECKSUM TO NATIVE ESP32 CRC32
+#define API_ENABLED                       // enable API
+#define DISABLE_API_CHECKSUM              // Add checksum to serial API response TODO UPDATE CHECKSUM TO NATIVE ESP32 CRC32
 #define API_DELIM ':'
 
 #define SERIAL_BAUD_RATE 115200   
 
-#define WIFI_SSID "WIFI-SSID"
-#define WIFI_PSWD "<WIFI-PSWD>"
-#define HOSTNAME "diy_fb"
+#define WIFI_SSID "WIFI-SSID"             // Your Wifi SSID
+#define WIFI_PSWD "<WIFI-PSWD>"           // Your Wifi Password
+#define HOSTNAME "diy_fb"                 // Default Hostname
+#define ACESSPOINT_NAME "DIY_FB"          // Default Accesspoint name
 
-#define BME280_I2C_ADDR 0x77            // (default 0x77) / Alternate 0x76
+#define BME280_I2C_ADDR 0x77              // (default 0x77) / Alternate 0x76
   
 
 
@@ -120,7 +130,7 @@
  ***/
 
 
-#include "mafData/ACDELCO_ 92281162.h"    // GM LS2              
+#include "mafData/ACDELCO_ 92281162.h"      // GM LS2              
 //#include "mafData/MH95-3000-100.h"        // PMAS MH95-3000 in 100mm housing              
 //#include "mafData/exampleKeyValueData.h"  // Example key > value data file (duplicate this as required)
 //#include "mafData/exampleAnalogData.h"    // Example Analog point data file (duplicate this as required)
@@ -208,6 +218,8 @@
  ***/
 #define leakTestTolerance 2               // Tolerance in cfm
 
+// TODO - Review need for automaticed check. Possibly better to just display stored value
+
 
 
  /****************************************
@@ -238,7 +250,12 @@
 
 
 
-//Test env /DM
+
+ /****************************************
+ * DEVELOPMENT SETTINGS
+ *
+ * Test environment /DM 
+ ***/
 #if defined DM
     #define BARO_SPARKFUN_BME280
     #define TEMP_SPARKFUN_BME280
