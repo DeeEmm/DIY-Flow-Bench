@@ -102,7 +102,6 @@ void menuCallback_leakTestCalibration() {
 
     float calibrationValue = leakTestCalibration();
 
-
     char calibrationValueText[12]; // Buffer big enough?
     dtostrf(calibrationValue, 6, 2, calibrationValueText); // Leave room for too large numbers!
 
@@ -125,10 +124,10 @@ void menuCallback_LeakTest() {
     if (testResult == LEAK_TEST_PASS)
     {
        // Display result on the main screen
-       errorVal = LEAK_TEST_PASS;      
+       statusVal = LEAK_TEST_PASS;      
     } else {
        // Display result on the main screen 
-       errorVal = LEAK_TEST_FAILED;       
+       statusVal = LEAK_TEST_FAILED;       
     }
 
 }

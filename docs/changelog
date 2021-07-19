@@ -147,6 +147,9 @@ Build #     - Description of Change
             - Serial reporting permanently enabled
             - Added Wifi Station mode
             - Added basic web server
-21071901    - Code refactor
+21072001    - Code refactor
             - Created basic Web UI
+            - Asynchronous web sockets
+            - Added Status messages
+            - Added JSON status message to API
         

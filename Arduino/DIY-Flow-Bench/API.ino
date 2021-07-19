@@ -17,14 +17,29 @@
  ***/
 
 
+
 /****************************************
  * DECLARE CONSTANTS
  ***/
+// standard units
+extern const int INWG; 
+extern const int KPA; 
+extern const int PSIA; 
+extern const int DEGC; 
+extern const int DEGF; 
+extern const int RANKINE; 
+extern const int PERCENT; 
+extern const int BAR; 
+
+
 
 
  /****************************************
  * DECLARE GLOBALS
  ***/
+extern bool streamMafData;
+extern float getRelativeHumidity(int);
+extern String localIpAddress;
 
 
 
@@ -60,7 +75,9 @@ uint16_t calcCRC(char* str) {
  * 'T' - Return temperature value in deg C
  * 'H' - Return humidity value in RH
  * 'R' - Return reference pressure value in in/h2o
- * 'B' - Return barometric Pressure in KPa
+ * 'I' - Return IP Address
+ * 'S' - Return WiFi SSID
+ * 'J' - Return JSON
  * Debug Commands
  * 'M' - Return MAF Data (NOTE: will only return data if flow > 0)
  * 'D' - Debug MAF on
@@ -91,7 +108,7 @@ void parseAPI(char serialData)
     String messageData;
     char serialResponse[30];
     double flowCFM = 0.01;
-
+    
 
     switch (serialData)
     {
@@ -200,6 +217,19 @@ void parseAPI(char serialData)
             // Barometric Pressure
             messageData += getBaroPressure(KPA);
         break;
+
+        case 'I': // IP Address
+            messageData = String("I") + API_DELIM + localIpAddress;
+        break;
+
+        case 'S': // WiFi SSID
+            messageData = String("I") + API_DELIM + WIFI_SSID;
+        break;
+
+        case 'J': // JSON Data
+            messageData = String("J") + API_DELIM + getJsonData();
+        break;
+
 
         // We've got here without a valid API request so lets get outta here before we send garbage to the serial comms
         default:

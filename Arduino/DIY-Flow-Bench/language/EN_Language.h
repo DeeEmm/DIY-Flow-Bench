@@ -1,15 +1,15 @@
 /****************************************
  * Language Constants
  *
- * NOTE: only 16 chars              "1234567890ABCDEF"
- *
  ***/
 
 
 //TODO(#12) Translations
-#define LANG_WARNING "Warning!"
-#define LANG_FLOW_LIMIT_EXCEEDED    "Flow Limit Err"
-#define LANG_REF_PRESS_LOW          "Low Ref Press"
+#define LANG_NO_ERROR               "Status OK"
+#define LANG_BENCH_RUNNING          "Bench Pressure OK"
+#define LANG_WARNING                "Warning!"
+#define LANG_FLOW_LIMIT_EXCEEDED    "Warning! Flow Limit Error"
+#define LANG_REF_PRESS_LOW          "Warning! Low Reference Pressure"
 #define LANG_LEAK_TEST_PASS         "Leak test OK"
 #define LANG_LEAK_TEST_FAILED       "Leak test fail"
 //                                  -----------------

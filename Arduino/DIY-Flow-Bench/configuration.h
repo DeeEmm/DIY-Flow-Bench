@@ -22,8 +22,10 @@
  *
  * <EEPROM.h>
  * <WiFi.h>
- * <WebServer.h>
+ * <AsyncTCP.h>
+ * <ESPAsyncWebServer.h>
  * <SPIFFS.h>
+ * <Arduino_JSON.h>
  * <Adafruit_BME280_DEV.h> 
  * "SparkFunBME280.h"
  * <Wire.h>
@@ -39,7 +41,7 @@
 
 #define MAJOR_VERSION "ESP"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "21071901"
+#define BUILD_NUMBER "21072001"
 #define RELEASE "V.ESP.X-ALPHA"
 
 

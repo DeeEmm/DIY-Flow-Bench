@@ -16,15 +16,17 @@
  * 
  ***/
 
-
+ 
 /****************************************
  * CORE LIBRARIES
  ***/
 
 #include <EEPROM.h>
 #include <WiFi.h>
-#include <WebServer.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
+#include <Arduino_JSON.h>
 #include "configuration.h"
 #include "boards.h"
 #include LANGUAGE_FILE
@@ -41,8 +43,15 @@
  * DECLARE VARIABLES
  ***/
 int serialData = 0;
-extern int errorVal;
-WebServer server(80);
+extern int statusVal;
+
+
+
+/****************************************
+ * Create AsyncWebServer object on port 80
+ ***/
+AsyncWebServer server(80);
+AsyncWebSocket ws("/ws");
 
 
 
@@ -52,58 +61,8 @@ WebServer server(80);
 void setup (void)
 {
 
-    // Serial
-    Serial.begin(SERIAL_BAUD_RATE);      
-    Serial.println("\r\n");
-    Serial.println("DIY Flow Bench ");
-    Serial.println("Version: " RELEASE);
-    Serial.println("Build: " BUILD_NUMBER);
-
-    // Filesystem
-    Serial.print(F("File System Inizializing "));
-    if (SPIFFS.begin()){
-      Serial.println(F("done."));
-    }else{
-      Serial.println(F("failed."));
-    }
-
-    // API
-    #if defined API_ENABLED
-      Serial.println("Serial API Enabled");
-    #endif
-
-    // WiFi    
-    Serial.println("Connecting to WiFi");
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(WIFI_SSID, WIFI_PSWD);
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
-      Serial.print(".");
-    }
- 
-    Serial.print("Connected to ");
-    Serial.println(WIFI_SSID);
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
-
+    initialiseServer();
     
-    // Server
-    server.on("/", []() {
-      loadFromSPIFFS("/index.html");
-    });
-    server.on("/style.css", []() {
-      loadFromSPIFFS("/style.css");
-    });
-    server.on("/favicon.png", []() {
-      loadFromSPIFFS("favicon.png");
-    });
-
-//    server.on("/data.html", sendData );
-    server.onNotFound(error404);
-    server.begin();
-    Serial.println("HTTP server started");
-
-    // Hardware    
     initialiseHardware();
 
 }
@@ -116,12 +75,10 @@ void setup (void)
 void loop ()
 {
 
-    //sendData();
-
     refPressureCheck();
-    if (errorVal != 0) errorHandler(errorVal);
+    statusMessageHandler(statusVal);
 
-    // If API enabled, read serial data
+    // If API enabled, parse serial data
     #if defined API_ENABLED         
         if (Serial.available() > 0) {
             serialData = Serial.read();
@@ -129,6 +86,6 @@ void loop ()
         }                            
     #endif
 
-    server.handleClient();
+    ws.cleanupClients();
 
 }

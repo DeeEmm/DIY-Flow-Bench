@@ -2,51 +2,58 @@
 	<HEAD>
       <title>DIY Flow Bench</title>
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <link rel="icon" type="image/png" href="favicon.png">
       <link rel="stylesheet" type="text/css" href="/style.css">    
 	</HEAD>
 	<BODY>
-		  <div class="topnav">
-			    <h1>DIY Flow Bench</h1>
-		  </div>
-
-      <div class="content">
-        <div class="card-grid">
-          <div class="card">
-            <p class="card-title"> Reference Pressure</p>
-            <p>%PREF%</p>
-            <p class="state"><span id="sliderValue1"></span> In/Aq</p>
-          </div>
-          <div class="card">
-            <p class="card-title"> Flow Rate</p>
-            <p>%FLOW%</p>
-            <p class="state"><span id="sliderValue2"></span> cfm</p>
-          </div>
-          <div class="card">
-            <p class="card-title"> Pitot</p>
-            <p>%PITOT%</p>
-            <p class="state"><span id="sliderValue3"></span> In/Aq</p>
-          </div>
-          <div class="card">
-            <p class="card-title"> Temperature</p>
-            <p>%TEMP%</p>
-            <p class="state"><span id="sliderValue1"></span> Deg</p>
-          </div>
-          <div class="card">
-            <p class="card-title"> Baro Pressure</p>
-            <p>%BARO%</p>
-            <p class="state"><span id="sliderValue2"></span> kPa</p>
-          </div>
-          <div class="card">
-            <p class="card-title"> Humidity</p>
-            <p>%RELH%</p>
-            <p class="state"><span id="sliderValue3"></span> &percnt;RH</p>
-          </div>
+        <div class="topnav">
+            <h1>DIY Flow Bench</h1>
         </div>
-      </div>
+        <div class="content">
+          <div class="card-grid">
+            <div class="card">
+              <p class="card-title">Reference Pressure</p>
+              <p><span class="card-value" id="PREF">&nbsp;</span></p>
+              <p class="state"> In/Aq</p>
+            </div>
+            <div class="card">
+              <p class="card-title">Flow Rate</p>
+              <p><span class="card-value" id="FLOW">&nbsp;</span></p>
+              <p class="state">cfm</p>
+            </div>
+            <div class="card">
+              <p class="card-title">Pitot</p>
+              <p><span class="card-value" id="PITOT">&nbsp;</span></p>
+              <p class="state">In/Aq</p>
+            </div>
+            <div class="card">
+              <p class="card-title">Temperature</p>
+              <p><span class="card-value" id="TEMP">&nbsp;</span></p>
+              <p class="state">Deg</p>
+            </div>
+            <div class="card">
+              <p class="card-title">Baro Pressure</p>
+              <p><span class="card-value" id="BARO">&nbsp;</span></p>
+              <p class="state">kPa</p>
+            </div>
+            <div class="card">
+              <p class="card-title">Humidity</p>
+              <p><span class="card-value" id="RELH">&nbsp;</span></p>
+              <p class="state">&percnt;RH</p>
+            </div>
+          </div>
+        </div>          
 
-      <div id="serverData">%STATUS_MESSAGE%</div>      
-      <p><a href="/on"><button class="button">ON</button></a>&nbsp;<a href="/off"><button class="button button2">OFF</button></a></p>
-      <div id="footer"><a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a> | Version: %RELEASE% Build: %BUILD_NUMBER%</div>      
-	</BODY>
+        <div class="status_message"><span id="STATUS_MESSAGE">&nbsp;</span></div>
+        <p><button id="button" class="button">Refresh</button></p>
+        
+        <p><a href="#"><button id="button" class="button">ON</button></a>&nbsp;<a href="#"><button class="button button2">OFF</button></a></p>
+        <div id="footer">Version: <span id="RELEASE">&nbsp;</span> | Build: <span id="BUILD_NUMBER">&nbsp;</span>  <a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a></div>      
+        <script src="/javascript.js"></script>
+
+        <div class="hidden_div">
+          <br>Ref Pressure mV: <span id="PREF_MV">&nbsp;</span>
+          <br>MAF mV: <span id="MAF_MV">&nbsp;</span>
+          <br>Pitot mV: <span id="PITOT_MV">&nbsp;</span>
+        </div>        
+  </BODY>
 </HTML>

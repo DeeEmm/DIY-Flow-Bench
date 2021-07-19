@@ -21,48 +21,39 @@
  * DECLARE CONSTANTS
  ***/
 
-// standard units
-#define RAW 0
-#define DEC 0
-#define INWG 1
-#define KPA 2
-#define PSIA 3
-#define DEGC 4
-#define DEGF 5
-#define RANKINE 6
-#define PERCENT 7
-#define BAR 8
-
-#define MOLECULAR_WEIGHT_DRY_AIR 28.964
 #define ABS_REF_PRESS_SENSOR
 
+const float MOLECULAR_WEIGHT_DRY_AIR = 28.964;
+
 // standard units
-#define RAW 0
-#define DEC 0
-#define INWG 1
-#define KPA 2
-#define PSIA 3
-#define DEGC 4
-#define DEGF 5
-#define RANKINE 6
-#define PERCENT 7
-#define BAR 8
+const int RAW = 0;
+const int DECI = 0;
+const int INWG = 1;
+const int KPA = 2;
+const int PSIA = 3;
+const int DEGC = 4;
+const int DEGF = 5;
+const int RANKINE = 6;
+const int PERCENT = 7;
+const int BAR = 8;
 
 // MAF Data Files
-#define VOLTAGE 1
-#define FREQUENCY 2
-#define KEY_VALUE 1
-#define RAW_ANALOG 2
-#define KG_H 1
-#define MG_S 2
-
+const int VOLTAGE = 1;
+const int FREQUENCY = 2;
+const int KEY_VALUE = 1;
+const int RAW_ANALOG = 2;
+const int KG_H = 1;
+const int MG_S = 2;
 
 // Error handler codes
-#define REF_PRESS_LOW 1
-#define LEAK_TEST_FAILED 2
-#define LEAK_TEST_PASS 3
-#define DHT11_READ_FAIL 4
-#define BME280_READ_FAIL 5
+const int NO_ERROR = 0;
+const int REF_PRESS_LOW = 1;
+const int LEAK_TEST_FAILED = 2;
+const int LEAK_TEST_PASS = 3;
+const int DHT11_READ_FAIL = 4;
+const int BME280_READ_FAIL = 5;
+const int BENCH_RUNNING = 6;
+
 
 
 /****************************************
@@ -70,13 +61,14 @@
  ***/
 bool streamMafData = false;
 float startupBaroPressure;
-int errorVal = 0;
-bool benchIsRunning();
+int statusVal = 0;
+//bool benchIsRunning();
+String statusMessage = "Starting...";
+
 extern long mafMapData[][2]; // mafData key > value array
 extern long mafMapAnalogData[]; // mafData analog value array
 
-
-
+JSONVar benchData;
 
 
 /****************************************
@@ -93,7 +85,7 @@ extern long mafMapAnalogData[]; // mafData analog value array
 
         //I2C address - BME280_I2C_ADDR
         if (!adafruitBme280.begin()) {  
-            int errorVal = BME280_READ_FAIL;
+            int statusVal = BME280_READ_FAIL;
           Serial.println("Adafruit BME280 Initialisation failed");      
         } else {
           Serial.println("Adafruit BME280 Initialised");      
@@ -111,7 +103,7 @@ extern long mafMapAnalogData[]; // mafData analog value array
         SparkFunBME280.setI2CAddress(BME280_I2C_ADDR); 
         if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
         {
-            int errorVal = BME280_READ_FAIL;
+            int statusVal = BME280_READ_FAIL;
           Serial.println("Sparkfun BME280 Initialisation failed");      
         } else {
           Serial.println("Sparkfun BME280 Initialised");      
@@ -304,7 +296,7 @@ float getTemp(int units)
         // NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
         int err = SimpleDHTErrSuccess;
         if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
-          int errorVal = DHT11_READ_FAIL; // Set error to display on screen
+          int statusVal = DHT11_READ_FAIL; // Set error to display on screen
           refTempDegC = 0;        
         } else {
           refTempDegC = refTemp;
@@ -349,7 +341,7 @@ float getRelativeHumidity(int units = 0)
         // NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
         int err = SimpleDHTErrSuccess;
         if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
-          int errorVal = DHT11_READ_FAIL; // Set error to display on screen
+          int statusVal = DHT11_READ_FAIL; // Set error to display on screen
           relativeHumidity = 0;        
         } else {
           relativeHumidity = refRelh;
@@ -369,7 +361,7 @@ float getRelativeHumidity(int units = 0)
 
     switch (units)
     {
-        case DEC:
+        case DECI:
             return relativeHumidity / 100;
         break;
 
@@ -418,7 +410,7 @@ float getVaporPressure(int units)
 float getSpecificGravity()
 {   
     float specificGravity;
-    float relativeHumidity = getRelativeHumidity(DEC);
+    float relativeHumidity = getRelativeHumidity(DECI);
     float vaporPressurePsia = getVaporPressure(PSIA);
     float baroPressurePsia = getBaroPressure(PSIA);
 
@@ -642,8 +634,10 @@ bool benchIsRunning()
 
     if ((refPressure > MIN_BENCH_PRESSURE) && (mafFlowRateCFM > MIN_FLOW_RATE))
     {
+        statusVal = BENCH_RUNNING;
         return true;
     } else {
+        statusVal = NO_ERROR;
         return false;
     }
 }
@@ -664,7 +658,7 @@ void refPressureCheck()
     // maybe a different alert would be more appropriate
     if ((refPressure > (calibrationRefPressure * (minTestPressurePercentage / 100))) && (benchIsRunning()))
     {
-        errorVal = REF_PRESS_LOW;
+        statusVal = REF_PRESS_LOW;
     }
 }
 
@@ -673,41 +667,50 @@ void refPressureCheck()
 
 
 /****************************************
- * ERROR CHECKING
+ * STATUS MESSAGE HANDLER
  * 
- * Check for system errors and display message to user on screen
  ***/
-void errorHandler(int errorVal)
+void statusMessageHandler(int statusVal)
 {
     if (!showAlarms) return;
 
-    switch (errorVal)
+    switch (statusVal)
     {
+        case NO_ERROR:
+            statusMessage = LANG_NO_ERROR;
+            Serial.println(LANG_NO_ERROR);
+        break;
+
+        case BENCH_RUNNING:
+            statusMessage = LANG_BENCH_RUNNING;
+            Serial.println(LANG_BENCH_RUNNING);
+        break;
+
         case REF_PRESS_LOW:
             // This alarm can get really annoying as it pops up every time the bench is off
             // need to add function to be able to enable / disable from menu
-            // displayDialog(LANG_WARNING, LANG_REF_PRESS_LOW);
-            // Serial.write(LANG_REF_PRESS_LOW);
+            // statusMessage = LANG_WARNING, LANG_REF_PRESS_LOW);
+            // Serial.println(LANG_REF_PRESS_LOW);
         break;
 
         case LEAK_TEST_FAILED:
-            displayDialog(LANG_WARNING, LANG_LEAK_TEST_FAILED);
-            sendSerial(LANG_LEAK_TEST_FAILED);
+            statusMessage = LANG_LEAK_TEST_FAILED;
+            Serial.println(LANG_LEAK_TEST_FAILED);
         break;
 
         case LEAK_TEST_PASS:
-            displayDialog(LANG_WARNING, LANG_LEAK_TEST_PASS);
-            sendSerial(LANG_LEAK_TEST_PASS);
+            statusMessage = LANG_LEAK_TEST_PASS;
+            Serial.println(LANG_LEAK_TEST_PASS);
         break;
 
         case DHT11_READ_FAIL:
-            displayDialog(LANG_WARNING, LANG_DHT11_READ_FAIL);
-            sendSerial(LANG_DHT11_READ_FAIL);
+            statusMessage = LANG_DHT11_READ_FAIL;
+            Serial.println(LANG_DHT11_READ_FAIL);
         break;
 
         case BME280_READ_FAIL:
-            displayDialog(LANG_WARNING, LANG_BME280_READ_FAIL);
-            sendSerial(LANG_BME280_READ_FAIL);
+            statusMessage = LANG_BME280_READ_FAIL;
+            Serial.println(LANG_BME280_READ_FAIL);
         break;
         
 
@@ -767,7 +770,7 @@ float leakTestCalibration() {
     EEPROM.write(NVM_LEAK_CAL_ADDR, RefPressure);
 
     // Display the value on the main screen
-    displayDialog(LANG_LEAK_CAL_VALUE, RefPressureText);  
+    statusMessage = LANG_LEAK_CAL_VALUE, RefPressureText;  
 
     return RefPressure;
 }
@@ -791,3 +794,76 @@ int  leakTest() {
     }
 
 }
+
+
+/****************************************
+ * Get JSON Data
+ ***/
+String getJsonData()
+{
+
+    float mafFlowCFM = getMafFlowCFM();
+    float refPressure = getRefPressure(INWG);   
+
+    benchData["STATUS_MESSAGE"] = String(statusMessage);
+
+    // Flow Rate
+    if (mafFlowCFM > MIN_FLOW_RATE)
+    {
+          benchData["FLOW"] = String(mafFlowCFM);        
+    } else {
+          benchData["FLOW"] = String(0);        
+    }
+
+    // Temperature
+    benchData["TEMP"] = String(getTemp(DEGC));        
+    
+    // Baro
+    benchData["BARO"] = String(getBaroPressure(KPA));        
+    
+    // Relative Humidity
+    benchData["RELH"] = String(getRelativeHumidity(PERCENT));
+
+    // Pitot
+    double pitotPressure = getPitotPressure(INWG);
+    // Pitot probe displays as a percentage of the reference pressure
+    double pitotPercentage = (getPitotPressure(INWG) / refPressure);
+    benchData["PITOT"] = String(pitotPercentage);
+    
+    // Reference pressure
+    benchData["PREF"] = String(refPressure);
+    
+    // Adjusted Flow
+    // get the desired bench test pressure
+//    double desiredRefPressureInWg = menuARef.getCurrentValue(); //TODO: Add ref pressure setting to UI & Config
+    // convert from the existing bench test
+//    double adjustedFlow = convertFlowDepression(refPressure, desiredRefPressureInWg, mafFlowCFM);
+    // Send it to the display
+//    benchData["AFLOW"] = String(adjustedFlow);
+
+    // Version and build
+    String versionNumberString = String(MAJOR_VERSION) + '.' + String(MINOR_VERSION);
+    String buildNumberString = String(BUILD_NUMBER);
+    benchData["RELEASE"] = String(RELEASE);
+    benchData["BUILD_NUMBER"] = String(BUILD_NUMBER);
+
+    // Ref Presure Voltage
+    int refPressRaw = analogRead(REF_PRESSURE_PIN);
+    double refMillivolts = (refPressRaw * (5.0 / 1024.0)) * 1000;
+    benchData["PREF_MV"] = String(refMillivolts);
+
+    // Maf Voltage
+    int mafFlowRaw = analogRead(MAF_PIN);
+    double mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
+    benchData["MAF_MV"] = String(mafMillivolts);
+
+    // Pitot Voltage
+    int pitotRaw = analogRead(PITOT_PIN);
+    double pitotMillivolts = (pitotRaw * (5.0 / 1024.0)) * 1000;
+    benchData["PITOT_MV"] = String(pitotMillivolts);
+
+    String jsonString = JSON.stringify(benchData);
+    return jsonString;
+
+}
+

@@ -28,12 +28,12 @@
     // Define Physical Pins
 
     // VAC CONTROL
-    #define VAC_CONTROL_PIN         1       // vac motor(s) on/off
-    #define VAC_SPEED_PIN           25      // DAC speed reference for VFD
-    #define VAC_BLEED_VALVE_PIN     26      // DAC bleed valve control
+    #define VAC_CONTROL_PIN         1         // vac motor(s) on/off
+    #define VAC_SPEED_PIN           25        // DAC speed reference for VFD
+    #define VAC_BLEED_VALVE_PIN     26        // DAC bleed valve control
 
     // SENSORS
-    #define SPEED_SENSOR_PIN        12      // turbine speed for turbo flow bench
+    #define SPEED_SENSOR_PIN        12        // turbine speed for turbo flow bench
     #define VOLTAGE_PIN             2
     #define MAF_PIN                 4
     #define REF_PRESSURE_PIN        35
@@ -44,8 +44,8 @@
     #define HUMIDITY_PIN            17
 
     // COMMS
-    #define SERIAL0_TX              1       // UART0
-    #define SERIAL0_RX              3       // UART0
+    #define SERIAL0_TX              1         // UART0
+    #define SERIAL0_RX              3         // UART0
     #define SCA_PIN                 21 
     #define SCL_PIN                 22 
 

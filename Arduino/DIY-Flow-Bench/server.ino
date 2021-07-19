@@ -22,10 +22,113 @@
  * DECLARE GLOBALS
  ***/
 
-//const char* LANGUAGE_FILE = "EN_Language.h";
 
 String hostname = HOSTNAME; 
+String localIpAddress;
 bool apMode = false;
+#define FILESYSTEM SPIFFS
+bool ledState = 0;
+
+
+
+
+
+/****************************************
+ * FORMAT BYTES
+ ***/
+String formatBytes(size_t bytes) {
+  if (bytes < 1024) {
+    return String(bytes) + "B";
+  } else if (bytes < (1024 * 1024)) {
+    return String(bytes / 1024.0) + "KB";
+  } else if (bytes < (1024 * 1024 * 1024)) {
+    return String(bytes / 1024.0 / 1024.0) + "MB";
+  } else {
+    return String(bytes / 1024.0 / 1024.0 / 1024.0) + "GB";
+  }
+}
+
+
+
+/****************************************
+ * INITIALISE SERVER
+ ***/
+void initialiseServer() {
+
+    // Serial
+    Serial.begin(SERIAL_BAUD_RATE);      
+    Serial.println("\r\n");
+    Serial.println("DIY Flow Bench ");
+    Serial.println("Version: " RELEASE);
+    Serial.println("Build: " BUILD_NUMBER);
+
+    // Filesystem
+    Serial.print(F("File System Inizializing "));
+    if (SPIFFS.begin()){
+      Serial.println(F("done."));
+    } else {
+      Serial.println(F("failed."));
+      #if defined FORMAT_FILESYSTEM_IF_FAILED
+          SPIFFS.format();
+          Serial.println("File System Formatted ");
+      #endif
+    }
+    Serial.println("Filesystem contents:");
+    FILESYSTEM.begin();
+    File root = FILESYSTEM.open("/");
+    File file = root.openNextFile();
+    while(file){
+        String fileName = file.name();
+        size_t fileSize = file.size();
+        Serial.print( fileName.c_str());
+        Serial.print(" : ");
+        Serial.println( formatBytes(fileSize).c_str());
+        file = root.openNextFile();
+    }
+
+
+    // API
+    #if defined API_ENABLED
+      Serial.println("Serial API Enabled");
+    #endif
+
+    // WiFi    
+    Serial.println("Connecting to WiFi");
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(WIFI_SSID, WIFI_PSWD);
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+    }
+    Serial.print("Connected to ");
+    Serial.println(WIFI_SSID);
+    Serial.print("IP address: ");
+    localIpAddress = WiFi.localIP().toString();
+    Serial.println(WiFi.localIP());
+
+    
+    // Server Request handlers
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send(SPIFFS, "/index.html", "text/html");
+    });
+
+    server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send(SPIFFS, "/style.css", "text/css");
+    });
+    server.on("/javascript.js", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send(SPIFFS, "/javascript.js", "text/javascript");
+    });
+  
+    ws.onEvent(onEvent);
+    server.addHandler(&ws);
+
+    server.begin();
+
+    Serial.println("Server Running");
+
+}
+
+
 
 
 
@@ -46,73 +149,58 @@ void sendSerial(String message)
 
 
 
+/****************************************
+ * Push Server Data 
+ ***/
+void notifyClients(String jsonValues) {
+  ws.textAll(String(jsonValues));
+}
+
+
 
 /****************************************
- * 404 Error
- * 
+ * Process Websocket Message
  ***/
-void error404() {
-  String message = "File Not Found\n\n";
-  message += "URI: ";
-  message += server.uri();
-  message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args();
-  message += "\n";
- 
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
+  AwsFrameInfo *info = (AwsFrameInfo*)arg;
+  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
+    data[len] = 0;
+    
+    if (strcmp((char*)data, "toggle") == 0) {
+      // This is where we assign data
+      ledState = !ledState;
+      notifyClients(getJsonData());
+    }
+
+    if (strcmp((char*)data, "getValues") == 0) {
+      notifyClients(getJsonData());
+    }
+    
   }
- 
-  server.send(404, "text/plain", message);
 }
 
-
-
-
 /****************************************
- * Load From SPIFFS
+ * Websocket Event Listener
  ***/
-bool loadFromSPIFFS(String path) {
-  String dataType = "text/html";
- 
-  Serial.print("Requested page -> ");
-  Serial.println(path);
-  if (SPIFFS.exists(path)){
-      File dataFile = SPIFFS.open(path, "r");
-      if (!dataFile) {
-          error404();
-          return false;
-      }
- 
-      if (server.streamFile(dataFile, dataType) != dataFile.size()) {
-        Serial.println("Sent less data than expected!");
-      }else{
-          Serial.println("Page served!");
-      }
- 
-      dataFile.close();
-  }else{
-      error404();
-      return false;
+void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
+ void *arg, uint8_t *data, size_t len) {
+  switch (type) {
+    case WS_EVT_CONNECT:
+      Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+      break;
+    case WS_EVT_DISCONNECT:
+      Serial.printf("WebSocket client #%u disconnected\n", client->id());
+      break;
+    case WS_EVT_DATA:
+      handleWebSocketMessage(arg, data, len);
+      break;
+    case WS_EVT_PONG:
+    case WS_EVT_ERROR:
+      break;
   }
-  return true;
 }
 
 
 
-/****************************************
- * Load From Server Root
- ***/
-void handleRoot() {
-    loadFromSPIFFS("/index.html");  
-}
 
-
-// void sendData() {
-//   long randNumber;
-//   randNumber = random(300);
-//   server.send(200, "text/event-stream", String(randNumber));
-// }
 
