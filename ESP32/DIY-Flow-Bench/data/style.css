@@ -1,0 +1,219 @@
+/* Set height of body and the document to 100% to enable "full page tabs" */
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: Arial;
+  font-size:22px;
+}
+
+/* Style tab links */
+.tablink {
+  background-color: #555;
+  color: white;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 18px 16px;
+  font-size: 22px;
+  width: 50%;
+}
+
+.tablink:active {
+  background-color: #777;
+}
+
+.tablink:hover {
+  background-color: #777;
+}
+
+/* Style the tab content (and add height:100% for full page content) */
+.tabcontent {
+  display: none;
+  padding: 100px 20px;
+  height: 100%;
+}
+
+#Home {background-color: white;}
+#News {background-color: white;}
+#Contact {background-color: white;}
+#About {background-color: white;}
+
+html {
+  font-family: Helvetica;
+  display: inline-block;
+  margin: 0px auto;
+}
+
+.headerbar {
+	overflow: hidden;
+	background-color: #0A1128;
+  text-align: center;
+}
+
+h1{
+  color: #FFF;
+}
+
+p{
+  font-size: 1.5rem;
+}
+
+a:link  {
+  color:#0A1128;
+  text-decoration:none;
+}
+
+a:visited, a:active {
+  color:#0A1128;
+  text-decoration:none;
+}
+
+a:hover {
+  color:#666;
+  text-decoration:none;
+}
+
+hr {
+  clear: both;
+}
+
+.content {
+	padding: 30px;
+}
+
+.float-right{
+  float:right;
+}
+
+.align-center{
+  text-align: center;
+}
+
+.clear-both {
+  clear:both;
+}
+
+.tile-grid {
+	max-width: 700px;
+	margin: 0 auto;
+	display: grid;
+	grid-gap: 2rem;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.tile {
+	background-color: white;
+	box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+  text-align: center;
+}
+
+.tile-title {
+	font-size: 1rem;
+	font-weight: bold;
+	color: #034078
+}
+
+.tile-value {
+	font-size: 2.1rem;
+	font-weight: bold;
+	color: #333
+}
+
+.config-panel {
+  max-width: 500px;
+  margin: auto auto;
+}
+
+.config-row {
+  margin-top: 5px;
+  margin-top: 5px;
+}
+
+.config-label {
+  padding-left: 5%;
+}
+
+.config-value {
+  padding-right: 5%;
+  width: 34%;
+  float: right;
+}
+
+.config-text {
+  width: 40%;
+  float: right;
+}
+
+.units {
+  font-size: 0.8rem;
+  color:#666;
+}
+
+.status_message {
+  font-size: 1.2rem;
+  color:#666;
+}
+
+#footer {
+  clear:both;
+  text-align: center;
+}
+
+.hidden_div {
+  display:none;
+}
+
+.button {
+  display: inline-block;
+  background-color: #008CBA;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  padding: 12px 30px;
+  text-decoration: none;
+  font-size: 22px;
+  margin: 2px;
+  cursor: pointer;
+}
+
+.save-button {
+  background-color: #44b112;
+}
+
+
+
+.tooltip {
+  position: relative;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 250px;
+  background-color: #666;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
