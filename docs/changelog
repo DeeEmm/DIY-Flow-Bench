@@ -152,4 +152,9 @@ Build #     - Description of Change
             - Asynchronous web sockets
             - Added Status messages
             - Added JSON status message to API
-        
+21072301    - Added Multicast DNS Service
+            - Added fallback to AP mode
+            - Added tabbed interface to webserver
+            - Added configuration settings
+            
+                    
