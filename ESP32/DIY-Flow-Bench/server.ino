@@ -19,12 +19,9 @@
 
 
 /****************************************
- * DECLARE GLOBALS
+ * DECLARE VARS
  ***/
 
-
-
-String localIpAddress;
 bool apMode = false;
 #define FILESYSTEM SPIFFS
 bool ledState = 0;
@@ -54,6 +51,7 @@ String formatBytes(size_t bytes) {
 void initialiseServer() {
 
     extern ConfigSettings config;
+    extern DeviceStatus stats;
 
     // Serial
     Serial.begin(config.serial_baud_rate);      
@@ -76,17 +74,17 @@ void initialiseServer() {
       #endif
     }
     // Filesystem info
-    unsigned int totalBytes = SPIFFS.totalBytes();
-    unsigned int usedBytes = SPIFFS.usedBytes();
+    stats.spiffs_mem_size = SPIFFS.totalBytes();
+    stats.spiffs_mem_used = SPIFFS.usedBytes();
  
     Serial.println("===== File system info =====");
  
     Serial.print("Total space:      ");
-    Serial.print(totalBytes);
+    Serial.print(stats.spiffs_mem_size);
     Serial.println("byte");
  
     Serial.print("Total space used: ");
-    Serial.print(usedBytes);
+    Serial.print(stats.spiffs_mem_used);
     Serial.println("byte");
  
     Serial.println();
@@ -121,9 +119,9 @@ void initialiseServer() {
       // Connection success     
       Serial.print("Connected to ");
       Serial.println(config.wifi_ssid);
-      localIpAddress = WiFi.localIP().toString();
+      stats.local_ip_address = WiFi.localIP().toString();
       Serial.print("IP address: ");
-      Serial.println(localIpAddress);
+      Serial.println(stats.local_ip_address);
     } else {
       // Did not connect - Go into AP Mode
       apMode = true;
@@ -132,9 +130,9 @@ void initialiseServer() {
       Serial.print(config.wifi_ap_ssid);
       Serial.println(")");
       WiFi.softAP(config.wifi_ap_ssid.c_str(), config.wifi_ap_pswd.c_str());
-      localIpAddress = WiFi.softAPIP().toString();
+      stats.local_ip_address = WiFi.softAPIP().toString();
       Serial.print("AP IP address: ");
-      Serial.println(localIpAddress);     
+      Serial.println(stats.local_ip_address);     
     }
 
     // Set up Multicast DNS
@@ -215,6 +213,11 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
 
     } else if (strcmp((char*)data, "loadConfig") == 0) {
       Serial.println("Load Config");
+      notifyClients(loadConfig());
+
+    } else if (strcmp((char*)data, "calibrate") == 0) {
+      Serial.println("Calibrate");
+      // TODO - Do calibration
       notifyClients(loadConfig());
 
     } else {

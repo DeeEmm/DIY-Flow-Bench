@@ -1,15 +1,17 @@
 var gateway = `ws://${window.location.hostname}/ws`;
 var websocket;
-
 window.addEventListener('load', onLoad);
 
+/***
+* Web Socket handlers
+*/
 
 function initialiseWebSocket() {
   console.log('Trying to open a WebSocket connection...');
   websocket = new WebSocket(gateway);
   websocket.onopen    = onOpen;
   websocket.onclose   = onClose;
-  websocket.onmessage = onMessage; // <-- add this line
+  websocket.onmessage = onMessage;
 }
 
 function refresh (){
@@ -23,6 +25,7 @@ function onOpen(event) {
   refresh();
 }
 
+
 function onClose(event) {
   console.log('Connection closed');
   setTimeout(initialiseWebSocket, 2000);
@@ -34,13 +37,12 @@ function onMessage(event) {
   var myObj = JSON.parse(event.data);
   var keys = Object.keys(myObj);
   
-  
   console.log(keys[0]);
   
   switch (keys[0]) {
     
-    case "CONF_WIFI_AP_SSID":
-    case "CONF_WIFI_SSID":
+    // We have received config data (not #st value)
+    case "CONF_WIFI_SSID": 
       for (var i = 0; i < keys.length; i++){
         var key = keys[i];
         try {
@@ -52,6 +54,7 @@ function onMessage(event) {
       }
     break;
     
+    //We have received status data
     case "STATUS_MESSAGE":
       for (var i = 0; i < keys.length; i++){
         var key = keys[i];
@@ -69,6 +72,10 @@ function onMessage(event) {
   
 }
 
+
+/***
+* Page Load Handler
+*/
 function onLoad(event) {
   initialiseWebSocket();
   initialiseButtons();
@@ -76,60 +83,85 @@ function onLoad(event) {
   console.log('Page Loaded');
 }
 
+
+/***
+* Initialise Buttons
+*/
 function initialiseButtons() {
   document.getElementById('refresh-button').addEventListener('click', function(){refresh();});
   document.getElementById('load-config-button').addEventListener('click', function(){socketSend('loadConfig');});
+  document.getElementById('calibrate-button').addEventListener('click', function(){socketSend('calibrate');});
   document.getElementById('save-config-button').addEventListener('click', function(){socketSend('saveConfig');});
 }
 
+
+/***
+* Serialise JSON
+*/
 function serializeJSON (form) {
-  // Create a new FormData object
   const formData = new FormData(form);
-
-  // Create an object to hold the name/value pairs
   const pairs = {};
-
-  // Add each name/value pair to the object
   for (const [name, value] of formData) {
     pairs[name] = value;
   }
-
-  // Return the JSON string
   return JSON.stringify(pairs, null, 2);
 }
 
+/***
+* Socket Send
+*/
 function socketSend(message){
- 
-  
+
   switch (message) {
     
     case "loadConfig":
       websocket.send(message);
-      console.log('Web Socket Message: ' + message);
+//      console.log('Web Socket Message: ' + message);
     break;
 
     case "saveConfig":
       const form = document.querySelector('form');
-      //serialise web form data into JSON
-      //Send JSON to server to update config.txt
-
       websocket.send(serializeJSON(form));
     break;
   }
 
 }
 
+
+/***
+* Page tabs
+*/
 function openPage(pageName, elmnt, color) {
-  // Hide all elements with class="tabcontent" by default */
   var i, tabcontent, tablinks;
   tabcontent = document.getElementsByClassName("tabcontent");
   for (i = 0; i < tabcontent.length; i++) {
     tabcontent[i].style.display = "none";
   }
-
-  // Show the specific tab content
   document.getElementById(pageName).style.display = "block";
+}
 
-  // Add the specific color to the button used to open the tab content
-//  elmnt.style.backgroundColor = color;
+
+/***
+* Modal Dialogs
+*/
+
+var fileModal = document.getElementById("fileModal");
+var statusModal = document.getElementById("statusModal");
+
+var spanCloseFileModal = document.getElementsByClassName("closeFileModal")[0];
+var spanCloseStatusModal = document.getElementsByClassName("closeStatusModal")[0];
+
+spanCloseFileModal.onclick = function() {
+  fileModal.style.display = "none";
+}
+
+spanCloseStatusModal.onclick = function() {
+  statusModal.style.display = "none";
+}
+
+window.onclick = function(event) {
+  if (event.target == fileModal || event.target == statusModal ) {
+    fileModal.style.display = "none";
+    statusModal.style.display = "none";
+  }
 }

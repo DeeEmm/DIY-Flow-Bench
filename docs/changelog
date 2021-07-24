@@ -156,5 +156,10 @@ Build #     - Description of Change
             - Added fallback to AP mode
             - Added tabbed interface to webserver
             - Added configuration settings
+21072401    - Added calibration settings
+            - Added additional configuration settings
+            - Updated configuration file JSON formatting
+            - Changed config file extension from txt to JSON
+            - Added modal dialogs for file management and status
             
                     

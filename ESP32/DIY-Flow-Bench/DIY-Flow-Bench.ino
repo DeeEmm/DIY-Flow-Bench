@@ -63,24 +63,44 @@ extern int statusVal;
 /****************************************
  * Create data structure for config params
  * 
- * Note that these settings are overwritten by config.txt stored in SPIFFS
+ * Note that these settings are overwritten by config.json stored in SPIFFS
  ***/
 struct ConfigSettings {
-  String wifi_ssid = "WIFI-SSID";            // Your Wifi SSID
-  String wifi_pswd = "<WIFI-PSWD>";          // Your Wifi Password
+  String wifi_ssid = "WIFI-SSID";           // Your Wifi SSID
+  String wifi_pswd = "<WIFI-PSWD>";         // Your Wifi Password
   String wifi_ap_ssid = "DIYFB";            // Default Accesspoint name
   String wifi_ap_pswd = "123456789";        // Default Accesspoint Password
-  String hostname = "diyfb";                 // Default Hostname
-  char* api_delim = ":";                    // API Serial comms delimiter
+  String hostname = "diyfb";                // Default Hostname
+  String api_delim = ":";                    // API Serial comms delimiter
   long serial_baud_rate = 115200;           // Default baud rate 
   int wifi_timeout = 30;                    // Time in seconds before falling back to AP mode
   int min_flow_rate = 3;                    // Flow rate at which bench is considered running
   int min_bench_pressure = 0;               // Minimum bench pressure at which bench is considered running
   int maf_min_millivolts = 100;             // Filter out results less than this
   int refresh_rate = 100;                   //  Screen refresh rate in milliseconds
+  float cal_ref_press = 10;                 //  Calibration orifice refe pressure
+  float cal_flow_rate = 14.4;               // Calibration orifica flow rate
+  float cal_offset = 0;                     // Calibration offset
+  int cyc_av_buffer = 5;                    // Number of scans over which to average output (helps stabilise results)
+  int leak_test_tolerance = 2;              //  Screen refresh rate in milliseconds
+  bool show_alarms = 5;                     // Number of scans over which to average output (helps stabilise results)
 };
 ConfigSettings config;
 
+struct DeviceStatus {
+  int boot_time = esp_timer_get_time();
+  int spiffs_mem_size = 0;
+  int spiffs_mem_used = 0;
+  String local_ip_address;
+  String maf_sensor;
+  String pref_sensor;
+  String temp_sensor;
+  String relh_sensor;
+  String baro_sensor;
+  String pitot_sensor;
+};
+
+DeviceStatus stats;
 
 
 

@@ -17,17 +17,6 @@
  ***/
 
 
-/****************************************
- * DECLARE CONSTANTS
- ***/
-
-
-
-/****************************************
- * DECLARE VARIABLES
- ***/
-
-
 
 
 /****************************************
@@ -38,8 +27,8 @@ String loadConfig(){
   extern ConfigSettings config;
 
 
-  if (SPIFFS.exists("/config.txt")){
-    File configFile = SPIFFS.open("/config.txt", FILE_READ);
+  if (SPIFFS.exists("/config.json")){
+    File configFile = SPIFFS.open("/config.json", FILE_READ);
 
     if (!configFile) {
         statusMessage = LANG_ERROR_LOADING_CONFIG;
@@ -84,7 +73,7 @@ String loadConfig(){
     }    
     configFile.close();
   } else {
-    Serial.println("config.txt missing");
+    Serial.println("config.json missing");
   }
 }
 
@@ -109,30 +98,32 @@ void saveConfig(uint8_t *data, size_t len){
   config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
   config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
 
-
+  config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
+  config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
+  config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
+  config.maf_min_millivolts  = configData["CONF_MIN_MAF_MILLIVOLTS"].as<int>();
+  config.api_delim = configData["CONF_API_DELIM"].as<String>();
+  config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
+  config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
+  config.leak_test_tolerance = configData["CONF_LEAK_TEST_TOLERANCE"].as<int>();
+  config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<float>();
+  config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<float>();
+  config.cal_offset = configData["CONF_CAL_OFFSET"].as<float>();
 
 
 //  DynamicJsonDocument configJson(1024);
 
-//  configJson["CONF_API_DELIM"] = String(config.api_delim);
-//  configJson["CONF_SERIAL_BAUD_RATE"] = String(config.serial_baud_rate);
-//  configJson["CONF_MIN_FLOW_RATE"] = String(config.min_flow_rate);
-//  configJson["CONF_MIN_BENCH_PRESSURE"] = String(config.min_bench_pressure);
-//  configJson["CONF_MAF_MIN_MILLIVOLTS"] = String(config.maf_min_millivolts);
 
-  // "CONF_REFRESH_RATE": 200,
   // "CONF_DATALOG_RATE": 200,
-  // "CONF_SHOW_ALARMS": "true",
-  // "CONF_LEAK_TEST_TOLERANCE": 2,
-  // "CONF_CAL_REF_PRESS": 10,
-  // "CONF_CAL_FLOW_RATE": 14.4
+
+
 
 
 //  char jsonBuffer[1024];
-  File configFile = SPIFFS.open("/config.txt", FILE_WRITE);
+  File configFile = SPIFFS.open("/config.json", FILE_WRITE);
   serializeJsonPretty(configData, configFile);
   // if (!configFile.println(data)){
-  //   //do nothing
+  //   Serial.println("config.json file wwrite failed");
   // }
   configFile.close();
 

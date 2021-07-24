@@ -175,12 +175,29 @@ hr {
   font-size: 22px;
   margin: 2px;
   cursor: pointer;
+  width:150px;
 }
 
-.save-button {
+#record-button {
+  background-color: #fa2e04;
+}
+
+#save-button {
   background-color: #44b112;
 }
 
+#calibrate-button{
+  background-color: #fa2e04;
+}
+
+#file-manager-button {
+  width:48%;
+}
+
+
+#status-button {
+  width:48%;
+}
 
 
 .tooltip {
@@ -195,7 +212,7 @@ hr {
   color: #fff;
   text-align: center;
   border-radius: 6px;
-  padding: 5px 0;
+  padding: 5px 5px;
   position: absolute;
   z-index: 1;
   bottom: 150%;
@@ -216,4 +233,46 @@ hr {
 
 .tooltip:hover .tooltiptext {
   visibility: visible;
+}
+
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 60%; /* Could be more or less, depending on screen size */
+  border-radius: 5px;
+}
+
+/* The Close Button */
+.closeStatusModal, .closeFileModal {
+  color: #aaa;
+  float: right;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.closeFileModal:hover, 
+.closeFileModal:focus,
+.closeStatusModal:hover,
+.closeStatusModal:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }

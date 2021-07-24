@@ -5,13 +5,53 @@
       <link rel="stylesheet" type="text/css" href="/style.css">    
 	</HEAD>
 	<BODY>
-    
+
+        <!-- File Manager Modal -->
+        <div id="fileModal" class="modal">
+          <div class="modal-content">
+            <span class="closeFileModal">&times;</span>
+            <h3>File Manager</h3>
+            <div>Filename | Filesize | Del | Download</div>
+            <div>Filename | Filesize | Del | Download</div>
+            <div>Filename | Filesize | Del | Download</div>
+            <div>Filename | Filesize | Del | Download</div>
+            <hr>
+            <button id="upload-button" class="button">Upload</button>
+          </div>        
+        </div>
+
+        <!-- Status Modal -->
+        <div id="statusModal" class="modal">
+          <div class="modal-content">
+            <span class="closeStatusModal">&times;</span>
+            <h3>System Status</h3>
+              <div class="config-row"><label class="config-label">Version: </label><span class="config-value" id="RELEASE">&nbsp;</span></div>
+              <div class="config-row"><label class="config-label">Build:  </label><span class="config-value" id="BUILD_NUMBER">&nbsp;</span></div>
+              <hr>
+              <div class="config-row"><label class="config-label">Memory Size:  </label><span class="config-value" id="SPIFFS_MEM_SIZE">&nbsp;</span></div>
+              <div class="config-row"><label class="config-label">Memory Used:  </label><span class="config-value" id="SPIFFS_MEM_USED">&nbsp;</span></div>
+              <div class="config-row"><label class="config-label">IP Address:  </label><span class="config-value" id="LOCAL_IP_ADDRESS">&nbsp;</span></div>
+              <div class="config-row"><label class="config-label">Uptime:  </label><span class="config-value" id="UPTIME">&nbsp;</span></div>
+              <div class="config-row"><label class="config-label">MAF Sensor:  </label><span class="config-value" id="MAF_SENSOR">&nbsp;</span></div>
+              <div class="config-row"><label class="config-label">Reference Pressure Sensor:  </label><span class="config-value" id="PREF_SENSOR">&nbsp;</span></div>
+              <div class="config-row"><label class="config-label">Temperature Sensor:  </label><span class="config-value" id="TEMP_SENSOR">&nbsp;</span></div>
+              <div class="config-row"><label class="config-label">Humidity Sensor:  </label><span class="config-value" id="RELH_SENSOR">&nbsp;</span></div>
+              <div class="config-row"><label class="config-label">Baro Sensor:  </label><span class="config-value" id="BARO_SENSOR">&nbsp;</span></div>
+              <div class="config-row"><label class="config-label">Pitot Sensor:  </label><span class="config-value" id="PITOT_SENSOR">&nbsp;</span></div>
+          </div>        
+        </div>
+          
+
+        <!-- main page code -->
+
         <div class="headerbar">
             <h1>DIY Flow Bench</h1>
         </div>
 
         <button class="tablink" onclick="openPage('dashboard', this, 'red')" id="defaultOpen">Dashboard</button>
         <button class="tablink" id="load-config-button" onclick="openPage('configuration', this, 'blue')">Configuration</button>
+
+        <!-- dashboard tab -->
 
         <div id="dashboard" class="tabcontent">        
           <div class="content">
@@ -55,7 +95,7 @@
               <br>MAF mV: <span id="MAF_MV">&nbsp;</span>
               <br>Pitot mV: <span id="PITOT_MV">&nbsp;</span>
             </div>   
-            <p><button id="refresh-button" class="button">Refresh</button></p>
+            <p><button id="refresh-button" class="button">Refresh</button>&nbsp;<button id="record-button" class="button">Record</button></p>
             <p><a href="#"><button id="button" class="button">ON</button></a>&nbsp;<a href="#"><button class="button button2">OFF</button></a></p>       
           </div>
                     
@@ -64,12 +104,13 @@
 
         </div>
         
-        <form action="#">
+
+        <!-- configuration tab -->
+
+        <form action="#" onsubmit="return false;">
         <div id="configuration" class="tabcontent">
           <div class="config-panel">
-            <div class="config-row"><label class="config-label">Version: </label><span class="config-value" id="RELEASE">&nbsp;</span></div>
-            <div class="config-row"><label class="config-label">Build:  </label><span class="config-value" id="BUILD_NUMBER">&nbsp;</span></div>
-            <hr>
+            <p><a href="#"><button onclick="document.getElementById('fileModal').style.display='block'" id="file-manager-button" class="button">File Manager</button></a>&nbsp;<a href="#"><button onclick="document.getElementById('statusModal').style.display='block'" id="status-button" class="button">Status</button></a></p>       
             <br>
             <h3>WiFi Info</h3>
             <div class="config-row tooltip"><label class="config-label">WiFi SSID:</label>&nbsp;<input type="text" id="CONF_WIFI_SSID"  name="CONF_WIFI_SSID" value="CONF_WIFI_SSID" class="config-text" ><span class="tooltiptext">The name of your WiFi network</span></div>
@@ -87,18 +128,24 @@
             <div class="config-row tooltip"><label class="config-label">Min Flow Rate:</label>&nbsp;<input type="text" id="CONF_MIN_FLOW_RATE" name="CONF_MIN_FLOW_RATE" value="CONF_MIN_FLOW_RATE" class="config-text"><span class="tooltiptext">Used to filter out non-zero flow values when bench is not running </span></div>
             <div class="config-row tooltip"><label class="config-label">Min Bench Pressure:</label>&nbsp;<input type="text" id="CONF_MIN_BENCH_PRESSURE" name="CONF_MIN_BENCH_PRESSURE" value="CONF_MIN_BENCH_PRESSURE" class="config-text"><span class="tooltiptext">Minimum reference pressure that bench is considered running</span></div>
             <div class="config-row tooltip"><label class="config-label">MAF Min Millivolts:</label>&nbsp;<input type="text" id="CONF_MAF_MIN_MILLIVOLTS" name="CONF_MAF_MIN_MILLIVOLTS" value="CONF_MAF_MIN_MILLIVOLTS" class="config-text"><span class="tooltiptext">Minimum MAF voltage that bench is considered running</span></div>
+            <div class="config-row tooltip"><label class="config-label">Cyclical Average Buffer:</label>&nbsp;<input type="text" id="CONF_CYCLIC_AVERAGE_BUFFER" name="CONF_CYCLIC_AVERAGE_BUFFER" value="CONF_CYCLIC_AVERAGE_BUFFER" class="config-text"><span class="tooltiptext">Mean buffer size - Used for smoothing results.</span></div>
             <br>
             <h3>Bench Settings</h3>
             <div class="config-row tooltip"><label class="config-label">Refresh Rate:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="CONF_REFRESH_RATE" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
             <div class="config-row tooltip"><label class="config-label">Display Alarms:</label>&nbsp;<input type="text" id="CONF_SHOW_ALARMS" name="CONF_SHOW_ALARMS" value="CONF_SHOW_ALARMS" class="config-text"><span class="tooltiptext">Show alarms on browser console</span></div>
             <br>
-            <h3>Calibration Data</h3>
-            <div class="config-row tooltip"><label class="config-label">Calibration Ref Pressure:</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="CONF_CAL_REF_PRESS" class="config-text"><span class="tooltiptext">Reference pressure measured during calibration</span></div>
-            <div class="config-row tooltip"><label class="config-label">Calibration Flow Rate:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="CONF_CAL_FLOW_RATE" class="config-text"><span class="tooltiptext">Flow rate measured during calibration</span></div>
-            <div class="config-row tooltip"><label class="config-label">Leak Test Tolerance:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_TOLERANCE" name="CONF_LEAK_TEST_TOLERANCE" value="CONF_LEAK_TEST_TOLERANCE" class="config-text"><span class="tooltiptext">Maximum allowable deviation in cfm</span></div>
-            <br>
-            <br>
             <div class="float-right"><button id="save-config-button" class="button">Save</button></div>
+            <br>
+            <br>
+            <h3>Calibration Data</h3>
+            <div class="config-row tooltip"><label class="config-label">Orifice Flow Rate:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="CONF_CAL_FLOW_RATE" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice Test Pressure:</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="CONF_CAL_REF_PRESS" class="config-text"><span class="tooltiptext">Reference pressure of calibration orifice</span></div>
+            <div class="config-row tooltip"><label class="config-label">Leak Test Tolerance:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_TOLERANCE" name="CONF_LEAK_TEST_TOLERANCE" value="CONF_LEAK_TEST_TOLERANCE" class="config-text"><span class="tooltiptext">Maximum allowable deviation in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Calibration Offset:</label>&nbsp;<input disabled="true" type="text" id="CONF_CAL_OFFSET" name="CONF_CAL_OFFSET" value="CONF_CAL_OFFSET" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
+            <br>
+            <div class="float-right"><button id="calibrate-button" class="button">Calibrate</button></div>
+            <br>
+            <br>
           </div>                    
         </div>
         </form>

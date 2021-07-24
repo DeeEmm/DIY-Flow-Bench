@@ -15,7 +15,7 @@
 
 #define MAJOR_VERSION "ESP-PORT"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "21072301"
+#define BUILD_NUMBER "21072401"
 #define RELEASE "V.ESP.X-ALPHA"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -23,24 +23,13 @@
 /****************************************
  * DEFAULT USER SETTINGS
  *
- * Updated user settings are stored in config.txt
- * These settings are used if config.txt is unavailable
  ***/
 
-#define MIN_BENCH_PRESSURE 0              // Minimum pressure that we consider the bench is 'operational' / 'running' / vac source is on
-#define MIN_FLOW_RATE 3                   // Flow rate in cfm below which bench is considered off
-#define CYCLIC_AVERAGE_BUFFER 5           // Number of scans over which to average output (helps stabilise results)
-#define MIN_MAF_MILLIVOLTS 100
-#define minTestPressurePercentage 80      // Lowest test pressure bench will generate accurate results. Please see note in wiki
-
-#define leakTestTolerance 2               // Tolerance in cfm
-#define calibrationRefPressure 10         // Reference pressure orifices were measured at (leave at 10" if calibrating with CD)
-#define calibrationFlowRate 14.4          // Standard flow rate for CD @ 10"/wg
+//#define CYCLIC_AVERAGE_BUFFER 5           // Number of scans over which to average output (helps stabilise results)
+#define MIN_TEST_PRESSURE_PERCENTAGE 80      // Lowest test pressure bench will generate accurate results. Please see note in wiki
 
 #define CONF_API_ENABLED                       // enable API
 #define CONF_DISABLE_API_CHECKSUM              // Add checksum to serial API response TODO UPDATE CHECKSUM TO NATIVE ESP32 CRC32
-char CONF_API_DELIM = ':';
-#define CONF_SERIAL_BAUD_RATE 115200   
 
 
 /****************************************

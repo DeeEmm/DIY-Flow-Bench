@@ -57,7 +57,7 @@ const int BENCH_RUNNING = 6;
 
 
 /****************************************
- * DECLARE GLOBALS
+ * DECLARE VARS
  ***/
 bool streamMafData = false;
 float startupBaroPressure;
@@ -652,11 +652,10 @@ void refPressureCheck()
 {
     float refPressure = getRefPressure(INWG);
 
-    // Check that pressure does not fall below limit set by minTestPressurePercentage when bench is running
+    // Check that pressure does not fall below limit set by MIN_TEST_PRESSURE_PERCENTAGE when bench is running
     // note alarm commented out in alarm function as 'nag' can get quite annoying
-    // Is this a redundant check? 
-    // maybe a different alert would be more appropriate
-    if ((refPressure > (calibrationRefPressure * (minTestPressurePercentage / 100))) && (benchIsRunning()))
+    // Is this a redundant check? Maybe a different alert would be more appropriate
+    if ((refPressure < (config.cal_ref_press * (MIN_TEST_PRESSURE_PERCENTAGE / 100))) && (benchIsRunning()))
     {
         statusVal = REF_PRESS_LOW;
     }
@@ -727,14 +726,16 @@ void statusMessageHandler(int statusVal)
 
     float MafFlowCFM = getMafFlowCFM();
     float RefPressure = getRefPressure(INWG);
-    float convertedMafFlowCFM = convertFlowDepression(RefPressure, calibrationRefPressure,  MafFlowCFM);
-    float flowCalibrationOffset = calibrationFlowRate - convertedMafFlowCFM;
+    float convertedMafFlowCFM = convertFlowDepression(RefPressure, config.cal_ref_press,  MafFlowCFM);
+    float flowCalibrationOffset = config.cal_flow_rate - convertedMafFlowCFM;
 
     char flowCalibrationOffsetText[12]; // Buffer big enough?
     dtostrf(flowCalibrationOffset, 6, 2, flowCalibrationOffsetText); // Leave room for too large numbers!
       
-    //Store data in EEPROM
-//    EEPROM.write(NVM_CD_CAL_OFFSET_ADDR, flowCalibrationOffset);
+    // Store data in EEPROM
+    // EEPROM.write(NVM_CD_CAL_OFFSET_ADDR, flowCalibrationOffset);
+
+// TODO - store in JSON 
 
     return flowCalibrationOffset;
 }
@@ -747,7 +748,7 @@ void statusMessageHandler(int statusVal)
  ***/
  float getCalibrationOffset() {
 
-//TODO
+// TODO - cal data loaded with json config
 
  }
 
@@ -785,7 +786,7 @@ int  leakTest() {
     int refPressure = getRefPressure(INWG);
 
     //compare calibration data from NVM
-    if (leakCalibrationValue > (refPressure - leakTestTolerance))
+    if (leakCalibrationValue > (refPressure - config.leak_test_tolerance))
     {   
        return LEAK_TEST_FAILED;
     } else {     
