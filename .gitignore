@@ -10,9 +10,13 @@
 /GUI/DiyFlowBench.Api.Test/obj
 /.vs
 .pio/
+build/
 Arduino/DIY-Flow-Bench/node_modules/*
 platformio.ini
 .pio/build/release/.sconsign39.dblite
 .pio/build/release/.sconsign39.dblite
 .pio/build/release/spiffs.bin
 .pio/build/release/.sconsign39.dblite
+.pio/build/release/spiffs.bin
+*.dblite
+.pio/build/release/spiffs.bin
