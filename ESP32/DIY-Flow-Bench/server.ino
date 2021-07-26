@@ -19,19 +19,22 @@
 
 
 /****************************************
+ * DECLARE CONSTANTS
+ ***/
+
+
+/****************************************
  * DECLARE VARS
  ***/
 
 bool apMode = false;
 #define FILESYSTEM SPIFFS
-bool ledState = 0;
-
 
 
 /****************************************
- * FORMAT BYTES
+ * Byte Decode 
  ***/
-String formatBytes(size_t bytes) {
+String byteDecode(size_t bytes) {
   if (bytes < 1024) {
     return String(bytes) + "B";
   } else if (bytes < (1024 * 1024)) {
@@ -88,19 +91,6 @@ void initialiseServer() {
     Serial.println("byte");
  
     Serial.println();
-    // Serial.println("Filesystem contents:");
-    // FILESYSTEM.begin();
-    // File root = FILESYSTEM.open("/");
-    // File file = root.openNextFile();
-    // while(file){
-    //     String fileName = file.name();
-    //     size_t fileSize = file.size();
-    //     Serial.print( fileName.c_str());
-    //     Serial.print(" : ");
-    //     Serial.println( formatBytes(fileSize).c_str());
-    //     file = root.openNextFile();
-    // }
-
 
     // API
     #if defined API_ENABLED
@@ -165,66 +155,89 @@ void initialiseServer() {
 
     Serial.println("Server Running");
 
-
-}
-
-
-
-
-
-/****************************************
- * Send Serial Message
- ***/
-void sendSerial(String message)
-{   
-
-    Serial.print(message);
-
-    #if defined SERIAL1_ENABLED
-        Serial1.print(message);
-    #endif
-
 }
 
 
 
 
 /****************************************
- * Push Server Data 
+ * Push Server Data to client
  ***/
 void notifyClients(String jsonValues) {
   ws.textAll(String(jsonValues));
 }
 
 
+/****************************************
+ * Decode Message Schema
+ ***/
+ int decodeMessageSchema (char *data) {
+
+  StaticJsonDocument<1024> messageData;
+  DeserializationError error = deserializeJson(messageData, data);
+  int schema = messageData["SCHEMA"].as<int>();  
+
+  Serial.print("Decoded Message Schema: ");
+  Serial.println(schema, DEC);
+
+  return schema;
+
+}
+
 
 /****************************************
  * Process Websocket Message
  ***/
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
+
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
+
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     data[len] = 0;
-    
-    if (strcmp((char*)data, "refresh") == 0) {
-      // This is where we assign data
-      ledState = !ledState;
-      notifyClients(getDataJson());
 
-    } else if (strcmp((char*)data, "loadConfig") == 0) {
-      Serial.println("Load Config");
-      notifyClients(loadConfig());
+  Serial.print("(char*)data: ");
+  Serial.println((char*)data);
 
-    } else if (strcmp((char*)data, "calibrate") == 0) {
-      Serial.println("Calibrate");
-      // TODO - Do calibration
-      notifyClients(loadConfig());
+    switch (decodeMessageSchema((char*)data)) {
 
-    } else {
-      Serial.println("Save Config");
-      saveConfig(data, len);
-      notifyClients(loadConfig());
+      case GET_FLOW_DATA:
+        Serial.println("Get Data");
+        notifyClients(getDataJson());
+      break;      
+
+      case CONFIG:
+        Serial.println("Load Config");
+        notifyClients(loadConfig());      
+      break;      
+
+      case CALIBRATE:
+        Serial.println("Calibrate");
+        // TODO - Do calibration
+//        notifyClients(calibrate());      
+      break;      
+
+      case FILE_LIST:
+        Serial.println("File List");
+        notifyClients(getFileListJSON());      
+      break;      
+
+      case SYS_STATUS:
+        Serial.println("Send Status");
+        notifyClients(getSystemStatusJSON());      
+      break;      
+
+      case SAVE_CONFIG:
+        Serial.println("Save Config");
+        saveConfig((char*)data);
+        //notifyClients(loadConfig());      
+      break;
+
+      default:
+        Serial.println("Unrecognised Message");
+      break;
+
     }
+
 
     if (strcmp((char*)data, "getValues") == 0) {
       notifyClients(getDataJson());
@@ -255,6 +268,60 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 }
 
 
+/****************************************
+ * Get File List in JSON format
+ ***/
+ String getFileListJSON () {
+
+    StaticJsonDocument<1024> dataJson;    
+    dataJson["SCHEMA"] = FILE_LIST;
+
+    Serial.println("Filesystem contents:");
+    FILESYSTEM.begin();
+    File root = FILESYSTEM.open("/");
+    File file = root.openNextFile();
+    while(file){
+        String fileName = file.name();
+        size_t fileSize = file.size();
+  
+        dataJson[fileName] = String(fileSize);
+
+        Serial.print( fileName.c_str());
+        Serial.print(" : ");
+        Serial.println( byteDecode(fileSize).c_str());
+        file = root.openNextFile();
+    }  
+
+    char jsonString[1024];
+    serializeJson(dataJson, jsonString);
+    return jsonString;
+    
+ }
 
 
+/****************************************
+ * Get System Status in JSON format
+ ***/
+String getSystemStatusJSON(){
+  
+  extern DeviceStatus stats;
+  StaticJsonDocument<1024> dataJson;    
 
+  dataJson["SCHEMA"] = SYS_STATUS;
+  dataJson["SPIFFS_MEM_SIZE"] = stats.spiffs_mem_size;
+  dataJson["SPIFFS_MEM_USED"] = stats.spiffs_mem_used;
+  dataJson["LOCAL_IP_ADDRESS"] = stats.local_ip_address;
+  dataJson["BOARDTYPE"] = stats.boardType;
+  dataJson["MAF_SENSOR"] = stats.mafSensor;
+  dataJson["PREF_SENSOR"] = stats.prefSensor;
+  dataJson["TEMP_SENSOR"] = stats.tempSensor;
+  dataJson["RELH_SENSOR"] = stats.relhSensor;
+  dataJson["BARO_SENSOR"] = stats.baroSensor;
+  dataJson["PITOT_SENSOR"] = stats.pitotSensor;
+  dataJson["BOOT_TIME"] = stats.boot_time;
+ 
+  char jsonString[1024];
+  serializeJson(dataJson, jsonString);
+  return jsonString;
+
+}

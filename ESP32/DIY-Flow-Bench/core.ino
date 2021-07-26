@@ -79,8 +79,8 @@ extern ConfigSettings config;
 
     // Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
     // https://github.com/adafruit/Adafruit_BME280_Library
-    #if defined REF_ADAFRUIT_BME280 || defined TEMP_ADAFRUIT_BME280 || defined BARO_ADAFRUIT_BME280
-        #include <Adafruit_BME280_DEV.h> 
+    #if PREF_SENSOR_REF_ADAFRUIT_BME280 || TEMP_SENSOR_ADAFRUIT_BME280 || BARO_SENSOR_ADAFRUIT_BME280
+        #include <Adafruit_BME280.h> 
         Adafruit_BME280 adafruitBme280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
 
         //I2C address - BME280_I2C_ADDR
@@ -94,7 +94,7 @@ extern ConfigSettings config;
 
     // Support for SPARKFUN_BME280 temp, pressure & Humidity sensors
     // https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide?_ga=2.39864294.574007306.1596270790-134320310.1596270790
-    #if defined RELH_SPARKFUN_BME280 || defined TEMP_SPARKFUN_BME280 || defined BARO_SPARKFUN_BME280
+    #if RELH_SENSOR_SPARKFUN_BME280 || TEMP_SENSOR_SPARKFUN_BME280 || BARO_SENSOR_SPARKFUN_BME280
         #include "SparkFunBME280.h"
         #include <Wire.h>
         BME280 SparkFunBME280;
@@ -112,12 +112,12 @@ extern ConfigSettings config;
 
     // Support for DHT11 humidity / temperature sensors
     // https://github.com/winlinvip/SimpleDHT
-    #if defined SIMPLE_RELH_DHT11 || defined SIMPLE_TEMP_DHT11
+    #if RELH_SENSOR_SIMPLE_RELH_DHT11 || TEMP_SENSOR_SIMPLE_TEMP_DHT11
         #include <SimpleDHT.h>  
         SimpleDHT11 dht11(HUMIDITY_PIN);    
     #endif
 
-    #if defined USE_REF_PRESS_AS_BARO && defined REF_MPX4250
+    #if BARO_SENSOR == REF_PRESS_AS_BARO
         startupBaroPressure = getRefPressure(KPA);
     #else
         startupBaroPressure = DEFAULT_BARO;
@@ -158,19 +158,19 @@ float getBaroPressure(int units)
     int rawBaroValue = analogRead(REF_BARO_PIN);
     int baroMillivolts = (rawBaroValue * (5.0 / 1024.0)) * 1000;
 
-    #if defined BARO_MPX4115
+    #ifdef BARO_SENSOR_MPX4115
         // Datasheet - https://html.alldatasheet.es/html-pdf/5178/MOTOROLA/MPX4115/258/1/MPX4115.html
         // Vout = VS (P x 0.009 – 0.095) --- Where VS = Supply Voltage (Formula from Datasheet)
         // P = ((Vout / VS ) - 0.095) / 0.009 --- Formula transposed for P
         baroPressureKpa = (((float)baroMillivolts / (float)supplyMillivolts ) - 0.095) / 0.009; 
 
-    #elif defined BARO_ADAFRUIT_BME280
+    #elif defined BARO_SENSOR_BARO_ADAFRUIT_BME280
         baroPressureKpa =  adafruitBme280.readPressure() / 1000; //Pa
 
-    #elif defined BARO_SPARKFUN_BME280
+    #elif defined BARO_SENSOR_SPARKFUN_BME280
         baroPressureKpa =  SparkFunBME280.readFloatPressure() / 1000; // Pa
 
-    #elif defined USE_REF_PRESS_AS_BARO
+    #elif defined BARO_SENSOR_USE_REF_PRESS_AS_BARO
         // No baro sensor defined so use value grabbed at startup from reference pressure sensor
         // NOTE will only work for absolute style pressure sensor like the MPX4250
         baroPressureKpa = startupBaroPressure; 
@@ -212,32 +212,33 @@ float getRefPressure(int units)
     int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
     float refPressMillivolts = (rawRefPressValue * (5.0 / 1024.0)) * 1000;
 
-    #if defined REF_MPXV7007
+    #ifdef PREF_SENSOR_REF_MPXV7007
         // Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
         // Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007DP Datasheet)
         // P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
         refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057;  
-    
 
-    #elif defined REF_MPX4250
+    #elif defined PREF_SENSOR_REF_MPX4250
         // NOTE: Untested.  Also not best choice of sensor
         // Datasheet - https://www.nxp.com/files-static/sensors/doc/data_sheet/MPX4250.pdf
         // Vout = VS x (0.00369 x P + 0.04) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
         // P = ((Vout / VS ) - 0.04) / 0.00369 --- Formula transposed for P
         // Note we use the baro value as this is an absolute sensor, so to prevent circular references we need to know
         // if we actually have a Baro sensor installed
-        #if defined USE_REF_PRESS_AS_BARO 
-            // we don't have a baro value so use the value hardcoded in the config to offset the sensor value
+        #if defined BARO_SENSOR_REF_PRESS_AS_BARO 
+            // we don't have a baro value so use the value hardcoded in the config to offset the pressure sensor value
             refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - DEFAULT_BARO;  
-  //          ABS_REF_PRESS_SENSOR       
+        #elif defined BARO_SENSOR_FIXED_VALUE            
+            refPressureKpa = DEFAULT_BARO;
         #else
             // use the current baro value to offset the sensor value
             refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - getBaroPressure(KPA);         
         #endif
 
+    #elif defined PREF_SENSOR_NOT_USED 
     #else
-        // No reference pressure sensor used so lets return 1 (so as not to throw maths out)
-        //refPressureKpa = 6.97448943333324; //28"
+        // No reference pressure sensor used so lets return a value (so as not to throw maths out)
+        // refPressureKpa = 6.97448943333324; //28"
         refPressureKpa = DEFAULT_REF_PRESS;
 
     #endif
@@ -286,13 +287,13 @@ float getTemp(int units)
     byte refRelh;
 
 
-    #if defined TEMP_ADAFRUIT_BME280
+    #ifdef TEMP_SENSOR_ADAFRUIT_BME280
         refTempDegC  =  adafruitBme280.readTemperature();
 
-    #elif defined TEMP_SPARKFUN_BME280
+    #elif defined TEMP_SENSOR_SPARKFUN_BME280
         refTempDegC =  SparkFunBME280.readTempC();
 
-    #elif defined SIMPLE_TEMP_DHT11
+    #elif defined TEMP_SENSOR_SIMPLE_TEMP_DHT11
         // NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
         int err = SimpleDHTErrSuccess;
         if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
@@ -337,7 +338,7 @@ float getRelativeHumidity(int units = 0)
     byte refTemp;
     byte refRelh;
 
-    #if defined SIMPLE_RELH_DHT11
+    #ifdef RELH_SENSOR_SIMPLE_RELH_DHT11
         // NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
         int err = SimpleDHTErrSuccess;
         if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
@@ -347,10 +348,10 @@ float getRelativeHumidity(int units = 0)
           relativeHumidity = refRelh;
         }
 
-    #elif defined RELH_ADAFRUIT_BME280
+    #elif defined RELH_SENSOR_ADAFRUIT_BME280
         relativeHumidity = adafruitBme280.readHumidity(); //%
 
-    #elif defined RELH_SPARKFUN_BME280
+    #elif defined RELH_SENSOR_SPARKFUN_BME280
         relativeHumidity =  SparkFunBME280.readFloatHumidity();
 
     #else
@@ -543,17 +544,17 @@ float getMafFlowCFM()
     mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH);// + calibrationOffset; // add calibration offset to value //TODO #21 Need to validate and test calibration routine
 
     if (streamMafData == true) {
-        sendSerial(String(mafMillivolts));
-        sendSerial("mv = ");
+        Serial.print(String(mafMillivolts));
+        Serial.println("mv = ");
         if (MAFdataUnit == KG_H) {
-            sendSerial(String(mafFlowRateRAW / 1000));
-            sendSerial("kg/h = ");
+            Serial.print(String(mafFlowRateRAW / 1000));
+            Serial.println("kg/h = ");
         } else if (MAFdataUnit == MG_S) {
-            sendSerial(String(mafFlowRateRAW));
-            sendSerial("mg/s = ");
+            Serial.print(String(mafFlowRateRAW));
+            Serial.println("mg/s = ");
         }
-        sendSerial(String(mafFlowRateCFM ));
-        sendSerial("cfm \r\n");
+        Serial.print(String(mafFlowRateCFM ));
+        Serial.println("cfm \r\n");
     }
 
     return mafFlowRateCFM;
@@ -573,7 +574,7 @@ float getPitotPressure(int units)
     int rawPitotPressValue = analogRead(PITOT_PIN);     
     int pitotPressMillivolts = (rawPitotPressValue * (5.0 / 1024.0)) * 1000;
 
-    #if defined PITOT_MPXV7007DP
+    #ifdef PITOT_SENSOR_MPXV7007DP
         // sensor characteristics from datasheet
         // Vout = VS x (0.057 x P + 0.5)
 
@@ -798,12 +799,16 @@ int  leakTest() {
 
 /****************************************
  * Get JSON Data
+ *
+ * Package up current bench data into JSON string
  ***/
-String getDataJson(){
-
+String getDataJson(){ 
+    
     float mafFlowCFM = getMafFlowCFM();
     float refPressure = getRefPressure(INWG);   
-    DynamicJsonDocument  dataJson(1024);    
+    StaticJsonDocument<1024> dataJson;    
+
+    dataJson["SCHEMA"] = GET_FLOW_DATA;
 
     dataJson["STATUS_MESSAGE"] = String(statusMessage);
 
@@ -863,9 +868,7 @@ String getDataJson(){
     dataJson["PITOT_MV"] = String(pitotMillivolts);
 
     char jsonString[1024];
-
     serializeJson(dataJson, jsonString);
-
     return jsonString;
 
 }

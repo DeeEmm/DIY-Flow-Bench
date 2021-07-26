@@ -23,7 +23,9 @@
  * DIYFB Shield
  *
  ***/
-#ifdef DIYFB_SHIELD 
+#ifdef DIYFB_SHIELD
+
+    const char* BOARD_TYPE = "DIYFB_SHIELD";
 
     // Define Physical Pins
 
@@ -69,9 +71,10 @@
 /****************************************
  * ESP32 / ESP32DUINO
  ***/
-#ifdef ESP32DUINO 
-
-
+#ifdef ESP32DUINO
+    
+    const char* BOARD_TYPE = "ESP32DUINO";
+    
     // Define Physical Pins
 
     // VAC CONTROL

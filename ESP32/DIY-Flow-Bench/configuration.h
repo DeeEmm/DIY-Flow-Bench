@@ -15,7 +15,7 @@
 
 #define MAJOR_VERSION "ESP-PORT"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "21072401"
+#define BUILD_NUMBER "21072701"
 #define RELEASE "V.ESP.X-ALPHA"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -47,8 +47,9 @@
  * Default ESP32DUINO 
  ***/
 
-//#define DIYFB_SHIELD                    // In development
-#define ESP32DUINO                        // Wemos D1 R32
+//#define DIYFB_SHIELD                    
+#define ESP32DUINO
+
 
 
 
@@ -56,8 +57,8 @@
  * CONFIGURE COMMUNICATIONS
  ***/
 
-
-#define BME280_I2C_ADDR 0x77              // (default 0x77) / Alternate 0x76
+// (default 0x77) / Alternate 0x76
+#define BME280_I2C_ADDR 0x77            
   
 
 
@@ -65,7 +66,7 @@
 /****************************************
  * CONFIGURE ALARMS
  ***/
-#define showAlarms true 
+#define showAlarms true
 
 //TODO - more granular alarm control - need to be able to disable individual alarms
 
@@ -77,15 +78,27 @@
  * If you want to modify the code to include additional MAF sensors
  * You will need to create your own MAF data file. Use exampleSensor.h as an example
  ***/
+    
+#include "mafData/ACDELCO_ 92281162.h" 
+const char* MAF_SENSOR = "ACDELCO_92281162";
 
+//#define MAF_SENSOR MH95-3000-100 
+//const char* MAF_SENSOR = "MH95-3000-100";        // PMAS MH95-3000 in 100mm housing              
 
-#include "mafData/ACDELCO_ 92281162.h"      // GM LS2              
-//#include "mafData/MH95-3000-100.h"        // PMAS MH95-3000 in 100mm housing              
-//#include "mafData/exampleKeyValueData.h"  // Example key > value data file (duplicate this as required)
-//#include "mafData/exampleAnalogData.h"    // Example Analog point data file (duplicate this as required)
-//#include "mafData/SIEMENS_5WK9605.h"      // Data from Tonys tests
-//#include "mafData/DELPHI_AF10118.h"       // kg/hr - Data from efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
-//#include "mafData/TEST.h"                 // Test Data
+//#define MAF_SENSOR SIEMENS_5WK9605 
+//const char* MAF_SENSOR = "SIEMENS_5WK9605";     // Data from Tonys tests
+
+//#define MAF_SENSOR DELPHI_AF10118 
+//const char* MAF_SENSOR = "DELPHI_AF10118";       // kg/hr - Data from efidynotuning.com/maf.htm (Stock - Ford '98 Explorer 5.0L)
+
+//#define MAF_SENSOR exampleKeyValueData 
+//const char* MAF_SENSOR = "exampleKeyValueData"; // Example key > value data file (duplicate this as required)
+
+//#define MAF_SENSOR exampleAnalogData 
+//const char* MAF_SENSOR = "exampleAnalogData";    // Example Analog point data file (duplicate this as required)
+
+//#define MAF_SENSOR TEST 
+//const char* MAF_SENSOR = "TEST";                 // Test Data
 
 
 
@@ -96,9 +109,15 @@
  ***/
 #define DEFAULT_REF_PRESS 1
 
-// Default: no selection
-//#define REF_MPXV7007                      // -7 / +7 psi
-//#define REF_MPX4250                       // 0-36psi (absolute)
+
+#define PREF_SENSOR_NOT_USED 
+const char* PREF_SENSOR = "Not Used";
+
+//#define PREF_SENSOR_REF_MPXV7007 
+//const char* PREF_SENSOR = "MPXV7007";        
+
+//#define PREF_SENSOR_REF_MPX4250 
+//const char* PREF_SENSOR = "PX4250";         
 
 
 
@@ -109,28 +128,38 @@
  * Note Pitot sensors need to be a differential pressure sensor (DP)
  ***/
 
-// Default: no selection
+// Uncomment ONE of the following 
 
-// Uncomment ONE of the following
-//#define PITOT_MPXV7007DP                  
+#define PITOT_SENSOR_NOT_USED 
+const char* PITOT_SENSOR = "Not Used";
 
-
+//#define PITOT_SENSOR_MPXV7007DP 
+//const char* PITOT_SENSOR = "MPXV7007DP";
 
 /****************************************
  * CONFIGURE BARO SENSOR
  *
  * Default Baro 101.3529kpa - standard sealevel baro pressure (14.7 psi) 
  ***/
+
+#define BARO_SENSOR_FIXED_VALUE 
+const char* BARO_SENSOR = "Fixed Value";
+
+//#define BARO_SENSOR_REF_PRESS_AS_BARO 
+//const char* BARO_SENSOR = "Ref Pressure";
+
+//#define BARO_SENSOR_ADAFRUIT_BME280 
+//const char* BARO_SENSOR = "ADAFRUIT_BME280";
+
+//#define BARO_SENSOR_SPARKFUN_BME280 
+//const char* BARO_SENSOR = "SPARKFUN_BME280";
+
+//#define BARO_SENSOR_MPX4115 
+//const char* BARO_SENSOR = "MPX4115";
+
 #define DEFAULT_BARO 101.3529
-
-// Uncomment ONE of the following
-//#define USE_REF_PRESS_AS_BARO
-//#define BARO_SPARKFUN_BME280 
-//#define BARO_MPX4115 
-//#define BARO_ADAFRUIT_BME280
-
-#define startupBaroScalingFactor 1        // scaling factor when using reference pressure sensor for baro correction
-#define startupBaroScalingOffset 100      // scaling offset when using reference pressure sensor for baro correction
+#define startupBaroScalingFactor 1          // scaling factor when using reference pressure sensor for baro correction
+#define startupBaroScalingOffset 100        // scaling offset when using reference pressure sensor for baro correction
 
 
 
@@ -141,10 +170,18 @@
  ***/
 #define DEFAULT_TEMP 21
 
-// Uncomment ONE of the following
-//#define TEMP_SPARKFUN_BME280
-//#define TEMP_ADAFRUIT_BME280
-//#define SIMPLE_TEMP_DHT11 
+
+#define TEMP_SENSOR_FIXED_VALUE
+const char* TEMP_SENSOR = "Fixed Value";
+
+//#define TEMP_SENSOR_SPARKFUN_BME280 
+//const char* TEMP_SENSOR = "SPARKFUN_BME280";
+
+//#define TEMP_SENSOR_ADAFRUIT_BME280 
+//const char* TEMP_SENSOR = "ADAFRUIT_BME280";
+
+//#define TEMP_SENSOR_SIMPLE_TEMP_DHT11 
+//const char* TEMP_SENSOR = "SIMPLE_TEMP_DHT11"; 
 
 
 
@@ -156,9 +193,17 @@
 #define DEFAULT_RELH 36
 
 // Uncomment ONE of the following
-//#define RELH_SPARKFUN_BME280
-//#define SIMPLE_RELH_DHT11 
-//#define RELH_ADAFRUIT_BME280
+#define RELH_SENSOR_FIXED_VALUE 
+const char* RELH_SENSOR = "Fixed Value";
+
+//#define RELH_SENSOR_SPARKFUN_BME280 
+//const char* RELH_SENSOR = "SPARKFUN_BME280";
+
+//#define RELH_SENSOR_SIMPLE_RELH_DHT11
+//const char* RELH_SENSOR = "SIMPLE_RELH_DHT11";
+
+//#define RELH_SENSOR_ADAFRUIT_BME280 
+//const char* RELH_SENSOR = "ADAFRUIT_BME280";
 
 
 
@@ -190,7 +235,7 @@
  ***/
 //#define DM
 #if defined DM
-    #define BARO_SPARKFUN_BME280
-    #define TEMP_SPARKFUN_BME280
-    #define RELH_SPARKFUN_BME280
+    #define BARO_SENSOR_SPARKFUN_BME280
+    #define TEMP_SENSOR_SPARKFUN_BME280
+    #define RELH_SENSOR_SPARKFUN_BME280
 #endif

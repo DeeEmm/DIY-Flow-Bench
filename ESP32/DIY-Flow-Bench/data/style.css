@@ -164,18 +164,22 @@ hr {
   display:none;
 }
 
+/***
+* Buttons
+*/
+
 .button {
   display: inline-block;
   background-color: #008CBA;
   border: none;
   border-radius: 4px;
   color: white;
-  padding: 12px 30px;
+  padding: 12px 12px;
   text-decoration: none;
   font-size: 22px;
   margin: 2px;
   cursor: pointer;
-  width:150px;
+  width: 150px;
 }
 
 #record-button {
@@ -198,6 +202,15 @@ hr {
 #status-button {
   width:48%;
 }
+
+#on-button {
+  background-color: #44b112;
+}
+
+#off-button {
+  background-color: #fa2e04;
+}
+
 
 
 .tooltip {
@@ -235,8 +248,7 @@ hr {
   visibility: visible;
 }
 
-
-/* The Modal (background) */
+/* Modal Dialogs */
 .modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
@@ -250,15 +262,23 @@ hr {
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
+
+
 /* Modal Content/Box */
 .modal-content {
   background-color: #fefefe;
   margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;
   border: 1px solid #888;
-  width: 60%; /* Could be more or less, depending on screen size */
+   width: 65%; 
   border-radius: 5px;
 }
+
+@media screen and (max-width: 800px) {
+  .modal-content {
+      width: 100%;
+    }
+  }
 
 /* The Close Button */
 .closeStatusModal, .closeFileModal {
@@ -275,4 +295,92 @@ hr {
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+.fileSizeTxt{
+  padding:10px;
+}
+
+.fileDelLink{
+  padding:10px;
+  left: 100px;
+}
+
+.fileListRow {
+  margin-bottom: 10px;
+}
+
+.column {
+  float: left;
+}
+
+.left {
+  width: 55%;
+}
+
+.middle {
+  width: 30%;
+}
+
+.right {
+  width: 5%;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+
+
+/***
+ * Lift Graph
+ */
+
+.graph-container {
+  margin-top:50px;
+  text-align: center;
+}
+
+svg.graph {
+    height: 500px;
+    width: 800px;
+}
+
+svg.graph .grid {
+  stroke: grey;
+  stroke-dasharray: 1 2;
+  stroke-width: 1;
+}
+
+svg.graph .points {
+  stroke: white;
+  stroke-width: 3;
+}
+svg.graph .first_set {
+  fill: #00554d;
+}
+
+svg.graph .surfaces {
+  fill-opacity: 0.5;
+}
+
+svg.graph .grid.double {
+  stroke-opacity: 0.4;
+}
+
+svg.graph .labels {
+  font-family: Arial;
+  font-size: 14px;
+  kerning: 1;
+}
+
+svg.graph .labels.x-labels {
+  text-anchor: middle;
+}
+
+svg.graph .labels.y-labels {
+  text-anchor: end;
 }

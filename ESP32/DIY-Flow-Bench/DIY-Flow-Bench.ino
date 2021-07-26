@@ -51,6 +51,12 @@
  * DECLARE CONSTANTS
  ***/
 
+#define GET_FLOW_DATA 1
+#define CONFIG 2
+#define CALIBRATE 3
+#define FILE_LIST 4
+#define SYS_STATUS 5
+#define SAVE_CONFIG 6
 
 
 /****************************************
@@ -60,12 +66,11 @@ int serialData = 0;
 extern int statusVal;
 
 
+
 /****************************************
- * Create data structure for config params
- * 
- * Note that these settings are overwritten by config.json stored in SPIFFS
+ * Create data structures
  ***/
-struct ConfigSettings {
+struct ConfigSettings { 
   String wifi_ssid = "WIFI-SSID";           // Your Wifi SSID
   String wifi_pswd = "<WIFI-PSWD>";         // Your Wifi Password
   String wifi_ap_ssid = "DIYFB";            // Default Accesspoint name
@@ -88,16 +93,17 @@ struct ConfigSettings {
 ConfigSettings config;
 
 struct DeviceStatus {
-  int boot_time = esp_timer_get_time();
   int spiffs_mem_size = 0;
   int spiffs_mem_used = 0;
   String local_ip_address;
-  String maf_sensor;
-  String pref_sensor;
-  String temp_sensor;
-  String relh_sensor;
-  String baro_sensor;
-  String pitot_sensor;
+  String boardType = BOARD_TYPE;
+  String mafSensor = MAF_SENSOR;
+  String prefSensor = PREF_SENSOR;
+  String tempSensor = TEMP_SENSOR;
+  String relhSensor = RELH_SENSOR;
+  String baroSensor = BARO_SENSOR;
+  String pitotSensor = PITOT_SENSOR;
+  int boot_time = esp_timer_get_time();
 };
 
 DeviceStatus stats;

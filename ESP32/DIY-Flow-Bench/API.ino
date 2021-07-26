@@ -269,10 +269,10 @@ void parseAPI(char serialData)
     // Send API Response
     #if defined DISABLE_API_CHECKSUM
 //        Serial.print(messageData + "\r\n");
-        sendSerial(messageData + "\r\n");
+          Serial.println(messageData + "\r\n");
     #else
 //        Serial.print(messageData + calcCRC(serialResponse) + "\r\n");
-//        sendSerial(messageData + calcCRC(serialResponse) +  "\r\n");
+//        Serial.println(messageData + calcCRC(serialResponse) +  "\r\n");
     #endif
 
 

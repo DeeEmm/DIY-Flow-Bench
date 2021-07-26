@@ -161,5 +161,12 @@ Build #     - Description of Change
             - Updated configuration file JSON formatting
             - Changed config file extension from txt to JSON
             - Added modal dialogs for file management and status
+21072701    - Populated modal dialogs for file management and status
+            - Added status info for hardware configuration
+            - Reformatted 
+            - Created UI Graphs for data visualisation
+            - Refactored websocket communications to use JSON data
+            - Moved status and config data into Structs
+            
             
                     
