@@ -30,19 +30,51 @@
 bool apMode = false;
 #define FILESYSTEM SPIFFS
 
+void sendIndexPage();
+void uploadFile();
+void onBody();
 
 /****************************************
- * Byte Decode 
+ * BYTE DECODE 
  ***/
 String byteDecode(size_t bytes) {
-  if (bytes < 1024) {
-    return String(bytes) + "B";
-  } else if (bytes < (1024 * 1024)) {
-    return String(bytes / 1024.0) + "KB";
-  } else if (bytes < (1024 * 1024 * 1024)) {
-    return String(bytes / 1024.0 / 1024.0) + "MB";
-  } else {
-    return String(bytes / 1024.0 / 1024.0 / 1024.0) + "GB";
+  if (bytes < 1024) return String(bytes) + " B";
+  else if (bytes < (1024 * 1024)) return String(bytes / 1024.0) + " KB";
+  else if (bytes < (1024 * 1024 * 1024)) return String(bytes / 1024.0 / 1024.0) + " MB";
+  else return String(bytes / 1024.0 / 1024.0 / 1024.0) + " GB";
+}
+
+
+
+/****************************************
+ * UPLOAD FILE
+ ***/
+void handleUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+  
+  if (SPIFFS.exists (filename) ) {
+    SPIFFS.remove (filename);
+  }
+  uint32_t freespace = SPIFFS.totalBytes() - SPIFFS.usedBytes();
+  
+  if(!filename.startsWith("/")) filename = "/"+filename;
+  if(!index && !fileUploadData.upload_error){
+    Serial.println((String)"UploadStart: " + filename);
+    request->_tempFile = SPIFFS.open(filename, "w");
+  }
+  if(len) {   
+    fileUploadData.file_size += len;
+    if (fileUploadData.file_size > freespace) {  
+      Serial.println( 'Upload rejected, not enough space');
+      fileUploadData.upload_error = true;
+    } else {
+      Serial.println('Writing file: \"' + String(filename) + '\" index=' + String(index) + ' len=' + String(len));
+      request->_tempFile.write(data,len);
+    }
+  }
+  if(final){
+    Serial.println((String)"UploadEnd: " + filename + "," + fileUploadData.file_size);
+    request->_tempFile.close();
+    request->redirect("/");
   }
 }
 
@@ -54,7 +86,7 @@ String byteDecode(size_t bytes) {
 void initialiseServer() {
 
     extern ConfigSettings config;
-    extern DeviceStatus stats;
+    extern DeviceStatus status;
 
     // Serial
     Serial.begin(config.serial_baud_rate);      
@@ -77,17 +109,17 @@ void initialiseServer() {
       #endif
     }
     // Filesystem info
-    stats.spiffs_mem_size = SPIFFS.totalBytes();
-    stats.spiffs_mem_used = SPIFFS.usedBytes();
+    status.spiffs_mem_size = SPIFFS.totalBytes();
+    status.spiffs_mem_used = SPIFFS.usedBytes();
  
     Serial.println("===== File system info =====");
  
     Serial.print("Total space:      ");
-    Serial.print(stats.spiffs_mem_size);
+    Serial.print(byteDecode(status.spiffs_mem_size));
     Serial.println("byte");
  
     Serial.print("Total space used: ");
-    Serial.print(stats.spiffs_mem_used);
+    Serial.print(byteDecode(status.spiffs_mem_used));
     Serial.println("byte");
  
     Serial.println();
@@ -109,9 +141,9 @@ void initialiseServer() {
       // Connection success     
       Serial.print("Connected to ");
       Serial.println(config.wifi_ssid);
-      stats.local_ip_address = WiFi.localIP().toString();
+      status.local_ip_address = WiFi.localIP().toString();
       Serial.print("IP address: ");
-      Serial.println(stats.local_ip_address);
+      Serial.println(status.local_ip_address);
     } else {
       // Did not connect - Go into AP Mode
       apMode = true;
@@ -120,9 +152,9 @@ void initialiseServer() {
       Serial.print(config.wifi_ap_ssid);
       Serial.println(")");
       WiFi.softAP(config.wifi_ap_ssid.c_str(), config.wifi_ap_pswd.c_str());
-      stats.local_ip_address = WiFi.softAPIP().toString();
+      status.local_ip_address = WiFi.softAPIP().toString();
       Serial.print("AP IP address: ");
-      Serial.println(stats.local_ip_address);     
+      Serial.println(status.local_ip_address);     
     }
 
     // Set up Multicast DNS
@@ -134,34 +166,84 @@ void initialiseServer() {
       Serial.println(".local");      
     }
 
+    // Server Request handlers     
+    server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request){
+      Serial.print("Upload Request Called ");
+      request->send(200);
+    }, handleUpload);
 
-    
-    // Server Request handlers
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-      request->send(SPIFFS, "/index.html", "text/html");
+    server.on("/", HTTP_ANY, [](AsyncWebServerRequest *request){    
+      if (SPIFFS.exists("/index.html.gz")){
+        AsyncWebServerResponse *response = request->beginResponse(SPIFFS, "/index.html.gz", "text/html", false);
+        response->addHeader("Content-Encoding", "gzip");
+        request->send(response);
+      } else {
+        request->send(SPIFFS, "/index.html", "text/html");
+      }
+      
+    });
+
+    server.on("/index.html", HTTP_ANY, [](AsyncWebServerRequest *request){
+      if (SPIFFS.exists("/index.html.gz")){
+        AsyncWebServerResponse *response = request->beginResponse(SPIFFS, "/index.html.gz", "text/html", false);
+        response->addHeader("Content-Encoding", "gzip");
+        request->send(response);
+      } else {
+        request->send(SPIFFS, "/index.html", "text/html");
+      }
     });
 
     server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
       request->send(SPIFFS, "/style.css", "text/css");
     });
+    
     server.on("/javascript.js", HTTP_GET, [](AsyncWebServerRequest *request){
       request->send(SPIFFS, "/javascript.js", "text/javascript");
     });
-  
+    
+    server.on("/download", HTTP_GET, [](AsyncWebServerRequest *request){              
+          String downloadFilename = request->url();
+          downloadFilename.remove(0,9);
+          Serial.print("Request Delete File: ");
+          Serial.println(downloadFilename);
+          request->send(SPIFFS, downloadFilename, String(), true);
+    });
+
+    // NOTE" this acts as a catch-all and allows us to process any request not specifically declared above
+    server.onNotFound( []( AsyncWebServerRequest * request )
+    {
+      Serial.printf("NOT_FOUND: ");
+      if (request->method() == HTTP_GET)
+        Serial.printf("GET");
+      else if (request->method() == HTTP_POST)
+        Serial.printf("POST");
+      else if (request->method() == HTTP_DELETE)
+        Serial.printf("DELETE");
+      else if (request->method() == HTTP_PUT)
+        Serial.printf("PUT");
+      else if (request->method() == HTTP_PATCH)
+        Serial.printf("PATCH");
+      else if (request->method() == HTTP_HEAD)
+        Serial.printf("HEAD");
+      else if (request->method() == HTTP_OPTIONS)
+        Serial.printf("OPTIONS");
+      else
+        Serial.printf("UNKNOWN");
+      Serial.printf(" http://%s%s\n", request->host().c_str(), request->url().c_str());
+      request->send( 404, "text/plain", "Not found." );
+    });
+
     ws.onEvent(onEvent);
+    server.onFileUpload(handleUpload);
     server.addHandler(&ws);
-
     server.begin();
-
     Serial.println("Server Running");
 
 }
 
 
-
-
 /****************************************
- * Push Server Data to client
+ * Push Server Data to client via websocket
  ***/
 void notifyClients(String jsonValues) {
   ws.textAll(String(jsonValues));
@@ -170,6 +252,7 @@ void notifyClients(String jsonValues) {
 
 /****************************************
  * Decode Message Schema
+ * Pulls SCHEMA value from JSON string
  ***/
  int decodeMessageSchema (char *data) {
 
@@ -185,20 +268,33 @@ void notifyClients(String jsonValues) {
 }
 
 
+
 /****************************************
  * Process Websocket Message
  ***/
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
+  
+  extern WebsocketData socketData;
 
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
+    
+  StaticJsonDocument<1024> messageData;
+  DeserializationError err = deserializeJson(messageData, data);
+  if (err) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(err.c_str());
+  }
+  
+  int schema = messageData["SCHEMA"].as<int>(); 
 
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
+    
     data[len] = 0;
 
-  Serial.print("(char*)data: ");
-  Serial.println((char*)data);
+    Serial.print("SCHEMA: ");
+    Serial.println(schema);
 
-    switch (decodeMessageSchema((char*)data)) {
+    switch (schema) {
 
       case GET_FLOW_DATA:
         Serial.println("Get Data");
@@ -206,14 +302,17 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       break;      
 
       case CONFIG:
+      case LOAD_CONFIG:
         Serial.println("Load Config");
         notifyClients(loadConfig());      
       break;      
 
       case CALIBRATE:
         Serial.println("Calibrate");
-        // TODO - Do calibration
-//        notifyClients(calibrate());      
+        if (benchIsRunning()){
+// TODO:          setCalibrationOffset();                         
+        }
+
       break;      
 
       case FILE_LIST:
@@ -229,7 +328,34 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       case SAVE_CONFIG:
         Serial.println("Save Config");
         saveConfig((char*)data);
-        //notifyClients(loadConfig());      
+        notifyClients(loadConfig());      
+      break;
+
+      case FILE_DELETE:
+        Serial.print("File Delete: ");
+        socketData.file_name = messageData["FILENAME"].as<String>();  
+        Serial.println(socketData.file_name);
+        if(SPIFFS.exists(socketData.file_name)){
+          SPIFFS.remove(socketData.file_name);
+        }  else {
+          Serial.print("Delete Failed: ");      
+          Serial.println(socketData.file_name);  
+        } 
+        notifyClients(getFileListJSON());      
+      break;      
+
+      case FILE_DOWNLOAD:
+        // NOTE: https://github.com/DeeEmm/DIY-Flow-Bench/issues/71#issuecomment-893104615        
+      break;      
+      
+      case START_BENCH:
+        status.liveStream = true;
+        // TODO: Relay output active
+      break;
+      
+      case STOP_BENCH:
+        status.liveStream = false;   
+        // TODO: Relay output disabled   
       break;
 
       default:
@@ -249,8 +375,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
 /****************************************
  * Websocket Event Listener
  ***/
-void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
- void *arg, uint8_t *data, size_t len) {
+void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
   switch (type) {
     case WS_EVT_CONNECT:
       Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
@@ -268,8 +393,9 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 }
 
 
+
 /****************************************
- * Get File List in JSON format
+ * Get SPIFFS File List in JSON format
  ***/
  String getFileListJSON () {
 
@@ -302,26 +428,41 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 /****************************************
  * Get System Status in JSON format
  ***/
-String getSystemStatusJSON(){
+String getSystemStatusJSON() {
   
-  extern DeviceStatus stats;
+  extern DeviceStatus status;
   StaticJsonDocument<1024> dataJson;    
 
   dataJson["SCHEMA"] = SYS_STATUS;
-  dataJson["SPIFFS_MEM_SIZE"] = stats.spiffs_mem_size;
-  dataJson["SPIFFS_MEM_USED"] = stats.spiffs_mem_used;
-  dataJson["LOCAL_IP_ADDRESS"] = stats.local_ip_address;
-  dataJson["BOARDTYPE"] = stats.boardType;
-  dataJson["MAF_SENSOR"] = stats.mafSensor;
-  dataJson["PREF_SENSOR"] = stats.prefSensor;
-  dataJson["TEMP_SENSOR"] = stats.tempSensor;
-  dataJson["RELH_SENSOR"] = stats.relhSensor;
-  dataJson["BARO_SENSOR"] = stats.baroSensor;
-  dataJson["PITOT_SENSOR"] = stats.pitotSensor;
-  dataJson["BOOT_TIME"] = stats.boot_time;
+  dataJson["SPIFFS_MEM_SIZE"] = status.spiffs_mem_size;
+  dataJson["SPIFFS_MEM_USED"] = status.spiffs_mem_used;
+  dataJson["LOCAL_IP_ADDRESS"] = status.local_ip_address;
+  dataJson["BOARDTYPE"] = status.boardType;
+  dataJson["MAF_SENSOR"] = status.mafSensor;
+  dataJson["PREF_SENSOR"] = status.prefSensor;
+  dataJson["TEMP_SENSOR"] = status.tempSensor;
+  dataJson["RELH_SENSOR"] = status.relhSensor;
+  dataJson["BARO_SENSOR"] = status.baroSensor;
+  dataJson["PITOT_SENSOR"] = status.pitotSensor;
+  dataJson["BOOT_TIME"] = status.boot_time;
  
   char jsonString[1024];
   serializeJson(dataJson, jsonString);
   return jsonString;
 
 }
+
+/****************************************
+ * onBody - serve gzipped page if available 
+ ***/
+void onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+  if (SPIFFS.exists("/index.html.gz")){
+    AsyncWebServerResponse *response = request->beginResponse(SPIFFS, "/index.html.gz", "text/html", false);
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  } else {
+    request->send(SPIFFS, "/index.html", "text/html");
+  }
+}
+
+

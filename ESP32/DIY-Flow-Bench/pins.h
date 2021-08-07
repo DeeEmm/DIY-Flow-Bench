@@ -2,7 +2,7 @@
  * The DIY Flow Bench project
  * https://diyflowbench.com
  * 
- * boards.h - Define pin mappings
+ * pins.h - Define pin mappings
  *
  * Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
  * 

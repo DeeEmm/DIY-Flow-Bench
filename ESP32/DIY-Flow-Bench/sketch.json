@@ -1,0 +1,6 @@
+{
+  "cpu": {
+    "fqbn": "esp32:esp32:esp32",
+    "port": "/dev/cu.usbserial-14140"
+  }
+}

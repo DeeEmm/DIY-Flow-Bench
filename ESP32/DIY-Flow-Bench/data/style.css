@@ -145,6 +145,11 @@ hr {
   float: right;
 }
 
+.config-select {
+  width: 41.5%;
+  float: right;
+}
+
 .units {
   font-size: 0.8rem;
   color:#666;
@@ -182,6 +187,20 @@ hr {
   width: 150px;
 }
 
+.button-sml {
+  float:right;
+  display: inline-block;
+  background-color: #008CBA;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  padding: 6px 6px;
+  text-decoration: none;
+  font-size: 12px;
+  margin: 2px;
+  cursor: pointer;
+}
+
 #record-button {
   background-color: #fa2e04;
 }
@@ -208,6 +227,10 @@ hr {
 }
 
 #off-button {
+  background-color: #fa2e04;
+}
+
+#delete-button {
   background-color: #fa2e04;
 }
 
@@ -263,7 +286,6 @@ hr {
 }
 
 
-
 /* Modal Content/Box */
 .modal-content {
   background-color: #fefefe;
@@ -280,8 +302,18 @@ hr {
     }
   }
 
+.file-upload-button {
+  padding: 12px 0px;
+  text-align: center;
+}
+
+input[type="file"] {
+  display: none;
+}  
+  
+
 /* The Close Button */
-.closeStatusModal, .closeFileModal {
+.closeStatusModal, .closeFileModal, .closeUploadModal {
   color: #aaa;
   float: right;
   font-size: 22px;
@@ -304,26 +336,35 @@ hr {
 .fileDelLink{
   padding:10px;
   left: 100px;
+  cursor: pointer;
+}
+
+
+.file-link {
+  cursor: pointer;
 }
 
 .fileListRow {
   margin-bottom: 10px;
+  /* margin-top: 87px; */
 }
 
 .column {
   float: left;
+  height: 40px;
 }
 
 .left {
   width: 55%;
+  height: 40px;
 }
 
 .middle {
-  width: 30%;
+  width: 25%;
 }
 
 .right {
-  width: 5%;
+  width: 10%;
 }
 
 /* Clear floats after the columns */
@@ -384,3 +425,7 @@ svg.graph .labels.x-labels {
 svg.graph .labels.y-labels {
   text-anchor: end;
 }
+
+
+
+

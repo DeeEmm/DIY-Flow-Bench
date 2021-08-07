@@ -35,7 +35,7 @@ void parseConfigData(StaticJsonDocument<1024>  configData){
   config.maf_min_millivolts  = configData["CONF_MAF_MIN_MILLIVOLTS"].as<int>();
   config.api_delim = configData["CONF_API_DELIM"].as<String>();
   config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
-  config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
+//  config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
   config.leak_test_tolerance = configData["CONF_LEAK_TEST_TOLERANCE"].as<int>();
   config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<float>();
   config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<float>();
@@ -47,7 +47,7 @@ void parseConfigData(StaticJsonDocument<1024>  configData){
 /****************************************
  * read config.json file
  ***/
-String loadConfig(){
+String loadConfig() {
 
   extern ConfigSettings config;
 
@@ -90,7 +90,7 @@ String loadConfig(){
 /****************************************
  * write config.json file
  ***/
-void saveConfig(char *data){
+void saveConfig(char *data) {
 
   StaticJsonDocument<1024> configData;
   DeserializationError error = deserializeJson(configData, data);
@@ -105,3 +105,11 @@ void saveConfig(char *data){
 
 }
 
+
+
+/****************************************
+ * invoke browser to save the config data
+ ***/
+String saveCalibration() {
+  return String("{\"SCHEMA\" : \"3\"}");
+}

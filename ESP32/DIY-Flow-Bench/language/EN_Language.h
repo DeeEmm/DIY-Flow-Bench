@@ -4,7 +4,7 @@
  ***/
 
 
-//TODO(#12) Translations
+//TODO:(#12) Translations
 #define LANG_NO_ERROR               "Status OK"
 #define LANG_BENCH_RUNNING          "Bench Pressure OK"
 #define LANG_WARNING                "Warning!"

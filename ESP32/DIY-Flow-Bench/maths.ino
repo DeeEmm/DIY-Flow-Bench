@@ -2,7 +2,7 @@
  * The DIY Flow Bench project
  * https://diyflowbench.com
  * 
- * core.ino - Core flow bench functions
+ * maths.ino - Core mathematical functions
  *
  * Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
  * 
@@ -72,14 +72,17 @@ extern ConfigSettings config;
 
 
 /****************************************
- * INITIALISE HARDWARE
+  INITIALISE HARDWARE
+ 
+ NOTE: this is being moved out into the sensors class
+ 
  ***/
  void initialiseHardware() {
 
 
     // Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
     // https://github.com/adafruit/Adafruit_BME280_Library
-    #if PREF_SENSOR_REF_ADAFRUIT_BME280 || TEMP_SENSOR_ADAFRUIT_BME280 || BARO_SENSOR_ADAFRUIT_BME280
+    #if defined(PREF_SENSOR_REF_ADAFRUIT_BME280) || defined(TEMP_SENSOR_ADAFRUIT_BME280) || defined(BARO_SENSOR_ADAFRUIT_BME280)
         #include <Adafruit_BME280.h> 
         Adafruit_BME280 adafruitBme280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
 
@@ -94,7 +97,7 @@ extern ConfigSettings config;
 
     // Support for SPARKFUN_BME280 temp, pressure & Humidity sensors
     // https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide?_ga=2.39864294.574007306.1596270790-134320310.1596270790
-    #if RELH_SENSOR_SPARKFUN_BME280 || TEMP_SENSOR_SPARKFUN_BME280 || BARO_SENSOR_SPARKFUN_BME280
+    #if defined (RELH_SENSOR_SPARKFUN_BME280) || defined(TEMP_SENSOR_SPARKFUN_BME280) || defined(BARO_SENSOR_SPARKFUN_BME280)
         #include "SparkFunBME280.h"
         #include <Wire.h>
         BME280 SparkFunBME280;
@@ -131,8 +134,7 @@ extern ConfigSettings config;
 /****************************************
  * GET BOARD VOLTAGE
  ***/
-float getSupplyMillivolts()
-{   
+float getSupplyMillivolts() {   
     int rawVoltageValue = analogRead(VOLTAGE_PIN);
     float supplyMillivolts = rawVoltageValue * (5.0 / 1024.0) * 1000;
 
@@ -146,8 +148,7 @@ float getSupplyMillivolts()
  * GET BAROMETRIC pressure (kPa)
  * NOTE: Sensor must return an absolute value
  ***/
-float getBaroPressure(int units)
-{   
+float getBaroPressure(int units) {   
 
     float baroPressureKpa;
     float baroPressurePsia;
@@ -200,8 +201,7 @@ float getBaroPressure(int units)
  * CALCULATE REFERENCE PRESSURE
  * Convert RAW pressure sensor data to In/WG or kPa
  ***/
-float getRefPressure(int units) 
-{   
+float getRefPressure(int units) {   
 
     float refPressureKpa;
     float refPressureInWg;
@@ -274,8 +274,7 @@ float getRefPressure(int units)
  * CALCULATE TEMPERATURE
  * Convert RAW temperature sensor data
  ***/
-float getTemp(int units)
-{   
+float getTemp(int units) {   
     float refAltRaw;
     float refPressureRaw;
     float refTempRaw;
@@ -331,8 +330,7 @@ float getTemp(int units)
 /****************************************
  * GET RELATIVE HUMIDITY %
  ***/
-float getRelativeHumidity(int units = 0)
-{   
+float getRelativeHumidity(int units = 0) {   
     float relativeHumidity;
     float tempDegC;
     byte refTemp;
@@ -381,8 +379,8 @@ float getRelativeHumidity(int units = 0)
 /****************************************
  * GET VAPOR PRESSURE
  ***/
-float getVaporPressure(int units)
-{   
+float getVaporPressure(int units) {
+     
     float airTemp = getTemp(DEGC);
     float molecularWeightOfDryAir = 28.964;
     float vapourPressureKpa =(0.61078 * exp((17.27 * airTemp)/(airTemp + 237.3))); // Tetans Equasion
@@ -408,8 +406,8 @@ float getVaporPressure(int units)
 /****************************************
  * GET SPECIFIC GRAVITY
  ***/
-float getSpecificGravity()
-{   
+float getSpecificGravity() {
+     
     float specificGravity;
     float relativeHumidity = getRelativeHumidity(DECI);
     float vaporPressurePsia = getVaporPressure(PSIA);
@@ -431,8 +429,7 @@ float getSpecificGravity()
  * Calcualted using ideal gas law:
  * https://www.pdblowers.com/tech-talk/volume-and-mass-flow-calculations-for-gases/
  ***/
-float convertMassFlowToVolumetric(float massFlowKgh)
-{   
+float convertMassFlowToVolumetric(float massFlowKgh) {   
   float mafFlowCFM;
   float gasPressure;
   float tempInRankine = getTemp(RANKINE); //tested ok
@@ -442,7 +439,7 @@ float convertMassFlowToVolumetric(float massFlowKgh)
   float refPressure = getRefPressure(PSIA);
   float massFlowLbm = massFlowKgh * 0.03674371036415;
 
-  gasPressure = baroPressure + refPressure; // TODO need to validate refPressure (should be a negative number)
+  gasPressure = baroPressure + refPressure; // TODO: need to validate refPressure (should be a negative number)
 
   mafFlowCFM = ((massFlowLbm * 1545 * tempInRankine) / (molecularWeight * 144 * gasPressure)); 
 
@@ -458,8 +455,7 @@ float convertMassFlowToVolumetric(float massFlowKgh)
  * GET MAF FLOW in CFM
  * Lookup CFM value from MAF data array
  ***/
-float getMafFlowCFM()
-{
+float getMafFlowCFM() {
     // NOTE mafMapData is global array declared in mafData files
     float calibrationOffset;
     float mafFlowRateCFM;
@@ -475,7 +471,7 @@ float getMafFlowCFM()
     }
 
     if (MAFoutputType == FREQUENCY){
-        // TODO #29 - MAF Data File configuration variables - add additional decode variables
+        // TODO: #29 - MAF Data File configuration variables - add additional decode variables
         // Add support for frequency based sensors
     }
 
@@ -541,7 +537,7 @@ float getMafFlowCFM()
 
 
     // convert kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
-    mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH);// + calibrationOffset; // add calibration offset to value //TODO #21 Need to validate and test calibration routine
+    mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH);// + calibrationOffset; // add calibration offset to value //TODO: #21 Need to validate and test calibration routine
 
     if (streamMafData == true) {
         Serial.print(String(mafMillivolts));
@@ -566,8 +562,8 @@ float getMafFlowCFM()
  * CALCULATE PITOT PROBE
  * Convert RAW differential pressure sensor data
  ***/
-float getPitotPressure(int units)
-{   
+float getPitotPressure(int units) {
+     
     float pitotPressureKpa = 0.00;
     float pitotPressureInWg;
     int supplyMillivolts = getSupplyMillivolts() / 1000;
@@ -604,62 +600,64 @@ float getPitotPressure(int units)
 
 
 /****************************************
- * CONVERT FLOW
- *
- * Convert flow values between different reference pressures
- * Flow at the new pressure drop = (the square root of (new pressure drop/old pressure drop)) times CFM at the old pressure drop.
- * An example of the above formula would be to convert flow numbers taken at 28" of water to those which would occur at 25" of water.
- * (25/28) = .89286
- * Using the square root key on your calculator and inputting the above number gives .94489 which can be rounded off to .945.
- * We can now multiply our CFM values at 28" of water by .945 to obtain the theoretical CFM values at 25" of water.
- * Source: http://www.flowspeed.com/cfm-numbers.htm
- ***/
-double convertFlowDepression(float oldPressure = 10, int newPressure = 28, float inputFlow = 0 )
-{
-    double outputFlow;
-    double pressureRatio = (newPressure / oldPressure);
-    outputFlow = (sqrt(pressureRatio) * inputFlow);
+* CONVERT FLOW
+*
+* Convert flow values between different reference pressures
+* Flow at the new pressure drop = (the square root of (new pressure drop/old pressure drop)) times CFM at the old pressure drop.
+* An example of the above formula would be to convert flow numbers taken at 28" of water to those which would occur at 25" of water.
+* (25/28) = .89286
+* Using the square root key on your calculator and inputting the above number gives .94489 which can be rounded off to .945.
+* We can now multiply our CFM values at 28" of water by .945 to obtain the theoretical CFM values at 25" of water.
+* Source: http://www.flowspeed.com/cfm-numbers.htm
+***/
+double convertFlowDepression(float oldPressure = 10, int newPressure = 28, float inputFlow = 0 ) {
+  double outputFlow;
+  double pressureRatio = (newPressure / oldPressure);
+  outputFlow = (sqrt(pressureRatio) * inputFlow);
 
-    return outputFlow;
+  return outputFlow;
 
 }
 
 
 /****************************************
- * BENCH IS RUNNING
- ***/
-bool benchIsRunning()
-{
-    float refPressure = getRefPressure(INWG);
-    float mafFlowRateCFM = getMafFlowCFM();
+* BENCH IS RUNNING
 
-    if ((refPressure > config.min_bench_pressure) && (mafFlowRateCFM > config.min_flow_rate))
-    {
-        statusVal = BENCH_RUNNING;
-        return true;
-    } else {
-        statusVal = NO_ERROR;
-        return false;
-    }
+TODO: This should be moved out of here and into somewhere else
+
+***/
+bool benchIsRunning() {
+
+  float refPressure = getRefPressure(INWG);
+  float mafFlowRateCFM = getMafFlowCFM();
+
+  if ((refPressure > config.min_bench_pressure) && (mafFlowRateCFM > config.min_flow_rate))
+  {
+      statusVal = BENCH_RUNNING;
+      return true;
+  } else {
+      statusVal = NO_ERROR;
+      return false;
+  }
 }
 
 
 
 /****************************************
- * CHECK REFERENCE PRESSURE
- * Make sure that reference pressure is within limits
- ***/
+* CHECK REFERENCE PRESSURE
+* Make sure that reference pressure is within limits
+***/
 void refPressureCheck()
 {
-    float refPressure = getRefPressure(INWG);
+  float refPressure = getRefPressure(INWG);
 
-    // Check that pressure does not fall below limit set by MIN_TEST_PRESSURE_PERCENTAGE when bench is running
-    // note alarm commented out in alarm function as 'nag' can get quite annoying
-    // Is this a redundant check? Maybe a different alert would be more appropriate
-    if ((refPressure < (config.cal_ref_press * (MIN_TEST_PRESSURE_PERCENTAGE / 100))) && (benchIsRunning()))
-    {
-        statusVal = REF_PRESS_LOW;
-    }
+  // Check that pressure does not fall below limit set by MIN_TEST_PRESSURE_PERCENTAGE when bench is running
+  // note alarm commented out in alarm function as 'nag' can get quite annoying
+  // Is this a redundant check? Maybe a different alert would be more appropriate
+  if ((refPressure < (config.cal_ref_press * (MIN_TEST_PRESSURE_PERCENTAGE / 100))) && (benchIsRunning()))
+  {
+      statusVal = REF_PRESS_LOW;
+  }
 }
 
 
@@ -667,209 +665,155 @@ void refPressureCheck()
 
 
 /****************************************
- * STATUS MESSAGE HANDLER
- * 
- ***/
+* STATUS MESSAGE HANDLER
+* 
+
+TODO: this needs review. Do we create a custom error / message handler?????
+
+If we do we need to accommodate ALL functions / classes / features
+
+Need to consider how this should work.
+
+What inputs do we have?
+What outputs do we have?
+How do we manage scope and persistency?
+
+Error handler class is probably most elegant
+
+***/
 void statusMessageHandler(int statusVal)
 {
-    if (!showAlarms) return;
+  if (!showAlarms) return;
 
-    switch (statusVal)
-    {
-        case NO_ERROR:
-            statusMessage = LANG_NO_ERROR;
-        break;
+  switch (statusVal)
+  {
+      case NO_ERROR:
+          statusMessage = LANG_NO_ERROR;
+      break;
 
-        case BENCH_RUNNING:
-            statusMessage = LANG_BENCH_RUNNING;
-            Serial.println(LANG_BENCH_RUNNING);
-        break;
+      case BENCH_RUNNING:
+          statusMessage = LANG_BENCH_RUNNING;
+          Serial.println(LANG_BENCH_RUNNING);
+      break;
 
-        case REF_PRESS_LOW:
-            // This alarm can get really annoying as it pops up every time the bench is off
-            // need to add function to be able to enable / disable from menu
-            // statusMessage = LANG_WARNING, LANG_REF_PRESS_LOW);
-            // Serial.println(LANG_REF_PRESS_LOW);
-        break;
+      case REF_PRESS_LOW:
+          // This alarm can get really annoying as it pops up every time the bench is off
+          // need to add function to be able to enable / disable from menu
+          // statusMessage = LANG_WARNING, LANG_REF_PRESS_LOW);
+          // Serial.println(LANG_REF_PRESS_LOW);
+      break;
 
-        case LEAK_TEST_FAILED:
-            statusMessage = LANG_LEAK_TEST_FAILED;
-            Serial.println(LANG_LEAK_TEST_FAILED);
-        break;
+      case LEAK_TEST_FAILED:
+          statusMessage = LANG_LEAK_TEST_FAILED;
+          Serial.println(LANG_LEAK_TEST_FAILED);
+      break;
 
-        case LEAK_TEST_PASS:
-            statusMessage = LANG_LEAK_TEST_PASS;
-            Serial.println(LANG_LEAK_TEST_PASS);
-        break;
+      case LEAK_TEST_PASS:
+          statusMessage = LANG_LEAK_TEST_PASS;
+          Serial.println(LANG_LEAK_TEST_PASS);
+      break;
 
-        case DHT11_READ_FAIL:
-            statusMessage = LANG_DHT11_READ_FAIL;
-            Serial.println(LANG_DHT11_READ_FAIL);
-        break;
+      case DHT11_READ_FAIL:
+          statusMessage = LANG_DHT11_READ_FAIL;
+          Serial.println(LANG_DHT11_READ_FAIL);
+      break;
 
-        case BME280_READ_FAIL:
-            statusMessage = LANG_BME280_READ_FAIL;
-            Serial.println(LANG_BME280_READ_FAIL);
-        break;
-        
-
-       
-    }
-
-}
-
-
-/****************************************
- * SET CALIBRATION OFFSET
- * 
- ***/
- float setCalibrationOffset() {
-
-    float MafFlowCFM = getMafFlowCFM();
-    float RefPressure = getRefPressure(INWG);
-    float convertedMafFlowCFM = convertFlowDepression(RefPressure, config.cal_ref_press,  MafFlowCFM);
-    float flowCalibrationOffset = config.cal_flow_rate - convertedMafFlowCFM;
-
-    char flowCalibrationOffsetText[12]; // Buffer big enough?
-    dtostrf(flowCalibrationOffset, 6, 2, flowCalibrationOffsetText); // Leave room for too large numbers!
+      case BME280_READ_FAIL:
+          statusMessage = LANG_BME280_READ_FAIL;
+          Serial.println(LANG_BME280_READ_FAIL);
+      break;
       
-    // Store data in EEPROM
-    // EEPROM.write(NVM_CD_CAL_OFFSET_ADDR, flowCalibrationOffset);
 
-// TODO - store in JSON 
-
-    return flowCalibrationOffset;
-}
-
-
-
-/****************************************
- * GET CALIBRATION OFFSET
- * 
- ***/
- float getCalibrationOffset() {
-
-// TODO - cal data loaded with json config
-
- }
-
-
-
-
-
-
-/****************************************
- * leakTestCalibration
- ***/
-float leakTestCalibration() {
-
-    float RefPressure = getRefPressure(INWG);  
-    char RefPressureText[12]; // Buffer big enough?
-    dtostrf(RefPressure, 6, 2, RefPressureText); // Leave room for too large numbers!
-    
-    //Store data in EEPROM
-//    EEPROM.write(NVM_LEAK_CAL_ADDR, RefPressure);
-
-    // Display the value on the main screen
-    statusMessage = LANG_LEAK_CAL_VALUE, RefPressureText;  
-
-    return RefPressure;
-}
-
-
-/****************************************
- * leakTest
- ***/
-int  leakTest() {
-
-    int leakCalibrationValue = 0; 
-//    leakCalibrationValue = EEPROM.read(NVM_LEAK_CAL_ADDR);
-    int refPressure = getRefPressure(INWG);
-
-    //compare calibration data from NVM
-    if (leakCalibrationValue > (refPressure - config.leak_test_tolerance))
-    {   
-       return LEAK_TEST_FAILED;
-    } else {     
-       return LEAK_TEST_PASS;
-    }
+     
+  }
 
 }
 
 
+
 /****************************************
- * Get JSON Data
- *
- * Package up current bench data into JSON string
- ***/
-String getDataJson(){ 
-    
-    float mafFlowCFM = getMafFlowCFM();
-    float refPressure = getRefPressure(INWG);   
-    StaticJsonDocument<1024> dataJson;    
+* Get JSON Data
+*
+* Package up current bench data into JSON string
 
-    dataJson["SCHEMA"] = GET_FLOW_DATA;
+TODO: This needs to be moved out from maths into somewhere else (communications? JSON?)
 
-    dataJson["STATUS_MESSAGE"] = String(statusMessage);
+however we call a lot of the maths functions to generate the data we need to include in the JSON files
 
-    // Flow Rate
-    if (mafFlowCFM > config.min_flow_rate)
-    {
-          dataJson["FLOW"] = String(mafFlowCFM);        
-    } else {
-          dataJson["FLOW"] = String(0);        
-    }
+look at creating global struct for holding Math data. 
 
-    // Temperature
-    dataJson["TEMP"] = String(getTemp(DEGC));        
-    
-    // Baro
-    dataJson["BARO"] = String(getBaroPressure(KPA));        
-    
-    // Relative Humidity
-    dataJson["RELH"] = String(getRelativeHumidity(PERCENT));
+Do we do this in main or within a maths class????
 
-    // Pitot
-    double pitotPressure = getPitotPressure(INWG);
-    // Pitot probe displays as a percentage of the reference pressure
-    double pitotPercentage = (getPitotPressure(INWG) / refPressure);
-    dataJson["PITOT"] = String(pitotPercentage);
-    
-    // Reference pressure
-    dataJson["PREF"] = String(refPressure);
-    
-    // Adjusted Flow
-    // get the desired bench test pressure
-//    double desiredRefPressureInWg = menuARef.getCurrentValue(); //TODO: Add ref pressure setting to UI & Config
-    // convert from the existing bench test
+
+***/
+String getDataJson() { 
+  
+  float mafFlowCFM = getMafFlowCFM();
+  float refPressure = getRefPressure(INWG);   
+  StaticJsonDocument<1024> dataJson;    
+
+  dataJson["SCHEMA"] = GET_FLOW_DATA;
+
+  dataJson["STATUS_MESSAGE"] = String(statusMessage);
+
+  // Flow Rate
+  if (mafFlowCFM > config.min_flow_rate)
+  {
+        dataJson["FLOW"] = String(mafFlowCFM);        
+  } else {
+        dataJson["FLOW"] = String(0);        
+  }
+
+  // Temperature
+  dataJson["TEMP"] = String(getTemp(DEGC));        
+  
+  // Baro
+  dataJson["BARO"] = String(getBaroPressure(KPA));        
+  
+  // Relative Humidity
+  dataJson["RELH"] = String(getRelativeHumidity(PERCENT));
+
+  // Pitot
+  double pitotPressure = getPitotPressure(INWG);
+  // Pitot probe displays as a percentage of the reference pressure
+  double pitotPercentage = (getPitotPressure(INWG) / refPressure);
+  dataJson["PITOT"] = String(pitotPercentage);
+  
+  // Reference pressure
+  dataJson["PREF"] = String(refPressure);
+  
+  // Adjusted Flow
+  // get the desired bench test pressure
+//    double desiredRefPressureInWg = menuARef.getCurrentValue(); //TODO:: Add ref pressure setting to UI & Config
+  // convert from the existing bench test
 //    double adjustedFlow = convertFlowDepression(refPressure, desiredRefPressureInWg, mafFlowCFM);
-    // Send it to the display
+  // Send it to the display
 //    dataJson["AFLOW"] = String(adjustedFlow);
 
-    // Version and build
-    String versionNumberString = String(MAJOR_VERSION) + '.' + String(MINOR_VERSION);
-    String buildNumberString = String(BUILD_NUMBER);
-    dataJson["RELEASE"] = String(RELEASE);
-    dataJson["BUILD_NUMBER"] = String(BUILD_NUMBER);
+  // Version and build
+  String versionNumberString = String(MAJOR_VERSION) + '.' + String(MINOR_VERSION);
+  String buildNumberString = String(BUILD_NUMBER);
+  dataJson["RELEASE"] = String(RELEASE);
+  dataJson["BUILD_NUMBER"] = String(BUILD_NUMBER);
 
-    // Ref Presure Voltage
-    int refPressRaw = analogRead(REF_PRESSURE_PIN);
-    double refMillivolts = (refPressRaw * (5.0 / 1024.0)) * 1000;
-    dataJson["PREF_MV"] = String(refMillivolts);
+  // Ref Presure Voltage
+  int refPressRaw = analogRead(REF_PRESSURE_PIN);
+  double refMillivolts = (refPressRaw * (5.0 / 1024.0)) * 1000;
+  dataJson["PREF_MV"] = String(refMillivolts);
 
-    // Maf Voltage
-    int mafFlowRaw = analogRead(MAF_PIN);
-    double mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
-    dataJson["MAF_MV"] = String(mafMillivolts);
+  // Maf Voltage
+  int mafFlowRaw = analogRead(MAF_PIN);
+  double mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
+  dataJson["MAF_MV"] = String(mafMillivolts);
 
-    // Pitot Voltage
-    int pitotRaw = analogRead(PITOT_PIN);
-    double pitotMillivolts = (pitotRaw * (5.0 / 1024.0)) * 1000;
-    dataJson["PITOT_MV"] = String(pitotMillivolts);
+  // Pitot Voltage
+  int pitotRaw = analogRead(PITOT_PIN);
+  double pitotMillivolts = (pitotRaw * (5.0 / 1024.0)) * 1000;
+  dataJson["PITOT_MV"] = String(pitotMillivolts);
 
-    char jsonString[1024];
-    serializeJson(dataJson, jsonString);
-    return jsonString;
+  char jsonString[1024];
+  serializeJson(dataJson, jsonString);
+  return jsonString;
 
 }
 

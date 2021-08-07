@@ -15,9 +15,18 @@
 
 #define MAJOR_VERSION "ESP-PORT"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "21072701"
+#define BUILD_NUMBER "21080701"
 #define RELEASE "V.ESP.X-ALPHA"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
+
+
+/****************************************
+ * SYSTEM SETTINGS
+ ***/
+#define showAlarms true
+#define MIN_REFRESH_RATE 200
+//#define DEBUG
+
 
 
 /****************************************
@@ -27,9 +36,9 @@
 
 //#define CYCLIC_AVERAGE_BUFFER 5           // Number of scans over which to average output (helps stabilise results)
 #define MIN_TEST_PRESSURE_PERCENTAGE 80      // Lowest test pressure bench will generate accurate results. Please see note in wiki
-
 #define CONF_API_ENABLED                       // enable API
-#define CONF_DISABLE_API_CHECKSUM              // Add checksum to serial API response TODO UPDATE CHECKSUM TO NATIVE ESP32 CRC32
+#define CONF_DISABLE_API_CHECKSUM              // Add checksum to serial API response TODO: UPDATE CHECKSUM TO NATIVE ESP32 CRC32
+
 
 
 /****************************************
@@ -60,15 +69,6 @@
 // (default 0x77) / Alternate 0x76
 #define BME280_I2C_ADDR 0x77            
   
-
-
- 
-/****************************************
- * CONFIGURE ALARMS
- ***/
-#define showAlarms true
-
-//TODO - more granular alarm control - need to be able to disable individual alarms
 
 
 
@@ -233,8 +233,7 @@ const char* RELH_SENSOR = "Fixed Value";
  *
  * Test environment /DM 
  ***/
-//#define DM
-#if defined DM
+#if defined DEBUG
     #define BARO_SENSOR_SPARKFUN_BME280
     #define TEMP_SENSOR_SPARKFUN_BME280
     #define RELH_SENSOR_SPARKFUN_BME280

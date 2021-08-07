@@ -1,4 +1,5 @@
 <!DOCTYPE HTML>
+<html lang="en">
 	<HEAD>
       <title>DIY Flow Bench</title>
       <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,11 +13,17 @@
             <span class="closeFileModal">&times;</span>
             <h3>File Manager</h3>
             <div id="file_list">Loading...</div>
+            <br>
             <hr>
-            <button id="create-file-button" class="button">New</button>
-            <button id="upload-button" class="button">Upload</button>
+            <br>
+            <form method="POST" action="/upload" enctype="multipart/form-data">
+              <label for="data" class="file-upload-button button">Select File</label>
+              <input id="data" type="file" name="wtf"/>
+                <input class="button file-submit-button" type="submit" value="Upload"/>
+            </form>
           </div>        
         </div>
+
 
         <!-- Status Modal -->
         <div id="statusModal" class="modal">
@@ -48,8 +55,8 @@
             <h1>DIY Flow Bench</h1>
         </div>
 
-        <button class="tablink" onclick="openPage('dashboard', this, 'red')" id="defaultOpen">Dashboard</button>
-        <button class="tablink" id="load-config-button" onclick="openPage('configuration', this, 'blue')">Configuration</button>
+        <button class="tablink" onclick="openPage('dashboard', this)" id="defaultOpen">Dashboard</button>
+        <button class="tablink" id="load-config-button" onclick="openPage('configuration', this)">Configuration</button>
         <div id="dashboard" class="tabcontent">        
           <div class="content">
             <div class="tile-grid">
@@ -97,7 +104,7 @@
               <button id="refresh-button" class="button">Refresh</button>
               <button id="record-button" class="button">Record</button>
               <button id="on-button" class="button">ON</button>
-              <button id="off-button" class="button button2">OFF</button>
+              <button id="off-button" class="button">OFF</button>
             
             </p>
             
@@ -107,7 +114,7 @@
                  
             <!-- lift graph -->
             
-            <!-- TODO 
+            <!-- TODO: 
             
             Set graph scaling based on MAF max flow rate 
             Add user settings for graph scaling
@@ -216,13 +223,13 @@
 
         <!-- configuration tab -->
 
-        <form action="#" onsubmit="return false;">
+        <form action="#" id="config-form" onsubmit="return false;">
         <div id="configuration" class="tabcontent">
           <div class="config-panel">
             <p><button id="file-manager-button" class="button">File Manager</button>&nbsp;<button id="status-button" class="button">Status</button></p>       
             <br>
             <h3>WiFi Info</h3>
-            <input type="hidden" id="SCHEMA" value="6">
+            <input type="hidden" id="SCHEMA" value="6" name="SCHEMA">
             <div class="config-row tooltip"><label class="config-label">WiFi SSID:</label>&nbsp;<input type="text" id="CONF_WIFI_SSID"  name="CONF_WIFI_SSID" value="CONF_WIFI_SSID" class="config-text" ><span class="tooltiptext">The name of your WiFi network</span></div>
             <div class="config-row tooltip"><label class="config-label">WiFi Password:</label>&nbsp;<input type="text" id="CONF_WIFI_PSWD" name="CONF_WIFI_PSWD" value="CONF_WIFI_PSWD" class="config-text"><span class="tooltiptext">Your WiFi Password</span></div>
             <div class="config-row tooltip"><label class="config-label ">WiFi AP SSID:</label>&nbsp;<input type="text" id="CONF_WIFI_AP_SSID" name="CONF_WIFI_AP_SSID" value="CONF_WIFI_AP_SSID" class="config-text" ><span class="tooltiptext">Access-point name for direct WiFi connection</span></div>
@@ -242,7 +249,6 @@
             <br>
             <h3>Bench Settings</h3>
             <div class="config-row tooltip"><label class="config-label">Refresh Rate:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="CONF_REFRESH_RATE" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
-            <div class="config-row tooltip"><label class="config-label">Display Alarms:</label>&nbsp;<input type="text" id="CONF_SHOW_ALARMS" name="CONF_SHOW_ALARMS" value="CONF_SHOW_ALARMS" class="config-text"><span class="tooltiptext">Show alarms on browser console</span></div>
             <br>
             <div class="float-right"><button id="save-config-button" class="button">Save</button></div>
             <br>

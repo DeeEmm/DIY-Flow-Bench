@@ -4,169 +4,175 @@
 
 NOTE: Build numbers follow format YY MM DD VV Where VV is incremental version (reset daily) 
 
-Build #     - Description of Change
+Build #         - Description of Change
  
-20081901    - Updated Build and Version variable length in TCMenu Designer
-20081601    - #46 Added reference pressure offet to volumetric flow calculation
-20081201    - #44 Added API call validation
-20081101    - Added pins definition for DIYFB shield
-            - Added serial comms handler
-            - Added secondary serial comms for bluetooth
-            - Created digital manometer function (for additional flow / pitot displays)
-            - General code tidying
-            - Renamed pins.h to boards.h
-            - Added PMAS MH95-3000 MAF 
-20080903    - Added delimiter to API responses
-            - Tidied API code
-20080902    - Added API Enum : Flow:Ref:Temp:Humidity:Baro 
-20080901    - Added CRC Checksum function
-20080705    - Dropped support for PMX2050 (only posotive range so will not work with vac - D'Oh!)
-            - Updated BOM
-            - Updated hardware schema
-            - Updated readme
-20080704    - Added MPX2050 Reference pressure sensor
-            - Improved code for using ref pressure value for baro on system boot
-            - Dropped support for BMP280
-20080703    - Updated MPX4250 Ref pressure calculations
-20080702    - Added I2C address to Sparkfun BME280 initialisation 
-            - Added configuration defaults for baro / temp / relH
-            - Fixed bench is running conditions / commented out low reference pressure alarm for testing
-            - Added releases to changelog
-20080604    - V.1.0-beta.14
-            - #36 MPX4250 scaling error - subtracted atmospheric pressure from reading
-            - #39 Fixed flow value fraction value (displaying zero)
-            - #40 Fixed adjusted flow display
-            - Updated tcmenu
-            - Fixed & tested pitot display
-            - Changed pitot display to show differential as percentage difference (to P Ref)
-20080603    - Updated LS2 MAF part number
-            - #37 updated temp / baro / humidty menu functions
-            - Added sensor test menu 
-            - Added Baro menu item
-            - #38 Fixed version + build menu items
-20080602    - Update tcmenu layout 
-20080601    - #37 Commented out 'freeze' statement (line 139) - while(1); //Freeze 
-20080501    - Moved language file call to configation settings
-            - Move pin configuration into pins.h
-            - Refactored menu code and moved calibration into dedicated functions
-            - Removed redundant calibration functions
-            - Rewrote calibration functions
-20080404    - Added comments to changelog file
-20080403    - Added comments to mafData files
-20080402    - Added analog mafData example 
-20080401    - V.1.0-beta.13
-            - Fixed some typos and reduced program size
-            - #32 Added additional array type for analog mafData files (memory issue)
-            - #33 Fixed humidity correction is
-20080307    - V.1.0-beta.12
-            - Added support for Sparkfun BME280 (works with generic 10 pin BME280)
-20080306    - Updated changelog
-20080305    - Updated documentation
-20080304    - Removed redundant Alpha files
-20080303    - Merge V1 branch into master
-20080302    - Added raw analog decode to getMafflowCFM() function
-20080301    - Added LS2 MAf Data file
-            - Updated MAF file format
-20080204    - Differentiate between kg/h & mg/s in API MAF Data command.
-            - Added support for MPX4250 reference pressure sensor
+20081901        - Updated Build and Version variable length in TCMenu Designer
+20081601        - #46 Added reference pressure offet to volumetric flow calculation
+20081201        - #44 Added API call validation
+20081101        - Added pins definition for DIYFB shield
+                - Added serial comms handler
+                - Added secondary serial comms for bluetooth
+                - Created digital manometer function (for additional flow / pitot displays)
+                - General code tidying
+                - Renamed pins.h to boards.h
+                - Added PMAS MH95-3000 MAF 
+20080903        - Added delimiter to API responses
+                - Tidied API code
+20080902        - Added API Enum : Flow:Ref:Temp:Humidity:Baro 
+20080901        - Added CRC Checksum function
+20080705        - Dropped support for PMX2050 (only posotive range so will not work with vac - D'Oh!)
+                - Updated BOM
+                - Updated hardware schema
+                - Updated readme
+20080704        - Added MPX2050 Reference pressure sensor
+                - Improved code for using ref pressure value for baro on system boot
+                - Dropped support for BMP280
+20080703        - Updated MPX4250 Ref pressure calculations
+20080702        - Added I2C address to Sparkfun BME280 initialisation 
+                - Added configuration defaults for baro / temp / relH
+                - Fixed bench is running conditions / commented out low reference pressure alarm for testing
+                - Added releases to changelog
+20080604        - V.1.0-beta.14
+                - #36 MPX4250 scaling error - subtracted atmospheric pressure from reading
+                - #39 Fixed flow value fraction value (displaying zero)
+                - #40 Fixed adjusted flow display
+                - Updated tcmenu
+                - Fixed & tested pitot display
+                - Changed pitot display to show differential as percentage difference (to P Ref)
+20080603        - Updated LS2 MAF part number
+                - #37 updated temp / baro / humidty menu functions
+                - Added sensor test menu 
+                - Added Baro menu item
+                - #38 Fixed version + build menu items
+20080602        - Update tcmenu layout 
+20080601        - #37 Commented out 'freeze' statement (line 139) - while(1); //Freeze 
+20080501        - Moved language file call to configation settings
+                - Move pin configuration into pins.h
+                - Refactored menu code and moved calibration into dedicated functions
+                - Removed redundant calibration functions
+                - Rewrote calibration functions
+20080404        - Added comments to changelog file
+20080403        - Added comments to mafData files
+20080402        - Added analog mafData example 
+20080401        - V.1.0-beta.13
+                - Fixed some typos and reduced program size
+                - #32 Added additional array type for analog mafData files (memory issue)
+                - #33 Fixed humidity correction is
+20080307        - V.1.0-beta.12
+                - Added support for Sparkfun BME280 (works with generic 10 pin BME280)
+20080306        - Updated changelog
+20080305        - Updated documentation
+20080304        - Removed redundant Alpha files
+20080303        - Merge V1 branch into master
+20080302        - Added raw analog decode to getMafflowCFM() function
+20080301        - Added LS2 MAf Data file
+                - Updated MAF file format
+20080204        - Differentiate between kg/h & mg/s in API MAF Data command.
+                - Added support for MPX4250 reference pressure sensor
 20080203	- Added support for the Generic Commands listed on the API section of the WIKI.  
         	- Added the Serial API Specification to the doc folder
-			- Added the beginning of the API layer for the GUI
-20080202    - V.1.0-beta.11
-            - Added additional API debug commands
-20080201    - Added additional variables to MAF data files #29
-20080102    - V.1.0-beta.10
-            - #28 fixed incorrect CFM reading...
-            - Updated getMafFlowCFM function
-            - Corrected mafData files voltage
-            - Added additional functions to API
-            - Update configuration.h set default values
-20080101    - Updated API Responses
-20072901    - V.1.0-beta.9
-            - Changed format version varables
-            - Added basic serial API functions
-            - Dropped ilib280 support (depreciated)
-            - #19 Added Adafruit BME280 support
-            - Corrected datatypes in mafData files
-            - Added website URL in docs
-20041501    - Reorganised project folder structure
-20010101	- V.1.0-beta.8
-            - Fixed spelling issue for ilib library calls
-			- Fixed load issue for Baro and Pitot 
-19123001 	- Fixed float issue for pRef
-19122601	- V.1.0-beta.7
-            - #23 DHT11 compile issue
-			- #19 Support for RH sensor
-			- Added MIN_MAF_MILLIVOLTS to filter MAF results 
-			- #20 Fixed issue with Pitot sensor decode
-19122401    - V.1.0-beta.6
-            - Bugfix release various display bugs
-			- Validated Mass > Volumetric flow conversion
-			- Validated Flow reference conversion
-			- Disabled menu timeout
-			- Added MafVolts to display for testing / diagnostics
-			- Tidied Display layout
-19122301    - V.1.0-beta.5
-            - Changed order of display items for better visibility on 2 line Display
-            - Added one decimal places to display values value (changed divisor to 10 in tcMenu)
-            - Renamed existing BMP280 code references to ADAFRUIT_BMP280
-            - Added support for ILIB_BMP280 library
-            - Added support for DHT11 sensor///////////s
-            - Added mass > volumetric flow compensation calculations
-            - Remapped Siemens_5WK9605 mafdata from cfm to kg/h
-19122002    - V.1.0-beta.4
-            - Issue #18 Compile error for BMP280 library
-19122001    - V.1.0-beta.3
-            - Added support for BMP280//sdfsdfdsfdf////
-            - Fixed potential MAF conversion issue
-            - Minor bugfixes
-19121001    - V.1.0-beta.2
-            - Issue #15 - Shortened menu descriptors
-            - Issue #14 - Sorted data in Delphi MAF file
-            - Issue #16 - Low flow error
-19120804    - V.1.0-beta.1
-            - Display Calibration results on screen 
-19120803    - #7  Update calibration functions 
-19120802    - Added partial support for additional languages
-			- Created function for popover display dialog
-			- Added max-flow error check
-19120801    - Added support for MAF lookup tables via external files
-			- Including support for alternate MAF sensors
-19120701    - Changed directory structure to resolve dependency issue 
-            - Moved libraries into src subfolder folder
-            - Created this changelog file
-19120601    - Fixed compile error (extra curly bracket)
-21071801    - Ported code to ESP32
-            - Removed TC menu support
-            - Removed external display support
-            - Disabled CRC Checksum
-            - Updated pin mapping
-            - Tested via Serial API
-21071802    - Added SPIFFS
-            - Added system status message to serial on boot
-            - Serial reporting permanently enabled
-            - Added Wifi Station mode
-            - Added basic web server
-21072001    - Code refactor
-            - Created basic Web UI
-            - Asynchronous web sockets
-            - Added Status messages
-            - Added JSON status message to API
-21072301    - Added Multicast DNS Service
-            - Added fallback to AP mode
-            - Added tabbed interface to webserver
-            - Added configuration settings
-21072401    - Added calibration settings
-            - Added additional configuration settings
-            - Updated configuration file JSON formatting
-            - Changed config file extension from txt to JSON
-            - Added modal dialogs for file management and status
-21072701    - Populated modal dialogs for file management and status
-            - Added status info for hardware configuration
-            - Reformatted 
-            - Created UI Graphs for data visualisation
-            - Refactored websocket communications to use JSON data
-            - Moved status and config data into Structs
-            
+		- Added the beginning of the API layer for the GUI
+20080202        - V.1.0-beta.11
+                - Added additional API debug commands
+20080201        - Added additional variables to MAF data files #29
+20080102        - V.1.0-beta.10
+                - #28 fixed incorrect CFM reading...
+                - Updated getMafFlowCFM function
+                - Corrected mafData files voltage
+                - Added additional functions to API
+                - Update configuration.h set default values
+20080101        - Updated API Responses
+20072901        - V.1.0-beta.9
+                - Changed format version varables
+                - Added basic serial API functions
+                - Dropped ilib280 support (depreciated)
+                - #19 Added Adafruit BME280 support
+                - Corrected datatypes in mafData files
+                - Added website URL in docs
+20041501        - Reorganised project folder structure
+20010101        - V.1.0-beta.8
+                - Fixed spelling issue for ilib library calls
+	        - Fixed load issue for Baro and Pitot 
+19123001        - Fixed float issue for pRef
+19122601        - V.1.0-beta.7
+                - #23 DHT11 compile issue
+	        - #19 Support for RH sensor
+	        - Added MIN_MAF_MILLIVOLTS to filter MAF results 
+		- #20 Fixed issue with Pitot sensor decode
+19122401        - V.1.0-beta.6
+                - Bugfix release various display bugs
+		- Validated Mass > Volumetric flow conversion
+		- Validated Flow reference conversion
+		- Disabled menu timeout
+		- Added MafVolts to display for testing / diagnostics
+		- Tidied Display layout
+19122301        - V.1.0-beta.5
+                - Changed order of display items for better visibility on 2 line Display
+                - Added one decimal places to display values value (changed divisor to 10 in tcMenu)
+                - Renamed existing BMP280 code references to ADAFRUIT_BMP280
+                - Added support for ILIB_BMP280 library
+                - Added support for DHT11 sensor///////////s
+                - Added mass > volumetric flow compensation calculations
+                - Remapped Siemens_5WK9605 mafdata from cfm to kg/h
+19122002        - V.1.0-beta.4
+                - Issue #18 Compile error for BMP280 library
+19122001        - V.1.0-beta.3
+                - Added support for BMP280//sdfsdfdsfdf////
+                - Fixed potential MAF conversion issue
+                - Minor bugfixes
+19121001        - V.1.0-beta.2
+                - Issue #15 - Shortened menu descriptors
+                - Issue #14 - Sorted data in Delphi MAF file
+                - Issue #16 - Low flow error
+19120804        - V.1.0-beta.1
+                - Display Calibration results on screen 
+19120803        - #7  Update calibration functions 
+19120802        - Added partial support for additional languages
+	       - Created function for popover display dialog
+	       - Added max-flow error check
+19120801        - Added support for MAF lookup tables via external files
+	       - Including support for alternate MAF sensors
+19120701        - Changed directory structure to resolve dependency issue 
+                - Moved libraries into src subfolder folder
+                - Created this changelog file
+19120601        - Fixed compile error (extra curly bracket)
+21071801        - Ported code to ESP32
+                - Removed TC menu support
+                - Removed external display support
+                - Disabled CRC Checksum
+                - Updated pin mapping
+                - Tested via Serial API
+21071802        - Added SPIFFS
+                - Added system status message to serial on boot
+                - Serial reporting permanently enabled
+                - Added Wifi Station mode
+                - Added basic web server
+21072001        - Code refactor
+                - Created basic Web UI
+                - Asynchronous web sockets
+                - Added Status messages
+                - Added JSON status message to API
+21072301        - Added Multicast DNS Service
+                - Added fallback to AP mode
+                - Added tabbed interface to webserver
+                - Added configuration settings
+21072401        - Added calibration settings
+                - Added additional configuration settings
+                - Updated configuration file JSON formatting
+                - Changed config file extension from txt to JSON
+                - Added modal dialogs for file management and status
+21072701        - Populated modal dialogs for file management and status
+                - Added status info for hardware configuration
+                - Reformatted 
+                - Created UI Graphs for data visualisation
+                - Refactored websocket communications to use JSON data
+                - Moved status and config data into Structs
+21080701        - #71 Added file download code to File manager
+                - #71 Added file delete code to File Manager
+                - #71 Added file Upload code to File Manager
+                - #65 Removed alarm mute feature
+                - Added data streaming inc refresh rate
+                - Added data streaming controls (on/off buttons)
+                - Started on code refactor
             
                     

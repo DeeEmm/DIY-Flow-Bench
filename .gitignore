@@ -13,3 +13,6 @@ ESP32/DIY-Flow-Bench/.pio/*
 ESP32/DIY-Flow-Bench/build/*
 Arduino/DIY-Flow-Bench/node_modules/*
 platformio.ini
+.nova/*
+.pio/*
+.pio/*
