@@ -2,7 +2,7 @@
 * The DIY Flow Bench project
 * https://diyflowbench.com
 * 
-* sensors.h - Sensors class header file
+* Hardware.h - Hardware header file
 *
 * Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
 * 
@@ -17,40 +17,16 @@
 ***/
 #pragma once
 
-#include "constants.h"
+class Hardware {
+	
+	friend class Messages;
+	friend class Maths;
 
-
-class Sensors {
-
-public:
-	Sensors();
-    void Begin();
-	void Initialise();
-    float MAF();
-	float Temp();
-	float Baro();
-	float RelH();
-	float PRef(int _unit);
-	float PDiff();
-	float Pitot();
-	float startupBaroPressure;
-  
-private:
-	int _unit;
-	float _baro;
-	float _mafval;
-	float _relh;
-	float _temp;
-	float _pref;
-	float _pdiff;
-	float _pitot;
-	String _mafSensorType;
-	String _tempSensorType;
-	String _baroSensorType;
-	String _relhSensorType;
-	String _prefSensorType;
-	String _pdiffSensorType;
-	String _pitotSensorType;    
-  
+	public:
+		Hardware();
+		void Initialise ();
+		float getSupplyMillivolts();
+		bool benchIsRunning();	
+		void checkRefPressure();
+		
 };
-

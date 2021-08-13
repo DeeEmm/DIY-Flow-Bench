@@ -1,15 +1,7 @@
-var gateway = `ws://${window.location.hostname}/ws`;
-var websocket;
-window.addEventListener('load', onLoad);
-
-var fileModal = document.getElementById("fileModal");
-var statusModal = document.getElementById("statusModal");
-var spanCloseFileModal = document.getElementsByClassName("closeFileModal")[0];
-var spanCloseStatusModal = document.getElementsByClassName("closeStatusModal")[0];
-
+// Constants
 // websocket message encoding - we need to send intVal to ESP32 Select(Case) 
 const GET_FLOW_DATA = 1;
-const CONFIG = 2;
+const REC_FLOW_DATA = 2;
 const CALIBRATE = 3;
 const FILE_LIST = 4;
 const SYS_STATUS = 5;
@@ -21,8 +13,17 @@ const FILE_UPLOAD = 10;
 const START_BENCH = 11;
 const STOP_BENCH = 12;
 
+var gateway = `ws://${window.location.hostname}/ws`;
+var websocket;
+window.addEventListener('load', onLoad);
+
+var fileModal = document.getElementById("fileModal");
+var statusModal = document.getElementById("statusModal");
+var spanCloseFileModal = document.getElementsByClassName("closeFileModal")[0];
+var spanCloseStatusModal = document.getElementsByClassName("closeStatusModal")[0];
+
 /****************************************
-* Web Socket handlers
+* Initialise Web Socket connection
 ***/
 function initialiseWebSocket() {
   console.log('Trying to open a WebSocket connection...');
@@ -34,15 +35,20 @@ function initialiseWebSocket() {
 
 /****************************************
 * OnOpen event handler
+*
+* Runs after web socket successfully created
 ***/
 function onOpen(event) {
   console.log('Connection opened');
   socketMessageSend(GET_FLOW_DATA);
-  socketMessageSend(CONFIG);
+  socketMessageSend(LOAD_CONFIG);
+  socketMessageSend(FILE_LIST);
 }
 
 /****************************************
 * onClose event handler
+*
+* Runs when web socket closed
 ***/
 function onClose(event) {
   console.log('Connection closed');
@@ -52,70 +58,74 @@ function onClose(event) {
 
 /****************************************
 * Websocket message event handler
+*
+* Runs when web socket message received
+* Pulls header value from JSON data and processes action accordingly
 ***/
 function onSocketMessageReceive(event) {
   
   try {
     var myObj = JSON.parse(event.data);
-    var keys = Object.keys(myObj);
-    var values = Object.values(myObj);
+    console.log("Socket Message Event: " + parseInt(myObj.HEADER));
   } catch(err) {
+    console.log("Malformed JSON data");
   }
-  console.log("onMessage Event: " + values[0]);
   
-  
-  // Lets check the first key value to determine what message we have received
-  switch (values[0]) {
-    
-    // We have received config data
-    case LOAD_CONFIG: 
-      for (var i = 0; i < keys.length; i++){
-        var key = keys[i];
+  key = null;
+
+  switch (parseInt(myObj.HEADER)) {    
+
+    case LOAD_CONFIG:      
+      for (key in myObj) {
         try {
-          document.getElementById(key).value = myObj[key];
-          //    console.log(key + ' : ' + myObj[key]);
+          if (key != "HEADER") {
+            document.getElementById(key).value = myObj[key];
+             // console.log(key + ' : ' + myObj[key]);
+           }
         } catch (error) {
           console.log('Missing or incorrect configuration parameter(s)');
         }
       }
     break;
     
-    //We have received bench data
     case GET_FLOW_DATA:
-      for (var i = 0; i < keys.length; i++){
-        var key = keys[i];
+      for (key in myObj) {
         try {
-          document.getElementById(key).innerHTML = myObj[key];
-          //    console.log(key + ' : ' + myObj[key]);
+          if (key != "HEADER") {
+            document.getElementById(key).innerHTML = myObj[key];
+             // console.log(key + ' : ' + myObj[key]);
+           }
         } catch (error) {
-          console.log(error);
           console.log('Missing or incorrect data parameter(s)');
         }
       }    
     break;
     
-    
     case CALIBRATE: 
-      /* We have calculated the calibration offset (on the ESP32) and pushed the configuration values to the browser.
+      /* 
+      We have calculated the calibration offset (on the ESP32) and pushed the configuration values to the browser.
        Now we are remotely instigating a save config (from the ESP32) to save the browser values back to the config.json file on the ESP32
        This is not perfect as we are playing message pingpong but it uses our existing functions and negates the need to write a new
        Save config function on the ESP32 just to be able to update the calibration value.
-       NOTE: We could save the config values into a dedicated file and keep them out of the browser altogether (perhaps we should) */
-       socketMessageSend(SAVE_CONFIG); 
+       NOTE: We could save the config values into a dedicated file and keep them out of the browser altogether (perhaps we should) 
+       
+      NOTE: REDUNDANT
+      TODO: rewrite calibration handling
+      */
+       socketMessageSend(CALIBRATE); 
     break;
     
-    // We have received a file list
     case FILE_LIST: 
       var fileList = '';
-      for (var i = 1; i < keys.length; i++){
-        var key = keys[i];
+      for (key in myObj) {
         try {
-          
-          // we need to break a cardinal rule here and create some HTML 
-          fileList += '<div class="fileListRow"><span class="column left"><a href="/download' + key + '" download class="file-link" onclick="downloadFile("' + key + '")">' + key + '</a></span><span class="column middle"><span class="fileSizeTxt">' + myObj[key] + ' bytes</span></span><span class="column right"><button id="delete-button"  onclick="socketMessageSend(\'' + FILE_DELETE + ':' + key + '\')" class="button-sml">Del</button></span>';
-          
-                   
-          //    console.log(key + ' : ' + myObj[key]);
+          if (key != "HEADER") {
+            // TODO: Need to rewrite this...
+            // We are breaking a cardinal rule here and creating view (GUI) code within the controller. 
+            // We could (should!) send out JSON to the browser and then create the file list HTML using Javascript on the client side
+            fileList += '<div class="fileListRow"><span class="column left"><a href="/download' + key + '" download class="file-link" onclick="downloadFile("' + key + '")">' + key + '</a></span><span class="column middle"><span class="fileSizeTxt">' + myObj[key] + ' bytes</span></span><span class="column right"><button id="delete-button"  onclick="socketMessageSend(\'' + FILE_DELETE + ':' + key + '\')" class="button-sml">Del</button></span>';
+          }
+          // console.log(key + ' : ' + myObj[key]);
         } catch (error) {
           console.log(error);
           console.log('Missing or incorrect system status');
@@ -124,13 +134,14 @@ function onSocketMessageReceive(event) {
       } 
     break;
 
-    // We have received system status
+
     case SYS_STATUS: 
-      for (var i = 0; i < keys.length; i++){
-        var key = keys[i];
+      for (key in myObj) {
         try {
-          document.getElementById(key).innerHTML = myObj[key];
-          //    console.log(key + ' : ' + myObj[key]);
+          if (key != "HEADER") {
+            document.getElementById(key).innerHTML = myObj[key];
+            //    console.log(key + ' : ' + myObj[key]);
+          }
         } catch (error) {
           console.log('Missing or incorrect status parameter(s)');
         }
@@ -161,14 +172,31 @@ function onFileUpload(event) {
 
 
 
+
 /****************************************
 * onLoad handler
 ***/
 function onLoad(event) {
-  
+
   initialiseWebSocket();
   initialiseButtons();
-  document.getElementById("defaultOpen").click();
+  const urlParams = new URLSearchParams(window.location.search);
+  const modal = urlParams.get('modal');  
+  
+  switch (modal) {
+  
+    case "upload":
+      
+      document.getElementById("load-config-button").click();
+      document.getElementById('fileModal').style.display='block';
+      
+     
+    break;
+    
+    default:
+      document.getElementById("load-dashboard-button").click();
+    
+  }
   console.log('Page Loaded');
   
 }
@@ -180,11 +208,17 @@ function onLoad(event) {
 function initialiseButtons() {
   
   document.getElementById('refresh-button').addEventListener('click', function(){socketMessageSend(GET_FLOW_DATA);});
-  document.getElementById('load-config-button').addEventListener('click', function(){socketMessageSend(CONFIG);});
+  document.getElementById('load-config-button').addEventListener('click', function(){socketMessageSend(LOAD_CONFIG);});
   document.getElementById('calibrate-button').addEventListener('click', function(){socketMessageSend(CALIBRATE);});
   document.getElementById('save-config-button').addEventListener('click', function(){socketMessageSend(SAVE_CONFIG);});
-  document.getElementById('file-manager-button').addEventListener('click', function(){socketMessageSend(FILE_LIST);});
-  document.getElementById('status-button').addEventListener('click', function(){socketMessageSend(SYS_STATUS);});
+  document.getElementById('file-manager-button').addEventListener('click', function(){
+    socketMessageSend(FILE_LIST);
+    document.getElementById('fileModal').style.display='block';
+  });
+  document.getElementById('status-button').addEventListener('click', function(){
+    socketMessageSend(SYS_STATUS);
+    document.getElementById('statusModal').style.display='block';
+  });
   document.getElementById('on-button').addEventListener('click', function(){socketMessageSend(START_BENCH);});
   document.getElementById('off-button').addEventListener('click', function(){socketMessageSend(STOP_BENCH);});
   
@@ -192,95 +226,98 @@ function initialiseButtons() {
 
 
 /****************************************
-* configForumJSON
+* configFormArray
+*
+* Create Array object from Configuration form data
 ***/
-function configFormJSON () {
-  
+function configFormArray () {
   const form = document.querySelectorAll('form')[1];
   //const form = document.querySelector('#config-form');
   const formData = new FormData(form);
   const assocArray = {};
-  assocArray['SCHEMA'] = 6;
   for (const [name, value] of formData) {
     assocArray[name] = value;
   }
-  return JSON.stringify(assocArray, null, 2);
-  
+  //return JSON.stringify(assocArray, null, 2);
+  return assocArray; 
 }
 
 /****************************************
 * socketMessageSend
+* 
+* Construct message: header + content & send to ESP32
 ***/
 function socketMessageSend(message){
   
   console.log('Web Socket Message: ' + message);
   
   var jsonMessage;
-  var schema;
+  var configArray;
+  var header;
   var action;
   var actionData;
   
   // check if data has been passed to the function with the action message
   var searchResult = String(message).search(":");
   if (searchResult != -1) {
-      schema = message.split(":");
-      action = Number(schema[0]);
-      actionData = schema[1];
+      header = message.split(":");
+      action = Number(header[0]);
+      actionData = header[1];
   } else {
       action = message;
   }
   
   switch (action) {
     
-    case GET_FLOW_DATA: // SCHEMA:1
-      jsonMessage = '{\"SCHEMA\":\"' + GET_FLOW_DATA + '\"}';
+    case GET_FLOW_DATA: // HEADER:1
+      jsonMessage = '{\"HEADER\":\"' + GET_FLOW_DATA + '\"}';
     break;
 
-    case CONFIG: // SCHEMA:2
-      jsonMessage = '{\"SCHEMA\":\"' + CONFIG + '\"}';
+    case REC_FLOW_DATA: // HEADER:2
+      jsonMessage = '{\"HEADER\":\"' + REC_FLOW_DATA + '\"}';
     break;
 
-    case CALIBRATE: // SCHEMA:3
-      jsonMessage ='{\"SCHEMA\":\"' + CALIBRATE + '\"}';
+    case CALIBRATE: // HEADER:3
+      jsonMessage ='{\"HEADER\":\"' + CALIBRATE + '\"}';
     break;
     
-    case FILE_LIST: // SCHEMA:4
-      jsonMessage ='{\"SCHEMA\":\"' + FILE_LIST + '\"}';
-      document.getElementById('fileModal').style.display='block';
+    case FILE_LIST: // HEADER:4
+      jsonMessage ='{\"HEADER\":\"' + FILE_LIST + '\"}';      
     break;
     
-    case SYS_STATUS: // SCHEMA:5
-      jsonMessage ='{\"SCHEMA\":\"' + SYS_STATUS + '\"}';
-      document.getElementById('statusModal').style.display='block';
+    case SYS_STATUS: // HEADER:5
+      jsonMessage ='{\"HEADER\":\"' + SYS_STATUS + '\"}';      
     break;
   
-    case SAVE_CONFIG:// SCHEMA:6
-      jsonMessage = configFormJSON();
+    case SAVE_CONFIG:// HEADER:6
+      configArray = configFormArray();
+      configArray['HEADER'] = SAVE_CONFIG;
+      jsonMessage = JSON.stringify(configArray, null, 2);
     break;
     
-    case LOAD_CONFIG: // SCHEMA:7
-    
+    case LOAD_CONFIG: // HEADER:7
+      jsonMessage = '{\"HEADER\":\"' + LOAD_CONFIG + '\"}';
     break;
     
-    case FILE_DOWNLOAD: // SCHEMA:8
-    
+    case FILE_DOWNLOAD: // HEADER:8
+      // NOTE: File sent by HTTP FORM POST Data and handled by server.on(...) request handler in Webserver::Initialise
     break;
     
-    case FILE_DELETE: // SCHEMA:9
-      jsonMessage ='{\"SCHEMA\":\"' + FILE_DELETE + '\",\"FILENAME\":\"' + actionData + '\"}';
+    case FILE_DELETE: // HEADER:9
+      jsonMessage ='{\"HEADER\":\"' + FILE_DELETE + '\",\"FILENAME\":\"' + actionData + '\"}';
 
     break;
     
-    case FILE_UPLOAD: // SCHEMA:10
-      
+    case FILE_UPLOAD: // HEADER:10
+      // NOTE: Handled by onFileUpload(event) and sent by HTTP FORM POST Data to server.on(...) request handler in Webserver::Initialise
     break;
     
-    case START_BENCH: // SCHEMA:11
-      jsonMessage ='{\"SCHEMA\":\"' + START_BENCH + '\"}';
+    case START_BENCH: // HEADER:11
+      jsonMessage ='{\"HEADER\":\"' + START_BENCH + '\"}';
     break;
     
-    case STOP_BENCH: // SCHEMA:12
-      jsonMessage ='{\"SCHEMA\":\"' + STOP_BENCH + '\"}';
+    case STOP_BENCH: // HEADER:12
+      jsonMessage ='{\"HEADER\":\"' + STOP_BENCH + '\"}';
     break;
 
   }

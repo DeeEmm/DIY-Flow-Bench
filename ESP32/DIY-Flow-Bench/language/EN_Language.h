@@ -2,7 +2,7 @@
  * Language Constants
  *
  ***/
-
+#pragma once
 
 //TODO:(#12) Translations
 #define LANG_NO_ERROR               "Status OK"
@@ -22,4 +22,8 @@
 #define LANG_LOW_FLOW_CAL_VAL       "Low Cal Value: "
 #define LANG_HIGH_FLOW_CAL_VAL      "High Cal Value: "
 #define LANG_REF_PRESS_VALUE        "Ref Press Val: "
+#define LANG_NOT_ENABLED            "Not Enabled"
+#define LANG_START_REF_PRESSURE     "Using Startup Ref Pressure"
+#define LANG_FIXED_VALUE            "Fixed value: "
 //                                  -----------------
+#define LANG_SAVING_CONFIG          "Saving Config..."

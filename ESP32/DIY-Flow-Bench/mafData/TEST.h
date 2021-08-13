@@ -7,9 +7,12 @@
  * File units = 1000 * kg/hr
  * Comments: Basic test data
  * Status:
- * Support: https://diyflowbench.com/forum/mafdata/22-selecting-and-decoding-your-maf-sensor
+ * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
+ * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
- 
+#ifndef MAFDATA_DEFINED
+#define MAFDATA_DEFINED
+
  
  /****************************************
    * MAF Type
@@ -102,3 +105,5 @@ long mafMapData[][2] = {
 {4900,291048},
 {5000,315320}
 };
+
+#endif

@@ -7,8 +7,12 @@
  * File units = 1000 * kg/hr
  * Comments:  Data calculated on 3 point data measured on flow bench by Tony Donn. 
  * Status: Unvalidated.
- * Support: https://diyflowbench.com/forum/mafdata/6-siemens-5wk9605
+ * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
+ * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
+#ifndef MAFDATA_DEFINED
+#define MAFDATA_DEFINED
+
 
 /****************************************
   * MAF Type
@@ -101,3 +105,5 @@ long mafMapData[][2] = {
 {4900,291048},
 {5000,315320}
 };
+
+#endif

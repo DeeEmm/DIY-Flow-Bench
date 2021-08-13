@@ -51,6 +51,11 @@ html {
   text-align: center;
 }
 
+.headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover {
+  color:white;
+  text-decoration: none;
+}
+
 h1{
   color: #FFF;
 }

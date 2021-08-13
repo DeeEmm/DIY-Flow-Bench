@@ -7,9 +7,13 @@
  * File units = 10 * mg/sec
  * Comments: Original data from Megasquirt website - www.microsquirt.info/maffactor_lsx.inc
  * Status: Validated
- * Support: https://diyflowbench.com/forum/mafdata/16-gm-ls2
+ * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
+ * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
- 
+#ifndef MAFDATA_DEFINED
+#define MAFDATA_DEFINED
+
+
  
 /****************************************
  * MAF Type
@@ -1077,3 +1081,5 @@ long mafMapAnalogData[] = {
 160775,
 160775
 };
+
+#endif

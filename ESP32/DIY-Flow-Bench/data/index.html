@@ -7,266 +7,267 @@
 	</HEAD>
 	<BODY>
 
-        <!-- File Manager Modal -->
-        <div id="fileModal" class="modal">
-          <div class="modal-content">
-            <span class="closeFileModal">&times;</span>
-            <h3>File Manager</h3>
-            <div id="file_list">Loading...</div>
-            <br>
-            <hr>
-            <br>
-            <form method="POST" action="/upload" enctype="multipart/form-data">
-              <label for="data" class="file-upload-button button">Select File</label>
-              <input id="data" type="file" name="wtf"/>
-                <input class="button file-submit-button" type="submit" value="Upload"/>
-            </form>
-          </div>        
-        </div>
+    <!-- File Manager Modal -->
+    <div id="fileModal" class="modal">
+      <div class="modal-content">
+        <span class="closeFileModal">&times;</span>
+        <h3>File Manager</h3>
+        <div id="file_list">Loading...</div>
+        <br>
+        <hr>
+        <br>
+        <form method="POST" action="/upload" enctype="multipart/form-data">
+          <label for="data" class="file-upload-button button">Select File</label>
+          <input id="data" type="file" name="wtf"/>
+            <input class="button file-submit-button" type="submit" value="Upload"/>
+        </form>
+      </div>        
+    </div>
 
 
-        <!-- Status Modal -->
-        <div id="statusModal" class="modal">
-          <div class="modal-content">
-            <span class="closeStatusModal">&times;</span>
-            <h3>System Status</h3>
-              <div class="config-row"><label class="config-label">Version: </label><span class="config-value" id="RELEASE">Loading...</span></div>
-              <div class="config-row"><label class="config-label">Build:  </label><span class="config-value" id="BUILD_NUMBER">Loading...</span></div>
-              <hr>
-              <div class="config-row"><label class="config-label">Memory Size:  </label><span class="config-value" id="SPIFFS_MEM_SIZE">Loading...</span> (bytes)</div>
-              <div class="config-row"><label class="config-label">Memory Used:  </label><span class="config-value" id="SPIFFS_MEM_USED">Loading...</span> (bytes)</div>
-              <div class="config-row"><label class="config-label">IP Address:  </label><span class="config-value" id="LOCAL_IP_ADDRESS">Loading...</span></div>
-              <!-- <div class="config-row"><label class="config-label">Uptime:  </label><span class="config-value" id="UPTIME">Loading...</span></div> -->
-              <div class="config-row"><label class="config-label">MAF Sensor:  </label><span class="config-value" id="MAF_SENSOR">Loading...</span></div>
-              <div class="config-row"><label class="config-label">Ref Press Sensor:  </label><span class="config-value" id="PREF_SENSOR">Loading...</span></div>
-              <div class="config-row"><label class="config-label">Temp Sensor:  </label><span class="config-value" id="TEMP_SENSOR">Loading...</span></div>
-              <div class="config-row"><label class="config-label">Humidity Sensor:  </label><span class="config-value" id="RELH_SENSOR">Loading...</span></div>
-              <div class="config-row"><label class="config-label">Baro Sensor:  </label><span class="config-value" id="BARO_SENSOR">Loading...</span></div>
-              <div class="config-row"><label class="config-label">Pitot Sensor:  </label><span class="config-value" id="PITOT_SENSOR">Loading...</span></div>
-          </div>        
-        </div>
-          
+    <!-- Status Modal -->
+    <div id="statusModal" class="modal">
+      <div class="modal-content">
+        <span class="closeStatusModal">&times;</span>
+        <h3>System Status</h3>
+          <div class="config-row"><label class="config-label">Version: </label><span class="config-value" id="RELEASE">Loading...</span></div>
+          <div class="config-row"><label class="config-label">Build:  </label><span class="config-value" id="BUILD_NUMBER">Loading...</span></div>
+          <hr>
+          <div class="config-row"><label class="config-label">Memory Size:  </label><span class="config-value" id="SPIFFS_MEM_SIZE">Loading...</span> (bytes)</div>
+          <div class="config-row"><label class="config-label">Memory Used:  </label><span class="config-value" id="SPIFFS_MEM_USED">Loading...</span> (bytes)</div>
+          <div class="config-row"><label class="config-label">IP Address:  </label><span class="config-value" id="LOCAL_IP_ADDRESS">Loading...</span></div>
+          <!-- <div class="config-row"><label class="config-label">Uptime:  </label><span class="config-value" id="UPTIME">Loading...</span></div> -->
+          <!-- <div class="config-row"><label class="config-label">Board Type:  </label><span class="config-value" id="BOARDTYPE">Loading...</span></div> -->
+          <!-- <div class="config-row"><label class="config-label">Boot Time:  </label><span class="config-value" id="BOOT_TIME">Loading...</span></div> -->
+          <div class="config-row"><label class="config-label">MAF Data File:  </label><span class="config-value" id="MAF_SENSOR">Loading...</span></div>
+          <div class="config-row"><label class="config-label">Ref Press Sensor:  </label><span class="config-value" id="PREF_SENSOR">Loading...</span></div>
+          <div class="config-row"><label class="config-label">Temp Sensor:  </label><span class="config-value" id="TEMP_SENSOR">Loading...</span></div>
+          <div class="config-row"><label class="config-label">Humidity Sensor:  </label><span class="config-value" id="RELH_SENSOR">Loading...</span></div>
+          <div class="config-row"><label class="config-label">Baro Sensor:  </label><span class="config-value" id="BARO_SENSOR">Loading...</span></div>
+          <div class="config-row"><label class="config-label">Pitot Sensor:  </label><span class="config-value" id="PITOT_SENSOR">Loading...</span></div>
+      </div>        
+    </div>
+      
 
 
 
-        <!-- main page code -->
+    <!-- main page code -->
 
-        <div class="headerbar">
-            <h1>DIY Flow Bench</h1>
-        </div>
+    <div class="headerbar">
+        <h1><a href="/" >DIY Flow Bench</a></h1>
+    </div>
 
-        <button class="tablink" onclick="openPage('dashboard', this)" id="defaultOpen">Dashboard</button>
-        <button class="tablink" id="load-config-button" onclick="openPage('configuration', this)">Configuration</button>
-        <div id="dashboard" class="tabcontent">        
-          <div class="content">
-            <div class="tile-grid">
-              <div class="tile">
-                <p class="tile-title">Ref Pressure</p>
-                <p><span class="tile-value" id="PREF">&nbsp;</span></p>
-                <p class="units"> In/Aq</p>
-              </div>
-              <div class="tile">
-                <p class="tile-title">Flow Rate</p>
-                <p><span class="tile-value" id="FLOW">&nbsp;</span></p>
-                <p class="units">cfm</p>
-              </div>
-              <div class="tile">
-                <p class="tile-title">Pitot</p>
-                <p><span class="tile-value" id="PITOT">&nbsp;</span></p>
-                <p class="units">In/Aq</p>
-              </div>
-              <div class="tile">
-                <p class="tile-title">Temperature</p>
-                <p><span class="tile-value" id="TEMP">&nbsp;</span></p>
-                <p class="units">Deg</p>
-              </div>
-              <div class="tile">
-                <p class="tile-title">Baro Pressure</p>
-                <p><span class="tile-value" id="BARO">&nbsp;</span></p>
-                <p class="units">kPa</p>
-              </div>
-              <div class="tile">
-                <p class="tile-title">Humidity</p>
-                <p><span class="tile-value" id="RELH">&nbsp;</span></p>
-                <p class="units">&percnt;RH</p>
-              </div>
-            </div>  
-          </div>          
-          <div class="align-center">
-            <div class="status_message"><span id="STATUS_MESSAGE">&nbsp;</span></div>                        
-            <div class="hidden_div">
-              <br>Ref Pressure mV: <span id="PREF_MV">&nbsp;</span>
-              <br>MAF mV: <span id="MAF_MV">&nbsp;</span>
-              <br>Pitot mV: <span id="PITOT_MV">&nbsp;</span>
-            </div>   
-            <p>
-              <button id="datalog-button" class="button">Datalog</button>
-              <button id="refresh-button" class="button">Refresh</button>
-              <button id="record-button" class="button">Record</button>
-              <button id="on-button" class="button">ON</button>
-              <button id="off-button" class="button">OFF</button>
-            
-            </p>
-            
-            
-            
-            
-                 
-            <!-- lift graph -->
-            
-            <!-- TODO: 
-            
-            Set graph scaling based on MAF max flow rate 
-            Add user settings for graph scaling
-            lift in 0.025" increments up to 1"
-            
-            Add ability to load multiple trend overlays to same graph - each trend has different colour - this gives ability to compare results
-            
-            Ability to chart additional data (From David Vizards IOP - Induction optimisation program)
-            Some of this may be possible with additional manually inputted data. This data could be in the form of header data in the JSON file
-            i.e. valve size / port area / port length
-            Additional graphs can then be displayed using simple button navigation
-            Might be worth splitting charting onto dedicated data logging page at this point to prevent UI Bloat
-            
-            Flow per square inch (valve area x lift)
-            Coefficient of discharge (max theoretical flow versus actual flow)
-            Port velocity (cfm x port area)
-            Port energy
-            Port energy density
-            Effective velocity
-            Swirl
-            Effective coefficient of discharge
-            
-            Load graph from JSON / SPIFFS File
-            Store Data in JSON / SPIFFS file
-            
-            -->
-            
-            <div class="graph-container">        
-              <svg class="graph" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
-                <g class="grid x-grid" id="xGrid">
-                  <line x1="113" x2="113" y1="10" y2="380"></line>
-                  <line x1="259" x2="259" y1="10" y2="380"></line>
-                  <line x1="405" x2="405" y1="10" y2="380"></line>
-                  <line x1="551" x2="551" y1="10" y2="380"></line>
-                  <line x1="697" x2="697" y1="10" y2="380"></line>
-                </g>
-                <g class="grid y-grid" id="yGrid">
-                  <line x1="86" x2="697" y1="10" y2="10"></line>
-                  <line x1="86" x2="697" y1="68" y2="68"></line>
-                  <line x1="86" x2="697" y1="126" y2="126"></line>
-                  <line x1="86" x2="697" y1="185" y2="185"></line>
-                  <line x1="86" x2="697" y1="243" y2="243"></line>
-                  <line x1="86" x2="697" y1="301" y2="301"></line>
-                  <line x1="86" x2="697" y1="360" y2="360"></line>
-                </g>
-                
-                
-                <g class="surfaces">
-            
-                    <line x1="550" y1="20" x2="620" y2="20"  style="stroke:rgb(0,0,255);stroke-width:2" /> 
-                  
-                    <line x1="113" y1="360" x2="259" y2="221"  style="stroke:rgb(0,0,255);stroke-width:2" />
-                    <line x1="259" y1="221" x2="405" y2="139"  style="stroke:rgb(0,0,255);stroke-width:2" />
-                    <line x1="405" y1="139" x2="551" y2="170"  style="stroke:rgb(0,0,255);stroke-width:2" />
-                    <line x1="551" y1="170" x2="697" y2="220"  style="stroke:rgb(0,0,255);stroke-width:2" />
-            
-            
-                    <line x1="550" y1="35" x2="620" y2="35"  style="stroke:rgb(255,0,0);stroke-width:2" /> 
-            
-                    <line x1="113" y1="360" x2="259" y2="231"  style="stroke:rgb(255,0,0);stroke-width:2" />
-                    <line x1="259" y1="231" x2="405" y2="179"  style="stroke:rgb(255,0,0);stroke-width:2" />
-                    <line x1="405" y1="179" x2="551" y2="200"  style="stroke:rgb(255,0,0);stroke-width:2" />
-                    <line x1="551" y1="200" x2="697" y2="230"  style="stroke:rgb(255,0,0);stroke-width:2" />
-            
-                </g>
-                
-                <use class="grid double" xlink:href="#xGrid" style=""></use>
-                <use class="grid double" xlink:href="#yGrid" style=""></use>
-                
-                <g class="labels x-labels">
-                    <text x="113" y="400">Lift: mm</text>
-                    <text x="259" y="400">2mm</text>
-                    <text x="405" y="400">3mm</text>
-                    <text x="551" y="400">4mm</text>
-                    <text x="697" y="400">5mm</text>
-                </g>
-                <g class="labels y-labels">
-                    <text x="80" y="15">200</text>
-                    <text x="80" y="131">150</text>
-                    <text x="80" y="248">100</text>
-                    <text x="80" y="365">Flow: CFM</text>
-                </g>
-                <g class="labels key-labels">
-                  <text x="625" y="25">Inlet</text>
-                  <text x="625" y="40">Exhaust</text>
-                </g>
-              </svg>
-            </div>  
-            
-            
-            <!-- end lift graph -->
-                        
-                        
-                        
-            
-            
-
-            
+    <button class="tablink" onclick="openPage('dashboard', this)" id="load-dashboard-button">Dashboard</button>
+    <button class="tablink" onclick="openPage('configuration', this)" id="load-config-button">Configuration</button>
+    <div id="dashboard" class="tabcontent">        
+      <div class="content">
+        <div class="tile-grid">
+          <div class="tile">
+            <p class="tile-title">Ref Pressure</p>
+            <p><span class="tile-value" id="PREF">&nbsp;</span></p>
+            <p class="units"> In/Aq</p>
           </div>
+          <div class="tile">
+            <p class="tile-title">Flow Rate</p>
+            <p><span class="tile-value" id="FLOW">&nbsp;</span></p>
+            <p class="units">cfm</p>
+          </div>
+          <div class="tile">
+            <p class="tile-title">Pitot</p>
+            <p><span class="tile-value" id="PITOT">&nbsp;</span></p>
+            <p class="units">In/Aq</p>
+          </div>
+          <div class="tile">
+            <p class="tile-title">Temperature</p>
+            <p><span class="tile-value" id="TEMP">&nbsp;</span></p>
+            <p class="units">Deg</p>
+          </div>
+          <div class="tile">
+            <p class="tile-title">Baro Pressure</p>
+            <p><span class="tile-value" id="BARO">&nbsp;</span></p>
+            <p class="units">kPa</p>
+          </div>
+          <div class="tile">
+            <p class="tile-title">Humidity</p>
+            <p><span class="tile-value" id="RELH">&nbsp;</span></p>
+            <p class="units">&percnt;RH</p>
+          </div>
+        </div>  
+      </div>          
+      <div class="align-center">
+        <div class="status_message"><span id="STATUS_MESSAGE">&nbsp;</span></div>                        
+        <div class="hidden_div">
+          <br>Ref Pressure mV: <span id="PREF_MV">&nbsp;</span>
+          <br>MAF mV: <span id="MAF_MV">&nbsp;</span>
+          <br>Pitot mV: <span id="PITOT_MV">&nbsp;</span>
+        </div>   
+        <p>
+          <button id="datalog-button" class="button">Datalog</button>
+          <button id="refresh-button" class="button">Refresh</button>
+          <button id="record-button" class="button">Record</button>
+          <button id="on-button" class="button">ON</button>
+          <button id="off-button" class="button">OFF</button>
+        
+        </p>
+        
+        
+        
+        
+             
+        <!-- lift graph -->
+        
+        <!-- TODO: 
+        
+        Set graph scaling based on MAF max flow rate 
+        Add user settings for graph scaling
+        lift in 0.025" increments up to 1"
+        
+        Add ability to load multiple trend overlays to same graph - each trend has different colour - this gives ability to compare results
+        
+        Ability to chart additional data (From David Vizards IOP - Induction optimisation program)
+        Some of this may be possible with additional manually inputted data. This data could be in the form of header data in the JSON file
+        i.e. valve size / port area / port length
+        Additional graphs can then be displayed using simple button navigation
+        Might be worth splitting charting onto dedicated data logging page at this point to prevent UI Bloat
+        
+        Flow per square inch (valve area x lift)
+        Coefficient of discharge (max theoretical flow versus actual flow)
+        Port velocity (cfm x port area)
+        Port energy
+        Port energy density
+        Effective velocity
+        Swirl
+        Effective coefficient of discharge
+        
+        Load graph from JSON / SPIFFS File
+        Store Data in JSON / SPIFFS file
+        
+        -->
+        
+        <div class="graph-container">        
+          <svg class="graph" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+            <g class="grid x-grid" id="xGrid">
+              <line x1="113" x2="113" y1="10" y2="380"></line>
+              <line x1="259" x2="259" y1="10" y2="380"></line>
+              <line x1="405" x2="405" y1="10" y2="380"></line>
+              <line x1="551" x2="551" y1="10" y2="380"></line>
+              <line x1="697" x2="697" y1="10" y2="380"></line>
+            </g>
+            <g class="grid y-grid" id="yGrid">
+              <line x1="86" x2="697" y1="10" y2="10"></line>
+              <line x1="86" x2="697" y1="68" y2="68"></line>
+              <line x1="86" x2="697" y1="126" y2="126"></line>
+              <line x1="86" x2="697" y1="185" y2="185"></line>
+              <line x1="86" x2="697" y1="243" y2="243"></line>
+              <line x1="86" x2="697" y1="301" y2="301"></line>
+              <line x1="86" x2="697" y1="360" y2="360"></line>
+            </g>
+            
+            
+            <g class="surfaces">
+        
+                <line x1="550" y1="20" x2="620" y2="20"  style="stroke:rgb(0,0,255);stroke-width:2" /> 
+              
+                <line x1="113" y1="360" x2="259" y2="221"  style="stroke:rgb(0,0,255);stroke-width:2" />
+                <line x1="259" y1="221" x2="405" y2="139"  style="stroke:rgb(0,0,255);stroke-width:2" />
+                <line x1="405" y1="139" x2="551" y2="170"  style="stroke:rgb(0,0,255);stroke-width:2" />
+                <line x1="551" y1="170" x2="697" y2="220"  style="stroke:rgb(0,0,255);stroke-width:2" />
+        
+        
+                <line x1="550" y1="35" x2="620" y2="35"  style="stroke:rgb(255,0,0);stroke-width:2" /> 
+        
+                <line x1="113" y1="360" x2="259" y2="231"  style="stroke:rgb(255,0,0);stroke-width:2" />
+                <line x1="259" y1="231" x2="405" y2="179"  style="stroke:rgb(255,0,0);stroke-width:2" />
+                <line x1="405" y1="179" x2="551" y2="200"  style="stroke:rgb(255,0,0);stroke-width:2" />
+                <line x1="551" y1="200" x2="697" y2="230"  style="stroke:rgb(255,0,0);stroke-width:2" />
+        
+            </g>
+            
+            <use class="grid double" xlink:href="#xGrid" style=""></use>
+            <use class="grid double" xlink:href="#yGrid" style=""></use>
+            
+            <g class="labels x-labels">
+                <text x="113" y="400">Lift: mm</text>
+                <text x="259" y="400">2mm</text>
+                <text x="405" y="400">3mm</text>
+                <text x="551" y="400">4mm</text>
+                <text x="697" y="400">5mm</text>
+            </g>
+            <g class="labels y-labels">
+                <text x="80" y="15">200</text>
+                <text x="80" y="131">150</text>
+                <text x="80" y="248">100</text>
+                <text x="80" y="365">Flow: CFM</text>
+            </g>
+            <g class="labels key-labels">
+              <text x="625" y="25">Inlet</text>
+              <text x="625" y="40">Exhaust</text>
+            </g>
+          </svg>
+        </div>  
+        
+        
+        <!-- end lift graph -->
                     
-          <!-- Footer -->
-          <br><div id="footer"><a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a></div>
-
-        </div>
+                    
+                    
+        
         
 
-        <!-- configuration tab -->
+        
+      </div>
+                
+      <!-- Footer -->
+      <br><div id="footer"><a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a></div>
 
-        <form action="#" id="config-form" onsubmit="return false;">
-        <div id="configuration" class="tabcontent">
-          <div class="config-panel">
-            <p><button id="file-manager-button" class="button">File Manager</button>&nbsp;<button id="status-button" class="button">Status</button></p>       
-            <br>
-            <h3>WiFi Info</h3>
-            <input type="hidden" id="SCHEMA" value="6" name="SCHEMA">
-            <div class="config-row tooltip"><label class="config-label">WiFi SSID:</label>&nbsp;<input type="text" id="CONF_WIFI_SSID"  name="CONF_WIFI_SSID" value="CONF_WIFI_SSID" class="config-text" ><span class="tooltiptext">The name of your WiFi network</span></div>
-            <div class="config-row tooltip"><label class="config-label">WiFi Password:</label>&nbsp;<input type="text" id="CONF_WIFI_PSWD" name="CONF_WIFI_PSWD" value="CONF_WIFI_PSWD" class="config-text"><span class="tooltiptext">Your WiFi Password</span></div>
-            <div class="config-row tooltip"><label class="config-label ">WiFi AP SSID:</label>&nbsp;<input type="text" id="CONF_WIFI_AP_SSID" name="CONF_WIFI_AP_SSID" value="CONF_WIFI_AP_SSID" class="config-text" ><span class="tooltiptext">Access-point name for direct WiFi connection</span></div>
-            <div class="config-row tooltip"><label class="config-label">WiFi AP Password:</label>&nbsp;<input type="text" id="CONF_WIFI_AP_PSWD" name="CONF_WIFI_AP_PSWD" value="CONF_WIFI_AP_PSWD" class="config-text"><span class="tooltiptext">Access-point password</span></div>
-            <div class="config-row tooltip"><label class="config-label">Hostname:</label>&nbsp;<input type="text" id="CONF_HOSTNAME" name="CONF_HOSTNAME" value="CONF_HOSTNAME" class="config-text"><span class="tooltiptext">DNS Hostname (used for connecting via URL e.g. http://diyfb.local)</span></div>
-            <div class="config-row tooltip"><label class="config-label">WiFi Timeout:</label>&nbsp;<input type="text" id="CONF_WIFI_TIMEOUT" name="CONF_WIFI_TIMEOUT" value="CONF_WIFI_TIMEOUT" class="config-text"><span class="tooltiptext">Number of seconds before WiFi defaults to Access-point mode</span></div>
-            <br>
-            <h3>API Settings</h3>
-            <div class="config-row tooltip"><label class="config-label">API Delimiter:</label>&nbsp;<input type="text" id="CONF_API_DELIM" name="CONF_API_DELIM" value="CONF_API_DELIM" class="config-text"><span class="tooltiptext">Character used to delimit API / Serial data </span></div>
-            <div class="config-row tooltip"><label class="config-label">Serial Baud Rate:</label>&nbsp;<input type="text" id="CONF_SERIAL_BAUD_RATE" name="CONF_SERIAL_BAUD_RATE" value="CONF_SERIAL_BAUD_RATE" class="config-text"><span class="tooltiptext">Baud rate for serial communication</span></div>
-            <br>
-            <h3>Data Filters</h3>
-            <div class="config-row tooltip"><label class="config-label">Min Flow Rate:</label>&nbsp;<input type="text" id="CONF_MIN_FLOW_RATE" name="CONF_MIN_FLOW_RATE" value="CONF_MIN_FLOW_RATE" class="config-text"><span class="tooltiptext">Used to filter out non-zero flow values when bench is not running </span></div>
-            <div class="config-row tooltip"><label class="config-label">Min Bench Pressure:</label>&nbsp;<input type="text" id="CONF_MIN_BENCH_PRESSURE" name="CONF_MIN_BENCH_PRESSURE" value="CONF_MIN_BENCH_PRESSURE" class="config-text"><span class="tooltiptext">Minimum reference pressure that bench is considered running</span></div>
-            <div class="config-row tooltip"><label class="config-label">MAF Min Millivolts:</label>&nbsp;<input type="text" id="CONF_MAF_MIN_MILLIVOLTS" name="CONF_MAF_MIN_MILLIVOLTS" value="CONF_MAF_MIN_MILLIVOLTS" class="config-text"><span class="tooltiptext">Minimum MAF voltage that bench is considered running</span></div>
-            <div class="config-row tooltip"><label class="config-label">Cyclical Average Buffer:</label>&nbsp;<input type="text" id="CONF_CYCLIC_AVERAGE_BUFFER" name="CONF_CYCLIC_AVERAGE_BUFFER" value="CONF_CYCLIC_AVERAGE_BUFFER" class="config-text"><span class="tooltiptext">Mean buffer size - Used for smoothing results.</span></div>
-            <br>
-            <h3>Bench Settings</h3>
-            <div class="config-row tooltip"><label class="config-label">Refresh Rate:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="CONF_REFRESH_RATE" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
-            <br>
-            <div class="float-right"><button id="save-config-button" class="button">Save</button></div>
-            <br>
-            <br>
-            <h3>Calibration Data</h3>
-            <div class="config-row tooltip"><label class="config-label">Orifice Flow Rate:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="CONF_CAL_FLOW_RATE" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice</span></div>
-            <div class="config-row tooltip"><label class="config-label">Orifice Test Pressure:</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="CONF_CAL_REF_PRESS" class="config-text"><span class="tooltiptext">Reference pressure of calibration orifice</span></div>
-            <div class="config-row tooltip"><label class="config-label">Leak Test Tolerance:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_TOLERANCE" name="CONF_LEAK_TEST_TOLERANCE" value="CONF_LEAK_TEST_TOLERANCE" class="config-text"><span class="tooltiptext">Maximum allowable deviation in cfm</span></div>
-            <div class="config-row tooltip"><label class="config-label">Calibration Offset:</label>&nbsp;<input disabled="disabled" type="text" id="CONF_CAL_OFFSET" name="CONF_CAL_OFFSET" value="CONF_CAL_OFFSET" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
-            <br>
-            <div class="float-right"><button id="calibrate-button" class="button">Calibrate</button></div>
-            <br>
-            <br>
-          </div>                    
-        </div>
-        </form>
+    </div>
+    
+
+    <!-- configuration tab -->
+
+    <form action="#" id="config-form" onsubmit="return false;">
+    <div id="configuration" class="tabcontent">
+      <div class="config-panel">
+        <p><button id="file-manager-button" class="button">File Manager</button>&nbsp;<button id="status-button" class="button">Status</button></p>       
+        <br>
+        <h3>WiFi Info</h3>        
+        <div class="config-row tooltip"><label class="config-label">WiFi SSID:</label>&nbsp;<input type="text" id="CONF_WIFI_SSID"  name="CONF_WIFI_SSID" value="CONF_WIFI_SSID" class="config-text" ><span class="tooltiptext">The name of your WiFi network</span></div>
+        <div class="config-row tooltip"><label class="config-label">WiFi Password:</label>&nbsp;<input type="text" id="CONF_WIFI_PSWD" name="CONF_WIFI_PSWD" value="CONF_WIFI_PSWD" class="config-text"><span class="tooltiptext">Your WiFi Password</span></div>
+        <div class="config-row tooltip"><label class="config-label ">WiFi AP SSID:</label>&nbsp;<input type="text" id="CONF_WIFI_AP_SSID" name="CONF_WIFI_AP_SSID" value="CONF_WIFI_AP_SSID" class="config-text" ><span class="tooltiptext">Access-point name for direct WiFi connection</span></div>
+        <div class="config-row tooltip"><label class="config-label">WiFi AP Password:</label>&nbsp;<input type="text" id="CONF_WIFI_AP_PSWD" name="CONF_WIFI_AP_PSWD" value="CONF_WIFI_AP_PSWD" class="config-text"><span class="tooltiptext">Access-point password</span></div>
+        <div class="config-row tooltip"><label class="config-label">Hostname:</label>&nbsp;<input type="text" id="CONF_HOSTNAME" name="CONF_HOSTNAME" value="CONF_HOSTNAME" class="config-text"><span class="tooltiptext">DNS Hostname (used for connecting via URL e.g. http://diyfb.local)</span></div>
+        <div class="config-row tooltip"><label class="config-label">WiFi Timeout:</label>&nbsp;<input type="text" id="CONF_WIFI_TIMEOUT" name="CONF_WIFI_TIMEOUT" value="CONF_WIFI_TIMEOUT" class="config-text"><span class="tooltiptext">Number of seconds before WiFi defaults to Access-point mode</span></div>
+        <br>
+        <h3>API Settings</h3>
+        <div class="config-row tooltip"><label class="config-label">API Delimiter:</label>&nbsp;<input type="text" id="CONF_API_DELIM" name="CONF_API_DELIM" value="CONF_API_DELIM" class="config-text"><span class="tooltiptext">Character used to delimit API / Serial data </span></div>
+        <div class="config-row tooltip"><label class="config-label">Serial Baud Rate:</label>&nbsp;<input type="text" id="CONF_SERIAL_BAUD_RATE" name="CONF_SERIAL_BAUD_RATE" value="CONF_SERIAL_BAUD_RATE" class="config-text"><span class="tooltiptext">Baud rate for serial communication</span></div>
+        <br>
+        <h3>Data Filters</h3>
+        <div class="config-row tooltip"><label class="config-label">Min Flow Rate:</label>&nbsp;<input type="text" id="CONF_MIN_FLOW_RATE" name="CONF_MIN_FLOW_RATE" value="CONF_MIN_FLOW_RATE" class="config-text"><span class="tooltiptext">Used to filter out non-zero flow values when bench is not running </span></div>
+        <div class="config-row tooltip"><label class="config-label">Min Bench Pressure:</label>&nbsp;<input type="text" id="CONF_MIN_BENCH_PRESSURE" name="CONF_MIN_BENCH_PRESSURE" value="CONF_MIN_BENCH_PRESSURE" class="config-text"><span class="tooltiptext">Minimum reference pressure that bench is considered running</span></div>
+        <div class="config-row tooltip"><label class="config-label">MAF Min Millivolts:</label>&nbsp;<input type="text" id="CONF_MAF_MIN_MILLIVOLTS" name="CONF_MAF_MIN_MILLIVOLTS" value="CONF_MAF_MIN_MILLIVOLTS" class="config-text"><span class="tooltiptext">Minimum MAF voltage that bench is considered running</span></div>
+        <div class="config-row tooltip"><label class="config-label">Cyclical Average Buffer:</label>&nbsp;<input type="text" id="CONF_CYCLIC_AVERAGE_BUFFER" name="CONF_CYCLIC_AVERAGE_BUFFER" value="CONF_CYCLIC_AVERAGE_BUFFER" class="config-text"><span class="tooltiptext">Mean buffer size - Used for smoothing results.</span></div>
+        <br>
+        <h3>Bench Settings</h3>
+        <div class="config-row tooltip"><label class="config-label">Refresh Rate:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="CONF_REFRESH_RATE" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
+        <br>
+        <div class="float-right"><button id="save-config-button" class="button">Save</button></div>
+        <br>
+        <br>
+        <h3>Calibration Data</h3>
+        <div class="config-row tooltip"><label class="config-label">Orifice Flow Rate:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="CONF_CAL_FLOW_RATE" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice</span></div>
+        <div class="config-row tooltip"><label class="config-label">Orifice Test Pressure:</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="CONF_CAL_REF_PRESS" class="config-text"><span class="tooltiptext">Reference pressure of calibration orifice</span></div>
+        <div class="config-row tooltip"><label class="config-label">Leak Test Tolerance:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_TOLERANCE" name="CONF_LEAK_TEST_TOLERANCE" value="CONF_LEAK_TEST_TOLERANCE" class="config-text"><span class="tooltiptext">Maximum allowable deviation in cfm</span></div>
+        <div class="config-row tooltip"><label class="config-label">Calibration Offset:</label>&nbsp;<input disabled="disabled" type="text" id="CONF_CAL_OFFSET" name="CONF_CAL_OFFSET" value="CONF_CAL_OFFSET" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
+        <br>
+        <div class="float-right"><button id="calibrate-button" class="button">Calibrate</button></div>
+        <br>
+        <br>
+      </div>                    
+    </div>
+    </form>
         
     
-        <script src="/javascript.js"></script>  
+    <script src="/javascript.js"></script>  
   </BODY>
 </HTML>

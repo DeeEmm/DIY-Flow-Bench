@@ -7,8 +7,12 @@
  * File units = 1000 * kg/hr
  * Comments:  Sensor mounted in 4" (100mm) housing - Data provided by PMAS
  * Status: Untested 
- * Support: https://diyflowbench.com/forum/mafdata/38-pmas-mh95-3000
+ * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
+ * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
+#ifndef MAFDATA_DEFINED
+#define MAFDATA_DEFINED
+
 
 /****************************************
   * MAF Type
@@ -307,3 +311,5 @@ long mafMapData[][2] = {
 {4984,678854},
 {5000,686611}
 };
+
+#endif

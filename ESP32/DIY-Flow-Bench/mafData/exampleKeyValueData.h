@@ -7,8 +7,12 @@
  * File units = 1000 * kg/hr
  * Comments: Example Data
  * Status: 
- * Support: https://diyflowbench.com/forum/mafdata/5-creating-your-maf-data-file
+ * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
+ * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
+#ifndef MAFDATA_DEFINED
+#define MAFDATA_DEFINED
+
 
 /****************************************
  * This is an example MAF Data file
@@ -121,3 +125,5 @@ long mafMapData[][2] = {
 {4900,291048},
 {5000,315320}
 };
+
+#endif

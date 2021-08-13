@@ -174,5 +174,13 @@ Build #         - Description of Change
                 - Added data streaming inc refresh rate
                 - Added data streaming controls (on/off buttons)
                 - Started on code refactor
-            
-                    
+21081301        - Major code refactor to object based structure complete
+                - Converted procedural functions to class + method
+                - Improved file upload handling
+                - Return to file upload modal after file upload
+                - Renamed Schema to Header to remove ambiguity
+                - Added sensor types used to status dialog
+                - Fixed Javascript errors for status websocket update
+                - Fixed timeout for AP mode
+                - Optimised websocket handler browser code
+                - Remove header key from config JSON file

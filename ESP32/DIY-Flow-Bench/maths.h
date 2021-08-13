@@ -2,7 +2,7 @@
 * The DIY Flow Bench project
 * https://diyflowbench.com
 * 
-* Calibration.h - Calibration header file
+* maths.h - Maths header file
 *
 * Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
 * 
@@ -18,18 +18,28 @@
 #pragma once
 
 
-class Calibration {
+class Maths {
 
 	friend class Sensors;
-	friend class Maths;
+	friend class Hardware;
 
 	public:
-		Calibration();
-		bool setFlowOffset();
-		float getFlowOffset();
-		bool setLeakTestPressure();
-		float getLeakTestPressure();
+		Maths();
+		double convertFlowDepression(float oldPressure = 10, int newPressure = 28, float inputFlow = 0);
+		float calculateBaroPressure(int units);
+		float calculateRefPressure(int units);
+		float calculateTemperature(int units);
+		float calculateRelativeHumidity(int units = 0);
+		float calculateVaporPressure(int units);
+		float calculateSpecificGravity();
+		float convertMassFlowToVolumetric(float massFlowKgh);
+		float calculateMafFlowCFM();
+		float calculatePitotPressure(int units);
+		
+		float startupBaroPressure;
 	
 	private:
+		const float MOLECULAR_WEIGHT_DRY_AIR = 28.964;
+		bool streamMafData = false;
 
 };

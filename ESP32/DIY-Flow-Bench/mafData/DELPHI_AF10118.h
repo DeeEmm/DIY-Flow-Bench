@@ -7,10 +7,12 @@
  * File units = 1000 * kg/hr
  * Comments: Example Data
  * Status: Unvalidated
- * Support: https://diyflowbench.com/forum/mafdata/7-delphi-af10118
+ * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
+ * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
- 
- 
+#ifndef MAFDATA_DEFINED
+#define MAFDATA_DEFINED
+
  /****************************************
   * MAF Type
   *
@@ -80,3 +82,5 @@ long mafMapData[][2] = {
 {4750,490925},
 {5000,490925}
 };
+
+#endif

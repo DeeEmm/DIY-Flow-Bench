@@ -7,8 +7,12 @@
  * File units = 10 * mg/sec
  * Comments: Example Data
  * Status: 
- * Support: https://diyflowbench.com/forum/mafdata/5-creating-your-maf-data-file
+ * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
+ * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
 ***/
+#ifndef MAFDATA_DEFINED
+#define MAFDATA_DEFINED
+
 
 /****************************************
  * This is an example MAF Data file
@@ -1090,3 +1094,5 @@ long mafMapAnalogData[] = {
 160775,
 160775
 };
+
+#endif

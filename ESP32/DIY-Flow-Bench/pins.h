@@ -15,9 +15,9 @@
  * 
  * 
  ***/
-
 #pragma once
 
+#include "configuration.h";
 
 /****************************************
  * DIYFB Shield
@@ -25,7 +25,7 @@
  ***/
 #ifdef DIYFB_SHIELD
 
-    const char* BOARD_TYPE = "DIYFB_SHIELD";
+    #define BOARD_TYPE              "DIYFB_SHIELD"
 
     // Define Physical Pins
 
@@ -73,7 +73,7 @@
  ***/
 #ifdef ESP32DUINO
     
-    const char* BOARD_TYPE = "ESP32DUINO";
+    #define BOARD_TYPE              "ESP32DUINO"
     
     // Define Physical Pins
 
