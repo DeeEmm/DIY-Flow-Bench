@@ -5,6 +5,8 @@
 
 General Version 1.0-Beta
 
+Please note that this version is soon to be superceded by the ESP32 port.
+
 For current build version please check the BUILD_NUMBER in  docs/changelog
 
 
@@ -50,48 +52,7 @@ You can download the latest version from our githib repository at https://github
 
 For more up to date information including current stable builds and documentation, please visit the WIKI page in our gitgub repository - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
 
-
-
-## 1. Component Selection
-###
-
-Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/1.-Component-selection
-
-
-## 2. Hardware Design
-###
-
-Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/2.-Hardware-Design.
-
-
-## 3. Installing / Getting started
-###
-
-Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/3.-Installation
-
-
-
-## 4. Configuration
-###
-
-Please refer to https://github.com/DeeEmm/DIY-Flow-Bench/wiki/4.-Configuration
-
-
-## 5. Calibration
-###
-
-Please refer to https://github.com/DeeEmm/DIY-Flow-Bench/wiki/5.-Calibration
-
-## 6. Operation
-###
-
-Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/6.-Operation
-
-
-## 7. Customisation
-###
-
-Please see https://github.com/DeeEmm/DIY-Flow-Bench/wiki/7.-Customisation
+NOTE: This version is soon to be superceded by the ESP32 port. Moving forwards support for the Arduino will no longer be offered. If youa re considering building this project, it is highly advised to use the ESP32 platform and new code.
 
 
 
