@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
  * The DIY Flow Bench project
  * https://diyflowbench.com
  * 
@@ -32,8 +32,8 @@ Maths::Maths() {
 
 
 
-/****************************************
- * GET BAROMETRIC pressure (kPa)
+/***********************************************************
+ * CALCULATE BAROMETRIC pressure (kPa)
  * NOTE: Sensor must return an absolute value
  ***/
 float Maths::calculateBaroPressure(int units) {   
@@ -66,7 +66,7 @@ float Maths::calculateBaroPressure(int units) {
 		// NOTE will only work for absolute style pressure sensor like the MPX4250
 		baroPressureKpa = startupBaroPressure; 
 	#else
-		// we dont have any sensor so use default - standard sealevel baro pressure (14.7 psi)
+		// we don't have any sensor so use default - // NOTE: standard sea level baro pressure is 14.7 psi
 		baroPressureKpa = DEFAULT_BARO;
 	#endif
 
@@ -87,7 +87,7 @@ float Maths::calculateBaroPressure(int units) {
 
 
 
-/****************************************
+/***********************************************************
  * CALCULATE REFERENCE PRESSURE
  * Convert RAW pressure sensor data to In/WG or kPa
  ***/
@@ -153,7 +153,7 @@ float Maths::calculateRefPressure(int units) {
 		break;
 
 		case PSIA:
-			 refPressureKpa = refPressureKpa * 0.145038;
+			refPressureKpa = refPressureKpa * 0.145038;
 			return refPressureKpa  * 0.01 ;
 		break;
 	}
@@ -162,7 +162,7 @@ float Maths::calculateRefPressure(int units) {
 
 
 
-/****************************************
+/***********************************************************
  * CALCULATE TEMPERATURE
  * Convert RAW temperature sensor data
  ***/
@@ -220,8 +220,8 @@ float Maths::calculateTemperature(int units) {
 
 
 
-/****************************************
- * GET RELATIVE HUMIDITY %
+/***********************************************************
+ * CALCULATE RELATIVE HUMIDITY %
  ***/
 float Maths::calculateRelativeHumidity(int units) {   
 	
@@ -247,7 +247,7 @@ float Maths::calculateRelativeHumidity(int units) {
 		relativeHumidity =  SparkFunBME280.readFloatHumidity();
 
 	#else
-		//we dont have any sensor so use standard value 
+		//we don't have any sensor so use standard value 
 		relativeHumidity = DEFAULT_RELH; // (36%)
 	#endif
 
@@ -269,8 +269,8 @@ float Maths::calculateRelativeHumidity(int units) {
 
 
 
-/****************************************
- * GET VAPOR PRESSURE
+/***********************************************************
+ * CALCULATE VAPOR PRESSURE
  ***/
 float Maths::calculateVaporPressure(int units) {
 	 
@@ -298,8 +298,8 @@ float Maths::calculateVaporPressure(int units) {
 
 
 
-/****************************************
- * GET SPECIFIC GRAVITY
+/***********************************************************
+ * CALCULATE SPECIFIC GRAVITY
  ***/
 float Maths::calculateSpecificGravity() {
 	 
@@ -318,10 +318,10 @@ float Maths::calculateSpecificGravity() {
 
 
 
-/****************************************
+/***********************************************************
  * CONVERT MASS FLOW TO VOLUMETRIC FLOW
  *
- * Calcualted using ideal gas law:
+ * Calculated using ideal gas law:
  * https://www.pdblowers.com/tech-talk/volume-and-mass-flow-calculations-for-gases/
  ***/
 float Maths::convertMassFlowToVolumetric(float massFlowKgh) {   
@@ -346,7 +346,7 @@ float Maths::convertMassFlowToVolumetric(float massFlowKgh) {
 
 
 
-/****************************************
+/***********************************************************
  * GET MAF FLOW in CFM
  * Lookup CFM value from MAF data array
  *
@@ -421,7 +421,7 @@ float Maths::calculateMafFlowCFM() {
 	}
 
 	// Get calibration offset from NVM
-//    EEPROM.get( NVM_CD_CAL_OFFSET_ADDR, calibrationOffset ); 
+//    EEPROM.get( NVM_CD_CAL_OFFSET_ADDR, calibrationOffset ); // REDUNDANT
 
 	if (MAFdataUnit == KG_H) {
 
@@ -436,7 +436,8 @@ float Maths::calculateMafFlowCFM() {
 
 
 	// convert kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
-	mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH);// + calibrationOffset; // add calibration offset to value //TODO: #21 Need to validate and test calibration routine
+	mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH);// + calibrationOffset; // add calibration offset to value 
+	//TODO: #21 Need to validate and test calibration routine
 
 	if (streamMafData == true) {
 		Serial.print(String(mafMillivolts));
@@ -457,7 +458,7 @@ float Maths::calculateMafFlowCFM() {
 
 
 
-/****************************************
+/***********************************************************
  * CALCULATE PITOT PROBE
  * Convert RAW differential pressure sensor data
  ***/
@@ -500,7 +501,7 @@ float Maths::calculatePitotPressure(int units) {
 
 
 
-/****************************************
+/***********************************************************
 * CONVERT FLOW
 *
 * Convert flow values between different reference pressures

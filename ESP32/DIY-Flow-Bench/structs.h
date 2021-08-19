@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
 * The DIY Flow Bench project
 * https://diyflowbench.com
 * 
@@ -21,7 +21,7 @@
 #include "configuration.h"
 
 
-/****************************************
+/***********************************************************
  * Configuration Settings
  *
  * NOTE: Do not edit these! Used to create default config file!
@@ -53,16 +53,17 @@ struct ConfigSettings {
 
 //ConfigSettings config;
 
-/****************************************
+/***********************************************************
  * Calibration Settings
  ***/
 struct CalibrationSettings { 
-  float flow_offset = 0.0;           
+  float flow_offset = 0.0;         
+  float leak_test = 0.0;  
 };
 
 
 
-/****************************************
+/***********************************************************
  * Device status
  ***/
 struct DeviceStatus {
@@ -88,7 +89,7 @@ struct DeviceStatus {
 
 
 
-/****************************************
+/***********************************************************
  * Websocket data
  ***/
 struct WebsocketData {
@@ -98,7 +99,7 @@ struct WebsocketData {
 
 
 
-/****************************************
+/***********************************************************
  * File upload data
  ***/
 struct FileUploadData {

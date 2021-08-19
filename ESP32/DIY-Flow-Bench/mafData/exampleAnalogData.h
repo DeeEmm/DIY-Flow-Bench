@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
  * exampleAnalogData.h
  *
  * Manufacturer: Manufacturer
@@ -14,7 +14,7 @@
 #define MAFDATA_DEFINED
 
 
-/****************************************
+/***********************************************************
  * This is an example MAF Data file
  * You can either use volts versus kg/hr or ms/sec, or 1024 analog data points versus ms/sec or kg/hr as below.
  * (refer to mafData/exampleKeyValueData.h if you have Volts > flow style data)
@@ -27,14 +27,14 @@
  ***/
 
 
-/****************************************
+/***********************************************************
   * MAF Type
   *
   ***/
  #define MAF_SENSOR_TYPE "YourMafName"
  
  
- /****************************************
+ /***********************************************************
  * MAF Output Type
  *
  * 1 = voltage
@@ -43,7 +43,7 @@
 int MAFoutputType = 1;
 
 
-/****************************************
+/***********************************************************
  * MAF Data format
  * 
  * 1 = key_value
@@ -52,7 +52,7 @@ int MAFoutputType = 1;
 int MAFdataFormat = 2; 
 
 
-/****************************************
+/***********************************************************
  * MAF Units
  * 
  * 1 = kg_h
@@ -61,7 +61,7 @@ int MAFdataFormat = 2;
 int MAFdataUnit = 2;
 
 
-/****************************************
+/***********************************************************
  * MAF Data
  *
  ***/

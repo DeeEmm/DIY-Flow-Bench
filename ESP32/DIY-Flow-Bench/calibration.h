@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
 * The DIY Flow Bench project
 * https://diyflowbench.com
 * 
@@ -17,6 +17,8 @@
 ***/
 #pragma once
 
+#include <ArduinoJson.h>
+
 
 class Calibration {
 
@@ -29,6 +31,10 @@ class Calibration {
 		float getFlowOffset();
 		bool setLeakTestPressure();
 		float getLeakTestPressure();
+		void saveCalibration();
+		void loadCalibration();
+		void parseCalibrationData(StaticJsonDocument<1024>  calibrationData);
+
 	
 	private:
 

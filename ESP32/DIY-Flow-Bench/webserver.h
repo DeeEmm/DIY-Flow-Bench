@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
 * The DIY Flow Bench project
 * https://diyflowbench.com
 * 
@@ -21,6 +21,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <ESPAsyncWebServer.h>
+#include <ArduinoJson.h>
 #include <SPIFFS.h>
 
 class Webserver {
@@ -38,6 +39,8 @@ class Webserver {
 		String getFileListJSON ();
 		String getSystemStatusJSON();
 		String getDataJSON();
+		StaticJsonDocument<1024> loadJSONFile(String filename);
+		void writeJSONFile(String data, String filename);
 		static String byteDecode(size_t bytes);
 		static void ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len);
 		static void ReceiveWebSocketMessage(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
@@ -60,4 +63,6 @@ class Webserver {
 		void sendIndexPage();
 		void uploadFile();
 		void onBody();
+	    String indexPage();
+		String index_html;
 };

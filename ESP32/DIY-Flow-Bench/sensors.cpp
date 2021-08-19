@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
  * The DIY Flow Bench project
  * https://diyflowbench.com
  * 
@@ -184,7 +184,7 @@ void Sensors::Initialise () {
 
 // Getters and setters - read sensor data and return it in SI Standard units
 
-/****************************************
+/***********************************************************
  * Returns RAW MAF Sensor value
  *
  * MAF decode is done in Maths.cpp
@@ -201,7 +201,7 @@ float Sensors::MAF() {
 }
 
 
-/****************************************
+/***********************************************************
  * Returns temperature in Deg C
  ***/
 float Sensors::Temp() {
@@ -229,6 +229,9 @@ float Sensors::Temp() {
 		} else {
 		  refTempDegC = refTemp;
 		}	
+	#elif defined TEMP_SENSOR_TYPE_LINEAR_ANALOG
+		refTempDegC = analogRead(TEMPERATURE_PIN);
+		_temp = refTempDegC * TEMP_ANALOG_SCALE;
 	#else
 		// We don't have any temperature input so we will assume default
 		refTempDegC = DEFAULT_TEMP;
@@ -239,27 +242,42 @@ float Sensors::Temp() {
 
 
 
-/****************************************
+/***********************************************************
  * Returns Barometric pressure in kPa
  ***/
 float Sensors::Baro() {
+	
+	float refBaroKpa;
+	
+	//#elif defined BARO_SENSOR_TYPE_LINEAR_ANALOG
+		refBaroKpa = analogRead(REF_BARO_PIN);
+		_baro = refBaroKpa * BARO_ANALOG_SCALE;
+	
+	
 	
 	return _baro;
 }
 
 
 
-/****************************************
+/***********************************************************
  * Returns Relative Humidity in %
  ***/
 float Sensors::RelH() {
+	
+	float refRelH;
+	
+	
+	//#elif defined RELH_SENSOR_TYPE_LINEAR_ANALOG
+		refRelH = analogRead(HUMIDITY_PIN);
+		_relh = refRelH * RELH_ANALOG_SCALE;
 
 	return _relh;
 }
 
 
 
-/****************************************
+/***********************************************************
  * Returns Reference pressure in kPa
  ***/
 float Sensors::PRef(int _unit) {
@@ -274,7 +292,7 @@ float Sensors::PRef(int _unit) {
 
 
 
-/****************************************
+/***********************************************************
  * Returns Pressure differential in kPa
  ***/
 float Sensors::PDiff() {
@@ -284,7 +302,7 @@ float Sensors::PDiff() {
 
 
 
-/****************************************
+/***********************************************************
  * Returns Pitot pressure differential in kPa
  ***/
 float Sensors::Pitot() {

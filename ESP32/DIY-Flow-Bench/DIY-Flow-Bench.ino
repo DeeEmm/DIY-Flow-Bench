@@ -1,40 +1,39 @@
-/****************************************
- * The DIY Flow Bench project
- * https://diyflowbench.com
- *
- * DIY-Flow-Bench.ino - Main process
- *
- * Open source flow bench project to measure and display volumetric air flow using an ESP32
- * 
- * For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
- * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions 
- * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
- * 
- * This project and all associated files are provided for use under the GNU GPL3 license:
- * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
- * 
- * 
+/***********************************************************
+* The DIY Flow Bench project
+* https://diyflowbench.com
+*
+* DIY-Flow-Bench.ino - Main process
+*
+* Open source flow bench project to measure and display volumetric air flow using an ESP32
+* 
+* For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+* Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions 
+* You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
+* 
+* This project and all associated files are provided for use under the GNU GPL3 license:
+* https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
+* 
+* 
 * The standard project board is the ESP32DUINO  
- *   
- * Other ESP32 based boards can be made to work. 
- * You can define custom pin definitions in boards.h
- * 
- * Default temp / baro / RelH uses BME280 device (Sparkfun / Adafruit / clone)
- * I2C address for the BME280 is 0x77
- *
- * Default MAF unit recommended is the GM LS2 MAF (ACDELCO_ 92281162.h)
- * This will measure up to approx 277cfm
- * 
- * DEPENDENCIES
- * This program has a number of core libraries that must be available for it to work.
- *
- * TODO: Add librarymanager references
- * if using the Arduino IDE, click here: http://librarymanager#ArduinoJSON
- *
- *
- ****/
-
-//#include "DIY-Flow-Bench.h"
+*   
+* Other ESP32 based boards can be made to work. 
+* You can define custom pin definitions in pins.h
+* 
+* Default temp / baro / RelH uses BME280 device (Sparkfun / Adafruit / clone)
+* I2C address for the BME280 is 0x77
+*
+* Default MAF unit recommended is the GM LS2 MAF (ACDELCO_ 92281162.h)
+* This will measure up to approx 277cfm
+* Other MAF sensors are supported by creation of MAF Data file - See mafDATA/ for examples
+*
+* DEPENDENCIES
+* This program has a number of core libraries that must be available for it to work.
+*
+* TODO: Add librarymanager references
+* if using the Arduino IDE, click here: http://librarymanager#ArduinoJSON
+*
+*
+****/
 
 #include <Arduino.h>
 #include <WiFi.h>
@@ -77,7 +76,7 @@ API _api;
 
 
 
-/****************************************
+/***********************************************************
  * INITIALISATION
  ***/
 void setup(void) {
@@ -90,7 +89,7 @@ void setup(void) {
 
 
 
-/****************************************
+/***********************************************************
  * MAIN PROGRAM LOOP
  ***/
 void loop () {

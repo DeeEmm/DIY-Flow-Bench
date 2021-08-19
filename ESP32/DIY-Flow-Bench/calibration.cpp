@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
  * The DIY Flow Bench project
  * https://diyflowbench.com
  * 
@@ -17,11 +17,15 @@
  ***/
 
 #include "calibration.h"
+#include <SPIFFS.h>
+#include <ArduinoJson.h>
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
 #include "sensors.h"
 #include "maths.h"
+#include "messages.h"
+#include "webserver.h"
 #include LANGUAGE_FILE
 
 
@@ -31,8 +35,10 @@ Calibration::Calibration () {
 
 
 
-/****************************************
-* SET CALIBRATION OFFSET
+
+
+/***********************************************************
+* Perform Flow Calibration
 *
 * Called from API.ino
 * Called from ProcessWebSocketMessage in server.ino
@@ -42,32 +48,30 @@ Calibration::Calibration () {
 ***/
 bool Calibration::setFlowOffset() {
 
-  extern struct CalibrationSettings calibrationSettings;
+  extern struct CalibrationSettings calibration;
   extern struct ConfigSettings config;
   
-  Sensors _sensor; // New local sensor class instance
+  Sensors _sensor; 
   Maths _maths;
+  Webserver _webserver;
   
-  extern void SendWebSocketMessage(String jsonValues);
-  extern String loadConfig();
-  extern String saveCalobration();
+  // Get the current flow value
+  // TODO: need to determine what flow sensors are active (MAF / Orifice / Pitot)
+  float MafFlowCFM = _maths.calculateMafFlowCFM();
+  // Get the current reference pressure
+  float RefPressure = _maths.calculateRefPressure(INWG);
   
-  float MafFlowCFM = _sensor.MAF();
-  float RefPressure = _sensor.PRef(INWG);
-  float convertedMafFlowCFM = _maths.convertFlowDepression(RefPressure, config.cal_ref_press,  MafFlowCFM);
-  float flowCalibrationOffset = config.cal_flow_rate - convertedMafFlowCFM;
-  
-  char flowCalibrationOffsetText[12]; // Buffer big enough?
-  dtostrf(flowCalibrationOffset, 6, 2, flowCalibrationOffsetText); // Leave room for too large numbers!
+  // convert the calibration orifice flow value  to our current ref pressure  
+  float convertedOrificeFlowCFM = _maths.convertFlowDepression(config.cal_ref_press, RefPressure,  config.cal_flow_rate);
+ 
+  // compare it to the measured flow to generate our flow offset
+  float flowCalibrationOffset = convertedOrificeFlowCFM - MafFlowCFM;
   
   // update config var
-  calibrationSettings.flow_offset  = flowCalibrationOffset;
+  calibration.flow_offset = flowCalibrationOffset;
   
   // TODO: Save calibration.json
-//  saveCalibration();
-  
-  // send new config to the browser
-  SendWebSocketMessage(loadConfig());
+  saveCalibration();    
   
   return true;
   
@@ -75,13 +79,17 @@ bool Calibration::setFlowOffset() {
 
 
 
-/****************************************
-* GET CALIBRATION OFFSET
+/***********************************************************
+* Get Flow offset
 * 
 ***/
 float Calibration::getFlowOffset() {
 
-// TODO: - cal data loaded with json config
+  extern struct CalibrationSettings calibration;
+  
+  loadCalibration();
+
+  return calibration.flow_offset;
 
 }
 
@@ -90,52 +98,96 @@ float Calibration::getFlowOffset() {
 
 
 
-/****************************************
-* leakTestCalibration
+/***********************************************************
+* Perform leakTestCalibration
 ***/
 bool Calibration::setLeakTestPressure() {
-
-  Maths _maths;
-
-  float RefPressure = _maths.calculateRefPressure(INWG);  
-  char RefPressureText[12]; // Buffer big enough?
-  dtostrf(RefPressure, 6, 2, RefPressureText); // Leave room for too large numbers!
   
-  //Store data in EEPROM
-//    EEPROM.write(NVM_LEAK_CAL_ADDR, RefPressure);
-
-  // Display the value on the main screen
-//TODO:  statusMessage = LANG_LEAK_CAL_VALUE, RefPressureText;  
+  extern struct CalibrationSettings calibration;
+  Maths _maths;
+  
+  calibration.leak_test = _maths.calculateRefPressure(INWG);  
 
   return true;
 }
 
 
 
-/****************************************
-* leakTest
+/***********************************************************
+* Get leakTest
 ***/
-float  Calibration::getLeakTestPressure() {
+float Calibration::getLeakTestPressure() {
 
-  Maths _maths;
+  extern struct CalibrationSettings calibration;
   
-  extern struct ConfigSettings config;  
-
-	float leakTestPressure = 0.0;
-	int leakCalibrationValue = 0; 
-	
-//    leakCalibrationValue = EEPROM.read(NVM_LEAK_CAL_ADDR);
-  int refPressure = _maths.calculateRefPressure(INWG);
-
-  //compare calibration data from NVM
-  if (leakCalibrationValue > (refPressure - config.leak_test_tolerance))
-  {   
-	 return LEAK_TEST_FAILED;
-  } else {     
-	 return LEAK_TEST_PASS;
-  }
+  loadCalibration();
   
-  return leakTestPressure;
+  return calibration.leak_test;
 
 }
+
+
+
+
+
+/***********************************************************
+ * saveCalibration 
+ * write calibration data to calibration.json file
+ ***/
+void Calibration::saveCalibration() {
+  
+  extern struct CalibrationSettings calibration;
+  
+  Messages _message;
+  Webserver _webserver;
+  
+  String jsonString;
+  StaticJsonDocument<1024> calibrationData;
+    
+  calibrationData["flow_offset"] = calibration.flow_offset; 
+  calibrationData["leak_test"] = calibration.leak_test; 
+
+  _message.Handler(LANG_SAVING_CALIBRATION);
+  
+  serializeJsonPretty(calibrationData, jsonString);
+  
+  _webserver.writeJSONFile(jsonString, "/calibration.json");
+
+
+}
+
+
+
+
+/***********************************************************
+ * Parse Calibration Data
+ ***/
+void Calibration::parseCalibrationData(StaticJsonDocument<1024>  calibrationData) {
+
+  extern struct CalibrationSettings calibration;  
+  
+  calibration.flow_offset = calibrationData["FLOW_OFFSET"].as<float>();
+  calibration.leak_test = calibrationData["LEAK_TEST"].as<float>();
+  
+
+}
+
+
+
+/***********************************************************
+ * loadCalibration
+ * Read calibration data from calibration.json file
+ ***/
+void Calibration::loadCalibration () {
+
+  Webserver _webserver;
+  
+  StaticJsonDocument<1024> calibrationData;
+  
+  calibrationData = _webserver.loadJSONFile("/calibration.json");
+  
+  parseCalibrationData(calibrationData);
+
+}
+
 

@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
 * The DIY Flow Bench project
 * https://diyflowbench.com
 * 
@@ -29,9 +29,7 @@ public:
     void parseConfigData(StaticJsonDocument<1024> configData);
     void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
     StaticJsonDocument<1024> LoadConfig ();
-    String loadCalibration ();
     void saveConfig (char *data);
-    void saveCalibration (char *data);
     void writeJSONFile(char *data, String filename);
   
 private:

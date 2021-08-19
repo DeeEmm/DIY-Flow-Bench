@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
  * The DIY Flow Bench project
  * https://diyflowbench.com
  * 
@@ -32,7 +32,7 @@
 #include LANGUAGE_FILE
 
 // extern struct ConfigSettings config;
-// extern struct CalibrationSettings calibrationSettings;
+// extern struct CalibrationSettings calibration;
 // extern struct DeviceStatus status;
 
 API::API() {
@@ -43,7 +43,7 @@ API::API() {
 
 
 
-/****************************************
+/***********************************************************
  * CREATE CHECKSUM
  *
  * Source: https://forum.arduino.cc/index.php?topic=311293.msg2158081#msg2158081
@@ -61,10 +61,7 @@ uint16_t API::calcCRC (char* str) {
     return CRC;
 }
 
-
-
-
-/****************************************
+/***********************************************************
  * PARSE API
  *
  * handle API responses:

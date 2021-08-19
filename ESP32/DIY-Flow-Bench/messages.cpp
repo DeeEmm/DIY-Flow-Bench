@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
  * The DIY Flow Bench project
  * https://diyflowbench.com
  * 
@@ -18,7 +18,7 @@
  
  /*
  
- TODO: 
+ TODO: Set up messaging
  
  - Status: 
 	 Receives int from calling statement, this updates global message variable with current status
@@ -51,7 +51,7 @@ Messages::Messages () {
 
 
 
-/****************************************
+/***********************************************************
 * Handler
 */
 void Messages::Handler(String languageString) {
@@ -73,7 +73,7 @@ void Messages::Handler(String languageString) {
 
 
 
-/****************************************
+/***********************************************************
 * DebugPrint
 */
 void Messages::DebugPrint(String message) {
@@ -88,7 +88,7 @@ void Messages::DebugPrint(String message) {
 
 
 
-/****************************************
+/***********************************************************
 * SerialPrint
 */
 void Messages::SerialPrint (String message) {
@@ -97,7 +97,7 @@ void Messages::SerialPrint (String message) {
 
 
 
-/****************************************
+/***********************************************************
 * SerialPrintLn
 */
 void Messages::SerialPrintLn (String message) {

@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
  * The DIY Flow Bench project
  * https://diyflowbench.com
  * 
@@ -28,7 +28,7 @@
 
 
 
-/****************************************
+/***********************************************************
 * CONSTRUCTOR
 */
 Hardware::Hardware() {
@@ -36,7 +36,7 @@ Hardware::Hardware() {
 
 
 
-/****************************************
+/***********************************************************
  * INITIALISE HARDWARE
  
  // TODO: Need to move ALL hardware initialisation into here
@@ -90,7 +90,7 @@ Hardware::Hardware() {
  }
 
 
-/****************************************
+/***********************************************************
  * GET BOARD VOLTAGE
  ***/
 float Hardware::getSupplyMillivolts() {   
@@ -102,7 +102,7 @@ float Hardware::getSupplyMillivolts() {
 
 
 
-/****************************************
+/***********************************************************
 * BENCH IS RUNNING
 */
 bool Hardware::benchIsRunning() {
@@ -127,7 +127,7 @@ bool Hardware::benchIsRunning() {
 }
 
 
-/****************************************
+/***********************************************************
 * CHECK REFERENCE PRESSURE
 * Make sure that reference pressure is within limits
 ***/

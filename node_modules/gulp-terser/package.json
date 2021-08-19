@@ -1,0 +1,73 @@
+{
+  "name": "gulp-terser",
+  "version": "2.0.1",
+  "description": "gulp plugin, compressed es6+ code.",
+  "scripts": {
+    "start": "npm run clean && tsc --watch",
+    "build": "npm run clean && tsc",
+    "clean": "rimraf ./dist",
+    "test": "mocha \"./test/build/**/*.js\"",
+    "test:gulp": "gulp --gulpfile ./test/gulpfile.js",
+    "eslint": "eslint ./ --fix",
+    "eslint:no-fix": "eslint ./"
+  },
+  "main": "dist/cjs.js",
+  "license": "MIT",
+  "keywords": [
+    "gulp",
+    "gulpplugin",
+    "uglify-es",
+    "terser"
+  ],
+  "author": {
+    "name": "段昊辰",
+    "email": "duanhaochen@126.com",
+    "url": "https://github.com/duan602728596"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/duan602728596/gulp-terser.git"
+  },
+  "dependencies": {
+    "plugin-error": "^1.0.1",
+    "terser": "5.4.0",
+    "through2": "^4.0.2",
+    "vinyl-sourcemaps-apply": "^0.2.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/eslint-parser": "^7.12.1",
+    "@types/node": "^14",
+    "@types/through2": "^2",
+    "@typescript-eslint/eslint-plugin": "^4.7.0",
+    "@typescript-eslint/parser": "^4.7.0",
+    "chai": "^4.2.0",
+    "commitizen": "^4.2.2",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^7.13.0",
+    "gulp": "^4.0.2",
+    "gulp-plumber": "^1.2.1",
+    "gulp-sourcemaps": "^3.0.0",
+    "husky": "^4.3.0",
+    "lint-staged": "^10.5.1",
+    "mocha": "^8.2.1",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.0.5"
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": "eslint"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}

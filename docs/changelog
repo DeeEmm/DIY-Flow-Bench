@@ -184,3 +184,13 @@ Build #         - Description of Change
                 - Fixed timeout for AP mode
                 - Optimised websocket handler browser code
                 - Remove header key from config JSON file
+21081902        - Removed DIY-Flow-Bench header file
+                - Flow calibration
+                - Leak test calibration
+                - added support for analog Temp / Baro / Relh sensors
+                - general code tidy
+                - Updated pin mapping
+                - added vanilla boot handling
+                - #63 Reviewed I/O
+                - #64 GZip compression
+                - #70 Server initialisation

@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
  * Language Constants
  *
  ***/
@@ -13,7 +13,10 @@
 #define LANG_LEAK_TEST_PASS         "Leak test OK"
 #define LANG_LEAK_TEST_FAILED       "Leak test fail"
 #define LANG_ERROR_LOADING_CONFIG   "Error loading config file"
-#define LANG_SAVING_LOADING_CONFIG  "Error saving config file"
+#define LANG_ERROR_SAVING_CONFIG    "Error saving config file"
+#define LANG_SAVING_CONFIG          "Saving config file"
+#define LANG_SAVING_CALIBRATION     "Error saving calibration file"
+#define LANG_ERROR_LOADING_FILE     "Error loading file"
 //                                  -----------------
 #define LANG_CAL_OFFET_VALUE        "Cal Value: "
 #define LANG_LEAK_CAL_VALUE         "Leak Cal Value: "
@@ -27,3 +30,4 @@
 #define LANG_FIXED_VALUE            "Fixed value: "
 //                                  -----------------
 #define LANG_SAVING_CONFIG          "Saving Config..."
+#define LANG_RUN_BENCH_TO_CALIBRATE "Bench must be running to calibrate"

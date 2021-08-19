@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
  * The DIY Flow Bench project
  * https://diyflowbench.com
  * 
@@ -28,13 +28,14 @@
 #include <ArduinoJson.h>
 #include "constants.h"
 #include "configuration.h"
+#include "calibration.h"
 #include "structs.h"
 #include "pins.h"
 #include "settings.h"
 #include "hardware.h"
 #include "messages.h"
 #include "maths.h"
-// #include LANGUAGE_FILE
+#include LANGUAGE_FILE
 
 
 Webserver::Webserver() {
@@ -45,7 +46,7 @@ Webserver::Webserver() {
 
 
 
-/****************************************
+/***********************************************************
  * Push Server Data to client via websocket
  ***/
 void Webserver::SendWebSocketMessage(String jsonValues) {
@@ -59,25 +60,10 @@ void Webserver::SendWebSocketMessage(String jsonValues) {
 
 
 
-void merge(JsonObject dest, JsonObjectConst src) {
-   for (auto kvp : src) {
-     dest[kvp.key()] = kvp.value();
-   }
-}
-
-// void deepmerge(JsonVariant dst, JsonVariantConst src) {
-//   if (src.is<JsonObject>()) {
-//     for (auto kvp : src.as<JsonObject>()) {
-//       merge(dst.getOrAddMember(kvp.key()), kvp.value());
-//     }
-//   } else {
-//     dst.set(src);
-//   }
-// }
 
 
 
-/****************************************
+/***********************************************************
  * Process Websocket Message
  ***/
 void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
@@ -89,6 +75,8 @@ void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   Settings _settings;
   Hardware _hardware;
   Webserver _webserver;
+  Calibration _calibration;
+  Messages _message;
   
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   
@@ -134,12 +122,28 @@ void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
 
       case CALIBRATE:
         Serial.println("Calibrate");
-        if (_hardware.benchIsRunning()){
-// TODO:          setCalibrationOffset();         
-// TODO:          //calibration.flow_offset                
+        if (_hardware.benchIsRunning()){          
+          _calibration.setFlowOffset();
+          // send new calibration to the browser
+          //_webserver.SendWebSocketMessage("flow offset");
+        } else {
+          _message.Handler(LANG_RUN_BENCH_TO_CALIBRATE);        
         }
 
       break;      
+
+      case LEAK_CAL:
+        Serial.println("Leak Test Calibration");
+        if (_hardware.benchIsRunning()){          
+          _calibration.setLeakTestPressure();
+          // send new calibration to the browser
+          //_webserver.SendWebSocketMessage("flow offset");
+        } else {
+          _message.Handler(LANG_RUN_BENCH_TO_CALIBRATE);        
+        }
+      
+      break;      
+      
 
       case FILE_LIST:
         Serial.println("File List");
@@ -196,7 +200,7 @@ void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
 
 
 
-/****************************************
+/***********************************************************
  * Websocket Event Listener
  ***/
 void Webserver::ReceiveWebSocketMessage(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
@@ -218,7 +222,7 @@ void Webserver::ReceiveWebSocketMessage(AsyncWebSocket *server, AsyncWebSocketCl
 }
 
 
-/****************************************
+/***********************************************************
  * BYTE DECODE 
  ***/
 String Webserver::byteDecode(size_t bytes) {
@@ -230,7 +234,7 @@ String Webserver::byteDecode(size_t bytes) {
 
 
 
-/****************************************
+/***********************************************************
  * UPLOAD FILE
  ***/
 void Webserver::ProcessUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
@@ -266,9 +270,9 @@ void Webserver::ProcessUpload(AsyncWebServerRequest *request, String filename, s
 
 
 
+String processor(const String& var) { return String("Waiting Data"); }
 
-
-/****************************************
+/***********************************************************
  * INITIALISE SERVER
  ***/
 void Webserver::Initialise() {
@@ -278,6 +282,10 @@ void Webserver::Initialise() {
     extern AsyncWebServer server;
     extern AsyncWebSocket ws;
     extern AsyncEventSource events;
+    
+    
+    
+    String index_html = "<!DOCTYPE HTML><html lang='en'><HEAD><title>DIY Flow Bench</title><meta name='viewport' content='width=device-width, initial-scale=1'> <script>function onFileUpload(event){this.setState({file:event.target.files[0]});const{file}=this.state;const data=new FormData;data.append('data',file);fetch('/upload',{method:'POST',body:data}).catch(e=>{console.log('Request failed',e);});}</script> <style>body,html{height:100%;margin:0;font-family:Arial;font-size:22px}a:link{color:#0A1128;text-decoration:none}a:visited,a:active{color:#0A1128;text-decoration:none}a:hover{color:#666;text-decoration:none}.headerbar{overflow:hidden;background-color:#0A1128;text-align:center}.headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover{color:white;text-decoration:none}.align-center{text-align:center}.file-upload-button{padding:12px 0px;text-align:center}.button{display:inline-block;background-color:#008CBA;border:none;border-radius:4px;color:white;padding:12px 12px;text-decoration:none;font-size:22px;margin:2px;cursor:pointer;width:150px}#footer{clear:both;text-align:center}.file-upload-button{padding:12px 0px;text-align:center}input[type='file']{display:none}</style></HEAD><BODY><div class='headerbar'><h1><a href='/' >DIY Flow Bench</a></h1></div> <br><div class='align-center'><p>Welcome to the DIY Flow Bench.</p><p>Please upload the index.html.gz file to get started.</p> <br><form method='POST' action='/upload' enctype='multipart/form-data'> <label for='data' class='file-upload-button button'>Select File</label> <input id='data' type='file' name='wtf'/> <input class='button file-submit-button' type='submit' value='Upload'/></form></div> <br><div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br></BODY></HTML>";
     
     Messages _message;
     
@@ -307,13 +315,10 @@ void Webserver::Initialise() {
     status.spiffs_mem_used = SPIFFS.usedBytes();
  
     _message.SerialPrintLn("===== File system info =====");
- 
     _message.SerialPrint("Total space:      ");
     _message.SerialPrintLn(byteDecode(status.spiffs_mem_size));
- 
     _message.SerialPrint("Total space used: ");
-    _message.SerialPrintLn(byteDecode(status.spiffs_mem_used));
- 
+    _message.SerialPrintLn(byteDecode(status.spiffs_mem_used)); 
     _message.SerialPrintLn("");
 
     // API
@@ -377,25 +382,29 @@ void Webserver::Initialise() {
     }, ProcessUpload);
 
     // Root URL request handler
-    server.on("/", HTTP_ANY, [](AsyncWebServerRequest *request){    
+    server.on("/", HTTP_ANY, [index_html](AsyncWebServerRequest *request){    
+      //extern String index_html;
       if (SPIFFS.exists("/index.html.gz")){
         AsyncWebServerResponse *response = request->beginResponse(SPIFFS, "/index.html.gz", "text/html", false);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
-      } else {
+      } else if (SPIFFS.exists("/index.html")) {
         request->send(SPIFFS, "/index.html", "text/html");
+      } else {
+        request->send(200, "text/html", index_html); 
       }
-      
     });
 
     // Index page request handler
-    server.on("/index.html", HTTP_ANY, [](AsyncWebServerRequest *request){
+    server.on("/index.html", HTTP_ANY, [index_html](AsyncWebServerRequest *request){
       if (SPIFFS.exists("/index.html.gz")){
         AsyncWebServerResponse *response = request->beginResponse(SPIFFS, "/index.html.gz", "text/html", false);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
-      } else {
+      } else if (SPIFFS.exists("/index.html")) {
         request->send(SPIFFS, "/index.html", "text/html");
+      } else {
+        request->send(200, "text/html", index_html); 
       }
     });
 
@@ -453,7 +462,7 @@ void Webserver::Initialise() {
 }
 
 
-/****************************************
+/***********************************************************
  * Decode Message Header
  * Pulls HEADER value from JSON string
  ***/
@@ -473,7 +482,7 @@ void Webserver::Initialise() {
 
 
 
-/****************************************
+/***********************************************************
  * Get SPIFFS File List in JSON format
  ***/
  String Webserver::getFileListJSON () {
@@ -504,7 +513,7 @@ void Webserver::Initialise() {
  }
 
 
-/****************************************
+/***********************************************************
  * Get System Status in JSON format
  ***/
 String Webserver::getSystemStatusJSON() {
@@ -534,7 +543,7 @@ String Webserver::getSystemStatusJSON() {
 
 
 
-/****************************************
+/***********************************************************
 * Get JSON Data
 *
 * Package up current bench data into JSON string
@@ -546,7 +555,6 @@ String Webserver::getDataJSON() {
   
   Maths _maths;
   
-  // TODO: Check scope of these... this->?????
   float mafFlowCFM = _maths.calculateMafFlowCFM();
   float refPressure = _maths.calculateRefPressure(INWG);   
   StaticJsonDocument<1024> dataJson;    
@@ -619,7 +627,7 @@ String Webserver::getDataJSON() {
 
 
 
-/****************************************
+/***********************************************************
  * onBody - serve gzipped page if available 
  ***/
 void Webserver::onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
@@ -633,3 +641,71 @@ void Webserver::onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len
 }
 
 
+
+
+/***********************************************************
+ * write JSON string to file
+ ***/
+void Webserver::writeJSONFile(String data, String filename) {
+
+  Messages _message;
+
+  StaticJsonDocument<1024> jsonData;
+  DeserializationError error = deserializeJson(jsonData, data);
+
+  _message.DebugPrint("Writing JSON file...");  
+
+  File outputFile = SPIFFS.open(filename, FILE_WRITE);
+  serializeJsonPretty(jsonData, outputFile);
+  outputFile.close();
+
+}
+
+
+
+
+
+
+/***********************************************************
+ * load JSON file 
+ ***/
+StaticJsonDocument<1024> Webserver::loadJSONFile(String filename) {
+  
+  Messages _message;
+  
+  if (SPIFFS.exists(filename)){
+    File jsonFile = SPIFFS.open(filename, FILE_READ);
+  
+    if (!jsonFile) {
+        _message.Handler(LANG_ERROR_LOADING_FILE);
+        _message.DebugPrint("Failed to open file for reading");
+    } else {
+        size_t size = jsonFile.size();
+        if (size > 1024) {
+          #ifdef DEBUG 
+            _message.DebugPrint("Config file size is too large");
+          #endif
+          exit;
+        }
+        // Allocate the memory pool on the stack.
+        // Use arduinojson.org/assistant to compute the capacity.
+        StaticJsonDocument<1024> jsonData;
+        
+        DeserializationError error = deserializeJson(jsonData, jsonFile);
+        if (error) {
+          _message.DebugPrint("deserializeJson() failed: ");
+          _message.DebugPrint(error.f_str());
+        }
+        
+        jsonFile.close();
+        return jsonData;
+        
+        // String jsonString;
+        // serializeJson(jsonData, jsonString);
+        // return jsonString;
+    }    
+    jsonFile.close();
+  } else {
+    _message.DebugPrint("File missing");
+  }
+}

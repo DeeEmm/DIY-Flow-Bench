@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
  * exampleKeyValueData.h
  *
  * Manufacturer: Manufacturer
@@ -14,7 +14,7 @@
 #define MAFDATA_DEFINED
 
 
-/****************************************
+/***********************************************************
  * This is an example MAF Data file
  * You can either use volts versus kg/hr or ms/sec as below, or 1024 analog data points versus ms/sec or kg/hr
  * (refer to mafData/exampleAnalogData.h if yo have 1024 points of analog data)
@@ -33,14 +33,14 @@
  ***/
 
 
-/****************************************
+/***********************************************************
   * MAF Type
   *
   ***/
  #define MAF_SENSOR_TYPE "YourMafName"
  
  
- /****************************************
+ /***********************************************************
  * MAF Output Type
  *
  * 1 = voltage
@@ -49,7 +49,7 @@
 int MAFoutputType = 1;
 
 
-/****************************************
+/***********************************************************
  * MAF Data format
  * 
  * 1 = key_value
@@ -59,7 +59,7 @@ int MAFdataFormat = 1;
 
 
 
-/****************************************
+/***********************************************************
  * MAF Units
  * 
  * 1 = kg_h
@@ -68,7 +68,7 @@ int MAFdataFormat = 1;
 int MAFdataUnit = 1;
 
 
-/****************************************
+/***********************************************************
  * MAF Data
  ***/
 long mafMapAnalogData[] = {0,0}; // Need to declare unused analog array to prevent code breaking

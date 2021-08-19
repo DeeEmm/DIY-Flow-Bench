@@ -1,4 +1,4 @@
-/****************************************
+/***********************************************************
  * The DIY Flow Bench project
  * https://diyflowbench.com
  * 
@@ -23,6 +23,7 @@
 // #include "calibration.h"
 #include <ArduinoJson.h>
 #include "messages.h"
+#include "webserver.h"
 #include <SPIFFS.h>
 #include LANGUAGE_FILE
 
@@ -32,7 +33,7 @@ Settings::Settings() {
 }
 
 
-/****************************************
+/***********************************************************
  * Parse Config Data
  ***/
 void Settings::parseConfigData(StaticJsonDocument<1024> configData) {
@@ -61,177 +62,53 @@ void Settings::parseConfigData(StaticJsonDocument<1024> configData) {
 }
 
 
-/****************************************
- * Parse Calibration Data
- ***/
-void Settings::parseCalibrationData(StaticJsonDocument<1024>  calibrationData) {
-
-  extern struct CalibrationSettings calibrationSettings;  
-  
-  calibrationSettings.flow_offset = calibrationData["CAL_FLOW_OFFSET"].as<float>();
-
-}
 
 
-/****************************************
+
+/***********************************************************
  * localConfig
  * read configuration data from config.json file
  ***/
  
 StaticJsonDocument<1024> Settings::LoadConfig () {
 
-  //extern ConfigSettings config;
-  
-  Messages _message;
-
-  if (SPIFFS.exists("/config.json")){
-    File configFile = SPIFFS.open("/config.json", FILE_READ);
-
-    if (!configFile) {
-        _message.Handler(LANG_ERROR_LOADING_CONFIG);        
-        _message.DebugPrint("Failed to open config file for reading");
-        configFile.close();
-    } else {
-        size_t size = configFile.size();
-        if (size > 1024) {
-          _message.DebugPrint("Config file size is too large");
-          exit;
-        }
-        // Allocate the memory pool on the stack.
-        // Use arduinojson.org/assistant to compute the capacity.
-        StaticJsonDocument<1024> configData;
-        // Parse the root object
-        DeserializationError error = deserializeJson(configData, configFile);
-        if (error) {
-          _message.DebugPrint("deserializeJson() failed: "); 
-          _message.DebugPrint(error.f_str());          
-        }
-        parseConfigData(configData);
-        configFile.close();
-        return configData;
-        //or return a string...
-        //String jsonString;        
-        //serializeJson(configData, jsonString);
-        //return jsonString;
-            }    
-    configFile.close();
-  } else {
-    _message.DebugPrint("config.json missing");
-  }
+  Webserver _webserver;
+  StaticJsonDocument<1024> configData;
+  configData = _webserver.loadJSONFile("/config.json");
+  parseConfigData(configData);
+  return configData;
 }
 
 
 
-/****************************************
- * loadCalibration
- * Read calibration data from calibration.json file
- ***/
-String Settings::loadCalibration () {
-
-  //extern CalibrationSettings calibration;
-  Messages _message;
-
-  if (SPIFFS.exists("/calibration.json")){
-    File calibrationFile = SPIFFS.open("/calibration.json", FILE_READ);
-
-    if (!calibrationFile) {
-        _message.Handler(LANG_ERROR_LOADING_CONFIG);
-        _message.DebugPrint("Failed to open config file for reading");
-        calibrationFile.close();
-    } else {
-        size_t size = calibrationFile.size();
-        if (size > 1024) {
-          #ifdef DEBUG 
-            _message.DebugPrint("Config file size is too large");
-          #endif
-          exit;
-        }
-        // Allocate the memory pool on the stack.
-        // Use arduinojson.org/assistant to compute the capacity.
-        StaticJsonDocument<1024> calibrationData;
-        // Parse the root object
-        DeserializationError error = deserializeJson(calibrationData, calibrationFile);
-        if (error) {
-          _message.DebugPrint("deserializeJson() failed: ");
-          _message.DebugPrint(error.f_str());
-        }
-        parseConfigData(calibrationData);
-        calibrationFile.close();
-        String jsonString;
-        serializeJson(calibrationData, jsonString);
-        return jsonString;
-    }    
-    calibrationFile.close();
-  } else {
-    _message.DebugPrint("calibration.json missing");
-  }
-}
 
 
-
-/****************************************
+/***********************************************************
  * saveConfig
  * write configuration data to config.json file
  ***/
 void Settings::saveConfig (char *data) {
 
   Messages _message;
-
+  Webserver _webserver;
+  
+  String jsonString;
   StaticJsonDocument<1024> configData;
+  
   DeserializationError error = deserializeJson(configData, data);
   parseConfigData(configData);  
+
   // We don't want to store the header data in the file, so lets remove it
   configData.remove('HEADER');
 
   _message.Handler(LANG_SAVING_CONFIG);
   _message.DebugPrint((char*)data);
-
-  File configFile = SPIFFS.open("/config.json", FILE_WRITE);
-  serializeJsonPretty(configData, configFile);
-  configFile.close();
-
-}
-
-
-
-/****************************************
- * saveCalibration 
- * write calibration data to calibration.json file
- ***/
-void Settings::saveCalibration (char *data) {
-
-  Messages _message;
-
-  StaticJsonDocument<1024> calibrationData;
-  DeserializationError error = deserializeJson(calibrationData, data);
-  parseConfigData(calibrationData);
-
-  _message.DebugPrint("Saving Calibration...");
-  _message.DebugPrint((char*)data);  
-
-  File calibrationFile = SPIFFS.open("/calibration.json", FILE_WRITE);
-  serializeJsonPretty(calibrationData, calibrationFile);
-  calibrationFile.close();
+  
+  serializeJsonPretty(configData, jsonString);
+  
+  _webserver.writeJSONFile(jsonString, "/config.json");
+  
 
 }
 
 
-/****************************************
- * write JSON string to file
- ***/
-void Settings::writeJSONFile(char *data, String filename) {
-
-  Messages _message;
-
-  StaticJsonDocument<1024> jsonData;
-  DeserializationError error = deserializeJson(jsonData, data);
-  parseConfigData(jsonData);
-
-  _message.DebugPrint("Saving JSON file..."); 
-  _message.DebugPrint((char*)data);  
-
-  File outputFile = SPIFFS.open(filename, FILE_WRITE);
-  serializeJsonPretty(jsonData, outputFile);
-  outputFile.close();
-
-}
