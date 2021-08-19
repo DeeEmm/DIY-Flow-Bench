@@ -194,3 +194,6 @@ Build #         - Description of Change
                 - #63 Reviewed I/O
                 - #64 GZip compression
                 - #70 Server initialisation
+21081902        - #75 Auto create config / calibration json file(s) if not exists
+                - Minor code tidying
+                - Updated README

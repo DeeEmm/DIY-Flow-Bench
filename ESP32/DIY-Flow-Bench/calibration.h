@@ -31,6 +31,7 @@ class Calibration {
 		float getFlowOffset();
 		bool setLeakTestPressure();
 		float getLeakTestPressure();
+		void createCalibrationFile();
 		void saveCalibration();
 		void loadCalibration();
 		void parseCalibrationData(StaticJsonDocument<1024>  calibrationData);

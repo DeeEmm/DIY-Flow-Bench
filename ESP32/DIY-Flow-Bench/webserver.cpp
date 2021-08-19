@@ -47,8 +47,8 @@ Webserver::Webserver() {
 
 
 /***********************************************************
- * Push Server Data to client via websocket
- ***/
+* Push Server Data to client via websocket
+***/
 void Webserver::SendWebSocketMessage(String jsonValues) {
   
   extern AsyncWebSocket ws;
@@ -64,8 +64,8 @@ void Webserver::SendWebSocketMessage(String jsonValues) {
 
 
 /***********************************************************
- * Process Websocket Message
- ***/
+* Process Websocket Message
+***/
 void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   
   extern struct WebsocketData socketData;
@@ -83,7 +83,7 @@ void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   StaticJsonDocument<1024> messageData;
   DeserializationError err = deserializeJson(messageData, data);
   if (err) {
-    Serial.print(F("deserializeJson() failed: "));
+    Serial.print(F("ProcessWebSocketMessage->deserializeJson() failed: "));
     Serial.println(err.c_str());
   }
   
@@ -110,7 +110,7 @@ void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
 
       case SAVE_CONFIG:
         Serial.println("Save Config");
-        _settings.saveConfig((char*)data);
+        _settings.saveConfig(messageData);
         
       case LOAD_CONFIG:
         Serial.println("Load Config");
@@ -201,8 +201,8 @@ void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
 
 
 /***********************************************************
- * Websocket Event Listener
- ***/
+* Websocket Event Listener
+***/
 void Webserver::ReceiveWebSocketMessage(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
   
   switch (type) {
@@ -223,8 +223,8 @@ void Webserver::ReceiveWebSocketMessage(AsyncWebSocket *server, AsyncWebSocketCl
 
 
 /***********************************************************
- * BYTE DECODE 
- ***/
+* Byte Decode 
+***/
 String Webserver::byteDecode(size_t bytes) {
   if (bytes < 1024) return String(bytes) + " B";
   else if (bytes < (1024 * 1024)) return String(bytes / 1024.0) + " KB";
@@ -235,11 +235,14 @@ String Webserver::byteDecode(size_t bytes) {
 
 
 /***********************************************************
- * UPLOAD FILE
- ***/
+* Process File Upload 
+*
+* Redirects browser back to Upload modal unless upload is index file
+***/
 void Webserver::ProcessUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
 
   extern struct FileUploadData fileUploadData;
+  String redirectURL;
   
   if (SPIFFS.exists (filename) ) {
     SPIFFS.remove (filename);
@@ -251,6 +254,14 @@ void Webserver::ProcessUpload(AsyncWebServerRequest *request, String filename, s
     Serial.println((String)"UploadStart: " + filename);
     request->_tempFile = SPIFFS.open(filename, "w");
   }
+  
+  // Set redirect to file Upload modal unless uploading the index file
+  if (filename == String("/index.html.gz")){
+    redirectURL = "/";
+  } else {
+    redirectURL = "/?modal=upload";
+  }
+  
   if(len) {   
     fileUploadData.file_size += len;
     if (fileUploadData.file_size > freespace) {  
@@ -261,10 +272,11 @@ void Webserver::ProcessUpload(AsyncWebServerRequest *request, String filename, s
       request->_tempFile.write(data,len);
     }
   }
+  
   if(final){
     Serial.println((String)"UploadEnd: " + filename + "," + fileUploadData.file_size);
     request->_tempFile.close();
-    request->redirect("/?modal=upload");
+    request->redirect(redirectURL);
   }
 }
 
@@ -273,8 +285,8 @@ void Webserver::ProcessUpload(AsyncWebServerRequest *request, String filename, s
 String processor(const String& var) { return String("Waiting Data"); }
 
 /***********************************************************
- * INITIALISE SERVER
- ***/
+* INITIALISE SERVER
+***/
 void Webserver::Initialise() {
     
     extern struct ConfigSettings config;
@@ -288,7 +300,8 @@ void Webserver::Initialise() {
     String index_html = "<!DOCTYPE HTML><html lang='en'><HEAD><title>DIY Flow Bench</title><meta name='viewport' content='width=device-width, initial-scale=1'> <script>function onFileUpload(event){this.setState({file:event.target.files[0]});const{file}=this.state;const data=new FormData;data.append('data',file);fetch('/upload',{method:'POST',body:data}).catch(e=>{console.log('Request failed',e);});}</script> <style>body,html{height:100%;margin:0;font-family:Arial;font-size:22px}a:link{color:#0A1128;text-decoration:none}a:visited,a:active{color:#0A1128;text-decoration:none}a:hover{color:#666;text-decoration:none}.headerbar{overflow:hidden;background-color:#0A1128;text-align:center}.headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover{color:white;text-decoration:none}.align-center{text-align:center}.file-upload-button{padding:12px 0px;text-align:center}.button{display:inline-block;background-color:#008CBA;border:none;border-radius:4px;color:white;padding:12px 12px;text-decoration:none;font-size:22px;margin:2px;cursor:pointer;width:150px}#footer{clear:both;text-align:center}.file-upload-button{padding:12px 0px;text-align:center}input[type='file']{display:none}</style></HEAD><BODY><div class='headerbar'><h1><a href='/' >DIY Flow Bench</a></h1></div> <br><div class='align-center'><p>Welcome to the DIY Flow Bench.</p><p>Please upload the index.html.gz file to get started.</p> <br><form method='POST' action='/upload' enctype='multipart/form-data'> <label for='data' class='file-upload-button button'>Select File</label> <input id='data' type='file' name='wtf'/> <input class='button file-submit-button' type='submit' value='Upload'/></form></div> <br><div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br></BODY></HTML>";
     
     Messages _message;
-    
+    Settings _settings;
+    Calibration _calibration;
 
     // Serial
     Serial.begin(config.serial_baud_rate);      
@@ -310,6 +323,15 @@ void Webserver::Initialise() {
           _message.SerialPrintLn("File System Formatted ");
       #endif
     }
+    
+    // Check if config and calibration json files exist. If not create them.
+    if (!SPIFFS.exists("/config.json")){
+      _settings.createConfigFile();
+    }
+    if (!SPIFFS.exists("/cal.json")){
+      _calibration.createCalibrationFile();
+    }
+    
     // Filesystem info
     status.spiffs_mem_size = SPIFFS.totalBytes();
     status.spiffs_mem_used = SPIFFS.usedBytes();
@@ -463,9 +485,9 @@ void Webserver::Initialise() {
 
 
 /***********************************************************
- * Decode Message Header
- * Pulls HEADER value from JSON string
- ***/
+* Decode Message Header
+* Pulls HEADER value from JSON string
+***/
  int Webserver::decodeMessageHeader (char *data) {
 
   StaticJsonDocument<1024> messageData;
@@ -483,8 +505,8 @@ void Webserver::Initialise() {
 
 
 /***********************************************************
- * Get SPIFFS File List in JSON format
- ***/
+* Get SPIFFS File List in JSON format
+***/
  String Webserver::getFileListJSON () {
 
     StaticJsonDocument<1024> dataJson;    
@@ -514,8 +536,8 @@ void Webserver::Initialise() {
 
 
 /***********************************************************
- * Get System Status in JSON format
- ***/
+* Get System Status in JSON format
+***/
 String Webserver::getSystemStatusJSON() {
   
   extern DeviceStatus status;
@@ -628,8 +650,8 @@ String Webserver::getDataJSON() {
 
 
 /***********************************************************
- * onBody - serve gzipped page if available 
- ***/
+* onBody - serve gzipped page if available 
+***/
 void Webserver::onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
   if (SPIFFS.exists("/index.html.gz")){
     AsyncWebServerResponse *response = request->beginResponse(SPIFFS, "/index.html.gz", "text/html", false);
@@ -644,8 +666,8 @@ void Webserver::onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len
 
 
 /***********************************************************
- * write JSON string to file
- ***/
+* write JSON string to file
+***/
 void Webserver::writeJSONFile(String data, String filename) {
 
   Messages _message;
@@ -653,7 +675,7 @@ void Webserver::writeJSONFile(String data, String filename) {
   StaticJsonDocument<1024> jsonData;
   DeserializationError error = deserializeJson(jsonData, data);
 
-  _message.DebugPrint("Writing JSON file...");  
+  //_message.DebugPrint("Writing JSON file...");  
 
   File outputFile = SPIFFS.open(filename, FILE_WRITE);
   serializeJsonPretty(jsonData, outputFile);
@@ -672,7 +694,7 @@ void Webserver::writeJSONFile(String data, String filename) {
 StaticJsonDocument<1024> Webserver::loadJSONFile(String filename) {
   
   Messages _message;
-  
+
   if (SPIFFS.exists(filename)){
     File jsonFile = SPIFFS.open(filename, FILE_READ);
   
@@ -693,7 +715,7 @@ StaticJsonDocument<1024> Webserver::loadJSONFile(String filename) {
         
         DeserializationError error = deserializeJson(jsonData, jsonFile);
         if (error) {
-          _message.DebugPrint("deserializeJson() failed: ");
+          _message.DebugPrint("loadJSONFile->deserializeJson() failed: ");
           _message.DebugPrint(error.f_str());
         }
         

@@ -70,7 +70,7 @@ bool Calibration::setFlowOffset() {
   // update config var
   calibration.flow_offset = flowCalibrationOffset;
   
-  // TODO: Save calibration.json
+  // TODO: Save cal.json
   saveCalibration();    
   
   return true;
@@ -129,11 +129,36 @@ float Calibration::getLeakTestPressure() {
 
 
 
+/***********************************************************
+* createConfig
+* 
+* Create configuration json file
+* Called from Webserver::Initialise() if config.json not found
+***/
+void Calibration::createCalibrationFile () {
+
+  extern struct CalibrationSettings calibration;
+  Webserver _webserver;
+  Messages _message;
+  String jsonString;
+  StaticJsonDocument<1024> calibrationData;
+  
+  _message.DebugPrint("Creating cal.json file..."); 
+  
+  calibrationData["FLOW_OFFSET"] = calibration.flow_offset;
+  calibrationData["LEAK_TEST"] = calibration.leak_test;
+  
+  serializeJsonPretty(calibrationData, jsonString);
+  _webserver.writeJSONFile(jsonString, "/cal.json");
+  
+}
+
+
 
 /***********************************************************
- * saveCalibration 
- * write calibration data to calibration.json file
- ***/
+* saveCalibration 
+* write calibration data to cal.json file
+***/
 void Calibration::saveCalibration() {
   
   extern struct CalibrationSettings calibration;
@@ -151,8 +176,7 @@ void Calibration::saveCalibration() {
   
   serializeJsonPretty(calibrationData, jsonString);
   
-  _webserver.writeJSONFile(jsonString, "/calibration.json");
-
+  _webserver.writeJSONFile(jsonString, "/cal.json");
 
 }
 
@@ -160,8 +184,8 @@ void Calibration::saveCalibration() {
 
 
 /***********************************************************
- * Parse Calibration Data
- ***/
+* Parse Calibration Data
+***/
 void Calibration::parseCalibrationData(StaticJsonDocument<1024>  calibrationData) {
 
   extern struct CalibrationSettings calibration;  
@@ -169,22 +193,21 @@ void Calibration::parseCalibrationData(StaticJsonDocument<1024>  calibrationData
   calibration.flow_offset = calibrationData["FLOW_OFFSET"].as<float>();
   calibration.leak_test = calibrationData["LEAK_TEST"].as<float>();
   
-
 }
 
 
 
 /***********************************************************
- * loadCalibration
- * Read calibration data from calibration.json file
- ***/
+* loadCalibration
+* Read calibration data from cal.json file
+***/
 void Calibration::loadCalibration () {
 
   Webserver _webserver;
   
   StaticJsonDocument<1024> calibrationData;
   
-  calibrationData = _webserver.loadJSONFile("/calibration.json");
+  calibrationData = _webserver.loadJSONFile("/cal.json");
   
   parseCalibrationData(calibrationData);
 

@@ -34,8 +34,8 @@ Settings::Settings() {
 
 
 /***********************************************************
- * Parse Config Data
- ***/
+* Parse Config Data
+***/
 void Settings::parseConfigData(StaticJsonDocument<1024> configData) {
 
   extern struct ConfigSettings config;
@@ -66,10 +66,9 @@ void Settings::parseConfigData(StaticJsonDocument<1024> configData) {
 
 
 /***********************************************************
- * localConfig
- * read configuration data from config.json file
- ***/
- 
+* loadConfig
+* read configuration data from config.json file
+***/ 
 StaticJsonDocument<1024> Settings::LoadConfig () {
 
   Webserver _webserver;
@@ -84,31 +83,70 @@ StaticJsonDocument<1024> Settings::LoadConfig () {
 
 
 /***********************************************************
- * saveConfig
- * write configuration data to config.json file
- ***/
-void Settings::saveConfig (char *data) {
+* createConfig
+* 
+* Create configuration json file
+* Called from Webserver::Initialise() if config.json not found
+***/
+void Settings::createConfigFile () {
 
-  Messages _message;
+  extern struct ConfigSettings config;
   Webserver _webserver;
-  
-  String jsonString;
+  Messages _message;
+  String jsonString;  
   StaticJsonDocument<1024> configData;
-  
-  DeserializationError error = deserializeJson(configData, data);
-  parseConfigData(configData);  
 
-  // We don't want to store the header data in the file, so lets remove it
-  configData.remove('HEADER');
-
-  _message.Handler(LANG_SAVING_CONFIG);
-  _message.DebugPrint((char*)data);
+  _message.DebugPrint("Creating config.json file..."); 
+ 
+  configData["CONF_WIFI_SSID"] = config.wifi_ssid;
+  configData["CONF_WIFI_PSWD"] = config.wifi_pswd;
+  configData["CONF_WIFI_AP_SSID"] = config.wifi_ap_ssid;
+  configData["CONF_WIFI_AP_PSWD"] = config.wifi_ap_pswd;
+  configData["CONF_HOSTNAME"] = config.hostname;
+  configData["CONF_WIFI_TIMEOUT"] = config.wifi_timeout;
+  configData["CONF_REFRESH_RATE"] = config.refresh_rate;
+  configData["CONF_MIN_BENCH_PRESSURE"] = config.min_bench_pressure;
+  configData["CONF_MIN_FLOW_RATE"] = config.min_flow_rate;
+  configData["CONF_CYCLIC_AVERAGE_BUFFER"] = config.cyc_av_buffer;
+  configData["CONF_MAF_MIN_MILLIVOLTS"] = config.maf_min_millivolts;
+  configData["CONF_API_DELIM"] = config.api_delim;
+  configData["CONF_SERIAL_BAUD_RATE"] = config.serial_baud_rate;
+  configData["CONF_LEAK_TEST_TOLERANCE"] = config.leak_test_tolerance;
+  configData["CONF_CAL_REF_PRESS"] = config.cal_ref_press;
+  configData["CONF_CAL_FLOW_RATE"] = config.cal_flow_rate;
   
   serializeJsonPretty(configData, jsonString);
-  
   _webserver.writeJSONFile(jsonString, "/config.json");
   
 
 }
 
 
+/***********************************************************
+* saveConfig
+* write configuration data to config.json file
+***/
+void Settings::saveConfig (StaticJsonDocument<1024> configData) {
+
+  Messages _message;
+  Webserver _webserver;
+  
+  String jsonString;
+  
+  parseConfigData(configData);  
+  
+  // We don't want to store the header data in the file, so lets remove it
+  configData.remove("HEADER");
+  
+  _message.Handler(LANG_SAVING_CONFIG);
+  _message.DebugPrint("Configuration Data:");
+  serializeJson(configData, Serial);
+  _message.DebugPrint("Saved to /config.json");
+  
+  serializeJsonPretty(configData, jsonString);
+  _webserver.writeJSONFile(jsonString, "/config.json");
+  
+  // Clear down the status Message
+  _message.Handler(LANG_NO_ERROR);
+
+}

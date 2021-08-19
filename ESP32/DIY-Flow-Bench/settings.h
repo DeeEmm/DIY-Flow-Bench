@@ -29,7 +29,8 @@ public:
     void parseConfigData(StaticJsonDocument<1024> configData);
     void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
     StaticJsonDocument<1024> LoadConfig ();
-    void saveConfig (char *data);
+    void saveConfig (StaticJsonDocument<1024> configData);
+    void createConfigFile ();
     void writeJSONFile(char *data, String filename);
   
 private:
