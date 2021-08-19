@@ -25,7 +25,7 @@ Current status of the project can be viewed at
 
 No official support is offered for development versions however basic ESP32 installation information can be found at
 
-- [https://github.com/DeeEmm/DIY-Flow-Bench/wiki/3.-Installation](https://github.com/DeeEmm/DIY-Flow-Bench/wiki/3.-Installation)
+- [https://github.com/DeeEmm/DIY-Flow-Bench/wiki/3.-Installation](https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Installation)
 
 
 ## Further Information
