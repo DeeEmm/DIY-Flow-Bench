@@ -17,6 +17,8 @@ const GET_CAL = 14;
 
 var leakCalVal;
 var flowCalVal;
+var leakCalTolerance;
+var leakTestThreshold;
 
 var gateway = `ws://${window.location.hostname}/ws`;
 var websocket;
@@ -100,12 +102,20 @@ function onSocketMessageReceive(event) {
           if (key != "HEADER") {
             document.getElementById(key).innerHTML = myObj[key];
 
-            
              // console.log(key + ' : ' + myObj[key]);
-             // TODO leak test
-             //if (key == "PREF"  && flow < someval && myObj[key] > (cal_flow + margin)) {
-               // change pref colour
-             //}
+             
+             // leak test
+             if (key == "PREF"){
+                if (myObj[key] > (leakCalVal - leakCalTolerance)) {
+                  // change pref colour
+                  document.getElementById("PREF").className = "prefTestOK";
+                } else if (myObj[key] > leakTestThreshold) {
+                  // change pref colour back
+                  document.getElementById("PREF").className = "prefTestNOK";
+                } else {
+                  document.getElementById("PREF").className = "tile-value";
+                }
+             }
            }
         } catch (error) {
           console.log('Missing or incorrect data parameter(s)');
@@ -113,22 +123,21 @@ function onSocketMessageReceive(event) {
       }    
     break;
     
-    case GET_CAL: 
-    
-      //for (key in myObj) {
-        //try {
-    
-        leakCalVal = myObj.leak_test;
-        flowCalVal = myObj.flow_offset;
-         
-      //} catch (error) {
-         //console.log(error);
-         // console.log('Missing or incorrect system status');
-      //}
-      //document.getElementById('file_list').innerHTML = fileList;
-      //} 
-
-     
+    case GET_CAL:
+      console.log("get-cal");
+      for (key in myObj) {
+        console.log(key);
+        try {
+          if (key != "HEADER") {
+            document.getElementById(key).value = myObj[key];
+             console.log(key + ' : ' + myObj[key]);
+           } 
+           if (key == "FLOW_OFFSET") flowCalVal = myObj[key];
+           if (key == "LEAK_CAL_VAL") leakCalVal = myObj[key];
+        } catch (error) {
+          console.log('Missing or incorrect calibration parameter(s)');
+        }
+      }    
     break;
     
     case FILE_LIST: 
@@ -202,11 +211,8 @@ function onLoad(event) {
   switch (modal) {
   
     case "upload":
-      
       document.getElementById("load-config-button").click();
       document.getElementById('fileModal').style.display='block';
-      
-     
     break;
     
     default:
@@ -224,7 +230,10 @@ function onLoad(event) {
 function initialiseButtons() {
   
   document.getElementById('refresh-button').addEventListener('click', function(){socketMessageSend(GET_FLOW_DATA);});
-  document.getElementById('load-config-button').addEventListener('click', function(){socketMessageSend(LOAD_CONFIG);});
+  document.getElementById('load-config-button').addEventListener('click', function(){
+    socketMessageSend(LOAD_CONFIG);
+    socketMessageSend(GET_CAL);
+  });
   document.getElementById('calibrate-button').addEventListener('click', function(){socketMessageSend(CALIBRATE);});
   document.getElementById('leak-cal-button').addEventListener('click', function(){socketMessageSend(LEAK_CAL);});
   document.getElementById('save-config-button').addEventListener('click', function(){socketMessageSend(SAVE_CONFIG);});
@@ -339,8 +348,12 @@ function socketMessageSend(message){
       jsonMessage ='{\"HEADER\":\"' + STOP_BENCH + '\"}';
     break;
     
-    case LEAK_CAL: // HEADER:3
+    case LEAK_CAL: // HEADER:13
       jsonMessage ='{\"HEADER\":\"' + LEAK_CAL + '\"}';
+    break;
+
+    case GET_CAL: // HEADER:14
+      jsonMessage ='{\"HEADER\":\"' + GET_CAL + '\"}';
     break;
 
 

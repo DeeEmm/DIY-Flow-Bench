@@ -7,13 +7,11 @@
 *.vs
 .nova/*
 .pio/*
-/GUI/.vs
-/GUI/DiyFlowBench.Api/obj
-/GUI/DiyFlowBench.Api.Test/obj/Debug/netcoreapp3.1
-/GUI/DiyFlowBench.Api.Test/obj
+GUI/
 ESP32/DIY-Flow-Bench/.pio/*
 ESP32/DIY-Flow-Bench/build/*
 ESP32/DIY-Flow-Bench/.nova/*
 Arduino/DIY-Flow-Bench/node_modules/*
 platformio.ini
 /ESP32/DIY-Flow-Bench/sketch.json
+node_modules/

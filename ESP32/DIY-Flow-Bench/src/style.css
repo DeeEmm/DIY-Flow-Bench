@@ -434,3 +434,18 @@ svg.graph .labels.y-labels {
 
 
 
+/***
+* TESTS 
+*/
+
+.prefTestOK {
+  color: lightgreen; 
+  font-size: 2.1rem;
+  font-weight: bold;
+}
+
+.prefTestNOK {
+  color: red; 
+  font-size: 2.1rem;
+  font-weight: bold;
+}

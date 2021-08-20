@@ -25,6 +25,7 @@ class Messages {
 		Messages();
 		void Handler(String languageString);
 		void DebugPrint(String message);
+		void DebugPrintLn(String message);
 		void SerialPrint (String message);
 		void SerialPrintLn (String message);
 		

@@ -3,7 +3,7 @@
 	<HEAD>
       <title>DIY Flow Bench</title>
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <link rel="stylesheet" type="text/css" href="style.css">    
+      <link rel="stylesheet" type="text/css" href="style.css">
 	</HEAD>
 	<BODY>
 
@@ -252,13 +252,14 @@
         <div class="config-row tooltip"><label class="config-label">Orifice Flow Rate:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="CONF_CAL_FLOW_RATE" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice</span></div>
         <div class="config-row tooltip"><label class="config-label">Orifice Test Pressure:</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="CONF_CAL_REF_PRESS" class="config-text"><span class="tooltiptext">Reference pressure of calibration orifice</span></div>
         <div class="config-row tooltip"><label class="config-label">Leak Test Tolerance:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_TOLERANCE" name="CONF_LEAK_TEST_TOLERANCE" value="CONF_LEAK_TEST_TOLERANCE" class="config-text"><span class="tooltiptext">Maximum allowable deviation in cfm</span></div>
+        <div class="config-row tooltip"><label class="config-label">Leak Test Threshold:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_THRESHOLD" name="CONF_LEAK_TEST_THRESHOLD" value="CONF_LEAK_TEST_THRESHOLD" class="config-text"><span class="tooltiptext">Value above which leak test activates</span></div>
         <br>
         <div class="float-right"><button id="save-config-button" class="button">Save</button></div>
         <br>
         <br>
         <h3>Calibration Data</h3>
-        <div class="config-row tooltip"><label class="config-label">Calibration Offset:</label>&nbsp;<input disabled="disabled" type="text" id="CONF_CAL_OFFSET" name="CONF_CAL_OFFSET" value="CONF_CAL_OFFSET" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
-        <div class="config-row tooltip"><label class="config-label">Leak Test Value:</label>&nbsp;<input disabled="disabled" type="text" id="CONF_CAL_LEAK" name="CONF_CAL_LEAK" value="CONF_CAL_LEAK" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
+        <div class="config-row tooltip"><label class="config-label">Calibration Offset:</label>&nbsp;<input disabled="disabled" type="text" id="FLOW_OFFSET" name="FLOW_OFFSET" value="FLOW_OFFSET" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
+        <div class="config-row tooltip"><label class="config-label">Leak Test Value:</label>&nbsp;<input disabled="disabled" type="text" id="LEAK_CAL_VAL" name="LEAK_CAL_VAL" value="LEAK_CAL_VAL" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
 
         <br>
         <div class="float-right"><button id="calibrate-button" class="button">Calibrate Flow Offset</button><button id="leak-cal-button" class="button">Calibrate Leak Test</button></div>
@@ -267,8 +268,6 @@
       </div>                    
     </div>
     </form>
-        
-    
-    <script src="/javascript.js"></script>  
+    <script src="/javascript.js"></script>
   </BODY>
 </HTML>

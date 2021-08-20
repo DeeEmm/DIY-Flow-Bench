@@ -33,7 +33,7 @@ class Calibration {
 		float getLeakTestPressure();
 		void createCalibrationFile();
 		void saveCalibration();
-		void loadCalibration();
+		StaticJsonDocument<1024> loadCalibration();
 		void parseCalibrationData(StaticJsonDocument<1024>  calibrationData);
 
 	

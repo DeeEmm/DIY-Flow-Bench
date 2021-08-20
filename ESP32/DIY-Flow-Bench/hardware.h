@@ -29,4 +29,6 @@ class Hardware {
 		bool benchIsRunning();	
 		void checkRefPressure();
 		
+	private:
+		void configurePins ();
 };

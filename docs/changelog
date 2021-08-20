@@ -197,3 +197,6 @@ Build #         - Description of Change
 21081902        - #75 Auto create config / calibration json file(s) if not exists
                 - Minor code tidying
                 - Updated README
+21082001        - Added vac control O/P
+                - #75 Fixed calibration data handling
+                

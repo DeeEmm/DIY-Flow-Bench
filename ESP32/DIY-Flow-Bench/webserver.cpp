@@ -51,10 +51,13 @@ Webserver::Webserver() {
 ***/
 void Webserver::SendWebSocketMessage(String jsonValues) {
   
-  extern AsyncWebSocket ws;
+  Messages _message;
+  _message.DebugPrintLn("Webserver::SendWebSocketMessage");
+  _message.DebugPrintLn(String(jsonValues));
   
+  extern AsyncWebSocket ws;
   ws.textAll(String(jsonValues));
-
+  
 }
 
 
@@ -64,7 +67,7 @@ void Webserver::SendWebSocketMessage(String jsonValues) {
 
 
 /***********************************************************
-* Process Websocket Message
+* Process Received Websocket Message
 ***/
 void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   
@@ -92,36 +95,25 @@ void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     
     data[len] = 0;
-    StaticJsonDocument<1024> configMessage;
-    StaticJsonDocument<1024> configHeader;  
-    StaticJsonDocument<1024> concatMessage;  
-    
-    String configMessageString;
+    StaticJsonDocument<1024> jsonMessage;
+    String jsonMessageString;
 
-    Serial.print("HEADER: ");
-    Serial.println(header);
+    _message.DebugPrint("Websocket header received: '");
+    _message.DebugPrint(String(header));
+    _message.DebugPrintLn("'");
 
     switch (header) {
 
-      case GET_FLOW_DATA:
-        Serial.println("Get Data");
+      case GET_FLOW_DATA: // HEADER: 1 
+        _message.DebugPrintLn("Get Data");
         SendWebSocketMessage(_webserver.getDataJSON());
       break;      
-
-      case SAVE_CONFIG:
-        Serial.println("Save Config");
-        _settings.saveConfig(messageData);
-        
-      case LOAD_CONFIG:
-        Serial.println("Load Config");
-        configMessage = _settings.LoadConfig();
-        configMessage["HEADER"] = LOAD_CONFIG; 
-        serializeJson(configMessage, configMessageString);
-        SendWebSocketMessage(configMessageString);      
-      break;      
-
-      case CALIBRATE:
-        Serial.println("Calibrate");
+      
+      case REC_FLOW_DATA: // HEADER: 2 
+      break;
+      
+      case CALIBRATE: // HEADER: 3 
+        _message.DebugPrintLn("Calibrate");
         if (_hardware.benchIsRunning()){          
           _calibration.setFlowOffset();
           // send new calibration to the browser
@@ -129,11 +121,65 @@ void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         } else {
           _message.Handler(LANG_RUN_BENCH_TO_CALIBRATE);        
         }
+      break;
+      
+      case FILE_LIST: // HEADER: 4 
+        _message.DebugPrintLn("File List");
+        SendWebSocketMessage(_webserver.getFileListJSON());      
+      break;      
+         
+      case SYS_STATUS: // HEADER: 5 
+        _message.DebugPrintLn("Send Status");
+        SendWebSocketMessage(_webserver.getSystemStatusJSON());      
+      break;  
 
+      case SAVE_CONFIG: // HEADER: 6 
+        _message.DebugPrintLn("Save Config");
+        _settings.saveConfig(messageData);
+        
+      case LOAD_CONFIG: // HEADER: 7 
+        _message.DebugPrintLn("Load Config");
+        jsonMessage = _settings.LoadConfig();
+        jsonMessage["HEADER"] = LOAD_CONFIG; 
+        serializeJson(jsonMessage, jsonMessageString);
+        SendWebSocketMessage(jsonMessageString);      
       break;      
 
-      case LEAK_CAL:
-        Serial.println("Leak Test Calibration");
+      case FILE_DOWNLOAD: // HEADER: 8 
+        // NOTE: https://github.com/DeeEmm/DIY-Flow-Bench/issues/71#issuecomment-893104615        
+      break;  
+ 
+      case FILE_DELETE: // HEADER: 9 
+        _message.DebugPrintLn("File Delete: ");
+        socketData.file_name = messageData["FILENAME"].as<String>();  
+        Serial.println(socketData.file_name);
+        if(SPIFFS.exists(socketData.file_name)){
+          SPIFFS.remove(socketData.file_name);
+        }  else {
+          _message.DebugPrintLn("Delete Failed: ");      
+          _message.DebugPrintLn(socketData.file_name);  
+        } 
+        SendWebSocketMessage(_webserver.getFileListJSON());      
+      break;  
+
+      case FILE_UPLOAD: // HEADER: 10 
+                
+      break;
+
+      case START_BENCH: // HEADER: 11 
+        _message.DebugPrintLn("Start Bench");
+        status.liveStream = true;
+        digitalWrite(VAC_BANK_1, HIGH);
+      break;     
+      
+      case STOP_BENCH: // HEADER: 12 
+        _message.DebugPrintLn("Stop Bench");
+        status.liveStream = false;   
+        digitalWrite(VAC_BANK_1, LOW);   
+      break;  
+
+      case LEAK_CAL: // HEADER: 13 
+        _message.DebugPrintLn("Leak Test Calibration");
         if (_hardware.benchIsRunning()){          
           _calibration.setLeakTestPressure();
           // send new calibration to the browser
@@ -141,54 +187,24 @@ void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         } else {
           _message.Handler(LANG_RUN_BENCH_TO_CALIBRATE);        
         }
+      break;         
       
-      break;      
-      
-
-      case FILE_LIST:
-        Serial.println("File List");
-        SendWebSocketMessage(_webserver.getFileListJSON());      
-      break;      
-
-      case SYS_STATUS:
-        Serial.println("Send Status");
-        SendWebSocketMessage(_webserver.getSystemStatusJSON());      
-      break;      
-
-
-      case FILE_DELETE:
-        Serial.print("File Delete: ");
-        socketData.file_name = messageData["FILENAME"].as<String>();  
-        Serial.println(socketData.file_name);
-        if(SPIFFS.exists(socketData.file_name)){
-          SPIFFS.remove(socketData.file_name);
-        }  else {
-          Serial.print("Delete Failed: ");      
-          Serial.println(socketData.file_name);  
-        } 
-        SendWebSocketMessage(_webserver.getFileListJSON());      
-      break;      
-
-      case FILE_DOWNLOAD:
-        // NOTE: https://github.com/DeeEmm/DIY-Flow-Bench/issues/71#issuecomment-893104615        
-      break;      
-      
-      case START_BENCH:
-        status.liveStream = true;
-        // TODO: Relay output active
-      break;
-      
-      case STOP_BENCH:
-        status.liveStream = false;   
-        // TODO: Relay output disabled   
-      break;
+      case GET_CAL: // HEADER: 14 
+        _message.DebugPrintLn("Send Calibration");
+        jsonMessage = _calibration.loadCalibration();
+        jsonMessage["HEADER"] = GET_CAL; 
+        serializeJson(jsonMessage, jsonMessageString);
+        SendWebSocketMessage(jsonMessageString);            
+      break;     
 
       default:
-        Serial.println("Unrecognised Message");
+        _message.DebugPrintLn("Unrecognised Websocket Header");
+        _message.DebugPrint("HEADER: '");
+        _message.DebugPrint(String(header));
+        _message.DebugPrintLn("'");
       break;
 
     }
-
 
     if (strcmp((char*)data, "getValues") == 0) {
       SendWebSocketMessage(_webserver.getDataJSON());
@@ -675,7 +691,7 @@ void Webserver::writeJSONFile(String data, String filename) {
   StaticJsonDocument<1024> jsonData;
   DeserializationError error = deserializeJson(jsonData, data);
 
-  //_message.DebugPrint("Writing JSON file...");  
+  //_message.DebugPrintLn("Writing JSON file...");  
 
   File outputFile = SPIFFS.open(filename, FILE_WRITE);
   serializeJsonPretty(jsonData, outputFile);
@@ -700,12 +716,12 @@ StaticJsonDocument<1024> Webserver::loadJSONFile(String filename) {
   
     if (!jsonFile) {
         _message.Handler(LANG_ERROR_LOADING_FILE);
-        _message.DebugPrint("Failed to open file for reading");
+        _message.DebugPrintLn("Failed to open file for reading");
     } else {
         size_t size = jsonFile.size();
         if (size > 1024) {
           #ifdef DEBUG 
-            _message.DebugPrint("Config file size is too large");
+            _message.DebugPrintLn("Config file size is too large");
           #endif
           exit;
         }
@@ -715,8 +731,8 @@ StaticJsonDocument<1024> Webserver::loadJSONFile(String filename) {
         
         DeserializationError error = deserializeJson(jsonData, jsonFile);
         if (error) {
-          _message.DebugPrint("loadJSONFile->deserializeJson() failed: ");
-          _message.DebugPrint(error.f_str());
+          _message.DebugPrintLn("loadJSONFile->deserializeJson() failed: ");
+          _message.DebugPrintLn(error.f_str());
         }
         
         jsonFile.close();
@@ -728,6 +744,6 @@ StaticJsonDocument<1024> Webserver::loadJSONFile(String filename) {
     }    
     jsonFile.close();
   } else {
-    _message.DebugPrint("File missing");
+    _message.DebugPrintLn("File missing");
   }
 }

@@ -44,6 +44,7 @@ struct ConfigSettings {
   float cal_offset = 0;                     // Calibration offset
   int cyc_av_buffer = 5;                    // Scan # over which to average output (helps smooth results)
   int leak_test_tolerance = 2;              // Leak test tolerance
+  int leak_test_threshold = 10;             // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
   bool show_alarms = true;                  // Display Alarms?
   bool debug_mode = true;
   bool api_enabled = true;
@@ -58,7 +59,7 @@ struct ConfigSettings {
  ***/
 struct CalibrationSettings { 
   float flow_offset = 0.0;         
-  float leak_test = 0.0;  
+  float leak_cal_val = 0.0;  
 };
 
 

@@ -81,11 +81,26 @@ void Messages::DebugPrint(String message) {
 	extern struct ConfigSettings config;
 
 	if (config.debug_mode) {
-		this->SerialPrintLn(message);
+		this->SerialPrint(message);
 	}
 		
 }
 
+
+
+
+/***********************************************************
+* DebugPrintLn
+*/
+void Messages::DebugPrintLn(String message) {
+
+	extern struct ConfigSettings config;
+
+	if (config.debug_mode) {
+		this->SerialPrintLn(message);
+	}
+		
+}
 
 
 /***********************************************************

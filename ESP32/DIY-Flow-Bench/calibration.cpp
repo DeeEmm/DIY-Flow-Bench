@@ -106,7 +106,7 @@ bool Calibration::setLeakTestPressure() {
   extern struct CalibrationSettings calibration;
   Maths _maths;
   
-  calibration.leak_test = _maths.calculateRefPressure(INWG);  
+  calibration.leak_cal_val = _maths.calculateRefPressure(INWG);  
 
   return true;
 }
@@ -122,7 +122,7 @@ float Calibration::getLeakTestPressure() {
   
   loadCalibration();
   
-  return calibration.leak_test;
+  return calibration.leak_cal_val;
 
 }
 
@@ -143,10 +143,10 @@ void Calibration::createCalibrationFile () {
   String jsonString;
   StaticJsonDocument<1024> calibrationData;
   
-  _message.DebugPrint("Creating cal.json file..."); 
+  _message.DebugPrintLn("Creating cal.json file..."); 
   
   calibrationData["FLOW_OFFSET"] = calibration.flow_offset;
-  calibrationData["LEAK_TEST"] = calibration.leak_test;
+  calibrationData["LEAK_CAL_VAL"] = calibration.leak_cal_val;
   
   serializeJsonPretty(calibrationData, jsonString);
   _webserver.writeJSONFile(jsonString, "/cal.json");
@@ -170,7 +170,7 @@ void Calibration::saveCalibration() {
   StaticJsonDocument<1024> calibrationData;
     
   calibrationData["flow_offset"] = calibration.flow_offset; 
-  calibrationData["leak_test"] = calibration.leak_test; 
+  calibrationData["leak_cal_val"] = calibration.leak_cal_val; 
 
   _message.Handler(LANG_SAVING_CALIBRATION);
   
@@ -186,12 +186,14 @@ void Calibration::saveCalibration() {
 /***********************************************************
 * Parse Calibration Data
 ***/
-void Calibration::parseCalibrationData(StaticJsonDocument<1024>  calibrationData) {
+void Calibration::parseCalibrationData(StaticJsonDocument<1024> calibrationData) {
 
   extern struct CalibrationSettings calibration;  
+  Messages _message;
+  _message.DebugPrintLn("Calibration::parseCalibrationData");
   
   calibration.flow_offset = calibrationData["FLOW_OFFSET"].as<float>();
-  calibration.leak_test = calibrationData["LEAK_TEST"].as<float>();
+  calibration.leak_cal_val = calibrationData["LEAK_CAL_VAL"].as<float>();
   
 }
 
@@ -201,16 +203,14 @@ void Calibration::parseCalibrationData(StaticJsonDocument<1024>  calibrationData
 * loadCalibration
 * Read calibration data from cal.json file
 ***/
-void Calibration::loadCalibration () {
+StaticJsonDocument<1024> Calibration::loadCalibration () {
 
   Webserver _webserver;
+  Messages _message;
+  _message.DebugPrintLn("Calibration::loadCalibration");
   
   StaticJsonDocument<1024> calibrationData;
-  
   calibrationData = _webserver.loadJSONFile("/cal.json");
-  
   parseCalibrationData(calibrationData);
-
+  return calibrationData;
 }
-
-

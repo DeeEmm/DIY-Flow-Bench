@@ -355,6 +355,7 @@ float Maths::convertMassFlowToVolumetric(float massFlowKgh) {
 float Maths::calculateMafFlowCFM() {
 	
 	extern struct ConfigSettings config;
+	extern CalibrationSettings calibration;
 	 
 //	float calibrationOffset;
 	float mafFlowRateCFM;
@@ -436,7 +437,7 @@ float Maths::calculateMafFlowCFM() {
 
 
 	// convert kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
-	mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH);// + calibrationOffset; // add calibration offset to value 
+	mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH) + calibration.flow_offset; // add calibration offset to value 
 	//TODO: #21 Need to validate and test calibration routine
 
 	if (streamMafData == true) {

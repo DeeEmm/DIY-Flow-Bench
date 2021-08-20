@@ -42,9 +42,25 @@ Hardware::Hardware() {
  // TODO: Need to move ALL hardware initialisation into here
  
  ***/
+ void Hardware::configurePins () {
+   
+    pinMode(VAC_BANK_1, OUTPUT);
+ 
+ }
+
+
+/***********************************************************
+ * INITIALISE HARDWARE
+ 
+ // TODO: Need to move ALL hardware initialisation into here
+ 
+ ***/
  void Hardware::Initialise () {
  
   Messages _message;
+  
+  configurePins();
+  
 
   // Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
   // https://github.com/adafruit/Adafruit_BME280_Library
@@ -55,9 +71,9 @@ Hardware::Hardware() {
     //I2C address - BME280_I2C_ADDR
     if (!adafruitBme280.begin()) {  
       _message.Handler(LANG_BME280_READ_FAIL);
-      _message.DebugPrint("Adafruit BME280 Initialisation failed");      
+      _message.DebugPrintLn("Adafruit BME280 Initialisation failed");      
     } else {
-      _message.DebugPrint("Adafruit BME280 Initialised");      
+      _message.DebugPrintLn("Adafruit BME280 Initialised");      
     }
   #endif
 
@@ -73,9 +89,9 @@ Hardware::Hardware() {
     if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
     {
       _message.Handler(LANG_BME280_READ_FAIL);
-      _message.DebugPrint("Sparkfun BME280 Initialisation failed");      
+      _message.DebugPrintLn("Sparkfun BME280 Initialisation failed");      
     } else {
-      _message.DebugPrint("Sparkfun BME280 Initialised");      
+      _message.DebugPrintLn("Sparkfun BME280 Initialised");      
     }
   #endif
 

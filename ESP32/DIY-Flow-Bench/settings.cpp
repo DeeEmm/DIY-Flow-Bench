@@ -55,6 +55,7 @@ void Settings::parseConfigData(StaticJsonDocument<1024> configData) {
   config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
 //  config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
   config.leak_test_tolerance = configData["CONF_LEAK_TEST_TOLERANCE"].as<int>();
+  config.leak_test_threshold = configData["CONF_LEAK_TEST_THRESHOLD"].as<int>();
   config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<float>();
   config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<float>();
 //  config.cal_offset = configData["CONF_CAL_OFFSET"].as<float>();
@@ -72,6 +73,9 @@ void Settings::parseConfigData(StaticJsonDocument<1024> configData) {
 StaticJsonDocument<1024> Settings::LoadConfig () {
 
   Webserver _webserver;
+  Messages _message;
+  _message.DebugPrintLn("Settings::LoadConfig"); 
+  
   StaticJsonDocument<1024> configData;
   configData = _webserver.loadJSONFile("/config.json");
   parseConfigData(configData);
@@ -96,7 +100,7 @@ void Settings::createConfigFile () {
   String jsonString;  
   StaticJsonDocument<1024> configData;
 
-  _message.DebugPrint("Creating config.json file..."); 
+  _message.DebugPrintLn("Creating config.json file..."); 
  
   configData["CONF_WIFI_SSID"] = config.wifi_ssid;
   configData["CONF_WIFI_PSWD"] = config.wifi_pswd;
@@ -112,6 +116,7 @@ void Settings::createConfigFile () {
   configData["CONF_API_DELIM"] = config.api_delim;
   configData["CONF_SERIAL_BAUD_RATE"] = config.serial_baud_rate;
   configData["CONF_LEAK_TEST_TOLERANCE"] = config.leak_test_tolerance;
+  configData["CONF_LEAK_TEST_THRESHOLD"] = config.leak_test_threshold;
   configData["CONF_CAL_REF_PRESS"] = config.cal_ref_press;
   configData["CONF_CAL_FLOW_RATE"] = config.cal_flow_rate;
   
@@ -139,9 +144,9 @@ void Settings::saveConfig (StaticJsonDocument<1024> configData) {
   configData.remove("HEADER");
   
   _message.Handler(LANG_SAVING_CONFIG);
-  _message.DebugPrint("Configuration Data:");
+  _message.DebugPrintLn("Configuration Data:");
   serializeJson(configData, Serial);
-  _message.DebugPrint("Saved to /config.json");
+  _message.DebugPrintLn("Saved to /config.json");
   
   serializeJsonPretty(configData, jsonString);
   _webserver.writeJSONFile(jsonString, "/config.json");
