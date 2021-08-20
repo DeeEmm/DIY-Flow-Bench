@@ -16,7 +16,7 @@
  * 
  ***/
 
-#include "API.h";
+#include "API.h"
 
 #include "constants.h"
 #include "structs.h"
@@ -31,7 +31,7 @@
 
 #include LANGUAGE_FILE
 
-// extern struct ConfigSettings config;
+extern struct ConfigSettings config;
 // extern struct CalibrationSettings calibration;
 // extern struct DeviceStatus status;
 
@@ -77,6 +77,7 @@ uint16_t API::calcCRC (char* str) {
  * 'N' - Return HOSTNAME
  * 'J' - Return JSON
  * Debug Commands
+ * '!' - Enables Verbose messaging
  * 'M' - Return MAF Data (NOTE: will only return data if flow > 0)
  * 'D' - Debug MAF on
  * 'd' - Debug MAF off
@@ -243,6 +244,17 @@ void API::ParseMessage(char apiMessage) {
       case 'J': // JSON Data
           status.statusMessage = String("J") + config.api_delim + _webserver.getDataJSON();
       break;
+      
+      case '!': // Debug Mode (enable verbose debug messages)
+        if (config.debug_mode == true){
+          config.debug_mode = false;
+          status.statusMessage = String("Debug Mode Off");
+        } else {
+          config.debug_mode = true;
+          status.statusMessage = String("Debug Mode On");
+        }
+        
+      break;
 
 
       // We've got here without a valid API request so lets get outta here before we send garbage to the serial comms
@@ -252,6 +264,7 @@ void API::ParseMessage(char apiMessage) {
 
       
   }
+  
 
   // Append delimiter to message data
   status.statusMessage += config.api_delim ;
@@ -262,10 +275,10 @@ void API::ParseMessage(char apiMessage) {
   // Send API Response
   #if defined DISABLE_API_CHECKSUM
         _message.DebugPrintLn(status.statusMessage + "\r\n");
-        _message.Handler(status.statusMessage + "\r\n");
+        // _message.Handler(status.statusMessage + "\r\n");
   #else
         _message.DebugPrintLn(status.statusMessage + calcCRC(serialResponse) + "\r\n");
-        _message.Handler(status.statusMessage + calcCRC(serialResponse) +  "\r\n");
+        // _message.Handler(status.statusMessage + calcCRC(serialResponse) +  "\r\n");
   #endif
 
 }

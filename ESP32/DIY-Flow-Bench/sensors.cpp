@@ -25,6 +25,7 @@
 #include "structs.h"
 #include "sensors.h"
 #include LANGUAGE_FILE
+#include MAF_SENSOR_FILE
 
 
 

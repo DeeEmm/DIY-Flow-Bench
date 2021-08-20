@@ -25,6 +25,7 @@
 /***********************************************************
 * SYSTEM SETTINGS
 ***/
+#define BOOT_MESSAGE "May the flow be with you..."
 #define showAlarms true
 #define MIN_REFRESH_RATE 200
 #define LANGUAGE_FILE "language/EN_Language.h"
@@ -81,13 +82,13 @@
 ***/
     
 // Uncomment One line only
-#define MAF_SENSOR_TYPE "mafData/ACDELCO_ 92281162.h" 
-// #define MAF_SENSOR_TYPE  "MH95-3000-100"                 // PMAS MH95-3000 in 100mm housing              
-// #define MAF_SENSOR_TYPE "mafData/SIEMENS_5WK9605"        // Data from Tonys tests
-// #define MAF_SENSOR_TYPE  "mafData/DELPHI_AF10118"        // kg/hr - Data from efidynotuning.com/maf.htm 
-// #define MAF_SENSOR_TYPE  "mafData/exampleKeyValueData"   // Example key > value data file 
-// #define MAF_SENSOR_TYPE  "mafData/exampleAnalogData"     // Example Analog point data file 
-// #define MAF_SENSOR_TYPE  "mafData/TEST"                  // Test Data
+#define MAF_SENSOR_FILE "mafData/ACDELCO_ 92281162.h" 
+// #define MAF_SENSOR_FILE  "MH95-3000-100"                 // PMAS MH95-3000 in 100mm housing              
+// #define MAF_SENSOR_FILE "mafData/SIEMENS_5WK9605"        // Data from Tonys tests
+// #define MAF_SENSOR_FILE  "mafData/DELPHI_AF10118"        // kg/hr - Data from efidynotuning.com/maf.htm 
+// #define MAF_SENSOR_FILE  "mafData/exampleKeyValueData"   // Example key > value data file 
+// #define MAF_SENSOR_FILE  "mafData/exampleAnalogData"     // Example Analog point data file 
+// #define MAF_SENSOR_FILE  "mafData/TEST"                  // Test Data
 
 
 
@@ -113,8 +114,8 @@
 ***/
 
 // Uncomment One line only
-#define PITOT_SENSOR_NOT_USED;
-// #define PITOT_SENSOR_TYPE_MPXV7007DP;
+#define PITOT_SENSOR_NOT_USED
+// #define PITOT_SENSOR_TYPE_MPXV7007DP
 
 /***********************************************************
 * CONFIGURE BARO SENSOR

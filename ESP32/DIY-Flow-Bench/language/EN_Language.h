@@ -29,5 +29,4 @@
 #define LANG_START_REF_PRESSURE     "Using Startup Ref Pressure"
 #define LANG_FIXED_VALUE            "Fixed value: "
 //                                  -----------------
-#define LANG_SAVING_CONFIG          "Saving Config..."
 #define LANG_RUN_BENCH_TO_CALIBRATE "Bench must be running to calibrate"

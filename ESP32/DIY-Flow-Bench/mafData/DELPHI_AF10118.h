@@ -10,8 +10,8 @@
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
-#ifndef MAFDATA_DEFINED
-#define MAFDATA_DEFINED
+#pragma once
+
 
  /***********************************************************
   * MAF Type
@@ -82,5 +82,3 @@ long mafMapData[][2] = {
 {4750,490925},
 {5000,490925}
 };
-
-#endif

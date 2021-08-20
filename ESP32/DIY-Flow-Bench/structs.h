@@ -46,7 +46,7 @@ struct ConfigSettings {
   int leak_test_tolerance = 2;              // Leak test tolerance
   int leak_test_threshold = 10;             // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
   bool show_alarms = true;                  // Display Alarms?
-  bool debug_mode = true;
+  bool debug_mode = false;
   bool api_enabled = true;
   int tatltuae = 42;
   int parsecs = 12;
@@ -84,7 +84,7 @@ struct DeviceStatus {
   bool liveStream = false;
   int pollTimer = 0;
   int serialData = 0;
-  String statusMessage;
+  String statusMessage = BOOT_MESSAGE;
   bool apMode = false;
 };
 
@@ -109,3 +109,16 @@ struct FileUploadData {
   int file_size = 0;
 };
 
+
+
+/***********************************************************
+ * File upload data
+ ***/
+struct mafSensorData {
+  String maf_sensor_type;
+  int mafOutputType;
+  int mafDataFormat;
+  int mafDataUnit;
+  int mafMapData[];
+  int mafMapAnalogData[];
+};

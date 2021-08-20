@@ -199,4 +199,6 @@ Build #         - Description of Change
                 - Updated README
 21082001        - Added vac control O/P
                 - #75 Fixed calibration data handling
-                
+21082002        - #78 Added Debug mode to API (Verbose messaging)
+                - Updated several compiler errors from WIN compiler
+                - 

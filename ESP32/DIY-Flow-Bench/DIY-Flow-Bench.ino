@@ -52,7 +52,9 @@ CalibrationSettings calibration;
 DeviceStatus status;
 WebsocketData socketData;
 FileUploadData fileUploadData;
+mafSensorData mafData;
 
+#include MAF_SENSOR_FILE
 #include LANGUAGE_FILE
 
 #include "settings.h"

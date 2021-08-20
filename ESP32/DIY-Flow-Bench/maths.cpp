@@ -23,8 +23,9 @@
 #include "pins.h"
 #include "structs.h"
 #include "hardware.h"
-#include MAF_SENSOR_TYPE
+#include MAF_SENSOR_FILE
 
+const float MOLECULAR_WEIGHT_DRY_AIR = 28.964;
 
 Maths::Maths() {
 
@@ -42,12 +43,12 @@ float Maths::calculateBaroPressure(int units) {
 
 	float baroPressureKpa;
 	float baroPressurePsia;
-	float baroPressureRaw;
-	float refTempRaw;
-	float refAltRaw;
-	int supplyMillivolts = _hardware.getSupplyMillivolts();
-	int rawBaroValue = analogRead(REF_BARO_PIN);
-	int baroMillivolts = (rawBaroValue * (5.0 / 1024.0)) * 1000;
+	// UNUSED: float baroPressureRaw;
+	// UNUSED: float refTempRaw;
+	// UNUSED: float refAltRaw;
+	// UNUSED: int supplyMillivolts = _hardware.getSupplyMillivolts();
+	// UNUSED: int rawBaroValue = analogRead(REF_BARO_PIN);
+	// UNUSED: int baroMillivolts = (rawBaroValue * (5.0 / 1024.0)) * 1000;
 
 	#ifdef BARO_SENSOR_TYPE_MPX4115
 		// Datasheet - https://html.alldatasheet.es/html-pdf/5178/MOTOROLA/MPX4115/258/1/MPX4115.html
@@ -82,7 +83,8 @@ float Maths::calculateBaroPressure(int units) {
 			return baroPressurePsia;
 		break;
 	}   
-
+	
+	return baroPressureKpa;
 }
 
 
@@ -95,14 +97,14 @@ float Maths::calculateRefPressure(int units) {
 	
 	Hardware _hardware;
 
-	float refPressureKpa;
+	float refPressureKpa = 0;
 	float refPressureInWg;
-	float refPressureRaw;
-	float refTempDegRaw;
-	float refAltRaw;
-	float supplyMillivolts = _hardware.getSupplyMillivolts();
-	int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
-	float refPressMillivolts = (rawRefPressValue * (5.0 / 1024.0)) * 1000;
+	// UNUSED: float refPressureRaw;
+	// UNUSED: float refTempDegRaw;
+	// UNUSED: float refAltRaw;
+	// UNUSED: float supplyMillivolts = _hardware.getSupplyMillivolts();
+	// UNUSED: int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
+	// UNUSED: float refPressMillivolts = (rawRefPressValue * (5.0 / 1024.0)) * 1000;
 
 	#ifdef PREF_SENSOR_TYPE_MPXV7007
 		// Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
@@ -158,6 +160,8 @@ float Maths::calculateRefPressure(int units) {
 		break;
 	}
 	
+	return refPressureKpa;
+	
 }
 
 
@@ -168,15 +172,15 @@ float Maths::calculateRefPressure(int units) {
  ***/
 float Maths::calculateTemperature(int units) {   
 	
-	float refAltRaw;
-	float refPressureRaw;
-	float refTempRaw;
+	// UNUSED: float refAltRaw;
+	// UNUSED: float refPressureRaw;
+	// UNUSED: float refTempRaw;
 	float refTempDegC;
 	float refTempDegF;
 	float refTempRankine;
-	float relativeHumidity;
-	byte refTemp;
-	byte refRelh;
+	// UNUSED: float relativeHumidity;
+	// UNUSED: byte refTemp;
+	// UNUSED: byte refRelh;
 
 
 	#ifdef TEMP_SENSOR_TYPE_ADAFRUIT_BME280
@@ -216,6 +220,8 @@ float Maths::calculateTemperature(int units) {
 			return refTempRankine;
 		break;
 	}   
+	
+	return refTempDegC;
 }
 
 
@@ -226,9 +232,9 @@ float Maths::calculateTemperature(int units) {
 float Maths::calculateRelativeHumidity(int units) {   
 	
 	float relativeHumidity;
-	float tempDegC;
-	byte refTemp;
-	byte refRelh;
+	// UNUSED: float tempDegC;
+	// UNUSED: byte refTemp;
+	// UNUSED: byte refRelh;
 
 	#ifdef RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
@@ -263,6 +269,8 @@ float Maths::calculateRelativeHumidity(int units) {
 
 
 	}  
+	
+	return relativeHumidity;
 
 }  
 	
@@ -277,7 +285,7 @@ float Maths::calculateVaporPressure(int units) {
 	 
 	 
 	float airTemp = this->calculateTemperature(DEGC);
-	float molecularWeightOfDryAir = 28.964;
+	// UNUSED: float molecularWeightOfDryAir = 28.964;
 	float vapourPressureKpa =(0.61078 * exp((17.27 * airTemp)/(airTemp + 237.3))); // Tetans Equasion
 	float vapourPressurePsia;
 
@@ -292,6 +300,8 @@ float Maths::calculateVaporPressure(int units) {
 			return vapourPressurePsia;
 		break;
 	}   
+	
+	return vapourPressureKpa;
 
 }  
 	
@@ -356,10 +366,11 @@ float Maths::calculateMafFlowCFM() {
 	
 	extern struct ConfigSettings config;
 	extern CalibrationSettings calibration;
+	extern int MAFoutputType;
 	 
 //	float calibrationOffset;
 	float mafFlowRateCFM;
-	float mafFlowRateKGH;
+	float mafFlowRateKGH = 0;
 	float mafFlowRateRAW;
 	int mafFlowRaw = analogRead(MAF_PIN);
 	float mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
@@ -469,15 +480,17 @@ float Maths::calculatePitotPressure(int units) {
 	 
 	float pitotPressureKpa = 0.00;
 	float pitotPressureInWg;
-	int supplyMillivolts = _hardware.getSupplyMillivolts() / 1000;
-	int rawPitotPressValue = analogRead(PITOT_PIN);     
-	int pitotPressMillivolts = (rawPitotPressValue * (5.0 / 1024.0)) * 1000;
+	
 
 	#ifdef PITOT_SENSOR_TYPE_MPXV7007DP
+	
+		float rawPitotPressValue = analogRead(PITOT_PIN);   
+		// UNUSED: int supplyMillivolts = _hardware.getSupplyMillivolts() / 1000;
+		// UNUSED: int pitotPressMillivolts = (rawPitotPressValue * (5.0 / 1024.0)) * 1000;
 		// sensor characteristics from datasheet
 		// Vout = VS x (0.057 x P + 0.5)
 
-		pitotPressureKpa = ((float)rawPitotPressValue / (float)1024 - 0.5) / 0.057;
+		pitotPressureKpa = (rawPitotPressValue / (float)1024 - 0.5) / 0.057;
 
 	#else
 		// No pitot probe used so lets return a zero value
@@ -497,6 +510,8 @@ float Maths::calculatePitotPressure(int units) {
 			return pitotPressureKpa;
 		break;
 	}
+	
+	return pitotPressureKpa;
 	
 }
 
