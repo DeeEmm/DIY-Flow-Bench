@@ -203,4 +203,5 @@ Build #         - Description of Change
                 - Updated several compiler errors from WIN compiler
                 - Converted mafData files to individual classes
                 - Created single header file mafData.h
+                - Created frequency based MAF Data files
                 

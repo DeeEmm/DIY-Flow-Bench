@@ -133,6 +133,6 @@ long MafData::getMafData() {
     {5000,315320}
     };
         
-    return mafLookupTable [1][2];
+    return mafLookupTable [][2];
  
 } 

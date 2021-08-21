@@ -14,4 +14,4 @@ ESP32/DIY-Flow-Bench/.nova/*
 Arduino/DIY-Flow-Bench/node_modules/*
 platformio.ini
 /ESP32/DIY-Flow-Bench/sketch.json
-node_modules/
+node_modules/*

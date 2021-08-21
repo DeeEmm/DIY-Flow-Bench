@@ -60,7 +60,7 @@ FileUploadData fileUploadData;
 #include LANGUAGE_FILE
 
 //test
-//#include "mafData/ACDELCO_92281162.h"
+//#include "mafData/ACDELCO-92281162.h"
 
 #include "settings.h"
 #include "hardware.h"

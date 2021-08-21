@@ -21,6 +21,7 @@
 
 #include "constants.h"
 #include "pins.h"
+#include "sensors.h"
 #include "structs.h"
 #include "hardware.h"
 #include MAF_SENSOR_FILE
@@ -368,24 +369,44 @@ float Maths::calculateMafFlowCFM() {
 	extern CalibrationSettings calibration;
 
     MafData _mafData;
+	Sensors _sensors;
 	
 //	float calibrationOffset;
 	float mafFlowRateCFM;
 	float mafFlowRateKGH = 0;
 	double mafFlowRateRAW;
-	long mafSensorVal = analogRead(MAF_PIN);
-	float mafMillivolts = (mafSensorVal * (5.0 / 1024.0)) * 1000;
+	float mafSensorVal = _sensors.getMAF;
+
 	int lookupValue;
 	int numRows;
 
-	if (mafMillivolts < config.maf_min_millivolts) {
-	  return 0;
+
+
+	
+	switch (_mafData.MAFoutputType())
+	{
+		case VOLTAGE:
+			if (mafMillivolts < config.maf_min_millivolts) {
+			  return 0;
+			}
+			
+			lookupValue = mafMillivolts;
+		break;
+
+		case FREQUENCY:
+			lookupValue = mafFrequency;
+		break;
+	
 	}
 
-	if (_mafData.MAFoutputType() == FREQUENCY){
-		// TODO: #29 - MAF Data File configuration variables - add additional decode variables
-		// Add support for frequency based sensors
-	}
+
+
+	//RAW_ANALOG
+	
+	// TODO: need to scale data in lookup tables
+	
+
+
 
 	// determine what kind of MAF data array we have 
 	if (_mafData.MAFdataFormat() == RAW_ANALOG){
@@ -401,7 +422,7 @@ float Maths::calculateMafFlowCFM() {
 		// so we need to work out which two values fall either side of our reference value and then do some interpolation to calculate the actual value
 		// We could of course limit the reference value to 10 bits (probably a good idea initially) but then we lose that extra resolution 
 		
-		mafFlowRateRAW = _mafData.mafMapAnalogData[mafSensorVal];
+		//mafFlowRateRAW = _mafData.mafMapAnalogData[mafSensorVal];
 
 	} else {
 
@@ -409,7 +430,7 @@ float Maths::calculateMafFlowCFM() {
 	   numRows = sizeof(_mafData.mafLookupTable)/sizeof(_mafData.mafLookupTable[0]);
 
 		// we have a mV / flow array so we use the mafMillivolts value for the lookup
-		lookupValue = mafMillivolts;
+//		lookupValue = mafMillivolts;
 
 		// then traverse the array until we find the lookupValue
 		for (int rowNum = 0; rowNum <= numRows; rowNum++) {
@@ -440,8 +461,6 @@ float Maths::calculateMafFlowCFM() {
 
 	}
 
-	// Get calibration offset from NVM
-//    EEPROM.get( NVM_CD_CAL_OFFSET_ADDR, calibrationOffset ); // REDUNDANT
 
 	if (_mafData.MAFdataUnit() == KG_H) {
 
@@ -456,7 +475,7 @@ float Maths::calculateMafFlowCFM() {
 
 
 	// convert kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
-	mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH) + calibration.flow_offset; // add calibration offset to value 
+	mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH) + calibration.flow_offset; 
 	//TODO: #21 Need to validate and test calibration routine
 
 	if (streamMafData == true) {

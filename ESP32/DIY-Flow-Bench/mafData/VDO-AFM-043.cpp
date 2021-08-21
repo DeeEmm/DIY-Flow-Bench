@@ -167,5 +167,7 @@ long MafData::getMafData() {
 		{11875,51199},
 		{12000,51199}
 	};
+	
+	return mafLookupTable [*][2];
 
 }
