@@ -25,7 +25,6 @@
 #include "hardware.h"
 #include MAF_SENSOR_FILE
 
-
 const float MOLECULAR_WEIGHT_DRY_AIR = 28.964;
 
 Maths::Maths() {
@@ -361,7 +360,7 @@ float Maths::convertMassFlowToVolumetric(float massFlowKgh) {
  * GET MAF FLOW in CFM
  * Lookup CFM value from MAF data array
  *
- * NOTE: mafMapData is global array declared in the MAFDATA files
+ * NOTE: mafLookupTable is global array declared in the MAFDATA files
  ***/
 float Maths::calculateMafFlowCFM() {
 	
@@ -373,9 +372,9 @@ float Maths::calculateMafFlowCFM() {
 //	float calibrationOffset;
 	float mafFlowRateCFM;
 	float mafFlowRateKGH = 0;
-	float mafFlowRateRAW;
-	int mafFlowRaw = analogRead(MAF_PIN);
-	float mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
+	double mafFlowRateRAW;
+	long mafSensorVal = analogRead(MAF_PIN);
+	float mafMillivolts = (mafSensorVal * (5.0 / 1024.0)) * 1000;
 	int lookupValue;
 	int numRows;
 
@@ -383,24 +382,31 @@ float Maths::calculateMafFlowCFM() {
 	  return 0;
 	}
 
-	if (_mafData.MAFoutputType == FREQUENCY){
+	if (_mafData.MAFoutputType() == FREQUENCY){
 		// TODO: #29 - MAF Data File configuration variables - add additional decode variables
 		// Add support for frequency based sensors
 	}
 
 	// determine what kind of MAF data array we have 
-	if (_mafData.MAFdataFormat == RAW_ANALOG){
+	if (_mafData.MAFdataFormat() == RAW_ANALOG){
 
-		// we have a raw analog data array so we use the mafFlowRaw for the lookup
-		lookupValue = mafFlowRaw;
+		// we have a raw analog data array so we use the mafSensorVal directly for the lookup
+		lookupValue = mafSensorVal;
 
 		// get the value directly from the data array
-		mafFlowRateRAW = _mafData.mafMapAnalogData[mafFlowRaw];
+		// TODO: #79 need to sort out conversion to 12 bit analog data on the ESP32 (4096)
+		
+		// Need to detect size of array and then do some maths to interpolate data values
+		// For a 12 bit array we can just use the raw value, but for a 10 bit array our 12 bit reference will not work.
+		// so we need to work out which two values fall either side of our reference value and then do some interpolation to calculate the actual value
+		// We could of course limit the reference value to 10 bits (probably a good idea initially) but then we lose that extra resolution 
+		
+		mafFlowRateRAW = _mafData.mafMapAnalogData[mafSensorVal];
 
 	} else {
 
 		//Set size of array
-	   numRows = sizeof(_mafData.mafMapData)/sizeof(_mafData.mafMapData[0]);
+	   numRows = sizeof(_mafData.mafLookupTable)/sizeof(_mafData.mafLookupTable[0]);
 
 		// we have a mV / flow array so we use the mafMillivolts value for the lookup
 		lookupValue = mafMillivolts;
@@ -409,13 +415,13 @@ float Maths::calculateMafFlowCFM() {
 		for (int rowNum = 0; rowNum <= numRows; rowNum++) {
 		
 			// lets check to see if exact match is found 
-			if (lookupValue == _mafData.mafMapData[rowNum][0]) {
+			if (lookupValue == _mafData.mafLookupTable[rowNum][0]) {
 				// we've got the exact value
-				mafFlowRateRAW = _mafData.mafMapData[rowNum][1];
+				mafFlowRateRAW = _mafData.mafLookupTable[rowNum][1];
 				break;
 
 			// We've overshot so lets use the previous value
-			} else if ( _mafData.mafMapData[rowNum][0] > lookupValue ) {
+			} else if ( _mafData.mafLookupTable[rowNum][0] > lookupValue ) {
 
 				if (rowNum == 0) {
 					// we were on the first row so lets set the value to zero and consider it no flow
@@ -425,7 +431,7 @@ float Maths::calculateMafFlowCFM() {
 					// Flow value is valid so let's convert it.
 					// lets use a linear interpolation formula to calculate the actual value
 					// NOTE: Y=Y0+(((X-X0)(Y1-Y0))/(X1-X0)) where Y = flow and X = Volts
-					mafFlowRateRAW = _mafData.mafMapData[rowNum-1][1] + (((lookupValue - _mafData.mafMapData[rowNum-1][0]) * (_mafData.mafMapData[rowNum][1] - _mafData.mafMapData[rowNum-1][1])) / (_mafData.mafMapData[rowNum][0] - _mafData.mafMapData[rowNum-1][0]));            
+					mafFlowRateRAW = _mafData.mafLookupTable[rowNum-1][1] + (((lookupValue - _mafData.mafLookupTable[rowNum-1][0]) * (_mafData.mafLookupTable[rowNum][1] - _mafData.mafLookupTable[rowNum-1][1])) / (_mafData.mafLookupTable[rowNum][0] - _mafData.mafLookupTable[rowNum-1][0]));            
 				}
 				break;
 			}
@@ -437,12 +443,12 @@ float Maths::calculateMafFlowCFM() {
 	// Get calibration offset from NVM
 //    EEPROM.get( NVM_CD_CAL_OFFSET_ADDR, calibrationOffset ); // REDUNDANT
 
-	if (_mafData.mafDataUnit == KG_H) {
+	if (_mafData.MAFdataUnit() == KG_H) {
 
 		// convert RAW datavalue back into kg/h
 		mafFlowRateKGH = float(mafFlowRateRAW / 1000); 
 
-	} else if (_mafData.mafDataUnit == MG_S) {
+	} else if (_mafData.MAFdataUnit() == MG_S) {
 
 		//  convert mg/s value into kg/h
 		mafFlowRateKGH = float(mafFlowRateRAW * 0.0036); 
@@ -456,10 +462,10 @@ float Maths::calculateMafFlowCFM() {
 	if (streamMafData == true) {
 		Serial.print(String(mafMillivolts));
 		Serial.println("mv = ");
-		if (_mafData.mafDataUnit == KG_H) {
+		if (_mafData.MAFdataUnit() == KG_H) {
 			Serial.print(String(mafFlowRateRAW / 1000));
 			Serial.println("kg/h = ");
-		} else if (_mafData.mafDataUnit == MG_S) {
+		} else if (_mafData.MAFdataUnit() == MG_S) {
 			Serial.print(String(mafFlowRateRAW));
 			Serial.println("mg/s = ");
 		}

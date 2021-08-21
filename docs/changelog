@@ -201,4 +201,6 @@ Build #         - Description of Change
                 - #75 Fixed calibration data handling
 21082002        - #78 Added Debug mode to API (Verbose messaging)
                 - Updated several compiler errors from WIN compiler
-                - 
+                - Converted mafData files to individual classes
+                - Created single header file mafData.h
+                

@@ -110,16 +110,3 @@ struct FileUploadData {
 };
 
 
-
-/***********************************************************
- * Maf Sensor data
- ***/
-// struct MafSensorData {
-//   String mafSensorType;
-//   int mafOutputType;
-//   int mafDataFormat;
-//   int mafDataUnit;
-//   int mafMapData[];
-//   int mafMapAnalogData[];
-// };
-// MafSensorData mafSensor;

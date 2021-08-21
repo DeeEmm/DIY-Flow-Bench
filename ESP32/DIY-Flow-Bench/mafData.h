@@ -20,20 +20,15 @@
 
 class MafData {
 
-	
-	
-
 	public:
 		MafData();
 		String mafSensorType ();
 		int MAFdataFormat ();
 		int MAFdataUnit ();
 		int MAFoutputType();
-		long getMapData();
-		long getMapAnalogData();
+		long getMafData();
 	
-		double mafMapData[];
-		double mafMapAnalogData[][2];
+		long mafLookupTable[][2];
 	
 	private:
 

@@ -99,9 +99,8 @@ void Sensors::Initialise () {
 	MafData _mafData;
 	
 	// MAF Sensor 
-	// TODO: Do we need to initialise different MAF types???
-	this->_mafSensorType = _mafData.mafSensorType;
-	this->_mafSensorType.remove(0, 8);
+	// TODO: We need to initialise different MAF types!
+	this->_mafSensorType = _mafData.mafSensorType();
 
 	// Baro Sensor
 	#ifdef BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
@@ -313,3 +312,8 @@ float Sensors::Pitot() {
 
 	return _pitot;
 }
+
+
+/*
+The MAF output frequency is a function of the power required to keep the air flow sensing elements (hot wires) at a fixed temperature above the ambient temperature. Air flowing through the sensor cools the sensing elements. The amount of cooling is proportional to the amount of air flow. The MAF sensor requires a greater amount of current in order to maintain the hot wires at a constant temperature as the air flow increases. The MAF sensor converts the changes in current draw to a frequency signal read by the PCM. The PCM calculates the air flow (grams per second) based on this signal.
+*/

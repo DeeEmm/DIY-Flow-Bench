@@ -53,7 +53,7 @@ int MAFdataUnit = 1;
  * MAF Data
  ***/
 long mafMapAnalogData[] = {0,0}; // Need to declare unused analog array to prevent code breaking
-long mafMapData[][2] = {
+long mafLookupTable[][2] = {
 {880,1156},
 {896,1271},
 {912,1390},

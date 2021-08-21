@@ -65,7 +65,7 @@ int MAFdataUnit = 2;
  * MAF Data
  *
  ***/
-long mafMapData[][2] = {{0,0}}; // Need to declare unused key>value array to prevent code breaking
+long mafLookupTable[][2] = {{0,0}}; // Need to declare unused key>value array to prevent code breaking
 long mafMapAnalogData[] = {
 0,
 177,
