@@ -45,6 +45,7 @@
 #include "constants.h"
 #include "configuration.h"
 #include "structs.h"
+#include "mafData.h"
 
 // Initiate Structs
 ConfigSettings config;
@@ -52,16 +53,21 @@ CalibrationSettings calibration;
 DeviceStatus status;
 WebsocketData socketData;
 FileUploadData fileUploadData;
-mafSensorData mafData;
+//mafSensorData mafSensor;
+
 
 #include MAF_SENSOR_FILE
 #include LANGUAGE_FILE
+
+//test
+//#include "mafData/ACDELCO_92281162.h"
 
 #include "settings.h"
 #include "hardware.h"
 #include "sensors.h"
 #include "webserver.h"
 #include "API.h"
+
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");

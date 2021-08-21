@@ -82,7 +82,7 @@
 ***/
     
 // Uncomment One line only
-#define MAF_SENSOR_FILE "mafData/ACDELCO_ 92281162.h" 
+#define MAF_SENSOR_FILE "mafData/ACDELCO_ 92281162.cpp" 
 // #define MAF_SENSOR_FILE  "MH95-3000-100"                 // PMAS MH95-3000 in 100mm housing              
 // #define MAF_SENSOR_FILE "mafData/SIEMENS_5WK9605"        // Data from Tonys tests
 // #define MAF_SENSOR_FILE  "mafData/DELPHI_AF10118"        // kg/hr - Data from efidynotuning.com/maf.htm 

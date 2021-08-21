@@ -28,10 +28,6 @@
 #include MAF_SENSOR_FILE
 
 
-
-
-
-
 //Sensors::Sensors(int tempSensorType, int baroSensorType, int relhSensorType, int prefSensorType, int pdiffSensorType, int pitotSensorTyp) {
 Sensors::Sensors() {
 
@@ -100,9 +96,11 @@ void Sensors::Initialise () {
 
 	extern struct DeviceStatus status;
 	
+	MafData _mafData;
+	
 	// MAF Sensor 
 	// TODO: Do we need to initialise different MAF types???
-	this->_mafSensorType = MAF_SENSOR_TYPE;
+	this->_mafSensorType = _mafData.mafSensorType;
 	this->_mafSensorType.remove(0, 8);
 
 	// Baro Sensor
