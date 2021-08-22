@@ -366,8 +366,10 @@ float Maths::convertMassFlowToVolumetric(float massFlowKgh) {
 float Maths::calculateMafFlowCFM() {
 	
 	extern CalibrationSettings calibration;
+namespace mafDataNs = ACDELCO_92281162;
 
-    MafData _mafData;
+
+    mafDataNs::MafData _mafData;
 	Sensors _sensors;
 	Hardware _hardware;
 		
@@ -386,7 +388,7 @@ float Maths::calculateMafFlowCFM() {
 	***/
 
 	//Set size of array
-    numRows = sizeof(_mafData.mafLookupTable)/sizeof(_mafData.mafLookupTable[0]) -1;
+    numRows = sizeof(_mafData.mafLookupTable)/sizeof(_mafData.mafLookupTable[0]) -1;  
 
 	lookupValue = _sensors.getMAF();
 
