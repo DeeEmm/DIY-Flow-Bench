@@ -24,7 +24,8 @@
 /***********************************************************
  * Configuration Settings
  *
- * NOTE: Do not edit these! Used to create default config file!
+ * NOTE: Do not edit these! Used to create default config file! 
+ * You can easily edit the config file via the browser after you connect!
  ***/
 struct ConfigSettings {
   String wifi_ssid = "WIFI-SSID";           // Your Wifi SSID

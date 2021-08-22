@@ -365,102 +365,60 @@ float Maths::convertMassFlowToVolumetric(float massFlowKgh) {
  ***/
 float Maths::calculateMafFlowCFM() {
 	
-	extern struct ConfigSettings config;
 	extern CalibrationSettings calibration;
 
     MafData _mafData;
 	Sensors _sensors;
-	
-//	float calibrationOffset;
+	Hardware _hardware;
+		
 	float mafFlowRateCFM;
 	float mafFlowRateKGH = 0;
 	double mafFlowRateRAW;
-	float mafSensorVal = _sensors.getMAF;
-
+	
 	int lookupValue;
 	int numRows;
 
 
+	/* 
+	* GET VALUE FROM LOOKUP TABLE USING THE SENSOR VALUE AS LOOKUP KEY
+	* THE TYPE OF SENSOR IS IRRELEVANT AS LONG AS THE CORRESPONDING LOOKUP TABLE IS USED.
+	* I.E 500HZ OR 500MV WILL GIVE THE CORRECT VALUE PROVIDED THE RIGHT TABLE IS CALLED.
+	***/
 
+	//Set size of array
+    numRows = sizeof(_mafData.mafLookupTable)/sizeof(_mafData.mafLookupTable[0]) -1;
+
+	lookupValue = _sensors.getMAF();
+
+	// Traverse the array until we find the lookupValue
+	for (int rowNum = 0; rowNum <= numRows; rowNum++) {
 	
-	switch (_mafData.MAFoutputType())
-	{
-		case VOLTAGE:
-			if (mafMillivolts < config.maf_min_millivolts) {
-			  return 0;
+		// Lets check to see if exact match is found 
+		if (lookupValue == _mafData.mafLookupTable[rowNum][0]) {
+			// we've got the exact value
+			mafFlowRateRAW = _mafData.mafLookupTable[rowNum][1];
+			break;
+
+		// We've overshot so lets use the previous value
+		} else if ( _mafData.mafLookupTable[rowNum][0] > lookupValue ) {
+
+			if (rowNum == 0) {
+				// we were on the first row so lets set the value to zero and consider it no flow
+				return 0;
+
+			} else {
+				// Flow value is valid so let's convert it.
+				// We use a linear interpolation formula to calculate the actual value
+				// NOTE: Y=Y0+(((X-X0)(Y1-Y0))/(X1-X0)) where Y = flow and X = Volts
+				mafFlowRateRAW = _mafData.mafLookupTable[rowNum-1][1] + (((lookupValue - _mafData.mafLookupTable[rowNum-1][0]) * (_mafData.mafLookupTable[rowNum][1] - _mafData.mafLookupTable[rowNum-1][1])) / (_mafData.mafLookupTable[rowNum][0] - _mafData.mafLookupTable[rowNum-1][0]));            
 			}
-			
-			lookupValue = mafMillivolts;
-		break;
-
-		case FREQUENCY:
-			lookupValue = mafFrequency;
-		break;
-	
-	}
-
-
-
-	//RAW_ANALOG
-	
-	// TODO: need to scale data in lookup tables
-	
-
-
-
-	// determine what kind of MAF data array we have 
-	if (_mafData.MAFdataFormat() == RAW_ANALOG){
-
-		// we have a raw analog data array so we use the mafSensorVal directly for the lookup
-		lookupValue = mafSensorVal;
-
-		// get the value directly from the data array
-		// TODO: #79 need to sort out conversion to 12 bit analog data on the ESP32 (4096)
-		
-		// Need to detect size of array and then do some maths to interpolate data values
-		// For a 12 bit array we can just use the raw value, but for a 10 bit array our 12 bit reference will not work.
-		// so we need to work out which two values fall either side of our reference value and then do some interpolation to calculate the actual value
-		// We could of course limit the reference value to 10 bits (probably a good idea initially) but then we lose that extra resolution 
-		
-		//mafFlowRateRAW = _mafData.mafMapAnalogData[mafSensorVal];
-
-	} else {
-
-		//Set size of array
-	   numRows = sizeof(_mafData.mafLookupTable)/sizeof(_mafData.mafLookupTable[0]);
-
-		// we have a mV / flow array so we use the mafMillivolts value for the lookup
-//		lookupValue = mafMillivolts;
-
-		// then traverse the array until we find the lookupValue
-		for (int rowNum = 0; rowNum <= numRows; rowNum++) {
-		
-			// lets check to see if exact match is found 
-			if (lookupValue == _mafData.mafLookupTable[rowNum][0]) {
-				// we've got the exact value
-				mafFlowRateRAW = _mafData.mafLookupTable[rowNum][1];
-				break;
-
-			// We've overshot so lets use the previous value
-			} else if ( _mafData.mafLookupTable[rowNum][0] > lookupValue ) {
-
-				if (rowNum == 0) {
-					// we were on the first row so lets set the value to zero and consider it no flow
-					return 0;
-
-				} else {
-					// Flow value is valid so let's convert it.
-					// lets use a linear interpolation formula to calculate the actual value
-					// NOTE: Y=Y0+(((X-X0)(Y1-Y0))/(X1-X0)) where Y = flow and X = Volts
-					mafFlowRateRAW = _mafData.mafLookupTable[rowNum-1][1] + (((lookupValue - _mafData.mafLookupTable[rowNum-1][0]) * (_mafData.mafLookupTable[rowNum][1] - _mafData.mafLookupTable[rowNum-1][1])) / (_mafData.mafLookupTable[rowNum][0] - _mafData.mafLookupTable[rowNum-1][0]));            
-				}
-				break;
-			}
-
+			break;
 		}
 
 	}
 
+
+   	// NOW THAT WE HAVE A VALUE, WE NEED TO SCALE IT AND CONVERT IT
 
 	if (_mafData.MAFdataUnit() == KG_H) {
 
@@ -473,14 +431,13 @@ float Maths::calculateMafFlowCFM() {
 		mafFlowRateKGH = float(mafFlowRateRAW * 0.0036); 
 	}
 
-
 	// convert kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
 	mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH) + calibration.flow_offset; 
-	//TODO: #21 Need to validate and test calibration routine
 
+	// lets stream data to the serial port
 	if (streamMafData == true) {
-		Serial.print(String(mafMillivolts));
-		Serial.println("mv = ");
+		Serial.print(String(lookupValue));
+		Serial.println(" (raw) = ");
 		if (_mafData.MAFdataUnit() == KG_H) {
 			Serial.print(String(mafFlowRateRAW / 1000));
 			Serial.println("kg/h = ");

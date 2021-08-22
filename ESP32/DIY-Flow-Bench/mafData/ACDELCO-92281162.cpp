@@ -10,11 +10,11 @@
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
-#pragma once
+#ifndef MAFDATA
+#define MAFDATA
 
 #include "../mafData.h"
 #include "../constants.h"
-
 
 
 MafData::MafData () {
@@ -1120,6 +1120,8 @@ long MafData::getMafData() {
     };
     
     
-    return mafLookupTable [1026][2];
+    return mafLookupTable [1024][2];
     
 }
+
+#endif

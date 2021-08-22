@@ -23,6 +23,7 @@
 #include "constants.h"
 #include "pins.h"
 #include "structs.h"
+#include "hardware.h"
 #include "sensors.h"
 #include "driver/pcnt.h"
 
@@ -30,19 +31,16 @@
 #include MAF_SENSOR_FILE
 
 
-//Sensors::Sensors(int tempSensorType, int baroSensorType, int relhSensorType, int prefSensorType, int pdiffSensorType, int pitotSensorTyp) {
 Sensors::Sensors() {
 
-	
 	// Zero out the sensor values
-	this->_mafval = 0.0;
+	this->_maf = 0.0;
 	this->_baro = 0.0;
 	this->_relh = 0.0;
 	this->_temp = 0.0;
 	this->_pref = 0.0;
 	this->_pdiff = 0.0;
 	this->_pitot = 0.0;
-	
 
 }
 
@@ -302,33 +300,20 @@ float Sensors::getPDiff() {
  * Returns Pitot pressure differential in kPa
  ***/
 float Sensors::getPitot() {
+	
+	Hardware _hardware;
 
 	// Pitot Voltage
 	  int pitotRaw = analogRead(PITOT_PIN);
-	  double pitotMillivolts = (pitotRaw * (5.0 / 1024.0)) * 1000;
+	  double pitotMillivolts = (pitotRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
 	  
 
 	return _pitot;
 }
 
 
-/*
-The MAF output frequency is a function of the power required to keep the air flow sensing elements (hot wires) at a fixed temperature above the ambient temperature. Air flowing through the sensor cools the sensing elements. The amount of cooling is proportional to the amount of air flow. The MAF sensor requires a greater amount of current in order to maintain the hot wires at a constant temperature as the air flow increases. The MAF sensor converts the changes in current draw to a frequency signal read by the PCM. The PCM calculates the air flow (grams per second) based on this signal.
-*/
 
 
-
-
-/***********************************************************
-* ISR for Frequency based MAF Sensors
-*
-* interrupt service routine - used for frequency trigger
-* (Exists in RAM not flash)
-***/
-void IRAM_ATTR MafISR()
-{
-	// Your Code...
-}
 
 /***********************************************************
  * Returns RAW MAF Sensor value
@@ -337,26 +322,38 @@ void IRAM_ATTR MafISR()
  ***/
 float Sensors::getMAF() {
 	
-	switch (this->_mafOutputType)
-	{
+	Hardware _hardware;
+	
+	switch (this->_mafOutputType) {
 		case VOLTAGE:
+		{
 			int mafFlowRaw = analogRead(MAF_PIN);
-			double mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
+			double mafMillivolts = (mafFlowRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
 			return mafMillivolts;
+		}
 		break;
 		
 		case FREQUENCY:
+		{
 			//pinMode(MAF_PIN, INPUT);
 			//attachInterrupt(MAF_PIN, Ext_INT1_ISR, RISING);
 			
-			//return mafFrequency;
+			double mafFrequency = 0.0;
+			return mafFrequency;
+		}
 		break;
 		
 	}
 	
+	return _maf;
 
 }
 
+
+
+/*
+The MAF output frequency is a function of the power required to keep the air flow sensing elements (hot wires) at a fixed temperature above the ambient temperature. Air flowing through the sensor cools the sensing elements. The amount of cooling is proportional to the amount of air flow. The MAF sensor requires a greater amount of current in order to maintain the hot wires at a constant temperature as the air flow increases. The MAF sensor converts the changes in current draw to a frequency signal read by the PCM. The PCM calculates the air flow (grams per second) based on this signal.
+*/
 
 
 

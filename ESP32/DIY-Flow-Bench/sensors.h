@@ -38,7 +38,7 @@ public:
 private:
 	int _unit;
 	float _baro;
-	float _mafval;
+	float _maf;
 	float _relh;
 	float _temp;
 	float _pref;

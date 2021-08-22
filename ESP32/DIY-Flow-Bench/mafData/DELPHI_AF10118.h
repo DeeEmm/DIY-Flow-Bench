@@ -10,7 +10,8 @@
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
-#pragma once
+#ifndef MAFDATA
+#define MAFDATA
 
 
  /***********************************************************
@@ -82,3 +83,6 @@ long mafLookupTable[][2] = {
 {4750,490925},
 {5000,490925}
 };
+
+
+#endif

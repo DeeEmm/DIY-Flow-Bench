@@ -10,7 +10,8 @@
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
-#pragma once
+#ifndef MAFDATA
+#define MAFDATA
 
 #include "../mafData.h"
 #include "../constants.h"
@@ -136,3 +137,5 @@ long MafData::getMafData() {
     return mafLookupTable [][2];
  
 } 
+
+#endif
