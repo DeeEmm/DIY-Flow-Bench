@@ -17,7 +17,7 @@
 
 #define MAJOR_VERSION "ESP-PORT"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "21082001"
+#define BUILD_NUMBER "21082301"
 #define RELEASE "V.ESP.X-ALPHA"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -82,11 +82,11 @@
 ***/
     
 // Uncomment One sensor only
-#define MAF_SENSOR_FILE "mafData/ACDELCO-92281162.cpp" 
-// #define MAF_SENSOR_FILE "mafData/ACDELCO-19330122.cpp" 
-// #define MAF_SENSOR_FILE "mafData/VDO-AFM-043.h"
+#define MAF_SENSOR_FILE "mafData/ACDELCO_92281162.h" 
+// #define MAF_SENSOR_FILE "mafData/ACDELCO_19330122.h" 
+// #define MAF_SENSOR_FILE "mafData/VDO_AFM_043.h"
 
-// #define MAF_SENSOR_FILE  "MH95-3000-100"                 // PMAS MH95-3000 in 100mm housing              
+// #define MAF_SENSOR_FILE  "MH95_3000_100"                 // PMAS MH95-3000 in 100mm housing              
 // #define MAF_SENSOR_FILE "mafData/SIEMENS_5WK9605"        // Data from Tonys tests
 // #define MAF_SENSOR_FILE  "mafData/DELPHI_AF10118"        // kg/hr - Data from efidynotuning.com/maf.htm 
 // #define MAF_SENSOR_FILE  "mafData/exampleKeyValueData"   // Example key > value data file 

@@ -24,12 +24,25 @@
 #include "sensors.h"
 #include "structs.h"
 #include "hardware.h"
-#include MAF_SENSOR_FILE
+//#include MAF_SENSOR_FILE
 
 const float MOLECULAR_WEIGHT_DRY_AIR = 28.964;
 
 Maths::Maths() {
-
+	
+	extern String mafSensorType;
+	// extern int MAFoutputType;
+	// extern int MAFdataFormat;
+	extern int MAFdataUnit;
+	extern long mafLookupTable[][2];
+	 
+	this->_mafDataUnit = MAFdataUnit;
+	
+	//memcpy (b, a, 50*50*sizeof(float));
+	//memcpy(p, q, 13*15*sizeof(*p));
+	memcpy(this->_mafLookupTable, mafLookupTable, sizeof this->_mafLookupTable);
+	
+	//this->_mafLookupTable[][2] = mafLookupTable[][2];
 }
 
 
@@ -366,10 +379,8 @@ float Maths::convertMassFlowToVolumetric(float massFlowKgh) {
 float Maths::calculateMafFlowCFM() {
 	
 	extern CalibrationSettings calibration;
-namespace mafDataNs = ACDELCO_92281162;
 
 
-    mafDataNs::MafData _mafData;
 	Sensors _sensors;
 	Hardware _hardware;
 		
@@ -388,7 +399,7 @@ namespace mafDataNs = ACDELCO_92281162;
 	***/
 
 	//Set size of array
-    numRows = sizeof(_mafData.mafLookupTable)/sizeof(_mafData.mafLookupTable[0]) -1;  
+    numRows = sizeof(this->_mafLookupTable)/sizeof(this->_mafLookupTable[0]) -1;  
 
 	lookupValue = _sensors.getMAF();
 
@@ -396,13 +407,13 @@ namespace mafDataNs = ACDELCO_92281162;
 	for (int rowNum = 0; rowNum <= numRows; rowNum++) {
 	
 		// Lets check to see if exact match is found 
-		if (lookupValue == _mafData.mafLookupTable[rowNum][0]) {
+		if (lookupValue == this->_mafLookupTable[rowNum][0]) {
 			// we've got the exact value
-			mafFlowRateRAW = _mafData.mafLookupTable[rowNum][1];
+			mafFlowRateRAW = this->_mafLookupTable[rowNum][1];
 			break;
 
 		// We've overshot so lets use the previous value
-		} else if ( _mafData.mafLookupTable[rowNum][0] > lookupValue ) {
+		} else if ( this->_mafLookupTable[rowNum][0] > lookupValue ) {
 
 			if (rowNum == 0) {
 				// we were on the first row so lets set the value to zero and consider it no flow
@@ -412,7 +423,7 @@ namespace mafDataNs = ACDELCO_92281162;
 				// Flow value is valid so let's convert it.
 				// We use a linear interpolation formula to calculate the actual value
 				// NOTE: Y=Y0+(((X-X0)(Y1-Y0))/(X1-X0)) where Y = flow and X = Volts
-				mafFlowRateRAW = _mafData.mafLookupTable[rowNum-1][1] + (((lookupValue - _mafData.mafLookupTable[rowNum-1][0]) * (_mafData.mafLookupTable[rowNum][1] - _mafData.mafLookupTable[rowNum-1][1])) / (_mafData.mafLookupTable[rowNum][0] - _mafData.mafLookupTable[rowNum-1][0]));            
+				mafFlowRateRAW = this->_mafLookupTable[rowNum-1][1] + (((lookupValue - this->_mafLookupTable[rowNum-1][0]) * (this->_mafLookupTable[rowNum][1] - this->_mafLookupTable[rowNum-1][1])) / (this->_mafLookupTable[rowNum][0] - this->_mafLookupTable[rowNum-1][0]));            
 			}
 			break;
 		}
@@ -422,12 +433,12 @@ namespace mafDataNs = ACDELCO_92281162;
 
    	// NOW THAT WE HAVE A VALUE, WE NEED TO SCALE IT AND CONVERT IT
 
-	if (_mafData.MAFdataUnit() == KG_H) {
+	if (this->_mafDataUnit == KG_H) {
 
 		// convert RAW datavalue back into kg/h
 		mafFlowRateKGH = float(mafFlowRateRAW / 1000); 
 
-	} else if (_mafData.MAFdataUnit() == MG_S) {
+	} else if (this->_mafDataUnit == MG_S) {
 
 		//  convert mg/s value into kg/h
 		mafFlowRateKGH = float(mafFlowRateRAW * 0.0036); 
@@ -440,10 +451,10 @@ namespace mafDataNs = ACDELCO_92281162;
 	if (streamMafData == true) {
 		Serial.print(String(lookupValue));
 		Serial.println(" (raw) = ");
-		if (_mafData.MAFdataUnit() == KG_H) {
+		if (this->_mafDataUnit == KG_H) {
 			Serial.print(String(mafFlowRateRAW / 1000));
 			Serial.println("kg/h = ");
-		} else if (_mafData.MAFdataUnit() == MG_S) {
+		} else if (this->_mafDataUnit == MG_S) {
 			Serial.print(String(mafFlowRateRAW));
 			Serial.println("mg/s = ");
 		}

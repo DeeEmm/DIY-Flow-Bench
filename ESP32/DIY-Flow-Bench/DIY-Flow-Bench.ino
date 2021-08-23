@@ -45,7 +45,6 @@
 #include "constants.h"
 #include "configuration.h"
 #include "structs.h"
-#include "mafData.h"
 
 // Initiate Structs
 ConfigSettings config;
@@ -59,9 +58,6 @@ FileUploadData fileUploadData;
 #include MAF_SENSOR_FILE
 #include LANGUAGE_FILE
 
-//using namespace ACDELCO_92281162
-namespace mafDataNs = ACDELCO_92281162;
-using namespace mafDataNs;
 
 //test
 //#include "mafData/ACDELCO-92281162.h"

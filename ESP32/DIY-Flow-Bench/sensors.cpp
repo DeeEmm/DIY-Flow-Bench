@@ -28,7 +28,7 @@
 #include "driver/pcnt.h"
 
 #include LANGUAGE_FILE
-#include MAF_SENSOR_FILE
+//#include MAF_SENSOR_FILE
 
 
 Sensors::Sensors() {
@@ -41,6 +41,21 @@ Sensors::Sensors() {
 	this->_pref = 0.0;
 	this->_pdiff = 0.0;
 	this->_pitot = 0.0;
+	
+	
+	
+	extern String mafSensorType;
+	extern int MAFoutputType;
+	extern int MAFdataFormat;
+	extern int MAFdataUnit;
+	//extern long mafLookupTable[][2];
+	
+	
+	this->_mafSensorType = mafSensorType;
+	this->_mafOutputType  = MAFoutputType;
+	this->_mafDataFormat = MAFdataFormat;
+	this->_mafDataUnit = MAFdataUnit;
+	
 
 }
 
@@ -95,15 +110,6 @@ void Sensors::Begin () {
 void Sensors::Initialise () {
 
 	extern struct DeviceStatus status;
-	
-	MafData _mafData;
-	
-	// MAF Sensor 
-	// TODO: We need to initialise different MAF types!
-	this->_mafSensorType = _mafData.mafSensorType();
-	this->_mafOutputType  = _mafData.MAFoutputType();
-	this->_mafDataFormat = _mafData.MAFdataFormat();
-	this->_mafDataUnit = _mafData.MAFdataUnit();
 
 	// Baro Sensor
 	#ifdef BARO_SENSOR_TYPE_REF_PRESS_AS_BARO

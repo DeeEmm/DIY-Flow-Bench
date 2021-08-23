@@ -13,6 +13,7 @@
 #ifndef MAFDATA
 #define MAFDATA
 
+//#ifdef DELPHI_AF10118
 
  /***********************************************************
   * MAF Type
@@ -84,5 +85,5 @@ long mafLookupTable[][2] = {
 {5000,490925}
 };
 
-
+//#endif
 #endif

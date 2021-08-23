@@ -41,5 +41,8 @@ class Maths {
 	private:
 		float MOLECULAR_WEIGHT_DRY_AIR;
 		bool streamMafData = false;
+		
+		int _mafDataUnit;
+		long _mafLookupTable[][2];
 
 };
