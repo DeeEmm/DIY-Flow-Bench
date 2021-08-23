@@ -46,14 +46,12 @@ Sensors::Sensors() {
 	
 	extern String mafSensorType;
 	extern int MAFoutputType;
-	extern int MAFdataFormat;
 	extern int MAFdataUnit;
 	//extern long mafLookupTable[][2];
 	
 	
 	this->_mafSensorType = mafSensorType;
 	this->_mafOutputType  = MAFoutputType;
-	this->_mafDataFormat = MAFdataFormat;
 	this->_mafDataUnit = MAFdataUnit;
 	
 
@@ -189,32 +187,16 @@ void Sensors::Initialise () {
 
 
 
-// Getters and setters - read sensor data and return it in SI Standard units
-
-
-
-
-
-
-
-
-
 
 
 /***********************************************************
  * Returns temperature in Deg C
  ***/
-float Sensors::getTemp() {
-
-	//float refAltRaw;
-	//float refPressureRaw;
-	//float refTempRaw;
+float Sensors::getTempValue() {
+	
+	Hardware _hardware;
 	float refTempDegC;
-	//float refTempDegF;
-	//float refTempRankine;
-	//float relativeHumidity;
-	byte refTemp;
-	//byte refRelh;
+
 
 	#ifdef TEMP_SENSOR_TYPE_ADAFRUIT_BME280
 		refTempDegC  =  adafruitBme280.readTemperature();
@@ -236,6 +218,8 @@ float Sensors::getTemp() {
 		// We don't have any temperature input so we will assume default
 		refTempDegC = DEFAULT_TEMP;
 	#endif
+	
+	refTempDegC += TEMP_TRIMPOT;
 
 	return _temp;
 }
@@ -245,13 +229,19 @@ float Sensors::getTemp() {
 /***********************************************************
  * Returns Barometric pressure in kPa
  ***/
-float Sensors::getBaro() {
+float Sensors::getBaroValue() {
 	
-	float refBaroKpa;
+	Hardware _hardware;
+	float baroKpaRaw;
 	
 	//#elif defined BARO_SENSOR_TYPE_LINEAR_ANALOG
-		refBaroKpa = analogRead(REF_BARO_PIN);
-		_baro = refBaroKpa * BARO_ANALOG_SCALE;
+	baroKpaRaw = analogRead(REF_BARO_PIN);
+	
+	double baroMillivolts = (baroKpaRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
+	baroMillivolts += BARO_TRIMPOT;		
+	
+	
+	_baro = baroMillivolts * BARO_ANALOG_SCALE;
 	
 	
 	
@@ -263,14 +253,21 @@ float Sensors::getBaro() {
 /***********************************************************
  * Returns Relative Humidity in %
  ***/
-float Sensors::getRelH() {
+float Sensors::getRelHValue() {
 	
-	float refRelH;
+	Hardware _hardware;
+	float relhRaw;
 	
 	
 	//#elif defined RELH_SENSOR_TYPE_LINEAR_ANALOG
-		refRelH = analogRead(HUMIDITY_PIN);
-		_relh = refRelH * RELH_ANALOG_SCALE;
+	relhRaw = analogRead(HUMIDITY_PIN);
+	
+	double relhMillivolts = (relhRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
+	relhMillivolts += RELH_TRIMPOT;
+	
+	_relh = relhMillivolts * RELH_ANALOG_SCALE;
+
+
 
 	return _relh;
 }
@@ -280,12 +277,14 @@ float Sensors::getRelH() {
 /***********************************************************
  * Returns Reference pressure in kPa
  ***/
-float Sensors::getPRef() {
+float Sensors::getPRefValue() {
+	
+	Hardware _hardware;
 
 	// Ref Pressure Voltage
-	  int refPressRaw = analogRead(REF_PRESSURE_PIN);
-	  double refMillivolts = (refPressRaw * (5.0 / 1024.0)) * 1000;
-	 
+	int refPressRaw = analogRead(REF_PRESSURE_PIN);
+	double prefMillivolts = (refPressRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
+	prefMillivolts += PREF_TRIMPOT;
 
 	return _pref;
 }
@@ -295,7 +294,9 @@ float Sensors::getPRef() {
 /***********************************************************
  * Returns Pressure differential in kPa
  ***/
-float Sensors::getPDiff() {
+float Sensors::getPDiffValue() {
+	
+	Hardware _hardware;
 
 	return _pdiff;
 }
@@ -305,14 +306,14 @@ float Sensors::getPDiff() {
 /***********************************************************
  * Returns Pitot pressure differential in kPa
  ***/
-float Sensors::getPitot() {
+float Sensors::getPitotValue() {
 	
 	Hardware _hardware;
 
 	// Pitot Voltage
-	  int pitotRaw = analogRead(PITOT_PIN);
-	  double pitotMillivolts = (pitotRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
-	  
+	int pitotRaw = analogRead(PITOT_PIN);
+	double pitotMillivolts = (pitotRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
+	pitotMillivolts += PITOT_TRIMPOT;
 
 	return _pitot;
 }
@@ -326,7 +327,7 @@ float Sensors::getPitot() {
  *
  * MAF decode is done in Maths.cpp
  ***/
-float Sensors::getMAF() {
+float Sensors::getMafValue() {
 	
 	Hardware _hardware;
 	
@@ -335,7 +336,10 @@ float Sensors::getMAF() {
 		{
 			int mafFlowRaw = analogRead(MAF_PIN);
 			double mafMillivolts = (mafFlowRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
+			mafMillivolts += MAF_TRIMPOT;
 			return mafMillivolts;
+			
+			
 		}
 		break;
 		
@@ -345,6 +349,7 @@ float Sensors::getMAF() {
 			//attachInterrupt(MAF_PIN, Ext_INT1_ISR, RISING);
 			
 			double mafFrequency = 0.0;
+			mafFrequency += MAF_TRIMPOT;
 			return mafFrequency;
 		}
 		break;

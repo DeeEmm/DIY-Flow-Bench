@@ -41,17 +41,6 @@ int MAFoutputType = VOLTAGE;
 
 
 /***********************************************************
-* MAF Data format
-* 
-* KEY_VALUE
-* RAW_ANALOG
-***/
-
-int  MAFdataFormat = KEY_VALUE; 
-
-
-
-/***********************************************************
 * MAF Units
 * 
 * KG_H

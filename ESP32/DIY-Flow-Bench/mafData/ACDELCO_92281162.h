@@ -35,17 +35,6 @@ String mafSensorType = "ACDELCO_92281162";
  ***/
 
 int MAFoutputType = VOLTAGE;
-    
-
-
-/***********************************************************
- * MAF Data format
- * 
- * KEY_VALUE
- * RAW_ANALOG (1024 data points)
- ***/
-
-int  MAFdataFormat = RAW_ANALOG; 
 
 
 
@@ -61,7 +50,7 @@ int MAFdataUnit = MG_S;
 
 
 /***********************************************************
- * Analog MAF Data 
+ * MAF Lookup table 
  *
  ***/
 

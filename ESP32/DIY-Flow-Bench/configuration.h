@@ -17,7 +17,7 @@
 
 #define MAJOR_VERSION "ESP-PORT"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "21082301"
+#define BUILD_NUMBER "21081302"
 #define RELEASE "V.ESP.X-ALPHA"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 

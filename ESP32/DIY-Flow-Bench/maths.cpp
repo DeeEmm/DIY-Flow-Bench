@@ -32,7 +32,6 @@ Maths::Maths() {
 	
 	extern String mafSensorType;
 	// extern int MAFoutputType;
-	// extern int MAFdataFormat;
 	extern int MAFdataUnit;
 	extern long mafLookupTable[][2];
 	 
@@ -62,7 +61,7 @@ float Maths::calculateBaroPressure(int units) {
 	// UNUSED: float refAltRaw;
 	// UNUSED: int supplyMillivolts = _hardware.getSupplyMillivolts();
 	// UNUSED: int rawBaroValue = analogRead(REF_BARO_PIN);
-	// UNUSED: int baroMillivolts = (rawBaroValue * (5.0 / 1024.0)) * 1000;
+	// UNUSED: int baroMillivolts = (rawBaroValue * (3.3 / 4095.0)) * 1000;
 
 	#ifdef BARO_SENSOR_TYPE_MPX4115
 		// Datasheet - https://html.alldatasheet.es/html-pdf/5178/MOTOROLA/MPX4115/258/1/MPX4115.html
@@ -118,7 +117,7 @@ float Maths::calculateRefPressure(int units) {
 	// UNUSED: float refAltRaw;
 	// UNUSED: float supplyMillivolts = _hardware.getSupplyMillivolts();
 	// UNUSED: int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
-	// UNUSED: float refPressMillivolts = (rawRefPressValue * (5.0 / 1024.0)) * 1000;
+	// UNUSED: float refPressMillivolts = (rawRefPressValue * (3.3 / 4095.0)) * 1000;
 
 	#ifdef PREF_SENSOR_TYPE_MPXV7007
 		// Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
@@ -372,36 +371,33 @@ float Maths::convertMassFlowToVolumetric(float massFlowKgh) {
 
 /***********************************************************
  * GET MAF FLOW in CFM
- * Lookup CFM value from MAF data array
+ * Lookup mass flow value from MAF data array and convert to cfm
  *
  * NOTE: mafLookupTable is global array declared in the MAFDATA files
  ***/
 float Maths::calculateMafFlowCFM() {
 	
 	extern CalibrationSettings calibration;
-
-
 	Sensors _sensors;
 	Hardware _hardware;
 		
-	float mafFlowRateCFM;
+	float mafFlowRateCFM = 0;
 	float mafFlowRateKGH = 0;
-	double mafFlowRateRAW;
+	double mafFlowRateRAW = 0;
 	
 	int lookupValue;
 	int numRows;
 
-
 	/* 
-	* GET VALUE FROM LOOKUP TABLE USING THE SENSOR VALUE AS LOOKUP KEY
-	* THE TYPE OF SENSOR IS IRRELEVANT AS LONG AS THE CORRESPONDING LOOKUP TABLE IS USED.
-	* I.E 500HZ OR 500MV WILL GIVE THE CORRECT VALUE PROVIDED THE RIGHT TABLE IS CALLED.
-	***/
+		Get value from lookup table using the sensor value as lookup key.
+		The type of sensor is irrelevant as long as the corresponding lookup table is used.
+		i.e 500hz or 500mv will give the correct value provided the right table is called.
+	*/
 
 	//Set size of array
     numRows = sizeof(this->_mafLookupTable)/sizeof(this->_mafLookupTable[0]) -1;  
 
-	lookupValue = _sensors.getMAF();
+	lookupValue = _sensors.getMafValue();
 
 	// Traverse the array until we find the lookupValue
 	for (int rowNum = 0; rowNum <= numRows; rowNum++) {
@@ -427,11 +423,13 @@ float Maths::calculateMafFlowCFM() {
 			}
 			break;
 		}
-
 	}
 
-
-   	// NOW THAT WE HAVE A VALUE, WE NEED TO SCALE IT AND CONVERT IT
+   	/* 
+	   Now that we have a value, we need to scale it and convert it.
+	   As we are use a MASS flow sensor, all values are going to be either kg/h or mg/sec
+	   The actual units used are determined by the mafDataUnit variable in the mafData file
+	 */
 
 	if (this->_mafDataUnit == KG_H) {
 
@@ -444,10 +442,10 @@ float Maths::calculateMafFlowCFM() {
 		mafFlowRateKGH = float(mafFlowRateRAW * 0.0036); 
 	}
 
-	// convert kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
+	// Now we need to convert from kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
 	mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH) + calibration.flow_offset; 
 
-	// lets stream data to the serial port
+	// lets stream data to the serial port if requested.
 	if (streamMafData == true) {
 		Serial.print(String(lookupValue));
 		Serial.println(" (raw) = ");
@@ -483,7 +481,7 @@ float Maths::calculatePitotPressure(int units) {
 	
 		float rawPitotPressValue = analogRead(PITOT_PIN);   
 		// UNUSED: int supplyMillivolts = _hardware.getSupplyMillivolts() / 1000;
-		// UNUSED: int pitotPressMillivolts = (rawPitotPressValue * (5.0 / 1024.0)) * 1000;
+		// UNUSED: int pitotPressMillivolts = (rawPitotPressValue * (3.3 / 4095.0)) * 1000;
 		// sensor characteristics from datasheet
 		// Vout = VS x (0.057 x P + 0.5)
 

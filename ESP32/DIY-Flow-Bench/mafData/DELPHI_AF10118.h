@@ -15,6 +15,7 @@
 
 //#ifdef DELPHI_AF10118
 
+
  /***********************************************************
   * MAF Type
   *
@@ -22,38 +23,30 @@
  #define MAF_SENSOR_TYPE "DELPHI_AF10118"
  
  
- /***********************************************************
+/***********************************************************
  * MAF Output Type
  *
- * 1 = voltage
- * 2 = frequency
+ * VOLTAGE
+ * FREQUENCY
  ***/
-int MAFoutputType = 1;
 
-
-/***********************************************************
- * MAF Data format
- * 
- * 1 = key_value
- * 2 = rawAnalog (1024 data points)
- ***/
-int MAFdataFormat = 1; 
+int MAFoutputType = VOLTAGE;
 
 
 
 /***********************************************************
  * MAF Units
  * 
- * 1 = kg_h
- * 2 = mg_s
+ * KG_H
+ * MG_S
  ***/
-int MAFdataUnit = 1;
+
+int MAFdataUnit = KG_H;
 
 
 /***********************************************************
  * MAF Data
  ***/
-long mafMapAnalogData[] = {0,0}; // Need to declare unused analog array to prevent code breaking
 long mafLookupTable[][2] = {
 {0,3650},
 {600,5620},

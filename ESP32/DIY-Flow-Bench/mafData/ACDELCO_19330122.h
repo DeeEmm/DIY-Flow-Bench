@@ -18,7 +18,6 @@
 #include "../constants.h"
 
 
-
 /***********************************************************
  * MAF Type
  *
@@ -36,16 +35,6 @@ String mafSensorType = "ACDELCO_19330122";
 
 int MAFoutputType = FREQUENCY;
 
-
-
-/***********************************************************
- * MAF Data format
- * 
- * KEY_VALUE
- * RAW_ANALOG
- ***/
-
-int  MAFdataFormat = KEY_VALUE; 
 
 
 /***********************************************************

@@ -31,15 +31,6 @@
 int MAFoutputType = 1;
 
 
-/***********************************************************
- * MAF Data format
- * 
- * 1 = key_value
- * 2 = rawAnalog (1024 data points)
- ***/
-int MAFdataFormat = 1; 
-
-
 
 /***********************************************************
  * MAF Units
