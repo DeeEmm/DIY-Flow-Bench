@@ -108,10 +108,12 @@ Hardware::Hardware() {
 
 /***********************************************************
  * GET BOARD VOLTAGE
+ *
+ * NOTE: ESP32 has 12 bit ADC (0-3.3v = 0-4095)
  ***/
 float Hardware::getSupplyMillivolts() {   
   int rawVoltageValue = analogRead(VOLTAGE_PIN);
-  float supplyMillivolts = rawVoltageValue * (5.0 / 1024.0) * 1000;
+  float supplyMillivolts = rawVoltageValue * (3.3 / 4095.0) * 1000;
 
   return supplyMillivolts;
 }

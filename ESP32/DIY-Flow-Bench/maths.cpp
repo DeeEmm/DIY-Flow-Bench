@@ -21,13 +21,27 @@
 
 #include "constants.h"
 #include "pins.h"
+#include "sensors.h"
 #include "structs.h"
 #include "hardware.h"
-#include MAF_SENSOR_TYPE
+//#include MAF_SENSOR_FILE
 
+const float MOLECULAR_WEIGHT_DRY_AIR = 28.964;
 
 Maths::Maths() {
-
+	
+	extern String mafSensorType;
+	// extern int MAFoutputType;
+	extern int MAFdataUnit;
+	extern long mafLookupTable[][2];
+	 
+	this->_mafDataUnit = MAFdataUnit;
+	
+	//memcpy (b, a, 50*50*sizeof(float));
+	//memcpy(p, q, 13*15*sizeof(*p));
+	memcpy(this->_mafLookupTable, mafLookupTable, sizeof this->_mafLookupTable);
+	
+	//this->_mafLookupTable[][2] = mafLookupTable[][2];
 }
 
 
@@ -42,12 +56,12 @@ float Maths::calculateBaroPressure(int units) {
 
 	float baroPressureKpa;
 	float baroPressurePsia;
-	float baroPressureRaw;
-	float refTempRaw;
-	float refAltRaw;
-	int supplyMillivolts = _hardware.getSupplyMillivolts();
-	int rawBaroValue = analogRead(REF_BARO_PIN);
-	int baroMillivolts = (rawBaroValue * (5.0 / 1024.0)) * 1000;
+	// UNUSED: float baroPressureRaw;
+	// UNUSED: float refTempRaw;
+	// UNUSED: float refAltRaw;
+	// UNUSED: int supplyMillivolts = _hardware.getSupplyMillivolts();
+	// UNUSED: int rawBaroValue = analogRead(REF_BARO_PIN);
+	// UNUSED: int baroMillivolts = (rawBaroValue * (3.3 / 4095.0)) * 1000;
 
 	#ifdef BARO_SENSOR_TYPE_MPX4115
 		// Datasheet - https://html.alldatasheet.es/html-pdf/5178/MOTOROLA/MPX4115/258/1/MPX4115.html
@@ -82,7 +96,8 @@ float Maths::calculateBaroPressure(int units) {
 			return baroPressurePsia;
 		break;
 	}   
-
+	
+	return baroPressureKpa;
 }
 
 
@@ -95,14 +110,14 @@ float Maths::calculateRefPressure(int units) {
 	
 	Hardware _hardware;
 
-	float refPressureKpa;
+	float refPressureKpa = 0;
 	float refPressureInWg;
-	float refPressureRaw;
-	float refTempDegRaw;
-	float refAltRaw;
-	float supplyMillivolts = _hardware.getSupplyMillivolts();
-	int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
-	float refPressMillivolts = (rawRefPressValue * (5.0 / 1024.0)) * 1000;
+	// UNUSED: float refPressureRaw;
+	// UNUSED: float refTempDegRaw;
+	// UNUSED: float refAltRaw;
+	// UNUSED: float supplyMillivolts = _hardware.getSupplyMillivolts();
+	// UNUSED: int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
+	// UNUSED: float refPressMillivolts = (rawRefPressValue * (3.3 / 4095.0)) * 1000;
 
 	#ifdef PREF_SENSOR_TYPE_MPXV7007
 		// Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
@@ -158,6 +173,8 @@ float Maths::calculateRefPressure(int units) {
 		break;
 	}
 	
+	return refPressureKpa;
+	
 }
 
 
@@ -168,15 +185,15 @@ float Maths::calculateRefPressure(int units) {
  ***/
 float Maths::calculateTemperature(int units) {   
 	
-	float refAltRaw;
-	float refPressureRaw;
-	float refTempRaw;
+	// UNUSED: float refAltRaw;
+	// UNUSED: float refPressureRaw;
+	// UNUSED: float refTempRaw;
 	float refTempDegC;
 	float refTempDegF;
 	float refTempRankine;
-	float relativeHumidity;
-	byte refTemp;
-	byte refRelh;
+	// UNUSED: float relativeHumidity;
+	// UNUSED: byte refTemp;
+	// UNUSED: byte refRelh;
 
 
 	#ifdef TEMP_SENSOR_TYPE_ADAFRUIT_BME280
@@ -216,6 +233,8 @@ float Maths::calculateTemperature(int units) {
 			return refTempRankine;
 		break;
 	}   
+	
+	return refTempDegC;
 }
 
 
@@ -226,9 +245,9 @@ float Maths::calculateTemperature(int units) {
 float Maths::calculateRelativeHumidity(int units) {   
 	
 	float relativeHumidity;
-	float tempDegC;
-	byte refTemp;
-	byte refRelh;
+	// UNUSED: float tempDegC;
+	// UNUSED: byte refTemp;
+	// UNUSED: byte refRelh;
 
 	#ifdef RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
@@ -263,6 +282,8 @@ float Maths::calculateRelativeHumidity(int units) {
 
 
 	}  
+	
+	return relativeHumidity;
 
 }  
 	
@@ -277,7 +298,7 @@ float Maths::calculateVaporPressure(int units) {
 	 
 	 
 	float airTemp = this->calculateTemperature(DEGC);
-	float molecularWeightOfDryAir = 28.964;
+	// UNUSED: float molecularWeightOfDryAir = 28.964;
 	float vapourPressureKpa =(0.61078 * exp((17.27 * airTemp)/(airTemp + 237.3))); // Tetans Equasion
 	float vapourPressurePsia;
 
@@ -292,6 +313,8 @@ float Maths::calculateVaporPressure(int units) {
 			return vapourPressurePsia;
 		break;
 	}   
+	
+	return vapourPressureKpa;
 
 }  
 	
@@ -348,105 +371,88 @@ float Maths::convertMassFlowToVolumetric(float massFlowKgh) {
 
 /***********************************************************
  * GET MAF FLOW in CFM
- * Lookup CFM value from MAF data array
+ * Lookup mass flow value from MAF data array and convert to cfm
  *
- * NOTE: mafMapData is global array declared in the MAFDATA files
+ * NOTE: mafLookupTable is global array declared in the MAFDATA files
  ***/
 float Maths::calculateMafFlowCFM() {
 	
-	extern struct ConfigSettings config;
 	extern CalibrationSettings calibration;
-	 
-//	float calibrationOffset;
-	float mafFlowRateCFM;
-	float mafFlowRateKGH;
-	float mafFlowRateRAW;
-	int mafFlowRaw = analogRead(MAF_PIN);
-	float mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
+	Sensors _sensors;
+	Hardware _hardware;
+		
+	float mafFlowRateCFM = 0;
+	float mafFlowRateKGH = 0;
+	double mafFlowRateRAW = 0;
+	
 	int lookupValue;
 	int numRows;
 
-	if (mafMillivolts < config.maf_min_millivolts) {
-	  return 0;
-	}
+	/* 
+		Get value from lookup table using the sensor value as lookup key.
+		The type of sensor is irrelevant as long as the corresponding lookup table is used.
+		i.e 500hz or 500mv will give the correct value provided the right table is called.
+	*/
 
-	if (MAFoutputType == FREQUENCY){
-		// TODO: #29 - MAF Data File configuration variables - add additional decode variables
-		// Add support for frequency based sensors
-	}
+	//Set size of array
+    numRows = sizeof(this->_mafLookupTable)/sizeof(this->_mafLookupTable[0]) -1;  
 
-	// determine what kind of MAF data array we have 
-	if (MAFdataFormat == RAW_ANALOG){
+	lookupValue = _sensors.getMafValue();
 
-		// we have a raw analog data array so we use the mafFlowRaw for the lookup
-		lookupValue = mafFlowRaw;
+	// Traverse the array until we find the lookupValue
+	for (int rowNum = 0; rowNum <= numRows; rowNum++) {
+	
+		// Lets check to see if exact match is found 
+		if (lookupValue == this->_mafLookupTable[rowNum][0]) {
+			// we've got the exact value
+			mafFlowRateRAW = this->_mafLookupTable[rowNum][1];
+			break;
 
-		// get the value directly from the data array
-		mafFlowRateRAW = mafMapAnalogData[mafFlowRaw];
+		// We've overshot so lets use the previous value
+		} else if ( this->_mafLookupTable[rowNum][0] > lookupValue ) {
 
-	} else {
+			if (rowNum == 0) {
+				// we were on the first row so lets set the value to zero and consider it no flow
+				return 0;
 
-		//Set size of array
-	   numRows = sizeof(mafMapData)/sizeof(mafMapData[0]);
-
-		// we have a mV / flow array so we use the mafMillivolts value for the lookup
-		lookupValue = mafMillivolts;
-
-		// then traverse the array until we find the lookupValue
-		for (int rowNum = 0; rowNum <= numRows; rowNum++) {
-		
-			// lets check to see if exact match is found 
-			if (lookupValue == mafMapData[rowNum][0]) {
-				// we've got the exact value
-				mafFlowRateRAW = mafMapData[rowNum][1];
-				break;
-
-			// We've overshot so lets use the previous value
-			} else if ( mafMapData[rowNum][0] > lookupValue ) {
-
-				if (rowNum == 0) {
-					// we were on the first row so lets set the value to zero and consider it no flow
-					return 0;
-
-				} else {
-					// Flow value is valid so let's convert it.
-					// lets use a linear interpolation formula to calculate the actual value
-					// NOTE: Y=Y0+(((X-X0)(Y1-Y0))/(X1-X0)) where Y = flow and X = Volts
-					mafFlowRateRAW = mafMapData[rowNum-1][1] + (((lookupValue - mafMapData[rowNum-1][0]) * (mafMapData[rowNum][1] - mafMapData[rowNum-1][1])) / (mafMapData[rowNum][0] - mafMapData[rowNum-1][0]));            
-				}
-				break;
+			} else {
+				// Flow value is valid so let's convert it.
+				// We use a linear interpolation formula to calculate the actual value
+				// NOTE: Y=Y0+(((X-X0)(Y1-Y0))/(X1-X0)) where Y = flow and X = Volts
+				mafFlowRateRAW = this->_mafLookupTable[rowNum-1][1] + (((lookupValue - this->_mafLookupTable[rowNum-1][0]) * (this->_mafLookupTable[rowNum][1] - this->_mafLookupTable[rowNum-1][1])) / (this->_mafLookupTable[rowNum][0] - this->_mafLookupTable[rowNum-1][0]));            
 			}
-
+			break;
 		}
-
 	}
 
-	// Get calibration offset from NVM
-//    EEPROM.get( NVM_CD_CAL_OFFSET_ADDR, calibrationOffset ); // REDUNDANT
+   	/* 
+	   Now that we have a value, we need to scale it and convert it.
+	   As we are use a MASS flow sensor, all values are going to be either kg/h or mg/sec
+	   The actual units used are determined by the mafDataUnit variable in the mafData file
+	 */
 
-	if (MAFdataUnit == KG_H) {
+	if (this->_mafDataUnit == KG_H) {
 
 		// convert RAW datavalue back into kg/h
 		mafFlowRateKGH = float(mafFlowRateRAW / 1000); 
 
-	} else if (MAFdataUnit == MG_S) {
+	} else if (this->_mafDataUnit == MG_S) {
 
 		//  convert mg/s value into kg/h
 		mafFlowRateKGH = float(mafFlowRateRAW * 0.0036); 
 	}
 
+	// Now we need to convert from kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
+	mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH) + calibration.flow_offset; 
 
-	// convert kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
-	mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH) + calibration.flow_offset; // add calibration offset to value 
-	//TODO: #21 Need to validate and test calibration routine
-
+	// lets stream data to the serial port if requested.
 	if (streamMafData == true) {
-		Serial.print(String(mafMillivolts));
-		Serial.println("mv = ");
-		if (MAFdataUnit == KG_H) {
+		Serial.print(String(lookupValue));
+		Serial.println(" (raw) = ");
+		if (this->_mafDataUnit == KG_H) {
 			Serial.print(String(mafFlowRateRAW / 1000));
 			Serial.println("kg/h = ");
-		} else if (MAFdataUnit == MG_S) {
+		} else if (this->_mafDataUnit == MG_S) {
 			Serial.print(String(mafFlowRateRAW));
 			Serial.println("mg/s = ");
 		}
@@ -469,15 +475,17 @@ float Maths::calculatePitotPressure(int units) {
 	 
 	float pitotPressureKpa = 0.00;
 	float pitotPressureInWg;
-	int supplyMillivolts = _hardware.getSupplyMillivolts() / 1000;
-	int rawPitotPressValue = analogRead(PITOT_PIN);     
-	int pitotPressMillivolts = (rawPitotPressValue * (5.0 / 1024.0)) * 1000;
+	
 
 	#ifdef PITOT_SENSOR_TYPE_MPXV7007DP
+	
+		float rawPitotPressValue = analogRead(PITOT_PIN);   
+		// UNUSED: int supplyMillivolts = _hardware.getSupplyMillivolts() / 1000;
+		// UNUSED: int pitotPressMillivolts = (rawPitotPressValue * (3.3 / 4095.0)) * 1000;
 		// sensor characteristics from datasheet
 		// Vout = VS x (0.057 x P + 0.5)
 
-		pitotPressureKpa = ((float)rawPitotPressValue / (float)1024 - 0.5) / 0.057;
+		pitotPressureKpa = (rawPitotPressValue / (float)1024 - 0.5) / 0.057;
 
 	#else
 		// No pitot probe used so lets return a zero value
@@ -497,6 +505,8 @@ float Maths::calculatePitotPressure(int units) {
 			return pitotPressureKpa;
 		break;
 	}
+	
+	return pitotPressureKpa;
 	
 }
 

@@ -26,25 +26,28 @@ public:
 	Sensors();
     void Begin();
 	void Initialise();
-    float MAF();
-	float Temp();
-	float Baro();
-	float RelH();
-	float PRef(int _unit);
-	float PDiff();
-	float Pitot();
+    float getMafValue();
+	float getTempValue();
+	float getBaroValue();
+	float getRelHValue();
+	float getPRefValue();
+	float getPDiffValue();
+	float getPitotValue();
 	float startupBaroPressure;
   
 private:
 	int _unit;
 	float _baro;
-	float _mafval;
+	float _maf;
 	float _relh;
 	float _temp;
 	float _pref;
 	float _pdiff;
 	float _pitot;
 	String _mafSensorType;
+	int _mafOutputType;
+	int _mafDataUnit;
+	
 	String _tempSensorType;
 	String _baroSensorType;
 	String _relhSensorType;

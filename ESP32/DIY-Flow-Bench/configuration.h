@@ -17,7 +17,7 @@
 
 #define MAJOR_VERSION "ESP-PORT"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "21082001"
+#define BUILD_NUMBER "21081302"
 #define RELEASE "V.ESP.X-ALPHA"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -25,6 +25,7 @@
 /***********************************************************
 * SYSTEM SETTINGS
 ***/
+#define BOOT_MESSAGE "May the flow be with you..."
 #define showAlarms true
 #define MIN_REFRESH_RATE 200
 #define LANGUAGE_FILE "language/EN_Language.h"
@@ -80,14 +81,20 @@
 * You will need to create your own MAF data file. Use exampleSensor.h as an example
 ***/
     
-// Uncomment One line only
-#define MAF_SENSOR_TYPE "mafData/ACDELCO_ 92281162.h" 
-// #define MAF_SENSOR_TYPE  "MH95-3000-100"                 // PMAS MH95-3000 in 100mm housing              
-// #define MAF_SENSOR_TYPE "mafData/SIEMENS_5WK9605"        // Data from Tonys tests
-// #define MAF_SENSOR_TYPE  "mafData/DELPHI_AF10118"        // kg/hr - Data from efidynotuning.com/maf.htm 
-// #define MAF_SENSOR_TYPE  "mafData/exampleKeyValueData"   // Example key > value data file 
-// #define MAF_SENSOR_TYPE  "mafData/exampleAnalogData"     // Example Analog point data file 
-// #define MAF_SENSOR_TYPE  "mafData/TEST"                  // Test Data
+// Uncomment One sensor only
+#define MAF_SENSOR_FILE "mafData/ACDELCO_92281162.h" 
+// #define MAF_SENSOR_FILE "mafData/ACDELCO_19330122.h" 
+// #define MAF_SENSOR_FILE "mafData/VDO_AFM_043.h"
+
+// #define MAF_SENSOR_FILE  "MH95_3000_100"                 // PMAS MH95-3000 in 100mm housing              
+// #define MAF_SENSOR_FILE "mafData/SIEMENS_5WK9605"        // Data from Tonys tests
+// #define MAF_SENSOR_FILE  "mafData/DELPHI_AF10118"        // kg/hr - Data from efidynotuning.com/maf.htm 
+// #define MAF_SENSOR_FILE  "mafData/exampleKeyValueData"   // Example key > value data file 
+// #define MAF_SENSOR_FILE  "mafData/exampleAnalogData"     // Example Analog point data file 
+// #define MAF_SENSOR_FILE  "mafData/TEST"                  // Test Data
+
+
+#define MAF_TRIMPOT 0.0
 
 
 
@@ -103,18 +110,38 @@
 // #define PREF_SENSOR_TYPE_MPXV7007      
 // #define PREF_SENSOR_TYPE_PX4250         
 
+#define PREF_TRIMPOT 0.0
+
+
+
+/***********************************************************
+* CONFIGURE DIFFERENTIAL PRESSURE SENSOR
+* If you want to modify the code to include additional reference pressure sensors
+* You will need to add your volts to kPa algorithm in the function calculateDiffPressure()
+***/
+#define DEFAULT_DIFF_PRESS 1
+
+// Uncomment One line only
+#define PDIFF_SENSOR_NOT_USED
+// #define PDIFF_SENSOR_TYPE_MPXV7007             
+
+#define PDIFF_TRIMPOT 0.0
+
+
 
 
 /***********************************************************
 * CONFIGURE PITOT PRESSURE SENSOR
 * If you want to modify the code to include additional pitot pressure sensors
-* You will need to add your volts to kPa algorythm in the function calculatePitotPressure()
+* You will need to add your volts to kPa algorithm in the function calculatePitotPressure()
 * Note Pitot sensors need to be a differential pressure sensor (DP)
 ***/
 
 // Uncomment One line only
-#define PITOT_SENSOR_NOT_USED;
-// #define PITOT_SENSOR_TYPE_MPXV7007DP;
+#define PITOT_SENSOR_NOT_USED
+// #define PITOT_SENSOR_TYPE_MPXV7007DP
+
+#define PITOT_TRIMPOT 0.0
 
 /***********************************************************
 * CONFIGURE BARO SENSOR
@@ -137,6 +164,9 @@
 #define startupBaroScalingOffset 100                        // scaling offset when using reference pressure sensor for baro correction
 
 
+#define BARO_TRIMPOT 0.0
+
+
 
 /***********************************************************
 * CONFIGURE TEMPERATURE SENSOR
@@ -153,6 +183,8 @@
 // #define TEMP_SENSOR_TYPE_SPARKFUN_BME280
 // #define TEMP_SENSOR_TYPE_ADAFRUIT_BME280
 // #define TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
+
+#define TEMP_TRIMPOT 0.0
 
 
 
@@ -172,7 +204,7 @@
 // #define RELH_SENSOR_TYPE_ADAFRUIT_BME280
 // #define RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
 
-
+#define RELH_TRIMPOT 0.0
 
 
 /***********************************************************

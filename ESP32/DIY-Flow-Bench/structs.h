@@ -24,7 +24,8 @@
 /***********************************************************
  * Configuration Settings
  *
- * NOTE: Do not edit these! Used to create default config file!
+ * NOTE: Do not edit these! Used to create default config file! 
+ * You can easily edit the config file via the browser after you connect!
  ***/
 struct ConfigSettings {
   String wifi_ssid = "WIFI-SSID";           // Your Wifi SSID
@@ -46,7 +47,7 @@ struct ConfigSettings {
   int leak_test_tolerance = 2;              // Leak test tolerance
   int leak_test_threshold = 10;             // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
   bool show_alarms = true;                  // Display Alarms?
-  bool debug_mode = true;
+  bool debug_mode = false;
   bool api_enabled = true;
   int tatltuae = 42;
   int parsecs = 12;
@@ -84,7 +85,7 @@ struct DeviceStatus {
   bool liveStream = false;
   int pollTimer = 0;
   int serialData = 0;
-  String statusMessage;
+  String statusMessage = BOOT_MESSAGE;
   bool apMode = false;
 };
 
@@ -108,4 +109,5 @@ struct FileUploadData {
   bool upload_error = false;
   int file_size = 0;
 };
+
 

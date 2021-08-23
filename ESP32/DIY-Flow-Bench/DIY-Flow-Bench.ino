@@ -52,14 +52,22 @@ CalibrationSettings calibration;
 DeviceStatus status;
 WebsocketData socketData;
 FileUploadData fileUploadData;
+//mafSensorData mafSensor;
 
+
+#include MAF_SENSOR_FILE
 #include LANGUAGE_FILE
+
+
+//test
+//#include "mafData/ACDELCO-92281162.h"
 
 #include "settings.h"
 #include "hardware.h"
 #include "sensors.h"
 #include "webserver.h"
 #include "API.h"
+
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");

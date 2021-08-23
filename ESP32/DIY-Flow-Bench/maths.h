@@ -25,11 +25,11 @@ class Maths {
 
 	public:
 		Maths();
-		double convertFlowDepression(float oldPressure = 10, int newPressure = 28, float inputFlow = 0);
+		double convertFlowDepression(float oldPressure, int newPressure, float inputFlow);
 		float calculateBaroPressure(int units);
 		float calculateRefPressure(int units);
 		float calculateTemperature(int units);
-		float calculateRelativeHumidity(int units = 0);
+		float calculateRelativeHumidity(int units);
 		float calculateVaporPressure(int units);
 		float calculateSpecificGravity();
 		float convertMassFlowToVolumetric(float massFlowKgh);
@@ -39,7 +39,10 @@ class Maths {
 		float startupBaroPressure;
 	
 	private:
-		const float MOLECULAR_WEIGHT_DRY_AIR = 28.964;
+		float MOLECULAR_WEIGHT_DRY_AIR;
 		bool streamMafData = false;
+		
+		int _mafDataUnit;
+		long _mafLookupTable[][2];
 
 };

@@ -281,10 +281,10 @@ void Webserver::ProcessUpload(AsyncWebServerRequest *request, String filename, s
   if(len) {   
     fileUploadData.file_size += len;
     if (fileUploadData.file_size > freespace) {  
-      Serial.println( 'Upload rejected, not enough space');
+      // TODO: Serial.println('Upload rejected, not enough space');
       fileUploadData.upload_error = true;
     } else {
-      Serial.println('Writing file: \"' + String(filename) + '\" index=' + String(index) + ' len=' + String(len));
+      // TODO: Serial.println('Writing file: \"' + String(filename) + '\" index=' + String(index) + ' len=' + String(len));
       request->_tempFile.write(data,len);
     }
   }
@@ -505,14 +505,21 @@ void Webserver::Initialise() {
 * Pulls HEADER value from JSON string
 ***/
  int Webserver::decodeMessageHeader (char *data) {
+   
+  Messages _message;
+  
+  int header = 0;
 
   StaticJsonDocument<1024> messageData;
   DeserializationError error = deserializeJson(messageData, data);
-  int header = messageData["HEADER"].as<int>();  
-
-  Serial.print("Decoded Message Header: ");
-  Serial.println(header, DEC);
-
+  if (!error){
+    header = messageData["HEADER"].as<int>();  
+    _message.DebugPrintLn("Decoded Message Header: ");
+    _message.DebugPrintLn(String(header));
+  } else {
+    _message.DebugPrintLn("Webserver::decodeMessageHeader ERROR");
+  }
+  
   return header;
 
 }
@@ -619,7 +626,7 @@ String Webserver::getDataJSON() {
   dataJson["RELH"] = String(_maths.calculateRelativeHumidity(PERCENT));
 
   // Pitot
-  double pitotPressure = _maths.calculatePitotPressure(INWG);
+  // NOT USED: double pitotPressure = _maths.calculatePitotPressure(INWG);
   // Pitot probe displays as a percentage of the reference pressure
   double pitotPercentage = (_maths.calculatePitotPressure(INWG) / refPressure);
   dataJson["PITOT"] = String(pitotPercentage);
@@ -690,12 +697,18 @@ void Webserver::writeJSONFile(String data, String filename) {
 
   StaticJsonDocument<1024> jsonData;
   DeserializationError error = deserializeJson(jsonData, data);
+  if (!error){
+    _message.DebugPrintLn("Writing JSON file...");  
+    File outputFile = SPIFFS.open(filename, FILE_WRITE);
+    serializeJsonPretty(jsonData, outputFile);
+    outputFile.close();
+  } else {
+    _message.DebugPrintLn("Webserver::writeJSONFile ERROR");
+  }
 
-  //_message.DebugPrintLn("Writing JSON file...");  
+  
 
-  File outputFile = SPIFFS.open(filename, FILE_WRITE);
-  serializeJsonPretty(jsonData, outputFile);
-  outputFile.close();
+
 
 }
 
@@ -710,6 +723,10 @@ void Webserver::writeJSONFile(String data, String filename) {
 StaticJsonDocument<1024> Webserver::loadJSONFile(String filename) {
   
   Messages _message;
+  
+  // Allocate the memory pool on the stack.
+  // Use arduinojson.org/assistant to compute the capacity.
+  StaticJsonDocument<1024> jsonData;
 
   if (SPIFFS.exists(filename)){
     File jsonFile = SPIFFS.open(filename, FILE_READ);
@@ -723,12 +740,8 @@ StaticJsonDocument<1024> Webserver::loadJSONFile(String filename) {
           #ifdef DEBUG 
             _message.DebugPrintLn("Config file size is too large");
           #endif
-          exit;
         }
-        // Allocate the memory pool on the stack.
-        // Use arduinojson.org/assistant to compute the capacity.
-        StaticJsonDocument<1024> jsonData;
-        
+
         DeserializationError error = deserializeJson(jsonData, jsonFile);
         if (error) {
           _message.DebugPrintLn("loadJSONFile->deserializeJson() failed: ");
@@ -746,4 +759,5 @@ StaticJsonDocument<1024> Webserver::loadJSONFile(String filename) {
   } else {
     _message.DebugPrintLn("File missing");
   }
+  return jsonData;
 }

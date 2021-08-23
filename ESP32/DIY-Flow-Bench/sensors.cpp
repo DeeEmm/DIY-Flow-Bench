@@ -23,26 +23,36 @@
 #include "constants.h"
 #include "pins.h"
 #include "structs.h"
+#include "hardware.h"
 #include "sensors.h"
+#include "driver/pcnt.h"
+
 #include LANGUAGE_FILE
+//#include MAF_SENSOR_FILE
 
 
-
-
-
-
-//Sensors::Sensors(int tempSensorType, int baroSensorType, int relhSensorType, int prefSensorType, int pdiffSensorType, int pitotSensorTyp) {
 Sensors::Sensors() {
 
-	
 	// Zero out the sensor values
-	this->_mafval = 0.0;
+	this->_maf = 0.0;
 	this->_baro = 0.0;
 	this->_relh = 0.0;
 	this->_temp = 0.0;
 	this->_pref = 0.0;
 	this->_pdiff = 0.0;
 	this->_pitot = 0.0;
+	
+	
+	
+	extern String mafSensorType;
+	extern int MAFoutputType;
+	extern int MAFdataUnit;
+	//extern long mafLookupTable[][2];
+	
+	
+	this->_mafSensorType = mafSensorType;
+	this->_mafOutputType  = MAFoutputType;
+	this->_mafDataUnit = MAFdataUnit;
 	
 
 }
@@ -98,11 +108,6 @@ void Sensors::Begin () {
 void Sensors::Initialise () {
 
 	extern struct DeviceStatus status;
-	
-	// MAF Sensor 
-	// TODO: Do we need to initialise different MAF types???
-	this->_mafSensorType = MAF_SENSOR_TYPE;
-	this->_mafSensorType.remove(0, 8);
 
 	// Baro Sensor
 	#ifdef BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
@@ -182,39 +187,16 @@ void Sensors::Initialise () {
 
 
 
-// Getters and setters - read sensor data and return it in SI Standard units
-
-/***********************************************************
- * Returns RAW MAF Sensor value
- *
- * MAF decode is done in Maths.cpp
- ***/
-float Sensors::MAF() {
-
-	// Maf Voltage
-	  int mafFlowRaw = analogRead(MAF_PIN);
-	  double mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
-	
-	// TODO: #26 Add MAF frequency style sensor 
-
-	return _mafval;
-}
 
 
 /***********************************************************
  * Returns temperature in Deg C
  ***/
-float Sensors::Temp() {
-
-	//float refAltRaw;
-	//float refPressureRaw;
-	//float refTempRaw;
+float Sensors::getTempValue() {
+	
+	Hardware _hardware;
 	float refTempDegC;
-	//float refTempDegF;
-	//float refTempRankine;
-	//float relativeHumidity;
-	byte refTemp;
-	//byte refRelh;
+
 
 	#ifdef TEMP_SENSOR_TYPE_ADAFRUIT_BME280
 		refTempDegC  =  adafruitBme280.readTemperature();
@@ -236,6 +218,8 @@ float Sensors::Temp() {
 		// We don't have any temperature input so we will assume default
 		refTempDegC = DEFAULT_TEMP;
 	#endif
+	
+	refTempDegC += TEMP_TRIMPOT;
 
 	return _temp;
 }
@@ -245,13 +229,19 @@ float Sensors::Temp() {
 /***********************************************************
  * Returns Barometric pressure in kPa
  ***/
-float Sensors::Baro() {
+float Sensors::getBaroValue() {
 	
-	float refBaroKpa;
+	Hardware _hardware;
+	float baroKpaRaw;
 	
 	//#elif defined BARO_SENSOR_TYPE_LINEAR_ANALOG
-		refBaroKpa = analogRead(REF_BARO_PIN);
-		_baro = refBaroKpa * BARO_ANALOG_SCALE;
+	baroKpaRaw = analogRead(REF_BARO_PIN);
+	
+	double baroMillivolts = (baroKpaRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
+	baroMillivolts += BARO_TRIMPOT;		
+	
+	
+	_baro = baroMillivolts * BARO_ANALOG_SCALE;
 	
 	
 	
@@ -263,14 +253,21 @@ float Sensors::Baro() {
 /***********************************************************
  * Returns Relative Humidity in %
  ***/
-float Sensors::RelH() {
+float Sensors::getRelHValue() {
 	
-	float refRelH;
+	Hardware _hardware;
+	float relhRaw;
 	
 	
 	//#elif defined RELH_SENSOR_TYPE_LINEAR_ANALOG
-		refRelH = analogRead(HUMIDITY_PIN);
-		_relh = refRelH * RELH_ANALOG_SCALE;
+	relhRaw = analogRead(HUMIDITY_PIN);
+	
+	double relhMillivolts = (relhRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
+	relhMillivolts += RELH_TRIMPOT;
+	
+	_relh = relhMillivolts * RELH_ANALOG_SCALE;
+
+
 
 	return _relh;
 }
@@ -280,12 +277,14 @@ float Sensors::RelH() {
 /***********************************************************
  * Returns Reference pressure in kPa
  ***/
-float Sensors::PRef(int _unit) {
+float Sensors::getPRefValue() {
+	
+	Hardware _hardware;
 
 	// Ref Pressure Voltage
-	  int refPressRaw = analogRead(REF_PRESSURE_PIN);
-	  double refMillivolts = (refPressRaw * (5.0 / 1024.0)) * 1000;
-	 
+	int refPressRaw = analogRead(REF_PRESSURE_PIN);
+	double prefMillivolts = (refPressRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
+	prefMillivolts += PREF_TRIMPOT;
 
 	return _pref;
 }
@@ -295,7 +294,9 @@ float Sensors::PRef(int _unit) {
 /***********************************************************
  * Returns Pressure differential in kPa
  ***/
-float Sensors::PDiff() {
+float Sensors::getPDiffValue() {
+	
+	Hardware _hardware;
 
 	return _pdiff;
 }
@@ -305,12 +306,178 @@ float Sensors::PDiff() {
 /***********************************************************
  * Returns Pitot pressure differential in kPa
  ***/
-float Sensors::Pitot() {
+float Sensors::getPitotValue() {
+	
+	Hardware _hardware;
 
 	// Pitot Voltage
-	  int pitotRaw = analogRead(PITOT_PIN);
-	  double pitotMillivolts = (pitotRaw * (5.0 / 1024.0)) * 1000;
-	  
+	int pitotRaw = analogRead(PITOT_PIN);
+	double pitotMillivolts = (pitotRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
+	pitotMillivolts += PITOT_TRIMPOT;
 
 	return _pitot;
 }
+
+
+
+
+
+/***********************************************************
+ * Returns RAW MAF Sensor value
+ *
+ * MAF decode is done in Maths.cpp
+ ***/
+float Sensors::getMafValue() {
+	
+	Hardware _hardware;
+	
+	switch (this->_mafOutputType) {
+		case VOLTAGE:
+		{
+			int mafFlowRaw = analogRead(MAF_PIN);
+			double mafMillivolts = (mafFlowRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
+			mafMillivolts += MAF_TRIMPOT;
+			return mafMillivolts;
+			
+			
+		}
+		break;
+		
+		case FREQUENCY:
+		{
+			//pinMode(MAF_PIN, INPUT);
+			//attachInterrupt(MAF_PIN, Ext_INT1_ISR, RISING);
+			
+			double mafFrequency = 0.0;
+			mafFrequency += MAF_TRIMPOT;
+			return mafFrequency;
+		}
+		break;
+		
+	}
+	
+	return _maf;
+
+}
+
+
+
+/*
+The MAF output frequency is a function of the power required to keep the air flow sensing elements (hot wires) at a fixed temperature above the ambient temperature. Air flowing through the sensor cools the sensing elements. The amount of cooling is proportional to the amount of air flow. The MAF sensor requires a greater amount of current in order to maintain the hot wires at a constant temperature as the air flow increases. The MAF sensor converts the changes in current draw to a frequency signal read by the PCM. The PCM calculates the air flow (grams per second) based on this signal.
+*/
+
+
+
+// https://github.com/DavidAntliff/esp32-freqcount/blob/master/frequency_count.c
+
+/*
+
+static void init_pcnt(uint8_t pulse_gpio, uint8_t ctrl_gpio, pcnt_unit_t unit, pcnt_channel_t channel, uint16_t filter_length)
+{
+	ESP_LOGD(TAG, "%s", __FUNCTION__);
+
+	// set up counter
+	pcnt_config_t pcnt_config = {
+		.pulse_gpio_num = pulse_gpio,
+		.ctrl_gpio_num = ctrl_gpio,
+		.lctrl_mode = PCNT_MODE_DISABLE,
+		.hctrl_mode = PCNT_MODE_KEEP,
+		.pos_mode = PCNT_COUNT_INC,  // count both rising and falling edges
+		.neg_mode = PCNT_COUNT_INC,
+		.counter_h_lim = 0,
+		.counter_l_lim = 0,
+		.unit = unit,
+		.channel = channel,
+	};
+
+	ESP_ERROR_CHECK(pcnt_unit_config(&pcnt_config));
+
+	// set the GPIO back to high-impedance, as pcnt_unit_config sets it as pull-up
+	ESP_ERROR_CHECK(gpio_set_pull_mode(pulse_gpio, GPIO_FLOATING));
+
+	// enable counter filter - at 80MHz APB CLK, 1000 pulses is max 80,000 Hz, so ignore pulses less than 12.5 us.
+	ESP_ERROR_CHECK(pcnt_set_filter_value(unit, filter_length));
+	ESP_ERROR_CHECK(pcnt_filter_enable(unit));
+}
+
+void frequency_count_task_function(void * pvParameter)
+{
+	frequency_count_configuration_t configuration;
+
+	assert(pvParameter);
+	ESP_LOGI(TAG, "Core ID %d", xPortGetCoreID());
+
+	configuration = *(frequency_count_configuration_t*)pvParameter;
+	frequency_count_configuration_t *task_inputs = &configuration;
+
+	ESP_LOGI(TAG, "pcnt_gpio %d, pcnt_unit %d, pcnt_channel %d, rmt_gpio %d, rmt_clk_div %d, sampling_period_seconds %f, sampling_window_seconds %f, filter_length %d",
+		task_inputs->pcnt_gpio,
+		task_inputs->pcnt_unit,
+		task_inputs->pcnt_channel,
+		task_inputs->rmt_gpio,
+		task_inputs->rmt_clk_div,
+		task_inputs->sampling_period_seconds,
+		task_inputs->sampling_window_seconds,
+		task_inputs->filter_length);
+
+	init_rmt(task_inputs->rmt_gpio, task_inputs->rmt_channel, task_inputs->rmt_clk_div);
+	init_pcnt(task_inputs->pcnt_gpio, task_inputs->rmt_gpio, task_inputs->pcnt_unit, task_inputs->pcnt_channel, task_inputs->filter_length);
+
+	// assuming 80MHz APB clock
+	const double rmt_period = (double)(task_inputs->rmt_clk_div) / 80000000.0;
+
+	const size_t items_size = RMT_MEM_BLOCK_BYTE_NUM * task_inputs->rmt_max_blocks;
+	rmt_item32_t * rmt_items = malloc(items_size);
+	assert(rmt_items);
+	memset(rmt_items, 0, items_size);
+	int num_rmt_items = create_rmt_window(rmt_items, task_inputs->sampling_window_seconds, rmt_period);
+	assert(num_rmt_items <= task_inputs->rmt_max_blocks * RMT_MEM_ITEM_NUM);
+
+	TickType_t last_wake_time = xTaskGetTickCount();
+	double frequency_hz;
+
+	while (1)
+	{
+		// clear counter
+		ESP_ERROR_CHECK(pcnt_counter_clear(task_inputs->pcnt_unit));
+
+		// start sampling window
+		ESP_ERROR_CHECK(rmt_write_items(task_inputs->rmt_channel, rmt_items, num_rmt_items, false));
+
+		// call wndow-start callback if set
+		if (task_inputs->window_start_callback)
+		{
+			(task_inputs->window_start_callback)();
+		}
+
+		// wait for window to finish
+		ESP_ERROR_CHECK(rmt_wait_tx_done(task_inputs->rmt_channel, portMAX_DELAY));
+
+		// read counter
+		int16_t count = 0;
+		ESP_ERROR_CHECK(pcnt_get_counter_value(task_inputs->pcnt_unit, &count));
+
+		// TODO: check for overflow?
+
+		frequency_hz = count / 2.0 / task_inputs->sampling_window_seconds;
+
+		// call the frequency update callback
+		if (task_inputs->frequency_update_callback)
+		{
+			(task_inputs->frequency_update_callback)(frequency_hz);
+		}
+
+		ESP_LOGD(TAG, "counter %d, frequency %f Hz", count, frequency_hz);
+
+		int delay_time = task_inputs->sampling_period_seconds * 1000 / portTICK_PERIOD_MS;
+		if (delay_time > 0)
+		{
+			vTaskDelayUntil(&last_wake_time, delay_time);
+		}
+	}
+
+	free(rmt_items);
+	free(task_inputs);  // TODO: avoid this if not dynamically allocated
+	vTaskDelete(NULL);
+}
+*/

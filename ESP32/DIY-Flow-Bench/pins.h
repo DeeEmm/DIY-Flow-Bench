@@ -17,7 +17,7 @@
 ***/
 #pragma once
 
-#include "configuration.h";
+#include "configuration.h"
 
 /***********************************************************
 * OFFICIAL DIYFB Shield 
@@ -125,7 +125,7 @@
     #define SERIAL0_TX              1                       // API
     #define SERIAL0_RX              3                       // API
     #define SERIAL2_TX              16                      // GAUGE PROTOCOL
-    #define SERIAL2_TX              17                      // GAUGE PROTOCOL
+    #define SERIAL2_RX              17                      // GAUGE PROTOCOL
     #define SCA_PIN                 21                      // BME280 etc
     #define SCL_PIN                 22                      // BME280 etc
     

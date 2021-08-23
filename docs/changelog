@@ -199,4 +199,15 @@ Build #         - Description of Change
                 - Updated README
 21082001        - Added vac control O/P
                 - #75 Fixed calibration data handling
-                
+21082301        - #78 Added Debug mode to API (Verbose messaging)
+                - Updated several compiler errors from WIN compiler
+                - Converted mafData files to individual classes
+                - Created single header file mafData.h
+                - Created frequency based MAF Data files
+                - #80 Added software trimpots
+                - Converted mafData files back to header files due to conflicts
+                - Renamed mafData files (changed dashes to underscores)
+                - Addressed compiletime issues found in Arduino IDE
+                - Compiling and working on Arduino-CLI
+21081302        - Renamed sensor classes
+                - Tidied up MAF sensor code

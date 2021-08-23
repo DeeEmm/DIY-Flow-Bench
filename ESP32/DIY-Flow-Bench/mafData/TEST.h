@@ -10,50 +10,53 @@
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
-#ifndef MAFDATA_DEFINED
-#define MAFDATA_DEFINED
+#ifndef MAFDATA
+#define MAFDATA
 
- 
- /***********************************************************
-   * MAF Type
-   *
-   ***/
-  #define MAF_SENSOR_TYPE "TEST"
-  
-  
-  /***********************************************************
- * MAF Output Type
- *
- * 1 = voltage
- * 2 = frequency
- ***/
-int MAFoutputType = 1;
+//#ifdef TEST
 
+#include "../constants.h"
 
-/***********************************************************
- * MAF Data format
- * 
- * 1 = key_value
- * 2 = rawAnalog (1024 data points)
- ***/
-int MAFdataFormat = 1; 
 
 
 
 /***********************************************************
- * MAF Units
- * 
- * 1 = kg_h
- * 2 = mg_s
- ***/
-int MAFdataUnit = 1;
+* MAF Type
+*
+***/
+
+String mafSensorType = "TEST";
+
 
 
 /***********************************************************
- * MAF Data
- ***/
-long mafMapAnalogData[] = {0,0}; // Need to declare unused analog array to prevent code breaking
-long mafMapData[][2] = {
+* MAF Output Type
+*
+* VOLTAGE
+* FREQUENCY
+***/
+
+int MAFoutputType = VOLTAGE;
+
+
+
+/***********************************************************
+* MAF Units
+* 
+* KG_H
+* MG_S
+***/
+
+int MAFdataUnit = KG_H;
+
+
+
+/***********************************************************
+* Kay>Val MAF Data 
+*
+***/
+    
+long mafLookupTable [][2] = {
 {100,6226},
 {200,6745},
 {300,7307},
@@ -105,5 +108,7 @@ long mafMapData[][2] = {
 {4900,291048},
 {5000,315320}
 };
+            
 
+//#endif
 #endif

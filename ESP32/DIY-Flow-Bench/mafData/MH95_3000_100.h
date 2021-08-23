@@ -10,8 +10,9 @@
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
-#ifndef MAFDATA_DEFINED
-#define MAFDATA_DEFINED
+#ifndef MAFDATA
+#define MAFDATA
+
 
 
 /***********************************************************
@@ -30,15 +31,6 @@
 int MAFoutputType = 1;
 
 
-/***********************************************************
- * MAF Data format
- * 
- * 1 = key_value
- * 2 = rawAnalog (1024 data points)
- ***/
-int MAFdataFormat = 1; 
-
-
 
 /***********************************************************
  * MAF Units
@@ -53,7 +45,7 @@ int MAFdataUnit = 1;
  * MAF Data
  ***/
 long mafMapAnalogData[] = {0,0}; // Need to declare unused analog array to prevent code breaking
-long mafMapData[][2] = {
+long mafLookupTable[][2] = {
 {880,1156},
 {896,1271},
 {912,1390},
