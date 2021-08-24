@@ -1,11 +1,16 @@
 # DIY-Flow-Bench
 
+## PLEASE NOTE:
+
+Please note that this version is soon to be superceded by the [ESP32 port](https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32)
+
+You can check progress on the ESP32 port in the [ESP32 Port Project](https://github.com/DeeEmm/DIY-Flow-Bench/projects/4)
+
+
 ## Version Information
 ###
 
 General Version 1.0-Beta
-
-Please note that this version is soon to be superceded by the ESP32 port.
 
 For current build version please check the BUILD_NUMBER in  docs/changelog
 
