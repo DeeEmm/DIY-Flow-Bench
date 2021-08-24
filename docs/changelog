@@ -209,5 +209,7 @@ Build #         - Description of Change
                 - Renamed mafData files (changed dashes to underscores)
                 - Addressed compiletime issues found in Arduino IDE
                 - Compiling and working on Arduino-CLI
-21081302        - Renamed sensor classes
+                - Renamed sensor classes
                 - Tidied up MAF sensor code
+21082401        - #81 Review 10-12 bit conversion for all inputs
+                - #26 Frequency based MAF support

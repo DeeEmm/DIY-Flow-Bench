@@ -33,7 +33,14 @@ public:
 	float getPRefValue();
 	float getPDiffValue();
 	float getPitotValue();
+	
+	void mafFreqCountISR();
+	void mafSetupISR(uint8_t irq_pin, void (*ISR_callback)(void), int value);
+	
 	float startupBaroPressure;
+	volatile uint64_t StartValue;                 
+	volatile uint64_t PeriodCount; 
+	hw_timer_t * timer;                   
   
 private:
 	int _unit;
@@ -47,6 +54,7 @@ private:
 	String _mafSensorType;
 	int _mafOutputType;
 	int _mafDataUnit;
+	
 	
 	String _tempSensorType;
 	String _baroSensorType;

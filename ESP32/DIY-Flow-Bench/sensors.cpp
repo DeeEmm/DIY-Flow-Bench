@@ -28,7 +28,6 @@
 #include "driver/pcnt.h"
 
 #include LANGUAGE_FILE
-//#include MAF_SENSOR_FILE
 
 
 Sensors::Sensors() {
@@ -42,22 +41,30 @@ Sensors::Sensors() {
 	this->_pdiff = 0.0;
 	this->_pitot = 0.0;
 	
-	
-	
 	extern String mafSensorType;
 	extern int MAFoutputType;
-	extern int MAFdataUnit;
-	//extern long mafLookupTable[][2];
-	
+	extern int MAFdataUnit;	
 	
 	this->_mafSensorType = mafSensorType;
 	this->_mafOutputType  = MAFoutputType;
 	this->_mafDataUnit = MAFdataUnit;
 	
+	// set up frequency style MAF
+	if (MAFoutputType == FREQUENCY) {
+		pinMode(MAF_PIN, INPUT); 
+	
+		volatile uint64_t StartValue = 0;                 
+		volatile uint64_t PeriodCount;                    
+		float Freq;                          
+		
+		hw_timer_t * timer = NULL;                        
+	}
 
 }
 
+
 void Sensors::Begin () {
+		
 	// What hardware / sensors do we have? Lets initialise them and report back to calling function
 	
 	// Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
@@ -102,12 +109,23 @@ void Sensors::Begin () {
 		#include <SimpleDHT.h>    		 
 	#endif
 
+
+
+
+
 }
+
+
+// VooDoo needed to get interrupt to work within class structure for frequency measurement. 
+// We declare an instance of the Sensor class so that we can use it for the MAF ISR
+// https://forum.arduino.cc/t/pointer-to-member-function/365758
+Sensors __mafVoodoo;
 
 
 void Sensors::Initialise () {
 
 	extern struct DeviceStatus status;
+	extern int MAFoutputType;
 
 	// Baro Sensor
 	#ifdef BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
@@ -170,9 +188,15 @@ void Sensors::Initialise () {
 	#elif defined PITOT_SENSOR_TYPE_MPXV7007
 		this->_pitotSensorType = "SMPXV7007";
 	#endif
-  
 	
-
+	
+	// Set up the MAF ISR if required
+	if (MAFoutputType == FREQUENCY) {	
+		__mafVoodoo.mafSetupISR(MAF_PIN, []{__mafVoodoo.mafFreqCountISR();}, FALLING);
+		timer = timerBegin(0, 2, true);                                  
+		timerStart(timer);	
+	}
+	
 	// Set status values for GUI
 	status.mafSensor = this->_mafSensorType;
 	status.baroSensor = this->_baroSensorType;
@@ -184,6 +208,69 @@ void Sensors::Initialise () {
 
 }
 
+
+/***********************************************************
+ * Set up MAF ISR
+ *
+ * We cannot call a non-static member function directly so we need to encapsulate it
+ * This is part of the Voodoo
+ ***/
+void Sensors::mafSetupISR(uint8_t irq_pin, void (*ISR_callback)(void), int value)
+{
+  attachInterrupt(digitalPinToInterrupt(irq_pin), ISR_callback, value);
+}
+
+
+
+
+/***********************************************************
+* Interrupt Service Routine for MAF Frequency measurement
+*
+* Determine how long since last triggered (Resides in RAM memory as it is faster)
+***/
+// TODO: Add IRAM_ATTR to Nova-Arduino 
+void IRAM_ATTR Sensors::mafFreqCountISR()
+{
+    uint64_t TempVal = timerRead(timer);            
+    PeriodCount = TempVal - StartValue;             
+    StartValue = TempVal;                           
+}
+
+
+
+
+/***********************************************************
+ * Returns RAW MAF Sensor value
+ *
+ * MAF decode is done in Maths.cpp
+ ***/
+float Sensors::getMafValue() {
+	
+	Hardware _hardware;
+	
+	switch (this->_mafOutputType) {
+		
+		case VOLTAGE:
+		{
+			int mafFlowRaw = analogRead(MAF_PIN);
+			double mafMillivolts = (mafFlowRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
+			_maf = mafMillivolts + MAF_TRIMPOT;
+			return _maf;
+		}
+		break;
+		
+		case FREQUENCY:
+		{  
+			_maf = 40000000.00 / PeriodCount;
+			//_maf = 40000000.00 / __mafVoodoo.PeriodCount; // NOTE: Do we need Voodoo?
+			_maf += MAF_TRIMPOT;
+			return _maf;
+		}
+		break;
+		
+	}	
+	return _maf;
+}
 
 
 
@@ -258,7 +345,6 @@ float Sensors::getRelHValue() {
 	Hardware _hardware;
 	float relhRaw;
 	
-	
 	//#elif defined RELH_SENSOR_TYPE_LINEAR_ANALOG
 	relhRaw = analogRead(HUMIDITY_PIN);
 	
@@ -322,56 +408,14 @@ float Sensors::getPitotValue() {
 
 
 
-/***********************************************************
- * Returns RAW MAF Sensor value
- *
- * MAF decode is done in Maths.cpp
- ***/
-float Sensors::getMafValue() {
-	
-	Hardware _hardware;
-	
-	switch (this->_mafOutputType) {
-		case VOLTAGE:
-		{
-			int mafFlowRaw = analogRead(MAF_PIN);
-			double mafMillivolts = (mafFlowRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
-			mafMillivolts += MAF_TRIMPOT;
-			return mafMillivolts;
-			
-			
-		}
-		break;
-		
-		case FREQUENCY:
-		{
-			//pinMode(MAF_PIN, INPUT);
-			//attachInterrupt(MAF_PIN, Ext_INT1_ISR, RISING);
-			
-			double mafFrequency = 0.0;
-			mafFrequency += MAF_TRIMPOT;
-			return mafFrequency;
-		}
-		break;
-		
-	}
-	
-	return _maf;
-
-}
 
 
 
-/*
-The MAF output frequency is a function of the power required to keep the air flow sensing elements (hot wires) at a fixed temperature above the ambient temperature. Air flowing through the sensor cools the sensing elements. The amount of cooling is proportional to the amount of air flow. The MAF sensor requires a greater amount of current in order to maintain the hot wires at a constant temperature as the air flow increases. The MAF sensor converts the changes in current draw to a frequency signal read by the PCM. The PCM calculates the air flow (grams per second) based on this signal.
-*/
-
-
+// TODO: Would like to implement PCNT pulse counter code but will see how interrupt handling performs first.
 
 // https://github.com/DavidAntliff/esp32-freqcount/blob/master/frequency_count.c
 
 /*
-
 static void init_pcnt(uint8_t pulse_gpio, uint8_t ctrl_gpio, pcnt_unit_t unit, pcnt_channel_t channel, uint16_t filter_length)
 {
 	ESP_LOGD(TAG, "%s", __FUNCTION__);

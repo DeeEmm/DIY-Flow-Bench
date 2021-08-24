@@ -24,7 +24,6 @@
 #include "sensors.h"
 #include "structs.h"
 #include "hardware.h"
-//#include MAF_SENSOR_FILE
 
 const float MOLECULAR_WEIGHT_DRY_AIR = 28.964;
 
@@ -37,10 +36,11 @@ Maths::Maths() {
 	 
 	this->_mafDataUnit = MAFdataUnit;
 	
-	//memcpy (b, a, 50*50*sizeof(float));
-	//memcpy(p, q, 13*15*sizeof(*p));
+	// lets copy our MAF lookup table into local scope
 	memcpy(this->_mafLookupTable, mafLookupTable, sizeof this->_mafLookupTable);
 	
+	//memcpy (b, a, 50*50*sizeof(float));
+	//memcpy(p, q, 13*15*sizeof(*p));
 	//this->_mafLookupTable[][2] = mafLookupTable[][2];
 }
 
@@ -59,9 +59,9 @@ float Maths::calculateBaroPressure(int units) {
 	// UNUSED: float baroPressureRaw;
 	// UNUSED: float refTempRaw;
 	// UNUSED: float refAltRaw;
-	// UNUSED: int supplyMillivolts = _hardware.getSupplyMillivolts();
-	// UNUSED: int rawBaroValue = analogRead(REF_BARO_PIN);
-	// UNUSED: int baroMillivolts = (rawBaroValue * (3.3 / 4095.0)) * 1000;
+	int supplyMillivolts = _hardware.getSupplyMillivolts();
+	int rawBaroValue = analogRead(REF_BARO_PIN);
+	int baroMillivolts = (rawBaroValue * (3.3 / 4095.0)) * 1000;
 
 	#ifdef BARO_SENSOR_TYPE_MPX4115
 		// Datasheet - https://html.alldatasheet.es/html-pdf/5178/MOTOROLA/MPX4115/258/1/MPX4115.html
@@ -115,9 +115,9 @@ float Maths::calculateRefPressure(int units) {
 	// UNUSED: float refPressureRaw;
 	// UNUSED: float refTempDegRaw;
 	// UNUSED: float refAltRaw;
-	// UNUSED: float supplyMillivolts = _hardware.getSupplyMillivolts();
-	// UNUSED: int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
-	// UNUSED: float refPressMillivolts = (rawRefPressValue * (3.3 / 4095.0)) * 1000;
+	float supplyMillivolts = _hardware.getSupplyMillivolts();
+	int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
+	float refPressMillivolts = (rawRefPressValue * (3.3 / 4095.0)) * 1000;
 
 	#ifdef PREF_SENSOR_TYPE_MPXV7007
 		// Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
@@ -299,7 +299,7 @@ float Maths::calculateVaporPressure(int units) {
 	 
 	float airTemp = this->calculateTemperature(DEGC);
 	// UNUSED: float molecularWeightOfDryAir = 28.964;
-	float vapourPressureKpa =(0.61078 * exp((17.27 * airTemp)/(airTemp + 237.3))); // Tetans Equasion
+	float vapourPressureKpa =(0.61078 * exp((17.27 * airTemp)/(airTemp + 237.3))); // Tetans Equation
 	float vapourPressurePsia;
 
 	 switch (units)
@@ -480,12 +480,12 @@ float Maths::calculatePitotPressure(int units) {
 	#ifdef PITOT_SENSOR_TYPE_MPXV7007DP
 	
 		float rawPitotPressValue = analogRead(PITOT_PIN);   
-		// UNUSED: int supplyMillivolts = _hardware.getSupplyMillivolts() / 1000;
+		int supplyMillivolts = _hardware.getSupplyMillivolts() / 1000;
 		// UNUSED: int pitotPressMillivolts = (rawPitotPressValue * (3.3 / 4095.0)) * 1000;
 		// sensor characteristics from datasheet
 		// Vout = VS x (0.057 x P + 0.5)
 
-		pitotPressureKpa = (rawPitotPressValue / (float)1024 - 0.5) / 0.057;
+		pitotPressureKpa = (rawPitotPressValue / supplyMillivolts - 0.5) / 0.057;
 
 	#else
 		// No pitot probe used so lets return a zero value

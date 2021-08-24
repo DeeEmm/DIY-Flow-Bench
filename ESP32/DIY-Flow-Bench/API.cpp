@@ -113,6 +113,8 @@ void API::ParseMessage(char apiMessage) {
 
   char serialResponse[30];
   double flowCFM = 0.01;
+  
+  
 
 
   switch (apiMessage)
@@ -160,7 +162,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'm': // Get MAF output voltage'
-          status.statusMessage = String("m") + config.api_delim + ((analogRead(MAF_PIN) * (5.0 / 1024.0)) * 1000);        
+          status.statusMessage = String("m") + config.api_delim + ((analogRead(MAF_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);        
       break;
 
       case 'T': // Get measured Temperature 'T.123.45\r\n'
@@ -168,7 +170,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 't': // Get Temperature sensor output voltage'
-          status.statusMessage = String("t") + config.api_delim + ((analogRead(TEMPERATURE_PIN) * (5.0 / 1024.0)) * 1000);
+          status.statusMessage = String("t") + config.api_delim + ((analogRead(TEMPERATURE_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);
       break;
 
       case 'H': // Get measured Humidity 'H.123.45\r\n'
@@ -176,7 +178,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'h': // Get Humidity sensor output voltage'
-          status.statusMessage = String("h") + config.api_delim + ((analogRead(HUMIDITY_PIN) * (5.0 / 1024.0)) * 1000);
+          status.statusMessage = String("h") + config.api_delim + ((analogRead(HUMIDITY_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);
       break;
 
       case 'R': // Get measured Reference Pressure 'R.123.45\r\n'
@@ -184,7 +186,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'r': // Get Reference Pressure sensor output voltage'
-          status.statusMessage = String("r") + config.api_delim + ((analogRead(REF_PRESSURE_PIN) * (5.0 / 1024.0)) * 1000);
+          status.statusMessage = String("r") + config.api_delim + ((analogRead(REF_PRESSURE_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);
       break;
 
       case 'B': // Get measured Baro Pressure 'B.123.45\r\n'
@@ -192,7 +194,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'b': // Get Baro Pressure sensor output voltage'
-          status.statusMessage = String("b") + config.api_delim + ((analogRead(REF_BARO_PIN) * (5.0 / 1024.0)) * 1000);
+          status.statusMessage = String("b") + config.api_delim + ((analogRead(REF_BARO_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);
       break;
 
       case 'v': // Get board supply voltage (mv) 'v.123.45\r\n'

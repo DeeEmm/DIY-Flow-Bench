@@ -45,6 +45,9 @@ Hardware::Hardware() {
  void Hardware::configurePins () {
    
     pinMode(VAC_BANK_1, OUTPUT);
+    
+    pinMode(MAF_PIN, INPUT); 
+  
  
  }
 
@@ -102,8 +105,14 @@ Hardware::Hardware() {
     SimpleDHT11 dht11(HUMIDITY_PIN);    
   #endif
 
+  
+  
+
+
 
  }
+
+
 
 
 /***********************************************************
