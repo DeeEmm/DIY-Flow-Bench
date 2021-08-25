@@ -44,13 +44,6 @@ public:
   
 private:
 	int _unit;
-	float _baro;
-	float _maf;
-	float _relh;
-	float _temp;
-	float _pref;
-	float _pdiff;
-	float _pitot;
 	String _mafSensorType;
 	int _mafOutputType;
 	int _mafDataUnit;

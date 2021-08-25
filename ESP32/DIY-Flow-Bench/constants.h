@@ -91,7 +91,7 @@
 #define REF_PRESS_AS_BARO 2
 #define FIXED_VALUE 3
 #define MPXV7007 4
-#define PX4250 5
+#define MPX4250 5
 #define MPXV7007DP 6
 #define ADAFRUIT_BME280 7
 #define SPARKFUN_BME280 8

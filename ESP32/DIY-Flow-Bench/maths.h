@@ -33,8 +33,9 @@ class Maths {
 		float calculateVaporPressure(int units);
 		float calculateSpecificGravity();
 		float convertMassFlowToVolumetric(float massFlowKgh);
-		float calculateMafFlowCFM();
+		float calculateFlowCFM();
 		float calculatePitotPressure(int units);
+		float calculateDiffPressure(int units);
 		
 		float startupBaroPressure;
 	

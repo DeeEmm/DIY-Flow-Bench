@@ -17,7 +17,7 @@
 
 #define MAJOR_VERSION "ESP-PORT"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "21081302"
+#define BUILD_NUMBER "21082501"
 #define RELEASE "V.ESP.X-ALPHA"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -33,10 +33,35 @@
 
 
 /***********************************************************
-* DEFAULT USER SETTINGS
-*
+* What style of bench is this?
 ***/
+#define MAF_STYLE_BENCH
+//#define ORIFICE_STYLE_BENCH
+//#define PITOT_STYLE_BENCH
+//#define VENTURI_STYLE_BENCH
 
+
+/***********************************************************
+* What orifices are used?
+* 
+* TODO: Move into configuration data
+*
+* {diameter_in_mm, cfm_flow@15"}
+***/
+// double orificeData [][2] = {
+//     {51.85,209.5},
+//     {42.38,139.5},
+//     {29.98,70.4},
+//     {21.16,35.5},
+//     {9.92,7.8}
+// };
+
+
+
+/***********************************************************
+* DEFAULT USER SETTINGS
+***/
+ 
 #define MIN_TEST_PRESSURE_PERCENTAGE 80                     // Lowest test pressure bench will generate accurate results. Please see note in wiki
 #define CONF_API_ENABLED                                    // enable API
 #define CONF_DISABLE_API_CHECKSUM                           // Add checksum to serial API response TODO: UPDATE CHECKSUM TO NATIVE ESP32 CRC32
@@ -87,10 +112,9 @@
 // #define MAF_SENSOR_FILE "mafData/VDO_AFM_043.h"
 
 // #define MAF_SENSOR_FILE  "MH95_3000_100"                 // PMAS MH95-3000 in 100mm housing              
-// #define MAF_SENSOR_FILE "mafData/SIEMENS_5WK9605"        // Data from Tonys tests
+// #define MAF_SENSOR_FILE  "mafData/SIEMENS_5WK9605"       // Data from Tonys tests
 // #define MAF_SENSOR_FILE  "mafData/DELPHI_AF10118"        // kg/hr - Data from efidynotuning.com/maf.htm 
-// #define MAF_SENSOR_FILE  "mafData/exampleKeyValueData"   // Example key > value data file 
-// #define MAF_SENSOR_FILE  "mafData/exampleAnalogData"     // Example Analog point data file 
+
 // #define MAF_SENSOR_FILE  "mafData/TEST"                  // Test Data
 
 
@@ -107,10 +131,12 @@
 
 // Uncomment One line only
 #define PREF_SENSOR_NOT_USED
+// #define PREF_SENSOR_TYPE_LINEAR_ANALOG 
 // #define PREF_SENSOR_TYPE_MPXV7007      
-// #define PREF_SENSOR_TYPE_PX4250         
+// #define PREF_SENSOR_TYPE_MPX4250         
 
 #define PREF_TRIMPOT 0.0
+#define PREF_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 
 
 
@@ -123,9 +149,11 @@
 
 // Uncomment One line only
 #define PDIFF_SENSOR_NOT_USED
+// #define PDIFF_SENSOR_TYPE_LINEAR_ANALOG 
 // #define PDIFF_SENSOR_TYPE_MPXV7007             
 
 #define PDIFF_TRIMPOT 0.0
+#define PDIFF_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 
 
 
@@ -139,14 +167,17 @@
 
 // Uncomment One line only
 #define PITOT_SENSOR_NOT_USED
+// #define PITOT_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from PITOT_PIN
 // #define PITOT_SENSOR_TYPE_MPXV7007DP
 
 #define PITOT_TRIMPOT 0.0
+#define PITOT_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
+
 
 /***********************************************************
 * CONFIGURE BARO SENSOR
 *
-* Default Baro 101.3529kpa - standard sealevel baro pressure (14.7 psi) 
+* Default Baro 101.3529kpa - standard sea level baro pressure (14.7 psi) 
 ***/
 
 
@@ -162,7 +193,6 @@
 #define BARO_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 #define startupBaroScalingFactor 1                          // scaling factor when using reference pressure sensor for baro correction
 #define startupBaroScalingOffset 100                        // scaling offset when using reference pressure sensor for baro correction
-
 
 #define BARO_TRIMPOT 0.0
 
@@ -185,6 +215,7 @@
 // #define TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 
 #define TEMP_TRIMPOT 0.0
+#define TEMP_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 
 
 

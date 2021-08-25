@@ -600,7 +600,7 @@ String Webserver::getDataJSON() {
   
   Maths _maths;
   
-  float mafFlowCFM = _maths.calculateMafFlowCFM();
+  float mafFlowCFM = _maths.calculateFlowCFM();
   float refPressure = _maths.calculateRefPressure(INWG);   
   StaticJsonDocument<1024> dataJson;    
 

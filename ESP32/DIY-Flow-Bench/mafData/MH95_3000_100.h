@@ -19,32 +19,34 @@
   * MAF Type
   *
   ***/
- #define MAF_SENSOR_TYPE "MH95-3000-100"
+ #define MAF_SENSOR_TYPE "MH95_3000_100"
  
  
- /***********************************************************
- * MAF Output Type
- *
- * 1 = voltage
- * 2 = frequency
- ***/
-int MAFoutputType = 1;
+
+/***********************************************************
+* MAF Output Type
+*
+* VOLTAGE
+* FREQUENCY
+***/
+int MAFoutputType = VOLTAGE;
 
 
 
 /***********************************************************
  * MAF Units
  * 
- * 1 = kg_h
- * 2 = mg_s
+ * KG_H
+ * MG_S
  ***/
-int MAFdataUnit = 1;
+
+int MAFdataUnit = KG_H;
 
 
 /***********************************************************
  * MAF Data
  ***/
-long mafMapAnalogData[] = {0,0}; // Need to declare unused analog array to prevent code breaking
+
 long mafLookupTable[][2] = {
 {880,1156},
 {896,1271},

@@ -148,7 +148,7 @@ void API::ParseMessage(char apiMessage) {
       case 'F': // Get measured Flow 'F123.45\r\n'
           status.statusMessage = String("F") + config.api_delim ;        
           // Truncate to 2 decimal places
-          flowCFM = _maths.calculateMafFlowCFM() * 100;
+          flowCFM = _maths.calculateFlowCFM() * 100;
           status.statusMessage += flowCFM / 100;
       break;
 
@@ -156,7 +156,7 @@ void API::ParseMessage(char apiMessage) {
           status.statusMessage = String("M") + config.api_delim ;        
           if (streamMafData == false) {
               streamMafData = true;
-              _maths.calculateMafFlowCFM();
+              _maths.calculateFlowCFM();
               streamMafData = false;         
           }
       break;
@@ -215,7 +215,7 @@ void API::ParseMessage(char apiMessage) {
           // Flow
           status.statusMessage = String("E") + config.api_delim ;        
           // Truncate to 2 decimal places
-          flowCFM = _maths.calculateMafFlowCFM() * 100;
+          flowCFM = _maths.calculateFlowCFM() * 100;
           status.statusMessage += (flowCFM / 100) + String(config.api_delim);
           // Reference Pressure
           status.statusMessage += _maths.calculateRefPressure(KPA) + String(config.api_delim);

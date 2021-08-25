@@ -213,3 +213,8 @@ Build #         - Description of Change
                 - Tidied up MAF sensor code
 21082401        - #81 Review 10-12 bit conversion for all inputs
                 - #26 Frequency based MAF support
+21082501        - Checked & updated remaining MAF data files
+                - Hardware::configurePins
+                - Added orifice detection code pins
+                - Started on #84 
+                - General code tidy

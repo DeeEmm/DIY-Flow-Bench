@@ -57,7 +57,7 @@ bool Calibration::setFlowOffset() {
   
   // Get the current flow value
   // TODO: need to determine what flow sensors are active (MAF / Orifice / Pitot)
-  float MafFlowCFM = _maths.calculateMafFlowCFM();
+  float MafFlowCFM = _maths.calculateFlowCFM();
   // Get the current reference pressure
   float RefPressure = _maths.calculateRefPressure(INWG);
   

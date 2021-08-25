@@ -32,94 +32,112 @@
 * CONSTRUCTOR
 */
 Hardware::Hardware() {
+  
 }
 
 
 
 /***********************************************************
- * INITIALISE HARDWARE
+* Configure pins
+*
+***/
+void Hardware::configurePins () {
  
- // TODO: Need to move ALL hardware initialisation into here
- 
- ***/
- void Hardware::configurePins () {
-   
-    pinMode(VAC_BANK_1, OUTPUT);
-    
-    pinMode(MAF_PIN, INPUT); 
+  // Inputs
+  pinMode(MAF_PIN, INPUT); 
+  pinMode(VOLTAGE_PIN, INPUT); 
+  pinMode(SPEED_SENSOR_PIN, INPUT); 
+  pinMode(REF_PRESSURE_PIN, INPUT); 
+  pinMode(DIFF_PRESSURE_PIN, INPUT); 
+  pinMode(PITOT_PIN, INPUT); 
+  #if defined TEMP_SENSOR_TYPE_LINEAR_ANALOG || defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
+    pinMode(TEMPERATURE_PIN, INPUT); 
+  #endif
+  #if defined RELH_SENSOR_TYPE_LINEAR_ANALOG || defined RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
+    pinMode(HUMIDITY_PIN, INPUT);  
+  #endif
+  #if defined BARO_SENSOR_TYPE_LINEAR_ANALOG || defined BARO_SENSOR_TYPE_MPX4115
+    pinMode(REF_BARO_PIN, INPUT);
+  #endif
   
- 
- }
+
+  // Outputs
+  pinMode(VAC_BANK_1, OUTPUT);
+  pinMode(VAC_BANK_2, OUTPUT);
+  pinMode(VAC_BANK_2, OUTPUT);
+  pinMode(VAC_SPEED_PIN, OUTPUT);
+  pinMode(VAC_BLEED_VALVE_PIN, OUTPUT);
+  pinMode(AVO_ENBL, OUTPUT);
+  pinMode(AVO_STEP, OUTPUT);
+  pinMode(AVO_DIR, OUTPUT);
+  pinMode(VAC_BANK_1, OUTPUT);
+
+}
 
 
 /***********************************************************
- * INITIALISE HARDWARE
- 
- // TODO: Need to move ALL hardware initialisation into here
- 
- ***/
- void Hardware::Initialise () {
- 
-  Messages _message;
-  
-  configurePins();
-  
+* INITIALISE HARDWARE
+* 
+* TODO: Need to move ALL hardware initialisation into here
+*
+***/
+void Hardware::Initialise () {
 
-  // Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
-  // https://github.com/adafruit/Adafruit_BME280_Library
-  #if defined(PREF_SENSOR_REF_ADAFRUIT_BME280) || defined(TEMP_SENSOR_ADAFRUIT_BME280) || defined(BARO_SENSOR_ADAFRUIT_BME280)
-    #include <Adafruit_BME280.h> 
-    Adafruit_BME280 adafruitBme280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
+Messages _message;
 
-    //I2C address - BME280_I2C_ADDR
-    if (!adafruitBme280.begin()) {  
-      _message.Handler(LANG_BME280_READ_FAIL);
-      _message.DebugPrintLn("Adafruit BME280 Initialisation failed");      
-    } else {
-      _message.DebugPrintLn("Adafruit BME280 Initialised");      
-    }
-  #endif
-
-  // Support for SPARKFUN_BME280 temp, pressure & Humidity sensors
-  // https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide?_ga=2.39864294.574007306.1596270790-134320310.1596270790
-  #if defined (RELH_SENSOR_SPARKFUN_BME280) || defined(TEMP_SENSOR_SPARKFUN_BME280) || defined(BARO_SENSOR_SPARKFUN_BME280)
-    #include "SparkFunBME280.h"
-    #include <Wire.h>
-    BME280 SparkFunBME280;
-
-    Wire.begin();
-    SparkFunBME280.setI2CAddress(BME280_I2C_ADDR); 
-    if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
-    {
-      _message.Handler(LANG_BME280_READ_FAIL);
-      _message.DebugPrintLn("Sparkfun BME280 Initialisation failed");      
-    } else {
-      _message.DebugPrintLn("Sparkfun BME280 Initialised");      
-    }
-  #endif
-
-  // Support for DHT11 humidity / temperature sensors
-  // https://github.com/winlinvip/SimpleDHT
-  #if RELH_SENSOR_SIMPLE_RELH_DHT11 || TEMP_SENSOR_SIMPLE_TEMP_DHT11
-    #include <SimpleDHT.h>  
-    SimpleDHT11 dht11(HUMIDITY_PIN);    
-  #endif
-
-  
-  
+configurePins();
 
 
+// Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
+// https://github.com/adafruit/Adafruit_BME280_Library
+#if defined(PREF_SENSOR_REF_ADAFRUIT_BME280) || defined(TEMP_SENSOR_ADAFRUIT_BME280) || defined(BARO_SENSOR_ADAFRUIT_BME280)
+  #include <Adafruit_BME280.h> 
+  Adafruit_BME280 adafruitBme280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
 
- }
+  //I2C address - BME280_I2C_ADDR
+  if (!adafruitBme280.begin()) {  
+    _message.Handler(LANG_BME280_READ_FAIL);
+    _message.DebugPrintLn("Adafruit BME280 Initialisation failed");      
+  } else {
+    _message.DebugPrintLn("Adafruit BME280 Initialised");      
+  }
+#endif
+
+// Support for SPARKFUN_BME280 temp, pressure & Humidity sensors
+// https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide?_ga=2.39864294.574007306.1596270790-134320310.1596270790
+#if defined (RELH_SENSOR_SPARKFUN_BME280) || defined(TEMP_SENSOR_SPARKFUN_BME280) || defined(BARO_SENSOR_SPARKFUN_BME280)
+  #include "SparkFunBME280.h"
+  #include <Wire.h>
+  BME280 SparkFunBME280;
+
+  Wire.begin();
+  SparkFunBME280.setI2CAddress(BME280_I2C_ADDR); 
+  if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
+  {
+    _message.Handler(LANG_BME280_READ_FAIL);
+    _message.DebugPrintLn("Sparkfun BME280 Initialisation failed");      
+  } else {
+    _message.DebugPrintLn("Sparkfun BME280 Initialised");      
+  }
+#endif
+
+// Support for DHT11 humidity / temperature sensors
+// https://github.com/winlinvip/SimpleDHT
+#if RELH_SENSOR_SIMPLE_RELH_DHT11 || TEMP_SENSOR_SIMPLE_TEMP_DHT11
+  #include <SimpleDHT.h>  
+  SimpleDHT11 dht11(HUMIDITY_PIN);    
+#endif
+
+}
 
 
 
 
 /***********************************************************
- * GET BOARD VOLTAGE
- *
- * NOTE: ESP32 has 12 bit ADC (0-3.3v = 0-4095)
- ***/
+* GET BOARD VOLTAGE
+*
+* NOTE: ESP32 has 12 bit ADC (0-3.3v = 0-4095)
+***/
 float Hardware::getSupplyMillivolts() {   
   int rawVoltageValue = analogRead(VOLTAGE_PIN);
   float supplyMillivolts = rawVoltageValue * (3.3 / 4095.0) * 1000;
@@ -141,7 +159,7 @@ bool Hardware::benchIsRunning() {
   
   // TODO: Check scope of these...
   float refPressure = _maths.calculateRefPressure(INWG);
-  float mafFlowRateCFM = _maths.calculateMafFlowCFM();
+  float mafFlowRateCFM = _maths.calculateFlowCFM();
 
   if ((refPressure > config.min_bench_pressure) && (mafFlowRateCFM > config.min_flow_rate))
   {

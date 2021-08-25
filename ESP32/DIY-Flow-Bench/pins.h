@@ -47,20 +47,19 @@
     #define VOLTAGE_PIN             0
     
     // SENSORS
-    #define SPEED_SENSOR_PIN        25                       // turbine speed for turbo flow bench
+    #define SPEED_SENSOR_PIN        25                       // turbine / rotor speed for turbo / blower flow bench
 
     #define MAF_PIN                 2
     #define REF_PRESSURE_PIN        4
     #define DIFF_PRESSURE_PIN       35
     #define PITOT_PIN               34
     
-    #define TEMPERATURE_PIN         26                      // NOTE: Not used by the DIYFB shield
-    #define REF_BARO_PIN            36                      // NOTE: Not used by the DIYFB shield
-    #define HUMIDITY_PIN            39                      // NOTE: Not used by the DIYFB shield
-
+    // ORIFICE DETECTION                                                                                    
+    #define ORIFICE_BCD_BIT1        26                      // NOTE: Normally TEMPERATURE_PIN
+    #define ORIFICE_BCD_BIT2        36                      // NOTE: Normally REF_BARO_PIN
+    #define ORIFICE_BCD_BIT3        39                      // NOTE: Normally HUMIDITY_PIN
     
-    // COMMS
-    
+    // COMMS    
     #define SERIAL0_TX              1                       // API
     #define SERIAL0_RX              3                       // API
     #define SERIAL2_TX              16                      // GAUGE PROTOCOL
@@ -68,7 +67,7 @@
     #define SCA_PIN                 21                      // BME280 etc
     #define SCL_PIN                 22                      // BME280 etc
 
-    // SPARE 
+    // SPARE - NOTE: Pins 15/32/33 are only available on Wemos D1 R32
     #define SPARE_PIN_1             15
     #define SPARE_PIN_2             32
     #define SPARE_PIN_3             33
@@ -119,9 +118,12 @@
     #define REF_BARO_PIN            36                      // NOTE: these become spare if BME280 used
     #define HUMIDITY_PIN            39                      // NOTE: these become spare if BME280 used
     
-    
+    // ORIFICE DETECTION                                                                                    
+    //#define ORIFICE_BCD_BIT1        26                      // NOTE: Normally TEMPERATURE_PIN
+    //#define ORIFICE_BCD_BIT2        36                      // NOTE: Normally REF_BARO_PIN
+    //#define ORIFICE_BCD_BIT3        39                      // NOTE: Normally HUMIDITY_PIN
+
     // COMMS
-    
     #define SERIAL0_TX              1                       // API
     #define SERIAL0_RX              3                       // API
     #define SERIAL2_TX              16                      // GAUGE PROTOCOL

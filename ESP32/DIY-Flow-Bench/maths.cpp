@@ -30,7 +30,6 @@ const float MOLECULAR_WEIGHT_DRY_AIR = 28.964;
 Maths::Maths() {
 	
 	extern String mafSensorType;
-	// extern int MAFoutputType;
 	extern int MAFdataUnit;
 	extern long mafLookupTable[][2];
 	 
@@ -48,42 +47,14 @@ Maths::Maths() {
 
 /***********************************************************
  * CALCULATE BAROMETRIC pressure (kPa)
- * NOTE: Sensor must return an absolute value
  ***/
 float Maths::calculateBaroPressure(int units) {   
 	
 	Hardware _hardware;
+	Sensors _sensors;
 
-	float baroPressureKpa;
-	float baroPressurePsia;
-	// UNUSED: float baroPressureRaw;
-	// UNUSED: float refTempRaw;
-	// UNUSED: float refAltRaw;
-	int supplyMillivolts = _hardware.getSupplyMillivolts();
-	int rawBaroValue = analogRead(REF_BARO_PIN);
-	int baroMillivolts = (rawBaroValue * (3.3 / 4095.0)) * 1000;
-
-	#ifdef BARO_SENSOR_TYPE_MPX4115
-		// Datasheet - https://html.alldatasheet.es/html-pdf/5178/MOTOROLA/MPX4115/258/1/MPX4115.html
-		// Vout = VS (P x 0.009 – 0.095) --- Where VS = Supply Voltage (Formula from Datasheet)
-		// P = ((Vout / VS ) - 0.095) / 0.009 --- Formula transposed for P
-		baroPressureKpa = (((float)baroMillivolts / (float)supplyMillivolts ) - 0.095) / 0.009; 
-
-	#elif defined BARO_SENSOR_TYPE_ADAFRUIT_BME280
-		baroPressureKpa =  adafruitBme280.readPressure() / 1000; //Pa
-
-	#elif defined BARO_SENSOR_TYPE_SPARKFUN_BME280
-		baroPressureKpa =  SparkFunBME280.readFloatPressure() / 1000; // Pa
-
-	#elif defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
-		// No baro sensor defined so use value grabbed at startup from reference pressure sensor
-		// NOTE will only work for absolute style pressure sensor like the MPX4250
-		baroPressureKpa = startupBaroPressure; 
-	#else
-		// we don't have any sensor so use default - // NOTE: standard sea level baro pressure is 14.7 psi
-		baroPressureKpa = DEFAULT_BARO;
-	#endif
-
+	float baroPressurePsia;	
+	float baroPressureKpa = _sensors.getBaroValue();
 
 	 switch (units)
 	{
@@ -104,52 +75,14 @@ float Maths::calculateBaroPressure(int units) {
 
 /***********************************************************
  * CALCULATE REFERENCE PRESSURE
- * Convert RAW pressure sensor data to In/WG or kPa
  ***/
 float Maths::calculateRefPressure(int units) {   
 	
-	Hardware _hardware;
+	Sensors _sensors;
 
-	float refPressureKpa = 0;
 	float refPressureInWg;
-	// UNUSED: float refPressureRaw;
-	// UNUSED: float refTempDegRaw;
-	// UNUSED: float refAltRaw;
-	float supplyMillivolts = _hardware.getSupplyMillivolts();
-	int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
-	float refPressMillivolts = (rawRefPressValue * (3.3 / 4095.0)) * 1000;
-
-	#ifdef PREF_SENSOR_TYPE_MPXV7007
-		// Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
-		// Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007DP Datasheet)
-		// P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
-		refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057;  
-
-	#elif defined PREF_SENSOR_TYPE_PX4250
-		// NOTE: Untested.  Also not best choice of sensor
-		// Datasheet - https://www.nxp.com/files-static/sensors/doc/data_sheet/MPX4250.pdf
-		// Vout = VS x (0.00369 x P + 0.04) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
-		// P = ((Vout / VS ) - 0.04) / 0.00369 --- Formula transposed for P
-		// Note we use the baro value as this is an absolute sensor, so to prevent circular references we need to know
-		// if we actually have a Baro sensor installed
-		#if defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO 
-			// we don't have a baro value so use the value hardcoded in the config to offset the pressure sensor value
-			refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - DEFAULT_BARO;  
-		#elif defined BARO_SENSOR_TYPE_FIXED_VALUE            
-			refPressureKpa = DEFAULT_BARO;
-		#else
-			// use the current baro value to offset the sensor value
-			refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - this->calculateBaroPressure(KPA);         
-		#endif
-
-	#elif defined PREF_SENSOR_NOT_USED 
-	#else
-		// No reference pressure sensor used so lets return a value (so as not to throw maths out)
-		// refPressureKpa = 6.97448943333324; //28"
-		refPressureKpa = DEFAULT_REF_PRESS;
-
-	#endif
-
+	float refPressureKpa = _sensors.getPRefValue();
+	
 	switch (units)
 	{
 		case INWG:
@@ -179,46 +112,60 @@ float Maths::calculateRefPressure(int units) {
 
 
 
+
+
+/***********************************************************
+ * CALCULATE DIFFERENTIAL PRESSURE
+ ***/
+float Maths::calculateDiffPressure(int units) {   
+	
+	Sensors _sensors;
+
+	float diffPressureInWg;
+	float diffPressureKpa = _sensors.getPDiffValue();
+	
+	switch (units)
+	{
+		case INWG:
+			// convert from kPa to inches Water
+			diffPressureInWg = diffPressureKpa * 4.0147421331128;
+			return diffPressureInWg;
+		break;
+
+		case KPA:
+			return diffPressureKpa;
+		break;
+
+		case BAR:
+			// 1kpa = 0.01 bar
+			return diffPressureKpa  * 0.01 ; 
+		break;
+
+		case PSIA:
+			diffPressureKpa = diffPressureKpa * 0.145038;
+			return diffPressureKpa  * 0.01 ;
+		break;
+	}
+	
+	return diffPressureKpa;
+	
+}
+
+
+
 /***********************************************************
  * CALCULATE TEMPERATURE
- * Convert RAW temperature sensor data
  ***/
 float Maths::calculateTemperature(int units) {   
 	
-	// UNUSED: float refAltRaw;
-	// UNUSED: float refPressureRaw;
-	// UNUSED: float refTempRaw;
-	float refTempDegC;
+	Sensors _sensors;
+
 	float refTempDegF;
 	float refTempRankine;
-	// UNUSED: float relativeHumidity;
-	// UNUSED: byte refTemp;
-	// UNUSED: byte refRelh;
+	float refTempDegC = _sensors.getTempValue();	
 
-
-	#ifdef TEMP_SENSOR_TYPE_ADAFRUIT_BME280
-		refTempDegC  =  adafruitBme280.readTemperature();
-
-	#elif defined TEMP_SENSOR_TYPE_SPARKFUN_BME280
-		refTempDegC =  SparkFunBME280.readTempC();
-
-	#elif defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
-		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
-		int err = SimpleDHTErrSuccess;
-		if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
-		  _message.Handler(LANG_DHT11_READ_FAIL); // Set error to display on screen
-		  refTempDegC = 0;        
-		} else {
-		  refTempDegC = refTemp;
-		}
-		
-	#else
-		// We don't have any temperature input so we will assume default
-		refTempDegC = DEFAULT_TEMP;
-	#endif
-
-	 switch (units)
-	{
+	switch (units) 	{
+	
 		case DEGC:
 			return refTempDegC;
 		break;
@@ -244,31 +191,9 @@ float Maths::calculateTemperature(int units) {
  ***/
 float Maths::calculateRelativeHumidity(int units) {   
 	
-	float relativeHumidity;
-	// UNUSED: float tempDegC;
-	// UNUSED: byte refTemp;
-	// UNUSED: byte refRelh;
+	Sensors _sensors;
 
-	#ifdef RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
-		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
-		int err = SimpleDHTErrSuccess;
-		if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
-		  _message.Handler(LANG_DHT11_READ_FAIL); // Set error to display on screen
-		  relativeHumidity = 0;        
-		} else {
-		  relativeHumidity = refRelh;
-		}
-
-	#elif defined RELH_SENSOR_TYPE_ADAFRUIT_BME280
-		relativeHumidity = adafruitBme280.readHumidity(); //%
-
-	#elif defined RELH_SENSOR_TYPE_SPARKFUN_BME280
-		relativeHumidity =  SparkFunBME280.readFloatHumidity();
-
-	#else
-		//we don't have any sensor so use standard value 
-		relativeHumidity = DEFAULT_RELH; // (36%)
-	#endif
+	float relativeHumidity = _sensors.getRelHValue();
 
 	switch (units)
 	{
@@ -280,7 +205,6 @@ float Maths::calculateRelativeHumidity(int units) {
 			return relativeHumidity;
 		break;
 
-
 	}  
 	
 	return relativeHumidity;
@@ -291,14 +215,11 @@ float Maths::calculateRelativeHumidity(int units) {
 
 
 /***********************************************************
- * CALCULATE VAPOR PRESSURE
+ * CALCULATE VAPOUR PRESSURE
  ***/
 float Maths::calculateVaporPressure(int units) {
 	 
-	 
-	 
 	float airTemp = this->calculateTemperature(DEGC);
-	// UNUSED: float molecularWeightOfDryAir = 28.964;
 	float vapourPressureKpa =(0.61078 * exp((17.27 * airTemp)/(airTemp + 237.3))); // Tetans Equation
 	float vapourPressurePsia;
 
@@ -335,7 +256,6 @@ float Maths::calculateSpecificGravity() {
 	
 	return specificGravity;
 
-
 }  
 	
 
@@ -370,128 +290,156 @@ float Maths::convertMassFlowToVolumetric(float massFlowKgh) {
 
 
 /***********************************************************
- * GET MAF FLOW in CFM
- * Lookup mass flow value from MAF data array and convert to cfm
- *
- * NOTE: mafLookupTable is global array declared in the MAFDATA files
+ * GET FLOW in CFM
  ***/
-float Maths::calculateMafFlowCFM() {
+float Maths::calculateFlowCFM() {
 	
 	extern CalibrationSettings calibration;
 	Sensors _sensors;
 	Hardware _hardware;
 		
-	float mafFlowRateCFM = 0;
-	float mafFlowRateKGH = 0;
-	double mafFlowRateRAW = 0;
+	float flowRateCFM = 0;
+	float flowRateKGH = 0;
+	double flowRateRAW = 0;
 	
-	int lookupValue;
-	int numRows;
-
-	/* 
-		Get value from lookup table using the sensor value as lookup key.
-		The type of sensor is irrelevant as long as the corresponding lookup table is used.
-		i.e 500hz or 500mv will give the correct value provided the right table is called.
-	*/
-
-	//Set size of array
-    numRows = sizeof(this->_mafLookupTable)/sizeof(this->_mafLookupTable[0]) -1;  
-
-	lookupValue = _sensors.getMafValue();
-
-	// Traverse the array until we find the lookupValue
-	for (int rowNum = 0; rowNum <= numRows; rowNum++) {
 	
-		// Lets check to see if exact match is found 
-		if (lookupValue == this->_mafLookupTable[rowNum][0]) {
-			// we've got the exact value
-			mafFlowRateRAW = this->_mafLookupTable[rowNum][1];
-			break;
+	/*
+	* MAF Style Bench
+	***/
+	#if defined MAF_STYLE_BENCH
+		
+		int lookupValue;
+		int numRows;
+		lookupValue = _sensors.getMafValue();
 
-		// We've overshot so lets use the previous value
-		} else if ( this->_mafLookupTable[rowNum][0] > lookupValue ) {
+		//Set size of array
+	    numRows = sizeof(this->_mafLookupTable)/sizeof(this->_mafLookupTable[0]) -1;  
 
-			if (rowNum == 0) {
-				// we were on the first row so lets set the value to zero and consider it no flow
-				return 0;
-
-			} else {
-				// Flow value is valid so let's convert it.
-				// We use a linear interpolation formula to calculate the actual value
-				// NOTE: Y=Y0+(((X-X0)(Y1-Y0))/(X1-X0)) where Y = flow and X = Volts
-				mafFlowRateRAW = this->_mafLookupTable[rowNum-1][1] + (((lookupValue - this->_mafLookupTable[rowNum-1][0]) * (this->_mafLookupTable[rowNum][1] - this->_mafLookupTable[rowNum-1][1])) / (this->_mafLookupTable[rowNum][0] - this->_mafLookupTable[rowNum-1][0]));            
+		// Traverse the array until we find the lookupValue
+		for (int rowNum = 0; rowNum <= numRows; rowNum++) {
+		
+			// Lets check to see if exact match is found 
+			if (lookupValue == this->_mafLookupTable[rowNum][0]) {
+				// we've got the exact value
+				flowRateRAW = this->_mafLookupTable[rowNum][1];
+				break;
+	
+			// We've overshot so lets use the previous value
+			} else if ( this->_mafLookupTable[rowNum][0] > lookupValue ) {
+	
+				if (rowNum == 0) {
+					// we were on the first row so lets set the value to zero and consider it no flow
+					return 0;
+				} else {
+					// Flow value is valid so let's convert it. 
+					// We use a linear interpolation formula to calculate the actual value
+					// NOTE: Y=Y0+(((X-X0)(Y1-Y0))/(X1-X0)) where Y = flow and X = Volts
+					flowRateRAW = this->_mafLookupTable[rowNum-1][1] + (((lookupValue - this->_mafLookupTable[rowNum-1][0]) * (this->_mafLookupTable[rowNum][1] - this->_mafLookupTable[rowNum-1][1])) / (this->_mafLookupTable[rowNum][0] - this->_mafLookupTable[rowNum-1][0]));            
+				}
+				break;
 			}
-			break;
 		}
-	}
+		
+		// Now that we have a flow value, we need to scale it and convert it.	
+		if (this->_mafDataUnit == KG_H) {
+	
+			// convert RAW datavalue back into kg/h
+			flowRateKGH = float(flowRateRAW / 1000); 
+	
+		} else if (this->_mafDataUnit == MG_S) {
+	
+			//  convert mg/s value into kg/h
+			flowRateKGH = float(flowRateRAW * 0.0036); 
+		}
+	
+		// Now we need to convert from kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
+		flowRateCFM = convertMassFlowToVolumetric(flowRateKGH) + calibration.flow_offset; 
+		
+		// TODO: we should also report back the MASS flow as ultimately this is more useful than CFM
+		
+	
+	/*
+	* Orifice Style Bench
+	***/
+	#elif defined ORIFICE_STYLE_BENCH //ratiometric
+	
+		// We use the ref pressure + differential pressure (pressure drop) across the orifice to calculate the flow. The pressure drop across an orifice is to the square of the flow. If flow doubles, pressure goes up 4 times, therefore the scale is logarithmic.
+		
+		// Assuming that the test pressure = pressure that orifices were calibrated at...
+		// If diff pressure = 0 and the bench is running we must be flowing 100% of calibrated orifice flow rate
+		// If diff pressure is equal to the ref pressure we must be flowing zero
+		// All other values are somewhere in between and can be expressed as a percentage (ratio) of the orifice's calibrated flow rate
+		
+		// #1 We need to know what orifice we are using - Get selected orifice flow + ref pressure it was calibrated at
+		
+		// #2 Convert orifice flow for current test (ref) pressure 
+		
+		// #3 Calculate flow as percentage of the reference orifice flow rate
+	
+		flowRateCFM = 0;	
+		
+		// TODO: we should convert CFM to MASS flow and also report this figure as ultimately it is more useful
+	
+	
+	/*
+	* Venturi Style Bench
+	***/
+	#elif defined VENTURI_STYLE_BENCH  //ratiometric
+	
+		// same process as per orifice style bench. Different size orifices are used for different flow rates
+		
+		
+		flowRateCFM = 0;
+	
+		// TODO: we should convert CFM to MASS flow and also report this figure as ultimately it is more useful
+	
+	
+	/*
+	* Pitot Style Bench
+	***/
+	#elif defined PITOT_STYLE_BENCH //ratiometric
+	
+		// Similar process to both orifice and Venturi but requires static pressure data 
+	
+	
+	
+		flowRateCFM = 0;
+		
+		// TODO: we should convert CFM to MASS flow and also report this figure as ultimately it is more useful
+		
+	#endif
 
-   	/* 
-	   Now that we have a value, we need to scale it and convert it.
-	   As we are use a MASS flow sensor, all values are going to be either kg/h or mg/sec
-	   The actual units used are determined by the mafDataUnit variable in the mafData file
-	 */
 
-	if (this->_mafDataUnit == KG_H) {
-
-		// convert RAW datavalue back into kg/h
-		mafFlowRateKGH = float(mafFlowRateRAW / 1000); 
-
-	} else if (this->_mafDataUnit == MG_S) {
-
-		//  convert mg/s value into kg/h
-		mafFlowRateKGH = float(mafFlowRateRAW * 0.0036); 
-	}
-
-	// Now we need to convert from kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
-	mafFlowRateCFM = convertMassFlowToVolumetric(mafFlowRateKGH) + calibration.flow_offset; 
-
-	// lets stream data to the serial port if requested.
+	
+	// Send data to the serial port if requested.
 	if (streamMafData == true) {
 		Serial.print(String(lookupValue));
 		Serial.println(" (raw) = ");
 		if (this->_mafDataUnit == KG_H) {
-			Serial.print(String(mafFlowRateRAW / 1000));
+			Serial.print(String(flowRateRAW / 1000));
 			Serial.println("kg/h = ");
 		} else if (this->_mafDataUnit == MG_S) {
-			Serial.print(String(mafFlowRateRAW));
+			Serial.print(String(flowRateRAW));
 			Serial.println("mg/s = ");
 		}
-		Serial.print(String(mafFlowRateCFM ));
+		Serial.print(String(flowRateCFM ));
 		Serial.println("cfm \r\n");
 	}
 
-	return mafFlowRateCFM;
+	return flowRateCFM;
 }
 
 
 
 /***********************************************************
- * CALCULATE PITOT PROBE
- * Convert RAW differential pressure sensor data
+ * CALCULATE PITOT PROBE VALUE
  ***/
 float Maths::calculatePitotPressure(int units) {
 	
 	Hardware _hardware;
 	 
-	float pitotPressureKpa = 0.00;
+	float pitotPressureKpa = 0.0;
 	float pitotPressureInWg;
-	
-
-	#ifdef PITOT_SENSOR_TYPE_MPXV7007DP
-	
-		float rawPitotPressValue = analogRead(PITOT_PIN);   
-		int supplyMillivolts = _hardware.getSupplyMillivolts() / 1000;
-		// UNUSED: int pitotPressMillivolts = (rawPitotPressValue * (3.3 / 4095.0)) * 1000;
-		// sensor characteristics from datasheet
-		// Vout = VS x (0.057 x P + 0.5)
-
-		pitotPressureKpa = (rawPitotPressValue / supplyMillivolts - 0.5) / 0.057;
-
-	#else
-		// No pitot probe used so lets return a zero value
-		pitotPressureKpa = 0;
-
-	#endif
 
 	switch (units)
 	{
@@ -525,7 +473,6 @@ float Maths::calculatePitotPressure(int units) {
 */
 
 double Maths::convertFlowDepression(float oldPressure, int newPressure, float inputFlow) {
-		
 
   double outputFlow;
   double pressureRatio = (newPressure / oldPressure);
