@@ -1,5 +1,7 @@
 # DIY-Flow-Bench
 
+![DIY Flow Bench Web Interface](https://user-images.githubusercontent.com/3038710/126745200-fead302f-e0aa-48b6-8165-f72902b1edac.png)
+
 ## Version Information
 ###
 
