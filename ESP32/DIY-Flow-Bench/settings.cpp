@@ -75,7 +75,7 @@ StaticJsonDocument<1024> Settings::LoadConfig () {
   Webserver _webserver;
   Messages _message;
   
-  _message.DebugPrintLn("Settings::LoadConfig"); 
+  _message.SerialPrintLn("Loading Configuration..."); 
   
   StaticJsonDocument<1024> configData;
   configData = _webserver.loadJSONFile("/config.json");

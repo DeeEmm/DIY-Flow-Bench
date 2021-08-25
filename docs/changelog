@@ -221,3 +221,5 @@ Build #         - Description of Change
 21082502        - Reviewed Status and error messages
                 - Changed release version to V2
                 - Package up for Release Candidate 1
+21082503        - #87 Wifi client network
+                - Corrected millivolt calc in Webserver::getDataJSON

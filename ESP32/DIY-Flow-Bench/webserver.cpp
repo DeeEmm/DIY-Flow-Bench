@@ -353,6 +353,9 @@ void Webserver::Initialise() {
       _calibration.createCalibrationFile();
     }
     
+    _settings.LoadConfig();
+    _calibration.loadCalibration();
+    
     // Filesystem info
     status.spiffs_mem_size = SPIFFS.totalBytes();
     status.spiffs_mem_used = SPIFFS.usedBytes();
@@ -373,12 +376,12 @@ void Webserver::Initialise() {
     status.apMode = false;
     unsigned long timeOut;
     timeOut = millis() + config.wifi_timeout;
-    _message.DebugPrintLn("Connecting to WiFi");
+    _message.SerialPrintLn("Connecting to WiFi");
     WiFi.mode(WIFI_STA);
     WiFi.begin(config.wifi_ssid.c_str(), config.wifi_pswd.c_str());
     while (WiFi.status() != WL_CONNECTED && millis() < timeOut) {
       delay(1000);
-      _message.DebugPrint(".");
+      _message.SerialPrint(".");
     } 
     if (WiFi.status() == WL_CONNECTED) {  
       // Connection success     
@@ -605,6 +608,7 @@ String Webserver::getDataJSON() {
   extern struct ConfigSettings config;
   
   Maths _maths;
+  Hardware _hardware;
   
   float mafFlowCFM = _maths.calculateFlowCFM();
   float refPressure = _maths.calculateRefPressure(INWG);   
@@ -654,19 +658,21 @@ String Webserver::getDataJSON() {
   dataJson["RELEASE"] = String(RELEASE);
   dataJson["BUILD_NUMBER"] = String(BUILD_NUMBER);
 
+  int supplyMillivolts = _hardware.getSupplyMillivolts();
+  
   // Ref Pressure Voltage
   int refPressRaw = analogRead(REF_PRESSURE_PIN);
-  double refMillivolts = (refPressRaw * (5.0 / 1024.0)) * 1000;
+  double refMillivolts = (refPressRaw * (supplyMillivolts / 4095.0)) * 1000;
   dataJson["PREF_MV"] = String(refMillivolts);
 
   // Maf Voltage
   int mafFlowRaw = analogRead(MAF_PIN);
-  double mafMillivolts = (mafFlowRaw * (5.0 / 1024.0)) * 1000;
+  double mafMillivolts = (mafFlowRaw * (supplyMillivolts / 4095.0)) * 1000;
   dataJson["MAF_MV"] = String(mafMillivolts);
 
   // Pitot Voltage
   int pitotRaw = analogRead(PITOT_PIN);
-  double pitotMillivolts = (pitotRaw * (5.0 / 1024.0)) * 1000;
+  double pitotMillivolts = (pitotRaw * (supplyMillivolts / 4095.0)) * 1000;
   dataJson["PITOT_MV"] = String(pitotMillivolts);
 
   char jsonString[1024];
