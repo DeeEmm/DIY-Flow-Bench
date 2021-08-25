@@ -1,0 +1,35 @@
+{
+  "name": "diy-flow-bench",
+  "version": "1.0.0",
+  "description": "## Version Information ###",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeeEmm/DIY-Flow-Bench.git"
+  },
+  "author": "DeeEmm",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/DeeEmm/DIY-Flow-Bench/issues"
+  },
+  "homepage": "https://github.com/DeeEmm/DIY-Flow-Bench#readme",
+  "dependencies": {
+    "gulp-clean": "^0.4.0",
+    "gulp-cli": "^1.4.0",
+    "gulp-cssnano": "^1.1.0",
+    "gulp-gzip": "^1.4.2",
+    "gulp-htmlmin": "^5.0.1",
+    "gulp-remove-html-comments": "^1.0.1",
+    "gulp-replace": "^1.1.3",
+    "gulp-terser": "^2.0.1"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2"
+  }
+}
