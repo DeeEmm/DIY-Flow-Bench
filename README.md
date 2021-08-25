@@ -48,7 +48,7 @@ The DIYFB system can be used on any flow bench and makes an ideal retrofit for o
 ## Download
 ###
 
-You can download the latest release from our Githib repository at https://github.com/DeeEmm/DIY-Flow-Bench/releases
+You can download the latest release from our [Githib repository](https://github.com/DeeEmm/DIY-Flow-Bench/releases)
 
 
 ## Development Info
@@ -57,21 +57,19 @@ This branch contains the current release candidate and is based on the ESP32 por
 
 After unit and peer testing is concluded and all bugs are resolved, this version will become the official DIYFB V2 release.
 
-IF you use this code and have found issues or have comments relating to the release, please raise an issue in the bugtracker.
+If you use this code and have found issues or have comments relating to the release, please raise an issue in the bugtracker.
 
-- Bugtracker - https://github.com/DeeEmm/DIY-Flow-Bench/issues
-- Discussion for this version - https://github.com/DeeEmm/DIY-Flow-Bench/discussions/49
-- Discord Chat - https://discord.gg/eAbktJj
+- [Bugtracker](https://github.com/DeeEmm/DIY-Flow-Bench/issues)
+- [Discussion for this version](https://github.com/DeeEmm/DIY-Flow-Bench/discussions/49)
+- [Discord Chat](https://discord.gg/eAbktJj)
 
 
 
 ## Support
 
-Documentation is provided for installation, configuration and use in the WIKI
+Documentation is provided for installation, configuration and use in the [WIKI](https://github.com/DeeEmm/DIY-Flow-Bench/wiki)
 
-- [https://github.com/DeeEmm/DIY-Flow-Bench/wiki](https://github.com/DeeEmm/DIY-Flow-Bench/wiki)
-
-If you get stuck, feel free to create a [discussion](https://github.com/DeeEmm/DIY-Flow-Bench/discussions) or hit us up over on the [Discord](https://discord.gg/eAbktJj) channel.
+If you get stuck, feel free to create a [discussion](https://github.com/DeeEmm/DIY-Flow-Bench/discussions/)  in the support forum, or hit us up over on the [Discord](https://discord.gg/eAbktJj) channel.
 
 If you find an issue, or have a feature request, please [raise an issue](https://github.com/DeeEmm/DIY-Flow-Bench/issues)
 
@@ -88,8 +86,8 @@ This project is released under the GPLV3 license. For details on usage please re
 ## Further Information
 ###
 
-- The latest information can be found in the project WIKI - https://github.com/DeeEmm/DIY-Flow-Bench/wiki
-- Github repository - https://github.com/DeeEmm/DIY-Flow-Bench
-- Support forums - https://github.com/DeeEmm/DIY-Flow-Bench/discussions
-- Discord - https://discord.gg/eAbktJj
-- Join our project community - https://www.facebook.com/groups/diyflowbench/ 
+- [Project WIKI]( https://github.com/DeeEmm/DIY-Flow-Bench/wiki)
+- [Github repository](https://github.com/DeeEmm/DIY-Flow-Bench)
+- [Support forums](https://github.com/DeeEmm/DIY-Flow-Bench/discussions) 
+- [Discord](https://discord.gg/eAbktJj)
+- [Join our project community](https://www.facebook.com/groups/diyflowbench/)
