@@ -36,11 +36,11 @@ The DIYFB system can be used on any flow bench and makes an ideal retrofit for o
 
 ## Project Goals
 ###
-- Validated software and hardware design
+- Validated software and hardware design.
 - Affordable & easy to source components.
 - Can be built & operated by a layman.
 - Generates results comparable with commercial flow bench.
-- Open source software and hardware design
+- Open source software and hardware design.
 
 
 ## Download
@@ -51,16 +51,13 @@ You can download the latest release from our Githib repository at https://github
 
 ## Development Info
 
-This branch contains current development version for the ESP32 port.
+This branch contains the current release candidate and is based on the ESP32 port of the original project.
 
-There is no official ESP32 release at this stage and whilst commits are undertaken to ensure functional code is uploaded, code may on occasion break.
+After unit and peer testing is concluded and all bugs are resolved, this version will become the official DIYFB V2 release.
 
-The main goal of the project is to develop functional ESP port with WiFi access and WEB-GUI that will replace the existing Arduino based main development branch.
+IF you use this code and have found issues or have comments relating to the release, please raise an issue in the bugtracker.
 
-Current status of the project can be viewed at
-
-- https://github.com/DeeEmm/DIY-Flow-Bench/projects/4
-
+- Bugtracker - https://github.com/DeeEmm/DIY-Flow-Bench/issues
 - Discussion for this version - https://github.com/DeeEmm/DIY-Flow-Bench/discussions/49
 - Discord Chat - https://discord.gg/eAbktJj
 
@@ -68,11 +65,15 @@ Current status of the project can be viewed at
 
 ## Support
 
-No official support is offered for development versions however basic ESP32 installation information can be found at
+Documentation is provided for installation, configuration and use in the WIKI
 
-- [https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Installation](https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Installation)
+- [https://github.com/DeeEmm/DIY-Flow-Bench/wiki](https://github.com/DeeEmm/DIY-Flow-Bench/wiki)
 
-If you get stuck, feel free to hit us up over on the Discord channel.
+If you get stuck, feel free to create a [discussion](https://github.com/DeeEmm/DIY-Flow-Bench/discussions) or hit us up over on the [Discord](https://discord.gg/eAbktJj) channel.
+
+If you find an issue, or have a feature request, please [raise an issue](https://github.com/DeeEmm/DIY-Flow-Bench/issues)
+
+
 
 
 ## License
