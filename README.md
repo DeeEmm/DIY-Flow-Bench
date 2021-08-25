@@ -3,7 +3,7 @@
 ## Version Information
 ###
 
-General Version ESP.X-Beta
+General Version V2.0-RC.1
 
 For current build version please check the BUILD_NUMBER in docs/changelog
 

@@ -66,6 +66,7 @@
     #define SERIAL2_TX              17                      // GAUGE PROTOCOL
     #define SCA_PIN                 21                      // BME280 etc
     #define SCL_PIN                 22                      // BME280 etc
+    
 
     // SPARE - NOTE: Pins 15/32/33 are only available on Wemos D1 R32
     #define SPARE_PIN_1             15

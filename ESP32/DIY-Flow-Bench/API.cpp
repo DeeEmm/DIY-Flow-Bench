@@ -277,10 +277,8 @@ void API::ParseMessage(char apiMessage) {
   // Send API Response
   #if defined DISABLE_API_CHECKSUM
         _message.DebugPrintLn(status.statusMessage + "\r\n");
-        // _message.Handler(status.statusMessage + "\r\n");
   #else
         _message.DebugPrintLn(status.statusMessage + calcCRC(serialResponse) + "\r\n");
-        // _message.Handler(status.statusMessage + calcCRC(serialResponse) +  "\r\n");
   #endif
 
 }

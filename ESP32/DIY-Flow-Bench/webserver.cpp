@@ -86,8 +86,8 @@ void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   StaticJsonDocument<1024> messageData;
   DeserializationError err = deserializeJson(messageData, data);
   if (err) {
-    Serial.print(F("ProcessWebSocketMessage->deserializeJson() failed: "));
-    Serial.println(err.c_str());
+    _message.DebugPrint(F("ProcessWebSocketMessage->deserializeJson() failed: "));
+    _message.DebugPrintLn(err.c_str());
   }
   
   int header = messageData["HEADER"].as<int>(); 
@@ -152,7 +152,7 @@ void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       case FILE_DELETE: // HEADER: 9 
         _message.DebugPrintLn("File Delete: ");
         socketData.file_name = messageData["FILENAME"].as<String>();  
-        Serial.println(socketData.file_name);
+        _message.DebugPrintLn(socketData.file_name);
         if(SPIFFS.exists(socketData.file_name)){
           SPIFFS.remove(socketData.file_name);
         }  else {
@@ -220,13 +220,19 @@ void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
 * Websocket Event Listener
 ***/
 void Webserver::ReceiveWebSocketMessage(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
+
+  Messages _message;
+  
+  String clientIP;
   
   switch (type) {
     case WS_EVT_CONNECT:
-      Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+      clientIP = client->remoteIP().toString().c_str();
+      _message.DebugPrint("WebSocket client connected from  ");
+      _message.DebugPrintLn(clientIP);
       break;
     case WS_EVT_DISCONNECT:
-      Serial.printf("WebSocket client #%u disconnected\n", client->id());
+      _message.DebugPrintLn("WebSocket client disconnected");
       break;
     case WS_EVT_DATA:
       Webserver::ProcessWebSocketMessage(arg, data, len);
@@ -257,6 +263,7 @@ String Webserver::byteDecode(size_t bytes) {
 ***/
 void Webserver::ProcessUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
 
+  Messages _message;
   extern struct FileUploadData fileUploadData;
   String redirectURL;
   
@@ -267,7 +274,7 @@ void Webserver::ProcessUpload(AsyncWebServerRequest *request, String filename, s
   
   if(!filename.startsWith("/")) filename = "/"+filename;
   if(!index && !fileUploadData.upload_error){
-    Serial.println((String)"UploadStart: " + filename);
+    _message.DebugPrintLn((String)"UploadStart: " + filename);
     request->_tempFile = SPIFFS.open(filename, "w");
   }
   
@@ -281,16 +288,16 @@ void Webserver::ProcessUpload(AsyncWebServerRequest *request, String filename, s
   if(len) {   
     fileUploadData.file_size += len;
     if (fileUploadData.file_size > freespace) {  
-      // TODO: Serial.println('Upload rejected, not enough space');
+      // TODO: _message.DebugPrintLn('Upload rejected, not enough space');
       fileUploadData.upload_error = true;
     } else {
-      // TODO: Serial.println('Writing file: \"' + String(filename) + '\" index=' + String(index) + ' len=' + String(len));
+      // TODO: _message.DebugPrintLn('Writing file: \"' + String(filename) + '\" index=' + String(index) + ' len=' + String(len));
       request->_tempFile.write(data,len);
     }
   }
   
   if(final){
-    Serial.println((String)"UploadEnd: " + filename + "," + fileUploadData.file_size);
+    _message.DebugPrintLn((String)"UploadEnd: " + filename + "," + fileUploadData.file_size);
     request->_tempFile.close();
     request->redirect(redirectURL);
   }
@@ -310,8 +317,6 @@ void Webserver::Initialise() {
     extern AsyncWebServer server;
     extern AsyncWebSocket ws;
     extern AsyncEventSource events;
-    
-    
     
     String index_html = "<!DOCTYPE HTML><html lang='en'><HEAD><title>DIY Flow Bench</title><meta name='viewport' content='width=device-width, initial-scale=1'> <script>function onFileUpload(event){this.setState({file:event.target.files[0]});const{file}=this.state;const data=new FormData;data.append('data',file);fetch('/upload',{method:'POST',body:data}).catch(e=>{console.log('Request failed',e);});}</script> <style>body,html{height:100%;margin:0;font-family:Arial;font-size:22px}a:link{color:#0A1128;text-decoration:none}a:visited,a:active{color:#0A1128;text-decoration:none}a:hover{color:#666;text-decoration:none}.headerbar{overflow:hidden;background-color:#0A1128;text-align:center}.headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover{color:white;text-decoration:none}.align-center{text-align:center}.file-upload-button{padding:12px 0px;text-align:center}.button{display:inline-block;background-color:#008CBA;border:none;border-radius:4px;color:white;padding:12px 12px;text-decoration:none;font-size:22px;margin:2px;cursor:pointer;width:150px}#footer{clear:both;text-align:center}.file-upload-button{padding:12px 0px;text-align:center}input[type='file']{display:none}</style></HEAD><BODY><div class='headerbar'><h1><a href='/' >DIY Flow Bench</a></h1></div> <br><div class='align-center'><p>Welcome to the DIY Flow Bench.</p><p>Please upload the index.html.gz file to get started.</p> <br><form method='POST' action='/upload' enctype='multipart/form-data'> <label for='data' class='file-upload-button button'>Select File</label> <input id='data' type='file' name='wtf'/> <input class='button file-submit-button' type='submit' value='Upload'/></form></div> <br><div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br></BODY></HTML>";
     
@@ -368,12 +373,12 @@ void Webserver::Initialise() {
     status.apMode = false;
     unsigned long timeOut;
     timeOut = millis() + config.wifi_timeout;
-    Serial.println("Connecting to WiFi");
+    _message.DebugPrintLn("Connecting to WiFi");
     WiFi.mode(WIFI_STA);
     WiFi.begin(config.wifi_ssid.c_str(), config.wifi_pswd.c_str());
     while (WiFi.status() != WL_CONNECTED && millis() < timeOut) {
       delay(1000);
-      Serial.print(".");
+      _message.DebugPrint(".");
     } 
     if (WiFi.status() == WL_CONNECTED) {  
       // Connection success     
@@ -534,8 +539,9 @@ void Webserver::Initialise() {
 
     StaticJsonDocument<1024> dataJson;    
     dataJson["HEADER"] = FILE_LIST;
+    Messages _message;
 
-    Serial.println("Filesystem contents:");
+    _message.DebugPrintLn("Filesystem contents:");
     FILESYSTEM.begin();
     File root = FILESYSTEM.open("/");
     File file = root.openNextFile();
@@ -545,9 +551,9 @@ void Webserver::Initialise() {
   
         dataJson[fileName] = String(fileSize);
 
-        Serial.print( fileName.c_str());
-        Serial.print(" : ");
-        Serial.println( byteDecode(fileSize).c_str());
+        _message.DebugPrint( fileName.c_str());
+        _message.DebugPrint(" : ");
+        _message.DebugPrintLn( byteDecode(fileSize).c_str());
         file = root.openNextFile();
     }  
 

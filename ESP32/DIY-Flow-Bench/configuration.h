@@ -15,10 +15,10 @@
 // Don't forget to update the changelog & README Versions!!
 // TODO: Automate build numbering with git tasks
 
-#define MAJOR_VERSION "ESP-PORT"
+#define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "21082501"
-#define RELEASE "V.ESP.X-ALPHA"
+#define BUILD_NUMBER "21082502"
+#define RELEASE "V.2.0-RC.1"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
 

@@ -24,6 +24,7 @@
 #include "sensors.h"
 #include "structs.h"
 #include "hardware.h"
+#include "messages.h"
 
 const float MOLECULAR_WEIGHT_DRY_AIR = 28.964;
 
@@ -297,6 +298,7 @@ float Maths::calculateFlowCFM() {
 	extern CalibrationSettings calibration;
 	Sensors _sensors;
 	Hardware _hardware;
+	Messages _message;
 		
 	float flowRateCFM = 0;
 	float flowRateKGH = 0;
@@ -413,17 +415,17 @@ float Maths::calculateFlowCFM() {
 	
 	// Send data to the serial port if requested.
 	if (streamMafData == true) {
-		Serial.print(String(lookupValue));
-		Serial.println(" (raw) = ");
+		_message.DebugPrint(String(lookupValue));
+		_message.DebugPrintLn(" (raw) = ");
 		if (this->_mafDataUnit == KG_H) {
-			Serial.print(String(flowRateRAW / 1000));
-			Serial.println("kg/h = ");
+			_message.DebugPrint(String(flowRateRAW / 1000));
+			_message.DebugPrintLn("kg/h = ");
 		} else if (this->_mafDataUnit == MG_S) {
-			Serial.print(String(flowRateRAW));
-			Serial.println("mg/s = ");
+			_message.DebugPrint(String(flowRateRAW));
+			_message.DebugPrintLn("mg/s = ");
 		}
-		Serial.print(String(flowRateCFM ));
-		Serial.println("cfm \r\n");
+		_message.DebugPrint(String(flowRateCFM ));
+		_message.DebugPrintLn("cfm \r\n");
 	}
 
 	return flowRateCFM;

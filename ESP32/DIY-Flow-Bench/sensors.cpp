@@ -26,6 +26,7 @@
 #include "structs.h"
 #include "hardware.h"
 #include "sensors.h"
+#include "messages.h"
 #include "driver/pcnt.h"
 
 #include LANGUAGE_FILE
@@ -45,6 +46,8 @@ Sensors::Sensors() {
 
 
 void Sensors::Begin () {
+
+	Messages _message;
 		
 	// What hardware / sensors do we have? Lets initialise them 
 	
@@ -56,9 +59,9 @@ void Sensors::Begin () {
 		//I2C address - BME280_I2C_ADDR
 		if (!adafruitBme280.begin()) {  
 			return BME280_READ_FAIL;			
-		  Serial.println("Adafruit BME280 Initialisation failed");      
+		  _message.DebugPrintLn("Adafruit BME280 Initialisation failed");      
 		} else {
-		  Serial.println("Adafruit BME280 Initialised");      
+		  _message.DebugPrintLn("Adafruit BME280 Initialised");      
 		}
 	#endif
 		
@@ -75,9 +78,9 @@ void Sensors::Begin () {
 		if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
 		{
 			return BME280_READ_FAIL;			
-		  Serial.println("Sparkfun BME280 Initialisation failed");      
+		  _message.DebugPrintLn("Sparkfun BME280 Initialisation failed");      
 		} else {
-		  Serial.println("Sparkfun BME280 Initialised");      
+		  _message.DebugPrintLn("Sparkfun BME280 Initialised");      
 		}
 	#endif
 

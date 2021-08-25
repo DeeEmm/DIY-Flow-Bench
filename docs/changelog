@@ -218,3 +218,6 @@ Build #         - Description of Change
                 - Added orifice detection code pins
                 - Started on #84 
                 - General code tidy
+21082502        - Reviewed Status and error messages
+                - Changed release version to V2
+                - Package up for Release Candidate 1
