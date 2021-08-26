@@ -19,9 +19,9 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Arduino (please complete the following information):**
+**ESP32 (please complete the following information):**
  - Firmware Version: [e.g. 1.0.20042001]
- - Hardware Type [e.g. Mega 2560]
+ - Hardware Type [e.g. Wemos D1 R32]
 
 **Additional context**
 Add any other context about the problem here.
