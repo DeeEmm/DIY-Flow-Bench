@@ -7,8 +7,8 @@
 
 General Version V2.0-RC.X
 
-For current build version please check the BUILD_NUMBER in docs/changelog
 
+[Download the latest official release](https://github.com/DeeEmm/DIY-Flow-Bench/releases)
 
 
 ## What is a Flow Bench?
@@ -16,9 +16,9 @@ For current build version please check the BUILD_NUMBER in docs/changelog
 
 A Flow Bench is a basic system to measure and display volumetric air flow.
 
-It is used as a tool for measuring and quantifying modifications and improvements made to items like automotive cylinder heads and carburettors by measuring the amount of air that they can flow. By measuring the volume of air that can be passed through the item the user can determine if modifications help improve air flow characteristics.
+It is used as a tool for measuring and quantifying modifications and improvements made to items like automotive cylinder heads and carburettors by measuring the amount of air that they can flow. By measuring the volume of air that can be passed through the item the user can determine if modifications made to the item help improve air flow characteristics.
 
-Traditionally constructed of a manometer and calibrated flow orifices, volumetric flow was calculated using mathematical methods. Modern flow benches use sensors to detect flow and reference pressures, flow calculations are now undertaken by microprocessor.
+Traditionally constructed of a manometer and calibrated flow orifices, volumetric flow was calculated using mathematical methods. Modern flow benches use sensors to detect flow and reference pressures and flow calculations are now undertaken by microprocessor.
 
 ## What is the DIY Flow Bench Project?
 ###
@@ -32,6 +32,7 @@ Support is included for the following systems architectures.
 - MAF based benches
 - Orifice based benches
 - Pitot style benches
+- Venturi style benches
 
 The DIYFB system can be used on any flow bench and makes an ideal retrofit for older manometer based benches as well as being the perfect choice for new builds.
 
@@ -44,11 +45,6 @@ The DIYFB system can be used on any flow bench and makes an ideal retrofit for o
 - Generates results comparable with commercial flow bench.
 - Open source software and hardware design.
 
-
-## Download
-###
-
-You can download the latest release from our [Githib repository](https://github.com/DeeEmm/DIY-Flow-Bench/releases)
 
 
 ## Development Info
