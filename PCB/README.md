@@ -23,7 +23,7 @@ __Notes:__
 
 |	ID	|	Name	|	Designator	|	Manufacturers Part #	|	QTY	|
 |	---	|	---	|	---	|	---	|	---	|
-|	1	|	39-30-0160	|	CN1,CN2	|		|	2	|
+|	1	|	2x16 Pin Molex Header	|	CN1,CN2	|	 39-30-0160	|	2	|
 |	2	|	330nF	|	C4,C1,C18	|	CT4-0805Y334M500	|	3	|
 |	3	|	MPX4250AP	|	U5,U4,U3	|	MPX4250AP	|	3	|
 |	4	|	10nF	|	C5,C2,C19	|	CT4-0805B103K500F3	|	3	|
