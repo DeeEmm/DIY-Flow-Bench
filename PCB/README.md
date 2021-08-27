@@ -20,7 +20,7 @@ __Notes:__
 - Only one type of pressure sensor is required for each channel - two types are listed (items 3 & 11) (MPXV7007DP is recommended)
 - Mini blade fuse holder is for standard automotive blade fuses
 - Wires can be soldered direct to board instead of using molex headers
-- Parts are readily available and should able to be substituted with generic parts
+- Parts are readily available and should be able to be substituted with generic parts
 
 |	ID	|	Name	|	Designator	|	Manufacturers Part #	|	QTY	|
 |	---	|	---	|	---	|	---	|	---	|
