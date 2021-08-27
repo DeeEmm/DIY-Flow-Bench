@@ -41,6 +41,6 @@ __Notes:__
 
 
 
-### Changelog
+## Changelog
 
 - 26/08.21 - Currently design is untested, prototype boards have been ordered. Will update once prototype has been reviewed
