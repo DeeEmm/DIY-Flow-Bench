@@ -1,3 +1,5 @@
+<img width="1304" alt="Screen Shot 2021-08-26 at 9 26 02 pm" src="https://user-images.githubusercontent.com/3038710/130958570-5c1db1ad-2d4a-40d0-b244-56f2d5d9c171.png">
+
 ## The DIY Flow Bench project
 
 ### https://diyflowbench.com
