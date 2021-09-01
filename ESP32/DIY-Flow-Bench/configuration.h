@@ -96,6 +96,21 @@
 // (default 0x77) / Alternate 0x76
 #define BME280_I2C_ADDR 0x77            
   
+  
+  
+
+
+/***********************************************************
+* CONFIGURE ADC
+*
+* NOTE: standard shield can use adafruit 1015 or 1115 ADC
+* MAF / PRef / PDiff / Pitot sensors all come through ADC
+* This allows conversion from 5v to 3.3 via ADC > I2C
+***/
+
+#define ADC_TYPE_ADS1015 // 12 bit (3 mV/bit)
+// #define ADC_TYPE_ADS1115 // 16 bit (188uV/bit)
+
 
 
 
@@ -148,7 +163,7 @@
 #define DEFAULT_DIFF_PRESS 1
 
 // Uncomment One line only
-#define PDIFF_SENSOR_NOT_USED
+#define PDIFF_SENSOR_NOT_USED            
 // #define PDIFF_SENSOR_TYPE_LINEAR_ANALOG 
 // #define PDIFF_SENSOR_TYPE_MPXV7007             
 
