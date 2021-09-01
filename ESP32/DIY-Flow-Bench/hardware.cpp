@@ -88,6 +88,21 @@ Messages _message;
 configurePins();
 
 
+//support for Adafruit 1015 (12bit) / 1115 (16bit) ADC
+#if defined PREF_SRC_ADC_1015 
+  #include <Adafruit_ADS1X15.h>
+  Adafruit_ADS1015 ads1015; 
+  ads1015.begin(ADC_I2C_ADDR);
+#endif
+
+
+#if defined PREF_SRC_ADC_1115
+  #include <Adafruit_ADS1X15.h>  
+  Adafruit_ADS1115 ads1115;
+  ads1115.begin(ADC_I2C_ADDR);
+#endif
+
+
 // Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
 // https://github.com/adafruit/Adafruit_BME280_Library
 #if defined(PREF_SENSOR_REF_ADAFRUIT_BME280) || defined(TEMP_SENSOR_ADAFRUIT_BME280) || defined(BARO_SENSOR_ADAFRUIT_BME280)

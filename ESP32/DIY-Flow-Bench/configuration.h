@@ -108,6 +108,8 @@
 * This allows conversion from 5v to 3.3 via ADC > I2C
 ***/
 
+#define ADC_I2C_ADDR 0x48 // Default is 0x48
+
 #define ADC_TYPE_ADS1015 // 12 bit (3 mV/bit)
 // #define ADC_TYPE_ADS1115 // 16 bit (188uV/bit)
 
@@ -144,6 +146,14 @@
 ***/
 #define DEFAULT_REF_PRESS 1
 
+//set source
+//#define PREF_SRC_PIN
+#define PREF_SRC_ADC_1015
+//#define PREF_SRC_ADC_1115
+
+//set ADC channel
+#define PREF_ADC_CHAN 1
+
 // Uncomment One line only
 #define PREF_SENSOR_NOT_USED
 // #define PREF_SENSOR_TYPE_LINEAR_ANALOG 
@@ -152,6 +162,8 @@
 
 #define PREF_TRIMPOT 0.0
 #define PREF_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
+
+
 
 
 

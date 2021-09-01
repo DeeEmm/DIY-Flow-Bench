@@ -408,16 +408,28 @@ float Sensors::getPRefValue() {
 	Hardware _hardware;
 
 	float refPressureKpa = 0;
-
 	float supplyMillivolts = _hardware.getSupplyMillivolts();
-	int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
-	float refPressMillivolts = (rawRefPressValue * (supplyMillivolts / 4095.0)) * 1000;
+
+	#ifdef PREF_SRC_ADC_1015
+		int16_t rawRefPressADC;
+		rawRefPressADC = ads1015.readADC_SingleEnded(PREF_ADC_CHAN);
+			
+	#elif defined PREF_SRC_ADC_1115
+		int16_t rawRefPressADC;
+		rawRefPressADC = ads1115.readADC_SingleEnded(PREF_ADC_CHAN);
+
+	#elif defined PREF_SRC_PIN
+		int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
+		float refPressMillivolts = (rawRefPressValue * (supplyMillivolts / 4095.0)) * 1000;
+	#endif
+
+
 	refPressMillivolts += PREF_TRIMPOT;
 
 	#ifdef PREF_SENSOR_TYPE_LINEAR_ANALOG
 		refPressureKpa = refPressMillivolts * PREF_ANALOG_SCALE;
 	
-	#elif PREF_SENSOR_TYPE_MPXV7007
+	#elif defined PREF_SENSOR_TYPE_MPXV7007
 		// Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
 		// Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007DP Datasheet)
 		// P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
