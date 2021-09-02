@@ -17,18 +17,24 @@
 ***/
 #pragma once
 
+#include <Adafruit_ADS1X15.h>
+
 class Hardware {
 	
 	friend class Messages;
 	friend class Maths;
 
+
 	public:
 		Hardware();
-		void Initialise ();
+		void begin ();
+		float getAdcMillivolts(int adcChannel);
 		float getSupplyMillivolts();
 		bool benchIsRunning();	
 		void checkRefPressure();
 		
 	private:
 		void configurePins ();
+		Adafruit_ADS1015 ads1015;
+		Adafruit_ADS1015 ads1115;
 };

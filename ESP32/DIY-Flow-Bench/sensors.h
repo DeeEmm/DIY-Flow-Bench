@@ -24,8 +24,8 @@ class Sensors {
 
 public:
 	Sensors();
-    void Begin();
-	void Initialise();
+    void begin();
+	void initialise();
     float getMafValue();
 	float getTempValue();
 	float getBaroValue();
@@ -55,6 +55,9 @@ private:
 	String _prefSensorType;
 	String _pdiffSensorType;
 	String _pitotSensorType;    
+	
+	
+
   
 };
 

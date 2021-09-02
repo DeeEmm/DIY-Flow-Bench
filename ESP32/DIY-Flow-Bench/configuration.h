@@ -135,8 +135,14 @@
 // #define MAF_SENSOR_FILE  "mafData/TEST"                  // Test Data
 
 
-#define MAF_TRIMPOT 0.0
+// Set signal source (Uncomment One line only)
+//#define MAF_SRC_PIN
+#define MAF_SRC_ADC_1015
+//#define MAF_SRC_ADC_1115
 
+
+#define MAF_TRIMPOT 0.0
+#define MAF_ADC_CHANNEL 0
 
 
 /***********************************************************
@@ -144,24 +150,23 @@
 * If you want to modify the code to include additional reference pressure sensors
 * You will need to add your volts to kPa algorithm in the function calculateRefPressure()
 ***/
-#define DEFAULT_REF_PRESS 1
+#define DEFAULT_REF_PRESS_VALUE 1
 
-//set source
+// Set signal source (Uncomment One line only)
 //#define PREF_SRC_PIN
 #define PREF_SRC_ADC_1015
 //#define PREF_SRC_ADC_1115
 
-//set ADC channel
-#define PREF_ADC_CHAN 1
-
-// Uncomment One line only
+// Set sensor type (Uncomment One line only)
 #define PREF_SENSOR_NOT_USED
 // #define PREF_SENSOR_TYPE_LINEAR_ANALOG 
 // #define PREF_SENSOR_TYPE_MPXV7007      
 // #define PREF_SENSOR_TYPE_MPX4250         
 
+
 #define PREF_TRIMPOT 0.0
 #define PREF_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
+#define PREF_ADC_CHANNEL 1
 
 
 
@@ -172,16 +177,21 @@
 * If you want to modify the code to include additional reference pressure sensors
 * You will need to add your volts to kPa algorithm in the function calculateDiffPressure()
 ***/
-#define DEFAULT_DIFF_PRESS 1
+#define DEFAULT_DIFF_PRESS_VALUE 1
 
-// Uncomment One line only
+// Set signal source (Uncomment One line only)
+//#define PDIFF_SRC_PIN
+#define PDIFF_SRC_ADC_1015
+//#define PDIFF_SRC_ADC_1115
+
+// Set sensor type (Uncomment One line only)
 #define PDIFF_SENSOR_NOT_USED            
 // #define PDIFF_SENSOR_TYPE_LINEAR_ANALOG 
 // #define PDIFF_SENSOR_TYPE_MPXV7007             
 
 #define PDIFF_TRIMPOT 0.0
 #define PDIFF_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
-
+#define PDIFF_ADC_CHANNEL 2
 
 
 
@@ -192,14 +202,20 @@
 * Note Pitot sensors need to be a differential pressure sensor (DP)
 ***/
 
-// Uncomment One line only
+// Set signal source (Uncomment One line only)
+//#define PITOT_SRC_PIN
+#define PITOT_SRC_ADC_1015
+//#define PITOT_SRC_ADC_1115
+
+
+// Set sensor type (Uncomment One line only)
 #define PITOT_SENSOR_NOT_USED
 // #define PITOT_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from PITOT_PIN
 // #define PITOT_SENSOR_TYPE_MPXV7007DP
 
 #define PITOT_TRIMPOT 0.0
 #define PITOT_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
-
+#define PITOT_ADC_CHANNEL 3
 
 /***********************************************************
 * CONFIGURE BARO SENSOR
@@ -216,7 +232,7 @@
 // #define BARO_SENSOR_TYPE_SPARKFUN_BME280
 // #define BARO_SENSOR_TYPE_MPX4115
 
-#define DEFAULT_BARO 101.3529
+#define DEFAULT_BARO_VALUE 101.3529
 #define BARO_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 #define startupBaroScalingFactor 1                          // scaling factor when using reference pressure sensor for baro correction
 #define startupBaroScalingOffset 100                        // scaling offset when using reference pressure sensor for baro correction
@@ -230,7 +246,7 @@
 *
 * Default 21 Degrees Celsius
 ***/
-#define DEFAULT_TEMP 21                                     // Value to return if no sensor used
+#define DEFAULT_TEMP_VALUE 21                               // Value to return if no sensor used
 #define TEMP_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 
 // Uncomment One line only
@@ -251,7 +267,7 @@
 *
 * Default 36% Rel H
 ***/
-#define DEFAULT_RELH 36                                     // Value to return if no sensor used
+#define DEFAULT_RELH_VALUE 36                               // Value to return if no sensor used
 #define RELH_ANALOG_SCALE 1.0                               // Scaling factor for raw analog value
 
 // Uncomment ONE of the following

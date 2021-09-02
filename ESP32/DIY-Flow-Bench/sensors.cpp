@@ -19,6 +19,7 @@
 * https://github.com/DavidAntliff/esp32-freqcount/blob/master/frequency_count.c
 ***/
 
+#include <Adafruit_ADS1X15.h>
 #include "Arduino.h"
 #include "configuration.h"
 #include "constants.h"
@@ -28,7 +29,6 @@
 #include "sensors.h"
 #include "messages.h"
 #include "driver/pcnt.h"
-
 #include LANGUAGE_FILE
 
 
@@ -45,12 +45,15 @@ Sensors::Sensors() {
 }
 
 
-void Sensors::Begin () {
+void Sensors::begin () {
 
 	Messages _message;
-		
-	// What hardware / sensors do we have? Lets initialise them 
 	
+		
+	// What sensors do we have? Lets initialise them 
+	
+	
+		
 	// Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
 	// https://github.com/adafruit/Adafruit_BME280_Library
 	#if defined TEMP_SENSOR_TYPE_ADAFRUIT_BME280 || defined BARO_SENSOR_TYPE_ADAFRUIT_BME280 || defined RELH_SENSOR_TYPE_ADAFRUIT_BME280 
@@ -92,13 +95,17 @@ void Sensors::Begin () {
 }
 
 
+
+
 // Voodoo needed to get interrupt to work within class structure for frequency measurement. 
 // We declare a new instance of the Sensor class so that we can use it for the MAF ISR
 // https://forum.arduino.cc/t/pointer-to-member-function/365758
 Sensors __mafVoodoo;
 
 
-void Sensors::Initialise () {
+
+
+void Sensors::initialise () {
 
 	extern struct DeviceStatus status;
 	extern int MAFoutputType;
@@ -108,9 +115,9 @@ void Sensors::Initialise () {
 		this->startupBaroPressure = this->PRef(KPA);
 		this->_baroSensorType = LANG_START_REF_PRESSURE;
 	#elif defined BARO_SENSOR_TYPE_FIXED_VALUE
-		this->startupBaroPressure = DEFAULT_BARO;
+		this->startupBaroPressure = DEFAULT_BARO_VALUE;
 		this->_baroSensorType = LANG_FIXED_VALUE;
-		this->_baroSensorType += DEFAULT_BARO;
+		this->_baroSensorType += DEFAULT_BARO_VALUE;
 	#elif defined BARO_SENSOR_TYPE_SPARKFUN_BME280
 		this->_baroSensorType = "Sparkfun BME280";
 	#elif defined BARO_SENSOR_TYPE_ADAFRUIT_BME280
@@ -127,7 +134,7 @@ void Sensors::Initialise () {
 		this->_tempSensorType = LANG_NOT_ENABLED;
 	#elif defined TEMP_SENSOR_TYPE_FIXED_VALUE
 		this->_tempSensorType = LANG_FIXED_VALUE;
-		this->_tempSensorType += DEFAULT_TEMP;
+		this->_tempSensorType += DEFAULT_TEMP_VALUE;
 	#elif defined TEMP_SENSOR_TYPE_SPARKFUN_BME280
 		this->_tempSensorType = "Sparkfun BME280";
 	#elif defined TEMP_SENSOR_TYPE_ADAFRUIT_BME280
@@ -144,7 +151,7 @@ void Sensors::Initialise () {
 		this->_relhSensorType = LANG_NOT_ENABLED;
 	#elif defined RELH_SENSOR_TYPE_FIXED_VALUE
 		this->_relhSensorType = LANG_FIXED_VALUE;
-		this->_relhSensorType += DEFAULT_RELH;
+		this->_relhSensorType += DEFAULT_RELH_VALUE;
 	#elif defined RELH_SENSOR_TYPE_SPARKFUN_BME280
 		this->_relhSensorType = "Sparkfun BME280";
 	#elif defined RELH_SENSOR_TYPE_ADAFRUIT_BME280
@@ -186,6 +193,8 @@ void Sensors::Initialise () {
 	
 	
 	// Set up the MAF ISR if required
+	// Note Frequency based MAFs are required to be attached direct to MAF pin for pulse counter to work
+	// This means 5v > 3.3v signal conditioning is required on MAF pin
 	if (MAFoutputType == FREQUENCY) {	
 		__mafVoodoo.mafSetupISR(MAF_PIN, []{__mafVoodoo.mafFreqCountISR();}, FALLING);
 		timer = timerBegin(0, 2, true);                                  
@@ -243,13 +252,25 @@ float Sensors::getMafValue() {
 	
 	float mafFlow = 0.0;
 	
+	
+	
+	
+	
 	switch (this->_mafOutputType) {
 		
 		case VOLTAGE:
 		{
 			int supplyMillivolts = _hardware.getSupplyMillivolts();
-			int mafFlowRaw = analogRead(MAF_PIN);
-			double mafMillivolts = (mafFlowRaw * (supplyMillivolts / 4095.0)) * 1000;
+			float mafMillivolts = 0.0;
+			int mafFlowRaw;
+			
+			#if defined MAF_SRC_ADC_1015 || defined MAF_SRC_ADC_1015
+				mafMillivolts = _hardware.getAdcMillivolts(MAF_ADC_CHANNEL);
+			#elif defined PREF_SRC_PIN	
+				mafFlowRaw = analogRead(REF_PRESSURE_PIN);
+				mafMillivolts = (mafFlowRaw * (supplyMillivolts / 4095.0)) * 1000;
+			#endif
+
 			mafFlow = mafMillivolts + MAF_TRIMPOT;
 			return mafFlow;
 		}
@@ -305,7 +326,7 @@ float Sensors::getTempValue() {
 		}	
 	#else
 		// We don't have any temperature input so we will assume default
-		refTempDegC = DEFAULT_TEMP;
+		refTempDegC = DEFAULT_TEMP_VALUE;
 	#endif
 	
 	return refTempDegC;
@@ -349,7 +370,7 @@ float Sensors::getBaroValue() {
 		baroPressureKpa = startupBaroPressure; 
 	#else
 		// we don't have any sensor so use default - // NOTE: standard sea level baro pressure is 14.7 psi
-		baroPressureKpa = DEFAULT_BARO;
+		baroPressureKpa = DEFAULT_BARO_VALUE;
 	#endif
 	
 	return baroPressureKpa;
@@ -392,7 +413,7 @@ float Sensors::getRelHValue() {
 
 	#else
 		//we don't have any sensor so use standard value 
-		relativeHumidity = DEFAULT_RELH; // (36%)
+		relativeHumidity = DEFAULT_RELH_VALUE; // (36%)
 	#endif
 
 	return relativeHumidity;
@@ -405,25 +426,22 @@ float Sensors::getRelHValue() {
  ***/
 float Sensors::getPRefValue() {
 	
+	Sensors::begin();
+	
 	Hardware _hardware;
-
-	float refPressureKpa = 0;
+	
+	float refPressureKpa = 0.0;
 	float supplyMillivolts = _hardware.getSupplyMillivolts();
+	float rawRefPressValue;
+	float refPressMillivolts;
 
-	#ifdef PREF_SRC_ADC_1015
-		int16_t rawRefPressADC;
-		rawRefPressADC = ads1015.readADC_SingleEnded(PREF_ADC_CHAN);
-			
-	#elif defined PREF_SRC_ADC_1115
-		int16_t rawRefPressADC;
-		rawRefPressADC = ads1115.readADC_SingleEnded(PREF_ADC_CHAN);
-
-	#elif defined PREF_SRC_PIN
-		int rawRefPressValue = analogRead(REF_PRESSURE_PIN);
-		float refPressMillivolts = (rawRefPressValue * (supplyMillivolts / 4095.0)) * 1000;
+	#if defined PREF_SRC_ADC_1015 || defined PREF_SRC_ADC_1015
+		refPressMillivolts = _hardware.getAdcMillivolts(PREF_ADC_CHANNEL);
+	#elif defined PREF_SRC_PIN	
+		rawRefPressValue = analogRead(REF_PRESSURE_PIN);
+		refPressMillivolts = (rawRefPressValue * (supplyMillivolts / 4095.0)) * 1000;
 	#endif
-
-
+	
 	refPressMillivolts += PREF_TRIMPOT;
 
 	#ifdef PREF_SENSOR_TYPE_LINEAR_ANALOG
@@ -444,9 +462,9 @@ float Sensors::getPRefValue() {
 		// if we actually have a Baro sensor installed
 		#if defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO 
 			// we don't have a baro value so use the value hardcoded in the config to offset the pressure sensor value
-			refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - DEFAULT_BARO;  
+			refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - DEFAULT_BARO_VALUE;  
 		#elif defined BARO_SENSOR_TYPE_FIXED_VALUE            
-			refPressureKpa = DEFAULT_BARO;
+			refPressureKpa = DEFAULT_BARO_VALUE;
 		#else
 			// use the current baro value to offset the sensor value
 			refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - this->calculateBaroPressure(KPA);         
@@ -456,7 +474,7 @@ float Sensors::getPRefValue() {
 	#else
 		// No reference pressure sensor used so lets return a value (so as not to throw maths out)
 		// refPressureKpa = 6.97448943333324; //28"
-		refPressureKpa = DEFAULT_REF_PRESS;
+		refPressureKpa = DEFAULT_REF_PRESS_VALUE;
 
 	#endif
 
@@ -474,11 +492,19 @@ float Sensors::getPDiffValue() {
 	
 	Hardware _hardware;
 
-	float diffPressureKpa = 0;
-
+	float diffPressureKpa = 0.0;
+	float diffPressMillivolts;
+	int rawDiffPressValue;
 	float supplyMillivolts = _hardware.getSupplyMillivolts();
-	int rawDiffPressValue = analogRead(DIFF_PRESSURE_PIN);
-	float diffPressMillivolts = (rawDiffPressValue * (supplyMillivolts / 4095.0)) * 1000;
+	
+
+	#if defined PDIFF_SRC_ADC_1015 || defined PDIFF_SRC_ADC_1015
+		diffPressMillivolts = _hardware.getAdcMillivolts(PDIFF_ADC_CHANNEL);
+	#elif defined PDIFF_SRC_PIN	
+		rawDiffPressValue = analogRead(DIFF_PRESSURE_PIN);
+		diffPressMillivolts = (rawDiffPressValue * (supplyMillivolts / 4095.0)) * 1000;
+	#endif
+	
 	diffPressMillivolts += PDIFF_TRIMPOT;
 
 	#ifdef PDIFF_SENSOR_TYPE_LINEAR_ANALOG
@@ -514,11 +540,18 @@ float Sensors::getPitotValue() {
 	Hardware _hardware;
 
 	float pitotPressureKpa = 0.0;
-	
-	// Pitot Voltage
 	float supplyMillivolts = _hardware.getSupplyMillivolts();
-	int pitotRaw = analogRead(PITOT_PIN);
-	double pitotMillivolts = (pitotRaw * (supplyMillivolts / 4095.0)) * 1000;
+	int pitotRaw;
+	double pitotMillivolts;
+	
+	
+	#if defined PITOT_SRC_ADC_1015 || defined PITOT_SRC_ADC_1015
+		pitotMillivolts = _hardware.getAdcMillivolts(PITOT_ADC_CHANNEL);
+	#elif defined PITOT_SRC_PIN	
+		pitotRaw = analogRead(PITOT_PIN);
+		pitotMillivolts = (pitotRaw * (supplyMillivolts / 4095.0)) * 1000;
+	#endif
+	
 	pitotMillivolts += PITOT_TRIMPOT;
 	
 	#ifdef PITOT_SENSOR_TYPE_LINEAR_ANALOG

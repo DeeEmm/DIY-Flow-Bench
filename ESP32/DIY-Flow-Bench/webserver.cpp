@@ -310,7 +310,7 @@ String processor(const String& var) { return String("Waiting Data"); }
 /***********************************************************
 * INITIALISE SERVER
 ***/
-void Webserver::Initialise() {
+void Webserver::begin() {
     
     extern struct ConfigSettings config;
     extern DeviceStatus status;

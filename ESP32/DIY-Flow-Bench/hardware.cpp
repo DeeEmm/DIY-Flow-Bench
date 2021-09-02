@@ -16,6 +16,8 @@
  * 
  ***/
 
+#include <Wire.h>
+#include <Adafruit_ADS1X15.h>
 #include <Arduino.h>
 #include "hardware.h"
 #include "configuration.h"
@@ -81,69 +83,97 @@ void Hardware::configurePins () {
 * TODO: Need to move ALL hardware initialisation into here
 *
 ***/
-void Hardware::Initialise () {
+void Hardware::begin () {
 
-Messages _message;
+  Messages _message;
+  
+  configurePins();
+  
+  // Support for [Adafruit 1015] (12bit) ADC
+  // https://github.com/adafruit/Adafruit_ADS1X15
+  #ifdef PREF_SRC_ADC_1015 
+    Adafruit_ADS1015 ads1015; 
+    ads1015.begin(ADC_I2C_ADDR);
+  #endif
+  
+  // Support for [Adafruit 1115] (16bit) ADC
+  // https://github.com/adafruit/Adafruit_ADS1X15
+  #ifdef PREF_SRC_ADC_1115
+    Adafruit_ADS1115 ads1115;
+    ads1115.begin(ADC_I2C_ADDR);
+  #endif
 
-configurePins();
 
-
-//support for Adafruit 1015 (12bit) / 1115 (16bit) ADC
-#if defined PREF_SRC_ADC_1015 
-  #include <Adafruit_ADS1X15.h>
-  Adafruit_ADS1015 ads1015; 
-  ads1015.begin(ADC_I2C_ADDR);
-#endif
-
-
-#if defined PREF_SRC_ADC_1115
-  #include <Adafruit_ADS1X15.h>  
-  Adafruit_ADS1115 ads1115;
-  ads1115.begin(ADC_I2C_ADDR);
-#endif
-
-
-// Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
-// https://github.com/adafruit/Adafruit_BME280_Library
-#if defined(PREF_SENSOR_REF_ADAFRUIT_BME280) || defined(TEMP_SENSOR_ADAFRUIT_BME280) || defined(BARO_SENSOR_ADAFRUIT_BME280)
-  #include <Adafruit_BME280.h> 
-  Adafruit_BME280 adafruitBme280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
-
-  //I2C address - BME280_I2C_ADDR
-  if (!adafruitBme280.begin()) {  
-    _message.Handler(LANG_BME280_READ_FAIL);
-    _message.DebugPrintLn("Adafruit BME280 Initialisation failed");      
-  } else {
-    _message.DebugPrintLn("Adafruit BME280 Initialised");      
-  }
-#endif
-
-// Support for SPARKFUN_BME280 temp, pressure & Humidity sensors
-// https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide?_ga=2.39864294.574007306.1596270790-134320310.1596270790
-#if defined (RELH_SENSOR_SPARKFUN_BME280) || defined(TEMP_SENSOR_SPARKFUN_BME280) || defined(BARO_SENSOR_SPARKFUN_BME280)
-  #include "SparkFunBME280.h"
-  #include <Wire.h>
-  BME280 SparkFunBME280;
-
-  Wire.begin();
-  SparkFunBME280.setI2CAddress(BME280_I2C_ADDR); 
-  if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
-  {
-    _message.Handler(LANG_BME280_READ_FAIL);
-    _message.DebugPrintLn("Sparkfun BME280 Initialisation failed");      
-  } else {
-    _message.DebugPrintLn("Sparkfun BME280 Initialised");      
-  }
-#endif
-
-// Support for DHT11 humidity / temperature sensors
-// https://github.com/winlinvip/SimpleDHT
-#if RELH_SENSOR_SIMPLE_RELH_DHT11 || TEMP_SENSOR_SIMPLE_TEMP_DHT11
-  #include <SimpleDHT.h>  
-  SimpleDHT11 dht11(HUMIDITY_PIN);    
-#endif
+// // Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
+// // https://github.com/adafruit/Adafruit_BME280_Library
+// #if defined(PREF_SENSOR_REF_ADAFRUIT_BME280) || defined(TEMP_SENSOR_ADAFRUIT_BME280) || defined(BARO_SENSOR_ADAFRUIT_BME280)
+//   #include <Adafruit_BME280.h> 
+//   Adafruit_BME280 adafruitBme280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
+// 
+//   //I2C address - BME280_I2C_ADDR
+//   if (!adafruitBme280.begin()) {  
+//     _message.Handler(LANG_BME280_READ_FAIL);
+//     _message.DebugPrintLn("Adafruit BME280 Initialisation failed");      
+//   } else {
+//     _message.DebugPrintLn("Adafruit BME280 Initialised");      
+//   }
+// #endif
+// 
+// // Support for SPARKFUN_BME280 temp, pressure & Humidity sensors
+// // https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide?_ga=2.39864294.574007306.1596270790-134320310.1596270790
+// #if defined (RELH_SENSOR_SPARKFUN_BME280) || defined(TEMP_SENSOR_SPARKFUN_BME280) || defined(BARO_SENSOR_SPARKFUN_BME280)
+//   #include "SparkFunBME280.h"
+//   #include <Wire.h>
+//   BME280 SparkFunBME280;
+// 
+//   Wire.begin();
+//   SparkFunBME280.setI2CAddress(BME280_I2C_ADDR); 
+//   if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
+//   {
+//     _message.Handler(LANG_BME280_READ_FAIL);
+//     _message.DebugPrintLn("Sparkfun BME280 Initialisation failed");      
+//   } else {
+//     _message.DebugPrintLn("Sparkfun BME280 Initialised");      
+//   }
+// #endif
+// 
+// // Support for DHT11 humidity / temperature sensors
+// // https://github.com/winlinvip/SimpleDHT
+// #if RELH_SENSOR_SIMPLE_RELH_DHT11 || TEMP_SENSOR_SIMPLE_TEMP_DHT11
+//   #include <SimpleDHT.h>  
+//   SimpleDHT11 dht11(HUMIDITY_PIN);    
+// #endif
 
 }
+
+
+
+
+/***********************************************************
+* GET ADS1X15 ADC value
+*
+***/
+float Hardware::getAdcMillivolts(int adcChannel) {   
+  
+  int16_t rawADCValue;
+  float adcMillivolts;
+  
+  #if defined PREF_SRC_ADC_1015
+    rawADCValue = this->ads1015.readADC_SingleEnded(adcChannel);
+    adcMillivolts = this->ads1015.computeVolts(rawADCValue);
+  #elif defined PREF_SRC_ADC_1115
+    rawADCValue = this->ads1115.readADC_SingleEnded(adcChannel);
+    adcMillivolts = this->ads1115.computeVolts(rawADCValue);
+  #endif
+  
+  return adcMillivolts;
+  
+}
+
+
+
+
+
 
 
 
