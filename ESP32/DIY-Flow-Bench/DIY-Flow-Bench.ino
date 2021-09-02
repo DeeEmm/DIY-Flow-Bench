@@ -89,9 +89,10 @@ API _api;
  ***/
 void setup(void) {
 
-  _webserver.Initialise();
-  _hardware.Initialise();
-  _sensors.Initialise();
+  _webserver.begin();
+  _hardware.begin();
+  _sensors.begin();
+  _sensors.initialise();
 
 }
 
