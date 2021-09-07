@@ -1,8 +1,6 @@
 /***********************************************************
  * Hardware schema for V1
  *
- * NOTE: Arduino shield planned for V2 will most likely
- * follow the pin designations set in configuration.h
  ***/
  
  
@@ -10,6 +8,9 @@
  
 /***********************************************************
 * MAF sensors
+*
+* Note MAF sensors are 5v devices. Voltage divider or ADC + level shifter is required 
+* to interface with 3.3v ESP32
 ***/
 
 
@@ -75,7 +76,7 @@ Pin 8 -  N/C
 
 
 /***********************************************************
-* Arduino pin-outs
+* Board pin-outs
 ***/
 
 For Arduino pinout please see pins.h

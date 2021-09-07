@@ -66,6 +66,7 @@ FileUploadData fileUploadData;
 #include "hardware.h"
 #include "sensors.h"
 #include "webserver.h"
+#include "messages.h"
 #include "API.h"
 
 
@@ -80,6 +81,7 @@ Settings _settings;
 Hardware _hardware;
 Webserver _webserver;
 Sensors _sensors;
+Messages _message;
 API _api;
 
 
@@ -90,9 +92,13 @@ API _api;
 void setup(void) {
 
   _webserver.begin();
+  _message.DebugPrintLn("webserver ok");
   _hardware.begin();
+  _message.DebugPrintLn("hardware ok");
   _sensors.begin();
+  _message.DebugPrintLn("sensors ok");
   _sensors.initialise();
+  _message.DebugPrintLn("sensors initialised");
 
 }
 
