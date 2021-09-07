@@ -89,19 +89,19 @@ void Hardware::begin () {
   
   configurePins();
   
-  // Support for [Adafruit 1015] (12bit) ADC
-  // https://github.com/adafruit/Adafruit_ADS1X15
-  #ifdef PREF_SRC_ADC_1015 
-    Adafruit_ADS1015 ads1015; 
-    ads1015.begin(ADC_I2C_ADDR);
-  #endif
-  
-  // Support for [Adafruit 1115] (16bit) ADC
-  // https://github.com/adafruit/Adafruit_ADS1X15
-  #ifdef PREF_SRC_ADC_1115
-    Adafruit_ADS1115 ads1115;
-    ads1115.begin(ADC_I2C_ADDR);
-  #endif
+//  // Support for [Adafruit 1015] (12bit) ADC
+//  // https://github.com/adafruit/Adafruit_ADS1X15
+//  #ifdef PREF_SRC_ADC_1015 
+//    Adafruit_ADS1015 ads1015; 
+//    ads1015.begin(ADC_I2C_ADDR);
+//  #endif
+//  
+//  // Support for [Adafruit 1115] (16bit) ADC
+//  // https://github.com/adafruit/Adafruit_ADS1X15
+//  #ifdef PREF_SRC_ADC_1115
+//    Adafruit_ADS1115 ads1115;
+//    ads1115.begin(ADC_I2C_ADDR);
+//  #endif
 
 
 // // Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
@@ -155,16 +155,16 @@ void Hardware::begin () {
 ***/
 float Hardware::getAdcMillivolts(int adcChannel) {   
   
-  int16_t rawADCValue;
-  float adcMillivolts;
+  int16_t rawADCValue = 0;
+  float adcMillivolts = 0.0;
   
-  #if defined PREF_SRC_ADC_1015
-    rawADCValue = this->ads1015.readADC_SingleEnded(adcChannel);
-    adcMillivolts = this->ads1015.computeVolts(rawADCValue);
-  #elif defined PREF_SRC_ADC_1115
-    rawADCValue = this->ads1115.readADC_SingleEnded(adcChannel);
-    adcMillivolts = this->ads1115.computeVolts(rawADCValue);
-  #endif
+//  #if defined PREF_SRC_ADC_1015
+//    rawADCValue = this->ads1015.readADC_SingleEnded(adcChannel);
+//    adcMillivolts = this->ads1015.computeVolts(rawADCValue);
+//  #elif defined PREF_SRC_ADC_1115
+//    rawADCValue = this->ads1115.readADC_SingleEnded(adcChannel);
+//    adcMillivolts = this->ads1115.computeVolts(rawADCValue);
+//  #endif
   
   return adcMillivolts;
   

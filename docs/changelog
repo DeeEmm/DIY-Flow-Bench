@@ -224,4 +224,6 @@ Build #         - Description of Change
 21082503        - #87 Wifi client network
                 - Corrected millivolt calc in Webserver::getDataJSON
 21090101        - Added support for 1015 / 1115 ADC for MAF / PRef / PDiff / Pitot
+21090801        - (temporarily disabled ADC)
+                - Updated BOM in docs folder
                 
