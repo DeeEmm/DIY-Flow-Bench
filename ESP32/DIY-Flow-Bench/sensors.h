@@ -19,13 +19,13 @@
 
 #include "constants.h"
 
-
 class Sensors {
 
 public:
 	Sensors();
     void begin();
 	void initialise();
+	void getBME280RawData();
     float getMafValue();
 	float getTempValue();
 	float getBaroValue();
@@ -48,7 +48,6 @@ private:
 	int _mafOutputType;
 	int _mafDataUnit;
 	
-	
 	String _tempSensorType;
 	String _baroSensorType;
 	String _relhSensorType;
@@ -56,8 +55,34 @@ private:
 	String _pdiffSensorType;
 	String _pitotSensorType;    
 	
+	// BME280 
+	unsigned int buffer[];
+	unsigned int data[8];
 	
-
-  
+	// Temperature coefficients
+	unsigned int dig_T1;
+	int dig_T2;
+	int dig_T3;
+	double t_fine;
+	
+	
+	// Pressure coefficients
+	unsigned int dig_P1;
+	int dig_P2;
+	int dig_P3;
+	int dig_P4;
+	int dig_P5;
+	int dig_P6;
+	int dig_P7;
+	int dig_P8;
+	int dig_P9;
+	
+	// Humidity
+	unsigned int dig_H1;
+    int dig_H2;
+	int dig_H3;
+	int dig_H4;
+	int dig_H5;
+	int dig_H6;
 };
 

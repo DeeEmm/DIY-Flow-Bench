@@ -196,6 +196,11 @@ void Webserver::ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         serializeJson(jsonMessage, jsonMessageString);
         SendWebSocketMessage(jsonMessageString);            
       break;     
+      
+      case RESTART: // HEADER: 15 
+        ESP.restart();
+        _message.DebugPrintLn("ESP Restart");
+      break;
 
       default:
         _message.DebugPrintLn("Unrecognised Websocket Header");

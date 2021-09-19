@@ -90,12 +90,19 @@
 
 
 /***********************************************************
-* CONFIGURE COMMUNICATIONS
+* CONFIGURE BME280
 ***/
 
-// (default 0x77) / Alternate 0x76
-#define BME280_I2C_ADDR 0x77            
+// (default 0x76) / Alternate 0x77
+// Check report in serial monitor on boot for address
+#define BME280_I2C_ADDR 0x76            
   
+  
+  
+/***********************************************************
+* CONFIGURE ENVIRONMENTAL PARAMS
+***/
+#define SEALEVELPRESSURE_HPA (1013.25)
   
   
 
@@ -108,7 +115,9 @@
 * This allows conversion from 5v to 3.3 via ADC > I2C
 ***/
 
-#define ADC_I2C_ADDR 0x48 // Default is 0x48
+// Default is 0x48
+// Check report in serial monitor on boot for address
+#define ADC_I2C_ADDR 0x48 
 
 #define ADC_TYPE_ADS1015 // 12 bit (3 mV/bit)
 // #define ADC_TYPE_ADS1115 // 16 bit (188uV/bit)
@@ -217,6 +226,7 @@
 #define PITOT_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 #define PITOT_ADC_CHANNEL 3
 
+
 /***********************************************************
 * CONFIGURE BARO SENSOR
 *
@@ -225,11 +235,10 @@
 
 
 // Uncomment One line only
-#define BARO_SENSOR_TYPE_FIXED_VALUE
+// #define BARO_SENSOR_TYPE_FIXED_VALUE
 // #define BARO_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from REF_BARO_PIN
 // #define BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
-// #define BARO_SENSOR_TYPE_ADAFRUIT_BME280
-// #define BARO_SENSOR_TYPE_SPARKFUN_BME280
+#define BARO_SENSOR_TYPE_BME280
 // #define BARO_SENSOR_TYPE_MPX4115
 
 #define DEFAULT_BARO_VALUE 101.3529
@@ -251,10 +260,9 @@
 
 // Uncomment One line only
 //#define TEMP_SENSOR_NOT_USED
-#define TEMP_SENSOR_TYPE_FIXED_VALUE
+// #define TEMP_SENSOR_TYPE_FIXED_VALUE
 // #define TEMP_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from TEMPERATURE_PIN
-// #define TEMP_SENSOR_TYPE_SPARKFUN_BME280
-// #define TEMP_SENSOR_TYPE_ADAFRUIT_BME280
+#define TEMP_SENSOR_TYPE_BME280
 // #define TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 
 #define TEMP_TRIMPOT 0.0
@@ -272,10 +280,9 @@
 
 // Uncomment ONE of the following
 //#define RELH_SENSOR_NOT_USED
-#define RELH_SENSOR_TYPE_FIXED_VALUE
+// #define RELH_SENSOR_TYPE_FIXED_VALUE
 // #define RELH_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from HUMIDITY_PIN
-// #define RELH_SENSOR_TYPE_SPARKFUN_BME280
-// #define RELH_SENSOR_TYPE_ADAFRUIT_BME280
+#define RELH_SENSOR_TYPE_BME280
 // #define RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
 
 #define RELH_TRIMPOT 0.0
@@ -306,7 +313,5 @@
 * Test environment /DM 
 ***/
 #if defined DEBUG
-    #define BARO_SENSOR_TYPE_SPARKFUN_BME280
-    #define TEMP_SENSOR_TYPE_SPARKFUN_BME280
-    #define RELH_SENSOR_TYPE_SPARKFUN_BME280
+    // Stuff to test
 #endif

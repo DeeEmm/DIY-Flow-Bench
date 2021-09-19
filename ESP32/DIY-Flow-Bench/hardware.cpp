@@ -89,56 +89,30 @@ void Hardware::begin () {
   
   configurePins();
   
-//  // Support for [Adafruit 1015] (12bit) ADC
-//  // https://github.com/adafruit/Adafruit_ADS1X15
+  this->getI2CList(); // TODO: move into status dialog instead of printing to serial monitor
+  
+  
+  
+  
+// Support for [Adafruit 1015] (12bit) ADC
+// https://github.com/adafruit/Adafruit_ADS1X15
 //  #ifdef PREF_SRC_ADC_1015 
 //    Adafruit_ADS1015 ads1015; 
 //    ads1015.begin(ADC_I2C_ADDR);
 //  #endif
-//  
-//  // Support for [Adafruit 1115] (16bit) ADC
-//  // https://github.com/adafruit/Adafruit_ADS1X15
+
+// Support for [Adafruit 1115] (16bit) ADC
+// https://github.com/adafruit/Adafruit_ADS1X15
 //  #ifdef PREF_SRC_ADC_1115
 //    Adafruit_ADS1115 ads1115;
 //    ads1115.begin(ADC_I2C_ADDR);
 //  #endif
 
 
-// // Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
-// // https://github.com/adafruit/Adafruit_BME280_Library
-// #if defined(PREF_SENSOR_REF_ADAFRUIT_BME280) || defined(TEMP_SENSOR_ADAFRUIT_BME280) || defined(BARO_SENSOR_ADAFRUIT_BME280)
-//   #include <Adafruit_BME280.h> 
-//   Adafruit_BME280 adafruitBme280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
-// 
-//   //I2C address - BME280_I2C_ADDR
-//   if (!adafruitBme280.begin()) {  
-//     _message.Handler(LANG_BME280_READ_FAIL);
-//     _message.DebugPrintLn("Adafruit BME280 Initialisation failed");      
-//   } else {
-//     _message.DebugPrintLn("Adafruit BME280 Initialised");      
-//   }
-// #endif
-// 
-// // Support for SPARKFUN_BME280 temp, pressure & Humidity sensors
-// // https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide?_ga=2.39864294.574007306.1596270790-134320310.1596270790
-// #if defined (RELH_SENSOR_SPARKFUN_BME280) || defined(TEMP_SENSOR_SPARKFUN_BME280) || defined(BARO_SENSOR_SPARKFUN_BME280)
-//   #include "SparkFunBME280.h"
-//   #include <Wire.h>
-//   BME280 SparkFunBME280;
-// 
-//   Wire.begin();
-//   SparkFunBME280.setI2CAddress(BME280_I2C_ADDR); 
-//   if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
-//   {
-//     _message.Handler(LANG_BME280_READ_FAIL);
-//     _message.DebugPrintLn("Sparkfun BME280 Initialisation failed");      
-//   } else {
-//     _message.DebugPrintLn("Sparkfun BME280 Initialised");      
-//   }
-// #endif
-// 
-// // Support for DHT11 humidity / temperature sensors
-// // https://github.com/winlinvip/SimpleDHT
+
+
+// Support for DHT11 humidity / temperature sensors
+// https://github.com/winlinvip/SimpleDHT
 // #if RELH_SENSOR_SIMPLE_RELH_DHT11 || TEMP_SENSOR_SIMPLE_TEMP_DHT11
 //   #include <SimpleDHT.h>  
 //   SimpleDHT11 dht11(HUMIDITY_PIN);    
@@ -146,6 +120,49 @@ void Hardware::begin () {
 
 }
 
+
+
+/***********************************************************
+* Get list of I2C devices 
+*
+* Based on: https://www.esp32.com/viewtopic.php?t=4742
+***/
+//int * Hardware::getI2CList() {   
+void Hardware::getI2CList() {   
+  
+  Messages _message;
+  // TODO: Detect I2C devices on bus and return addresses in array to be displayed in status dialog
+
+  // ESP32 I2C Scanner
+  // Based on code of Nick Gammon  http://www.gammon.com.au/forum/?id=10896
+  // ESP32 DevKit - Arduino IDE 1.8.5
+  // Device tested PCF8574 - Use pullup resistors 3K3 ohms !
+  // PCF8574 Default Freq 100 KHz 
+  
+  Wire.begin (SCA_PIN, SCL_PIN); 
+
+  Serial.println ();
+  Serial.println ("Scanning for I2C devices...");
+  byte count = 0;
+
+  Wire.begin();
+  for (byte i = 8; i < 120; i++)   {
+    Wire.beginTransmission (i);          // Begin I2C transmission Address (i)
+    if (Wire.endTransmission () == 0)  { // Receive 0 = success (ACK response) 
+    
+      Serial.print ("Found address: ");
+      Serial.print (i, DEC);
+      Serial.print (" (0x");
+      Serial.print (i, HEX);     // PCF8574 7 bit address
+      Serial.println (")");
+      count++;
+    }
+  }
+  Serial.print ("Found ");      
+  Serial.print (count, DEC);        // numbers of devices
+  Serial.println (" device(s).");
+  Serial.println (" ");
+}
 
 
 

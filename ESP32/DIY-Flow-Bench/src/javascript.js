@@ -14,6 +14,7 @@ const START_BENCH = 11;
 const STOP_BENCH = 12;
 const LEAK_CAL = 13;
 const GET_CAL = 14;
+const RESTART = 15;
 
 var leakCalVal;
 var flowCalVal;
@@ -234,6 +235,7 @@ function initialiseButtons() {
     socketMessageSend(LOAD_CONFIG);
     socketMessageSend(GET_CAL);
   });
+  document.getElementById('restart-button').addEventListener('click', function(){socketMessageSend(RESTART);});
   document.getElementById('calibrate-button').addEventListener('click', function(){socketMessageSend(CALIBRATE);});
   document.getElementById('leak-cal-button').addEventListener('click', function(){socketMessageSend(LEAK_CAL);});
   document.getElementById('save-config-button').addEventListener('click', function(){socketMessageSend(SAVE_CONFIG);});
@@ -355,6 +357,11 @@ function socketMessageSend(message){
     case GET_CAL: // HEADER:14
       jsonMessage ='{\"HEADER\":\"' + GET_CAL + '\"}';
     break;
+    
+    case RESTART: // HEADER:15
+    jsonMessage ='{\"HEADER\":\"' + RESTART + '\"}';
+    location.reload();
+  break;
 
 
   }

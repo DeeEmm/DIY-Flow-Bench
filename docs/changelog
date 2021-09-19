@@ -226,4 +226,6 @@ Build #         - Description of Change
 21090101        - Added support for 1015 / 1115 ADC for MAF / PRef / PDiff / Pitot
 21090801        - (temporarily disabled ADC)
                 - Updated BOM in docs folder
-                
+21091101        - Added additional dependencies for BME280 - ESP32
+21091801        - Custom BME280 code to replace Adafruit and Sparkfun libraries
+                - Added soft reset button to config panel

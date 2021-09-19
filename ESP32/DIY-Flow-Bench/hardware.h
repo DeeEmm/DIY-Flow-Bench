@@ -28,6 +28,8 @@ class Hardware {
 	public:
 		Hardware();
 		void begin ();
+		//int * getI2CList();
+		void getI2CList();
 		float getAdcMillivolts(int adcChannel);
 		float getSupplyMillivolts();
 		bool benchIsRunning();	
