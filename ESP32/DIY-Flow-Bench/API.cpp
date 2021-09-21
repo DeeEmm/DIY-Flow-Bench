@@ -114,46 +114,48 @@ void API::ParseMessage(char apiMessage) {
   char serialResponse[30];
   double flowCFM = 0.01;
   
+  String apiResponse;
+  
   
 
 
   switch (apiMessage)
   {
       case 'C': // Test Checksum - somewhere to test custom responses
-          status.statusMessage = String("V") + config.api_delim + "2" + "." + MAJOR_VERSION + "." + BUILD_NUMBER;
+          apiResponse = String("V") + config.api_delim + "2" + "." + MAJOR_VERSION + "." + BUILD_NUMBER;
       break;
       
 
       case 'V': // Get Version 'VMmYYMMDDXX\r\n'
-          status.statusMessage = String("V") + config.api_delim + MAJOR_VERSION + "." + MINOR_VERSION + "." + BUILD_NUMBER;
+          apiResponse = String("V") + config.api_delim + MAJOR_VERSION + "." + MINOR_VERSION + "." + BUILD_NUMBER;
       break;
 
       case 'L': // Perform Leak Test Calibration 'L\r\n'
-// TODO:          status.statusMessage = String("L") + config.api_delim + leakTestCalibration();
+// TODO:          apiResponse = String("L") + config.api_delim + leakTestCalibration();
           // TODO: confirm Leak Test Calibration success in response
       break;
 
       case 'l': // Perform Leak Test 'l\r\n'      
-// TODO:         status.statusMessage = String("l") + config.api_delim + leakTest();
+// TODO:         apiResponse = String("l") + config.api_delim + leakTest();
           // TODO: confirm Leak Test success in response
       break;
 
       case 'O': // Flow Offset Calibration  'O\r\n'        
 // TODO:          setCalibrationOffset();
 // TODO:          calibration.flow_offset
-          status.statusMessage = String("O") + config.api_delim + config.cal_offset;
+          apiResponse = String("O") + config.api_delim + config.cal_offset;
           // TODO: confirm Flow Offset Calibration success in response
       break;
 
       case 'F': // Get measured Flow 'F123.45\r\n'
-          status.statusMessage = String("F") + config.api_delim ;        
+          apiResponse = String("F") + config.api_delim ;        
           // Truncate to 2 decimal places
           flowCFM = _maths.calculateFlowCFM() * 100;
-          status.statusMessage += flowCFM / 100;
+          apiResponse += flowCFM / 100;
       break;
 
       case 'M': // Get MAF sensor data'
-          status.statusMessage = String("M") + config.api_delim ;        
+          apiResponse = String("M") + config.api_delim ;        
           if (streamMafData == false) {
               streamMafData = true;
               _maths.calculateFlowCFM();
@@ -162,98 +164,98 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'm': // Get MAF output voltage'
-          status.statusMessage = String("m") + config.api_delim + ((analogRead(MAF_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);        
+          apiResponse = String("m") + config.api_delim + ((analogRead(MAF_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);        
       break;
 
       case 'T': // Get measured Temperature 'T.123.45\r\n'
-          status.statusMessage = String("T") + config.api_delim + _maths.calculateTemperature(DEGC);
+          apiResponse = String("T") + config.api_delim + _maths.calculateTemperature(DEGC);
       break;
 
       case 't': // Get Temperature sensor output voltage'
-          status.statusMessage = String("t") + config.api_delim + ((analogRead(TEMPERATURE_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);
+          apiResponse = String("t") + config.api_delim + ((analogRead(TEMPERATURE_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);
       break;
 
       case 'H': // Get measured Humidity 'H.123.45\r\n'
-          status.statusMessage = String("H") + config.api_delim + _maths.calculateRelativeHumidity(PERCENT);
+          apiResponse = String("H") + config.api_delim + _maths.calculateRelativeHumidity(PERCENT);
       break;
 
       case 'h': // Get Humidity sensor output voltage'
-          status.statusMessage = String("h") + config.api_delim + ((analogRead(HUMIDITY_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);
+          apiResponse = String("h") + config.api_delim + ((analogRead(HUMIDITY_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);
       break;
 
       case 'R': // Get measured Reference Pressure 'R.123.45\r\n'
-          status.statusMessage = String("R") + config.api_delim + _maths.calculateRefPressure(KPA);
+          apiResponse = String("R") + config.api_delim + _maths.calculateRefPressure(KPA);
       break;
 
       case 'r': // Get Reference Pressure sensor output voltage'
-          status.statusMessage = String("r") + config.api_delim + ((analogRead(REF_PRESSURE_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);
+          apiResponse = String("r") + config.api_delim + ((analogRead(REF_PRESSURE_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);
       break;
 
       case 'B': // Get measured Baro Pressure 'B.123.45\r\n'
-          status.statusMessage = String("B") + config.api_delim + _maths.calculateBaroPressure(KPA);
+          apiResponse = String("B") + config.api_delim + _maths.calculateBaroPressure(KPA);
       break;
 
       case 'b': // Get Baro Pressure sensor output voltage'
-          status.statusMessage = String("b") + config.api_delim + ((analogRead(REF_BARO_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);
+          apiResponse = String("b") + config.api_delim + ((analogRead(REF_BARO_PIN) * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000);
       break;
 
       case 'v': // Get board supply voltage (mv) 'v.123.45\r\n'
-          status.statusMessage = String("v") + config.api_delim + _hardware.getSupplyMillivolts();
+          apiResponse = String("v") + config.api_delim + _hardware.getSupplyMillivolts();
       break;
       
       case 'D': // DEBUG MAF'
-          status.statusMessage = String("D") + config.api_delim ;
+          apiResponse = String("D") + config.api_delim ;
           streamMafData = true;
       break;
 
       case 'd': // DEBUG OFF'
-          status.statusMessage = String("d") + config.api_delim;
+          apiResponse = String("d") + config.api_delim;
           streamMafData = false;
       break;
 
       case 'E': // Enum - Flow:Ref:Temp:Humidity:Baro
           // Flow
-          status.statusMessage = String("E") + config.api_delim ;        
+          apiResponse = String("E") + config.api_delim ;        
           // Truncate to 2 decimal places
           flowCFM = _maths.calculateFlowCFM() * 100;
-          status.statusMessage += (flowCFM / 100) + String(config.api_delim);
+          apiResponse += (flowCFM / 100) + String(config.api_delim);
           // Reference Pressure
-          status.statusMessage += _maths.calculateRefPressure(KPA) + String(config.api_delim);
+          apiResponse += _maths.calculateRefPressure(KPA) + String(config.api_delim);
           // Temperature
-          status.statusMessage += _maths.calculateTemperature(DEGC) + String(config.api_delim);
+          apiResponse += _maths.calculateTemperature(DEGC) + String(config.api_delim);
           // Humidity
-          status.statusMessage += _maths.calculateRelativeHumidity(PERCENT) + String(config.api_delim);
+          apiResponse += _maths.calculateRelativeHumidity(PERCENT) + String(config.api_delim);
           // Barometric Pressure
-          status.statusMessage += _maths.calculateBaroPressure(KPA);
+          apiResponse += _maths.calculateBaroPressure(KPA);
       break;
 
       case 'I': // IP Address
-          status.statusMessage = String("I") + config.api_delim + status.local_ip_address;
+          apiResponse = String("I") + config.api_delim + status.local_ip_address;
       break;
 
       case 'N': // Hostname
-          status.statusMessage = String("I") + config.api_delim + config.hostname;
+          apiResponse = String("I") + config.api_delim + config.hostname;
       break;
 
       case 'S': // WiFi SSID
           if (status.apMode == true) {
-            status.statusMessage = String("I") + config.api_delim + config.wifi_ap_ssid;            
+            apiResponse = String("I") + config.api_delim + config.wifi_ap_ssid;            
           } else {
-            status.statusMessage = String("I") + config.api_delim + config.wifi_ssid;            
+            apiResponse = String("I") + config.api_delim + config.wifi_ssid;            
           }
       break;
 
       case 'J': // JSON Data
-          status.statusMessage = String("J") + config.api_delim + _webserver.getDataJSON();
+          apiResponse = String("J") + config.api_delim + _webserver.getDataJSON();
       break;
       
       case '!': // Debug Mode (enable verbose debug messages)
         if (config.debug_mode == true){
           config.debug_mode = false;
-          status.statusMessage = String("Debug Mode Off");
+          apiResponse = String("Debug Mode Off");
         } else {
           config.debug_mode = true;
-          status.statusMessage = String("Debug Mode On");
+          apiResponse = String("Debug Mode On");
         }
         
       break;
@@ -269,16 +271,16 @@ void API::ParseMessage(char apiMessage) {
   
 
   // Append delimiter to message data
-  status.statusMessage += config.api_delim ;
+  apiResponse += config.api_delim ;
 
   // Convert message data to char array for CRC function
-  status.statusMessage.toCharArray(serialResponse, sizeof(serialResponse));
+  apiResponse.toCharArray(serialResponse, sizeof(serialResponse));
 
   // Send API Response
   #if defined DISABLE_API_CHECKSUM
-        _message.DebugPrintLn(status.statusMessage + "\r\n");
+        _message.SerialPrintLn(apiResponse + "\r\n");
   #else
-        _message.DebugPrintLn(status.statusMessage + calcCRC(serialResponse) + "\r\n");
+        _message.SerialPrintLn(apiResponse + calcCRC(serialResponse) + "\r\n");
   #endif
 
 }

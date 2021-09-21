@@ -101,6 +101,7 @@ void Hardware::begin () {
 //    ads1015.begin(ADC_I2C_ADDR);
 //  #endif
 
+
 // Support for [Adafruit 1115] (16bit) ADC
 // https://github.com/adafruit/Adafruit_ADS1X15
 //  #ifdef PREF_SRC_ADC_1115
@@ -167,44 +168,76 @@ void Hardware::getI2CList() {
 
 
 /***********************************************************
-* GET ADS1X15 ADC value
+* GET ADS1015 ADC value
 *
-***/
-float Hardware::getAdcMillivolts(int adcChannel) {   
+* Based on: https://github.com/sparkfun/SparkFun_ADS1015_Arduino_Library/blob/master/src/SparkFun_ADS1015_Arduino_Library.cpp
+* and :https://github.com/adafruit/Adafruit_ADS1X15/blob/master/Adafruit_ADS1X15.cpp
+*
+ ***/
+int Hardware::getADCRawData(int channel) {
+
+  if (channel > 3) {
+    return 0;
+  }
   
-  int16_t rawADCValue = 0;
-  float adcMillivolts = 0.0;
+  uint16_t mode = ((4 + channel) << 12);
+    
+  uint16_t config = 0x8000;
+  config |= mode;
+  config |= 0X0000; // Gain (+/- 6.144v) NOTE: we are assuming all sensors have same FSD, else we need to scale each sensor within each sensor->function in sensors.cpp
+  config |= 0x0100; // Mode = Single
+  config |= 4; // data rate = 4 (default)
+  config |= 0x0000; // comparator mode traditional
+  config |= 0x0000; // polarity low
+  config |= 0x0000; // alert is non-latching
+  config |= 3;
   
-//  #if defined PREF_SRC_ADC_1015
-//    rawADCValue = this->ads1015.readADC_SingleEnded(adcChannel);
-//    adcMillivolts = this->ads1015.computeVolts(rawADCValue);
-//  #elif defined PREF_SRC_ADC_1115
-//    rawADCValue = this->ads1115.readADC_SingleEnded(adcChannel);
-//    adcMillivolts = this->ads1115.computeVolts(rawADCValue);
-//  #endif
+  Wire.beginTransmission(ADC_I2C_ADDR);  
   
-  return adcMillivolts;
+  Wire.write((uint8_t)0x01);
+  Wire.write((uint8_t)(config >> 8));
+  Wire.write((uint8_t)(config & 0xFF));
+  Wire.endTransmission();
+  
+  delay(10); // TODO: This is a hack, need to test for transmission complete. (Delays are bad Mmmmnnkay) [might not even need it, screen refresh rate might be enough!]
+  
+  Wire.beginTransmission(ADC_I2C_ADDR);
+  Wire.write(0x00);
+  Wire.endTransmission();
+
+  int rv = Wire.requestFrom(ADC_I2C_ADDR, (uint8_t) 2);
+  int raw;
+  if (rv == 2) {
+    raw = Wire.read() << 8;
+    raw += Wire.read();
+  }
+  
+  #ifdef ADC_TYPE_ADS1015
+    raw >>= 4;  // Shift 12-bit results
+  #endif
+  
+  return int(raw);
   
 }
 
 
-
-
-
-
-
-
-
 /***********************************************************
 * GET BOARD VOLTAGE
+* Measures 5v supply buck power to ESP32 via voltage divider
+* We use a 10k-10k divider on the official shield
+* This gives a max of 2.5v which is fine for the ESP32's 3.3v logic
+* Use a 0.1uf cap on input to help filter noise
 *
 * NOTE: ESP32 has 12 bit ADC (0-3.3v = 0-4095)
 ***/
-float Hardware::getSupplyMillivolts() {   
+int Hardware::getSupplyMillivolts() {   
+
   int rawVoltageValue = analogRead(VOLTAGE_PIN);
-  float supplyMillivolts = rawVoltageValue * (3.3 / 4095.0) * 1000;
+  
+  float supplyMillivolts = (2 * (rawVoltageValue * (3.3 / 4095.0) * 1000)) + SUPPLY_MV_TRIMPOT;
 
   return supplyMillivolts;
+  
 }
 
 

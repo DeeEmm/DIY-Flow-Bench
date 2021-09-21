@@ -26,6 +26,7 @@ public:
     void begin();
 	void initialise();
 	void getBME280RawData();
+	int convertADCtoMillivolts(int rawVal);
     float getMafValue();
 	float getTempValue();
 	float getBaroValue();

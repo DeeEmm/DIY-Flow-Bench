@@ -88,8 +88,11 @@ function onSocketMessageReceive(event) {
       for (key in myObj) {
         try {
           if (key != "HEADER") {
-            document.getElementById(key).value = myObj[key];
-             // console.log(key + ' : ' + myObj[key]);
+            if (key == "PAGE_TITLE") {
+              document.getElementById(key).innerHTML = myObj[key];
+            } else {
+              document.getElementById(key).value = myObj[key];
+            }
            }
         } catch (error) {
           console.log('Missing or incorrect configuration parameter(s)');

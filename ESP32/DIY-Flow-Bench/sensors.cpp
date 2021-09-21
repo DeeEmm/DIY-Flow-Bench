@@ -46,9 +46,9 @@ Sensors::Sensors() {
 	this->_mafDataUnit = MAFdataUnit;
 	
 	
-	unsigned int buffer[24];
-	unsigned int data[8];
-	unsigned int dig_H1 = 0;
+	// unsigned int buffer[24];
+	// unsigned int data[8];
+	// unsigned int dig_H1 = 0;
 	
 	
 }
@@ -222,6 +222,30 @@ void IRAM_ATTR Sensors::mafFreqCountISR() {
 
 
 
+
+/***********************************************************
+ * Convert ADC value to millivolts
+ ***/
+ int Sensors::convertADCtoMillivolts(int rawVal) {
+
+	int millivolts;
+	
+	#if defined ADC_TYPE_ADS1015 // 12 bit
+		// 12 bits - sign bit = 11 bit mantissa = 2047 | 6.144v = max voltage (gain) of ADC
+		// millivolts = ((rawVal * (6.144 / 2047)) * 1000); 
+		millivolts = rawVal * 3.0014; 
+	#elif defined ADC_TYPE_ADS1115 // 16 bit
+		// 16 bits - sign bit = 15 bits mantissa = 32767 | 6.144v = max voltage (gain) of ADC
+		// millivolts = ((rawVal * (6.144 / 32767)) * 1000); 
+		millivolts = rawVal * 0.1875057;
+	#endif
+	
+	return millivolts;
+}
+
+
+
+
 /***********************************************************
  * Returns RAW MAF Sensor value
  *
@@ -232,27 +256,24 @@ float Sensors::getMafValue() {
 	Hardware _hardware;
 	
 	float mafFlow = 0.0;
-	
-	
-	
-	
-	
+
 	switch (this->_mafOutputType) {
 		
 		case VOLTAGE:
 		{
-			int supplyMillivolts = _hardware.getSupplyMillivolts();
-			float mafMillivolts = 0.0;
+			int mafMillivolts = 0;
 			int mafFlowRaw;
 			
-			#if defined MAF_SRC_ADC_1015 || defined MAF_SRC_ADC_1015
-				mafMillivolts = _hardware.getAdcMillivolts(MAF_ADC_CHANNEL);
-			#elif defined PREF_SRC_PIN	
-				mafFlowRaw = analogRead(REF_PRESSURE_PIN);
-				mafMillivolts = (mafFlowRaw * (supplyMillivolts / 4095.0)) * 1000;
+			#if defined MAF_SRC_ADC
+				mafFlowRaw = _hardware.getADCRawData(MAF_ADC_CHANNEL);
+				mafMillivolts = convertADCtoMillivolts(int(mafFlowRaw));
+				
+			#elif defined MAF_SRC_PIN	
+				mafFlowRaw = analogRead(MAF_PIN);
+				mafMillivolts = (mafFlowRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
 			#endif
 
-			mafFlow = mafMillivolts + MAF_TRIMPOT;
+			mafFlow = mafMillivolts + MAF_MV_TRIMPOT;			
 			return mafFlow;
 		}
 		break;
@@ -261,7 +282,7 @@ float Sensors::getMafValue() {
 		{  
 			mafFlow = 40000000.00 / PeriodCount;
 			//mafFlow = 40000000.00 / __mafVoodoo.PeriodCount; // NOTE: Do we need Voodoo?
-			mafFlow += MAF_TRIMPOT;
+			mafFlow += MAF_MV_TRIMPOT;
 			return mafFlow;
 		}
 		break;
@@ -411,16 +432,13 @@ void Sensors::getBME280RawData() {
 float Sensors::getTempValue() {
 	
 	Hardware _hardware;
-	float refTempDegC;
-	
-	int supplyMillivolts = _hardware.getSupplyMillivolts();
-
+	double refTempDegC;
 
 	#ifdef TEMP_SENSOR_TYPE_LINEAR_ANALOG
 	
 		int rawTempValue = analogRead(TEMPERATURE_PIN);	
-		int tempMillivolts = (rawTempValue * (supplyMillivolts / 4095.0)) * 1000;	
-		tempMillivolts += TEMP_TRIMPOT;		
+		int tempMillivolts = (rawTempValue * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;	
+		tempMillivolts += TEMP_MV_TRIMPOT;		
 		refTempDegC = tempMillivolts * TEMP_ANALOG_SCALE;
 		
 	#elif defined TEMP_SENSOR_TYPE_BME280
@@ -434,10 +452,7 @@ float Sensors::getTempValue() {
 		 double var1 = (((double)adc_t) / 16384.0 - ((double)dig_T1) / 1024.0) * ((double)dig_T2);
 		 double var2 = ((((double)adc_t) / 131072.0 - ((double)dig_T1) / 8192.0) * (((double)adc_t)/131072.0 - ((double)dig_T1)/8192.0)) * ((double)dig_T3);
 		 double t_fine = (long)(var1 + var2);
-		 double cTemp = (var1 + var2) / 5120.0;
-		 //double fTemp = cTemp * 1.8 + 32;
-		 
-		 refTempDegC = cTemp;
+		 refTempDegC = (var1 + var2) / 5120.0;
 
 	#elif defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
@@ -466,22 +481,19 @@ float Sensors::getBaroValue() {
 	
 	Hardware _hardware;
 	
-	float baroPressureKpa;
-	
-	int supplyMillivolts = _hardware.getSupplyMillivolts();
-	
+	double baroPressureKpa;
+		
 	#ifdef BARO_SENSOR_TYPE_LINEAR_ANALOG
 		
 		int rawBaroValue = analogRead(REF_BARO_PIN);
-		int baroMillivolts = (rawBaroValue * (supplyMillivolts / 4095.0)) * 1000;
-		baroMillivolts += BARO_TRIMPOT;		
+		int baroMillivolts = (rawBaroValue * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
+		baroMillivolts += BARO_MV_TRIMPOT;		
 		baroPressureKpa = baroMillivolts * BARO_ANALOG_SCALE;
 	
 	#elif BARO_SENSOR_TYPE_MPX4115
 		// Datasheet - https://html.alldatasheet.es/html-pdf/5178/MOTOROLA/MPX4115/258/1/MPX4115.html
 		// Vout = VS (P x 0.009 – 0.095) --- Where VS = Supply Voltage (Formula from Datasheet)
-		// P = ((Vout / VS ) - 0.095) / 0.009 --- Formula transposed for P
-		baroPressureKpa = (((float)baroMillivolts / (float)supplyMillivolts ) - 0.095) / 0.009; 
+		refPressurePa = map(_hardware.getADCRawData(PREF_ADC_CHANNEL), 0, 4095, 15000, 115000);
 
 	#elif defined BARO_SENSOR_TYPE_BME280
 		
@@ -506,9 +518,7 @@ float Sensors::getBaroValue() {
 		p = (p - (var2 / 4096.0)) * 6250.0 / var1;
 		var1 = ((double) dig_P9) * p * p / 2147483648.0;
 		var2 = p * ((double) dig_P8) / 32768.0;
-		double pressure = (p + (var1 + var2 + ((double)dig_P7)) / 16.0) / 1000;
-		
-		baroPressureKpa = pressure;
+		baroPressureKpa = (p + (var1 + var2 + ((double)dig_P7)) / 16.0) / 1000;
 
 	#elif defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
 		// No baro sensor defined so use value grabbed at startup from reference pressure sensor
@@ -532,16 +542,16 @@ float Sensors::getRelHValue() {
 	Hardware _hardware;
 	
 	float relativeHumidity;
-	
-	int supplyMillivolts = _hardware.getSupplyMillivolts();
-	int rawRelhValue = analogRead(HUMIDITY_PIN);
-	int relhMillivolts = (rawRelhValue * (supplyMillivolts / 4095.0)) * 1000;
-	relhMillivolts += BARO_TRIMPOT;		
-
+		
 	#ifdef RELH_SENSOR_TYPE_LINEAR_ANALOG
+	
+		int rawRelhValue = analogRead(HUMIDITY_PIN);
+		int relhMillivolts = (rawRelhValue * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
+		relhMillivolts += RELH_MV_TRIMPOT;		
 		relativeHumidity = relhMillivolts * RELH_ANALOG_SCALE;
 	
 	#elif RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
+	
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
 		int err = SimpleDHTErrSuccess;
 		if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
@@ -558,25 +568,27 @@ float Sensors::getRelHValue() {
 		// Convert the humidity data
 		long adc_h = ((long)(this->data[6] & 0xFF) * 256 + (long)(this->data[7] & 0xFF));
 		
-		
 		// Humidity offset calculations
 		double var_H = (((double)t_fine) - 76800.0);
 		var_H = (adc_h - (dig_H4 * 64.0 + dig_H5 / 16384.0 * var_H)) * (dig_H2 / 65536.0 * (1.0 + dig_H6 / 67108864.0 * var_H * (1.0 + dig_H3 / 67108864.0 * var_H)));
-		double humidity = var_H * (1.0 - dig_H1 * var_H / 524288.0);
-		if(humidity > 100.0){
-			humidity = 100.0;
-		} else if(humidity < 0.0) {
-			humidity = 0.0;
-		}
+		relativeHumidity = var_H * (1.0 - dig_H1 * var_H / 524288.0);
+		
+//Serial.println(relativeHumidity);
 
-		relativeHumidity = humidity;
+		// Prevent overflow / out of range errors
+		if (relativeHumidity > 100.0) {
+			relativeHumidity = 100.0;
+		} 
+		if (relativeHumidity < 0) {
+			relativeHumidity = 0;
+		}
 
 	#else
 		//we don't have any sensor so use standard value 
 		relativeHumidity = DEFAULT_RELH_VALUE; // (36%)
 	#endif
 
-	return relativeHumidity;
+	return relativeHumidity; //typecast to float to prevent overflow (ovf)
 }
 
 
@@ -590,45 +602,34 @@ float Sensors::getPRefValue() {
 	
 	Hardware _hardware;
 	
+	float refPressurePa = 0.0;
 	float refPressureKpa = 0.0;
-	float supplyMillivolts = _hardware.getSupplyMillivolts();
-	float rawRefPressValue;
-	float refPressMillivolts;
+	int refPressRaw;
+	int refPressMillivolts;
+	int supplyMillivolts = _hardware.getSupplyMillivolts();
 
-	#if defined PREF_SRC_ADC_1015 || defined PREF_SRC_ADC_1015
-		refPressMillivolts = _hardware.getAdcMillivolts(PREF_ADC_CHANNEL);
+	#if defined PREF_SRC_ADC
+		refPressRaw = _hardware.getADCRawData(PREF_ADC_CHANNEL);
+        refPressMillivolts = convertADCtoMillivolts(int(refPressRaw));
+				
 	#elif defined PREF_SRC_PIN	
-		rawRefPressValue = analogRead(REF_PRESSURE_PIN);
-		refPressMillivolts = (rawRefPressValue * (supplyMillivolts / 4095.0)) * 1000;
+		refPressRaw = analogRead(REF_PRESSURE_PIN);
+		refPressMillivolts = (refPressRaw * (supplyMillivolts / 4095.0)) * 1000;
 	#endif
 	
-	refPressMillivolts += PREF_TRIMPOT;
+	refPressMillivolts += PREF_MV_TRIMPOT;
+
+//Serial.println(refPressMillivolts);
+
 
 	#ifdef PREF_SENSOR_TYPE_LINEAR_ANALOG
-		refPressureKpa = refPressMillivolts * PREF_ANALOG_SCALE;
+		refPressurePa = refPressMillivolts * PREF_ANALOG_SCALE;
 	
 	#elif defined PREF_SENSOR_TYPE_MPXV7007
+		// RECOMMENDED SENSOR !!!
 		// Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
 		// Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007DP Datasheet)
-		// P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
-		refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057;  
-
-	#elif defined PREF_SENSOR_TYPE_MPX4250
-		// NOTE: Untested.  Also not best choice of sensor
-		// Datasheet - https://www.nxp.com/files-static/sensors/doc/data_sheet/MPX4250.pdf
-		// Vout = VS x (0.00369 x P + 0.04) --- Where VS = Supply Voltage (Formula from MPXV7007 Datasheet)
-		// P = ((Vout / VS ) - 0.04) / 0.00369 --- Formula transposed for P
-		// Note we use the baro value as this is an absolute sensor, so to prevent circular references we need to know
-		// if we actually have a Baro sensor installed
-		#if defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO 
-			// we don't have a baro value so use the value hardcoded in the config to offset the pressure sensor value
-			refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - DEFAULT_BARO_VALUE;  
-		#elif defined BARO_SENSOR_TYPE_FIXED_VALUE            
-			refPressureKpa = DEFAULT_BARO_VALUE;
-		#else
-			// use the current baro value to offset the sensor value
-			refPressureKpa = (((refPressMillivolts / supplyMillivolts ) - 0.04) / 0.00369) - this->calculateBaroPressure(KPA);         
-		#endif
+		refPressurePa = map(_hardware.getADCRawData(PREF_ADC_CHANNEL), 0, 4095, -7000, 7000); 
 
 	#elif defined PREF_SENSOR_NOT_USED 
 	#else
@@ -637,6 +638,8 @@ float Sensors::getPRefValue() {
 		refPressureKpa = DEFAULT_REF_PRESS_VALUE;
 
 	#endif
+	
+	refPressureKpa = refPressurePa / 1000;
 
 	return refPressureKpa;
 }
@@ -652,37 +655,42 @@ float Sensors::getPDiffValue() {
 	
 	Hardware _hardware;
 
+	float diffPressurePa = 0.0;
 	float diffPressureKpa = 0.0;
-	float diffPressMillivolts;
-	int rawDiffPressValue;
-	float supplyMillivolts = _hardware.getSupplyMillivolts();
-	
+	int diffPressMillivolts;
+	int diffPressRaw;	
 
-	#if defined PDIFF_SRC_ADC_1015 || defined PDIFF_SRC_ADC_1015
-		diffPressMillivolts = _hardware.getAdcMillivolts(PDIFF_ADC_CHANNEL);
+	#if defined PDIFF_SRC_ADC 
+		diffPressRaw = _hardware.getADCRawData(PDIFF_ADC_CHANNEL);
+		diffPressMillivolts = convertADCtoMillivolts(int(diffPressRaw));
+		
 	#elif defined PDIFF_SRC_PIN	
-		rawDiffPressValue = analogRead(DIFF_PRESSURE_PIN);
-		diffPressMillivolts = (rawDiffPressValue * (supplyMillivolts / 4095.0)) * 1000;
+		diffPressRaw = analogRead(DIFF_PRESSURE_PIN);
+		diffPressMillivolts = (diffPressRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
 	#endif
 	
-	diffPressMillivolts += PDIFF_TRIMPOT;
+//Serial.println(diffPressRaw);	
+	
+	diffPressMillivolts += PDIFF_MV_TRIMPOT;
 
 	#ifdef PDIFF_SENSOR_TYPE_LINEAR_ANALOG
-		diffPressureKpa = diffPressMillivolts * PDIFF_ANALOG_SCALE;
+		diffPressurePa = diffPressMillivolts * PDIFF_ANALOG_SCALE;
 	
 	#elif PDIFF_SENSOR_TYPE_MPXV7007
+		// RECOMMENDED SENSOR
 		// Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
 		// Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007DP Datasheet)
-		// P = ((Vout / VS ) - 0.5) / 0.057 --- Formula transposed for P
-		refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057;  
+		refPressurePa = map(_hardware.getADCRawData(PREF_ADC_CHANNEL), 0, 4095, -7000, 7000);  
 
 	#elif defined PDIFF_SENSOR_NOT_USED 
 	#else
 		// No reference pressure sensor used so lets return a value (so as not to throw maths out)
 		// refPressureKpa = 6.97448943333324; //28"
-		diffPressureKpa = DEFAULT_PDIFF_PRESS;
+		diffPressurePa = DEFAULT_PDIFF_PRESS;
 
 	#endif
+	
+	diffPressureKpa = diffPressurePa / 1000;
 
 	return diffPressureKpa;
 }
@@ -699,35 +707,45 @@ float Sensors::getPitotValue() {
 	
 	Hardware _hardware;
 
+	float pitotPressurePa = 0.0;
 	float pitotPressureKpa = 0.0;
-	float supplyMillivolts = _hardware.getSupplyMillivolts();
-	int pitotRaw;
-	double pitotMillivolts;
+	int pitotPressRaw;
+	int pitotMillivolts;
 	
 	
-	#if defined PITOT_SRC_ADC_1015 || defined PITOT_SRC_ADC_1015
-		pitotMillivolts = _hardware.getAdcMillivolts(PITOT_ADC_CHANNEL);
+	#if defined PITOT_SRC_ADC
+		pitotPressRaw = _hardware.getADCRawData(PITOT_ADC_CHANNEL);
+		pitotMillivolts = convertADCtoMillivolts(int(pitotPressRaw));
+		
 	#elif defined PITOT_SRC_PIN	
-		pitotRaw = analogRead(PITOT_PIN);
-		pitotMillivolts = (pitotRaw * (supplyMillivolts / 4095.0)) * 1000;
+		pitotPressRaw = analogRead(PITOT_PIN);
+		pitotMillivolts = (pitotPressRaw * (_hardware.getSupplyMillivolts() / 4095.0)) * 1000;
 	#endif
 	
-	pitotMillivolts += PITOT_TRIMPOT;
+//Serial.println(pitotPressRaw);		
 	
-	#ifdef PITOT_SENSOR_TYPE_LINEAR_ANALOG
-		pitotPressureKpa = pitotMillivolts * PITOT_ANALOG_SCALE;
+	pitotMillivolts += PITOT_MV_TRIMPOT;
 	
-	#elif PITOT_SENSOR_TYPE_MPXV7007DP
+	#ifdef defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
+		pitotPressurePa = pitotMillivolts * PITOT_ANALOG_SCALE;
+	
+	#elif defined PITOT_SENSOR_TYPE_MPXV7007DP
+		// RECOMMENDED SENSOR
 		// sensor characteristics from datasheet
 		// Vout = VS x (0.057 x P + 0.5)
-		pitotPressureKpa = (pitotMillivolts / supplyMillivolts - 0.5) / 0.057;
+		pitotPressurePa = map(_hardware.getADCRawData(PREF_ADC_CHANNEL), 0, 4095, -7000, 7000);
 
 	#else
 		// No pitot probe used so lets return a zero value
-		pitotPressureKpa = 0.0;
+		pitotPressurePa = 0.0;
 
 	#endif
+	
+	pitotPressureKpa = pitotPressurePa / 1000;
 
 	return pitotPressureKpa;
 }
+
+
+
 

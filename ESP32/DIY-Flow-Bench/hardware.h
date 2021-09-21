@@ -17,8 +17,6 @@
 ***/
 #pragma once
 
-#include <Adafruit_ADS1X15.h>
-
 class Hardware {
 	
 	friend class Messages;
@@ -30,13 +28,13 @@ class Hardware {
 		void begin ();
 		//int * getI2CList();
 		void getI2CList();
-		float getAdcMillivolts(int adcChannel);
-		float getSupplyMillivolts();
+		int getADCRawData(int channel);
+		int getSupplyMillivolts();
 		bool benchIsRunning();	
 		void checkRefPressure();
 		
 	private:
 		void configurePins ();
-		Adafruit_ADS1015 ads1015;
-		Adafruit_ADS1015 ads1115;
+		uint8_t buffer[3];
+		uint8_t m_bitShift; 
 };

@@ -229,3 +229,12 @@ Build #         - Description of Change
 21091101        - Added additional dependencies for BME280 - ESP32
 21091801        - Custom BME280 code to replace Adafruit and Sparkfun libraries
                 - Added soft reset button to config panel
+                - Added I2C Scanner to serial monitor
+21092001        - Added user defined vanity title
+                - Dropped support for DHT11
+                - Fixed RH reading
+                - Added ADC1015 support for MAF / PRef / PDiff / Pitot
+                - #97 API disabled by debug mode
+                - Fixed Board voltage ADC code
+                - Change pressure sensor calcs to pascals
+                - Dropped support for MPX5100/5700
