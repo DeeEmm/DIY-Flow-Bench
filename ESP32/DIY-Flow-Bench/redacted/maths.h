@@ -22,6 +22,14 @@ class Maths {
 
 	friend class Sensors;
 	friend class Hardware;
+	friend class mafData;
+	
+	private:
+		float MOLECULAR_WEIGHT_DRY_AIR;
+		bool streamMafData = false;
+		
+		int _mafDataUnit;
+
 
 	public:
 		Maths();
@@ -38,12 +46,7 @@ class Maths {
 		float calculateDiffPressure(int units);
 		
 		float startupBaroPressure;
-	
-	private:
-		float MOLECULAR_WEIGHT_DRY_AIR;
-		bool streamMafData = false;
-		
-		int _mafDataUnit;
+
 		long _mafLookupTable[][2];
 
 };

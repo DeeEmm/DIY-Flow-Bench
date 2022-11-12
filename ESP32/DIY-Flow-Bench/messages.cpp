@@ -20,103 +20,236 @@
  
  TODO: Set up messaging
  
- - Status: 
-	 Receives int from calling statement, this updates global message variable with current status
+ - Handler: 
 	 Potentially we can push mulitple messages onto a stack and display them in priority or on rotation
 	 Messages are active until cancelled?
 	 Messages are active until error has cleared?
  
  - Serial:
 	 Handles.serial print messages
-	 messages can be allocated to any serial port (set via config)
 	 
  - API:
 	 We already have a dedicated API file but ostensibly it could also fall under 'messages'
 	 
  - Websocket messages:
-	 We send message status to browser to let user know whats happening
+	 We send message status to browser to let user know whats happening (currently prepared by this->handler)
 	 
  - Log:
 	 Send messages to log file
  
  */
-
+ 
+#include <Wire.h>
+#include <Arduino.h>
 #include "messages.h"
+#include "constants.h"
+#include "pins.h"
+#include "configuration.h"
 #include "structs.h"
+#include LANGUAGE_FILE
 
-Messages::Messages () {
+
+Messages::Messages() {
+	
+}
 
 
+/***********************************************************
+* Initialise class
+*/
+void Messages::begin(void) {
+		
+	this->beginSerial();
+	
+}
+
+
+/***********************************************************
+* Begin Serial
+*
+* Default port Serial0 (U0UXD) used. (Same as programming port / usb)
+* NOTE: Serial1 reserved for SPI
+* NOTE: Serial2 reserved for gauge comms
+*
+* Serial.begin(baud-rate, protocol, RX pin, TX pin);
+*
+* TODO:  Should we move into hardware? 
+* Serial port is not specifically tied to messages also shared with API
+*/
+void Messages::beginSerial(void) {
+	
+	#if defined SERIAL0_ENABLED
+		Serial.begin(SERIAL0_BAUD, SERIAL_8N1 , SERIAL0_RX_PIN, SERIAL0_TX_PIN); 
+	#endif
+	
 }
 
 
 
 /***********************************************************
-* Handler
+* Message Handler
+*
+* Processes translated status messages for display in the browser
+* Example:
+*   _message.Handler(translate.LANG_VAL_SAVING_CONFIG);
+*
+* NOTE: Language strings are defined in the current language file i.e. /language/XX_Language.h
+* TODO: Store last message received for later recall
 */
-void Messages::Handler(String languageString) {
+void Messages::Handler(const std::string langPhrase) {
 
 	extern struct DeviceStatus status;
 
-	// NOTE: Language string is #defined in the current language file
-	
 	// Push the string to the Status Message
-	status.statusMessage = languageString;
+	status.statusMessage = langPhrase;
 	
 	//If we have debug enabled send the message to the serial port
-	#ifdef DEBUG 
-		this->serialPrintLn(status.statusMessage); 
+	#if defined DEBUG && defined SERIAL0_ENABLED
+		this->serialPrintf("%s  \n", langPhrase); 
 	#endif
+}
+
+
+
+/***********************************************************
+* serialPrintf
+* Always prints to serial port
+* 
+* Encapsulates vsnprintf method and uses standard c++ xxprintf formatting
+*
+* Based on...
+* https://forum.arduino.cc/t/esp32-where-can-i-find-the-reference-for-serial-printf-the-print-with-the-f-as-a-suffix/1007598/8
+*
+* For string formatters see...
+* https://cpp4arduino.com/2020/02/07/how-to-format-strings-without-the-string-class.html
+* https://en.wikipedia.org/wiki/Printf_format_string
+*
+* Example using d2str to convert float to char (double to string)
+* _message.serialPrintf((char*)"kg/h = %c", dtostrf((flowRateRAW / 1000), 7, 2, _message.floatBuffer)); 
+*/
+size_t Messages::serialPrintf(const std::string format, ...) {
 	
+	#ifdef SERIAL0_ENABLED
 	
-}
-
-
-
-/***********************************************************
-* DebugPrint
-*/
-void Messages::DebugPrint(String message) {
-
-	extern struct ConfigSettings config;
-
-	if (config.debug_mode) {
-		this->SerialPrint(message);
-	}
+		char buf[API_RESPONSE_LENGTH];
+		va_list ap;
+		va_start(ap, format);
+		vsnprintf(buf, sizeof(buf), format.c_str(), ap);
+		va_end(ap);
+		return(Serial.write(buf));
 		
+	#endif
 }
 
 
 
 
 /***********************************************************
-* DebugPrintLn
+* blobPrintf
+* Prints blob to serial port
+* 
+* Follows same formatting as serialPrintf
 */
-void Messages::DebugPrintLn(String message) {
+size_t Messages::blobPrintf(std::string format, ...) {
 
-	extern struct ConfigSettings config;
+	#ifdef SERIAL0_ENABLED
+	
+		char buf[API_BLOB_LENGTH];
+		va_list ap;
+		va_start(ap, format);
+		vsnprintf(buf, sizeof(buf), format.c_str(), ap);
+		va_end(ap);
+		return(Serial.write(buf));
 
-	if (config.debug_mode) {
-		this->SerialPrintLn(message);
-	}
+	#endif
+}
+
+
+
+/***********************************************************
+* statusPrintf
+* Prints to serial port if status_print_mode enabled
+* 
+* Follows same formatting as serialPrintf
+*/
+size_t Messages::statusPrintf(const std::string format, ...) {
+
+	#ifdef SERIAL0_ENABLED
+	
+		extern struct ConfigSettings config;
+	
+		if (config.status_print_mode) {
+			char buf[API_STATUS_LENGTH];
+			va_list ap;
+			va_start(ap, format);
+			vsnprintf(buf, sizeof(buf), format.c_str(), ap);
+			va_end(ap);
+			return(Serial.write(buf));
+		} else {
+			return 0;
+		}
 		
-}
-
-
-/***********************************************************
-* SerialPrint
-*/
-void Messages::SerialPrint (String message) {
-	Serial.print(message);
+	#endif
 }
 
 
 
 /***********************************************************
-* SerialPrintLn
+* debugPrintf
+* Prints to serial port if debug_mode enabled
+* 
+* Follows same formatting as serialPrintf
 */
-void Messages::SerialPrintLn (String message) {
-	Serial.println(message);
+size_t Messages::debugPrintf(const std::string format, ...) {
+
+	#ifdef SERIAL0_ENABLED
+	
+		extern struct ConfigSettings config;
+	
+		if (config.debug_mode) {
+			char buf[API_STATUS_LENGTH];
+			va_list ap;
+			va_start(ap, format);
+			vsnprintf(buf, sizeof(buf), format.c_str(), ap);
+			va_end(ap);
+			return(Serial.write(buf));
+		} else {
+			return 0;
+		}
+		
+	#endif
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***********************************************************
+* serialPrintf
+* 
+* Threadsafe print
+*/
+// extern int  ets_putc(int);
+// void * ICACHE_FLASH_ATTR Messages::serialPrintf(const char *s, ...) {
+//    int i=0;
+//    for (i=0; i<(sizeof(user_printfHook)/4); i++)   {
+// 	  if (user_printfHook[i] != NULL)  {
+// 		 ((void (*)(const char *))user_printfHook[i])(s);
+// 	  }
+//    }
+//    va_list args;
+//    va_start(args, s);
+//    ets_vprintf(ets_putc, s, args);
+//    va_end(args);
+// }
+
 
 

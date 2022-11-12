@@ -1,0 +1,120 @@
+/***********************************************************
+ * Hardware schema for V2
+ *
+ * NOTE: This code was developed to work on the DIYFB shield but can be adapted for use with other hardware.
+ * 
+ * The schema outlined below should help you to design your own shield or even just hook up sensors directly to
+ * your ESP32 controller via breadboard or veroboard. The code is designed to take advantage of standard off-the-shelf
+ * breakout boards that can easily be sourced via Tandy / Maplins / Radio Shack / Online / Wherever / Etc.
+ *
+ * However there are some caveats to be aware of...
+ *
+ * MAF and pressure sensors require 5v and so will not work when directly coupled to the ESP32 as it is a 3.3v device.
+ * For this reason an ADC is used (ADS1115 recommended) however it will need to be supplied at 5v. This means that you will
+ * need a 5v <> 3.3v logic level shifter to connect the I2C bus between the ADC1115 and the ESP32. As a result you will also 
+ * need to integrate both 3.3v and 5v supplies. Buck style power supplies work well. (Make sure you tie the 0v Ref lines)
+ *
+ * The BME is a 3.3v device so you need to connect the BME's I2C bus to the ESP32 side of the I2C level shifter (3.3v side). 
+ *
+ * It should also be noted that not all Bosch BME breakout boards are built equally. There are many that claim to be BM[E]280's but are in fact BM[P]280's.
+ * Note different 'E' and 'P' designations which refer to environment and pressure respectively. These boards are visually very similar but lack the Humidity 
+ * measurement aspect. Many boards even have BME280 screen printed on them making it very hard to tell. BME / BMP control registers are identical except for 
+ * the humidity control, so pressure and temperature code can be shared for both devices. The foot print is also shared, so many BOBs are used for both sensors.
+ * My advice is to buy your BME280 from a reputable source as pretty much ALL of the cheaper non-branded units I sourced online turned out to be BMP280's 
+ * If you get a chance to compare a BME and a BMP side-by-side yo will see that the BME is slightly squarer / larger (NOTE: we are only talking 0.2mm difference)
+ *
+ * There is also some (legacy) provision in the code for connecting analog sensors directly to the ESP32 within the code left over from V1 but this should largely
+ * be considered redundant and the I2C connection schema used in preference. Discrete connections should work although are untested and may require code tweaks to
+ * work with your chosen devices. Check the configuration for scaling and offset values. It should also be considered that using I2C does free up hardware pins to 
+ * be utilised by other features / functions and it will massively simplify your design. Additionally future code versions will likely rely on free pin availability.
+ *
+ ***/
+ 
+ 
+ 
+ 
+/***********************************************************
+* MAF sensors
+*
+* Note MAF sensors are 5v devices. Voltage divider or ADC + level shifter is required 
+* to interface with 3.3v ESP32
+***/
+
+
+## GM Style
+A - Low reference
+B - IAT Sensor Signal
+C - Sensor Ground
+D - Sensor Voltage supply
+E - MAF Sensor Signal
+
+
+## Siemens
+1 - GND / 0V
+2 - Output Signal (0-5V) - connect to Arduino Analog Pin A0
+3 - 12V
+
+
+## Bosch 5 pin
+1 - Temperature sensor output, not used in ALH engine
+2 - 12V supply input
+3 - Ground
+4 - 5V reference input voltage
+5 - Output voltage
+
+
+/***********************************************************
+* Temp / Humidity / Baro sensors 
+*
+* NOTE Preferred choice is Sparkfun / Adafruit / Pico compatible BME280 sensor
+***/
+
+##  BME280 combined sensor (using I2C)
+Datasheet - https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide/all
+
+VCC - 3.3V !!!
+GND - 0V
+SDA - PIN 20 (Dedicated SCA pin for Mega2560)
+SCL - PIN 21 (Dedicated SCL pin for Mega2560)
+
+
+/***********************************************************
+* Pressure sensors 
+*
+* NOTE Preferred choice is NXP MPXV7007DP due to ideal scale / range. (+/- 28" AQ)
+* All other NXP sensors have much larger range and so offer poor resolution
+* MPXV7007DP is expensive but offers the best performance.
+***/
+
+
+## MPXV7007DP DIL Surface mount sensors
+Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
+
+Pin 1 -  N/C
+Pin 2 -  Vs
+Pin 3 -  Ground
+Pin 4 -  Vout
+Pin 5 -  N/C
+Pin 6 -  N/C
+Pin 7 -  N/C
+Pin 8 -  N/C
+
+
+## MPX4250 / 2050 / MPX4250 etc Through-hole style sensors 
+Datasheet - https://www.nxp.com/docs/en/data-sheet/MPX4250A.pdf
+NOTE: range is very large so resolution is very low with these sensors.
+
+Pin 1 -  Vout (Pin 1 has the notch)
+Pin 2 - Ground
+Pin 3 -  Vcc
+Pin 4 -  V1
+Pin 5 -  V2
+Pin 6 -  Vex
+
+
+
+/***********************************************************
+* Board pin-outs
+***/
+
+For ESP32 pinout please see pins.h

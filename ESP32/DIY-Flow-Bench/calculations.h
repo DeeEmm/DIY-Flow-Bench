@@ -2,7 +2,7 @@
 * The DIY Flow Bench project
 * https://diyflowbench.com
 * 
-* API.h - API header file
+* calculations.h - Maths header file
 *
 * Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
 * 
@@ -17,26 +17,33 @@
 ***/
 #pragma once
 
-#include <Arduino.h>
 
+class Calculations {
 
-class API {
-
-	friend class Hardware;
 	friend class Sensors;
-	friend class Maths;
-	friend class Messages;
-	friend class Webserver;
-
+	friend class Hardware;
+	friend class mafData;
+	
 	private:
-		uint16_t calcCRC (char* str);
-		String getConfigJSON();
+		float MOLECULAR_WEIGHT_DRY_AIR;
+		bool streamMafData = false;
+		
+		// int _mafDataUnit;
 
-		bool streamMafData;
-		char* crcValue;	
-	
 	public:
-		API();
-		void ParseMessage(char apiMessage);
-	
+		Calculations();
+		float convertFlowDepression(float oldPressure, float newPressure, float inputFlow);
+		float convertPressure(float baroPressureKpa, int units);
+		float convertTemperature(float refTempDegC, int units);
+		float convertRelativeHumidity(double relativeHumidity, int units);
+
+		float calculateVaporPressure(int units);
+		float calculateSpecificGravity();
+		float convertMassFlowToVolumetric(float massFlowKgh);
+		float calculateFlowCFM();
+
+		float startupBaroPressure;
+
+		// long _mafLookupTable[][2];
+
 };

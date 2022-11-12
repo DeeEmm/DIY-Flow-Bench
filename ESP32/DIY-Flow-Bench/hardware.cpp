@@ -17,18 +17,20 @@
  ***/
 
 #include <Wire.h>
-#include <Adafruit_ADS1X15.h>
 #include <Arduino.h>
 #include "hardware.h"
+#include "sensors.h"
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
 #include "pins.h"
-#include "maths.h"
+#include "calculations.h"
 #include "messages.h"
 #include LANGUAGE_FILE
 
-
+// NOTE: I2C code should be brought into hardware.cpp
+// NOTE: If we replace I2Cdev with wire we need to rewrite the ADC Code
+#include <I2Cdev.h>
 
 /***********************************************************
 * CONSTRUCTOR
@@ -46,12 +48,15 @@ Hardware::Hardware() {
 void Hardware::configurePins () {
  
   // Inputs
-  pinMode(MAF_PIN, INPUT); 
-  pinMode(VOLTAGE_PIN, INPUT); 
+  //TODO
+//  pinMode(MAF_PIN, INPUT); 
+  pinMode(VCC_3V3_PIN, INPUT); 
+  pinMode(VCC_5V_PIN, INPUT); 
   pinMode(SPEED_SENSOR_PIN, INPUT); 
-  pinMode(REF_PRESSURE_PIN, INPUT); 
-  pinMode(DIFF_PRESSURE_PIN, INPUT); 
-  pinMode(PITOT_PIN, INPUT); 
+//  pinMode(REF_PRESSURE_PIN, INPUT); 
+//  pinMode(DIFF_PRESSURE_PIN, INPUT); 
+//  pinMode(PITOT_PIN, INPUT); 
+  
   #if defined TEMP_SENSOR_TYPE_LINEAR_ANALOG || defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
     pinMode(TEMPERATURE_PIN, INPUT); 
   #endif
@@ -64,15 +69,23 @@ void Hardware::configurePins () {
   
 
   // Outputs
-  pinMode(VAC_BANK_1, OUTPUT);
-  pinMode(VAC_BANK_2, OUTPUT);
-  pinMode(VAC_BANK_2, OUTPUT);
+  pinMode(VAC_BANK_1_PIN, OUTPUT);
+  pinMode(VAC_BANK_2_PIN, OUTPUT);
+  pinMode(VAC_BANK_3_PIN, OUTPUT);
   pinMode(VAC_SPEED_PIN, OUTPUT);
   pinMode(VAC_BLEED_VALVE_PIN, OUTPUT);
-  pinMode(AVO_ENBL, OUTPUT);
-  pinMode(AVO_STEP, OUTPUT);
-  pinMode(AVO_DIR, OUTPUT);
-  pinMode(VAC_BANK_1, OUTPUT);
+  pinMode(AVO_ENBL_PIN, OUTPUT);
+  pinMode(AVO_STEP_PIN, OUTPUT);
+  pinMode(AVO_DIR_PIN, OUTPUT);
+  pinMode(VAC_BANK_1_PIN, OUTPUT);
+
+  #ifdef ESP32_WROVER_KIT
+    // Disable pins for use with JTAG Debugger (sets to high impedance)
+    // pinMode(12, INPUT);
+    // pinMode(13, INPUT);
+    // pinMode(14, INPUT);
+    // pinMode(15, INPUT);    
+  #endif
 
 }
 
@@ -87,38 +100,14 @@ void Hardware::begin () {
 
   Messages _message;
   
+  _message.serialPrintf((char*)"Initialising Hardware \n");
+  
   configurePins();
   
   this->getI2CList(); // TODO: move into status dialog instead of printing to serial monitor
   
+  _message.serialPrintf((char*)"Hardware Initialised \n");
   
-  
-  
-// Support for [Adafruit 1015] (12bit) ADC
-// https://github.com/adafruit/Adafruit_ADS1X15
-//  #ifdef PREF_SRC_ADC_1015 
-//    Adafruit_ADS1015 ads1015; 
-//    ads1015.begin(ADC_I2C_ADDR);
-//  #endif
-
-
-// Support for [Adafruit 1115] (16bit) ADC
-// https://github.com/adafruit/Adafruit_ADS1X15
-//  #ifdef PREF_SRC_ADC_1115
-//    Adafruit_ADS1115 ads1115;
-//    ads1115.begin(ADC_I2C_ADDR);
-//  #endif
-
-
-
-
-// Support for DHT11 humidity / temperature sensors
-// https://github.com/winlinvip/SimpleDHT
-// #if RELH_SENSOR_SIMPLE_RELH_DHT11 || TEMP_SENSOR_SIMPLE_TEMP_DHT11
-//   #include <SimpleDHT.h>  
-//   SimpleDHT11 dht11(HUMIDITY_PIN);    
-// #endif
-
 }
 
 
@@ -127,42 +116,69 @@ void Hardware::begin () {
 * Get list of I2C devices 
 *
 * Based on: https://www.esp32.com/viewtopic.php?t=4742
-***/
-//int * Hardware::getI2CList() {   
+***/ 
 void Hardware::getI2CList() {   
   
   Messages _message;
-  // TODO: Detect I2C devices on bus and return addresses in array to be displayed in status dialog
 
-  // ESP32 I2C Scanner
-  // Based on code of Nick Gammon  http://www.gammon.com.au/forum/?id=10896
-  // ESP32 DevKit - Arduino IDE 1.8.5
-  // Device tested PCF8574 - Use pullup resistors 3K3 ohms !
-  // PCF8574 Default Freq 100 KHz 
-  
   Wire.begin (SCA_PIN, SCL_PIN); 
 
-  Serial.println ();
-  Serial.println ("Scanning for I2C devices...");
+  _message.serialPrintf((char*)"Scanning for I2C devices...\n");
   byte count = 0;
 
   Wire.begin();
+  
   for (byte i = 8; i < 120; i++)   {
-    Wire.beginTransmission (i);          // Begin I2C transmission Address (i)
-    if (Wire.endTransmission () == 0)  { // Receive 0 = success (ACK response) 
-    
-      Serial.print ("Found address: ");
-      Serial.print (i, DEC);
-      Serial.print (" (0x");
-      Serial.print (i, HEX);     // PCF8574 7 bit address
-      Serial.println (")");
+    Wire.beginTransmission (i);          
+    if (Wire.endTransmission () == 0)  {  
+      _message.serialPrintf((char*)"Found address: %u (0x%X)\n", i, i);
       count++;
     }
   }
-  Serial.print ("Found ");      
-  Serial.print (count, DEC);        // numbers of devices
-  Serial.println (" device(s).");
-  Serial.println (" ");
+  
+  _message.serialPrintf((char*)"Found %u device(s). \n", count);
+
+}
+
+
+
+
+
+
+
+/***********************************************************
+* GET BME Data
+* Fetch raw BME data
+***/
+void Hardware::getBMERawData() {
+  
+}
+
+
+
+/** Get operational status.
+ * from - https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/ADS1115/ADS1115.cpp
+ * @return Current operational status (false for active conversion, true for inactive)
+ * @see ADS1115_RA_CONFIG
+ * @see ADS1115_CFG_OS_BIT
+ */
+bool Hardware::isADCConversionReady() {
+    I2Cdev::readBit(ADC_I2C_ADDR, 0x01, 15, buffer);
+    return buffer[0];
+}
+
+/** Poll the operational status bit until the conversion is finished
+ * from - https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/ADS1115/ADS1115.cpp
+ * Retry at most 'max_retries' times
+ * conversion is finished, then return true;
+ * @see ADS1115_CFG_OS_BIT
+ * @return True if data is available, false otherwise
+ */
+bool Hardware::pollADCConversion(uint16_t max_retries) {  
+  for(uint16_t i = 0; i < max_retries; i++) {
+    if (isADCConversionReady()) return true;
+  }
+  return false;
 }
 
 
@@ -170,74 +186,140 @@ void Hardware::getI2CList() {
 /***********************************************************
 * GET ADS1015 ADC value
 *
-* Based on: https://github.com/sparkfun/SparkFun_ADS1015_Arduino_Library/blob/master/src/SparkFun_ADS1015_Arduino_Library.cpp
-* and :https://github.com/adafruit/Adafruit_ADS1X15/blob/master/Adafruit_ADS1X15.cpp
+* Based on: 
+* https://www.ti.com/lit/ds/symlink/ads1115.pdf
 *
- ***/
-int Hardware::getADCRawData(int channel) {
+* Bitwise gain values (in hex)
+* 0x0000: +/- 6.144V (187.5uV / bit)
+* 0x0200: +/- 4.096V (125uV / bit)
+* 0x0400: +/- 2.048V (62.5uV / bit)
+* 0x0600: +/- 1.024V (31.25uV / bit)
+* 0x0800: +/- 0.512V (15.525uV / bit)
+* 0x0A00: +/- 0.256V (7.8125uV / bit)
+*
+***/
+int16_t Hardware::getADCRawData(int channel) {
 
   if (channel > 3) {
     return 0;
   }
-  
-  uint16_t mode = ((4 + channel) << 12);
-    
-  uint16_t config = 0x8000;
-  config |= mode;
-  config |= 0X0000; // Gain (+/- 6.144v) NOTE: we are assuming all sensors have same FSD, else we need to scale each sensor within each sensor->function in sensors.cpp
-  config |= 0x0100; // Mode = Single
-  config |= 4; // data rate = 4 (default)
-  config |= 0x0000; // comparator mode traditional
-  config |= 0x0000; // polarity low
-  config |= 0x0000; // alert is non-latching
-  config |= 3;
-  
-  Wire.beginTransmission(ADC_I2C_ADDR);  
-  
-  Wire.write((uint8_t)0x01);
-  Wire.write((uint8_t)(config >> 8));
-  Wire.write((uint8_t)(config & 0xFF));
-  Wire.endTransmission();
-  
-  delay(10); // TODO: This is a hack, need to test for transmission complete. (Delays are bad Mmmmnnkay) [might not even need it, screen refresh rate might be enough!]
-  
-  Wire.beginTransmission(ADC_I2C_ADDR);
-  Wire.write(0x00);
-  Wire.endTransmission();
 
-  int rv = Wire.requestFrom(ADC_I2C_ADDR, (uint8_t) 2);
-  int raw;
-  if (rv == 2) {
-    raw = Wire.read() << 8;
-    raw += Wire.read();
-  }
+  if (pollADCConversion(ADC_MAX_RETRIES) == true) {
+
+    // Prepare config
+    _config = 0x0003;  // Disable the comparator (default val)
+    _config |= 0x0110; // RATE - Data rate or Sample Per Seconds bits 5 through 7
+    _config |= 0x0100; // MODE - mode bit 8 - Single-shot mode (default) 
+    _config |= 0x0000; // GAIN - PGA/voltage gain bits 9 through 11 
+    
+    switch (channel) // MUX - Multiplex channel, bits 12 through 14
+    {
+      case (0):
+          _config |= 0x4000; // Channel 1
+          break;
+      case (1):
+          _config |= 0x5000; // Channel 2
+          break;
+      case (2):
+          _config |= 0x6000; // Channel 3
+          break;
+      case (3):
+          _config |= 0x7000; // Channel 4
+          break;
+    }
+    
+    _config |= 0x8000; // WRITE: Set to start a single-conversion
+    
+    _config >>= 8; // Bit shift
+    _config &= 0xFF; // Bit mask
+    
+    I2Cdev::writeWord(ADC_I2C_ADDR, 0x01, _config);
+    
+    //delay(10); // TODO: DELAYS are a hack, need to test for transmission complete. (Delays are bad Mmmmnnkay) 
+    
+    I2Cdev::readBytes(ADC_I2C_ADDR, 0x00 , 2, buffer);
+    rawADCval = buffer[0] + (buffer[1] << 8);
   
+  }
+    
   #ifdef ADC_TYPE_ADS1015
-    raw >>= 4;  // Shift 12-bit results
+    rawADCval >>= 4;  // Bit shift 12-bit results
   #endif
   
-  return int(raw);
+  return int16_t(rawADCval);
   
 }
 
 
+
+
+
+
+
 /***********************************************************
-* GET BOARD VOLTAGE
+ * Get ADC millivolts
+ ***/
+ float Hardware::getADCMillivolts(int channel) {
+
+  int16_t rawVal;
+  float millivolts;
+  float microvolts;
+  
+  rawVal = getADCRawData(channel);
+  
+  #if defined ADC_TYPE_ADS1115 // 16 bit
+    // 16 bits - sign bit = 15 bits mantissa = 32767 | 6.144v = max voltage (gain) of ADC | 187.5 uV / LSB
+    // millivolts = ((rawVal * (6.144 / 32768)) / 1000); 
+    microvolts = (rawVal * 6.144) / 32768;
+    millivolts = microvolts / 1000;
+  
+  #elif defined ADC_TYPE_ADS1015 // 12 bit
+    // 12 bits - sign bit = 11 bit mantissa = 2047 | 6.144v = max voltage (gain) of ADC
+    // millivolts = ((rawVal * (6.144 / 2047)) / 1000); 
+    microvolts = (rawVal * 6.144) / 2047; 
+    millivolts = microvolts / 1000;
+  
+  #endif
+  
+  return millivolts;
+}
+
+
+
+/***********************************************************
+* GET 3.3V SUPPLY VOLTAGE
+* Measures 3.3v supply buck power to ESP32 
+* 3.3v buck connected directly to ESP32 input
+* Use a 0.1uf cap on input to help filter noise
+*
+* NOTE: ESP32 has 12 bit ADC (0-3300mv = 0-4095)
+***/
+float Hardware::get3v3SupplyMillivolts() {   
+
+  return 3300; //REMOVE: DEBUG: temp test !!!
+
+  // long rawVoltageValue = analogRead(VCC_3V3_PIN);  
+  // float vcc3v3SupplyMillivolts = (rawVoltageValue * 0.805860805860806) ;
+  // return vcc3v3SupplyMillivolts + VCC_3V3_TRIMPOT;
+}
+
+
+/***********************************************************
+* GET 5V SUPPLY VOLTAGE
 * Measures 5v supply buck power to ESP32 via voltage divider
 * We use a 10k-10k divider on the official shield
 * This gives a max of 2.5v which is fine for the ESP32's 3.3v logic
 * Use a 0.1uf cap on input to help filter noise
 *
-* NOTE: ESP32 has 12 bit ADC (0-3.3v = 0-4095)
+* NOTE: ESP32 has 12 bit ADC (0-3300mv = 0-4095)
 ***/
-int Hardware::getSupplyMillivolts() {   
+float Hardware::get5vSupplyMillivolts() {   
 
-  int rawVoltageValue = analogRead(VOLTAGE_PIN);
-  
-  float supplyMillivolts = (2 * (rawVoltageValue * (3.3 / 4095.0) * 1000)) + SUPPLY_MV_TRIMPOT;
+  return 5000; //REMOVE: DEBUG: temp test !!!
 
-  return supplyMillivolts;
-  
+  // long rawVoltageValue = analogRead(VCC_5V_PIN);  
+  // float vcc5vSupplyMillivolts = (2 * rawVoltageValue * 0.805860805860806) ;
+  // return vcc5vSupplyMillivolts + VCC_5V_TRIMPOT;
 }
 
 
@@ -248,20 +330,23 @@ int Hardware::getSupplyMillivolts() {
 bool Hardware::benchIsRunning() {
     
   Messages _message;
-  Maths _maths;
+  Calculations _calculations;
+  Sensors _sensors;
   
   extern struct ConfigSettings config;
+  extern struct translator translate;
   
   // TODO: Check scope of these...
-  float refPressure = _maths.calculateRefPressure(INWG);
-  float mafFlowRateCFM = _maths.calculateFlowCFM();
+  float refPressure = _calculations.convertPressure(_sensors.getPRefValue(), INWG);
+  
+  float mafFlowRateCFM = _calculations.calculateFlowCFM();
 
   if ((refPressure > config.min_bench_pressure) && (mafFlowRateCFM > config.min_flow_rate))
   {
-	  _message.Handler(LANG_BENCH_RUNNING);
+	  _message.Handler(translate.LANG_VAL_BENCH_RUNNING);
 	  return true;
   } else {
-    _message.Handler(LANG_NO_ERROR);
+    _message.Handler(translate.LANG_VAL_NO_ERROR);
 	  return false;
   }
 }
@@ -274,17 +359,28 @@ bool Hardware::benchIsRunning() {
 void Hardware::checkRefPressure() {
   
   Messages _message;
-  Maths _maths;
+  Calculations _calculations;
+  Sensors _sensors;
   
   extern struct ConfigSettings config;
+  extern struct translator translate;
   
-  float refPressure = _maths.calculateRefPressure(INWG);
+  float refPressure = _calculations.convertPressure(_sensors.getPRefValue(), INWG);
     
   // Check that pressure does not fall below limit set by MIN_TEST_PRESSURE_PERCENTAGE when bench is running
   // note alarm commented out in alarm function as 'nag' can get quite annoying
   // Is this a redundant check? Maybe a different alert would be more appropriate
   if ((refPressure < (config.cal_ref_press * (MIN_TEST_PRESSURE_PERCENTAGE / 100))) && (Hardware::benchIsRunning()))
   {
-    _message.Handler(LANG_REF_PRESS_LOW);
+    _message.Handler(translate.LANG_VAL_REF_PRESS_LOW);
   }
 }
+
+
+
+
+
+
+
+
+

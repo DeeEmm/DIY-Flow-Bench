@@ -19,71 +19,117 @@
 
 #include "constants.h"
 
+
 class Sensors {
 
-public:
-	Sensors();
-    void begin();
-	void initialise();
-	void getBME280RawData();
-	int convertADCtoMillivolts(int rawVal);
-    float getMafValue();
-	float getTempValue();
-	float getBaroValue();
-	float getRelHValue();
-	float getPRefValue();
-	float getPDiffValue();
-	float getPitotValue();
-	
-	void mafFreqCountISR();
-	void mafSetupISR(uint8_t irq_pin, void (*ISR_callback)(void), int value);
-	
-	float startupBaroPressure;
-	volatile uint64_t StartValue;                 
-	volatile uint64_t PeriodCount; 
-	hw_timer_t * timer;                   
-  
-private:
-	int _unit;
-	String _mafSensorType;
-	int _mafOutputType;
-	int _mafDataUnit;
-	
-	String _tempSensorType;
-	String _baroSensorType;
-	String _relhSensorType;
-	String _prefSensorType;
-	String _pdiffSensorType;
-	String _pitotSensorType;    
-	
-	// BME280 
-	unsigned int buffer[];
-	unsigned int data[8];
-	
-	// Temperature coefficients
-	unsigned int dig_T1;
-	int dig_T2;
-	int dig_T3;
-	double t_fine;
-	
-	
-	// Pressure coefficients
-	unsigned int dig_P1;
-	int dig_P2;
-	int dig_P3;
-	int dig_P4;
-	int dig_P5;
-	int dig_P6;
-	int dig_P7;
-	int dig_P8;
-	int dig_P9;
-	
-	// Humidity
-	unsigned int dig_H1;
-    int dig_H2;
-	int dig_H3;
-	int dig_H4;
-	int dig_H5;
-	int dig_H6;
-};
+	friend class mafData;
 
+	private:
+		int _unit;
+		char* _mafSensorType;
+		int _mafOutputType;
+		int _mafDataUnit;
+		float refPressMillivolts;
+		float pDiffMillivolts;
+		float pitotMillivolts;
+		float mafMillivolts;
+
+		
+		char* _tempSensorType;
+		char* _baroSensorType;
+		char* _relhSensorType;
+		char* _prefSensorType;
+		char* _pdiffSensorType;
+		char* _pitotSensorType;    
+		
+		// Temperature coefficients
+		uint16_t dig_T1;
+		int16_t dig_T2;
+		int16_t dig_T3;
+		int32_t t_fine;
+		int32_t t_var1;
+		int32_t t_var2;
+
+		//long adc_t;
+		
+		
+		// Pressure coefficients
+		uint16_t dig_P1;
+		int16_t dig_P2;
+		int16_t dig_P3;
+		int16_t dig_P4;
+		int16_t dig_P5;
+		int16_t dig_P6;
+		int16_t dig_P7;
+		int16_t dig_P8;
+		int16_t dig_P9;
+		long adc_p;
+		
+		// Humidity
+		uint8_t dig_H1;
+		int16_t dig_H2;
+		uint8_t dig_H3;
+		int16_t dig_H4;
+		int16_t dig_H5;
+		int8_t  dig_H6;
+		long adc_h;
+		double var_H;
+
+		// ADC
+		float adc_min;
+		float adc_fsd;
+
+		// BME280 
+		
+		// private functions
+		bool BME280init(void);
+		uint8_t BME280Read8(uint8_t reg);
+		uint16_t BME280Read16(uint8_t reg);
+		uint16_t BME280Read16LE(uint8_t reg);
+		int16_t BME280ReadS16(uint8_t reg);
+		int16_t BME280ReadS16LE(uint8_t reg);
+		uint32_t BME280Read24(uint8_t reg);
+		void writeRegister(uint8_t reg, uint8_t val);
+		float BME280GetTemperature(void);
+		// float BME280GetPressure(void);
+		float BME280GetHumidity(void);
+		void BME280WriteRegister(uint8_t reg, uint8_t val);
+		
+		//unsigned int data[8];
+		//unsigned int buffer[25];
+
+
+	public:
+		Sensors();
+		void begin();
+		void initialise();
+		void getBME280RawData();
+		int convertADCtoMillivolts(int rawVal);
+		float getMafValue();
+		float getMafMillivolts();
+		float getTempValue();
+		float getBaroValue();
+		double getRelHValue();
+		float getAltitude();
+		float getPRefMillivolts();
+		float getPRefValue();
+		float getPDiffMillivolts();
+		float getPDiffValue();
+		float getPitotMillivolts();
+		float getPitotValue();
+		
+		void mafFreqCountISR();
+		void mafSetupISR(uint8_t irq_pin, void (*ISR_callback)(void), int value);
+		
+		float startupBaroPressure;
+		volatile uint64_t StartValue;                 
+		volatile uint64_t PeriodCount; 
+		hw_timer_t * timer;         
+		bool isTransport_OK;          
+		// float refTempDegC;
+		float baroPressureKpa;
+		uint32_t baroPressureHpa;
+		float baroPressurePa;
+		float relativeHumidity;
+  
+};

@@ -23,7 +23,7 @@
 #include "constants.h"
 #include "structs.h"
 #include "sensors.h"
-#include "maths.h"
+#include "calculations.h"
 #include "messages.h"
 #include "webserver.h"
 #include LANGUAGE_FILE
@@ -35,13 +35,11 @@ Calibration::Calibration () {
 
 
 
-
-
 /***********************************************************
 * Perform Flow Calibration
 *
 * Called from API.ino
-* Called from ProcessWebSocketMessage in server.ino
+* Called from processWebSocketMessage in server.ino
 *
 * TODO: #75 The calibration handling needs to be rewritten. https://github.com/DeeEmm/DIY-Flow-Bench/issues/75
 * 
@@ -51,18 +49,17 @@ bool Calibration::setFlowOffset() {
   extern struct CalibrationSettings calibration;
   extern struct ConfigSettings config;
   
-  Sensors _sensor; 
-  Maths _maths;
-  Webserver _webserver;
+  Sensors _sensors; 
+  Calculations _calculations;
   
   // Get the current flow value
   // TODO: need to determine what flow sensors are active (MAF / Orifice / Pitot)
-  float MafFlowCFM = _maths.calculateFlowCFM();
+  float MafFlowCFM = _calculations.calculateFlowCFM();
   // Get the current reference pressure
-  float RefPressure = _maths.calculateRefPressure(INWG);
+  float RefPressure = _calculations.convertPressure(_sensors.getPRefValue(), INWG);
   
   // convert the calibration orifice flow value  to our current ref pressure  
-  float convertedOrificeFlowCFM = _maths.convertFlowDepression(config.cal_ref_press, RefPressure,  config.cal_flow_rate);
+  float convertedOrificeFlowCFM = _calculations.convertFlowDepression(config.cal_ref_press, RefPressure,  config.cal_flow_rate);
  
   // compare it to the measured flow to generate our flow offset
   float flowCalibrationOffset = convertedOrificeFlowCFM - MafFlowCFM;
@@ -104,9 +101,10 @@ float Calibration::getFlowOffset() {
 bool Calibration::setLeakTestPressure() {
   
   extern struct CalibrationSettings calibration;
-  Maths _maths;
+  Calculations _calculations;
+  Sensors _sensors;
   
-  calibration.leak_cal_val = _maths.calculateRefPressure(INWG);  
+  calibration.leak_cal_val = _calculations.convertPressure(_sensors.getPRefValue(), INWG);  
 
   return true;
 }
@@ -143,7 +141,7 @@ void Calibration::createCalibrationFile () {
   String jsonString;
   StaticJsonDocument<1024> calibrationData;
   
-  _message.DebugPrintLn("Creating cal.json file..."); 
+  _message.statusPrintf((char*)"Creating cal.json file... \n"); 
   
   calibrationData["FLOW_OFFSET"] = calibration.flow_offset;
   calibrationData["LEAK_CAL_VAL"] = calibration.leak_cal_val;
@@ -162,6 +160,7 @@ void Calibration::createCalibrationFile () {
 void Calibration::saveCalibration() {
   
   extern struct CalibrationSettings calibration;
+  extern struct translator translate;
   
   Messages _message;
   Webserver _webserver;
@@ -172,7 +171,7 @@ void Calibration::saveCalibration() {
   calibrationData["flow_offset"] = calibration.flow_offset; 
   calibrationData["leak_cal_val"] = calibration.leak_cal_val; 
 
-  _message.Handler(LANG_SAVING_CALIBRATION);
+  _message.Handler(translate.LANG_VAL_SAVING_CALIBRATION);
   
   serializeJsonPretty(calibrationData, jsonString);
   
@@ -190,7 +189,7 @@ void Calibration::parseCalibrationData(StaticJsonDocument<1024> calibrationData)
 
   extern struct CalibrationSettings calibration;  
   Messages _message;
-  _message.DebugPrintLn("Calibration::parseCalibrationData");
+  _message.statusPrintf((char*)"Calibration::parseCalibrationData \n");
   
   calibration.flow_offset = calibrationData["FLOW_OFFSET"].as<float>();
   calibration.leak_cal_val = calibrationData["LEAK_CAL_VAL"].as<float>();
@@ -207,7 +206,7 @@ StaticJsonDocument<1024> Calibration::loadCalibration () {
 
   Webserver _webserver;
   Messages _message;
-  _message.DebugPrintLn("Calibration::loadCalibration");
+  _message.statusPrintf((char*)"Calibration::loadCalibration \n");
   
   StaticJsonDocument<1024> calibrationData;
   calibrationData = _webserver.loadJSONFile("/cal.json");

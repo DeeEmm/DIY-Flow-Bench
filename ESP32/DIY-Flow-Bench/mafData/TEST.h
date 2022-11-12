@@ -36,7 +36,7 @@ String mafSensorType = "TEST";
 * FREQUENCY
 ***/
 
-int MAFoutputType = VOLTAGE;
+int mafOutputType = VOLTAGE;
 
 
 
@@ -47,7 +47,7 @@ int MAFoutputType = VOLTAGE;
 * MG_S
 ***/
 
-int MAFdataUnit = KG_H;
+int mafDataUnit = KG_H;
 
 
 

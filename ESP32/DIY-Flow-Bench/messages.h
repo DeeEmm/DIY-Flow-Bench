@@ -17,19 +17,31 @@
 ***/
 #pragma once
 
-#include "Arduino.h"
+#include <Arduino.h>
+#include "configuration.h"
 
 class Messages {
 
-	public:
-		Messages();
-		void Handler(String languageString);
-		void DebugPrint(String message);
-		void DebugPrintLn(String message);
-		void SerialPrint (String message);
-		void SerialPrintLn (String message);
-		
-
 	private:
 		
+		char printBuffer[PRINT_BUFFER_LENGTH];
+		
+		
+	public:
+		Messages();
+		
+		void Handler(const std::string langPhrase);
+		void begin(void);
+		void beginSerial(void);
+
+		size_t serialPrintTestf(char *buf, char *format, ...);
+		size_t serialPrintf(const std::string format, ...);
+		size_t blobPrintf(std::string format, ...);
+		size_t debugPrintf(const std::string format, ...);
+		size_t statusPrintf(const std::string format, ...);
+		
+		// void * ICACHE_FLASH_ATTR Messages::serialPrintf(const char *s, ...);
+		
+		char floatBuffer[16];
+
 };

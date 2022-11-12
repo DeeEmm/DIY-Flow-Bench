@@ -24,16 +24,15 @@ class Settings {
 
     friend class Messages;
 
-public:
-	Settings();
-    void parseConfigData(StaticJsonDocument<1024> configData);
-    void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
-    StaticJsonDocument<1024> LoadConfig ();
-    void saveConfig (StaticJsonDocument<1024> configData);
-    void createConfigFile ();
-    void writeJSONFile(char *data, String filename);
-  
-private:
-   
-  
+    private:
+
+    public:
+        Settings();
+        void parseConfigData(StaticJsonDocument<1024> configData);
+        void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
+        StaticJsonDocument<1024> LoadConfig ();
+        void saveConfig (StaticJsonDocument<1024> configData);
+        void createConfigFile ();
+        void writeJSONFile(char *data, String filename);
+
 };

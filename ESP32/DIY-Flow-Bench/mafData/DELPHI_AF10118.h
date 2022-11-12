@@ -30,7 +30,7 @@
  * FREQUENCY
  ***/
 
-int MAFoutputType = VOLTAGE;
+int mafOutputType = VOLTAGE;
 
 
 
@@ -41,14 +41,13 @@ int MAFoutputType = VOLTAGE;
  * MG_S
  ***/
 
-int MAFdataUnit = KG_H;
+int mafDataUnit = KG_H;
 
 
 /***********************************************************
  * MAF Data
  ***/
-long mafLookupTable[][2] = {
-{0,3650},
+long mafLookupTable[27][2] = {
 {600,5620},
 {800,8982},
 {940,10711},

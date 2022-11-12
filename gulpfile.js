@@ -56,4 +56,5 @@ gulp.task('html', function() {
 	   .pipe(gulp.dest('esp32/DIY-Flow-Bench/build'));
 	});
 	
-gulp.task('default', gulp.series('css', 'js', 'html', 'compress', 'clean'))
+gulp.task('default', gulp.series('css', 'js', 'html', 'compress', 'clean'));
+gulp.task('build', gulp.series('css', 'js', 'html', 'compress', 'clean'));

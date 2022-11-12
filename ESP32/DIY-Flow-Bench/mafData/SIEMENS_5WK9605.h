@@ -14,12 +14,13 @@
 #define MAFDATA
 
 
+#include "../constants.h"
 
 /***********************************************************
   * MAF Type
   *
   ***/
- #define MAF_SENSOR_TYPE "SIEMENS_5WK9605"
+ String mafSensorType = "SIEMENS_5WK9605";
  
  
 
@@ -29,7 +30,7 @@
 * VOLTAGE
 * FREQUENCY
 ***/
-int MAFoutputType = VOLTAGE;
+int mafOutputType = VOLTAGE;
 
 
 
@@ -40,7 +41,7 @@ int MAFoutputType = VOLTAGE;
  * MG_S
  ***/
 
-int MAFdataUnit = KG_H;
+int mafDataUnit = KG_H;
 
 
 /***********************************************************

@@ -34,7 +34,7 @@ String mafSensorType = "VDO_AFM_043";
 * FREQUENCY
 ***/
 
-int MAFoutputType = FREQUENCY;
+int mafOutputType = FREQUENCY;
 
 
 
@@ -45,7 +45,7 @@ int MAFoutputType = FREQUENCY;
 * MG_S
 ***/
 
-int MAFdataUnit = MG_S;
+int mafDataUnit = MG_S;
 
 
 

@@ -40,18 +40,18 @@ void Settings::parseConfigData(StaticJsonDocument<1024> configData) {
 
   extern struct ConfigSettings config;
 
-  config.wifi_ssid = configData["CONF_WIFI_SSID"].as<String>();
-  config.wifi_pswd = configData["CONF_WIFI_PSWD"].as<String>();
-  config.wifi_ap_ssid = configData["CONF_WIFI_AP_SSID"].as<String>();
-  config.wifi_ap_pswd = configData["CONF_WIFI_AP_PSWD"].as<String>();
-  config.hostname = configData["CONF_HOSTNAME"].as<String>();
+  strcpy(config.wifi_ssid, configData["CONF_WIFI_SSID"]);
+  strcpy(config.wifi_pswd, configData["CONF_WIFI_PSWD"]);
+  strcpy(config.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
+  strcpy(config.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
+  strcpy(config.hostname, configData["CONF_HOSTNAME"]);
   config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
   config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
   config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
   config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
   config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
   config.maf_min_millivolts  = configData["CONF_MAF_MIN_MILLIVOLTS"].as<int>();
-  config.api_delim = configData["CONF_API_DELIM"].as<String>();
+  strcpy(config.api_delim, configData["CONF_API_DELIM"]);
   config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
 //  config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
   config.leak_test_tolerance = configData["CONF_LEAK_TEST_TOLERANCE"].as<int>();
@@ -75,7 +75,7 @@ StaticJsonDocument<1024> Settings::LoadConfig () {
   Webserver _webserver;
   Messages _message;
   
-  _message.SerialPrintLn("Loading Configuration..."); 
+  _message.serialPrintf((char*)"Loading Configuration... \n"); 
   
   StaticJsonDocument<1024> configData;
   configData = _webserver.loadJSONFile("/config.json");
@@ -101,9 +101,9 @@ void Settings::createConfigFile () {
   String jsonString;  
   StaticJsonDocument<1024> configData;
 
-  _message.DebugPrintLn("Creating config.json file..."); 
+  _message.serialPrintf((char*)"Creating config.json file... \n"); 
  
-  configData["PAGE_TITLE"] = PAGE_TITLE;
+  configData["PAGE_TITLE"] = config.pageTitle;
   configData["CONF_WIFI_SSID"] = config.wifi_ssid;
   configData["CONF_WIFI_PSWD"] = config.wifi_pswd;
   configData["CONF_WIFI_AP_SSID"] = config.wifi_ap_ssid;
@@ -138,6 +138,8 @@ void Settings::saveConfig (StaticJsonDocument<1024> configData) {
   Messages _message;
   Webserver _webserver;
   
+  extern struct translator translate;
+  
   String jsonString;
   
   parseConfigData(configData);  
@@ -145,15 +147,15 @@ void Settings::saveConfig (StaticJsonDocument<1024> configData) {
   // We don't want to store the header data in the file, so lets remove it
   configData.remove("HEADER");
   
-  _message.Handler(LANG_SAVING_CONFIG);
-  _message.DebugPrintLn("Configuration Data:");
+  _message.Handler(translate.LANG_VAL_SAVING_CONFIG);
+  _message.statusPrintf((char*)"Configuration Data: \n");
   serializeJson(configData, Serial);
-  _message.DebugPrintLn("Saved to /config.json");
+  _message.statusPrintf((char*)"Saved to /config.json \n");
   
   serializeJsonPretty(configData, jsonString);
   _webserver.writeJSONFile(jsonString, "/config.json");
   
   // Clear down the status Message
-  _message.Handler(LANG_NO_ERROR);
+  _message.Handler(translate.LANG_VAL_NO_ERROR);
 
 }

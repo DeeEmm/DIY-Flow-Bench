@@ -17,9 +17,61 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "21092201"
-#define RELEASE "V.2.0-RC.2"
+#define BUILD_NUMBER "12112201"
+#define RELEASE "V.2.0-RC.3"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
+
+
+
+/***********************************************************
+* SELECT BENCH TYPE
+* NOTE: Only MAF style bench working at this stage
+***/
+
+#define MAF_STYLE_BENCH
+//#define ORIFICE_STYLE_BENCH
+//#define PITOT_STYLE_BENCH
+//#define VENTURI_STYLE_BENCH
+
+
+
+/***********************************************************
+* SELECT BOARD TYPE 
+*
+* Default DIYFB_SHIELD 
+* NOTE: ESP32_WROVER_KIT can be used for debug workflows in VSCode / PlatformIO
+***/
+
+//#define DIYFB_SHIELD                    
+//#define ESP32DUINO
+#define ESP32_WROVER_KIT // DEBUG BUILD
+
+
+
+/***********************************************************
+* CONFIGURE FILESYSTEM
+***/
+
+#define FORMAT_FILESYSTEM_IF_FAILED true
+
+
+
+/***********************************************************
+* CONFIGURE COMMS
+*
+* Default comms port is 0 (U0UXD) - (USB programming port) This is used for API / Status Messages / Debugging
+* Port 2 (U2UXD) is used to communicate with digital gauge for automated measurements & logging
+*
+***/
+
+#define SERIAL0_ENABLED
+#define SERIAL2_ENABLED
+
+#define SERIAL0_BAUD 115200
+#define SERIAL2_BAUD 9600
+
+
+
 
 
 /***********************************************************
@@ -27,19 +79,22 @@
 ***/
 #define BOOT_MESSAGE "May the flow be with you..."
 #define PAGE_TITLE "DIY Flow Bench"
-#define showAlarms true
-#define MIN_REFRESH_RATE 200
-#define LANGUAGE_FILE "language/EN_Language.h"
+#define LANGUAGE_FILE "language/EN_language.h"
+#define SHOW_ALARMS true
+#define MIN_REFRESH_RATE 100
+#define API_IS_ENABLED                                  
+#define API_BLOB_LENGTH 1024
+#define API_RESPONSE_LENGTH 64
+#define API_STATUS_LENGTH 128
+#define API_JSON_LENGTH 1020
+#define PRINT_BUFFER_LENGTH 128
+//#define API_CHECKSUM_IS_ENABLED                           // Add checksum to serial API response TODO: UPDATE CHECKSUM TO NATIVE ESP32 CRC32
+#define MAX_SEMAPHORE_DELAY 1000                          // Define max value rather than just use portMAX_DELAY
+#define WEBSOCK_CLEAN_FREQ 600000
 
 
 
-/***********************************************************
-* What style of bench is this?
-***/
-#define MAF_STYLE_BENCH
-//#define ORIFICE_STYLE_BENCH
-//#define PITOT_STYLE_BENCH
-//#define VENTURI_STYLE_BENCH
+
 
 
 /***********************************************************
@@ -59,100 +114,104 @@
 
 
 
+
 /***********************************************************
-* DEFAULT USER SETTINGS
+* BENCH SETTINGS
 ***/
- 
 #define MIN_TEST_PRESSURE_PERCENTAGE 80                     // Lowest test pressure bench will generate accurate results. Please see note in wiki
-#define CONF_API_ENABLED                                    // enable API
-#define CONF_DISABLE_API_CHECKSUM                           // Add checksum to serial API response TODO: UPDATE CHECKSUM TO NATIVE ESP32 CRC32
 
-
-
-/***********************************************************
-* CONFIGURE FILESYSTEM
-***/
-
-#define FORMAT_FILESYSTEM_IF_FAILED true
-
-
-
-
-/***********************************************************
-* SELECT BOARD TYPE 
-*
-* Default ESP32DUINO 
-***/
-
-#define DIYFB_SHIELD                    
-//#define ESP32DUINO
-
+ 
 
 
 /***********************************************************
 * TUNE HARDWARE 
+*
+* Adjustment figures for voltage regulators etc
 ***/
 
-#define SUPPLY_MV_TRIMPOT 333                               // Measure and compare to serial monitor value           
+#define VCC_3V3_TRIMPOT 0.0                                 // volts
+#define VCC_5V_TRIMPOT 0.0                                  // volts
+
+
+
+
+
 
 
 
 /***********************************************************
 * CONFIGURE BME280
+*
+* Default address 0x76 / Alternate is usually 0x77
+* NOTE: Check the report shown in serial monitor on boot for addresses of I2C devices and update BME280_I2C_ADDR accordingly
 ***/
 
-// (default 0x76) / Alternate 0x77
-// Check report in serial monitor on boot for address
-#define BME280_I2C_ADDR 0x76            
-//#define BME280_I2C_ADDR 0x77            
-  
-  
+// #define BME_IS_ENABLED                                      // Comment to disable BME related code
+
+const int BME280_I2C_ADDR = 0x76;                           
+//const int BME280_I2C_ADDR = 0x77;       
+#define BME_SCAN_DELAY_MS 10       
 
 
 /***********************************************************
 * CONFIGURE ADC
 *
-* NOTE: standard shield can use adafruit 1015 or 1115 ADC
-* MAF / PRef / PDiff / Pitot sensors all come through ADC
-* This allows conversion from 5v to 3.3 via ADC > I2C
+* NOTE: standard shield can use ADS1015 (12 bit) or ADS1115 (16 bit) ADC's
+* MAF / P-Ref / P-Diff / Pitot sensors are all connected through the ADC (see below for channel designation)
+* NOTE: ADC is used at 5 Volts with an I2C level shifter to allow it to communicate on the 3.3v I2C bus of the ESP32. This allows for an easy way to run 5v sensors on the 3.3v ESP32
+* ADC communication can be found in Hardware->getADCRawData()
+*
+* Default address is 0x48
+* Connect ADR pin as below to set alternate addresses
+* 0x48 (1001000) ADR -> GND
+* 0x49 (1001001) ADR -> VDD
+* 0x4A (1001010) ADR -> SDA
+* 0x4B (1001011) ADR -> SCL
+*
+* NOTE: Check the report shown in serial monitor on boot for addresses of I2C devices and update ADC_I2C_ADDR accordingly
 ***/
 
-// Default is 0x48
-// Check report in serial monitor on boot for address
-#define ADC_I2C_ADDR 0x48 
+//#define ADC_IS_ENABLED                                      // Comment to disable ADC related code
 
-#define ADC_TYPE_ADS1015 // 12 bit (3 mV/bit)
-// #define ADC_TYPE_ADS1115 // 16 bit (188uV/bit)
+const int  ADC_I2C_ADDR = 0x48; 
+#define ADC_SCAN_DELAY_MS 10
+#define ADC_MAX_RETRIES 10
+
+// #define ADC_TYPE_ADS1015 // 12 bit (3 mV/bit)
+#define ADC_TYPE_ADS1115 // 16 bit (188uV/bit)
 
 
 
 
 /***********************************************************
 * CONFIGURE MAF
-* Uncomment active MAF
 * If you want to modify the code to include additional MAF sensors
-* You will need to create your own MAF data file. Use exampleSensor.h as an example
+* You will need to create your own MAF data file. Use exampleMafData.h as an example
+*
+* NOTE: RC level software has only been tested with default recommended sensor (ACDELCO_92281162)
 ***/
+
+// #define MAF_IS_ENABLED                                      // Comment to disable MAF related code
     
 // Uncomment One sensor only
-#define MAF_SENSOR_FILE "mafData/ACDELCO_92281162.h" 
-// #define MAF_SENSOR_FILE "mafData/ACDELCO_19330122.h" 
-// #define MAF_SENSOR_FILE "mafData/VDO_AFM_043.h"
-
-// #define MAF_SENSOR_FILE  "MH95_3000_100"                 // PMAS MH95-3000 in 100mm housing              
-// #define MAF_SENSOR_FILE  "mafData/SIEMENS_5WK9605"       // Data from Tonys tests
-// #define MAF_SENSOR_FILE  "mafData/DELPHI_AF10118"        // kg/hr - Data from efidynotuning.com/maf.htm 
-
-// #define MAF_SENSOR_FILE  "mafData/TEST"                  // Test Data
+#define MAF_DATA_FILE "mafData/ACDELCO_92281162.h"        //default recommended sensor    
+// #define MAF_DATA_FILE "mafData/ACDELCO_19330122.h" 
+// #define MAF_DATA_FILE "mafData/VDO_AFM_043.h"
+// #define MAF_DATA_FILE  "mafData/MH95_3000_100.h"       // PMAS MH95-3000 in 100mm housing              
+// #define MAF_DATA_FILE  "mafData/SIEMENS_5WK9605.h"        // Data from Tonys tests
+// #define MAF_DATA_FILE  "mafData/DELPHI_AF10118.h"      // kg/hr - Data from efidynotuning.com/maf.htm 
+// #define MAF_DATA_FILE  "mafData/TEST.h"                // Test Data
 
 
 // Set signal source (Uncomment One line only)
-//#define MAF_SRC_PIN
-#define MAF_SRC_ADC
+#define MAF_SRC_IS_PIN
+//#define MAF_SRC_IS_ADC
 
 
-#define MAF_MV_TRIMPOT 0.0
+#define MAF_MV_TRIMPOT 0.0                                  // Millivolt offset
 #define MAF_ADC_CHANNEL 0
+
+
 
 
 /***********************************************************
@@ -162,6 +221,9 @@
 *
 * Recommended sensor is the MPXV7007DP
 ***/
+
+// #define PREF_IS_ENABLED                                     // Comment to disable reference pressure related code
+
 #define DEFAULT_REF_PRESS_VALUE 1                           // Fixed pressure value in Pascals
 
 // Set signal source (Uncomment One line only)
@@ -173,8 +235,7 @@
 // #define PREF_SENSOR_TYPE_LINEAR_ANALOG 
 #define PREF_SENSOR_TYPE_MPXV7007        
 
-
-#define PREF_MV_TRIMPOT 0
+#define PREF_MV_TRIMPOT 0.0                                 // Millivolt offset
 #define PREF_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 #define PREF_ADC_CHANNEL 2                                  // TODO: TEMP SWAPPED WITH PDIFF (ERROR ON PCB)
 
@@ -189,20 +250,24 @@
 * 
 * Recommended sensor is the MPXV7007DP
 ***/
+
+// #define DIFF_IS_ENABLED                                     //Comment to disable Differential pressure related code
+
 #define DEFAULT_DIFF_PRESS_VALUE 1                          // Fixed pressure value in Pascals
 
 // Set signal source (Uncomment One line only)
-//#define PDIFF_SRC_PIN
-#define PDIFF_SRC_ADC
+#define PDIFF_SRC_IS_PIN
+//#define PDIFF_SRC_IS_ADC
 
 // Set sensor type (Uncomment One line only)
-#define PDIFF_SENSOR_NOT_USED            
+// #define PDIFF_SENSOR_NOT_USED            
 // #define PDIFF_SENSOR_TYPE_LINEAR_ANALOG 
-// #define PDIFF_SENSOR_TYPE_MPXV7007          
+#define PDIFF_SENSOR_TYPE_MPXV7007          
 
-#define PDIFF_MV_TRIMPOT 0
-#define PDIFF_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
-#define PDIFF_ADC_CHANNEL 1                                  // TODO: TEMP SWAPPED WITH PREF (ERROR ON PCB)
+#define PDIFF_MV_TRIMPOT 0.0                                // Millivolt offset
+#define PDIFF_ANALOG_SCALE 1.0                              // Scaling factor used for raw analog value
+#define PDIFF_ADC_CHANNEL 1                                 // TODO: TEMP SWAPPED WITH PREF (ERROR ON PCB)
+
 
 
 
@@ -215,20 +280,23 @@
 * Recommended sensor is the MPXV7007DP
 ***/
 
+// #define PITOT_IS_ENABLED                                    // Comment to disable pitot related code
+
 // Set signal source (Uncomment One line only)
-//#define PITOT_SRC_PIN
-#define PITOT_SRC_ADC
-
-
+#define PITOT_SRC_IS_PIN
+//#define PITOT_SRC_IS_ADC
 
 // Set sensor type (Uncomment One line only)
 // #define PITOT_SENSOR_NOT_USED
-// #define PITOT_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from PITOT_PIN
+// #define PITOT_SENSOR_TYPE_LINEAR_ANALOG                  // Use analog signal from PITOT_PIN
 #define PITOT_SENSOR_TYPE_MPXV7007DP
 
-#define PITOT_MV_TRIMPOT 0.0
-#define PITOT_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
+#define PITOT_MV_TRIMPOT 0.0                                // Millivolt offset
+#define PITOT_ANALOG_SCALE 1.0                              // Scaling factor used for raw analog value
 #define PITOT_ADC_CHANNEL 3
+
+
+
 
 
 /***********************************************************
@@ -239,19 +307,25 @@
 * Recommended sensor is the BME280
 ***/
 
+// #define BARO_IS_ENABLED                                     // Comment to disable Baro related code
 
 // Uncomment One line only
 // #define BARO_SENSOR_TYPE_FIXED_VALUE
 // #define BARO_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from REF_BARO_PIN
 #define BARO_SENSOR_TYPE_BME280
-// #define BARO_SENSOR_TYPE_MPX4115
+// #define BARO_SENSOR_TYPE_MPX4115                         // use absolute pressure sensor
 
-#define DEFAULT_BARO_VALUE 101.3529
+#define DEFAULT_BARO_VALUE 101.3529                         // Default pressure in kPa
 #define BARO_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 #define startupBaroScalingFactor 1                          // scaling factor when using reference pressure sensor for baro correction
 #define startupBaroScalingOffset 100                        // scaling offset when using reference pressure sensor for baro correction
 
-#define BARO_MV_TRIMPOT 0
+#define BARO_MV_TRIMPOT 0.0                                 // Millivolt offset
+#define BARO_FINE_ADJUST 0.0                                // Adjust end value
+
+#define SEALEVELPRESSURE_HPA 1016.90                        // Change for your local value
+
+
 
 
 
@@ -260,18 +334,22 @@
 *
 * Recommended sensor is the BME280
 ***/
+
+// #define TEMP_IS_ENABLED                                     // Comment to disable temperature related code.
+
 #define DEFAULT_TEMP_VALUE 21                               // Value to return if no sensor used
 #define TEMP_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 
 // Uncomment One line only
-//#define TEMP_SENSOR_NOT_USED
+// #define TEMP_SENSOR_NOT_USED
 // #define TEMP_SENSOR_TYPE_FIXED_VALUE
 // #define TEMP_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from TEMPERATURE_PIN
 #define TEMP_SENSOR_TYPE_BME280
 // #define TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 
-#define TEMP_MV_TRIMPOT 0
+#define TEMP_MV_TRIMPOT 0.0                                 // Millivolt offset
 #define TEMP_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
+#define TEMP_FINE_ADJUST 0.0                                // Adjust end value
 
 
 
@@ -280,17 +358,21 @@
 *
 * Recommended sensor is the BME280
 ***/
+
+// #define RELH_IS_ENABLED                                     // Comment to disable humidity related code
+
 #define DEFAULT_RELH_VALUE 36                               // Value to return if no sensor used
 #define RELH_ANALOG_SCALE 1.0                               // Scaling factor for raw analog value
 
 // Uncomment ONE of the following
-//#define RELH_SENSOR_NOT_USED
+// #define RELH_SENSOR_NOT_USED
 // #define RELH_SENSOR_TYPE_FIXED_VALUE
 // #define RELH_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from HUMIDITY_PIN
 #define RELH_SENSOR_TYPE_BME280
 // #define RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
 
-#define RELH_MV_TRIMPOT 0
+#define RELH_MV_TRIMPOT 0.0                                 // Millivolt offset
+#define RELH_FINE_ADJUST 0.0                                // Adjust end value
 
 
 /***********************************************************
@@ -303,9 +385,9 @@
 // NOTE: This method is currently unused
 // It is not clear if this method would produce usable results for all sensors.
 // Suggest that once project is stable, method is implimented and results compared against known good data to validate 
+// Potential for use of saw bench blade or similar for easily available orifice of known size (currently using CD)
 
 // generate MAF data table using three point method
 #define calibrationPlateHighCFM 100                         // Flow rate for large calibration orifice
 #define calibrationPlateMidCFM 50                           // Flow rate for med calibration orifice
 #define calibrationPlateLowCFM 10                           // Flow rate for small calibration orifice
-

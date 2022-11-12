@@ -22,39 +22,44 @@
 
 
 /***********************************************************
- * Configuration Settings
+ * Default / Fallback Configuration Settings
  *
- * NOTE: Do not edit these! Used to create default config file! 
- * You can easily edit the config file via the browser after you connect!
+ * NOTE: Do not edit these! Please leave the default values.
+ * These are used to generate the default config settings in the event of a system crash.
+ * If you edit these, you may get locked out of your system or brick your device.
+ * You can easily edit the config settings via the browser after you connect!
  ***/
 struct ConfigSettings {
-  String pageTitle = PAGE_TITLE;
-  String wifi_ssid = "WIFI-SSID";           // Your Wifi SSID
-  String wifi_pswd = "<WIFI-PSWD>";         // Your Wifi Password
-  String wifi_ap_ssid = "DIYFB";            // Default Access Point name
-  String wifi_ap_pswd = "123456789";        // Default Access Point Password
-  String hostname = "diyfb";                // Default Hostname
-  String api_delim = ":";                   // API Serial comms delimiter
-  long serial_baud_rate = 115200;           // Default baud rate 
-  unsigned long wifi_timeout = 10000;       // Time in millisec's before falling back to AP mode
-  int min_flow_rate = 3;                    // Flow rate at which bench is considered running
-  int min_bench_pressure = 0;               // Min bench pressure where bench is considered running
-  int maf_min_millivolts = 100;             // Filter out results less than this
-  int refresh_rate = 250;                   // Screen refresh rate in milliseconds (>180)
-  float cal_ref_press = 10;                 // Calibration orifice refe pressure
-  float cal_flow_rate = 14.4;               // Calibration orifica flow rate
-  float cal_offset = 0;                     // Calibration offset
-  int cyc_av_buffer = 5;                    // Scan # over which to average output (helps smooth results)
-  int leak_test_tolerance = 2;              // Leak test tolerance
-  int leak_test_threshold = 10;             // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
-  bool show_alarms = true;                  // Display Alarms?
-  bool debug_mode = false;
-  bool api_enabled = true;
+  int api_response_length = 64;                   // API Serial comms message length
+  long serial_baud_rate = 115200;                 // Default baud rate 
+  unsigned long wifi_timeout = 15000;             // Time in millisec's before falling back to AP mode
+  int min_flow_rate = 3;                          // Flow rate at which bench is considered running
+  int min_bench_pressure = 0;                     // Min bench pressure where bench is considered running
+  int maf_min_millivolts = 100;                   // Filter out results less than this
+  int refresh_rate = 200;                         // Screen refresh rate in milliseconds (>180)
+  float cal_ref_press = 10;                       // Calibration orifice refe pressure
+  float cal_flow_rate = 14.4;                     // Calibration orifica flow rate
+  float cal_offset = 0;                           // Calibration offset
+  int cyc_av_buffer = 3;                          // [5] Scan # over which to average output (helps smooth results)
+  int leak_test_tolerance = 2;                    // Leak test tolerance
+  int leak_test_threshold = 10;                   // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
+  bool show_alarms = true;                        // Display Alarms?
+  bool debug_mode = false;                         // Global debug print override //REMOVE: (DISABLE)
+  bool dev_mode = false;                          // Developer mode
+  bool status_print_mode = false;                 // Stream status data to serial
+  bool api_enabled = true;                        // Can disable serial API if required
   int tatltuae = 42;
   int parsecs = 12;
+  char pageTitle[32] = "DIY Flow Bench";       // Display name for software
+  char wifi_ssid[32] = "WIFI-SSID";            // Your Wifi SSID
+  char wifi_pswd[32] = "<WIFI-PSWD>";          // Your Wifi Password
+  char wifi_ap_pswd[32] = "123456789";         // Default Access Point Password
+  char hostname[32] = "diyfb";                 // Default Hostname
+  char api_delim[2] = ":";                    // API Serial comms delimiter
+  char wifi_ap_ssid[32] = "DIYFB";             // Default Access Point name
 };
 
-//ConfigSettings config;
+
 
 /***********************************************************
  * Calibration Settings
@@ -83,10 +88,13 @@ struct DeviceStatus {
   String baroSensor;
   String pitotSensor;
   int boot_time = millis();
-  bool liveStream = false;
+  bool liveStream = true;
+  long adcPollTimer = 0;
+  long bmePollTimer = 0;
+  long wsCLeanPollTimer = 0;
   int pollTimer = 0;
   int serialData = 0;
-  String statusMessage = BOOT_MESSAGE;
+  std::string statusMessage = BOOT_MESSAGE;
   bool apMode = false;
 };
 
@@ -96,7 +104,7 @@ struct DeviceStatus {
  * Websocket data
  ***/
 struct WebsocketData {
- String file_name;
+  String file_name;
   int length = 0;
 };
 
@@ -106,9 +114,27 @@ struct WebsocketData {
  * File upload data
  ***/
 struct FileUploadData {
- String file_name;
+  char* file_name;
   bool upload_error = false;
   int file_size = 0;
 };
 
 
+
+
+/***********************************************************
+ * Sensor data
+ ***/
+struct SensorData {
+  float MAF;
+  float MafMv;
+  float TempDegC;
+  double RelH;
+  float BaroKPA;
+  float PRefKPA;
+  float PRefMv;
+  float PDiffKPA;
+  float PDiffMv;
+  float PitotKPA;
+  float PitotMv;
+};

@@ -1,11 +1,187 @@
 ===================================================================
-!! Don't forget to update the build number in DIY-Flow-Bench.ino !!
+Current build status
 ===================================================================
 
-NOTE: Build numbers follow format YY MM DD VV Where VV is incremental version (reset daily) 
+Project compiles and runs but will crash when accessing I2C 
+
+I2C dev work is not finished
+
+
+===================================================================
+Current work in progress
+===================================================================
+
+I2C / BME is not returning stable data - it looks like it's the I2C code - possibly result of clash between BME280 and AD1115 code.
+Currently trying to determine where the issue originates from. Also possibly related to websocket interrupt
+
+Have implemented I2C class to bring BME and 1115 code into singular control and try and prevent data collisions.
+Next stage is to try and modify websocket code to better manage interrupt by controlling sensor / webserver tasks with semaphore.
+Also a possibility of replacing websocket control with 'Event Source' method in ESPAsyncWebServer and regular Navigation to aliminate interrupt
+
+Code refactor has created memory issue with move to char* arrays. Have changed out char* references to std::string but still more work to do there
+
+Temp commented sensor calls from main loop and API now much faster. Need to figure out a way to better manage task handover
+
+Just noticed that fixed Baro data is displaying incorrect value. Not sure why?!??
+
+
+
+===================================================================
+!! Don't forget to update the build number in configuration.h !!
+===================================================================
+
+Build numbers follow format YY MM DD VV Where VV is the incremental daily version
+
+!! Most recent entry at top !!
 
 Build #         - Description of Change
- 
+
+12112201        - Redacted SPI calls from within external libraries to allow VSCode debugging
+                - Moved MAFData into MAFData class to help better manage memory
+                - Refactored message calls from char* to std::string
+                - Replaced sensor.get calls in webserver with globals to reduce overheads
+                - Refactored platformIO.ini added dependencies + debug info
+                - Reviewed and updated .gitignore
+03112201        - Migrated to VSCode from Arduino-CLI
+                - Code optimisation
+01112201        - Refactored API class                - 
+31102201        - Moved all webserver functions into webserver class
+                - Code refactor for main
+                - Moved tasks back into core 1 (test inconclusive)
+23102201        - Code refactor for printf
+                - Replaced printString instances to char array
+                - Changed serial.print method function to utilise C++ vsnprintf method
+21102201        - Split main loop into core 1 and webserver into core 2 (test)
+                - Refactored BME code
+13102201        - Updated API functions
+                - Moved Debug_mode into config struct
+                - Added Status streaming mode to API
+                - Added Dev mode option
+07072201        - Changed ADC1115 code to use I2CDev
+02062201        - Renamed 'maths.h' class to 'calculations.h' (already a library class named math)
+23062201        - Refactored I2C code
+                - Added globals for sensor data
+                - Sensor data read in loop and made available to websocket interrupt
+                - Updated hardware schema to V2
+22061601        - Improved BME accuracy
+22061501        - Removed BME sensors voltage signals from API
+                - Disabled MAF Frequency ISR's
+22061301        - Fixed divide by Zero issue for ADC PRef
+                - Added get.sensor.millivolts functions for Pdiff / Pitot and MAF sensors
+                - Replaced MAP function 
+                - Changed Millivolt sensor vars from INT to FLOAT
+22061201        - Updated API calls 
+                - Added API debug functions
+                - Added additional debug messages to assist with fault finding
+22060901        - Updated pressure sensor algorithm
+                - updated ADC sensor values for supply voltage variation
+22060801        - Temporarily replaced BME code with Adafruit library as humidity code was broken
+                - General code refactoring
+                - Addressed NPM dependabot alerts with update of NPM / Gulp and dependencies
+21092301        - Reformatted changelog
+21092201        - Added user defined vanity title
+                - Dropped support for DHT11
+                - Fixed RH reading
+                - Added ADC1015 support for MAF / PRef / PDiff / Pitot
+                - #97 API disabled by debug mode
+                - Fixed Board voltage ADC code
+                - Change pressure sensor calcs to pascals
+                - Dropped support for MPX5100/5700
+                - NOTE: Remapped pins
+21091801        - Custom BME280 code to replace Adafruit and Sparkfun libraries
+                - Added soft reset button to config panel
+                - Added I2C Scanner to serial monitor
+21091101        - Added additional dependencies for BME280 - ESP32
+21090801        - (temporarily disabled ADC)
+                - Updated BOM in docs folder
+21090101        - Added support for 1015 / 1115 ADC for MAF / PRef / PDiff / Pitot
+21082503        - #87 Wifi client network
+                - Corrected millivolt calc in Webserver::getDataJSON
+21082502        - Reviewed Status and error messages
+                - Changed release version to V2
+                - Package up for Release Candidate 1
+21082501        - Checked & updated remaining MAF data files
+                - Hardware::configurePins
+                - Added orifice detection code pins
+                - Started on #84 
+                - General code tidy
+21082401        - #81 Review 10-12 bit conversion for all inputs
+                - #26 Frequency based MAF support
+21082301        - #78 Added Debug mode to API (Verbose messaging)
+                - Updated several compiler errors from WIN compiler
+                - Converted mafData files to individual classes
+                - Created single header file mafData.h
+                - Created frequency based MAF Data files
+                - #80 Added software trimpots
+                - Converted mafData files back to header files due to conflicts
+                - Renamed mafData files (changed dashes to underscores)
+                - Addressed compiletime issues found in Arduino IDE
+                - Compiling and working on Arduino-CLI
+                - Renamed sensor classes
+                - Tidied up MAF sensor code
+21082001        - Added vac control O/P
+                - #75 Fixed calibration data handling
+21081902        - #75 Auto create config / calibration json file(s) if not exists
+                - Minor code tidying
+                - Updated README
+21081902        - Removed DIY-Flow-Bench header file
+                - Flow calibration
+                - Leak test calibration
+                - added support for analog Temp / Baro / Relh sensors
+                - general code tidy
+                - Updated pin mapping
+                - added vanilla boot handling
+                - #63 Reviewed I/O
+                - #64 GZip compression
+                - #70 Server initialisation
+21081301        - Major code refactor to object based structure complete
+                - Converted procedural functions to class + method
+                - Improved file upload handling
+                - Return to file upload modal after file upload
+                - Renamed Schema to Header to remove ambiguity
+                - Added sensor types used to status dialog
+                - Fixed Javascript errors for status websocket update
+                - Fixed timeout for AP mode
+                - Optimised websocket handler browser code
+                - Remove header key from config JSON file
+21080701        - #71 Added file download code to File manager
+                - #71 Added file delete code to File Manager
+                - #71 Added file Upload code to File Manager
+                - #65 Removed alarm mute feature
+                - Added data streaming inc refresh rate
+                - Added data streaming controls (on/off buttons)
+                - Started on code refactor
+21072701        - Populated modal dialogs for file management and status
+                - Added status info for hardware configuration
+                - Reformatted 
+                - Created UI Graphs for data visualisation
+                - Refactored websocket communications to use JSON data
+                - Moved status and config data into Structs
+21072401        - Added calibration settings
+                - Added additional configuration settings
+                - Updated configuration file JSON formatting
+                - Changed config file extension from txt to JSON
+                - Added modal dialogs for file management and status
+21072301        - Added Multicast DNS Service
+                - Added fallback to AP mode
+                - Added tabbed interface to webserver
+                - Added configuration settings
+21072001        - Code refactor
+                - Created basic Web UI
+                - Asynchronous web sockets
+                - Added Status messages
+                - Added JSON status message to API
+21071802        - Added SPIFFS
+                - Added system status message to serial on boot
+                - Serial reporting permanently enabled
+                - Added Wifi Station mode
+                - Added basic web server
+21071801        - Ported code to ESP32
+                - Removed TC menu support
+                - Removed external display support
+                - Disabled CRC Checksum
+                - Updated pin mapping
+                - Tested via Serial API
 20081901        - Updated Build and Version variable length in TCMenu Designer
 20081601        - #46 Added reference pressure offet to volumetric flow calculation
 20081201        - #44 Added API call validation
@@ -136,105 +312,5 @@ Build #         - Description of Change
                 - Moved libraries into src subfolder folder
                 - Created this changelog file
 19120601        - Fixed compile error (extra curly bracket)
-21071801        - Ported code to ESP32
-                - Removed TC menu support
-                - Removed external display support
-                - Disabled CRC Checksum
-                - Updated pin mapping
-                - Tested via Serial API
-21071802        - Added SPIFFS
-                - Added system status message to serial on boot
-                - Serial reporting permanently enabled
-                - Added Wifi Station mode
-                - Added basic web server
-21072001        - Code refactor
-                - Created basic Web UI
-                - Asynchronous web sockets
-                - Added Status messages
-                - Added JSON status message to API
-21072301        - Added Multicast DNS Service
-                - Added fallback to AP mode
-                - Added tabbed interface to webserver
-                - Added configuration settings
-21072401        - Added calibration settings
-                - Added additional configuration settings
-                - Updated configuration file JSON formatting
-                - Changed config file extension from txt to JSON
-                - Added modal dialogs for file management and status
-21072701        - Populated modal dialogs for file management and status
-                - Added status info for hardware configuration
-                - Reformatted 
-                - Created UI Graphs for data visualisation
-                - Refactored websocket communications to use JSON data
-                - Moved status and config data into Structs
-21080701        - #71 Added file download code to File manager
-                - #71 Added file delete code to File Manager
-                - #71 Added file Upload code to File Manager
-                - #65 Removed alarm mute feature
-                - Added data streaming inc refresh rate
-                - Added data streaming controls (on/off buttons)
-                - Started on code refactor
-21081301        - Major code refactor to object based structure complete
-                - Converted procedural functions to class + method
-                - Improved file upload handling
-                - Return to file upload modal after file upload
-                - Renamed Schema to Header to remove ambiguity
-                - Added sensor types used to status dialog
-                - Fixed Javascript errors for status websocket update
-                - Fixed timeout for AP mode
-                - Optimised websocket handler browser code
-                - Remove header key from config JSON file
-21081902        - Removed DIY-Flow-Bench header file
-                - Flow calibration
-                - Leak test calibration
-                - added support for analog Temp / Baro / Relh sensors
-                - general code tidy
-                - Updated pin mapping
-                - added vanilla boot handling
-                - #63 Reviewed I/O
-                - #64 GZip compression
-                - #70 Server initialisation
-21081902        - #75 Auto create config / calibration json file(s) if not exists
-                - Minor code tidying
-                - Updated README
-21082001        - Added vac control O/P
-                - #75 Fixed calibration data handling
-21082301        - #78 Added Debug mode to API (Verbose messaging)
-                - Updated several compiler errors from WIN compiler
-                - Converted mafData files to individual classes
-                - Created single header file mafData.h
-                - Created frequency based MAF Data files
-                - #80 Added software trimpots
-                - Converted mafData files back to header files due to conflicts
-                - Renamed mafData files (changed dashes to underscores)
-                - Addressed compiletime issues found in Arduino IDE
-                - Compiling and working on Arduino-CLI
-                - Renamed sensor classes
-                - Tidied up MAF sensor code
-21082401        - #81 Review 10-12 bit conversion for all inputs
-                - #26 Frequency based MAF support
-21082501        - Checked & updated remaining MAF data files
-                - Hardware::configurePins
-                - Added orifice detection code pins
-                - Started on #84 
-                - General code tidy
-21082502        - Reviewed Status and error messages
-                - Changed release version to V2
-                - Package up for Release Candidate 1
-21082503        - #87 Wifi client network
-                - Corrected millivolt calc in Webserver::getDataJSON
-21090101        - Added support for 1015 / 1115 ADC for MAF / PRef / PDiff / Pitot
-21090801        - (temporarily disabled ADC)
-                - Updated BOM in docs folder
-21091101        - Added additional dependencies for BME280 - ESP32
-21091801        - Custom BME280 code to replace Adafruit and Sparkfun libraries
-                - Added soft reset button to config panel
-                - Added I2C Scanner to serial monitor
-21092001        - Added user defined vanity title
-                - Dropped support for DHT11
-                - Fixed RH reading
-                - Added ADC1015 support for MAF / PRef / PDiff / Pitot
-                - #97 API disabled by debug mode
-                - Fixed Board voltage ADC code
-                - Change pressure sensor calcs to pascals
-                - Dropped support for MPX5100/5700
+
+

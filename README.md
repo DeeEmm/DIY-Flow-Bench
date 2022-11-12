@@ -11,6 +11,9 @@ General Version V2.0-RC.X
 [Download the latest official release](https://github.com/DeeEmm/DIY-Flow-Bench/releases)
 
 
+NOTE: This project is still in active development and is currently at Release Candidate stage. We are working towards a stable software and hardware release. If you are interested in contributing with testing please head over to our [Discord](https://discord.gg/eAbktJj) channel or [discussion forums](https://github.com/DeeEmm/DIY-Flow-Bench/discussions). 
+
+
 ## What is a Flow Bench?
 ###
 
@@ -34,7 +37,7 @@ Support is included for the following systems architectures.
 - Pitot style benches
 - Venturi style benches
 
-The DIYFB system can be used on any flow bench and makes an ideal retrofit for older manometer based benches as well as being the perfect choice for new builds.
+The DIYFB system can be used on any flow bench and makes an ideal retrofit for older manometer based benches as well as being the perfect choice for new builds. We include DIY hardware plans so you can build a basic MAF based flow bench that uses a shop vac for the vacuum source. This is a great entry level bench and perfect for most shops and hobbyists. We also provide support for larger and more complex bench designs.
 
 
 ## Project Goals
@@ -44,6 +47,7 @@ The DIYFB system can be used on any flow bench and makes an ideal retrofit for o
 - Can be built & operated by a layman.
 - Generates results comparable with commercial flow bench.
 - Open source software and hardware design.
+- DIY Shield kits available to purchase.
 
 
 
@@ -63,9 +67,9 @@ If you use this code and have found issues or have comments relating to the rele
 
 ## Support
 
-Documentation is provided for installation, configuration and use in the [WIKI](https://github.com/DeeEmm/DIY-Flow-Bench/wiki)
+Documentation is provided for installation, configuration and use in the [WIKI](https://github.com/DeeEmm/DIY-Flow-Bench/wiki).
 
-If you get stuck, feel free to create a [discussion](https://github.com/DeeEmm/DIY-Flow-Bench/discussions/)  in the support forum, or hit us up over on the [Discord](https://discord.gg/eAbktJj) channel.
+If you get stuck, feel free to create a [discussion](https://github.com/DeeEmm/DIY-Flow-Bench/discussions/) in the support forum, or hit us up over on the [Discord](https://discord.gg/eAbktJj) channel.
 
 If you find an issue, or have a feature request, please [raise an issue](https://github.com/DeeEmm/DIY-Flow-Bench/issues)
 
@@ -75,7 +79,7 @@ If you find an issue, or have a feature request, please [raise an issue](https:/
 ## License
 ###
 
-This project is released under the GPLV3 license. For details on usage please refer to the license file included with this project
+This software is released under the GPLV3 license. For details on usage please refer to the license file included with this project
 
 
 

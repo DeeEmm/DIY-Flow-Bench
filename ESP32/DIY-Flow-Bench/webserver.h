@@ -30,31 +30,33 @@ class Webserver {
 	friend class Messages;
 	friend class Hardware;
 	friend class Settings;
+	friend class Sensors;
 	friend class AsyncWebServer;
 	friend class AsyncWebSocket;
 	friend class AsyncEventSource;
+	friend class ArduinoJSON;
+	
+	
+	protected:
 
-	public:
-		Webserver();		
+		void loop();
+
+    	AsyncWebServer *server;
+
 		String getFileListJSON ();
 		String getSystemStatusJSON();
-		String getDataJSON();
-		StaticJsonDocument<1024> loadJSONFile(String filename);
-		void writeJSONFile(String data, String filename);
-		static String byteDecode(size_t bytes);
-		static void ProcessWebSocketMessage(void *arg, uint8_t *data, size_t len);
-		static void ReceiveWebSocketMessage(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
-		static void ProcessUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
-		static void SendWebSocketMessage(String jsonValues);
-		static void begin();
-		static int decodeMessageHeader (char *data);
-		static void onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
 		
-		void Handler(String languageString);
-		//void DebugPrint(String message);
-		//void SerialPrint (String message);
-		//void SerialPrintLn (String message);
-	
+		StaticJsonDocument<1024> dataJson; 
+		
+		String byteDecode(size_t bytes);
+		char* byteDecoder(size_t bytes);
+		void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
+		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
+		void onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
+		int decodeMessageHeader (char *data);
+				
+		// void Handler(String languageString);
+
 	
 	private:
 		
@@ -62,7 +64,24 @@ class Webserver {
 		
 		void sendIndexPage();
 		void uploadFile();
-		void onBody();
-	    String indexPage();
-		String index_html;
+		// void onBody();
+    	char* indexPage();
+		char* index_html;
+		
+		
+	public:
+	
+		Webserver() {
+			server = NULL;
+			webskt = NULL;
+		}
+		
+		AsyncWebSocket *webskt;
+		
+		void begin();
+		void writeJSONFile(String data, String filename);
+		String getDataJSON();
+		StaticJsonDocument<1024> loadJSONFile(String filename);
+		void sendWebSocketMessage(String jsonValues);
+
 };
