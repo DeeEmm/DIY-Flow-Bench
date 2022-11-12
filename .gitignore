@@ -2,7 +2,6 @@
 .pio/*
 .vscode/*
 build/*
-lib/*
 libdeps/*
 components/*
 node_modules/*
