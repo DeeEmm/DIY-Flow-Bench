@@ -89,56 +89,31 @@ void Hardware::begin () {
   
   configurePins();
   
-//  // Support for [Adafruit 1015] (12bit) ADC
-//  // https://github.com/adafruit/Adafruit_ADS1X15
+  this->getI2CList(); // TODO: move into status dialog instead of printing to serial monitor
+  
+  
+  
+  
+// Support for [Adafruit 1015] (12bit) ADC
+// https://github.com/adafruit/Adafruit_ADS1X15
 //  #ifdef PREF_SRC_ADC_1015 
 //    Adafruit_ADS1015 ads1015; 
 //    ads1015.begin(ADC_I2C_ADDR);
 //  #endif
-//  
-//  // Support for [Adafruit 1115] (16bit) ADC
-//  // https://github.com/adafruit/Adafruit_ADS1X15
+
+
+// Support for [Adafruit 1115] (16bit) ADC
+// https://github.com/adafruit/Adafruit_ADS1X15
 //  #ifdef PREF_SRC_ADC_1115
 //    Adafruit_ADS1115 ads1115;
 //    ads1115.begin(ADC_I2C_ADDR);
 //  #endif
 
 
-// // Support for ADAFRUIT_BME280 temp, pressure & Humidity sensors
-// // https://github.com/adafruit/Adafruit_BME280_Library
-// #if defined(PREF_SENSOR_REF_ADAFRUIT_BME280) || defined(TEMP_SENSOR_ADAFRUIT_BME280) || defined(BARO_SENSOR_ADAFRUIT_BME280)
-//   #include <Adafruit_BME280.h> 
-//   Adafruit_BME280 adafruitBme280; // Instantiate (create) a BMP280_DEV object and set-up for I2C operation (address 0x77)
-// 
-//   //I2C address - BME280_I2C_ADDR
-//   if (!adafruitBme280.begin()) {  
-//     _message.Handler(LANG_BME280_READ_FAIL);
-//     _message.DebugPrintLn("Adafruit BME280 Initialisation failed");      
-//   } else {
-//     _message.DebugPrintLn("Adafruit BME280 Initialised");      
-//   }
-// #endif
-// 
-// // Support for SPARKFUN_BME280 temp, pressure & Humidity sensors
-// // https://learn.sparkfun.com/tutorials/sparkfun-bme280-breakout-hookup-guide?_ga=2.39864294.574007306.1596270790-134320310.1596270790
-// #if defined (RELH_SENSOR_SPARKFUN_BME280) || defined(TEMP_SENSOR_SPARKFUN_BME280) || defined(BARO_SENSOR_SPARKFUN_BME280)
-//   #include "SparkFunBME280.h"
-//   #include <Wire.h>
-//   BME280 SparkFunBME280;
-// 
-//   Wire.begin();
-//   SparkFunBME280.setI2CAddress(BME280_I2C_ADDR); 
-//   if (SparkFunBME280.beginI2C() == false) //Begin communication over I2C
-//   {
-//     _message.Handler(LANG_BME280_READ_FAIL);
-//     _message.DebugPrintLn("Sparkfun BME280 Initialisation failed");      
-//   } else {
-//     _message.DebugPrintLn("Sparkfun BME280 Initialised");      
-//   }
-// #endif
-// 
-// // Support for DHT11 humidity / temperature sensors
-// // https://github.com/winlinvip/SimpleDHT
+
+
+// Support for DHT11 humidity / temperature sensors
+// https://github.com/winlinvip/SimpleDHT
 // #if RELH_SENSOR_SIMPLE_RELH_DHT11 || TEMP_SENSOR_SIMPLE_TEMP_DHT11
 //   #include <SimpleDHT.h>  
 //   SimpleDHT11 dht11(HUMIDITY_PIN);    
@@ -148,46 +123,121 @@ void Hardware::begin () {
 
 
 
-
 /***********************************************************
-* GET ADS1X15 ADC value
+* Get list of I2C devices 
 *
+* Based on: https://www.esp32.com/viewtopic.php?t=4742
 ***/
-float Hardware::getAdcMillivolts(int adcChannel) {   
+//int * Hardware::getI2CList() {   
+void Hardware::getI2CList() {   
   
-  int16_t rawADCValue = 0;
-  float adcMillivolts = 0.0;
+  Messages _message;
+  // TODO: Detect I2C devices on bus and return addresses in array to be displayed in status dialog
+
+  // ESP32 I2C Scanner
+  // Based on code of Nick Gammon  http://www.gammon.com.au/forum/?id=10896
+  // ESP32 DevKit - Arduino IDE 1.8.5
+  // Device tested PCF8574 - Use pullup resistors 3K3 ohms !
+  // PCF8574 Default Freq 100 KHz 
   
-//  #if defined PREF_SRC_ADC_1015
-//    rawADCValue = this->ads1015.readADC_SingleEnded(adcChannel);
-//    adcMillivolts = this->ads1015.computeVolts(rawADCValue);
-//  #elif defined PREF_SRC_ADC_1115
-//    rawADCValue = this->ads1115.readADC_SingleEnded(adcChannel);
-//    adcMillivolts = this->ads1115.computeVolts(rawADCValue);
-//  #endif
-  
-  return adcMillivolts;
-  
+  Wire.begin (SCA_PIN, SCL_PIN); 
+
+  Serial.println ();
+  Serial.println ("Scanning for I2C devices...");
+  byte count = 0;
+
+  Wire.begin();
+  for (byte i = 8; i < 120; i++)   {
+    Wire.beginTransmission (i);          // Begin I2C transmission Address (i)
+    if (Wire.endTransmission () == 0)  { // Receive 0 = success (ACK response) 
+    
+      Serial.print ("Found address: ");
+      Serial.print (i, DEC);
+      Serial.print (" (0x");
+      Serial.print (i, HEX);     // PCF8574 7 bit address
+      Serial.println (")");
+      count++;
+    }
+  }
+  Serial.print ("Found ");      
+  Serial.print (count, DEC);        // numbers of devices
+  Serial.println (" device(s).");
+  Serial.println (" ");
 }
 
 
 
+/***********************************************************
+* GET ADS1015 ADC value
+*
+* Based on: https://github.com/sparkfun/SparkFun_ADS1015_Arduino_Library/blob/master/src/SparkFun_ADS1015_Arduino_Library.cpp
+* and :https://github.com/adafruit/Adafruit_ADS1X15/blob/master/Adafruit_ADS1X15.cpp
+*
+ ***/
+int Hardware::getADCRawData(int channel) {
 
+  if (channel > 3) {
+    return 0;
+  }
+  
+  uint16_t mode = ((4 + channel) << 12);
+    
+  uint16_t config = 0x8000;
+  config |= mode;
+  config |= 0X0000; // Gain (+/- 6.144v) NOTE: we are assuming all sensors have same FSD, else we need to scale each sensor within each sensor->function in sensors.cpp
+  config |= 0x0100; // Mode = Single
+  config |= 4; // data rate = 4 (default)
+  config |= 0x0000; // comparator mode traditional
+  config |= 0x0000; // polarity low
+  config |= 0x0000; // alert is non-latching
+  config |= 3;
+  
+  Wire.beginTransmission(ADC_I2C_ADDR);  
+  
+  Wire.write((uint8_t)0x01);
+  Wire.write((uint8_t)(config >> 8));
+  Wire.write((uint8_t)(config & 0xFF));
+  Wire.endTransmission();
+  
+  delay(10); // TODO: This is a hack, need to test for transmission complete. (Delays are bad Mmmmnnkay) [might not even need it, screen refresh rate might be enough!]
+  
+  Wire.beginTransmission(ADC_I2C_ADDR);
+  Wire.write(0x00);
+  Wire.endTransmission();
 
-
-
+  int rv = Wire.requestFrom(ADC_I2C_ADDR, (uint8_t) 2);
+  int raw;
+  if (rv == 2) {
+    raw = Wire.read() << 8;
+    raw += Wire.read();
+  }
+  
+  #ifdef ADC_TYPE_ADS1015
+    raw >>= 4;  // Shift 12-bit results
+  #endif
+  
+  return int(raw);
+  
+}
 
 
 /***********************************************************
 * GET BOARD VOLTAGE
+* Measures 5v supply buck power to ESP32 via voltage divider
+* We use a 10k-10k divider on the official shield
+* This gives a max of 2.5v which is fine for the ESP32's 3.3v logic
+* Use a 0.1uf cap on input to help filter noise
 *
 * NOTE: ESP32 has 12 bit ADC (0-3.3v = 0-4095)
 ***/
-float Hardware::getSupplyMillivolts() {   
+int Hardware::getSupplyMillivolts() {   
+
   int rawVoltageValue = analogRead(VOLTAGE_PIN);
-  float supplyMillivolts = rawVoltageValue * (3.3 / 4095.0) * 1000;
+  
+  float supplyMillivolts = (2 * (rawVoltageValue * (3.3 / 4095.0) * 1000)) + SUPPLY_MV_TRIMPOT;
 
   return supplyMillivolts;
+  
 }
 
 

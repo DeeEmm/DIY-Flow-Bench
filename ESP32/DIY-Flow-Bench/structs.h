@@ -28,6 +28,7 @@
  * You can easily edit the config file via the browser after you connect!
  ***/
 struct ConfigSettings {
+  String pageTitle = PAGE_TITLE;
   String wifi_ssid = "WIFI-SSID";           // Your Wifi SSID
   String wifi_pswd = "<WIFI-PSWD>";         // Your Wifi Password
   String wifi_ap_ssid = "DIYFB";            // Default Access Point name

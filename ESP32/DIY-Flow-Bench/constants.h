@@ -42,6 +42,7 @@
 #define STOP_BENCH 12
 #define LEAK_CAL 13
 #define GET_CAL 14 
+#define RESTART 15
 
 
 /***********************************************************
@@ -93,7 +94,7 @@
 #define MPXV7007 4
 #define MPX4250 5
 #define MPXV7007DP 6
-#define ADAFRUIT_BME280 7
+#define BME280 7
 #define SPARKFUN_BME280 8
 #define MPX4115 9
 #define SIMPLE_TEMP_DHT11 10

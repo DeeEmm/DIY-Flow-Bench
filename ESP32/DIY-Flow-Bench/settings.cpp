@@ -103,6 +103,7 @@ void Settings::createConfigFile () {
 
   _message.DebugPrintLn("Creating config.json file..."); 
  
+  configData["PAGE_TITLE"] = PAGE_TITLE;
   configData["CONF_WIFI_SSID"] = config.wifi_ssid;
   configData["CONF_WIFI_PSWD"] = config.wifi_pswd;
   configData["CONF_WIFI_AP_SSID"] = config.wifi_ap_ssid;

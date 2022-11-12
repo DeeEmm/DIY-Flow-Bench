@@ -19,8 +19,8 @@
 * Other ESP32 based boards can be made to work. 
 * You can define custom pin definitions in pins.h
 * 
-* Default temp / baro / RelH uses BME280 device (Sparkfun / Adafruit / clone)
-* I2C address for the BME280 is 0x77
+* Default temp / baro / RelH uses BME280 device
+* I2C address for the BME280 is 0x77 / 0x76
 *
 * Default MAF unit recommended is the GM LS2 MAF (ACDELCO_ 92281162.h)
 * This will measure up to approx 277cfm
@@ -37,6 +37,7 @@
 
 #include <Arduino.h>
 #include <WiFi.h>
+//#include <Wire.h>
 #include <ESPmDNS.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -86,19 +87,18 @@ API _api;
 
 
 
+
 /***********************************************************
  * INITIALISATION
  ***/
 void setup(void) {
 
   _webserver.begin();
-  _message.DebugPrintLn("webserver ok");
+  _message.SerialPrintLn("webserver running");
   _hardware.begin();
-  _message.DebugPrintLn("hardware ok");
+  _message.SerialPrintLn("hardware initialised");
   _sensors.begin();
-  _message.DebugPrintLn("sensors ok");
-  _sensors.initialise();
-  _message.DebugPrintLn("sensors initialised");
+  _message.SerialPrintLn("sensors initialised");
 
 }
 

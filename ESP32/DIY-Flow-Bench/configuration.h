@@ -17,7 +17,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "21090101"
+#define BUILD_NUMBER "21092201"
 #define RELEASE "V.2.0-RC.2"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -26,6 +26,7 @@
 * SYSTEM SETTINGS
 ***/
 #define BOOT_MESSAGE "May the flow be with you..."
+#define PAGE_TITLE "DIY Flow Bench"
 #define showAlarms true
 #define MIN_REFRESH_RATE 200
 #define LANGUAGE_FILE "language/EN_Language.h"
@@ -83,19 +84,27 @@
 * Default ESP32DUINO 
 ***/
 
-//#define DIYFB_SHIELD                    
-#define ESP32DUINO
-
+#define DIYFB_SHIELD                    
+//#define ESP32DUINO
 
 
 
 /***********************************************************
-* CONFIGURE COMMUNICATIONS
+* TUNE HARDWARE 
 ***/
 
-// (default 0x77) / Alternate 0x76
-#define BME280_I2C_ADDR 0x77            
-  
+#define SUPPLY_MV_TRIMPOT 333                               // Measure and compare to serial monitor value           
+
+
+
+/***********************************************************
+* CONFIGURE BME280
+***/
+
+// (default 0x76) / Alternate 0x77
+// Check report in serial monitor on boot for address
+#define BME280_I2C_ADDR 0x76            
+//#define BME280_I2C_ADDR 0x77            
   
   
 
@@ -108,7 +117,9 @@
 * This allows conversion from 5v to 3.3 via ADC > I2C
 ***/
 
-#define ADC_I2C_ADDR 0x48 // Default is 0x48
+// Default is 0x48
+// Check report in serial monitor on boot for address
+#define ADC_I2C_ADDR 0x48 
 
 #define ADC_TYPE_ADS1015 // 12 bit (3 mV/bit)
 // #define ADC_TYPE_ADS1115 // 16 bit (188uV/bit)
@@ -137,36 +148,35 @@
 
 // Set signal source (Uncomment One line only)
 //#define MAF_SRC_PIN
-#define MAF_SRC_ADC_1015
-//#define MAF_SRC_ADC_1115
+#define MAF_SRC_ADC
 
 
-#define MAF_TRIMPOT 0.0
+#define MAF_MV_TRIMPOT 0.0
 #define MAF_ADC_CHANNEL 0
 
 
 /***********************************************************
 * CONFIGURE REFERENCE PRESSURE SENSOR
 * If you want to modify the code to include additional reference pressure sensors
-* You will need to add your volts to kPa algorithm in the function calculateRefPressure()
+* You will need to add your volts to kPa algorithm in the function sensors->getPRef()
+*
+* Recommended sensor is the MPXV7007DP
 ***/
-#define DEFAULT_REF_PRESS_VALUE 1
+#define DEFAULT_REF_PRESS_VALUE 1                           // Fixed pressure value in Pascals
 
 // Set signal source (Uncomment One line only)
 //#define PREF_SRC_PIN
-#define PREF_SRC_ADC_1015
-//#define PREF_SRC_ADC_1115
+#define PREF_SRC_ADC
 
 // Set sensor type (Uncomment One line only)
-#define PREF_SENSOR_NOT_USED
+// #define PREF_SENSOR_NOT_USED
 // #define PREF_SENSOR_TYPE_LINEAR_ANALOG 
-// #define PREF_SENSOR_TYPE_MPXV7007      
-// #define PREF_SENSOR_TYPE_MPX4250         
+#define PREF_SENSOR_TYPE_MPXV7007        
 
 
-#define PREF_TRIMPOT 0.0
+#define PREF_MV_TRIMPOT 0
 #define PREF_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
-#define PREF_ADC_CHANNEL 1
+#define PREF_ADC_CHANNEL 2                                  // TODO: TEMP SWAPPED WITH PDIFF (ERROR ON PCB)
 
 
 
@@ -175,61 +185,65 @@
 /***********************************************************
 * CONFIGURE DIFFERENTIAL PRESSURE SENSOR
 * If you want to modify the code to include additional reference pressure sensors
-* You will need to add your volts to kPa algorithm in the function calculateDiffPressure()
+* You will need to add your volts to kPa algorithm in the function sensors->getPDiff()
+* 
+* Recommended sensor is the MPXV7007DP
 ***/
-#define DEFAULT_DIFF_PRESS_VALUE 1
+#define DEFAULT_DIFF_PRESS_VALUE 1                          // Fixed pressure value in Pascals
 
 // Set signal source (Uncomment One line only)
 //#define PDIFF_SRC_PIN
-#define PDIFF_SRC_ADC_1015
-//#define PDIFF_SRC_ADC_1115
+#define PDIFF_SRC_ADC
 
 // Set sensor type (Uncomment One line only)
 #define PDIFF_SENSOR_NOT_USED            
 // #define PDIFF_SENSOR_TYPE_LINEAR_ANALOG 
-// #define PDIFF_SENSOR_TYPE_MPXV7007             
+// #define PDIFF_SENSOR_TYPE_MPXV7007          
 
-#define PDIFF_TRIMPOT 0.0
+#define PDIFF_MV_TRIMPOT 0
 #define PDIFF_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
-#define PDIFF_ADC_CHANNEL 2
+#define PDIFF_ADC_CHANNEL 1                                  // TODO: TEMP SWAPPED WITH PREF (ERROR ON PCB)
 
 
 
 /***********************************************************
 * CONFIGURE PITOT PRESSURE SENSOR
 * If you want to modify the code to include additional pitot pressure sensors
-* You will need to add your volts to kPa algorithm in the function calculatePitotPressure()
+* You will need to add your volts to kPa algorithm in the function sensors->getPitot()
 * Note Pitot sensors need to be a differential pressure sensor (DP)
+*
+* Recommended sensor is the MPXV7007DP
 ***/
 
 // Set signal source (Uncomment One line only)
 //#define PITOT_SRC_PIN
-#define PITOT_SRC_ADC_1015
-//#define PITOT_SRC_ADC_1115
+#define PITOT_SRC_ADC
+
 
 
 // Set sensor type (Uncomment One line only)
-#define PITOT_SENSOR_NOT_USED
+// #define PITOT_SENSOR_NOT_USED
 // #define PITOT_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from PITOT_PIN
-// #define PITOT_SENSOR_TYPE_MPXV7007DP
+#define PITOT_SENSOR_TYPE_MPXV7007DP
 
-#define PITOT_TRIMPOT 0.0
+#define PITOT_MV_TRIMPOT 0.0
 #define PITOT_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 #define PITOT_ADC_CHANNEL 3
+
 
 /***********************************************************
 * CONFIGURE BARO SENSOR
 *
 * Default Baro 101.3529kpa - standard sea level baro pressure (14.7 psi) 
+*
+* Recommended sensor is the BME280
 ***/
 
 
 // Uncomment One line only
-#define BARO_SENSOR_TYPE_FIXED_VALUE
+// #define BARO_SENSOR_TYPE_FIXED_VALUE
 // #define BARO_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from REF_BARO_PIN
-// #define BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
-// #define BARO_SENSOR_TYPE_ADAFRUIT_BME280
-// #define BARO_SENSOR_TYPE_SPARKFUN_BME280
+#define BARO_SENSOR_TYPE_BME280
 // #define BARO_SENSOR_TYPE_MPX4115
 
 #define DEFAULT_BARO_VALUE 101.3529
@@ -237,27 +251,26 @@
 #define startupBaroScalingFactor 1                          // scaling factor when using reference pressure sensor for baro correction
 #define startupBaroScalingOffset 100                        // scaling offset when using reference pressure sensor for baro correction
 
-#define BARO_TRIMPOT 0.0
+#define BARO_MV_TRIMPOT 0
 
 
 
 /***********************************************************
 * CONFIGURE TEMPERATURE SENSOR
 *
-* Default 21 Degrees Celsius
+* Recommended sensor is the BME280
 ***/
 #define DEFAULT_TEMP_VALUE 21                               // Value to return if no sensor used
 #define TEMP_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 
 // Uncomment One line only
 //#define TEMP_SENSOR_NOT_USED
-#define TEMP_SENSOR_TYPE_FIXED_VALUE
+// #define TEMP_SENSOR_TYPE_FIXED_VALUE
 // #define TEMP_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from TEMPERATURE_PIN
-// #define TEMP_SENSOR_TYPE_SPARKFUN_BME280
-// #define TEMP_SENSOR_TYPE_ADAFRUIT_BME280
+#define TEMP_SENSOR_TYPE_BME280
 // #define TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 
-#define TEMP_TRIMPOT 0.0
+#define TEMP_MV_TRIMPOT 0
 #define TEMP_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 
 
@@ -265,20 +278,19 @@
 /***********************************************************
 * CONFIGURE HUMIDITY SENSOR
 *
-* Default 36% Rel H
+* Recommended sensor is the BME280
 ***/
 #define DEFAULT_RELH_VALUE 36                               // Value to return if no sensor used
 #define RELH_ANALOG_SCALE 1.0                               // Scaling factor for raw analog value
 
 // Uncomment ONE of the following
 //#define RELH_SENSOR_NOT_USED
-#define RELH_SENSOR_TYPE_FIXED_VALUE
+// #define RELH_SENSOR_TYPE_FIXED_VALUE
 // #define RELH_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from HUMIDITY_PIN
-// #define RELH_SENSOR_TYPE_SPARKFUN_BME280
-// #define RELH_SENSOR_TYPE_ADAFRUIT_BME280
+#define RELH_SENSOR_TYPE_BME280
 // #define RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
 
-#define RELH_TRIMPOT 0.0
+#define RELH_MV_TRIMPOT 0
 
 
 /***********************************************************
@@ -293,20 +305,7 @@
 // Suggest that once project is stable, method is implimented and results compared against known good data to validate 
 
 // generate MAF data table using three point method
-#define calibrationPlateHighCFM 100                 // Flow rate for large calibration orifice
-#define calibrationPlateMidCFM 50                   // Flow rate for med calibration orifice
-#define calibrationPlateLowCFM 10                   // Flow rate for small calibration orifice
+#define calibrationPlateHighCFM 100                         // Flow rate for large calibration orifice
+#define calibrationPlateMidCFM 50                           // Flow rate for med calibration orifice
+#define calibrationPlateLowCFM 10                           // Flow rate for small calibration orifice
 
-
-
-
-/***********************************************************
-* DEVELOPMENT SETTINGS
-*
-* Test environment /DM 
-***/
-#if defined DEBUG
-    #define BARO_SENSOR_TYPE_SPARKFUN_BME280
-    #define TEMP_SENSOR_TYPE_SPARKFUN_BME280
-    #define RELH_SENSOR_TYPE_SPARKFUN_BME280
-#endif
