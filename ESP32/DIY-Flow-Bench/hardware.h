@@ -43,9 +43,9 @@ class Hardware {
 		void getBMERawData();
 		
 		int16_t getADCRawData(int channel);
-		float get3v3SupplyMillivolts();
-		float get5vSupplyMillivolts();
-		float getADCMillivolts(int channel);
+		double get3v3SupplyMillivolts();
+		double get5vSupplyMillivolts();
+		double getADCMillivolts(int channel);
 		bool benchIsRunning();	
 		void checkRefPressure();
 		

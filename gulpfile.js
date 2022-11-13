@@ -34,13 +34,22 @@ gulp.task('clean', function () {
 		.pipe(clean());
 });
 
-gulp.task('compress', function(done) {
+gulp.task('compress+gzip', function(done) {
 	gulp.src('esp32/DIY-Flow-Bench/build/index.html')
 	.pipe(gzip())
 	.pipe(gulp.dest('esp32/DIY-Flow-Bench/data'))
 	done();
 });
+
+gulp.task('compress', function(done) {
+	gulp.src('esp32/DIY-Flow-Bench/build/index.html')
+	//.pipe(gzip())
+	.pipe(gulp.dest('esp32/DIY-Flow-Bench/data'))
+	done();
+});
 	
+
+
 gulp.task('html', function() {
 	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
 	 	.pipe(removeHtmlComments())
@@ -56,5 +65,5 @@ gulp.task('html', function() {
 	   .pipe(gulp.dest('esp32/DIY-Flow-Bench/build'));
 	});
 	
-gulp.task('default', gulp.series('css', 'js', 'html', 'compress', 'clean'));
-gulp.task('build', gulp.series('css', 'js', 'html', 'compress', 'clean'));
+gulp.task('minify+gzip', gulp.series('css', 'js', 'html', 'compress+gzip', 'clean'));
+gulp.task('minify', gulp.series('css', 'js', 'html', 'compress', 'clean'));

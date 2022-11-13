@@ -13,15 +13,15 @@
 * Except where noted this project and all associated files are provided for use under the GNU GPL3 license:
 * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
 * 
-* The standard project board is the ESP32DUINO  
-* Other ESP32 based boards can be made to work. 
+* The standard project board is the ESP32DUINO used in conjunction with the DIY-Flow-Bnch shield
+* Other ESP32 based boards and custom shields can be made to work. 
 * You can define custom pin definitions to suit your project in pins.h
 * 
 * Default Temperature / Barometric Pressure / Relative Humidity uses a BME280 device connected via I2C
-* The generic I2C address for the BME280 is 0x77 / 0x76
+* The generic I2C address for the BME280 is 0x77 / 0x76 (NOTE: BME NOT BMP!!)
 *
-* Default MAF / Reference Pressure / Pitot / Differential Pressure sensors use ADS1115 or ADS1015 ADCs via I2C
-* The generic I2C address for the ADS is 0x48 but can also be set to 0x49 / 0x4A / 0x4B
+* Default MAF / Reference Pressure / Pitot / Differential Pressure sensors use ADS1115 (recommended) or ADS1015 ADCs via I2C
+* The generic I2C address for the ADS is 0x48 but can also be set to 0x49 / 0x4A / 0x4B by pin linking at the device
 *
 * Default MAF unit recommended is the GM LS2 MAF (ACDELCO_ 92281162.h) This will measure up to approx 277cfm
 * Other MAF sensors are supported by creation of MAF Data file - See mafDATA/ for examples
@@ -41,7 +41,6 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
-#include <ArduinoJson.h>
 #include "constants.h"
 #include "configuration.h"
 #include "structs.h"
@@ -49,9 +48,12 @@
 #include <I2Cdev.h>
 #include "hardware.h"
 #include "sensors.h"
+#include "calculations.h"
 #include "webserver.h"
 #include "messages.h"
 #include "API.h"
+#define ARDUINOJSON_ENABLE_STD_STRING 1 // allow support for std::string
+#include <ArduinoJson.h>
 
 // #include MAF_DATA_FILE
 #include LANGUAGE_FILE
@@ -64,12 +66,13 @@ WebsocketData socketData;
 FileUploadData fileUploadData;
 //mafSensorData mafSensor;
 SensorData sensorVal;
-translator translate;
+Translator translate;
 
 // Initiate Classes
 Settings _settings;
 Hardware _hardware;
 Webserver _webserver;
+Calculations _calculations;
 Sensors _sensors;
 Messages _message;
 API _api;
@@ -93,13 +96,13 @@ TaskHandle_t webserverTaskHandle = NULL;
  void webloop(void *pvParameter) {
    
   // NOTE: Default core is usually core 1 so lets make sure we are on core 1
-  _message.debugPrintf((char*)"Webserver process assigned to CPU core %d \n", xPortGetCoreID());
+  _message.debugPrintf("Webserver process assigned to CPU core %d \n", xPortGetCoreID());
   // Print Stack HWM (high water mark)    
-  _message.debugPrintf((char*)"Webserver Stack HWM: %d \n", uxTaskGetStackHighWaterMark(NULL));
+  _message.debugPrintf("Webserver Stack HWM: %d \n", uxTaskGetStackHighWaterMark(NULL));
 
   _webserver.begin();
 
-  _message.serialPrintf((char*)"Webserver initialisation complete \n");
+  _message.serialPrintf("Webserver initialisation complete \n");
 
   // Infinite Loop
   for(;;) {
@@ -156,11 +159,11 @@ void mainloop (void *pvParameter) {
   
 
   // NOTE: Default core is usually core 1
-  _message.debugPrintf((char*)"Hardware process assigned to CPU core : %d \n", xPortGetCoreID());
+  _message.debugPrintf("Hardware process assigned to CPU core : %d \n", xPortGetCoreID());
   // Print Stack HWM (high water mark)
-  _message.debugPrintf((char*)"Main Stack HWM: %d \n", uxTaskGetStackHighWaterMark(NULL));
+  _message.debugPrintf("Main Stack HWM: %d \n", uxTaskGetStackHighWaterMark(NULL));
   
-  _message.serialPrintf((char*)"Hardware initialisation complete \n");
+  _message.serialPrintf("Hardware initialisation complete \n");
   
   // Infinite Loop
   for(;;) {
@@ -226,13 +229,13 @@ void setup(void) {
   
   _message.begin();
   
-  _message.serialPrintf((char*)"\r\nDIY Flow Bench \nVersion: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);  
+  _message.serialPrintf("\r\nDIY Flow Bench \nVersion: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);  
     
   _hardware.begin();
   
   _sensors.begin();
   
-  if (config.api_enabled) _message.serialPrintf((char*)"Serial API Enabled \n");
+  if (config.api_enabled) _message.serialPrintf("Serial API Enabled \n");
 
   _webserver.begin();
   
@@ -246,8 +249,8 @@ void setup(void) {
   uint8_t defaultCore = xPortGetCoreID();                   // This core (1)
   uint8_t secondaryCore = (defaultCore > 0 ? 0 : 1);        // Free core (0)
   
-  _message.serialPrintf((char*)"Default core : %d\n", defaultCore);
-  _message.serialPrintf((char*)"Secondary core : %d\n", secondaryCore);
+  _message.serialPrintf("Default core : %d\n", defaultCore);
+  _message.serialPrintf("Secondary core : %d\n", secondaryCore);
   
   
   // xSemaphore = xSemaphoreCreateBinary();
@@ -305,15 +308,22 @@ void loop () {
   #endif
 
   // // Non breaking delay for sensor update
-  // if (millis() > status.bmePollTimer) {
-  //   status.bmePollTimer = millis() + BME_SCAN_DELAY_MS; 
-  //  
-  //   // Get BME sensor data and store it in global struct so that they can be accessed by webserver   
-  //   // TODO: CHANGE TO QUEUE
-  //   sensorVal.TempDegC = _sensors.getTempValue();
-  //   sensorVal.BaroKPA = _sensors.getBaroValue();
-  //   sensorVal.RelH  = _sensors.getRelHValue();
-  // }
+  if (millis() > status.bmePollTimer) {
+    status.bmePollTimer = millis() + BME_SCAN_DELAY_MS; 
+   
+    // Get env sensor data, truncate to 2 decimal places and store it in global struct so that they can be accessed by webserver   
+	  
+    // Get Temp
+    int value = _sensors.getTempValue() * 100 + .5;
+    sensorVal.TempDegC = (double)value / 100;
+    // Get Baro
+	  value = _calculations.convertPressure(_sensors.getBaroValue(), HPA) * 100 + .5;
+    sensorVal.BaroKPA = (double)value / 100;
+    // Get RelH
+	  value = _sensors.getRelHValue() * 100 + .5;
+    sensorVal.RelH = (double)value / 100;
+
+  }
 
   // Process API comms
   if (config.api_enabled) {        

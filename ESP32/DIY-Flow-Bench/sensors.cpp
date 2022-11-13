@@ -19,38 +19,34 @@
 * https://github.com/DavidAntliff/esp32-freqcount/blob/master/frequency_count.c
 ***/
 
-#include <Adafruit_ADS1X15.h>
-#include <SFunBME280.h>
-#include <Wire.h>
 #include "Arduino.h"
 #include "configuration.h"
 #include "constants.h"
 #include "pins.h"
 #include "structs.h"
+#include <Wire.h>
 #include "hardware.h"
 #include "sensors.h"
 #include "messages.h"
 #include "driver/pcnt.h"
 #include LANGUAGE_FILE
-#include MAF_DATA_FILE
 
+#ifdef MAF_IS_ENABLED
+#include MAF_DATA_FILE
+#endif
+
+#ifdef ADC_IS_ENABLED
+#include <Adafruit_ADS1X15.h>
+#endif
+
+#ifdef BME_IS_ENABLED
+#include <SFunBME280.h>
 //#include "bme280.h"
+#endif
 
 
 
 Sensors::Sensors() {
-
-	// mafData _mafData;
-	
-	// extern char* mafSensorType;
-	// extern int mafOutputType;
-	// extern int mafDataUnit;	
-	
-	// this->_mafSensorType = mafSensorType;
-	// this->_mafOutputType  = mafOutputType;
-	// this->_mafDataUnit = mafDataUnit;
-
-
 
 }
 
@@ -59,11 +55,11 @@ void Sensors::begin () {
 
 	Messages _message;
 	
-	_message.serialPrintf((char*)"Initialising Sensors \n");
+	_message.serialPrintf("Initialising Sensors \n");
 	
 	Sensors::initialise ();
 	
-	_message.serialPrintf((char*)"Sensors Initialised \n");
+	_message.serialPrintf("Sensors Initialised \n");
 
 }
 
@@ -79,10 +75,12 @@ Sensors __mafVoodoo;
 void Sensors::initialise () {
 
 	Messages _message;
+	#ifdef MAF_IS_ENABLED
 	MafData _mafdata;
+	#endif
 
 	extern struct DeviceStatus status;
-    // extern struct translator translate;
+    extern struct Translator translate;
 	// extern int mafOutputType;
 
 	// _mafdata.begin();
@@ -93,7 +91,7 @@ void Sensors::initialise () {
 		//BME280 _bme280;
 		BME280 _BMESensor;
 		
-		_message.serialPrintf((char*)"Initialising BME280 \n");	
+		_message.serialPrintf("Initialising BME280 \n");	
 		
 		_BMESensor.setMode(0); // Sleep mode - required when writing settings to BME device
 		_BMESensor.setReferencePressure(SEALEVELPRESSURE_HPA * 100);
@@ -111,89 +109,12 @@ void Sensors::initialise () {
 	
 	
 		// if (!this->BME280init()) {
-		// 	_message.statusPrintf((char*)"BME280 device Error!! \n");
+		// 	_message.statusPrintf("BME280 device Error!! \n");
 		// } else {
-		// 	_message.statusPrintf((char*)"BME280 device initialised \n");		
+		// 	_message.statusPrintf("BME280 device initialised \n");		
 		// }
 	#endif
 
-	// Baro Sensor
-	#ifdef BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
-		this->startupBaroPressure = this->getPRefValue();
-		this->_baroSensorType = translate.LANG_VAL_START_REF_PRESSURE;
-	#elif defined BARO_SENSOR_TYPE_FIXED_VALUE
-		this->startupBaroPressure = DEFAULT_BARO_VALUE;
-		this->_baroSensorType = translate.LANG_VAL_FIXED_VALUE;
-		this->_baroSensorType += DEFAULT_BARO_VALUE;
-	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
-		this->_baroSensorType = (char*)"BME280";
-	#elif defined BARO_SENSOR_TYPE_MPX4115
-		this->_baroSensorType = "MPX4115";
-	#elif defined BARO_SENSOR_TYPE_LINEAR_ANALOG
-		this->_baroSensorType = "ANALOG PIN: " + REF_BARO_PIN;
-	#endif
-	
-	//Temp Sensor
-	#ifdef TEMP_SENSOR_NOT_USED
-		this->startupBaroPressure = this->getPRefValue();
-		this->_tempSensorType = translate.LANG_VAL_NOT_ENABLED;
-	#elif defined TEMP_SENSOR_TYPE_FIXED_VALUE
-		this->_tempSensorType = translate.LANG_VAL_FIXED_VALUE;
-		this->_tempSensorType += DEFAULT_TEMP_VALUE;
-	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
-		this->_tempSensorType = (char*)"BME280";
-	#elif defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
-		this->_tempSensorType = (char*)"Simple DHT11";
-	#elif defined TEMP_SENSOR_TYPE_LINEAR_ANALOG
-		this->_tempSensorType = (char*)"ANALOG PIN: " + TEMPERATURE_PIN;
-	#endif
-	
-	// Rel Humidity Sensor
-	#ifdef RELH_SENSOR_NOT_USED
-		this->startupBaroPressure = this->getPRefValue();
-		this->_relhSensorType = translate.LANG_VAL_NOT_ENABLED;
-	#elif defined RELH_SENSOR_TYPE_FIXED_VALUE
-		this->_relhSensorType = translate.LANG_VAL_FIXED_VALUE;
-		this->_relhSensorType += DEFAULT_RELH_VALUE;
-	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
-		this->_relhSensorType = (char*)"BME280";
-	#elif defined RELH_SENSOR_TYPE_SIMPLE_TEMP_DHT11
-		this->_relhSensorType = "Simple DHT11";
-	#elif defined RELH_SENSOR_TYPE_LINEAR_ANALOG
-		this->_relhSensorType = (char*)"ANALOG PIN: " + HUMIDITY_PIN;
-	#endif
-
-	// reference pressure
-	#ifdef PREF_SENSOR_NOT_USED
-		this->_prefSensorType = translate.LANG_VAL_NOT_ENABLED;
-	#elif defined PREF_SENSOR_TYPE_MPXV7007
-		this->_prefSensorType = (char*)"SMPXV7007";
-	#elif defined PREF_SENSOR_TYPE_MPX4250
-		this->_prefSensorType = (char*)"MPX4250";
-	#elif defined PREF_SENSOR_TYPE_LINEAR_ANALOG
-		this->_prefSensorType = (char*)"ANALOG PIN: " + REF_PRESSURE_PIN;
-	#endif
-	
-	// differential pressure
-	#ifdef PDIFF_SENSOR_NOT_USED
-		this->_pdiffSensorType = translate.LANG_VAL_NOT_ENABLED;
-	#elif defined PPDIFF_SENSOR_TYPE_MPXV7007
-		this->_pdiffSensorType = (char*)"SMPXV7007";
-	#elif defined PDIFF_SENSOR_TYPE_LINEAR_ANALOG
-		this->_pdiffSensorType = (char*)"ANALOG PIN: " + DIFF_PRESSURE_PIN;
-	#endif
-	
-	// pitot pressure differential
-    #ifdef PITOT_SENSOR_NOT_USED
-		this->_pitotSensorType = translate.LANG_VAL_NOT_ENABLED;
-	#elif defined PITOT_SENSOR_TYPE_MPXV7007
-		this->_pitotSensorType = (char*)"SMPXV7007";
-	#elif defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
-		this->_pitotSensorType = (char*)"ANALOG PIN: " + PITOT_PIN;
-	#endif
-	
-	
-	
 
 	// Set up the MAF ISR if required
 	// Note Frequency based MAFs are required to be attached direct to MAF pin for pulse counter to work
@@ -205,14 +126,115 @@ void Sensors::initialise () {
 		timerStart(timer);	
 	}
 */	
+
+
+	// Definitions for system status pane
+	// MAF Sensor
+	#if defined MAF_IS_ENABLED && MAF_SRC_IS_ADC && ADC_IS_ENABLED
+		this->_mafSensorType = _mafdata.mafSensorType;
+	#elif defined MAF_IS_ENABLED && defined MAF_SRC_IS_PIN
+		this->_mafSensorType = _mafdata.mafSensorType + " on GPIO:" + MAF_PIN;
+	#else
+		this->_mafSensorType = translate.LANG_VAL_NOT_ENABLED;
+	#endif
+
+	// Baro Sensor
+	#if defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
+		this->startupBaroPressure = this->getPRefValue();
+		this->_baroSensorType = translate.LANG_VAL_START_REF_PRESSURE;
+	#elif defined BARO_SENSOR_TYPE_FIXED_VALUE
+		this->startupBaroPressure = DEFAULT_BARO_VALUE;
+		this->_baroSensorType = translate.LANG_VAL_FIXED_VALUE;
+		this->_baroSensorType += DEFAULT_BARO_VALUE;
+	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
+		this->_baroSensorType = "BME280";
+	#elif defined BARO_SENSOR_TYPE_MPX4115
+		this->_baroSensorType = "MPX4115";
+	#elif defined BARO_SENSOR_TYPE_LINEAR_ANALOG
+		this->_baroSensorType = "ANALOG PIN: " + REF_BARO_PIN;
+	#else 
+		this->_baroSensorType = translate.LANG_VAL_FIXED_VALUE + DEFAULT_BARO_VALUE;
+	#endif
+	
+	//Temp Sensor
+	#ifdef TEMP_SENSOR_NOT_USED
+		this->startupBaroPressure = this->getPRefValue();
+		this->_tempSensorType = translate.LANG_VAL_NOT_ENABLED;
+	#elif defined TEMP_SENSOR_TYPE_FIXED_VALUE
+		this->_tempSensorType = translate.LANG_VAL_FIXED_VALUE;
+		this->_tempSensorType += DEFAULT_TEMP_VALUE;
+	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
+		this->_tempSensorType = "BME280";
+	#elif defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
+		this->_tempSensorType = "Simple DHT11";
+	#elif defined TEMP_SENSOR_TYPE_LINEAR_ANALOG
+		this->_tempSensorType = "ANALOG PIN: " + TEMPERATURE_PIN;
+	#else 
+		this->_tempSensorType = translate.LANG_VAL_FIXED_VALUE + DEFAULT_TEMP_VALUE;
+	#endif
+	
+	// Rel Humidity Sensor
+	#ifdef RELH_SENSOR_NOT_USED
+		this->startupBaroPressure = this->getPRefValue();
+		this->_relhSensorType = translate.LANG_VAL_NOT_ENABLED;
+	#elif defined RELH_SENSOR_TYPE_FIXED_VALUE
+		this->_relhSensorType = translate.LANG_VAL_FIXED_VALUE;
+		this->_relhSensorType += DEFAULT_RELH_VALUE;
+	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
+		this->_relhSensorType = "BME280";
+	#elif defined RELH_SENSOR_TYPE_SIMPLE_TEMP_DHT11
+		this->_relhSensorType = "Simple DHT11";
+	#elif defined RELH_SENSOR_TYPE_LINEAR_ANALOG
+		this->_relhSensorType = "ANALOG PIN: " + HUMIDITY_PIN;
+	#else 
+		this->_relhSensorType = translate.LANG_VAL_FIXED_VALUE + DEFAULT_RELH_VALUE;
+	#endif
+
+	// reference pressure
+	#ifdef PREF_SENSOR_NOT_USED
+		this->_prefSensorType = translate.LANG_VAL_NOT_ENABLED;
+	#elif defined PREF_SENSOR_TYPE_MPXV7007 && defined ADS_IS_ENABLED
+		this->_prefSensorType = "SMPXV7007";
+	#elif defined PREF_SENSOR_TYPE_MPX4250 && defined ADS_IS_ENABLED
+		this->_prefSensorType = "MPX4250";
+	#elif defined PREF_SENSOR_TYPE_LINEAR_ANALOG
+		this->_prefSensorType = "ANALOG PIN: " + REF_PRESSURE_PIN;
+	#else 
+		this->_prefSensorType = translate.LANG_VAL_NOT_ENABLED;
+	#endif
+	
+	// differential pressure
+	#ifdef PDIFF_SENSOR_NOT_USED
+		this->_pdiffSensorType = translate.LANG_VAL_NOT_ENABLED;
+	#elif defined PPDIFF_SENSOR_TYPE_MPXV7007 && defined ADS_IS_ENABLED
+		this->_pdiffSensorType = "SMPXV7007";
+	#elif defined PDIFF_SENSOR_TYPE_LINEAR_ANALOG
+		this->_pdiffSensorType = "ANALOG PIN: " + DIFF_PRESSURE_PIN;
+	#else 
+		this->_pdiffSensorType = translate.LANG_VAL_NOT_ENABLED;
+	#endif
+	
+	// pitot pressure differential
+    #ifdef PITOT_SENSOR_NOT_USED
+		this->_pitotSensorType = translate.LANG_VAL_NOT_ENABLED;
+	#elif defined PITOT_SENSOR_TYPE_MPXV7007 && defined ADS_IS_ENABLED
+		this->_pitotSensorType = "SMPXV7007";
+	#elif defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
+		this->_pitotSensorType = "ANALOG PIN: " + PITOT_PIN;
+	#else 
+		this->_pitotSensorType = translate.LANG_VAL_NOT_ENABLED;
+	#endif
+	
 	// Set status values for GUI
-	status.mafSensor = _mafdata.mafSensorType;
+	status.mafSensor = this->_mafSensorType;
 	status.baroSensor = this->_baroSensorType;
 	status.tempSensor = this->_tempSensorType;
 	status.relhSensor = this->_relhSensorType;
 	status.prefSensor = this->_prefSensorType;
 	status.pdiffSensor = this->_pdiffSensorType;
 	status.pitotSensor = this->_pitotSensorType;
+
+	// END System status definitions
 
 }
 
@@ -250,7 +272,7 @@ void IRAM_ATTR Sensors::mafFreqCountISR() {
 /***********************************************************
  * Returns MAF signal in Millivolts
  ***/
-float Sensors::getMafMillivolts() {
+double Sensors::getMafMillivolts() {
 	
 	Hardware _hardware;
 	
@@ -282,12 +304,13 @@ float Sensors::getMafMillivolts() {
  *
  * MAF decode is done in Calculations.cpp
  ***/
-float Sensors::getMafValue() {
+double Sensors::getMafValue() {
 	
 	Hardware _hardware;
+	#ifdef MAF_IS_ENABLED
 	MafData _mafdata;
 	
-	float mafFlow = 0.0;
+	double mafFlow = 0.0;
 
 	switch (_mafdata.mafOutputType) {
 		
@@ -325,6 +348,10 @@ float Sensors::getMafValue() {
 	}	
 	
 	return mafFlow;
+
+	#endif
+
+	return 1; // MAF is disabled so lets return 1
 }
 
 
@@ -333,32 +360,31 @@ float Sensors::getMafValue() {
 /***********************************************************
  * Returns temperature in Deg C
  ***/
-float Sensors::getTempValue() {
+double Sensors::getTempValue() {
 	
 	Hardware _hardware;
 	Messages _message;
-	//BME280 _bme280;
-	BME280 _BMESensor;
 
-	float refTempDegC;
+
+	double refTempDegC;
 	
-	   // extern struct translator translate;
+	   // extern struct Translator translate;
 	
 	#ifdef TEMP_SENSOR_TYPE_LINEAR_ANALOG
 	
 		long rawTempValue = analogRead(TEMPERATURE_PIN);	
-		float tempMillivolts = (rawTempValue * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;	
+		double tempMillivolts = (rawTempValue * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;	
 		tempMillivolts += TEMP_MV_TRIMPOT;		
 		refTempDegC = tempMillivolts * TEMP_ANALOG_SCALE;
+		refTempDegC +=  TEMP_FINE_ADJUST;
 		
 	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
+
+		BME280 _BMESensor;
 		
 		//refTempDegC = _bme280.getTemperature();
-		
 		refTempDegC = _BMESensor.readTempC() / 100.00F;
-	
-// //REMOVE: DEBUG_PRINT	
-// _message.debugPrintf((char*)"refTempDegC - %f \n", refTempDegC);
+		refTempDegC +=  TEMP_FINE_ADJUST;
 
 	#elif defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
@@ -369,57 +395,65 @@ float Sensors::getTempValue() {
 		} else {
 		  refTempDegC = refTemp;
 		}	
+		refTempDegC +=  TEMP_FINE_ADJUST;
+
 	#else
 		// We don't have any temperature input so we will assume default
 		refTempDegC = DEFAULT_TEMP_VALUE;
 	#endif
 	
-	
-//REMOVE:
-_message.debugPrintf((char*)"TEMP =  %f /n", refTempDegC);
-	
-	return refTempDegC + TEMP_FINE_ADJUST;
+	return refTempDegC;
 }
 
 
 
 /***********************************************************
 * Returns Barometric pressure in kPa
-* NOTE: Should we use Hpa?
+* NOTE: Should we use hPa? (hPa is standard output of BME280)
 ***/
-float Sensors::getBaroValue() {
+double Sensors::getBaroValue() {
 	
 	Hardware _hardware;
-	// BME280 _bme280;
-	BME280 _BMESensor;
+
 		
 	#if defined BARO_SENSOR_TYPE_LINEAR_ANALOG
 		
 		long rawBaroValue = analogRead(REF_BARO_PIN);
-		float baroMillivolts = (rawBaroValue * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;
+		double baroMillivolts = (rawBaroValue * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;
 		baroMillivolts += BARO_MV_TRIMPOT;		
 		baroPressureKpa = baroMillivolts * BARO_ANALOG_SCALE;
+		baroPressureKpa += BARO_FINE_ADJUST;
 	
 	#elif defined BARO_SENSOR_TYPE_MPX4115
 		// Datasheet - https://html.alldatasheet.es/html-pdf/5178/MOTOROLA/MPX4115/258/1/MPX4115.html
 		// Vout = VS (P x 0.009 – 0.095) --- Where VS = Supply Voltage (Formula from Datasheet)
-		refPressureKPa = map(_hardware.getADCRawData(PREF_ADC_CHANNEL), 0, 4095, 15000, 115000);
+		baroPressureKpa = map(_hardware.getADCRawData(BARO_ADC_CHANNEL), 0, 4095, 15000, 115000);
+		baroPressureKpa += BARO_FINE_ADJUST;
 
 	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
+
+		BME280 _BMESensor;
 			
-		// baroPressureKpa = _bme280.getBaro() / 100.0F;
-		baroPressureHpa = _BMESensor.readFloatPressure() / 100.0F; // readFloatPressure = uint32_t
+		// baroPressureKpa = _bme280.getBaro() * 10.0F; 
+		baroPressureKpa = _BMESensor.readFloatPressure() * 10.0F; // Convert hPa to kPa
+		baroPressureKpa += BARO_FINE_ADJUST;
 		
 	#elif defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
 		// No baro sensor defined so use value grabbed at startup from reference pressure sensor
 		// NOTE will only work for absolute style pressure sensor like the MPX4250
 		baroPressureKpa = startupBaroPressure; 
+		baroPressureKpa += BARO_FINE_ADJUST;
 	#else
 		// we don't have any sensor so use default - // NOTE: standard sea level baro pressure is 14.7 psi
 		baroPressureKpa = DEFAULT_BARO_VALUE;
 	#endif
 
-	return baroPressureKpa = baroPressureHpa  + BARO_FINE_ADJUST;
+	// Truncate to 2 decimal places
+	// int value = baroPressureKpa * 100 + .5;
+    // return (double)value / 100;
+
+	return baroPressureKpa;
+
 }
 
 
@@ -430,17 +464,16 @@ float Sensors::getBaroValue() {
 double Sensors::getRelHValue() {
 	
 	Hardware _hardware;
-	// BME280 _bme280;
-	BME280 _BMESensor;
-	
-	  // extern struct translator translate;
+
+	  // extern struct Translator translate;
 		
 	#ifdef RELH_SENSOR_TYPE_LINEAR_ANALOG
 	
 		long rawRelhValue = analogRead(HUMIDITY_PIN);
-		float relhMillivolts = (rawRelhValue * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;
+		double relhMillivolts = (rawRelhValue * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;
 		relhMillivolts += RELH_MV_TRIMPOT;		
 		relativeHumidity = relhMillivolts * RELH_ANALOG_SCALE;
+		relativeHumidity += RELH_FINE_ADJUST;
 	
 	#elif defined RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
 	
@@ -452,11 +485,15 @@ double Sensors::getRelHValue() {
 		} else {
 		  relativeHumidity = refRelh;
 		}
+		relativeHumidity + RELH_FINE_ADJUST;
 
 	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
+
+		BME280 _BMESensor;
 	
 		// relativeHumidity = _bme280.getHumidity(); 
 		relativeHumidity = _BMESensor.readFloatHumidity() * 10;
+		relativeHumidity + RELH_FINE_ADJUST;
 		
 
 	#else
@@ -464,22 +501,16 @@ double Sensors::getRelHValue() {
 		relativeHumidity = DEFAULT_RELH_VALUE; // (36%)
 	
 	#endif
-	
-	// DEPRECATED: Sanity check value (masks error - not really good)
-	// if (relativeHumidity > 100.0) {
-	//   relativeHumidity = 100.0;  
-	// } else if (relativeHumidity < 0.0) {
-	//     relativeHumidity = 0.0;
-	// }
 
-	return  relativeHumidity + RELH_FINE_ADJUST;
+	return relativeHumidity;
+	
 }
 
 
 /***********************************************************
  * Returns altitude based on pressure difference from local sea level
  ***/
-float Sensors::getAltitude() {
+double Sensors::getAltitude() {
   // Equation taken from BMP180 datasheet (page 16):
   //  http://www.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
 
@@ -488,7 +519,7 @@ float Sensors::getAltitude() {
   //  http://forums.adafruit.com/viewtopic.php?f=22&t=58064
 
   //TODO: BREAK PRESSURE OUT TO CONFIG VALUE THAT CAN BE SET IN GUI
-  float atmospheric = getRelHValue() / 100.0F;
+  double atmospheric = getRelHValue() / 100.0F;
   return 44330.0 * (1.0 - pow(atmospheric / SEALEVELPRESSURE_HPA, 0.1903));
 }
 
@@ -498,7 +529,7 @@ float Sensors::getAltitude() {
  * getPRefMillivolts
  * Returns Reference pressure in Millivolts
  ***/
-float Sensors::getPRefMillivolts() {
+double Sensors::getPRefMillivolts() {
 
 	Hardware _hardware;
 
@@ -528,12 +559,12 @@ float Sensors::getPRefMillivolts() {
  * getPRefValue
  * Returns Reference pressure in kPa
  ***/
-float Sensors::getPRefValue() {
+double Sensors::getPRefValue() {
 
 	Hardware _hardware;
 	Messages _message;
 	
-	float refPressureKpa = 0.0;
+	double refPressureKpa = 0.0;
 	
 	#if defined PREF_SENSOR_TYPE_LINEAR_ANALOG
 		refPressureKpa = getPRefMillivolts() * PREF_ANALOG_SCALE;
@@ -555,6 +586,7 @@ float Sensors::getPRefValue() {
 	#endif
 	
 	return refPressureKpa;
+
 }
 
 
@@ -563,7 +595,7 @@ float Sensors::getPRefValue() {
 /***********************************************************
  * Returns Differential Pressure in Millivolts
  ***/
-float Sensors::getPDiffMillivolts() {
+double Sensors::getPDiffMillivolts() {
 	
 	Hardware _hardware;
 	
@@ -594,12 +626,12 @@ float Sensors::getPDiffMillivolts() {
 /***********************************************************
  * Returns Pressure differential in kPa
  ***/
-float Sensors::getPDiffValue() {
+double Sensors::getPDiffValue() {
 
 	Hardware _hardware;
 	Messages _message;
 
-	float diffPressureKpa = 0.0;
+	double diffPressureKpa = 0.0;
 	int diffPressMillivolts;
 	long diffPressRaw;	
 
@@ -613,7 +645,7 @@ float Sensors::getPDiffValue() {
 		return 1;
 	#endif
 	
-//_message.serialPrintf((char*)"%s \n", diffPressRaw);	
+//_message.serialPrintf("%s \n", diffPressRaw);	
 	
 	diffPressMillivolts += PDIFF_MV_TRIMPOT;
 
@@ -645,8 +677,9 @@ float Sensors::getPDiffValue() {
 		diffPressureKpa = DEFAULT_PDIFF_PRESS;
 
 	#endif
-	
+
 	return diffPressureKpa;
+
 }
 
 
@@ -655,7 +688,7 @@ float Sensors::getPDiffValue() {
 /***********************************************************
  * Returns Pitot Pressure in Millivolts
  ***/
-float Sensors::getPitotMillivolts() {
+double Sensors::getPitotMillivolts() {
 
 	Hardware _hardware;
 	
@@ -687,14 +720,14 @@ float Sensors::getPitotMillivolts() {
 /***********************************************************
  * Returns Pitot pressure differential in kPa
  ***/
-float Sensors::getPitotValue() {
+double Sensors::getPitotValue() {
 	
 	Hardware _hardware;
 
 
-	float pitotPressureKpa = 0.0;
+	double pitotPressureKpa = 0.0;
  	long pitotPressRaw;
-	float pitotMillivolts;
+	double pitotMillivolts;
 	
 	
 	#if defined PITOT_SRC_IS_ADC && defined ADC_IS_ENABLED
@@ -727,6 +760,7 @@ float Sensors::getPitotValue() {
 	#endif
 
 	return pitotPressureKpa;
+
 }
 
 
@@ -752,11 +786,11 @@ bool Sensors::BME280init() {
 	
 	// while ((retry++ < 5) && (chip_id != 0x60)) {
 	// 	chip_id = Sensors::BME280Read8(BME280_REG_CHIPID);
-	// 	_message.statusPrintf((char*)"BME280 Read chip ID: %s \n", chip_id);
+	// 	_message.statusPrintf("BME280 Read chip ID: %s \n", chip_id);
 	// 	delay(100);
 	// }
 	if (chip_id != 0x60){
-		_message.statusPrintf((char*)"BME280 Read Chip ID fail! \n");
+		_message.statusPrintf("BME280 Read Chip ID fail! \n");
 		return false;
 	}
 	
@@ -787,7 +821,7 @@ bool Sensors::BME280init() {
 	return true;
 }
 
-float Sensors::BME280GetTemperature(void) {
+double Sensors::BME280GetTemperature(void) {
 	int32_t var1, var2;
 
 	int32_t adc_T = BME280Read24(BME280_REG_TEMPDATA);
@@ -799,12 +833,12 @@ float Sensors::BME280GetTemperature(void) {
 	var1 = (((adc_T >> 3) - ((int32_t)(dig_T1 << 1))) *	((int32_t)dig_T2)) >> 11;
 	var2 = (((((adc_T >> 4) - ((int32_t)dig_T1)) * ((adc_T >> 4) - ((int32_t)dig_T1))) >> 12) * ((int32_t)dig_T3)) >> 14;
 	t_fine = var1 + var2;
-	float T = (t_fine * 5 + 128) >> 8;
+	double T = (t_fine * 5 + 128) >> 8;
 	return T / 100;
 }
 
 
-float Sensors::BME280getBaro(void) {
+double Sensors::BME280getBaro(void) {
   int64_t var1, var2, p;
   // Call getTemperature to get t_fine
   BME280GetTemperature();
@@ -828,10 +862,10 @@ float Sensors::BME280getBaro(void) {
   var1 = (((int64_t)dig_P9) * (p >> 13) * (p >> 13)) >> 25;
   var2 = (((int64_t)dig_P8) * p) >> 19;
   p = ((p + var1 + var2) >> 8) + (((int64_t)dig_P7) << 4);
-  return (float)(p / 256.0);
+  return (double)(p / 256.0);
 }
 
-float Sensors::BME280GetHumidity(void) {
+double Sensors::BME280GetHumidity(void) {
   int32_t v_x1_u32r, adc_H;
   // Call getTemperature to get t_fine	
   BME280GetTemperature();
@@ -846,7 +880,7 @@ float Sensors::BME280GetHumidity(void) {
   v_x1_u32r = (v_x1_u32r < 0 ? 0 : v_x1_u32r);
   v_x1_u32r = (v_x1_u32r > 419430400 ? 419430400 : v_x1_u32r);
   v_x1_u32r = v_x1_u32r >> 12;
-  float h = v_x1_u32r / 1024.0;
+  double h = v_x1_u32r / 1024.0;
   return h;
 }
 
@@ -923,7 +957,7 @@ uint32_t Sensors::BME280Read24(uint8_t reg) {
 	// } else if (isTransport_OK == false) {
 	// 	isTransport_OK = true;
 	// 	if (!BME280init()) {
-	// 		_message.statusPrintf((char*)"BME280 device not connected or broken! \n");
+	// 		_message.statusPrintf("BME280 device not connected or broken! \n");
 	// 	}
 	// }
 	data = Wire.read();

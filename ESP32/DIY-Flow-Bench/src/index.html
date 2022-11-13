@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<HEAD>
-      <title>DIY Flow Bench</title>
+      <title>DIY Flow Bench %TEMPLATE_TEST%</title>
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel="stylesheet" type="text/css" href="style.css">
 	</HEAD>
@@ -30,15 +30,24 @@
       <div class="modal-content">
         <span class="closeStatusModal">&times;</span>
         <h3>System Status</h3>
-          <div class="config-row"><label class="config-label">Version: </label><span class="config-value" id="RELEASE">Loading...</span></div>
+        <h4>Firmware</h4>
+        <div class="config-row"><label class="config-label">Version: </label><span class="config-value" id="RELEASE">Loading...</span></div>
           <div class="config-row"><label class="config-label">Build:  </label><span class="config-value" id="BUILD_NUMBER">Loading...</span></div>
+          <h4>Storage</h4>
           <hr>
           <div class="config-row"><label class="config-label">Memory Size:  </label><span class="config-value" id="SPIFFS_MEM_SIZE">Loading...</span> (bytes)</div>
           <div class="config-row"><label class="config-label">Memory Used:  </label><span class="config-value" id="SPIFFS_MEM_USED">Loading...</span> (bytes)</div>
+          <h4>Network</h4>
+          <hr>
           <div class="config-row"><label class="config-label">IP Address:  </label><span class="config-value" id="LOCAL_IP_ADDRESS">Loading...</span></div>
           <!-- <div class="config-row"><label class="config-label">Uptime:  </label><span class="config-value" id="UPTIME">Loading...</span></div> -->
-          <!-- <div class="config-row"><label class="config-label">Board Type:  </label><span class="config-value" id="BOARDTYPE">Loading...</span></div> -->
+          <h4>Hardware Configuration</h4>
+          <hr>
+          <div class="config-row"><label class="config-label">Bench Type:  </label><span class="config-value" id="BENCHTYPE">Loading...</span></div>
+          <div class="config-row"><label class="config-label">Board Type:  </label><span class="config-value" id="BOARDTYPE">Loading...</span></div>
           <!-- <div class="config-row"><label class="config-label">Boot Time:  </label><span class="config-value" id="BOOT_TIME">Loading...</span></div> -->
+          <h4>Sensor Configuration</h4>
+          <hr>
           <div class="config-row"><label class="config-label">MAF Data File:  </label><span class="config-value" id="MAF_SENSOR">Loading...</span></div>
           <div class="config-row"><label class="config-label">Ref Press Sensor:  </label><span class="config-value" id="PREF_SENSOR">Loading...</span></div>
           <div class="config-row"><label class="config-label">Temp Sensor:  </label><span class="config-value" id="TEMP_SENSOR">Loading...</span></div>
@@ -85,7 +94,7 @@
           <div class="tile tile-baro">
             <p class="tile-title">Baro Pressure</p>
             <p><span class="tile-value" id="BARO">&nbsp;</span></p>
-            <p class="units">hPa</p>
+            <p class="units">millibar (hPa)</p>
           </div>
           <div class="tile tile-relh">
             <p class="tile-title">Humidity</p>

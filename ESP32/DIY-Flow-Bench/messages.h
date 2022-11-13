@@ -30,7 +30,7 @@ class Messages {
 	public:
 		Messages();
 		
-		void Handler(const std::string langPhrase);
+		void Handler(const String langPhrase);
 		void begin(void);
 		void beginSerial(void);
 

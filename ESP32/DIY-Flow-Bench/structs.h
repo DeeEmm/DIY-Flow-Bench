@@ -37,9 +37,9 @@ struct ConfigSettings {
   int min_bench_pressure = 0;                     // Min bench pressure where bench is considered running
   int maf_min_millivolts = 100;                   // Filter out results less than this
   int refresh_rate = 200;                         // Screen refresh rate in milliseconds (>180)
-  float cal_ref_press = 10;                       // Calibration orifice refe pressure
-  float cal_flow_rate = 14.4;                     // Calibration orifica flow rate
-  float cal_offset = 0;                           // Calibration offset
+  double cal_ref_press = 10;                       // Calibration orifice refe pressure
+  double cal_flow_rate = 14.4;                     // Calibration orifica flow rate
+  double cal_offset = 0;                           // Calibration offset
   int cyc_av_buffer = 3;                          // [5] Scan # over which to average output (helps smooth results)
   int leak_test_tolerance = 2;                    // Leak test tolerance
   int leak_test_threshold = 10;                   // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
@@ -65,8 +65,8 @@ struct ConfigSettings {
  * Calibration Settings
  ***/
 struct CalibrationSettings { 
-  float flow_offset = 0.0;         
-  float leak_cal_val = 0.0;  
+  double flow_offset = 0.0;         
+  double leak_cal_val = 0.0;  
 };
 
 
@@ -80,6 +80,7 @@ struct DeviceStatus {
   int spiffs_mem_used = 0;
   String local_ip_address;
   String boardType;
+  String benchType;
   String mafSensor;
   String prefSensor;
   String pdiffSensor;
@@ -94,7 +95,7 @@ struct DeviceStatus {
   long wsCLeanPollTimer = 0;
   int pollTimer = 0;
   int serialData = 0;
-  std::string statusMessage = BOOT_MESSAGE;
+  String statusMessage = BOOT_MESSAGE;
   bool apMode = false;
 };
 
@@ -114,7 +115,7 @@ struct WebsocketData {
  * File upload data
  ***/
 struct FileUploadData {
-  char* file_name;
+  String file_name;
   bool upload_error = false;
   int file_size = 0;
 };
@@ -126,15 +127,15 @@ struct FileUploadData {
  * Sensor data
  ***/
 struct SensorData {
-  float MAF;
-  float MafMv;
-  float TempDegC;
+  double MAF;
+  double MafMv;
+  double TempDegC;
   double RelH;
-  float BaroKPA;
-  float PRefKPA;
-  float PRefMv;
-  float PDiffKPA;
-  float PDiffMv;
-  float PitotKPA;
-  float PitotMv;
+  double BaroKPA;
+  double PRefKPA;
+  double PRefMv;
+  double PDiffKPA;
+  double PDiffMv;
+  double PitotKPA;
+  double PitotMv;
 };

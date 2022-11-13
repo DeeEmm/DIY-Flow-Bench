@@ -33,10 +33,10 @@ class API {
 		String getConfigJSON();
 
 		bool streamMafData;
-		char* crcValue;	
 	
 	public:
 		API();
 		void ParseMessage(char apiMessage);
+		uint32_t CRC;	
 	
 };

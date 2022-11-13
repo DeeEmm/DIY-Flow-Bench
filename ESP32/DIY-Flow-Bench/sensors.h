@@ -26,21 +26,21 @@ class Sensors {
 
 	private:
 		int _unit;
-		char* _mafSensorType;
 		int _mafOutputType;
 		int _mafDataUnit;
-		float refPressMillivolts;
-		float pDiffMillivolts;
-		float pitotMillivolts;
-		float mafMillivolts;
+		double refPressMillivolts;
+		double pDiffMillivolts;
+		double pitotMillivolts;
+		double mafMillivolts;
 
 		
-		char* _tempSensorType;
-		char* _baroSensorType;
-		char* _relhSensorType;
-		char* _prefSensorType;
-		char* _pdiffSensorType;
-		char* _pitotSensorType;    
+		String _mafSensorType;
+		String _tempSensorType;
+		String _baroSensorType;
+		String _relhSensorType;
+		String _prefSensorType;
+		String _pdiffSensorType;
+		String _pitotSensorType;    
 		
 		// Temperature coefficients
 		uint16_t dig_T1;
@@ -76,8 +76,8 @@ class Sensors {
 		double var_H;
 
 		// ADC
-		float adc_min;
-		float adc_fsd;
+		double adc_min;
+		double adc_fsd;
 
 		// BME280 
 		
@@ -90,9 +90,6 @@ class Sensors {
 		int16_t BME280ReadS16LE(uint8_t reg);
 		uint32_t BME280Read24(uint8_t reg);
 		void writeRegister(uint8_t reg, uint8_t val);
-		float BME280GetTemperature(void);
-		// float BME280GetPressure(void);
-		float BME280GetHumidity(void);
 		void BME280WriteRegister(uint8_t reg, uint8_t val);
 		
 		//unsigned int data[8];
@@ -105,31 +102,34 @@ class Sensors {
 		void initialise();
 		void getBME280RawData();
 		int convertADCtoMillivolts(int rawVal);
-		float getMafValue();
-		float getMafMillivolts();
-		float getTempValue();
-		float getBaroValue();
+		double BME280GetTemperature(void);
+		// double BME280GetPressure(void);
+		double BME280GetHumidity(void);
+		double getMafValue();
+		double getMafMillivolts();
+		double getTempValue();
+		double getBaroValue();
 		double getRelHValue();
-		float getAltitude();
-		float getPRefMillivolts();
-		float getPRefValue();
-		float getPDiffMillivolts();
-		float getPDiffValue();
-		float getPitotMillivolts();
-		float getPitotValue();
+		double getAltitude();
+		double getPRefMillivolts();
+		double getPRefValue();
+		double getPDiffMillivolts();
+		double getPDiffValue();
+		double getPitotMillivolts();
+		double getPitotValue();
 		
 		void mafFreqCountISR();
 		void mafSetupISR(uint8_t irq_pin, void (*ISR_callback)(void), int value);
 		
-		float startupBaroPressure;
+		double startupBaroPressure;
 		volatile uint64_t StartValue;                 
 		volatile uint64_t PeriodCount; 
 		hw_timer_t * timer;         
 		bool isTransport_OK;          
-		// float refTempDegC;
-		float baroPressureKpa;
-		uint32_t baroPressureHpa;
-		float baroPressurePa;
-		float relativeHumidity;
+		// double refTempDegC;
+		double baroPressureKpa;
+		double baroPressureHpa;
+		double baroPressurePa;
+		double relativeHumidity;
   
 };

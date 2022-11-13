@@ -56,9 +56,9 @@ void Settings::parseConfigData(StaticJsonDocument<1024> configData) {
 //  config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
   config.leak_test_tolerance = configData["CONF_LEAK_TEST_TOLERANCE"].as<int>();
   config.leak_test_threshold = configData["CONF_LEAK_TEST_THRESHOLD"].as<int>();
-  config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<float>();
-  config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<float>();
-//  config.cal_offset = configData["CONF_CAL_OFFSET"].as<float>();
+  config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
+  config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
+//  config.cal_offset = configData["CONF_CAL_OFFSET"].as<double>();
 
 }
 
@@ -75,7 +75,7 @@ StaticJsonDocument<1024> Settings::LoadConfig () {
   Webserver _webserver;
   Messages _message;
   
-  _message.serialPrintf((char*)"Loading Configuration... \n"); 
+  _message.serialPrintf("Loading Configuration... \n"); 
   
   StaticJsonDocument<1024> configData;
   configData = _webserver.loadJSONFile("/config.json");
@@ -101,7 +101,7 @@ void Settings::createConfigFile () {
   String jsonString;  
   StaticJsonDocument<1024> configData;
 
-  _message.serialPrintf((char*)"Creating config.json file... \n"); 
+  _message.serialPrintf("Creating config.json file... \n"); 
  
   configData["PAGE_TITLE"] = config.pageTitle;
   configData["CONF_WIFI_SSID"] = config.wifi_ssid;
@@ -138,7 +138,7 @@ void Settings::saveConfig (StaticJsonDocument<1024> configData) {
   Messages _message;
   Webserver _webserver;
   
-  extern struct translator translate;
+  extern struct Translator translate;
   
   String jsonString;
   
@@ -148,9 +148,9 @@ void Settings::saveConfig (StaticJsonDocument<1024> configData) {
   configData.remove("HEADER");
   
   _message.Handler(translate.LANG_VAL_SAVING_CONFIG);
-  _message.statusPrintf((char*)"Configuration Data: \n");
+  _message.statusPrintf("Configuration Data: \n");
   serializeJson(configData, Serial);
-  _message.statusPrintf((char*)"Saved to /config.json \n");
+  _message.statusPrintf("Saved to /config.json \n");
   
   serializeJsonPretty(configData, jsonString);
   _webserver.writeJSONFile(jsonString, "/config.json");

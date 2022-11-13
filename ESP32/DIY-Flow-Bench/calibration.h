@@ -28,9 +28,9 @@ class Calibration {
 	public:
 		Calibration();
 		bool setFlowOffset();
-		float getFlowOffset();
+		double getFlowOffset();
 		bool setLeakTestPressure();
-		float getLeakTestPressure();
+		double getLeakTestPressure();
 		void createCalibrationFile();
 		void saveCalibration();
 		StaticJsonDocument<1024> loadCalibration();

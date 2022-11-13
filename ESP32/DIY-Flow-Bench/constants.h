@@ -58,6 +58,7 @@
 #define  RANKINE 6
 #define  PERCENT 7
 #define  BAR 8
+#define  HPA 9
 
 
 

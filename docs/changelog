@@ -4,7 +4,7 @@ Current build status
 
 Project compiles and runs but will crash when accessing I2C 
 
-I2C dev work is not finished
+I2C dev work is not finished (BME + I2C disabled for testing)
 
 
 ===================================================================
@@ -16,14 +16,10 @@ Currently trying to determine where the issue originates from. Also possibly rel
 
 Have implemented I2C class to bring BME and 1115 code into singular control and try and prevent data collisions.
 Next stage is to try and modify websocket code to better manage interrupt by controlling sensor / webserver tasks with semaphore.
+
 Also a possibility of replacing websocket control with 'Event Source' method in ESPAsyncWebServer and regular Navigation to aliminate interrupt
 
-Code refactor has created memory issue with move to char* arrays. Have changed out char* references to std::string but still more work to do there
-
 Temp commented sensor calls from main loop and API now much faster. Need to figure out a way to better manage task handover
-
-Just noticed that fixed Baro data is displaying incorrect value. Not sure why?!??
-
 
 
 ===================================================================
@@ -36,6 +32,18 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+13112201        - Reverted char arrays back to strings
+                - Fixed CRC32 checksum for API responses
+                - Fixed ability to completely disable BME280 / ADC1115 / MAF
+                - Fixed Device Status in WebUI
+                - Fixed Sensor values displaying in webUI
+                - Updated Status pane layout in UI
+                - Fixed Baro value
+                - Changed Baro display value to millibar (hPa)
+                - Truncated sensor values to 2 decimal places
+                - Addressed rounding errors by changing floats to doubles
+                - Disabled index.html.gz for event source / template tests
+                - Using minified html instead
 12112201        - Redacted SPI calls from within external libraries to allow VSCode debugging
                 - Moved MAFData into MAFData class to help better manage memory
                 - Refactored message calls from char* to std::string

@@ -99,14 +99,37 @@ void Hardware::configurePins () {
 void Hardware::begin () {
 
   Messages _message;
+
+  extern struct DeviceStatus status;
   
-  _message.serialPrintf((char*)"Initialising Hardware \n");
+  _message.serialPrintf("Initialising Hardware \n");
   
   configurePins();
   
   this->getI2CList(); // TODO: move into status dialog instead of printing to serial monitor
   
-  _message.serialPrintf((char*)"Hardware Initialised \n");
+  _message.serialPrintf("Hardware Initialised \n");
+
+
+  // Bench definitions for system status pane
+  #if defined MAF_STYLE_BENCH
+    status.benchType = "MAF Style";
+  #elif defined ORIFICE_STYLE_BENCH
+    status.benchType = "Orifice Style";
+  #elif defined PITOT_STYLE_BENCH
+    status.benchType = "Pitot Style";
+  #elif defined VENTURI_STYLE_BENCH
+    status.benchType = "Venturi Style";
+  #endif
+
+  // Board definitions for system status pane
+  #if defined DIYFB_SHIELD                    
+    status.boardType = "DIYFB Shield";
+  #elif defined ESP32DUINO
+    status.boardType = "ESP32DUINO";
+  #elif defined ESP32_WROVER_KIT 
+    status.boardType = "ESP32_WROVER_KIT";
+  #endif
   
 }
 
@@ -123,7 +146,7 @@ void Hardware::getI2CList() {
 
   Wire.begin (SCA_PIN, SCL_PIN); 
 
-  _message.serialPrintf((char*)"Scanning for I2C devices...\n");
+  _message.serialPrintf("Scanning for I2C devices...\n");
   byte count = 0;
 
   Wire.begin();
@@ -131,12 +154,12 @@ void Hardware::getI2CList() {
   for (byte i = 8; i < 120; i++)   {
     Wire.beginTransmission (i);          
     if (Wire.endTransmission () == 0)  {  
-      _message.serialPrintf((char*)"Found address: %u (0x%X)\n", i, i);
+      _message.serialPrintf("Found address: %u (0x%X)\n", i, i);
       count++;
     }
   }
   
-  _message.serialPrintf((char*)"Found %u device(s). \n", count);
+  _message.serialPrintf("Found %u device(s). \n", count);
 
 }
 
@@ -259,11 +282,11 @@ int16_t Hardware::getADCRawData(int channel) {
 /***********************************************************
  * Get ADC millivolts
  ***/
- float Hardware::getADCMillivolts(int channel) {
+ double Hardware::getADCMillivolts(int channel) {
 
   int16_t rawVal;
-  float millivolts;
-  float microvolts;
+  double millivolts;
+  double microvolts;
   
   rawVal = getADCRawData(channel);
   
@@ -294,12 +317,12 @@ int16_t Hardware::getADCRawData(int channel) {
 *
 * NOTE: ESP32 has 12 bit ADC (0-3300mv = 0-4095)
 ***/
-float Hardware::get3v3SupplyMillivolts() {   
+double Hardware::get3v3SupplyMillivolts() {   
 
   return 3300; //REMOVE: DEBUG: temp test !!!
 
   // long rawVoltageValue = analogRead(VCC_3V3_PIN);  
-  // float vcc3v3SupplyMillivolts = (rawVoltageValue * 0.805860805860806) ;
+  // double vcc3v3SupplyMillivolts = (rawVoltageValue * 0.805860805860806) ;
   // return vcc3v3SupplyMillivolts + VCC_3V3_TRIMPOT;
 }
 
@@ -313,12 +336,12 @@ float Hardware::get3v3SupplyMillivolts() {
 *
 * NOTE: ESP32 has 12 bit ADC (0-3300mv = 0-4095)
 ***/
-float Hardware::get5vSupplyMillivolts() {   
+double Hardware::get5vSupplyMillivolts() {   
 
   return 5000; //REMOVE: DEBUG: temp test !!!
 
   // long rawVoltageValue = analogRead(VCC_5V_PIN);  
-  // float vcc5vSupplyMillivolts = (2 * rawVoltageValue * 0.805860805860806) ;
+  // double vcc5vSupplyMillivolts = (2 * rawVoltageValue * 0.805860805860806) ;
   // return vcc5vSupplyMillivolts + VCC_5V_TRIMPOT;
 }
 
@@ -334,12 +357,12 @@ bool Hardware::benchIsRunning() {
   Sensors _sensors;
   
   extern struct ConfigSettings config;
-  extern struct translator translate;
+  extern struct Translator translate;
   
   // TODO: Check scope of these...
-  float refPressure = _calculations.convertPressure(_sensors.getPRefValue(), INWG);
+  double refPressure = _calculations.convertPressure(_sensors.getPRefValue(), INWG);
   
-  float mafFlowRateCFM = _calculations.calculateFlowCFM();
+  double mafFlowRateCFM = _calculations.calculateFlowCFM();
 
   if ((refPressure > config.min_bench_pressure) && (mafFlowRateCFM > config.min_flow_rate))
   {
@@ -363,9 +386,9 @@ void Hardware::checkRefPressure() {
   Sensors _sensors;
   
   extern struct ConfigSettings config;
-  extern struct translator translate;
+  extern struct Translator translate;
   
-  float refPressure = _calculations.convertPressure(_sensors.getPRefValue(), INWG);
+  double refPressure = _calculations.convertPressure(_sensors.getPRefValue(), INWG);
     
   // Check that pressure does not fall below limit set by MIN_TEST_PRESSURE_PERCENTAGE when bench is running
   // note alarm commented out in alarm function as 'nag' can get quite annoying

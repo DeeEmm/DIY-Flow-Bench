@@ -25,24 +25,24 @@ class Calculations {
 	friend class mafData;
 	
 	private:
-		float MOLECULAR_WEIGHT_DRY_AIR;
+		double MOLECULAR_WEIGHT_DRY_AIR;
 		bool streamMafData = false;
 		
 		// int _mafDataUnit;
 
 	public:
 		Calculations();
-		float convertFlowDepression(float oldPressure, float newPressure, float inputFlow);
-		float convertPressure(float baroPressureKpa, int units);
-		float convertTemperature(float refTempDegC, int units);
-		float convertRelativeHumidity(double relativeHumidity, int units);
+		double convertFlowDepression(double oldPressure, double newPressure, double inputFlow);
+		double convertPressure(double baroPressureKpa, int units);
+		double convertTemperature(double refTempDegC, int units);
+		double convertRelativeHumidity(double relativeHumidity, int units);
 
-		float calculateVaporPressure(int units);
-		float calculateSpecificGravity();
-		float convertMassFlowToVolumetric(float massFlowKgh);
-		float calculateFlowCFM();
+		double calculateVaporPressure(int units);
+		double calculateSpecificGravity();
+		double convertMassFlowToVolumetric(double massFlowKgh);
+		double calculateFlowCFM();
 
-		float startupBaroPressure;
+		double startupBaroPressure;
 
 		// long _mafLookupTable[][2];
 

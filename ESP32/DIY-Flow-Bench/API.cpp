@@ -17,7 +17,7 @@
  ***/
 
 #include "API.h"
-
+#include <esp32/rom/crc.h>
 #include "constants.h"
 #include "structs.h"
 #include "configuration.h"
@@ -39,22 +39,15 @@ API::API() {
 
 
 /***********************************************************
- * CREATE CHECKSUM
+ * CREATE CRC32 CHECKSUM
  *
- * Source: https://forum.arduino.cc/index.php?topic=311293.msg2158081#msg2158081
- * Usage: myVar = calcCRC(str);
+ * Source: https://techoverflow.net/2022/08/05/how-to-compute-crc32-with-ethernet-polynomial-0x04c11db7-on-esp32-crc-h/
  *
  ***/
 uint16_t API::calcCRC (char* str) {
-  
-  // Initialise CRC
-  uint16_t CRC = 0; 
-  
-  // Traverse each character in the string
-  for (int i=0;i<strlen(str);i++) {
-      // TODO: update the CRC value using the built in CRC32 function
-//        CRC= _crc16_update (CRC, str[i]);  // NOTE: OLD CRC16 Library!!
-  }
+
+  CRC = (~crc32_le((uint32_t)~(0xffffffff), (const uint8_t*)str, 8))^0xffffffFF;
+
   return CRC;
 }
 
@@ -172,8 +165,8 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "5%s%f", config.api_delim , _hardware.get5vSupplyMillivolts());
       break;
       
-      case 'B': // Get measured Baro Pressure 'B.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "B%s%f", config.api_delim , _calculations.convertPressure(_sensors.getBaroValue(), KPA));
+      case 'B': // Get measured Baro Pressure in hPa'B.123.45\r\n'
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "B%s%f", config.api_delim , _calculations.convertPressure(_sensors.getBaroValue(), HPA));
       break;
 
       case 'C': // Current configuration in JSON
@@ -194,16 +187,16 @@ void API::ParseMessage(char apiMessage) {
 
       case 'E': // Enum - Flow:Ref:Temp:Humidity:Baro
           // // Flow
-          // apiResponse = (char*)("E") + config.api_delim ;        
+          // apiResponse = ("E") + config.api_delim ;        
           // // Truncate to 2 decimal places
           // flowCFM = _calculations.calculateFlowCFM() * 100;
-          // apiResponse += (flowCFM / 100) + (char*)(config.api_delim);
+          // apiResponse += (flowCFM / 100) + (config.api_delim);
           // // Reference Pressure
-          // apiResponse += _calculations.convertPressure(_sensors.getPRefValue(), KPA) + (char*)(config.api_delim);
+          // apiResponse += _calculations.convertPressure(_sensors.getPRefValue(), KPA) + (config.api_delim);
           // // Temperature
-          // apiResponse += _calculations.convertTemperature(_sensors.getTempValue(), DEGC) + (char*)(config.api_delim);
+          // apiResponse += _calculations.convertTemperature(_sensors.getTempValue(), DEGC) + (config.api_delim);
           // // Humidity
-          // apiResponse += _calculations.convertRelativeHumidity(_sensors.getRelHValue(), PERCENT) + (char*)(config.api_delim);
+          // apiResponse += _calculations.convertRelativeHumidity(_sensors.getRelHValue(), PERCENT) + (config.api_delim);
           // // Barometric Pressure
           // apiResponse += _calculations.convertPressure(_sensors.getBaroValue(), KPA);
           
@@ -237,12 +230,12 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'L': // Perform Leak Test Calibration 'L\r\n'
-          // TODO: apiResponse = (char*)("L") + config.api_delim + leakTestCalibration();
+          // TODO: apiResponse = ("L") + config.api_delim + leakTestCalibration();
           // TODO: confirm Leak Test Calibration success in response
       break;
       
       case 'l': // Perform Leak Test 'l\r\n'      
-          // TODO: apiResponse = (char*)("l") + config.api_delim + leakTest();
+          // TODO: apiResponse = ("l") + config.api_delim + leakTest();
           // TODO: confirm Leak Test success in response
       break;
       
@@ -291,7 +284,7 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 't': // Get measured Temperature in Fahrenheit 'F.123.45\r\n'
-          float TdegF;
+          double TdegF;
           TdegF = _calculations.convertTemperature(_sensors.getTempValue(), DEGF);
           snprintf(apiResponse, API_RESPONSE_LENGTH, "t%s%f", config.api_delim , TdegF);
       break;      

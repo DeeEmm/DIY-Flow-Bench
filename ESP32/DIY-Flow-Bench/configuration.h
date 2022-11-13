@@ -17,7 +17,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "12112201"
+#define BUILD_NUMBER "13112201"
 #define RELEASE "V.2.0-RC.3"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -40,6 +40,7 @@
 *
 * Default DIYFB_SHIELD 
 * NOTE: ESP32_WROVER_KIT can be used for debug workflows in VSCode / PlatformIO
+* NOTE: If defining new board make sure to add board type definition to Hardware::begin
 ***/
 
 //#define DIYFB_SHIELD                    
@@ -150,7 +151,9 @@
 
 const int BME280_I2C_ADDR = 0x76;                           
 //const int BME280_I2C_ADDR = 0x77;       
-#define BME_SCAN_DELAY_MS 10       
+#define BME_SCAN_DELAY_MS 1000                                  // Does not need to be fast!!       
+
+
 
 
 /***********************************************************

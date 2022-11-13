@@ -26,7 +26,7 @@
 #include "messages.h"
 #include MAF_DATA_FILE
 
-const float MOLECULAR_WEIGHT_DRY_AIR = 28.964;
+const double MOLECULAR_WEIGHT_DRY_AIR = 28.964;
 
 Calculations::Calculations() {
 }
@@ -36,18 +36,22 @@ Calculations::Calculations() {
 
 
 /***********************************************************
-   CONVERT PRESSURE
- ***/
-float Calculations::convertPressure(float pressureKpa, int units) {
+* CONVERT PRESSURE
+*
+* Accepts input in kPa returns converted pressure 
+* Units - HPA / BAR / PSIA / INWG
+*
+***/
+double Calculations::convertPressure(double pressureKpa, int units) {
 
   Sensors _sensors;
 
-  float refPressureInWg;
+  double refPressureInWg;
 
   switch (units)
   {
-    case KPA:
-      return pressureKpa;
+    case HPA:
+      return pressureKpa * 0.1;
       break;
 
     case BAR:
@@ -79,12 +83,12 @@ float Calculations::convertPressure(float pressureKpa, int units) {
 /***********************************************************
    CONVERT TEMPERATURE
  ***/
-float Calculations::convertTemperature(float refTempDegC, int units) {
+double Calculations::convertTemperature(double refTempDegC, int units) {
 
   Sensors _sensors;
 
-  float refTempDegF;
-  float refTempRankine;
+  double refTempDegF;
+  double refTempRankine;
 
   switch (units) 	{
 
@@ -113,7 +117,7 @@ float Calculations::convertTemperature(float refTempDegC, int units) {
 /***********************************************************
    CONVERT RELATIVE HUMIDITY %
  ***/
-float Calculations::convertRelativeHumidity(double relativeHumidity, int units) {
+double Calculations::convertRelativeHumidity(double relativeHumidity, int units) {
 
   Sensors _sensors;
 
@@ -139,13 +143,13 @@ float Calculations::convertRelativeHumidity(double relativeHumidity, int units) 
 /***********************************************************
    CALCULATE VAPOUR PRESSURE
  ***/
-float Calculations::calculateVaporPressure(int units) {
+double Calculations::calculateVaporPressure(int units) {
 
   Sensors _sensors;
 
-  float airTemp;
-  float vapourPressureKpa;
-  float vapourPressurePsia;
+  double airTemp;
+  double vapourPressureKpa;
+  double vapourPressurePsia;
 
   airTemp = this->convertTemperature(_sensors.getTempValue(), DEGC);
   vapourPressureKpa = (0.61078 * exp((17.27 * airTemp) / (airTemp + 237.3))); // Tetans Equation
@@ -172,14 +176,14 @@ float Calculations::calculateVaporPressure(int units) {
 /***********************************************************
    CALCULATE SPECIFIC GRAVITY
  ***/
-float Calculations::calculateSpecificGravity() {
+double Calculations::calculateSpecificGravity() {
   
   Sensors _sensors;
 
-  float specificGravity;
-  float relativeHumidity = this->convertRelativeHumidity(_sensors.getRelHValue(), DECI);
-  float vaporPressurePsia = this->calculateVaporPressure(PSIA);
-  float baroPressurePsia = this->convertPressure(_sensors.getBaroValue(), PSIA);
+  double specificGravity;
+  double relativeHumidity = this->convertRelativeHumidity(_sensors.getRelHValue(), DECI);
+  double vaporPressurePsia = this->calculateVaporPressure(PSIA);
+  double baroPressurePsia = this->convertPressure(_sensors.getBaroValue(), PSIA);
 
   specificGravity = (1 - (0.378 * relativeHumidity * vaporPressurePsia) / baroPressurePsia);
 
@@ -196,18 +200,18 @@ float Calculations::calculateSpecificGravity() {
    Calculated using ideal gas law:
    https://www.pdblowers.com/tech-talk/volume-and-mass-flow-calculations-for-gases/
  ***/
-float Calculations::convertMassFlowToVolumetric(float massFlowKgh) {
+double Calculations::convertMassFlowToVolumetric(double massFlowKgh) {
   
   Sensors _sensors;
 
-  float mafFlowCFM;
-  float gasPressure;
-  float tempInRankine = this->convertTemperature(_sensors.getTempValue(), RANKINE); //tested ok
-  float specificGravity = this->calculateSpecificGravity(); //tested ok
-  float molecularWeight = MOLECULAR_WEIGHT_DRY_AIR * specificGravity; //tested ok
-  float baroPressure = this->convertPressure(_sensors.getBaroValue(), PSIA);
-  float refPressure = this->convertPressure(_sensors.getPRefValue(), PSIA);
-  float massFlowLbm = massFlowKgh * 0.03674371036415;
+  double mafFlowCFM;
+  double gasPressure;
+  double tempInRankine = this->convertTemperature(_sensors.getTempValue(), RANKINE); //tested ok
+  double specificGravity = this->calculateSpecificGravity(); //tested ok
+  double molecularWeight = MOLECULAR_WEIGHT_DRY_AIR * specificGravity; //tested ok
+  double baroPressure = this->convertPressure(_sensors.getBaroValue(), PSIA);
+  double refPressure = this->convertPressure(_sensors.getPRefValue(), PSIA);
+  double massFlowLbm = massFlowKgh * 0.03674371036415;
 
   gasPressure = baroPressure + refPressure; // TODO: need to validate refPressure (should be a negative number)
 
@@ -226,7 +230,7 @@ float Calculations::convertMassFlowToVolumetric(float massFlowKgh) {
   Supported bench types - MAF / Orifice / Pitot
    
  ***/
-float Calculations::calculateFlowCFM() {
+double Calculations::calculateFlowCFM() {
 
   extern CalibrationSettings calibration;
   
@@ -235,8 +239,8 @@ float Calculations::calculateFlowCFM() {
   Messages _message;
   MafData _mafdata;
 
-  float flowRateCFM = 0;
-  float flowRateKGH = 0;
+  double flowRateCFM = 0;
+  double flowRateKGH = 0;
   double flowRateRAW = 0;
 
 
@@ -253,7 +257,7 @@ float Calculations::calculateFlowCFM() {
 
   //Check MAF data is valid
   if (_mafdata.mafLookupTable == nullptr) {
-    _message.serialPrintf((char*)"Invalid MAF Data  \n");
+    _message.serialPrintf("Invalid MAF Data  \n");
   }
 
   //Set size of array
@@ -288,13 +292,13 @@ float Calculations::calculateFlowCFM() {
   if (_mafdata.mafDataUnit == KG_H) {
 
     // convert RAW datavalue back into kg/h
-    flowRateKGH = float(flowRateRAW / 1000);
+    flowRateKGH = double(flowRateRAW / 1000);
 
   } else if (_mafdata.mafDataUnit == MG_S) {
 
     //  convert mg/s value into kg/h
     // flowRateKGH = float(flowRateRAW * 0.0036); // TEST  : is divide by float an issue????
-    flowRateKGH = float(flowRateRAW / 277.8);
+    flowRateKGH = double(flowRateRAW / 277.8);
   }
 
   // Now we need to convert from kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
@@ -359,11 +363,11 @@ float Calculations::calculateFlowCFM() {
   // Send data to the serial port if requested.
   if (streamMafData == true) {   
     if (_mafdata.mafDataUnit == KG_H) {
-      _message.serialPrintf((char*)"%s (raw) = kg/h = %c \n", lookupValue, dtostrf((flowRateRAW / 1000), 7, 2, _message.floatBuffer));
+      _message.serialPrintf("%s (raw) = kg/h = %c \n", lookupValue, dtostrf((flowRateRAW / 1000), 7, 2, _message.floatBuffer));
     } else if (_mafdata.mafDataUnit == MG_S) {
-      _message.serialPrintf((char*)"%s (raw) = mg/s = %d \n", lookupValue, dtostrf((flowRateRAW / 1000), 7, 2, _message.floatBuffer));
+      _message.serialPrintf("%s (raw) = mg/s = %d \n", lookupValue, dtostrf((flowRateRAW / 1000), 7, 2, _message.floatBuffer));
     }
-    _message.serialPrintf((char*)"%s (raw) = cfm = %d \n", lookupValue,dtostrf((flowRateCFM / 1000), 7, 2, _message.floatBuffer));
+    _message.serialPrintf("%s (raw) = cfm = %d \n", lookupValue,dtostrf((flowRateCFM / 1000), 7, 2, _message.floatBuffer));
   }
 
   return flowRateCFM;
@@ -385,10 +389,10 @@ float Calculations::calculateFlowCFM() {
   Source: http://www.flowspeed.com/cfm-numbers.htm
 */
 
-float Calculations::convertFlowDepression(float oldPressure, float newPressure, float inputFlow) {
+double Calculations::convertFlowDepression(double oldPressure, double newPressure, double inputFlow) {
 
-  //float outputFlow;
-  //float pressureRatio = (newPressure / oldPressure);
+  //double outputFlow;
+  //double pressureRatio = (newPressure / oldPressure);
   //outputFlow = (sqrt(pressureRatio) * inputFlow);
 
   //return outputFlow;

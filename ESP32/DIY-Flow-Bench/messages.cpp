@@ -96,7 +96,7 @@ void Messages::beginSerial(void) {
 * NOTE: Language strings are defined in the current language file i.e. /language/XX_Language.h
 * TODO: Store last message received for later recall
 */
-void Messages::Handler(const std::string langPhrase) {
+void Messages::Handler(const String langPhrase) {
 
 	extern struct DeviceStatus status;
 
@@ -125,7 +125,7 @@ void Messages::Handler(const std::string langPhrase) {
 * https://en.wikipedia.org/wiki/Printf_format_string
 *
 * Example using d2str to convert float to char (double to string)
-* _message.serialPrintf((char*)"kg/h = %c", dtostrf((flowRateRAW / 1000), 7, 2, _message.floatBuffer)); 
+* _message.serialPrintf("kg/h = %c", dtostrf((flowRateRAW / 1000), 7, 2, _message.floatBuffer)); 
 */
 size_t Messages::serialPrintf(const std::string format, ...) {
 	
