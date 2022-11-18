@@ -32,30 +32,20 @@
 *
 *
 ****/
-
 #include <Arduino.h>
 #include "freertos/semphr.h"
-#include <WiFi.h>
-#include <Wire.h>
-#include <ESPmDNS.h>
-#include <AsyncTCP.h>
-#include <ESPAsyncWebServer.h>
-#include <SPIFFS.h>
+
 #include "constants.h"
 #include "configuration.h"
 #include "structs.h"
-#include "settings.h"
-#include <I2Cdev.h>
+
 #include "hardware.h"
 #include "sensors.h"
 #include "calculations.h"
 #include "webserver.h"
 #include "messages.h"
 #include "API.h"
-#define ARDUINOJSON_ENABLE_STD_STRING 1 // allow support for std::string
-#include <ArduinoJson.h>
 
-// #include MAF_DATA_FILE
 #include LANGUAGE_FILE
 
 // Initiate Structs
@@ -69,7 +59,6 @@ SensorData sensorVal;
 Translator translate;
 
 // Initiate Classes
-Settings _settings;
 Hardware _hardware;
 Webserver _webserver;
 Calculations _calculations;
@@ -77,10 +66,7 @@ Sensors _sensors;
 Messages _message;
 API _api;
 
-// AsyncWebServer server(80);
-// AsyncWebSocket ws("/ws");
-// AsyncEventSource events("/events");
-
+// Set up semaphore signalling between tasks
 SemaphoreHandle_t xSemaphore = NULL;
 TaskHandle_t hardwareTaskHandle = NULL;
 TaskHandle_t webserverTaskHandle = NULL;
@@ -324,6 +310,12 @@ void loop () {
     sensorVal.RelH = (double)value / 100;
 
   }
+
+    // events.send(String(temperature).c_str(),"temperature",millis());
+    // events.send(String(humidity).c_str(),"humidity",millis());
+    // events.send(String(pressure).c_str(),"pressure",millis());
+
+
 
   // Process API comms
   if (config.api_enabled) {        

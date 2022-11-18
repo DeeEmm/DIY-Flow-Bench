@@ -20,7 +20,7 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include <ESPAsyncWebServer.h>
+#include <ESPAsyncWebserver.h>
 #include <ArduinoJson.h>
 #include <SPIFFS.h>
 
@@ -51,9 +51,10 @@ class Webserver {
 		String byteDecode(size_t bytes);
 		void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
+		static void saveConfig(AsyncWebServerRequest *request);
 		void onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
 		int decodeMessageHeader (char *data);
-		String processTemplate(const String& var);
+		static String processTemplate(const String& var);
 		
 		// void Handler(String languageString);
 
@@ -82,5 +83,10 @@ class Webserver {
 		String getDataJSON();
 		StaticJsonDocument<1024> loadJSONFile(String filename);
 		void sendWebSocketMessage(String jsonValues);
+		void parseConfigData(StaticJsonDocument<1024> configData);
+		StaticJsonDocument<1024> loadConfig ();
+		void createConfigFile ();
+
+		
 
 };

@@ -1,5 +1,6 @@
 var gulp = require('gulp'); 
 var cssnano = require('gulp-cssnano'); 
+// var minifyCSS = require('gulp-minify-css');
 var terser = require('gulp-terser');
 const htmlmin = require('gulp-htmlmin');
 var replace = require('gulp-replace');
@@ -11,8 +12,9 @@ fs = require('fs');
 gulp.task('css', function(done){    
 	return gulp.src('esp32/DIY-Flow-Bench/src/style.css')       
 		.pipe(cssnano())       
+		// .pipe(minifyCSS())
 		.pipe(gulp.dest('esp32/DIY-Flow-Bench/build'))
-		done();; 
+		done(); 
 });	
 
 gulp.task('js', function(done){    
@@ -49,11 +51,10 @@ gulp.task('compress', function(done) {
 });
 	
 
-
 gulp.task('html', function() {
 	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
 	 	.pipe(removeHtmlComments())
-		.pipe(replace(/<link rel="stylesheet" type="text\/css" href="style.css"[^>]*>/, function(s) {
+		.pipe(replace(/<link rel="stylesheet" type="text\/css" href="\/style.css"[^>]*>/, function(s) {
 			 var style = fs.readFileSync('esp32/DIY-Flow-Bench/build/style.css', 'utf8');
 			 return '<style>\n' + style + '\n</style>';
 		   }))

@@ -1,5 +1,22 @@
-// Constants
-// websocket message encoding - we need to send intVal to ESP32 Select(Case) 
+/***********************************************************
+* javascript.js
+*
+* Browser control code for DIY-Flow-bench project
+* Handles data transmission and display update tasks
+* Provides UI control to browser
+*
+* TODO: look at implimenting browser based file downloading for data recording...
+* https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
+*
+***/
+
+
+
+
+/***********************************************************
+* Constants
+* Websocket message encoding - we need to send intVal to ESP32 Select(Case) 
+***/
 const GET_FLOW_DATA = 1;
 const REC_FLOW_DATA = 2;
 const CALIBRATE = 3;
@@ -25,9 +42,9 @@ var websocket;
 window.addEventListener('load', onLoad);
 
 var fileModal = document.getElementById("fileModal");
-var statusModal = document.getElementById("statusModal");
+var aboutModal = document.getElementById("aboutModal");
 var spanCloseFileModal = document.getElementsByClassName("closeFileModal")[0];
-var spanCloseStatusModal = document.getElementsByClassName("closeStatusModal")[0];
+var spanCloseAboutModal = document.getElementsByClassName("closeAboutModal")[0];
 
 /***********************************************************
 * Initialise Web Socket connection
@@ -241,9 +258,9 @@ function initialiseButtons() {
     socketMessageSend(FILE_LIST);
     document.getElementById('fileModal').style.display='block';
   });
-  document.getElementById('status-button').addEventListener('click', function(){
+  document.getElementById('about-button').addEventListener('click', function(){
     socketMessageSend(SYS_STATUS);
-    document.getElementById('statusModal').style.display='block';
+    document.getElementById('aboutModal').style.display='block';
   });
   document.getElementById('on-button').addEventListener('click', function(){socketMessageSend(START_BENCH);});
   document.getElementById('off-button').addEventListener('click', function(){socketMessageSend(STOP_BENCH);});
@@ -387,11 +404,11 @@ spanCloseFileModal.onclick = function() {
 }
 
 /***********************************************************
-* Close modal status dialog
+* Close modal about dialog
 ***/
-spanCloseStatusModal.onclick = function() {
+spanCloseAboutModal.onclick = function() {
   
-  statusModal.style.display = "none";
+  aboutModal.style.display = "none";
   
 }
 
@@ -401,9 +418,9 @@ spanCloseStatusModal.onclick = function() {
 ***/
 window.onclick = function(event) {
   
-  if (event.target == fileModal || event.target == statusModal ) {
+  if (event.target == fileModal || event.target == aboutModal ) {
     fileModal.style.display = "none";
-    statusModal.style.display = "none";
+    aboutModal.style.display = "none";
   }
   
 }
@@ -414,6 +431,6 @@ window.onclick = function(event) {
 document.addEventListener("keydown", ({key}) => {
   if (key === "Escape") {
     fileModal.style.display = "none";
-    statusModal.style.display = "none";
+    aboutModal.style.display = "none";
   }
 })

@@ -26,6 +26,11 @@
 
 
 /***********************************************************
+ * General
+ ***/
+#define ARDUINOJSON_ENABLE_STD_STRING 1 // allow support for std::string
+
+/***********************************************************
  * Websocket Header Schema
  ***/
 #define GET_FLOW_DATA 1

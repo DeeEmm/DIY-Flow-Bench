@@ -16,14 +16,16 @@
  * 
  ***/
 
-#include <Wire.h>
 #include <Arduino.h>
-#include "hardware.h"
-#include "sensors.h"
+
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
 #include "pins.h"
+
+#include <Wire.h>
+#include "hardware.h"
+#include "sensors.h"
 #include "calculations.h"
 #include "messages.h"
 #include LANGUAGE_FILE

@@ -16,12 +16,13 @@
  * 
  ***/
 
-#include "calibration.h"
-#include <SPIFFS.h>
-#include <ArduinoJson.h>
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
+
+#include "calibration.h"
+#include <SPIFFS.h>
+#include <ArduinoJson.h>
 #include "sensors.h"
 #include "calculations.h"
 #include "messages.h"

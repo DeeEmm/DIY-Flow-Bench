@@ -11,7 +11,7 @@ struct Translator {
     String LANG_VAL_NULL = "NULL";
     String LANG_VAL_NO_ERROR = "Status OK";
     String LANG_VAL_BENCH_RUNNING = "Bench Pressure OK";
-    String LANG_VAL_WEBSERVER_RUNNING = "Webserver Running";
+    String LANG_VAL_SERVER_RUNNING = "Webserver Running";
     String LANG_VAL_WARNING = "Warning!";
     String LANG_VAL_FLOW_LIMIT_EXCEEDED = "Warning! Flow Limit Error";
     String LANG_VAL_REF_PRESS_LOW = "Warning! Low Reference Pressure";

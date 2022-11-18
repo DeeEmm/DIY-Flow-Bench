@@ -39,13 +39,15 @@
  
  */
  
-#include <Wire.h>
 #include <Arduino.h>
-#include "messages.h"
-#include "constants.h"
-#include "pins.h"
+
 #include "configuration.h"
+#include "constants.h"
 #include "structs.h"
+#include "pins.h"
+
+#include <Wire.h>
+#include "messages.h"
 #include LANGUAGE_FILE
 
 

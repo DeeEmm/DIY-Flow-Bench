@@ -20,10 +20,12 @@
 ***/
 
 #include "Arduino.h"
+
 #include "configuration.h"
 #include "constants.h"
 #include "pins.h"
 #include "structs.h"
+
 #include <Wire.h>
 #include "hardware.h"
 #include "sensors.h"

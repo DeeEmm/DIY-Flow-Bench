@@ -11,6 +11,13 @@ I2C dev work is not finished (BME + I2C disabled for testing)
 Current work in progress
 ===================================================================
 
+- implimenting templates to propogate status details on page load
+- use Async Event Source Plugin to stream data to browser without need for websocket
+- modify server request handlers to take API commands via URL ... /api/control/on etc
+- modify server request handler to accept form data to update config settings
+
+- also need to determine max read rate for sensor and ADR polling
+
 I2C / BME is not returning stable data - it looks like it's the I2C code - possibly result of clash between BME280 and AD1115 code.
 Currently trying to determine where the issue originates from. Also possibly related to websocket interrupt
 
@@ -21,6 +28,11 @@ Also a possibility of replacing websocket control with 'Event Source' method in 
 
 Temp commented sensor calls from main loop and API now much faster. Need to figure out a way to better manage task handover
 
+===================================================================
+Items to sort before formal release
+===================================================================
+
+- Update mafData files
 
 ===================================================================
 !! Don't forget to update the build number in configuration.h !!
@@ -32,6 +44,12 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+18112201        - Changed config form to use POST vars instead of websockets
+                - Moved settings class methods into webserver class
+                - Rewrote WebUI file handler to use POST vars instead of websockets
+15112201        - Added template processing using custom template_placeholders
+                - Added headers to javascript.js
+                - Added URL rewrite rule for / & /index.html
 13112201        - Reverted char arrays back to strings
                 - Fixed CRC32 checksum for API responses
                 - Fixed ability to completely disable BME280 / ADC1115 / MAF

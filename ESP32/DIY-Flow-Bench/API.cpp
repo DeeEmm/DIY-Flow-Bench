@@ -16,11 +16,12 @@
  * 
  ***/
 
-#include "API.h"
-#include <esp32/rom/crc.h>
 #include "constants.h"
 #include "structs.h"
 #include "configuration.h"
+
+#include "API.h"
+#include <esp32/rom/crc.h>
 #include "pins.h"
 #include "hardware.h"
 #include "sensors.h"

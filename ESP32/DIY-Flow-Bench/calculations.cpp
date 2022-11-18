@@ -17,11 +17,13 @@
  ***/
 
 #include <Arduino.h>
-#include "calculations.h"
+
 #include "constants.h"
-#include "pins.h"
-#include "sensors.h"
 #include "structs.h"
+#include "pins.h"
+
+#include "calculations.h"
+#include "sensors.h"
 #include "hardware.h"
 #include "messages.h"
 #include MAF_DATA_FILE
