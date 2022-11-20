@@ -145,7 +145,23 @@ function initialiseButtons() {
     console.log('Leak Test Calibration');
   });
 
+  document.getElementById('restart-button').addEventListener('click', function(){
+    console.log('System Reboot');
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/reboot');
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+          window.location.href = '/';
+      } else {
+          alert('Reboot failed');
+      }
+  };
+  xhr.send();
+  });
+
 }
+
+
 
 
 /***********************************************************

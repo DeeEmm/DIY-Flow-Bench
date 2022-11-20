@@ -187,8 +187,10 @@ void Webserver::begin()
 
   server->on("/api/reboot", HTTP_GET, [](AsyncWebServerRequest *request)
              {
-      request->send(200, "text/html", "<meta http-equiv=\"refresh\" content=\"5; URL='/index.html'\" /><p>Rebooting in 5 seconds...</p>");
-      ESP.restart(); });
+//      request->send(200, "text/html", "<meta http-equiv=\"refresh\" content=\"5; URL='/index.html'\" /><p>Rebooting in 5 seconds...</p>");
+      request->send(200, "text/html", "{\"reboot\":\"now\"}");
+      ESP.restart(); 
+      request->redirect("/"); });
 
 
 
