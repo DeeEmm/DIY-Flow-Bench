@@ -32,6 +32,10 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 Build #         - Description of Change
 
 20112202        - Browser reboot function improvements
+                - Removed unused constants
+                - Removed deprecated code from webserver class
+                - Added status messages to GUI
+                - Moved default HTML into const
 20112201        - Removed Settings class along with settings.cpp & settings.h
                 - Converted BME Sensor update to use Server Sent Events (SSE)
                 - Converted ADC Sensor update to use Server Sent Events (SSE)

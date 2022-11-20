@@ -1,11 +1,12 @@
-/* 
+/***********************************************************
 * DIY-Flow-Bench style.css
 * 
 * NOTE: use of % sizing in this document will break the browser output. This is because of bug #1234 in ESPAsyncWebserver library.
 * The fix is easy - change #define TEMPLATE_PLACEHOLDER '%' in WebResponseImpl.h and %TEMPLATE_PLACEHOLDERS% to use '$' instead.
 * Unfortunately TEMPLATE_PLACEHOLDER is not exposed as a class method and so the change requires the core hack described above
 * We do not want to have to maintain a custom ESPAsyncWebserver library so have rewritten our CSS to avoid using % sizing
-* This way our project will function with the vanilla ESPAsyncWebserver library.
+* This way our project will function with the vanilla ESPAsyncWebserver library but also means it will break if % chars are 
+* present in the output. [BTW - comments are stripped out during minification so the % chars above are not an issue]
 * 
 * TODO: Look at implimenting flex / flex-wrap - https://polypane.app/blog/4-css-layouts-without-using-media-queries/
 ***/
@@ -198,6 +199,21 @@ hr {
 /***
 * Buttons
 */
+
+.control-button {
+  display: inline-block;
+  background-color: #008CBA;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  padding: 12px 12px;
+  text-decoration: none;
+  font-size: 22px;
+  margin: 2px;
+  cursor: pointer;
+  width: 150px;
+  height: 70px;
+}
 
 .button {
   display: inline-block;

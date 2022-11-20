@@ -17,7 +17,7 @@
         <hr>
         <br>
         <div class="float-right">
-          <form method="POST" action="/upload" enctype="multipart/form-data">
+          <form method="POST" action="/api/file/upload" enctype="multipart/form-data">
             <label for="data" class="file-upload-button button">Select File</label>
             <input id="data" type="file" name="wtf"/>
             <input class="button file-submit-button" type="submit" value="Upload"/>
@@ -110,7 +110,7 @@
         </div>  
       </div>          
       <div class="align-center">
-        <div class="status_message"><span id="STATUS_MESSAGE">&nbsp;</span></div>                        
+        <div class="status_message"><span id="STATUS_MESSAGE">%STATUS_MESSAGE%</span></div>                        
         <div class="hidden_div">
           <br>Ref Pressure mV: <span id="PREF_MV">&nbsp;</span>
           <br>MAF mV: <span id="MAF_MV">&nbsp;</span>
@@ -121,8 +121,9 @@
           <button id="datalog-button" class="button">Datalog</button>
           <button id="record-button" class="button">Record</button>
         -->
-          <button id="on-button" class="button">START</button>
-          <button id="off-button" class="button">STOP</button>
+          <button id="on-button" class="control-button">START BENCH</button>
+          <button id="off-button" class="control-button">STOP BENCH</button>
+          <button id="clear-message-button" class="control-button">CLEAR MESSAGE</button>
         
         </p>
         
@@ -235,13 +236,11 @@
     
 
     <!-- configuration tab -->
-
-    
     <div id="configuration" class="tabcontent tabcontentConfig">
       <div class="config-panel">
         <p style="text-align:center"><button id="file-manager-button" class="button">Files</button> <button id="info-button" class="button">Info</button> <button id="support-button" class="button" onclick="window.open('https://github.com/DeeEmm/DIY-Flow-Bench/wiki','_blank')">Support</button> <button id="restart-button" class="button" >Reboot</button></p>       
         <br>
-        <form method="POST" action="/saveconfig">
+        <form method="POST" action="/api/saveconfig">
           <h3>WiFi Info</h3>        
           <div class="config-row tooltip"><label class="config-label">WiFi SSID:</label>&nbsp;<input type="text" id="CONF_WIFI_SSID"  name="CONF_WIFI_SSID" value="%CONF_WIFI_SSID%" class="config-text" ><span class="tooltiptext">The name of your WiFi network</span></div>
           <div class="config-row tooltip"><label class="config-label">WiFi Password:</label>&nbsp;<input type="text" id="CONF_WIFI_PSWD" name="CONF_WIFI_PSWD" value="%CONF_WIFI_PSWD%" class="config-text"><span class="tooltiptext">Your WiFi Password</span></div>

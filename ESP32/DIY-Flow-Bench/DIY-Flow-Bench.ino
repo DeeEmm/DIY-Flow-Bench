@@ -325,9 +325,13 @@ void loop () {
     sensorVal.RelH = (double)sensorINT / 100;
     _webserver.events->send(String(sensorVal.RelH).c_str(),"RELH",millis());
 
-
   }
 
+  // Status Update
+  if (millis() > status.statusUpdateRate) {
+    status.statusUpdateRate = millis() + STATUS_UPDATE_RATE; 
+    _webserver.events->send(String(status.statusMessage).c_str(),"STATUS_MESSAGE",millis());
+  }
 
 
   // Process API comms

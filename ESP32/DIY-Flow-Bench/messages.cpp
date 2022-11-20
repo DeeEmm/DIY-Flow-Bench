@@ -96,7 +96,7 @@ void Messages::beginSerial(void) {
 *   _message.Handler(translate.LANG_VAL_SAVING_CONFIG);
 *
 * NOTE: Language strings are defined in the current language file i.e. /language/XX_Language.h
-* TODO: Store last message received for later recall
+* TODO: Store last message received for later recall / Store several message that are displayed on rotation
 */
 void Messages::Handler(const String langPhrase) {
 

@@ -30,25 +30,6 @@
  ***/
 #define ARDUINOJSON_ENABLE_STD_STRING 1 // allow support for std::string
 
-/***********************************************************
- * Websocket Header Schema
- ***/
-#define GET_FLOW_DATA 1
-#define REC_FLOW_DATA 2
-#define CALIBRATE 3
-#define FILE_LIST 4
-#define SYS_STATUS 5
-#define SAVE_CONFIG 6 
-#define LOAD_CONFIG 7
-#define FILE_DOWNLOAD 8
-#define FILE_DELETE 9
-#define FILE_UPLOAD 10
-#define START_BENCH 11
-#define STOP_BENCH 12
-#define LEAK_CAL 13
-#define GET_CAL 14 
-#define RESTART 15
-
 
 /***********************************************************
  * Standard Units

@@ -366,7 +366,7 @@ bool Hardware::benchIsRunning() {
   
   double mafFlowRateCFM = _calculations.calculateFlowCFM();
 
-  if ((refPressure > config.min_bench_pressure) && (mafFlowRateCFM > config.min_flow_rate))
+  if ((refPressure > config.min_bench_pressure))
   {
 	  _message.Handler(translate.LANG_VAL_BENCH_RUNNING);
 	  return true;

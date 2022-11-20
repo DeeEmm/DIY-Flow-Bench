@@ -49,9 +49,11 @@ bool Calibration::setFlowOffset() {
 
   extern struct CalibrationSettings calibration;
   extern struct ConfigSettings config;
+  extern struct Translator translate;
   
   Sensors _sensors; 
   Calculations _calculations;
+  Messages _message;
   
   // Get the current flow value
   // TODO: need to determine what flow sensors are active (MAF / Orifice / Pitot)
@@ -70,6 +72,8 @@ bool Calibration::setFlowOffset() {
   
   // TODO: Save cal.json
   saveCalibration();    
+
+  _message.Handler(translate.LANG_VAL_CAL_OFFET_VALUE + flowCalibrationOffset);
   
   return true;
   
@@ -102,10 +106,15 @@ double Calibration::getFlowOffset() {
 bool Calibration::setLeakTestPressure() {
   
   extern struct CalibrationSettings calibration;
+  extern struct Translator translate;
+
   Calculations _calculations;
   Sensors _sensors;
+  Messages _message;
   
   calibration.leak_cal_val = _calculations.convertPressure(_sensors.getPRefValue(), INWG);  
+
+  _message.Handler(translate.LANG_VAL_LEAK_CAL_VALUE + calibration.leak_cal_val);
 
   return true;
 }

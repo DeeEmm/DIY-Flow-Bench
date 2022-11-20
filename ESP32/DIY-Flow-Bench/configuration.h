@@ -93,7 +93,7 @@
 //#define API_CHECKSUM_IS_ENABLED                           // Add checksum to serial API response TODO: UPDATE CHECKSUM TO NATIVE ESP32 CRC32
 #define MAX_SEMAPHORE_DELAY 1000                          // Define max value rather than just use portMAX_DELAY
 #define WEBSOCK_CLEAN_FREQ 600000
-
+#define STATUS_UPDATE_RATE 100
 
 
 

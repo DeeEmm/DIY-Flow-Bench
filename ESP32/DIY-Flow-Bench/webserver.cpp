@@ -68,9 +68,6 @@ void Webserver::begin()
   // webskt = new AsyncWebSocket("/ws");
   events = new AsyncEventSource("/events");
 
-  // TODO: Test Accesspoint is working
-  String index_html = translate.LANG_VAL_INDEX_HTML;
-
   Messages _message;
   Calibration _calibration;
 
@@ -141,103 +138,159 @@ void Webserver::begin()
   }
 
   // API request handlers [JSON confirmation response]
-  server->on("/api/bench/on", HTTP_POST, [](AsyncWebServerRequest *request)
-             {
+  server->on("/api/bench/on", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Hardware _hardware;
+      _message.Handler(translate.LANG_VAL_BENCH_RUNNING);
       _message.debugPrintf("Bench On \n");
       _hardware.benchOn(); 
-      request->send(200, "text/html", "{\"bench\":\"on\"}"); });
+      // request->send(200, "text/html", "{\"bench\":\"on\"}"); 
+      });
 
-  server->on("/api/bench/off", HTTP_POST, [](AsyncWebServerRequest *request)
-             {
+  server->on("/api/bench/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Hardware _hardware;
+      _message.Handler(translate.LANG_VAL_BENCH_STOPPED);
       _message.debugPrintf("Bench Off \n");
       _hardware.benchOff(); 
-      request->send(200, "text/html", "{\"bench\":\"off\"}"); });
+      // request->send(200, "text/html", "{\"bench\":\"off\"}"); 
+      });
 
-  server->on("/api/debug/on", HTTP_POST, [](AsyncWebServerRequest *request)
-             {
+  server->on("/api/debug/on", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
+      _message.Handler(translate.LANG_VAL_DEBUG_MODE);
       _message.debugPrintf("Debug Mode On\n");
       config.debug_mode = true;
       request->send(200, "text/html", "{\"debug\":\"on\"}"); });
 
-  server->on("/api/debug/off", HTTP_POST, [](AsyncWebServerRequest *request)
-             {
+  server->on("/api/debug/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
+      _message.Handler(translate.LANG_VAL_BLANK);
       _message.debugPrintf("Debug Mode Off\n");
       config.debug_mode = false;
       request->send(200, "text/html", "{\"debug\":\"off\"}"); });
 
-  server->on("/api/dev/on", HTTP_POST, [](AsyncWebServerRequest *request)
-             {
+  server->on("/api/dev/on", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
+      _message.Handler(translate.LANG_VAL_DEV_MODE);
       _message.debugPrintf("Developer Mode On\n");
       config.dev_mode = true;
       request->send(200, "text/html", "{\"dev\":\"on\"}"); });
 
-  server->on("/api/dev/off", HTTP_POST, [](AsyncWebServerRequest *request)
-             {
+  server->on("/api/dev/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
+      _message.Handler(translate.LANG_VAL_BLANK);
       _message.debugPrintf("Developer Mode Off\n");
       config.dev_mode = false;
       request->send(200, "text/html", "{\"dev\":\"off\"}"); });
 
-  server->on("/api/reboot", HTTP_GET, [](AsyncWebServerRequest *request)
-             {
-//      request->send(200, "text/html", "<meta http-equiv=\"refresh\" content=\"5; URL='/index.html'\" /><p>Rebooting in 5 seconds...</p>");
-      request->send(200, "text/html", "{\"reboot\":\"now\"}");
+  server->on("/api/clear-message", HTTP_GET, [](AsyncWebServerRequest *request) {
+      Messages _message;
+      status.statusMessage = "";
+      _message.Handler(translate.LANG_VAL_NO_ERROR);
+      _message.debugPrintf("Clearing messages...\n");
+       });
+
+  server->on("/api/bench/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
+      Messages _message;
+      _message.Handler(translate.LANG_VAL_SYSTEM_REBOOTING);
+      request->send(200, "text/html", "{\"reboot\":\"true\"}");
       ESP.restart(); 
       request->redirect("/"); });
 
+  server->on("/api/bench/calibrate", HTTP_GET, [](AsyncWebServerRequest *request){
+      Messages _message;
+      Calibration _calibrate;
+      Hardware _hardware;
+      if (_hardware.benchIsRunning()) {
+        _message.Handler(translate.LANG_VAL_CALIBRATING);
+        _message.debugPrintf("Calibrating Flow...\n");
+        request->send(200, "text/html", "{\"calibrate\":\"true\"}");
+        _calibrate.setFlowOffset();         
+      } else {
+        _message.Handler(translate.LANG_VAL_RUN_BENCH_TO_CALIBRATE);
+        request->send(200, "text/html", "{\"calibrate\":\"false\"}");
+      }  
+      request->redirect("/");});
+
+  server->on("/api/bench/leakcal", HTTP_GET, [](AsyncWebServerRequest *request){
+      Messages _message;
+      Calibration _calibrate;
+      Hardware _hardware;
+      if (_hardware.benchIsRunning()) {
+        _message.Handler(translate.LANG_VAL_LEAK_CALIBRATING);
+        _message.debugPrintf("Calibrating Leak Test...\n");
+        request->send(200, "text/html", "{\"leakcal\":\"true\"}");
+        _calibrate.setLeakTestPressure();
+      } else {
+        _message.Handler(translate.LANG_VAL_RUN_BENCH_TO_CALIBRATE);
+        request->send(200, "text/html", "{\"leakcal\":\"false\"}");
+      } 
+      request->redirect("/"); });
 
 
   // Upload request handler
-  server->on("/upload", HTTP_POST, [](AsyncWebServerRequest *request)
-      {
+  server->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
       Messages _message;
       _message.serialPrintf("Upload Request Called \n");
       request->redirect("/?view=upload"); },
       processUpload);
 
-  // Save Configuration Form
-  server->on("/saveconfig", HTTP_POST, saveConfig);
+  // Upload request handler
+  server->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
+      Messages _message;
+      _message.serialPrintf("Upload Request Called \n");
+      request->redirect("/?view=upload"); },
+      processUpload);
 
   // Download request handler
-  server->on("/download", HTTP_GET, [](AsyncWebServerRequest *request)
-             {              
-          Messages _message;
-          String downloadFilename = request->url();
-          downloadFilename.remove(0,9);
-          _message.serialPrintf("Request Delete File: %s \n", downloadFilename);
-          request->send(SPIFFS, downloadFilename, String(), true); });
+  server->on("/api/file/download", HTTP_GET, [](AsyncWebServerRequest *request){              
+      Messages _message;
+      String downloadFilename = request->url();
+      downloadFilename.remove(0,9);
+      _message.debugPrintf("Request Download File: %s \n", downloadFilename);
+      request->send(SPIFFS, downloadFilename, String(), true); });
+
+  // Delete request handler
+  server->on("/api/file/delete", HTTP_POST, [](AsyncWebServerRequest *request){              
+      Messages _message;
+      String fileToDelete;
+      AsyncWebParameter *p = request->getParam("filename", true);
+      fileToDelete = p->value();      
+      // Don't delete index.html (you can overwrite it!!)
+      // if (fileToDelete != "/index.html"){
+        if(SPIFFS.exists(fileToDelete)){
+          SPIFFS.remove(fileToDelete);
+        }  else {
+          _message.debugPrintf("Delete Failed: %s", fileToDelete);  
+          _message.Handler(translate.LANG_VAL_DELETE_FAILED);    
+        } 
+        if (fileToDelete == "/index.html"){
+          request->redirect("/");
+        } else {
+          request->redirect("/?view=upload");
+        }
+      
+       });
+
+  // Save Configuration Form
+  server->on("/api/saveconfig", HTTP_POST, saveConfig);
 
   server->rewrite("/index.html", "/");
 
   // Style sheet request handler
-  server->on("/style.css", HTTP_ANY, [](AsyncWebServerRequest *request)
-             { request->send(SPIFFS, "/style.css", "text/css"); });
+  server->on("/style.css", HTTP_ANY, [](AsyncWebServerRequest *request){ request->send(SPIFFS, "/style.css", "text/css"); });
 
   // Javascript file request handler
-  server->on("/javascript.js", HTTP_ANY, [](AsyncWebServerRequest *request)
-             { request->send(SPIFFS, "/javascript.js", "text/javascript"); });
+  server->on("/javascript.js", HTTP_ANY, [](AsyncWebServerRequest *request){ request->send(SPIFFS, "/javascript.js", "text/javascript"); });
              
   // Index page request handler
-  server->on("/", HTTP_ANY, [index_html](AsyncWebServerRequest *request)
-             {
-      // NOTE: GZipped response disabled to allow local template parsing
-      // if (SPIFFS.exists("/index.html.gz")){
-      //   AsyncWebServerResponse *response = request->beginResponse(SPIFFS, "/index.html.gz", "text/html", false);
-      //   response->addHeader("Content-Encoding", "gzip");
-      //   request->send(response);
-      // } else if (SPIFFS.exists("/index.html")) {
+  server->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
       if (SPIFFS.exists("/index.html")) {
-        // request->send(SPIFFS, "/index.html", "text/html");
         request->send(SPIFFS, "/index.html", "text/html", false, processTemplate);
       } else {
-        request->send(200, "text/html", index_html); 
+        extern struct Translator trans;
+        request->send(200, "text/html", LANG_VAL_INDEX_HTML); 
       } });
 
 
@@ -252,37 +305,6 @@ void Webserver::begin()
     client->send("hello!", NULL, millis(), 10000);
   });
 
-
-  // CATCH-ALL this allows us to process any request not specifically declared above
-  server->onNotFound([](AsyncWebServerRequest *request)
-                     {
-      Messages _message;
-      _message.debugPrintf("REQUEST: NOT_FOUND: \n");
-      if (request->method() == HTTP_GET)
-        _message.debugPrintf("REQUEST: GET \n");
-      else if (request->method() == HTTP_POST)
-        _message.debugPrintf("REQUEST: POST \n");
-      else if (request->method() == HTTP_DELETE)
-        _message.debugPrintf("REQUEST: DELETE \n");
-      else if (request->method() == HTTP_PUT)
-        _message.debugPrintf("REQUEST: PUT \n");
-      else if (request->method() == HTTP_PATCH)
-        _message.debugPrintf("REQUEST: PATCH \n");
-      else if (request->method() == HTTP_HEAD)
-        _message.debugPrintf("REQUEST: HEAD \n");
-      else if (request->method() == HTTP_OPTIONS)
-        _message.debugPrintf("REQUEST: OPTIONS \n");
-      else
-        _message.debugPrintf("REQUEST UNKNOWN \n");
-        //_message.serialPrint(" http://%s%s\n", request->host().c_str(), request->url().c_str());
-        request->send( 404, "text/plain", "Not found." ); });
-
-  // start websocket ISR listener
-  // REF: https://github.com/me-no-dev/ESPAsyncWebServer/issues/225
-  // webskt->onEvent(onWebSocketEvent);
-
-  // webskt->onEvent(std::bind(&Webserver::onWebSocketEvent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6));
-
   server->onFileUpload(processUpload);
   // server->addHandler(webskt);
   server->addHandler(events);
@@ -292,195 +314,6 @@ void Webserver::begin()
   _message.serialPrintf("Server Running \n");
 }
 
-// /***********************************************************
-//  * sendWebSocketMessage
-//  * Push Server Data to client via websocket
-//  ***/
-// void Webserver::sendWebSocketMessage(String jsonValues)
-// {
-
-//   webskt->textAll(String(jsonValues));
-// }
-
-// /***********************************************************
-//  * onWebSocketEvent
-//  * Websocket Event Listener
-//  ***/
-// void Webserver::onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
-// {
-
-//   extern struct WebsocketData socketData;
-//   extern struct DeviceStatus status;
-//   extern struct Translator translate;
-
-//   Hardware _hardware;
-//   Webserver _webserver;
-//   Calibration _calibration;
-//   Messages _message;
-
-//   StaticJsonDocument<1024> messageData;
-//   StaticJsonDocument<1024> jsonMessage;
-//   String jsonMessageString;
-//   String clientIP;
-//   int header;
-//   DeserializationError err;
-
-//   switch (type)
-//   {
-
-//   case WS_EVT_CONNECT:
-//     clientIP = client->remoteIP().toString().c_str();
-//     _message.debugPrintf("WebSocket client connected from %s \n", clientIP);
-//     break;
-
-//   case WS_EVT_DISCONNECT:
-//     _message.debugPrintf("WebSocket client disconnected \n");
-//     break;
-
-//   case WS_EVT_PONG:
-//     _message.debugPrintf("PING \n");
-//     break;
-
-//   case WS_EVT_ERROR:
-//     _message.debugPrintf("WebSocket error \n");
-//     break;
-
-//   case WS_EVT_DATA:
-//     // this->processWebSocketMessage(arg, data, len);
-
-//     _message.debugPrintf("Websocket data received \n");
-
-//     err = deserializeJson(messageData, data);
-//     if (err)
-//     {
-//       _message.debugPrintf("processWebSocketMessage->deserializeJson() failed: %s \n", err.c_str());
-//     }
-
-//     header = messageData["HEADER"].as<int>();
-
-//     _message.debugPrintf("Websocket header: %i \n", header);
-
-//     switch (header)
-//     {
-
-//     case GET_FLOW_DATA: // HEADER: 1
-//       _message.debugPrintf("Get Data \n");
-//       sendWebSocketMessage(_webserver.getDataJSON());
-//       break;
-
-//     case REC_FLOW_DATA: // HEADER: 2
-//       break;
-
-//     case CALIBRATE: // HEADER: 3
-//       _message.debugPrintf("Calibrate \n");
-//       if (_hardware.benchIsRunning())
-//       {
-//         _calibration.setFlowOffset();
-//         // send new calibration to the browsers
-//         //_webserver.sendWebSocketMessage("flow offset");
-//       }
-//       else
-//       {
-//         _message.Handler(translate.LANG_VAL_RUN_BENCH_TO_CALIBRATE);
-//       }
-//       break;
-
-//     case FILE_LIST: // HEADER: 4
-//       _message.debugPrintf("File List \n");
-//       sendWebSocketMessage(_webserver.getFileListJSON());
-//       break;
-
-//     case SYS_STATUS: // HEADER: 5
-//       _message.debugPrintf("Send Status \n");
-//       sendWebSocketMessage(_webserver.getSystemStatusJSON());
-//       break;
-
-//     case SAVE_CONFIG: // HEADER: 6
-//       _message.debugPrintf("Save Config \n");
-//       // saveConfig(messageData);
-
-//     case LOAD_CONFIG: // HEADER: 7
-//       _message.debugPrintf("Load Config \n");
-//       jsonMessage = loadConfig();
-//       jsonMessage["HEADER"] = LOAD_CONFIG;
-//       serializeJson(jsonMessage, jsonMessageString);
-//       sendWebSocketMessage(jsonMessageString);
-//       break;
-
-//     case FILE_DOWNLOAD: // HEADER: 8
-//                         // NOTE: https://github.com/DeeEmm/DIY-Flow-Bench/issues/71#issuecomment-893104615
-//       break;
-
-//     case FILE_DELETE: // HEADER: 9
-//       socketData.file_name = messageData["FILENAME"].as<String>();
-//       _message.debugPrintf("File Delete: %s \n", socketData.file_name);
-//       if (SPIFFS.exists(socketData.file_name))
-//       {
-//         SPIFFS.remove(socketData.file_name);
-//       }
-//       else
-//       {
-//         _message.statusPrintf("Delete Failed: %s \n", socketData.file_name);
-//       }
-//       sendWebSocketMessage(_webserver.getFileListJSON());
-//       break;
-
-//     case FILE_UPLOAD: // HEADER: 10
-
-//       break;
-
-//     case START_BENCH: // HEADER: 11
-//       _message.debugPrintf("Start Bench \n");
-//       status.liveStream = true;
-//       digitalWrite(VAC_BANK_1_PIN, HIGH);
-//       break;
-
-//     case STOP_BENCH: // HEADER: 12
-//       _message.statusPrintf("Stop Bench \n");
-//       status.liveStream = false;
-//       digitalWrite(VAC_BANK_1_PIN, LOW);
-//       break;
-
-//     case LEAK_CAL: // HEADER: 13
-//       _message.debugPrintf("Leak Test Calibration \n");
-//       if (_hardware.benchIsRunning())
-//       {
-//         _calibration.setLeakTestPressure();
-//         // send new calibration to the browser
-//         //_webserver.sendWebSocketMessage("flow offset");
-//       }
-//       else
-//       {
-//         _message.Handler(translate.LANG_VAL_RUN_BENCH_TO_CALIBRATE);
-//       }
-//       break;
-
-//     case GET_CAL: // HEADER: 14
-//       _message.debugPrintf("Send Calibration \n");
-//       jsonMessage = _calibration.loadCalibration();
-//       jsonMessage["HEADER"] = GET_CAL;
-//       serializeJson(jsonMessage, jsonMessageString);
-//       sendWebSocketMessage(jsonMessageString);
-//       break;
-
-//     case RESTART: // HEADER: 15
-//       ESP.restart();
-//       _message.debugPrintf("ESP Restart \n");
-//       break;
-
-//     default:
-//       _message.debugPrintf("Unrecognised Websocket Header \n");
-//       _message.debugPrintf("HEADER: %s \n", header);
-//       break;
-//     }
-
-//     if (strcmp((char *)data, "getValues") == 0)    {
-//       sendWebSocketMessage(_webserver.getDataJSON());
-//     }
-
-//     break;
-//   }
-// }
 
 /***********************************************************
  * byteDecode
@@ -497,6 +330,7 @@ String Webserver::byteDecode(size_t bytes)
   else
     return String(bytes / 1024.0 / 1024.0 / 1024.0) + " GB";
 }
+
 
 /***********************************************************
  * Process File Upload
@@ -518,7 +352,7 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
   if (!filename.startsWith("/"))
     filename = "/" + filename;
   if (!index && !fileUploadData.upload_error)  {
-    _message.statusPrintf("UploadStart: %s \n", filename);
+    _message.debugPrintf("UploadStart: %s \n", filename);
     request->_tempFile = SPIFFS.open(filename, "w");
   }
 
@@ -580,8 +414,6 @@ void Webserver::parseConfigData(StaticJsonDocument<1024> configData) {
 
 
 
-
-
 /***********************************************************
 * loadConfig
 * read configuration data from config.json file
@@ -597,8 +429,6 @@ StaticJsonDocument<1024> Webserver::loadConfig () {
   return configData;  
 
 }
-
-
 
 
 /***********************************************************
@@ -640,9 +470,6 @@ void Webserver::createConfigFile () {
   
 
 }
-
-
-
 
 
 
@@ -703,31 +530,6 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
 
 
 
-
-// /***********************************************************
-//  * decodeMessageHeader
-//  * 
-//  * Pulls HEADER value from JSON string
-//  ***/
-// int Webserver::decodeMessageHeader(char *data)
-// {
-
-//   Messages _message;
-
-//   int header = 0;
-
-//   StaticJsonDocument<1024> messageData;
-//   DeserializationError error = deserializeJson(messageData, data);
-//   if (!error)  {
-//     header = messageData["HEADER"].as<int>();
-//     _message.debugPrintf("Decoded Message Header: %s \n", header);
-//   }  else  {
-//     _message.debugPrintf("Webserver::decodeMessageHeader ERROR \n");
-//   }
-
-//   return header;
-// }
-
 /***********************************************************
  * getFileListJSON
  * 
@@ -741,7 +543,7 @@ String Webserver::getFileListJSON()
   size_t fileSize;
 
   StaticJsonDocument<1024> dataJson;
-  dataJson["HEADER"] = FILE_LIST;
+  // dataJson["HEADER"] = FILE_LIST;
 
   Messages _message;
 
@@ -761,41 +563,6 @@ String Webserver::getFileListJSON()
   return jsonString;
 }
 
-
-// /***********************************************************
-//  * getSystemStatusJSON
-//  * 
-//  * Get System Status in JSON format
-//  ***/
-// String Webserver::getSystemStatusJSON()
-// {
-
-//   extern DeviceStatus status;
-//   String jsonString;
-
-//   Messages _message;
-
-//   _message.debugPrintf("Webserver::getDataJSON() \n");
-
-//   StaticJsonDocument<1024> dataJson;
-
-//   dataJson["HEADER"] = SYS_STATUS;
-//   dataJson["SPIFFS_MEM_SIZE"] = status.spiffs_mem_size;
-//   dataJson["SPIFFS_MEM_USED"] = status.spiffs_mem_used;
-//   dataJson["LOCAL_IP_ADDRESS"] = status.local_ip_address;
-//   dataJson["BOARDTYPE"] = status.boardType;
-//   dataJson["BENCHTYPE"] = status.benchType;
-//   dataJson["MAF_SENSOR"] = status.mafSensor;
-//   dataJson["PREF_SENSOR"] = status.prefSensor;
-//   dataJson["TEMP_SENSOR"] = status.tempSensor;
-//   dataJson["RELH_SENSOR"] = status.relhSensor;
-//   dataJson["BARO_SENSOR"] = status.baroSensor;
-//   dataJson["PITOT_SENSOR"] = status.pitotSensor;
-//   dataJson["BOOT_TIME"] = status.boot_time;
-
-//   serializeJson(dataJson, jsonString);
-//   return jsonString;
-// }
 
 
 /***********************************************************
@@ -824,7 +591,6 @@ String Webserver::getDataJSON()
 
   StaticJsonDocument<1024> dataJson;
 
-  dataJson["HEADER"] = GET_FLOW_DATA;
   dataJson["STATUS_MESSAGE"] = status.statusMessage;
   // Flow Rate
   if (mafFlowCFM > config.min_flow_rate)  {
@@ -999,6 +765,8 @@ String Webserver::processTemplate(const String &var)
   if (var == "BARO_SENSOR") return String(status.baroSensor);
   if (var == "PITOT_SENSOR") return String(status.pitotSensor);
   if (var == "PDIFF_SENSOR") return String(status.pdiffSensor);
+  if (var == "STATUS_MESSAGE") return String(status.statusMessage);
+
 
   // Config Settings
   if (var == "CONF_WIFI_SSID") return String(config.wifi_ssid);
@@ -1036,7 +804,7 @@ String Webserver::processTemplate(const String &var)
     while (file)  {
       fileName = file.name();
       fileSize = file.size();
-      fileList += "<div class='fileListRow'><span class='column left'><a href='/download" + fileName + " download class='file-link' onclick='downloadFile('" + fileName + "')'>" + fileName + "</a></span><span class='column middle'><span class='fileSizeTxt'>" + fileSize + " bytes</span></span><span class='column right'><button id='delete-button'  onclick='socketMessageSend(\'" + FILE_DELETE + ":" + fileName + "\")' class='button-sml'>Del</button></span></div>";
+      fileList += "<div class='fileListRow'><span class='column left'><a href='/api/file/download" + fileName + " download class='file-link' onclick='downloadFile('" + fileName + "')'>" + fileName + "</a></span><span class='column middle'><span class='fileSizeTxt'>" + fileSize + " bytes</span></span><span class='column right'><form method='POST' action='/api/file/delete'><input type='hidden' name='filename' value='/" + fileName + "'><input id='delete-button'  class='button-sml' type='submit' value='Delete'></form></span></div>";
       file = root.openNextFile();
     }
     return fileList;

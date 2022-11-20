@@ -94,6 +94,7 @@ struct DeviceStatus {
   long adcPollTimer = 0;
   long bmePollTimer = 0;
   long apiPollTimer = 0;
+  long statusUpdateRate = 50;
   long wsCLeanPollTimer = 0;
   int pollTimer = 0;
   int serialData = 0;

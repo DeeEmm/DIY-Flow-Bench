@@ -12,8 +12,6 @@
 *
 ***/
 
-
-
 var leakCalVal;
 var flowCalVal;
 var leakCalTolerance;
@@ -58,14 +56,15 @@ if (!!window.EventSource) {
     document.getElementById("BARO").innerHTML = e.data;
   }, false);
 
+  source.addEventListener('STATUS_MESSAGE', function(e) {
+    document.getElementById("STATUS_MESSAGE").innerHTML = e.data;
+  }, false);
+
   source.addEventListener('PING', function(e) {
     console.log("PING", e.data);
   }, false);
 
 }
-
-
-
 
 
 
@@ -85,8 +84,6 @@ function onFileUpload(event) {
           console.log('Request failed', e);
       });
 }
-
-
 
 
 /***********************************************************
@@ -120,6 +117,8 @@ function onLoad(event) {
 * Initialise buttons
 ***/
 function initialiseButtons() {
+  
+  var xhr = new XMLHttpRequest();
 
   document.getElementById('file-manager-button').addEventListener('click', function(){
     document.getElementById('fileModal').style.display='block';
@@ -131,37 +130,60 @@ function initialiseButtons() {
 
   document.getElementById('on-button').addEventListener('click', function(){
     console.log('Bench On');
+    xhr.open('GET', '/api/bench/on');
+    xhr.onload = function() {
+      if (xhr.status === 200) window.location.href = '/';
+    };
+    xhr.send();
   });
 
   document.getElementById('off-button').addEventListener('click', function(){
     console.log('Bench Off');
+    xhr.open('GET', '/api/bench/off');
+    xhr.onload = function() {
+      if (xhr.status === 200) window.location.href = '/';
+    };
+    xhr.send();
   });
 
   document.getElementById('calibrate-button').addEventListener('click', function(){
-    console.log('Calibrate');
+    console.log('Calibrate FLow Offset');
+    xhr.open('GET', '/api/bench/calibrate');
+    xhr.onload = function() {
+      if (xhr.status === 200) window.location.href = '/';
+    };
+    xhr.send();
   });
 
   document.getElementById('leak-cal-button').addEventListener('click', function(){
     console.log('Leak Test Calibration');
+    xhr.open('GET', '/api/bench/leakcal');
+    xhr.onload = function() {
+      if (xhr.status === 200) window.location.href = '/';
+    };
+    xhr.send();
   });
+
+  document.getElementById('clear-message-button').addEventListener('click', function(){
+    console.log('Clear Message');
+    xhr.open('GET', '/api/clear-message');
+    xhr.onload = function() {
+      if (xhr.status === 200) window.location.href = '/';
+    };
+    xhr.send();
+  });
+
 
   document.getElementById('restart-button').addEventListener('click', function(){
     console.log('System Reboot');
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/api/reboot');
+    xhr.open('GET', '/api/bench/reboot');
     xhr.onload = function() {
-      if (xhr.status === 200) {
-          window.location.href = '/';
-      } else {
-          alert('Reboot failed');
-      }
-  };
-  xhr.send();
+      if (xhr.status === 200) window.location.href = '/';
+    };
+    xhr.send();
   });
 
 }
-
-
 
 
 /***********************************************************
