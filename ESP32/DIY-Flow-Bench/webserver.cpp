@@ -21,9 +21,6 @@
 #include "constants.h"
 #include "structs.h"
 
-// #undef TEMPLATE_PLACEHOLDER
-// #define TEMPLATE_PLACEHOLDER '$' // AsyncWebServer template delimiter
-
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <AsyncTCP.h>
@@ -39,15 +36,6 @@
 #include "calculations.h"
 #include LANGUAGE_FILE
 
-
-
-
-/***********************************************************
- * Class Constructor
- ***/
-// Webserver::Webserver() {
-//
-// }
 
 /***********************************************************
  * INITIALISE SERVER
@@ -289,7 +277,6 @@ void Webserver::begin()
       if (SPIFFS.exists("/index.html")) {
         request->send(SPIFFS, "/index.html", "text/html", false, processTemplate);
       } else {
-        extern struct Translator trans;
         request->send(200, "text/html", LANG_VAL_INDEX_HTML); 
       } });
 

@@ -37,9 +37,9 @@
 #include MAF_DATA_FILE
 #endif
 
-#ifdef ADC_IS_ENABLED
-#include <Adafruit_ADS1X15.h>
-#endif
+// #ifdef ADC_IS_ENABLED
+// #include <Adafruit_ADS1X15.h>
+// #endif
 
 #ifdef BME_IS_ENABLED
 #include <SFunBME280.h>

@@ -31,6 +31,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+21112201        - Fixed default web page
 20112202        - Browser reboot function improvements
                 - Removed unused constants
                 - Removed deprecated code from webserver class
