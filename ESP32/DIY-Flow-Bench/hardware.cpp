@@ -404,8 +404,20 @@ void Hardware::checkRefPressure() {
 
 
 
+/***********************************************************
+* benchOn
+*
+*/
+void Hardware::benchOn() {
+  digitalWrite(VAC_BANK_1_PIN, HIGH);
+}
 
 
-
-
+/***********************************************************
+* benchOff
+*
+*/
+void Hardware::benchOff() {
+  digitalWrite(VAC_BANK_1_PIN, LOW);
+}
 

@@ -74,9 +74,11 @@ class Webserver {
 		Webserver() {
 			server = NULL;
 			webskt = NULL;
+			events = NULL;
 		}
 		
 		AsyncWebSocket *webskt;
+		AsyncEventSource *events;
 		
 		void begin();
 		void writeJSONFile(String data, String filename);

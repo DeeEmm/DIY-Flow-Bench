@@ -66,7 +66,7 @@ void Webserver::begin()
 
   server = new AsyncWebServer(80);
   // webskt = new AsyncWebSocket("/ws");
-  AsyncEventSource events("/");
+  events = new AsyncEventSource("/events");
 
   // TODO: Test Accesspoint is working
   String index_html = translate.LANG_VAL_INDEX_HTML;
@@ -136,31 +136,68 @@ void Webserver::begin()
   if (!MDNS.begin(config.hostname))  {
     _message.serialPrintf("Error starting mDNS \n");
   }  else  {
-    _message.serialPrintf("Access via: http://%s.local \n", config.hostname);
+    status.hostname = config.hostname;
+    _message.serialPrintf("Access via: http://%s.local \n", status.hostname);
   }
 
-  // Debug request handler
-  server->on("/debug", HTTP_POST, [](AsyncWebServerRequest *request)
+  // API request handlers [JSON confirmation response]
+  server->on("/api/bench/on", HTTP_POST, [](AsyncWebServerRequest *request)
              {
       Messages _message;
-      _message.serialPrintf("Debug Mode \n");
-      config.debug_mode = true;
-      request->redirect("/"); });
+      Hardware _hardware;
+      _message.debugPrintf("Bench On \n");
+      _hardware.benchOn(); 
+      request->send(200, "text/html", "{\"bench\":\"on\"}"); });
 
-  // Dev mode request handler
-  server->on("/dev", HTTP_POST, [](AsyncWebServerRequest *request)
+  server->on("/api/bench/off", HTTP_POST, [](AsyncWebServerRequest *request)
              {
       Messages _message;
-      _message.serialPrintf("Developer Mode \n");
+      Hardware _hardware;
+      _message.debugPrintf("Bench Off \n");
+      _hardware.benchOff(); 
+      request->send(200, "text/html", "{\"bench\":\"off\"}"); });
+
+  server->on("/api/debug/on", HTTP_POST, [](AsyncWebServerRequest *request)
+             {
+      Messages _message;
+      _message.debugPrintf("Debug Mode On\n");
+      config.debug_mode = true;
+      request->send(200, "text/html", "{\"debug\":\"on\"}"); });
+
+  server->on("/api/debug/off", HTTP_POST, [](AsyncWebServerRequest *request)
+             {
+      Messages _message;
+      _message.debugPrintf("Debug Mode Off\n");
+      config.debug_mode = false;
+      request->send(200, "text/html", "{\"debug\":\"off\"}"); });
+
+  server->on("/api/dev/on", HTTP_POST, [](AsyncWebServerRequest *request)
+             {
+      Messages _message;
+      _message.debugPrintf("Developer Mode On\n");
       config.dev_mode = true;
-      request->redirect("/"); });
+      request->send(200, "text/html", "{\"dev\":\"on\"}"); });
+
+  server->on("/api/dev/off", HTTP_POST, [](AsyncWebServerRequest *request)
+             {
+      Messages _message;
+      _message.debugPrintf("Developer Mode Off\n");
+      config.dev_mode = false;
+      request->send(200, "text/html", "{\"dev\":\"off\"}"); });
+
+  server->on("/api/reboot", HTTP_GET, [](AsyncWebServerRequest *request)
+             {
+      request->send(200, "text/html", "<meta http-equiv=\"refresh\" content=\"5; URL='/index.html'\" /><p>Rebooting in 5 seconds...</p>");
+      ESP.restart(); });
+
+
 
   // Upload request handler
   server->on("/upload", HTTP_POST, [](AsyncWebServerRequest *request)
       {
       Messages _message;
       _message.serialPrintf("Upload Request Called \n");
-      request->redirect("/?modal=upload"); },
+      request->redirect("/?view=upload"); },
       processUpload);
 
   // Save Configuration Form
@@ -201,6 +238,19 @@ void Webserver::begin()
         request->send(200, "text/html", index_html); 
       } });
 
+
+  // Handle SSE Web Server Events
+  // NOTE: SSE Event pushed in main loop (DIY-Flow-Bench.ino)
+  events->onConnect([](AsyncEventSourceClient *client){
+    if(client->lastId()){
+      // _message.serialPrintf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
+      Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
+    }
+    // send event with message "hello!", id current millis and set reconnect delay to 1 second
+    client->send("hello!", NULL, millis(), 10000);
+  });
+
+
   // CATCH-ALL this allows us to process any request not specifically declared above
   server->onNotFound([](AsyncWebServerRequest *request)
                      {
@@ -233,7 +283,7 @@ void Webserver::begin()
 
   server->onFileUpload(processUpload);
   // server->addHandler(webskt);
-  // server.addHandler(&events);
+  server->addHandler(events);
   server->begin();
 
   _message.Handler(translate.LANG_VAL_SERVER_RUNNING);
@@ -474,7 +524,7 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
   if (filename == String("/index.html.gz") || filename == String("/index.html"))  {
     redirectURL = "/";
   }  else  {
-    redirectURL = "/?modal=upload";
+    redirectURL = "/?view=upload";
   }
 
   if (len)  {
@@ -486,7 +536,7 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
       // TODO: _message.statusPrintf("Writing file: '%s' index=%s len=%s \n", filename, index, len);
       request->_tempFile.write(data, len);
     }
-  }
+  } 
 
   if (final)  {
     _message.statusPrintf("UploadEnd: %s,%s \n", filename, fileUploadData.file_size);
@@ -645,7 +695,7 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
 
   _message.debugPrintf("Configuration Saved \n");
 
-  request->redirect("/");
+  request->redirect("/?view=config");
 
 }
 
@@ -935,6 +985,7 @@ String Webserver::processTemplate(const String &var)
   if (var == "SPIFFS_MEM_SIZE") return String(status.spiffs_mem_size);
   if (var == "SPIFFS_MEM_USED") return String(status.spiffs_mem_used);
   if (var == "LOCAL_IP_ADDRESS") return String(status.local_ip_address);
+  if (var == "HOSTNAME") return String(status.hostname);
   if (var == "UPTIME") return String(esp_timer_get_time()/1000);
   if (var == "BENCHTYPE") return String(status.benchType);
   if (var == "BOARDTYPE") return String(status.boardType);

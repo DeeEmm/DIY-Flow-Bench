@@ -49,6 +49,11 @@ class Hardware {
 		bool benchIsRunning();	
 		void checkRefPressure();
 		
+		void benchOn();
+		void benchOff();
+
+
+
 	private:
 		void configurePins ();
 		uint8_t buffer[3];

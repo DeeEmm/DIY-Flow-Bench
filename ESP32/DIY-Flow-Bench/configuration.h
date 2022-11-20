@@ -17,7 +17,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "18112201"
+#define BUILD_NUMBER "20112201"
 #define RELEASE "V.2.0-RC.3"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -88,6 +88,7 @@
 #define API_RESPONSE_LENGTH 64
 #define API_STATUS_LENGTH 128
 #define API_JSON_LENGTH 1020
+#define API_SCAN_DELAY_MS 100
 #define PRINT_BUFFER_LENGTH 128
 //#define API_CHECKSUM_IS_ENABLED                           // Add checksum to serial API response TODO: UPDATE CHECKSUM TO NATIVE ESP32 CRC32
 #define MAX_SEMAPHORE_DELAY 1000                          // Define max value rather than just use portMAX_DELAY
@@ -151,7 +152,7 @@
 
 const int BME280_I2C_ADDR = 0x76;                           
 //const int BME280_I2C_ADDR = 0x77;       
-#define BME_SCAN_DELAY_MS 1000                                  // Does not need to be fast!!       
+#define BME_SCAN_DELAY_MS 1000                                  // Does not need to be faster than this as sensor read speed is around 30 secs!!       
 
 
 
@@ -176,8 +177,8 @@ const int BME280_I2C_ADDR = 0x76;
 
 //#define ADC_IS_ENABLED                                      // Comment to disable ADC related code
 
-const int  ADC_I2C_ADDR = 0x48; 
-#define ADC_SCAN_DELAY_MS 10
+const int ADC_I2C_ADDR = 0x48; 
+#define ADC_SCAN_DELAY_MS 100                                 // Need to allow enough time for ADC read (min 10ms)
 #define ADC_MAX_RETRIES 10
 
 // #define ADC_TYPE_ADS1015 // 12 bit (3 mV/bit)

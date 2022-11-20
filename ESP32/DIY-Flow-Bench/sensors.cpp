@@ -208,7 +208,7 @@ void Sensors::initialise () {
 	// differential pressure
 	#ifdef PDIFF_SENSOR_NOT_USED
 		this->_pdiffSensorType = translate.LANG_VAL_NOT_ENABLED;
-	#elif defined PPDIFF_SENSOR_TYPE_MPXV7007 && defined ADS_IS_ENABLED
+	#elif defined PDIFF_SENSOR_TYPE_MPXV7007 && defined ADS_IS_ENABLED
 		this->_pdiffSensorType = "SMPXV7007";
 	#elif defined PDIFF_SENSOR_TYPE_LINEAR_ANALOG
 		this->_pdiffSensorType = "ANALOG PIN: " + DIFF_PRESSURE_PIN;

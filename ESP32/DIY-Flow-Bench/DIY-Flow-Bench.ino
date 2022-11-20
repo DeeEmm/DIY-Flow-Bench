@@ -71,6 +71,8 @@ SemaphoreHandle_t xSemaphore = NULL;
 TaskHandle_t hardwareTaskHandle = NULL;
 TaskHandle_t webserverTaskHandle = NULL;
 
+int sensorINT;
+
 
 /***********************************************************
  * WEBSERVER LOOP (Runs on CPU Core 1)
@@ -259,88 +261,91 @@ void setup(void) {
 
 
 /***********************************************************
- * MAIN LOOP (Not Used)
+ * MAIN LOOP
+ * 
+ * NOTE: Use non-breaking delays for throttling events
  ***/
 void loop () {
-
   
   #ifdef ADC_IS_ENABLED    
     
-    // if (millis() > status.adcPollTimer) { // Non breaking delay for ADC read
-    //   status.adcPollTimer = millis() + ADC_SCAN_DELAY_MS; 
-    // 
-    //   // Get ADC sensor data value and store it in global vars so it can be accessed by webserver
-    //   for (int adcChannel = 0; adcChannel <= 3; adcChannel++) {
-    //     switch (adcChannel) {
-    //     
-    //       case MAF_ADC_CHANNEL:
-    //         sensorVal.MAF = _sensors.getMafValue();
-    //       break;
-    //       
-    //       case PREF_ADC_CHANNEL:
-    //         sensorVal.PRefKPA = _sensors.getPRefValue();
-    //       break;
-    //       
-    //       case PDIFF_ADC_CHANNEL:
-    //         sensorVal.PDiffKPA = _sensors.getPDiffValue();
-    //       break;
-    //       
-    //       case PITOT_ADC_CHANNEL:
-    //         sensorVal.PitotKPA = _sensors.getPitotValue();
-    //       break; 
-    //     }
-    //   }   
-    // }
+    if (millis() > status.adcPollTimer) { // Non breaking delay for ADC read
+      status.adcPollTimer = millis() + ADC_SCAN_DELAY_MS; 
+    
+      // Get ADC sensor data value and store it in global vars so it can be accessed by webserver
+      for (int adcChannel = 0; adcChannel <= 3; adcChannel++) {
+        switch (adcChannel) {
+        
+          case MAF_ADC_CHANNEL:
+            sensorINT = _sensors.getMafValue() * 100 + .5; 
+            sensorVal.MAF = (double)sensorINT / 100; 
+            _webserver.events->send(String(sensorVal.MAF).c_str(),(char*)"FLOW", millis());
+          break;
+          
+          case PREF_ADC_CHANNEL:
+            sensorINT = _sensors.getPRefValue() * 100 + .5; 
+            sensorVal.PRefKPA = (double)sensorINT / 100; 
+            _webserver.events->send(String(sensorVal.PRefKPA).c_str(),(char*)"PREF", millis());
+          break;
+          
+          case PDIFF_ADC_CHANNEL:
+            sensorINT = _sensors.getPDiffValue() * 100 + .5; 
+            sensorVal.PDiffKPA = (double)sensorINT / 100; 
+            _webserver.events->send(String(sensorVal.PDiffKPA).c_str(),(char*)"DIFF", millis());
+          break;
+          
+          case PITOT_ADC_CHANNEL:
+            sensorINT = _sensors.getPitotValue() * 100 + .5; 
+            sensorVal.PitotKPA = (double)sensorINT / 100; 
+            _webserver.events->send(String(sensorVal.PitotKPA).c_str(),(char*)"PITOT", millis());
+          break; 
+        }
+      }   
+    }
   #endif
+  
 
-  // // Non breaking delay for sensor update
+  // Non breaking delay for sensor update
   if (millis() > status.bmePollTimer) {
     status.bmePollTimer = millis() + BME_SCAN_DELAY_MS; 
-   
-    // Get env sensor data, truncate to 2 decimal places and store it in global struct so that they can be accessed by webserver   
-	  
-    // Get Temp
-    int value = _sensors.getTempValue() * 100 + .5;
-    sensorVal.TempDegC = (double)value / 100;
-    // Get Baro
-	  value = _calculations.convertPressure(_sensors.getBaroValue(), HPA) * 100 + .5;
-    sensorVal.BaroKPA = (double)value / 100;
-    // Get RelH
-	  value = _sensors.getRelHValue() * 100 + .5;
-    sensorVal.RelH = (double)value / 100;
+   	  
+    // Push Temperature value to browser using SSE (Truncate to 2 DP by casting to int)
+    sensorINT = _sensors.getTempValue() * 100 + .5; 
+    sensorVal.TempDegC = (double)sensorINT / 100; 
+     _webserver.events->send(String(sensorVal.TempDegC).c_str(),(char*)"TEMP", millis());
+
+
+    // Push Baro to browser using SSE
+	  sensorINT = _calculations.convertPressure(_sensors.getBaroValue(), HPA) * 100 + .5;
+    sensorVal.BaroKPA = (double)sensorINT / 100;
+    _webserver.events->send(String(sensorVal.BaroKPA).c_str(),"BARO",millis());
+    
+    // Get RelH to browser using SSE
+	  sensorINT = _sensors.getRelHValue() * 100 + .5;
+    sensorVal.RelH = (double)sensorINT / 100;
+    _webserver.events->send(String(sensorVal.RelH).c_str(),"RELH",millis());
+
 
   }
-
-    // events.send(String(temperature).c_str(),"temperature",millis());
-    // events.send(String(humidity).c_str(),"humidity",millis());
-    // events.send(String(pressure).c_str(),"pressure",millis());
 
 
 
   // Process API comms
   if (config.api_enabled) {        
-    if (Serial.available() > 0) {
-    status.serialData = Serial.read();
-    _api.ParseMessage(status.serialData);
+      if (millis() > status.apiPollTimer) {
+        status.apiPollTimer = millis() + API_SCAN_DELAY_MS; 
+        if (Serial.available() > 0) {
+          status.serialData = Serial.read();
+          _api.ParseMessage(status.serialData);
+        }
     }                            
   }
   
   
-  // // Push data to websocket
-  // config.refresh_rate = config.refresh_rate < MIN_REFRESH_RATE ? MIN_REFRESH_RATE : config.refresh_rate;
-  // if ((millis() > status.pollTimer) && status.liveStream) {
-  //   status.pollTimer = millis() + config.refresh_rate; 
-  //   // TODO: We need to make sure that message has been sent
-  //   _webserver.sendWebSocketMessage(_webserver.getDataJSON());
-  // }
+  // TODO: PID Vac source Analog VFD control [if PREF not within limits]
 
 
-  // // Cleanup abandoned websockets to prevent overload
-  // // NOTE: As there is only 1 client, we should only need a low poll rate
-  // if (millis() > status.wsCLeanPollTimer) {
-  //   status.wsCLeanPollTimer = millis() + WEBSOCK_CLEAN_FREQ; 
-  //   _webserver.webskt->cleanupClients();
-  // }
+
 
   //mSec delay to prevent Watch Dog Timer (WDT) triggering for empty task
   vTaskDelay( 1 ); 

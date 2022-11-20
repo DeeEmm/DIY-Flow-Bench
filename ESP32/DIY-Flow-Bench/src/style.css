@@ -1,4 +1,16 @@
-/* Set height of body and the document to 100pcnt to enable "full page tabs" */
+/* 
+* DIY-Flow-Bench style.css
+* 
+* NOTE: use of % sizing in this document will break the browser output. This is because of bug #1234 in ESPAsyncWebserver library.
+* The fix is easy - change #define TEMPLATE_PLACEHOLDER '%' in WebResponseImpl.h and %TEMPLATE_PLACEHOLDERS% to use '$' instead.
+* Unfortunately TEMPLATE_PLACEHOLDER is not exposed as a class method and so the change requires the core hack described above
+* We do not want to have to maintain a custom ESPAsyncWebserver library so have rewritten our CSS to avoid using % sizing
+* This way our project will function with the vanilla ESPAsyncWebserver library.
+* 
+* TODO: Look at implimenting flex / flex-wrap - https://polypane.app/blog/4-css-layouts-without-using-media-queries/
+***/
+
+/* Set height of body and the document to 100 percent of viewport height to enable "full page tabs" */
 body, html {
   height: 100vh;
   margin: 0;
@@ -6,7 +18,7 @@ body, html {
   font-size:22px;
 }
 
-/* Style tab links */
+/* Set tabs to 50 percent of viewport width */
 .tablink {
   background-color: #555;
   color: white;
@@ -27,8 +39,13 @@ body, html {
   background-color: #777;
 }
 
-/* Style the tab content (and add height:100pcnt for full page content) */
-.tabcontent {
+/* Style the tab content (and add height:100% of viewport height for full page content) */
+.tabcontentMain {
+  padding: 100px 20px;
+  height: 100vh;
+}
+
+.tabcontentConfig {
   display: none;
   padding: 100px 20px;
   height: 100vh;
@@ -223,7 +240,7 @@ hr {
 
 
 
-#about-button, #support-button,  #file-manager-button, #restart-button {
+#info-button, #support-button,  #file-manager-button, #restart-button {
   width:120px;
   height: 50px;
 }
@@ -321,17 +338,18 @@ input[type="file"] {
   
 
 /* The Close Button */
-.closeAboutModal, .closeFileModal, .closeUploadModal {
+.closeInfoModalButton, .closeFileModalButton {
   color: #aaa;
   float: right;
   font-size: 22px;
   font-weight: bold;
+  cursor: pointer;
 }
 
-.closeFileModal:hover, 
-.closeFileModal:focus,
-.closeAboutModal:hover,
-.closeAboutModal:focus {
+.closeFileModalButton:hover, 
+.closeFileModalButton:focus,
+.closeInfoModalButton:hover,
+.closeInfoModalButton:focus {
   color: black;
   text-decoration: none;
   cursor: pointer;

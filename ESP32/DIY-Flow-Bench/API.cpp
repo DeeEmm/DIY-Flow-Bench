@@ -158,6 +158,14 @@ void API::ParseMessage(char apiMessage) {
 
       // NOTE: Responses are alphabetised
 
+      case '0': // Bench Off
+          _hardware.benchOff();
+      break;
+      
+      case '1': // Bench On
+          _hardware.benchOn();
+      break;
+      
       case '3': // Get 3v board supply voltage (mv) 'v.123.45\r\n'
           snprintf(apiResponse, API_RESPONSE_LENGTH, "3%s%f", config.api_delim ,_hardware.get3v3SupplyMillivolts());
       break;

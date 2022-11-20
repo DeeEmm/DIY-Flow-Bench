@@ -2,37 +2,24 @@
 Current build status
 ===================================================================
 
-Project compiles and runs but will crash when accessing I2C 
-
+Project compiles and runs but will crash if I2C is enabled
 I2C dev work is not finished (BME + I2C disabled for testing)
+Websockets have been junked in favor of Server Side Events (SSE) to push sensor data to browser
 
 
 ===================================================================
 Current work in progress
 ===================================================================
 
-- implimenting templates to propogate status details on page load
-- use Async Event Source Plugin to stream data to browser without need for websocket
-- modify server request handlers to take API commands via URL ... /api/control/on etc
-- modify server request handler to accept form data to update config settings
+I2C class to bring BME and 1115 code into singular control and try and prevent data collisions.
 
-- also need to determine max read rate for sensor and ADR polling
-
-I2C / BME is not returning stable data - it looks like it's the I2C code - possibly result of clash between BME280 and AD1115 code.
-Currently trying to determine where the issue originates from. Also possibly related to websocket interrupt
-
-Have implemented I2C class to bring BME and 1115 code into singular control and try and prevent data collisions.
-Next stage is to try and modify websocket code to better manage interrupt by controlling sensor / webserver tasks with semaphore.
-
-Also a possibility of replacing websocket control with 'Event Source' method in ESPAsyncWebServer and regular Navigation to aliminate interrupt
-
-Temp commented sensor calls from main loop and API now much faster. Need to figure out a way to better manage task handover
 
 ===================================================================
 Items to sort before formal release
 ===================================================================
 
 - Update mafData files
+- Rename DIY-Flow-Bench.cpp to DIY-Flow-Bench.ino for Arduino IDE compatibility
 
 ===================================================================
 !! Don't forget to update the build number in configuration.h !!
@@ -44,6 +31,14 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+20112201        - Removed Settings class along with settings.cpp & settings.h
+                - Converted BME Sensor update to use Server Sent Events (SSE)
+                - Converted ADC Sensor update to use Server Sent Events (SSE)
+                - Refactoring of HTML and Javascript
+                - Implimented basic on/off fan motor control via broser + API
+                - Implimented browser reboot
+                - Fixed some navigation/url issues
+                - Implimented basic /api/function url schema (on/off/reboot)
 18112201        - Changed config form to use POST vars instead of websockets
                 - Moved settings class methods into webserver class
                 - Rewrote WebUI file handler to use POST vars instead of websockets
