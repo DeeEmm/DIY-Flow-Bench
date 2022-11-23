@@ -17,8 +17,8 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "21112201"
-#define RELEASE "V.2.0-RC.3"
+#define BUILD_NUMBER "22112201"
+#define RELEASE "V.2.0-RC.3-WIP"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
 
@@ -71,6 +71,7 @@
 #define SERIAL0_BAUD 115200
 #define SERIAL2_BAUD 9600
 
+#define WEBSERVER_ENABLED
 
 
 
@@ -148,10 +149,10 @@
 * NOTE: Check the report shown in serial monitor on boot for addresses of I2C devices and update BME280_I2C_ADDR accordingly
 ***/
 
-// #define BME_IS_ENABLED                                      // Comment to disable BME related code
+#define BME_IS_ENABLED                                      // Comment to disable BME related code
 
-const int BME280_I2C_ADDR = 0x76;                           
-//const int BME280_I2C_ADDR = 0x77;       
+// const int BME280_I2C_ADDR = 0x76;                           
+const int BME280_I2C_ADDR = 0x77;       
 #define BME_SCAN_DELAY_MS 1000                                  // Does not need to be faster than this as sensor read speed is around 30 secs!!       
 
 
@@ -311,7 +312,7 @@ const int ADC_I2C_ADDR = 0x48;
 * Recommended sensor is the BME280
 ***/
 
-// #define BARO_IS_ENABLED                                     // Comment to disable Baro related code
+#define BARO_IS_ENABLED                                     // Comment to disable Baro related code
 
 // Uncomment One line only
 // #define BARO_SENSOR_TYPE_FIXED_VALUE
@@ -339,7 +340,7 @@ const int ADC_I2C_ADDR = 0x48;
 * Recommended sensor is the BME280
 ***/
 
-// #define TEMP_IS_ENABLED                                     // Comment to disable temperature related code.
+#define TEMP_IS_ENABLED                                     // Comment to disable temperature related code.
 
 #define DEFAULT_TEMP_VALUE 21                               // Value to return if no sensor used
 #define TEMP_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
@@ -363,7 +364,7 @@ const int ADC_I2C_ADDR = 0x48;
 * Recommended sensor is the BME280
 ***/
 
-// #define RELH_IS_ENABLED                                     // Comment to disable humidity related code
+#define RELH_IS_ENABLED                                     // Comment to disable humidity related code
 
 #define DEFAULT_RELH_VALUE 36                               // Value to return if no sensor used
 #define RELH_ANALOG_SCALE 1.0                               // Scaling factor for raw analog value
