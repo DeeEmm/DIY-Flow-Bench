@@ -98,7 +98,8 @@ void API::ParseMessage(char apiMessage) {
 
   extern struct ConfigSettings config;
   extern struct DeviceStatus status;
-  
+  extern struct SensorData sensorVal;
+
   Calculations _calculations;
   Sensors _sensors;
   Messages _message;
@@ -175,7 +176,7 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'B': // Get measured Baro Pressure in hPa'B.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "B%s%f", config.api_delim , _calculations.convertPressure(_sensors.getBaroValue(), HPA));
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "B%s%f", config.api_delim , _calculations.convertPressure(sensorVal.BaroKPA, HPA));
       break;
 
       case 'C': // Current configuration in JSON
@@ -211,10 +212,10 @@ void API::ParseMessage(char apiMessage) {
           
           snprintf(apiResponse, API_RESPONSE_LENGTH, "E%s%f%s%f%s%f%s%f%s%f", 
           config.api_delim, _calculations.calculateFlowCFM() * 100, 
-          config.api_delim, _calculations.convertPressure(_sensors.getPRefValue(), KPA), 
-          config.api_delim, _calculations.convertTemperature(_sensors.getTempValue(), DEGC), 
-          config.api_delim, _calculations.convertRelativeHumidity(_sensors.getRelHValue(), PERCENT), 
-          config.api_delim, _calculations.convertPressure(_sensors.getBaroValue(), KPA));
+          config.api_delim, _calculations.convertPressure(sensorVal.PRefKPA, KPA), 
+          config.api_delim, _calculations.convertTemperature(sensorVal.TempDegC, DEGC), 
+          config.api_delim, _calculations.convertRelativeHumidity(sensorVal.RelH, PERCENT), 
+          config.api_delim, _calculations.convertPressure(sensorVal.BaroKPA, KPA));
       break;      
       
       case 'F': // Get measured Flow 'F123.45\r\n'       
@@ -222,7 +223,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'H': // Get measured Humidity 'H.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "H%s%f", config.api_delim , _sensors.getRelHValue());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "H%s%f", config.api_delim , sensorVal.RelH);
       break;
 
       case 'I': // IP Address
@@ -273,7 +274,7 @@ void API::ParseMessage(char apiMessage) {
       break;      
   
       case 'R': // Get measured Reference Pressure 'R.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "R%s%f", config.api_delim , _calculations.convertPressure(_sensors.getPRefValue(), INWG));
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "R%s%f", config.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INWG));
       break;
       
       case 'r': // Get Reference Pressure sensor output voltage          
@@ -289,12 +290,12 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'T': // Get measured Temperature in Celcius 'T.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "T%s%f", config.api_delim , _sensors.getTempValue());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "T%s%f", config.api_delim , sensorVal.TempDegC);
       break;
       
       case 't': // Get measured Temperature in Fahrenheit 'F.123.45\r\n'
           double TdegF;
-          TdegF = _calculations.convertTemperature(_sensors.getTempValue(), DEGF);
+          TdegF = _calculations.convertTemperature(sensorVal.TempDegC, DEGF);
           snprintf(apiResponse, API_RESPONSE_LENGTH, "t%s%f", config.api_delim , TdegF);
       break;      
       

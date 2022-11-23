@@ -32,7 +32,9 @@
 
 // NOTE: I2C code should be brought into hardware.cpp
 // NOTE: If we replace I2Cdev with wire we need to rewrite the ADC Code
-#include <I2Cdev.h>
+// #include <I2Cdev.h>
+
+
 
 /***********************************************************
 * CONSTRUCTOR
@@ -101,15 +103,11 @@ void Hardware::configurePins () {
 void Hardware::begin () {
 
   Messages _message;
-
   extern struct DeviceStatus status;
   
   _message.serialPrintf("Initialising Hardware \n");
-  
   configurePins();
-  
-  this->getI2CList(); // TODO: move into status dialog instead of printing to serial monitor
-  
+  this->getI2CList();
   _message.serialPrintf("Hardware Initialised \n");
 
 
@@ -145,7 +143,6 @@ void Hardware::begin () {
 void Hardware::getI2CList() {   
   
   Messages _message;
-
   Wire.begin (SCA_PIN, SCL_PIN); 
 
   _message.serialPrintf("Scanning for I2C devices...\n");
@@ -188,7 +185,7 @@ void Hardware::getBMERawData() {
  * @see ADS1115_CFG_OS_BIT
  */
 bool Hardware::isADCConversionReady() {
-    I2Cdev::readBit(ADC_I2C_ADDR, 0x01, 15, buffer);
+    // I2Cdev::readBit(ADC_I2C_ADDR, 0x01, 15, buffer);
     return buffer[0];
 }
 
@@ -258,11 +255,11 @@ int16_t Hardware::getADCRawData(int channel) {
     _config >>= 8; // Bit shift
     _config &= 0xFF; // Bit mask
     
-    I2Cdev::writeWord(ADC_I2C_ADDR, 0x01, _config);
+    // I2Cdev::writeWord(ADC_I2C_ADDR, 0x01, _config);
     
     //delay(10); // TODO: DELAYS are a hack, need to test for transmission complete. (Delays are bad Mmmmnnkay) 
     
-    I2Cdev::readBytes(ADC_I2C_ADDR, 0x00 , 2, buffer);
+    // I2Cdev::readBytes(ADC_I2C_ADDR, 0x00 , 2, buffer);
     rawADCval = buffer[0] + (buffer[1] << 8);
   
   }
@@ -356,13 +353,13 @@ bool Hardware::benchIsRunning() {
     
   Messages _message;
   Calculations _calculations;
-  Sensors _sensors;
   
   extern struct ConfigSettings config;
   extern struct Translator translate;
+  extern struct SensorData sensorVal;
   
   // TODO: Check scope of these...
-  double refPressure = _calculations.convertPressure(_sensors.getPRefValue(), INWG);
+  double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INWG);
   
   double mafFlowRateCFM = _calculations.calculateFlowCFM();
 
@@ -385,12 +382,12 @@ void Hardware::checkRefPressure() {
   
   Messages _message;
   Calculations _calculations;
-  Sensors _sensors;
-  
+
+  extern struct SensorData sensorVal;
   extern struct ConfigSettings config;
   extern struct Translator translate;
   
-  double refPressure = _calculations.convertPressure(_sensors.getPRefValue(), INWG);
+  double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INWG);
     
   // Check that pressure does not fall below limit set by MIN_TEST_PRESSURE_PERCENTAGE when bench is running
   // note alarm commented out in alarm function as 'nag' can get quite annoying

@@ -6,6 +6,7 @@
 #ifndef LANGDATA
 #define LANGDATA
 
+#include "Arduino.h"
 
 struct Translator {
     String LANG_VAL_BLANK = ""; 

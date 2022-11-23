@@ -147,13 +147,15 @@ double Calculations::convertRelativeHumidity(double relativeHumidity, int units)
  ***/
 double Calculations::calculateVaporPressure(int units) {
 
+  extern struct SensorData sensorVal;
+
   Sensors _sensors;
 
   double airTemp;
   double vapourPressureKpa;
   double vapourPressurePsia;
 
-  airTemp = this->convertTemperature(_sensors.getTempValue(), DEGC);
+  airTemp = this->convertTemperature(sensorVal.TempDegC, DEGC);
   vapourPressureKpa = (0.61078 * exp((17.27 * airTemp) / (airTemp + 237.3))); // Tetans Equation
 
   switch (units)
@@ -180,12 +182,13 @@ double Calculations::calculateVaporPressure(int units) {
  ***/
 double Calculations::calculateSpecificGravity() {
   
+  extern struct SensorData sensorVal;
   Sensors _sensors;
 
   double specificGravity;
-  double relativeHumidity = this->convertRelativeHumidity(_sensors.getRelHValue(), DECI);
+  double relativeHumidity = this->convertRelativeHumidity(sensorVal.RelH, DECI);
   double vaporPressurePsia = this->calculateVaporPressure(PSIA);
-  double baroPressurePsia = this->convertPressure(_sensors.getBaroValue(), PSIA);
+  double baroPressurePsia = this->convertPressure(sensorVal.BaroKPA, PSIA);
 
   specificGravity = (1 - (0.378 * relativeHumidity * vaporPressurePsia) / baroPressurePsia);
 
@@ -204,15 +207,16 @@ double Calculations::calculateSpecificGravity() {
  ***/
 double Calculations::convertMassFlowToVolumetric(double massFlowKgh) {
   
+  extern struct SensorData sensorVal;
   Sensors _sensors;
 
   double mafFlowCFM;
   double gasPressure;
-  double tempInRankine = this->convertTemperature(_sensors.getTempValue(), RANKINE); //tested ok
+  double tempInRankine = this->convertTemperature(sensorVal.TempDegC, RANKINE); //tested ok
   double specificGravity = this->calculateSpecificGravity(); //tested ok
   double molecularWeight = MOLECULAR_WEIGHT_DRY_AIR * specificGravity; //tested ok
-  double baroPressure = this->convertPressure(_sensors.getBaroValue(), PSIA);
-  double refPressure = this->convertPressure(_sensors.getPRefValue(), PSIA);
+  double baroPressure = this->convertPressure(sensorVal.BaroKPA, PSIA);
+  double refPressure = this->convertPressure(sensorVal.PRefKPA, PSIA);
   double massFlowLbm = massFlowKgh * 0.03674371036415;
 
   gasPressure = baroPressure + refPressure; // TODO: need to validate refPressure (should be a negative number)
@@ -245,8 +249,6 @@ double Calculations::calculateFlowCFM() {
   double flowRateKGH = 0;
   double flowRateRAW = 0;
 
-
-
   /*
     MAF Style Bench
   ***/
@@ -255,6 +257,7 @@ double Calculations::calculateFlowCFM() {
   int lookupValue;
   int numRows;
   
+  // TODO: We should really pass MAF value to this method
   lookupValue = _sensors.getMafValue();
 
   //Check MAF data is valid

@@ -2,16 +2,22 @@
 Current build status
 ===================================================================
 
-Project compiles and runs but will crash if I2C is enabled
-I2C dev work is not finished (BME + I2C disabled for testing)
-Websockets have been junked in favor of Server Side Events (SSE) to push sensor data to browser
+Project compiles and runs but I2C is still returning unstable data despite isolating I2C to just BME
+The tinyBME library returns valid stable data when run in isolation from rest of code
+Data becomes corrupt when run along side ESPAsyncWebserver
+Interwebs has lots of comments RE AsyncWS + I2C corruption, so this could be one potential cause.
+Could also still be related to synchronous tasks / interrupts. I am unsure what ESPAsyncWS does under the hood.
+Need to spend some time working through disabling each part of the code until I can isolate the cause.
+Then I can engineer a fix.
 
+I have written several I2C libraries to try and overcome the issue, but perhaps what I really need to do
+is to write new webserver code. 
 
 ===================================================================
 Current work in progress
 ===================================================================
 
-I2C class to bring BME and 1115 code into singular control and try and prevent data collisions.
+Trying to isolate I2C + AsyncWS issue.
 
 
 ===================================================================
@@ -19,6 +25,7 @@ Items to sort before formal release
 ===================================================================
 
 - Update mafData files
+- Translations
 - Rename DIY-Flow-Bench.cpp to DIY-Flow-Bench.ino for Arduino IDE compatibility
 
 ===================================================================
@@ -31,6 +38,16 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+22112201        - Integrated tiny::BME library
+                - Created tasks for sensor read and data push
+                - Added semaphore to tasks to prevent data corruption
+                - Created hex dump to serve favicon.ico file (browser load error)
+                - Changed sensor methods to use stored sensor values
+                - Started to update comments to Doxygen format
+                - Added WIP suffix to release version (Work In Progress)
+                - Removed I2CDev lbrary as tinyBME uses wire directly
+21112202        - Fixed file download
+                - Evaluating tiny::BME library
 21112201        - Fixed default web page
 20112202        - Browser reboot function improvements
                 - Removed unused constants

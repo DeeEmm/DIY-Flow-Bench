@@ -37,14 +37,13 @@
 #include MAF_DATA_FILE
 #endif
 
-// #ifdef ADC_IS_ENABLED
-// #include <Adafruit_ADS1X15.h>
-// #endif
 
 #ifdef BME_IS_ENABLED
-#include <SFunBME280.h>
-//#include "bme280.h"
+#define TINY_BME280_I2C
+#include "TinyBME280.h"
 #endif
+
+
 
 
 
@@ -56,21 +55,16 @@ Sensors::Sensors() {
 void Sensors::begin () {
 
 	Messages _message;
-	
 	_message.serialPrintf("Initialising Sensors \n");
-	
 	Sensors::initialise ();
-	
 	_message.serialPrintf("Sensors Initialised \n");
-
 }
-
 
 
 // NOTE: Voodoo needed to get interrupt to work within class structure for frequency measurement. 
 // We declare a new instance of the Sensor class so that we can use it for the MAF ISR
 // https://forum.arduino.cc/t/pointer-to-member-function/365758
-Sensors __mafVoodoo;
+// Sensors __mafVoodoo;
 
 
 
@@ -90,31 +84,28 @@ void Sensors::initialise () {
 	//initialise BME
 	#ifdef BME_IS_ENABLED
 	
-		//BME280 _bme280;
-		BME280 _BMESensor;
+		tiny::BME280 _BMESensor;
 		
 		_message.serialPrintf("Initialising BME280 \n");	
 		
-		_BMESensor.setMode(0); // Sleep mode - required when writing settings to BME device
-		_BMESensor.setReferencePressure(SEALEVELPRESSURE_HPA * 100);
-		_BMESensor.setI2CAddress(BME280_I2C_ADDR);
-		_BMESensor.beginI2C();
 		_BMESensor.setPressureOverSample(16);
 		_BMESensor.setHumidityOverSample(4);
 		_BMESensor.setTempOverSample(16);
 		_BMESensor.setStandbyTime(1);
 		_BMESensor.setFilter(16);
-		_BMESensor.setMode(2); // Normal
+		_BMESensor.setMode(tiny::Mode::NORMAL); // Normal
 		
-		//_bme280.initialise(BME280_I2C_ADDR);
-//		//_bme280.setControl(0x11); // 0x11 - Normal Mode
-	
-	
-		// if (!this->BME280init()) {
-		// 	_message.statusPrintf("BME280 device Error!! \n");
-		// } else {
-		// 	_message.statusPrintf("BME280 device initialised \n");		
-		// }
+		if (_BMESensor.beginI2C(BME280_I2C_ADDR) == false)
+		{
+			_message.serialPrintf("BME sensor did not respond. \n");
+			_message.serialPrintf("Please check wiring and I2C address\n");
+			_message.serialPrintf("BME I2C address %s set in configuration.h. \n", BME280_I2C_ADDR);
+			while(1); //Freeze
+		} else {
+			_message.serialPrintf("BME280 Initialised\n");
+		}
+
+
 	#endif
 
 
@@ -370,8 +361,6 @@ double Sensors::getTempValue() {
 
 	double refTempDegC;
 	
-	   // extern struct Translator translate;
-	
 	#ifdef TEMP_SENSOR_TYPE_LINEAR_ANALOG
 	
 		long rawTempValue = analogRead(TEMPERATURE_PIN);	
@@ -382,11 +371,9 @@ double Sensors::getTempValue() {
 		
 	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 
-		BME280 _BMESensor;
+		tiny::BME280 _BMESensor;
+		refTempDegC = _BMESensor.readFixedTempC() / 100;
 		
-		//refTempDegC = _bme280.getTemperature();
-		refTempDegC = _BMESensor.readTempC() / 100.00F;
-		refTempDegC +=  TEMP_FINE_ADJUST;
 
 	#elif defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
@@ -404,6 +391,7 @@ double Sensors::getTempValue() {
 		refTempDegC = DEFAULT_TEMP_VALUE;
 	#endif
 	
+	// if (TEMP_FINE_ADJUST != 0) refTempDegC += TEMP_FINE_ADJUST;
 	return refTempDegC;
 }
 
@@ -411,34 +399,31 @@ double Sensors::getTempValue() {
 
 /***********************************************************
 * Returns Barometric pressure in kPa
-* NOTE: Should we use hPa? (hPa is standard output of BME280)
+* NOTE: 1 kPa = 10 hPa | 1 hPa = 1 millibar
 ***/
 double Sensors::getBaroValue() {
 	
 	Hardware _hardware;
-
+	double baroPressureHpa;
 		
 	#if defined BARO_SENSOR_TYPE_LINEAR_ANALOG
 		
 		long rawBaroValue = analogRead(REF_BARO_PIN);
-		double baroMillivolts = (rawBaroValue * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;
+		double baroMillivolts = (rawBaroValue * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 10000;
 		baroMillivolts += BARO_MV_TRIMPOT;		
-		baroPressureKpa = baroMillivolts * BARO_ANALOG_SCALE;
-		baroPressureKpa += BARO_FINE_ADJUST;
+		baroPressureHpa = baroMillivolts * BARO_ANALOG_SCALE;
+		baroPressureHpa += BARO_FINE_ADJUST;
 	
 	#elif defined BARO_SENSOR_TYPE_MPX4115
 		// Datasheet - https://html.alldatasheet.es/html-pdf/5178/MOTOROLA/MPX4115/258/1/MPX4115.html
 		// Vout = VS (P x 0.009 – 0.095) --- Where VS = Supply Voltage (Formula from Datasheet)
-		baroPressureKpa = map(_hardware.getADCRawData(BARO_ADC_CHANNEL), 0, 4095, 15000, 115000);
-		baroPressureKpa += BARO_FINE_ADJUST;
+		baroPressureHpa = map(_hardware.getADCRawData(BARO_ADC_CHANNEL), 0, 4095, 15000, 115000);
+		baroPressureHpa += BARO_FINE_ADJUST;
 
 	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 
-		BME280 _BMESensor;
-			
-		// baroPressureKpa = _bme280.getBaro() * 10.0F; 
-		baroPressureKpa = _BMESensor.readFloatPressure() * 10.0F; // Convert hPa to kPa
-		baroPressureKpa += BARO_FINE_ADJUST;
+		tiny::BME280 _BMESensor;
+		baroPressureHpa = _BMESensor.readFixedPressure() / 100; 
 		
 	#elif defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
 		// No baro sensor defined so use value grabbed at startup from reference pressure sensor
@@ -454,7 +439,8 @@ double Sensors::getBaroValue() {
 	// int value = baroPressureKpa * 100 + .5;
     // return (double)value / 100;
 
-	return baroPressureKpa;
+	// if (BARO_FINE_ADJUST != 0) baroPressureKpa += BARO_FINE_ADJUST;
+	return baroPressureHpa;
 
 }
 
@@ -466,6 +452,8 @@ double Sensors::getBaroValue() {
 double Sensors::getRelHValue() {
 	
 	Hardware _hardware;
+
+	double relativeHumidity;
 
 	  // extern struct Translator translate;
 		
@@ -491,19 +479,16 @@ double Sensors::getRelHValue() {
 
 	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 
-		BME280 _BMESensor;
-	
-		// relativeHumidity = _bme280.getHumidity(); 
-		relativeHumidity = _BMESensor.readFloatHumidity() * 10;
-		relativeHumidity + RELH_FINE_ADJUST;
+		tiny::BME280 _BMESensor;
+		relativeHumidity = _BMESensor.readFixedHumidity() / 1000;
 		
-
 	#else
 		// we don't have a sensor so use nominal fixed value 
 		relativeHumidity = DEFAULT_RELH_VALUE; // (36%)
 	
 	#endif
 
+	// if (RELH_FINE_ADJUST != 0) relativeHumidity += RELH_FINE_ADJUST;
 	return relativeHumidity;
 	
 }
@@ -740,9 +725,7 @@ double Sensors::getPitotValue() {
 	#else
 		pitotMillivolts = 1;
 		return 1;
-	#endif
-	
-//Serial.println(pitotPressRaw);		
+	#endif		
 	
 	pitotMillivolts += PITOT_MV_TRIMPOT;
 	
@@ -765,217 +748,3 @@ double Sensors::getPitotValue() {
 
 }
 
-
-
-
-
-
-
-
-
-//DEPRECATED:
-/*
-
-
-// https://github.com/Seeed-Studio/Grove_BME280/blob/master/Seeed_BME280.cpp
-
-bool Sensors::BME280init() {
-	
-	Messages _message;
-	
-	uint8_t retry = 0;
-	uint8_t chip_id = 0;
-	
-	// while ((retry++ < 5) && (chip_id != 0x60)) {
-	// 	chip_id = Sensors::BME280Read8(BME280_REG_CHIPID);
-	// 	_message.statusPrintf("BME280 Read chip ID: %s \n", chip_id);
-	// 	delay(100);
-	// }
-	if (chip_id != 0x60){
-		_message.statusPrintf("BME280 Read Chip ID fail! \n");
-		return false;
-	}
-	
-	dig_T1 = BME280Read16LE(BME280_REG_DIG_T1);
-	dig_T2 = BME280ReadS16LE(BME280_REG_DIG_T2);
-	dig_T3 = BME280ReadS16LE(BME280_REG_DIG_T3);
-	
-	dig_P1 = BME280Read16LE(BME280_REG_DIG_P1);
-	dig_P2 = BME280ReadS16LE(BME280_REG_DIG_P2);
-	dig_P3 = BME280ReadS16LE(BME280_REG_DIG_P3);
-	dig_P4 = BME280ReadS16LE(BME280_REG_DIG_P4);
-	dig_P5 = BME280ReadS16LE(BME280_REG_DIG_P5);
-	dig_P6 = BME280ReadS16LE(BME280_REG_DIG_P6);
-	dig_P7 = BME280ReadS16LE(BME280_REG_DIG_P7);
-	dig_P8 = BME280ReadS16LE(BME280_REG_DIG_P8);
-	dig_P9 = BME280ReadS16LE(BME280_REG_DIG_P9);
-	
-	dig_H1 = BME280Read8(BME280_REG_DIG_H1);
-	dig_H2 = BME280Read16LE(BME280_REG_DIG_H2);
-	dig_H3 = BME280Read8(BME280_REG_DIG_H3);
-	dig_H4 = (BME280Read8(BME280_REG_DIG_H4) << 4) | (0x0F & BME280Read8(BME280_REG_DIG_H4 + 1));
-	dig_H5 = (BME280Read8(BME280_REG_DIG_H5 + 1) << 4) | (0x0F & BME280Read8(BME280_REG_DIG_H5) >> 4);
-	dig_H6 = (int8_t)BME280Read8(BME280_REG_DIG_H6);
-	
-	BME280WriteRegister(BME280_REG_CTRLHUMID, 0x05);  //Choose 16X oversampling
-	BME280WriteRegister(BME280_REG_CTRL, 0xB7);  //Choose 16X oversampling
-	
-	return true;
-}
-
-double Sensors::BME280GetTemperature(void) {
-	int32_t var1, var2;
-
-	int32_t adc_T = BME280Read24(BME280_REG_TEMPDATA);
-	// Check if the last transport succeeded
-	if (!isTransport_OK) {
-		return 0;
-	}
-	adc_T >>= 4;
-	var1 = (((adc_T >> 3) - ((int32_t)(dig_T1 << 1))) *	((int32_t)dig_T2)) >> 11;
-	var2 = (((((adc_T >> 4) - ((int32_t)dig_T1)) * ((adc_T >> 4) - ((int32_t)dig_T1))) >> 12) * ((int32_t)dig_T3)) >> 14;
-	t_fine = var1 + var2;
-	double T = (t_fine * 5 + 128) >> 8;
-	return T / 100;
-}
-
-
-double Sensors::BME280getBaro(void) {
-  int64_t var1, var2, p;
-  // Call getTemperature to get t_fine
-  BME280GetTemperature();
-  // Check if the last transport succeeded
-  if (!isTransport_OK) {
-	return 0;
-  }
-  int32_t adc_P = BME280Read24(BME280_REG_PRESSUREDATA);
-  adc_P >>= 4;
-  var1 = ((int64_t)t_fine) - 128000;
-  var2 = var1 * var1 * (int64_t)dig_P6;
-  var2 = var2 + ((var1 * (int64_t)dig_P5) << 17);
-  var2 = var2 + (((int64_t)dig_P4) << 35);
-  var1 = ((var1 * var1 * (int64_t)dig_P3) >> 8) + ((var1 * (int64_t)dig_P2) << 12);
-  var1 = (((((int64_t)1) << 47) + var1)) * ((int64_t)dig_P1) >> 33;
-  if (var1 == 0) {
-	return 0; // avoid exception caused by division by zero
-  }
-  p = 1048576 - adc_P;
-  p = (((p << 31) - var2) * 3125) / var1;
-  var1 = (((int64_t)dig_P9) * (p >> 13) * (p >> 13)) >> 25;
-  var2 = (((int64_t)dig_P8) * p) >> 19;
-  p = ((p + var1 + var2) >> 8) + (((int64_t)dig_P7) << 4);
-  return (double)(p / 256.0);
-}
-
-double Sensors::BME280GetHumidity(void) {
-  int32_t v_x1_u32r, adc_H;
-  // Call getTemperature to get t_fine	
-  BME280GetTemperature();
-  // Check if the last transport succeeded
-  if (!isTransport_OK) {
-	return 0;
-  }
-  adc_H = BME280Read16(BME280_REG_HUMIDITYDATA);
-  v_x1_u32r = (t_fine - ((int32_t)76800));
-  v_x1_u32r = (((((adc_H << 14) - (((int32_t)dig_H4) << 20) - (((int32_t)dig_H5) * v_x1_u32r)) + ((int32_t)16384)) >> 15) * (((((((v_x1_u32r * ((int32_t)dig_H6)) >> 10) * (((v_x1_u32r * ((int32_t)dig_H3)) >> 11) + ((int32_t)32768))) >> 10) + ((int32_t)2097152)) * ((int32_t)dig_H2) + 8192) >> 14));
-  v_x1_u32r = (v_x1_u32r - (((((v_x1_u32r >> 15) * (v_x1_u32r >> 15)) >> 7) * ((int32_t)dig_H1)) >> 4));
-  v_x1_u32r = (v_x1_u32r < 0 ? 0 : v_x1_u32r);
-  v_x1_u32r = (v_x1_u32r > 419430400 ? 419430400 : v_x1_u32r);
-  v_x1_u32r = v_x1_u32r >> 12;
-  double h = v_x1_u32r / 1024.0;
-  return h;
-}
-
-
-uint8_t Sensors::BME280Read8(uint8_t reg) {
-	
-	Wire.beginTransmission(BME280_I2C_ADDR);
-	Wire.write(reg);
-	Wire.endTransmission();
-
-	Wire.requestFrom(BME280_I2C_ADDR, 1);
-	// return 0 if slave didn't response
-	if (Wire.available() < 1) {
-		isTransport_OK = false;
-		return 0;
-	} else {
-		isTransport_OK = true;
-	}
-
-	return Wire.read();
-}
-
-
-uint16_t Sensors::BME280Read16(uint8_t reg) {
-	uint8_t msb, lsb;
-
-	Wire.beginTransmission(BME280_I2C_ADDR);
-	Wire.write(reg);
-	Wire.endTransmission();
-
-	Wire.requestFrom(BME280_I2C_ADDR, 2);
-	// return 0 if slave didn't response
-	if (Wire.available() < 2) {
-		isTransport_OK = false;
-		return 0;
-	} else {
-		isTransport_OK = true;
-	}
-	msb = Wire.read();
-	lsb = Wire.read();
-
-	return (uint16_t) msb << 8 | lsb;
-}
-
-
-uint16_t Sensors::BME280Read16LE(uint8_t reg) {
-	uint16_t data = BME280Read16(reg);
-	return (data >> 8) | (data << 8);
-}
-
-int16_t Sensors::BME280ReadS16(uint8_t reg) {
-	return (int16_t)BME280Read16(reg);
-}
-
-int16_t Sensors::BME280ReadS16LE(uint8_t reg) {
-	return (int16_t)BME280Read16LE(reg);
-}
-
-uint32_t Sensors::BME280Read24(uint8_t reg) {
-	
-	Messages _message;
-	
-	uint32_t data;
-
-	Wire.beginTransmission(BME280_I2C_ADDR);
-	Wire.write(reg);
-	Wire.endTransmission();
-
-	Wire.requestFrom(BME280_I2C_ADDR, 3);
-	// return 0 if slave didn't respond
-	// if (Wire.available() < 3) {
-	// 	isTransport_OK = false;
-	// 	return 0;
-	// } else if (isTransport_OK == false) {
-	// 	isTransport_OK = true;
-	// 	if (!BME280init()) {
-	// 		_message.statusPrintf("BME280 device not connected or broken! \n");
-	// 	}
-	// }
-	data = Wire.read();
-	data <<= 8;
-	data |= Wire.read();
-	data <<= 8;
-	data |= Wire.read();
-
-	return data;
-}
-
-void Sensors::BME280WriteRegister(uint8_t reg, uint8_t val) {
-	Wire.beginTransmission(BME280_I2C_ADDR); // start transmission to device
-	Wire.write(reg);       // send register address
-	Wire.write(val);         // send value to write
-	Wire.endTransmission();     // end transmission
-}
-
-*/

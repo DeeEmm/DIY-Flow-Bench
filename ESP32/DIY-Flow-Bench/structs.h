@@ -34,7 +34,7 @@ struct ConfigSettings {
   long serial_baud_rate = 115200;                 // Default baud rate 
   unsigned long wifi_timeout = 15000;             // Time in millisec's before falling back to AP mode
   int min_flow_rate = 3;                          // Flow rate at which bench is considered running
-  int min_bench_pressure = 0;                     // Min bench pressure where bench is considered running
+  int min_bench_pressure = 3;                     // Min bench pressure where bench is considered running
   int maf_min_millivolts = 100;                   // Filter out results less than this
   int refresh_rate = 200;                         // Screen refresh rate in milliseconds (>180)
   double cal_ref_press = 10;                       // Calibration orifice refe pressure
@@ -131,10 +131,13 @@ struct FileUploadData {
  ***/
 struct SensorData {
   double MAF;
+  double FlowMASS;
+  double FlowCFM;
   double MafMv;
   double TempDegC;
   double RelH;
   double BaroKPA;
+  double BaroHPA;
   double PRefKPA;
   double PRefMv;
   double PDiffKPA;

@@ -40,8 +40,8 @@ if (!!window.EventSource) {
     document.getElementById("PITOT").innerHTML = e.data;
   }, false);
   
-  source.addEventListener('DIFF', function(e) {
-    document.getElementById("DIFF").innerHTML = e.data;
+  source.addEventListener('PDIFF', function(e) {
+    document.getElementById("PDIFF").innerHTML = e.data;
   }, false); 
 
   source.addEventListener('TEMP', function(e) {

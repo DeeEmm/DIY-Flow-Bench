@@ -229,8 +229,8 @@
     #define SERIAL0_RX_PIN              3                       // API
     #define SERIAL2_TX_PIN              16                      // GAUGE PROTOCOL
     #define SERIAL2_RX_PIN              17                      // GAUGE PROTOCOL
-    #define SCA_PIN                     21                      // BME280 etc
-    #define SCL_PIN                     22                      // BME280 etc
+    #define SCA_PIN                     21                      // BME280 SCA
+    #define SCL_PIN                     22                      // BME280 SCL
     
     // SPARE
     #define SPARE_PIN_1                 33                      // [JTAG TMS]                     

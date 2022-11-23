@@ -147,6 +147,14 @@ hr {
 	color: #333
 }
 
+.tile-pdiff {
+  display:none;
+}
+
+.tile-pitot {
+  display:block;
+}
+
 .config-panel {
   max-width: 650px;
   margin: auto auto;

@@ -80,12 +80,17 @@
           <div class="tile tile-pref">
             <p class="tile-title">Ref Pressure</p>
             <p><span class="tile-value" id="PREF">&nbsp;</span></p>
-            <p class="units"> In/Aq</p>
+            <p class="units">In/Aq</p>
           </div>
           <div class="tile tile-flow">
             <p class="tile-title">Flow Rate</p>
             <p><span class="tile-value" id="FLOW">&nbsp;</span></p>
             <p class="units">cfm</p>
+          </div>
+          <div class="tile tile-pdiff">
+            <p class="tile-title">Diff Pressure</p>
+            <p><span class="tile-value" id="PDIFF">&nbsp;</span></p>
+            <p class="units">In/Aq</p>
           </div>
           <div class="tile tile-pitot">
             <p class="tile-title">Pitot</p>
@@ -247,7 +252,7 @@
           <div class="config-row tooltip"><label class="config-label">WiFi AP SSID:</label>&nbsp;<input type="text" id="CONF_WIFI_AP_SSID" name="CONF_WIFI_AP_SSID" value="%CONF_WIFI_AP_SSID%" class="config-text" ><span class="tooltiptext">Access-point name for direct WiFi connection</span></div>
           <div class="config-row tooltip"><label class="config-label">WiFi AP Password:</label>&nbsp;<input type="text" id="CONF_WIFI_AP_PSWD" name="CONF_WIFI_AP_PSWD" value="%CONF_WIFI_AP_PSWD%" class="config-text"><span class="tooltiptext">Access-point password</span></div>
           <div class="config-row tooltip"><label class="config-label">Hostname:</label>&nbsp;<input type="text" id="CONF_HOSTNAME" name="CONF_HOSTNAME" value="%CONF_HOSTNAME%" class="config-text"><span class="tooltiptext">DNS Hostname (used for connecting via URL e.g. http://diyfb.local)</span></div>
-          <div class="config-row tooltip"><label class="config-label">WiFi Timeout:</label>&nbsp;<input type="text" id="CONF_WIFI_TIMEOUT" name="CONF_WIFI_TIMEOUT" value="%CONF_WIFI_TIMEOUT%" class="config-text"><span class="tooltiptext">Number of seconds before WiFi defaults to Access-point mode</span></div>
+          <div class="config-row tooltip"><label class="config-label">WiFi Timeout:</label>&nbsp;<input type="text" id="CONF_WIFI_TIMEOUT" name="CONF_WIFI_TIMEOUT" value="%CONF_WIFI_TIMEOUT%" class="config-text"><span class="tooltiptext">Number of milliseconds before WiFi defaults to Access-point mode</span></div>
           <br>
           <h3>API Settings</h3>
           <div class="config-row tooltip"><label class="config-label">API Delimiter:</label>&nbsp;<input type="text" id="CONF_API_DELIM" name="CONF_API_DELIM" value="%CONF_API_DELIM%" class="config-text"><span class="tooltiptext">Character used to delimit API / Serial data </span></div>
@@ -263,10 +268,10 @@
           <div class="config-row tooltip"><label class="config-label">Refresh Rate:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="%CONF_REFRESH_RATE%" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
           <br>
           <h3>Calibration Settings</h3>
-          <div class="config-row tooltip"><label class="config-label">Orifice Flow Rate:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="%CONF_CAL_FLOW_RATE%" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice Test Pressure:</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="%CONF_CAL_REF_PRESS%" class="config-text"><span class="tooltiptext">Reference pressure of calibration orifice</span></div>
+          <div class="config-row tooltip"><label class="config-label">Orifice Flow Rate:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="%CONF_CAL_FLOW_RATE%" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice in cfm</span></div>
+          <div class="config-row tooltip"><label class="config-label">Orifice Test Pressure:</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="%CONF_CAL_REF_PRESS%" class="config-text"><span class="tooltiptext">Reference depression of calibration orifice in in/wg</span></div>
           <div class="config-row tooltip"><label class="config-label">Leak Test Tolerance:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_TOLERANCE" name="CONF_LEAK_TEST_TOLERANCE" value="%CONF_LEAK_TEST_TOLERANCE%" class="config-text"><span class="tooltiptext">Maximum allowable deviation in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Leak Test Threshold:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_THRESHOLD" name="CONF_LEAK_TEST_THRESHOLD" value="%CONF_LEAK_TEST_THRESHOLD%" class="config-text"><span class="tooltiptext">Value above which leak test activates</span></div>
+          <div class="config-row tooltip"><label class="config-label">Leak Test Threshold:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_THRESHOLD" name="CONF_LEAK_TEST_THRESHOLD" value="%CONF_LEAK_TEST_THRESHOLD%" class="config-text"><span class="tooltiptext">Depression value above which leak test activates</span></div>
           <br>
           <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
         </form>

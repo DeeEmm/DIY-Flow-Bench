@@ -53,7 +53,6 @@ void Webserver::begin()
   extern DeviceStatus status;
 
   server = new AsyncWebServer(80);
-  // webskt = new AsyncWebSocket("/ws");
   events = new AsyncEventSource("/events");
 
   Messages _message;
@@ -216,14 +215,6 @@ void Webserver::begin()
       } 
       request->redirect("/"); });
 
-
-  // Upload request handler
-  server->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
-      Messages _message;
-      _message.serialPrintf("Upload Request Called \n");
-      request->redirect("/?view=upload"); },
-      processUpload);
-
   // Upload request handler
   server->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
       Messages _message;
@@ -235,7 +226,7 @@ void Webserver::begin()
   server->on("/api/file/download", HTTP_GET, [](AsyncWebServerRequest *request){              
       Messages _message;
       String downloadFilename = request->url();
-      downloadFilename.remove(0,9);
+      downloadFilename.remove(0,18); // Strip the file path (first 18 chars)
       _message.debugPrintf("Request Download File: %s \n", downloadFilename);
       request->send(SPIFFS, downloadFilename, String(), true); });
 
@@ -271,7 +262,14 @@ void Webserver::begin()
 
   // Javascript file request handler
   server->on("/javascript.js", HTTP_ANY, [](AsyncWebServerRequest *request){ request->send(SPIFFS, "/javascript.js", "text/javascript"); });
-             
+
+  // Favicon rquest handler (icon hex dump is in constants.h)
+  server->on("/favicon.ico", HTTP_ANY, [](AsyncWebServerRequest *request){
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "image/x-icon", favicon_ico_gz, favicon_ico_gz_len);
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  });
+  
   // Index page request handler
   server->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
       if (SPIFFS.exists("/index.html")) {
@@ -280,20 +278,7 @@ void Webserver::begin()
         request->send(200, "text/html", LANG_VAL_INDEX_HTML); 
       } });
 
-
-  // Handle SSE Web Server Events
-  // NOTE: SSE Event pushed in main loop (DIY-Flow-Bench.ino)
-  events->onConnect([](AsyncEventSourceClient *client){
-    if(client->lastId()){
-      // _message.serialPrintf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
-      Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
-    }
-    // send event with message "hello!", id current millis and set reconnect delay to 1 second
-    client->send("hello!", NULL, millis(), 10000);
-  });
-
   server->onFileUpload(processUpload);
-  // server->addHandler(webskt);
   server->addHandler(events);
   server->begin();
 
@@ -574,7 +559,7 @@ String Webserver::getDataJSON()
 
   // double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INWG);
 
-  double mafFlowCFM = _calculations.calculateFlowCFM();
+  double mafFlowCFM = sensorVal.MAF;
 
   StaticJsonDocument<1024> dataJson;
 
@@ -791,7 +776,7 @@ String Webserver::processTemplate(const String &var)
     while (file)  {
       fileName = file.name();
       fileSize = file.size();
-      fileList += "<div class='fileListRow'><span class='column left'><a href='/api/file/download" + fileName + " download class='file-link' onclick='downloadFile('" + fileName + "')'>" + fileName + "</a></span><span class='column middle'><span class='fileSizeTxt'>" + fileSize + " bytes</span></span><span class='column right'><form method='POST' action='/api/file/delete'><input type='hidden' name='filename' value='/" + fileName + "'><input id='delete-button'  class='button-sml' type='submit' value='Delete'></form></span></div>";
+      fileList += "<div class='fileListRow'><span class='column left'><a href='/api/file/download/" + fileName + "' download class='file-link'>" + fileName + "</a></span><span class='column middle'><span class='fileSizeTxt'>" + fileSize + " bytes</span></span><span class='column right'><form method='POST' action='/api/file/delete'><input type='hidden' name='filename' value='/" + fileName + "'><input id='delete-button'  class='button-sml' type='submit' value='Delete'></form></span></div>";
       file = root.openNextFile();
     }
     return fileList;

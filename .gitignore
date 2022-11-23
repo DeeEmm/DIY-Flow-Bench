@@ -3,6 +3,7 @@
 .vscode/*
 build/*
 libdeps/*
+lib/dev*
 components/*
 node_modules/*
 partition_table/*
