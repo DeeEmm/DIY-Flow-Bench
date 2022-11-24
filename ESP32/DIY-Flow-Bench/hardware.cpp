@@ -30,6 +30,7 @@
 #include "messages.h"
 #include LANGUAGE_FILE
 
+
 // NOTE: I2C code should be brought into hardware.cpp
 // NOTE: If we replace I2Cdev with wire we need to rewrite the ADC Code
 // #include <I2Cdev.h>
@@ -105,6 +106,7 @@ void Hardware::begin () {
   Messages _message;
   extern struct DeviceStatus status;
   
+  this->beginSerial();
   _message.serialPrintf("Initialising Hardware \n");
   configurePins();
   this->getI2CList();
@@ -136,6 +138,28 @@ void Hardware::begin () {
 
 
 /***********************************************************
+* Begin Serial
+*
+* Default port Serial0 (U0UXD) used. (Same as programming port / usb)
+* NOTE: Serial1 reserved for SPI
+* NOTE: Serial2 reserved for gauge comms
+*
+* Serial.begin(baud-rate, protocol, RX pin, TX pin);
+*
+* TODO:  Should we move into hardware? 
+* Serial port is not specifically tied to messages and is also shared with API
+*/
+void Hardware::beginSerial(void) {
+	
+	#if defined SERIAL0_ENABLED
+		Serial.begin(SERIAL0_BAUD, SERIAL_8N1 , SERIAL0_RX_PIN, SERIAL0_TX_PIN); 
+	#endif
+	
+}
+
+
+
+/***********************************************************
 * Get list of I2C devices 
 *
 * Based on: https://www.esp32.com/viewtopic.php?t=4742
@@ -143,7 +167,10 @@ void Hardware::begin () {
 void Hardware::getI2CList() {   
   
   Messages _message;
+
+  // #define CONFIG_DISABLE_HAL_LOCKS
   Wire.begin (SCA_PIN, SCL_PIN); 
+  Wire.setClock(400000);
 
   _message.serialPrintf("Scanning for I2C devices...\n");
   byte count = 0;
@@ -158,6 +185,8 @@ void Hardware::getI2CList() {
     }
   }
   
+  Wire.end(); // Kill Wire here so that I2C can start clean with different settings
+
   _message.serialPrintf("Found %u device(s). \n", count);
 
 }

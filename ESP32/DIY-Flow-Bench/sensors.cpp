@@ -41,9 +41,9 @@
 #ifdef BME_IS_ENABLED
 #define TINY_BME280_I2C
 #include "TinyBME280.h"
+tiny::BME280 _BMESensor;
+TwoWire I2CBME = TwoWire(0);
 #endif
-
-
 
 
 
@@ -84,16 +84,10 @@ void Sensors::initialise () {
 	//initialise BME
 	#ifdef BME_IS_ENABLED
 	
-		tiny::BME280 _BMESensor;
-		
 		_message.serialPrintf("Initialising BME280 \n");	
-		
-		_BMESensor.setPressureOverSample(16);
-		_BMESensor.setHumidityOverSample(4);
-		_BMESensor.setTempOverSample(16);
-		_BMESensor.setStandbyTime(1);
-		_BMESensor.setFilter(16);
-		_BMESensor.setMode(tiny::Mode::NORMAL); // Normal
+
+		Wire.begin (SCA_PIN, SCL_PIN); 
+		Wire.setClock(20000);
 		
 		if (_BMESensor.beginI2C(BME280_I2C_ADDR) == false)
 		{
@@ -105,6 +99,12 @@ void Sensors::initialise () {
 			_message.serialPrintf("BME280 Initialised\n");
 		}
 
+		_BMESensor.setTempOverSample(1);
+		_BMESensor.setPressureOverSample(1);
+		_BMESensor.setHumidityOverSample(1);
+		_BMESensor.setStandbyTime(0);
+		_BMESensor.setFilter(0);
+		_BMESensor.setMode(tiny::Mode::NORMAL); // NORMAL / FORCED / SLEEP
 
 	#endif
 
@@ -371,9 +371,7 @@ double Sensors::getTempValue() {
 		
 	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 
-		tiny::BME280 _BMESensor;
 		refTempDegC = _BMESensor.readFixedTempC() / 100;
-		
 
 	#elif defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
@@ -422,7 +420,6 @@ double Sensors::getBaroValue() {
 
 	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 
-		tiny::BME280 _BMESensor;
 		baroPressureHpa = _BMESensor.readFixedPressure() / 100; 
 		
 	#elif defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
@@ -479,7 +476,6 @@ double Sensors::getRelHValue() {
 
 	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 
-		tiny::BME280 _BMESensor;
 		relativeHumidity = _BMESensor.readFixedHumidity() / 1000;
 		
 	#else

@@ -17,7 +17,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "22112201"
+#define BUILD_NUMBER "22112401"
 #define RELEASE "V.2.0-RC.3-WIP"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -65,8 +65,8 @@
 *
 ***/
 
-#define SERIAL0_ENABLED
-#define SERIAL2_ENABLED
+#define SERIAL0_ENABLED                                  // Default serial comms (API & status)
+// #define SERIAL2_ENABLED                                  // Digital guage serial protocol
 
 #define SERIAL0_BAUD 115200
 #define SERIAL2_BAUD 9600

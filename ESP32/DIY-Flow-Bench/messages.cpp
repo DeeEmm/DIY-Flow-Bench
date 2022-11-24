@@ -56,35 +56,6 @@ Messages::Messages() {
 }
 
 
-/***********************************************************
-* Initialise class
-*/
-void Messages::begin(void) {
-		
-	this->beginSerial();
-	
-}
-
-
-/***********************************************************
-* Begin Serial
-*
-* Default port Serial0 (U0UXD) used. (Same as programming port / usb)
-* NOTE: Serial1 reserved for SPI
-* NOTE: Serial2 reserved for gauge comms
-*
-* Serial.begin(baud-rate, protocol, RX pin, TX pin);
-*
-* TODO:  Should we move into hardware? 
-* Serial port is not specifically tied to messages also shared with API
-*/
-void Messages::beginSerial(void) {
-	
-	#if defined SERIAL0_ENABLED
-		Serial.begin(SERIAL0_BAUD, SERIAL_8N1 , SERIAL0_RX_PIN, SERIAL0_TX_PIN); 
-	#endif
-	
-}
 
 
 
@@ -139,7 +110,8 @@ size_t Messages::serialPrintf(const std::string format, ...) {
 		vsnprintf(buf, sizeof(buf), format.c_str(), ap);
 		va_end(ap);
 		return(Serial.write(buf));
-		
+	#else	
+		return 0;
 	#endif
 }
 
@@ -162,7 +134,8 @@ size_t Messages::blobPrintf(std::string format, ...) {
 		vsnprintf(buf, sizeof(buf), format.c_str(), ap);
 		va_end(ap);
 		return(Serial.write(buf));
-
+	#else	
+		return 0;
 	#endif
 }
 
@@ -190,7 +163,8 @@ size_t Messages::statusPrintf(const std::string format, ...) {
 		} else {
 			return 0;
 		}
-		
+	#else	
+		return 0;
 	#endif
 }
 
@@ -218,7 +192,8 @@ size_t Messages::debugPrintf(const std::string format, ...) {
 		} else {
 			return 0;
 		}
-		
+	#else	
+		return 0;	
 	#endif
 }
 

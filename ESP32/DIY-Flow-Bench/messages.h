@@ -31,9 +31,6 @@ class Messages {
 		Messages();
 		
 		void Handler(const String langPhrase);
-		void begin(void);
-		void beginSerial(void);
-
 		size_t serialPrintTestf(char *buf, char *format, ...);
 		size_t serialPrintf(const std::string format, ...);
 		size_t blobPrintf(std::string format, ...);

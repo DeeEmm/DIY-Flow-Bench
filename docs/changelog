@@ -20,6 +20,14 @@ Current work in progress
 Trying to isolate I2C + AsyncWS issue.
 
 
+Poss thread safe library for i2c BME280 + ADS1115 (recommended + official)
+https://github.com/UncleRus/esp-idf-lib
+https://esp-idf-lib.readthedocs.io/en/latest/groups/i2cdev.html
+https://esp-idf-lib.readthedocs.io/en/latest/
+https://esp-idf-lib.readthedocs.io/en/latest/groups/bmp280.html        
+
+Alternate https://github.com/epvuc/esp-fume-detector/blob/master/main/bme280_sup.c ????
+
 ===================================================================
 Items to sort before formal release
 ===================================================================
@@ -38,6 +46,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+22112401        - Solved I2C BME280 read issue - Redefinition of BME class within sensor read methods
 22112201        - Integrated tiny::BME library
                 - Created tasks for sensor read and data push
                 - Added semaphore to tasks to prevent data corruption

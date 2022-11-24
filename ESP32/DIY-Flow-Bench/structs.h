@@ -105,16 +105,6 @@ struct DeviceStatus {
 
 
 /***********************************************************
- * Websocket data
- ***/
-struct WebsocketData {
-  String file_name;
-  int length = 0;
-};
-
-
-
-/***********************************************************
  * File upload data
  ***/
 struct FileUploadData {

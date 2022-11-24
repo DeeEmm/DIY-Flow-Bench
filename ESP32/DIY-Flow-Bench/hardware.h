@@ -36,6 +36,7 @@ class Hardware {
 		void begin ();
 		//TODO: return array of I2C devices
 		//int * getI2CList();
+		void beginSerial(void);
 		void getI2CList();
 		void getI2CDeviceList();
 		bool isADCConversionReady();

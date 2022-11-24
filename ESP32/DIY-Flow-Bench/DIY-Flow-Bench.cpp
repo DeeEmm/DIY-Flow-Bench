@@ -57,19 +57,17 @@
 ConfigSettings config;
 CalibrationSettings calibration;
 DeviceStatus status;
-WebsocketData socketData;
 FileUploadData fileUploadData;
-//mafSensorData mafSensor;
 SensorData sensorVal;
 Translator translate;
 
 // Initiate Classes
-Hardware _hardware;
-Webserver _webserver;
-Calculations _calculations;
-Sensors _sensors;
-Messages _message;
 API _api;
+Calculations _calculations;
+Hardware _hardware;
+Messages _message;
+Sensors _sensors;
+Webserver _webserver;
 
 // Set up semaphore signalling between tasks
 SemaphoreHandle_t i2c_task_mutex;
@@ -94,7 +92,7 @@ void TASKgetBenchData( void * parameter ){
   for( ;; ) {
     // Check if semaphore available
     if (millis() > status.adcPollTimer){
-      if (xSemaphoreTake(i2c_task_mutex,100)==pdTRUE) {
+      if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
         status.adcPollTimer = millis() + ADC_SCAN_DELAY_MS; // Only reset timer when task executes
         // Get MAF Value and truncate to 2DP
         sensorVal.FlowMASS = _sensors.getMafValue();
@@ -134,9 +132,13 @@ void TASKgetEnviroData( void * parameter ){
       if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
         status.bmePollTimer = millis() + BME_SCAN_DELAY_MS; // Only reset timer when task executes
         sensorVal.TempDegC = _sensors.getTempValue();
+        vTaskDelay(3);
         sensorVal.BaroHPA = _sensors.getBaroValue();
+        vTaskDelay(3);
         sensorVal.BaroKPA = sensorVal.BaroHPA / 10;
+        vTaskDelay(3);
         sensorVal.RelH = _sensors.getRelHValue();
+        vTaskDelay(3);
         xSemaphoreGive(i2c_task_mutex); // Release semaphore
       }
     }
@@ -181,11 +183,12 @@ void TASKpushData( void * parameter ){
  ***/
 void setup(void) {
   
-  _message.begin();
-  _message.serialPrintf("\r\nDIY Flow Bench \nVersion: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);  
   _hardware.begin();
   _sensors.begin();
+
+  _message.serialPrintf("\r\nDIY Flow Bench \nVersion: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);    
   if (config.api_enabled) _message.serialPrintf("Serial API Enabled \n");
+
   #ifdef WEBSERVER_ENABLED
   _webserver.begin();
   #endif
@@ -217,9 +220,9 @@ void setup(void) {
 
   i2c_task_mutex = xSemaphoreCreateMutex();
 
-  xTaskCreate(TASKgetEnviroData, "BME_TASK", 20480, NULL, 20, &bmeTaskHandle);
+  xTaskCreate(TASKgetEnviroData, "BME_TASK", 20480, NULL, 2, &bmeTaskHandle);
   // xTaskCreate(TASKgetBenchData, "ADC_TASK", 20480, NULL, 2, &adcTaskHandle);
-  xTaskCreate(TASKpushData, "SSE_TASK", 20480, NULL, 20, &sseTaskHandle);
+  xTaskCreate(TASKpushData, "SSE_TASK", 20480, NULL, 2, &sseTaskHandle);
 
 }
 
