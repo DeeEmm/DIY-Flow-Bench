@@ -34,6 +34,7 @@ class Hardware {
 	public:
 		Hardware();
 		void begin ();
+		void initialise ();
 		//TODO: return array of I2C devices
 		//int * getI2CList();
 		void beginSerial(void);

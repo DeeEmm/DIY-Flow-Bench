@@ -35,7 +35,10 @@
 // NOTE: If we replace I2Cdev with wire we need to rewrite the ADC Code
 // #include <I2Cdev.h>
 
-
+#ifdef ADC_IS_ENABLED
+#include <ADS1115_lite.h>
+ADS1115_lite adc(ADC_I2C_ADDR);
+#endif
 
 /***********************************************************
 * CONSTRUCTOR
@@ -96,22 +99,17 @@ void Hardware::configurePins () {
 
 
 /***********************************************************
-* INITIALISE HARDWARE
-* 
-* TODO: Need to move ALL hardware initialisation into here
-*
-***/
+ * @brief begin method
+ * 
+ * TODO: Need to move ALL hardware initialisation into here
+ **/
 void Hardware::begin () {
 
   Messages _message;
   extern struct DeviceStatus status;
   
-  this->beginSerial();
-  _message.serialPrintf("Initialising Hardware \n");
-  configurePins();
-  this->getI2CList();
-  _message.serialPrintf("Hardware Initialised \n");
-
+  this->beginSerial();                                      // Start of serial comms
+  this->initialise();                                       // Initialise hardware
 
   // Bench definitions for system status pane
   #if defined MAF_STYLE_BENCH
@@ -134,6 +132,39 @@ void Hardware::begin () {
   #endif
   
 }
+
+
+/***********************************************************
+ * @brief Initialise hardware
+*/
+void Hardware::initialise () {
+
+  Messages _message;
+
+  _message.serialPrintf("Initialising Hardware \n");
+
+  configurePins(); // Load pin definitions from pins.h
+  this->getI2CList(); // Scan and list I2C devices to serial monitor
+
+  #ifdef ADC_IS_ENABLED
+  _message.serialPrintf("Initialising ADS1115 \n");
+
+  // adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V);
+  // adc.setSampleRate(ADS1115_REG_CONFIG_DR_16SPS); // 16 samples / sec
+  
+  if (!adc.testConnection()) {
+      _message.serialPrintf("ADS1115 Connection failed");
+			while(1); //Freeze
+		} else {
+			_message.serialPrintf("ADS1115 Initialised\n");
+  }
+  #endif
+
+  _message.serialPrintf("Hardware Initialised \n");
+
+
+}
+
 
 
 
@@ -160,22 +191,17 @@ void Hardware::beginSerial(void) {
 
 
 /***********************************************************
-* Get list of I2C devices 
-*
-* Based on: https://www.esp32.com/viewtopic.php?t=4742
-***/ 
+ * Get list of I2C devices 
+ * @brief Loop through I2C addresses and print list of devices to serial
+ * @remark Based on: https://www.esp32.com/viewtopic.php?t=4742
+ * @note Wire is required but glbally called in main setup in DIY-Flow-Bench.cpp
+ ***/ 
 void Hardware::getI2CList() {   
   
   Messages _message;
 
-  // #define CONFIG_DISABLE_HAL_LOCKS
-  Wire.begin (SCA_PIN, SCL_PIN); 
-  Wire.setClock(400000);
-
   _message.serialPrintf("Scanning for I2C devices...\n");
   byte count = 0;
-
-  Wire.begin();
   
   for (byte i = 8; i < 120; i++)   {
     Wire.beginTransmission (i);          
@@ -185,8 +211,6 @@ void Hardware::getI2CList() {
     }
   }
   
-  Wire.end(); // Kill Wire here so that I2C can start clean with different settings
-
   _message.serialPrintf("Found %u device(s). \n", count);
 
 }
@@ -207,46 +231,36 @@ void Hardware::getBMERawData() {
 
 
 
-/** Get operational status.
- * from - https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/ADS1115/ADS1115.cpp
- * @return Current operational status (false for active conversion, true for inactive)
- * @see ADS1115_RA_CONFIG
- * @see ADS1115_CFG_OS_BIT
- */
-bool Hardware::isADCConversionReady() {
-    // I2Cdev::readBit(ADC_I2C_ADDR, 0x01, 15, buffer);
-    return buffer[0];
-}
+// /** Get operational status.
+//  * from - https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/ADS1115/ADS1115.cpp
+//  * @return Current operational status (false for active conversion, true for inactive)
+//  * @see ADS1115_RA_CONFIG
+//  * @see ADS1115_CFG_OS_BIT
+//  */
+// bool Hardware::isADCConversionReady() {
+//     // I2Cdev::readBit(ADC_I2C_ADDR, 0x01, 15, buffer);
+//     return buffer[0];
+// }
 
-/** Poll the operational status bit until the conversion is finished
- * from - https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/ADS1115/ADS1115.cpp
- * Retry at most 'max_retries' times
- * conversion is finished, then return true;
- * @see ADS1115_CFG_OS_BIT
- * @return True if data is available, false otherwise
- */
-bool Hardware::pollADCConversion(uint16_t max_retries) {  
-  for(uint16_t i = 0; i < max_retries; i++) {
-    if (isADCConversionReady()) return true;
-  }
-  return false;
-}
+// /** Poll the operational status bit until the conversion is finished
+//  * from - https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/ADS1115/ADS1115.cpp
+//  * Retry at most 'max_retries' times
+//  * conversion is finished, then return true;
+//  * @see ADS1115_CFG_OS_BIT
+//  * @return True if data is available, false otherwise
+//  */
+// bool Hardware::pollADCConversion(uint16_t max_retries) {  
+//   for(uint16_t i = 0; i < max_retries; i++) {
+//     if (isADCConversionReady()) return true;
+//   }
+//   return false;
+// }
 
 
 
 /***********************************************************
-* GET ADS1015 ADC value
-*
-* Based on: 
-* https://www.ti.com/lit/ds/symlink/ads1115.pdf
-*
-* Bitwise gain values (in hex)
-* 0x0000: +/- 6.144V (187.5uV / bit)
-* 0x0200: +/- 4.096V (125uV / bit)
-* 0x0400: +/- 2.048V (62.5uV / bit)
-* 0x0600: +/- 1.024V (31.25uV / bit)
-* 0x0800: +/- 0.512V (15.525uV / bit)
-* 0x0A00: +/- 0.256V (7.8125uV / bit)
+* @brief GET ADS1015 ADC value
+* @note uses ADC1115-lite library - https://github.com/terryjmyers/ADS1115-Lite
 *
 ***/
 int16_t Hardware::getADCRawData(int channel) {
@@ -255,49 +269,32 @@ int16_t Hardware::getADCRawData(int channel) {
     return 0;
   }
 
-  if (pollADCConversion(ADC_MAX_RETRIES) == true) {
+  adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V);
+  adc.setSampleRate(ADS1115_REG_CONFIG_DR_16SPS);
 
-    // Prepare config
-    _config = 0x0003;  // Disable the comparator (default val)
-    _config |= 0x0110; // RATE - Data rate or Sample Per Seconds bits 5 through 7
-    _config |= 0x0100; // MODE - mode bit 8 - Single-shot mode (default) 
-    _config |= 0x0000; // GAIN - PGA/voltage gain bits 9 through 11 
-    
-    switch (channel) // MUX - Multiplex channel, bits 12 through 14
-    {
-      case (0):
-          _config |= 0x4000; // Channel 1
-          break;
-      case (1):
-          _config |= 0x5000; // Channel 2
-          break;
-      case (2):
-          _config |= 0x6000; // Channel 3
-          break;
-      case (3):
-          _config |= 0x7000; // Channel 4
-          break;
-    }
-    
-    _config |= 0x8000; // WRITE: Set to start a single-conversion
-    
-    _config >>= 8; // Bit shift
-    _config &= 0xFF; // Bit mask
-    
-    // I2Cdev::writeWord(ADC_I2C_ADDR, 0x01, _config);
-    
-    //delay(10); // TODO: DELAYS are a hack, need to test for transmission complete. (Delays are bad Mmmmnnkay) 
-    
-    // I2Cdev::readBytes(ADC_I2C_ADDR, 0x00 , 2, buffer);
-    rawADCval = buffer[0] + (buffer[1] << 8);
-  
+  switch (channel) // MUX - Multiplex channel
+  {
+    case (0):
+        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_0);
+    break;
+
+    case (1):
+        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_1);
+    break;
+
+    case (2):
+        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_2);
+    break;
+
+    case (3):
+        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_3);
+    break;
   }
-    
-  #ifdef ADC_TYPE_ADS1015
-    rawADCval >>= 4;  // Bit shift 12-bit results
-  #endif
   
-  return int16_t(rawADCval);
+  adc.triggerConversion(); //Start a conversion.  This immediatly returns
+  rawADCval = adc.getConversion(); //This polls the ADS1115 and wait for conversion to finish, THEN returns the value
+
+  return rawADCval;
   
 }
 
@@ -308,27 +305,25 @@ int16_t Hardware::getADCRawData(int channel) {
 
 
 /***********************************************************
- * Get ADC millivolts
+ * @brief Get ADC millivolts
  ***/
  double Hardware::getADCMillivolts(int channel) {
 
-  int16_t rawVal;
+  double volts;
   double millivolts;
-  double microvolts;
-  
-  rawVal = getADCRawData(channel);
+  const double ADC_GAIN = 6.144F;
+
+  int16_t rawVal = getADCRawData(channel);
   
   #if defined ADC_TYPE_ADS1115 // 16 bit
     // 16 bits - sign bit = 15 bits mantissa = 32767 | 6.144v = max voltage (gain) of ADC | 187.5 uV / LSB
-    // millivolts = ((rawVal * (6.144 / 32768)) / 1000); 
-    microvolts = (rawVal * 6.144) / 32768;
-    millivolts = microvolts / 1000;
+    volts = rawVal * ADC_GAIN / 32767.00F;
+    millivolts = volts * 1000.00F;
   
   #elif defined ADC_TYPE_ADS1015 // 12 bit
     // 12 bits - sign bit = 11 bit mantissa = 2047 | 6.144v = max voltage (gain) of ADC
-    // millivolts = ((rawVal * (6.144 / 2047)) / 1000); 
-    microvolts = (rawVal * 6.144) / 2047; 
-    millivolts = microvolts / 1000;
+    volts = (rawVal * ADC_GAIN) / 2047; 
+    millivolts = volts * 1000;
   
   #endif
   
@@ -337,8 +332,10 @@ int16_t Hardware::getADCRawData(int channel) {
 
 
 
+
+
 /***********************************************************
-* GET 3.3V SUPPLY VOLTAGE
+* @brief GET 3.3V SUPPLY VOLTAGE
 * Measures 3.3v supply buck power to ESP32 
 * 3.3v buck connected directly to ESP32 input
 * Use a 0.1uf cap on input to help filter noise
@@ -356,7 +353,7 @@ double Hardware::get3v3SupplyMillivolts() {
 
 
 /***********************************************************
-* GET 5V SUPPLY VOLTAGE
+* @brief GET 5V SUPPLY VOLTAGE
 * Measures 5v supply buck power to ESP32 via voltage divider
 * We use a 10k-10k divider on the official shield
 * This gives a max of 2.5v which is fine for the ESP32's 3.3v logic
@@ -376,7 +373,8 @@ double Hardware::get5vSupplyMillivolts() {
 
 
 /***********************************************************
-* BENCH IS RUNNING
+ * @brief BENCH IS RUNNING
+ * @return bool:bench is running
 */
 bool Hardware::benchIsRunning() {
     

@@ -176,7 +176,7 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'B': // Get measured Baro Pressure in hPa'B.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "B%s%f", config.api_delim , _calculations.convertPressure(sensorVal.BaroKPA, HPA));
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "B%s%f", config.api_delim , sensorVal.BaroHPA);
       break;
 
       case 'C': // Current configuration in JSON

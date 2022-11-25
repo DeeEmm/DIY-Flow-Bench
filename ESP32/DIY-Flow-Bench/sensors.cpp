@@ -52,6 +52,9 @@ Sensors::Sensors() {
 }
 
 
+/***********************************************************
+ * @brief Sensor begin method
+*/
 void Sensors::begin () {
 
 	Messages _message;
@@ -68,6 +71,9 @@ void Sensors::begin () {
 
 
 
+/***********************************************************
+ * @brief Sensor initialise method 
+*/
 void Sensors::initialise () {
 
 	Messages _message;
@@ -85,9 +91,6 @@ void Sensors::initialise () {
 	#ifdef BME_IS_ENABLED
 	
 		_message.serialPrintf("Initialising BME280 \n");	
-
-		Wire.begin (SCA_PIN, SCL_PIN); 
-		Wire.setClock(20000);
 		
 		if (_BMESensor.beginI2C(BME280_I2C_ADDR) == false)
 		{
@@ -123,7 +126,7 @@ void Sensors::initialise () {
 
 	// Definitions for system status pane
 	// MAF Sensor
-	#if defined MAF_IS_ENABLED && MAF_SRC_IS_ADC && ADC_IS_ENABLED
+	#if defined MAF_IS_ENABLED && defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
 		this->_mafSensorType = _mafdata.mafSensorType;
 	#elif defined MAF_IS_ENABLED && defined MAF_SRC_IS_PIN
 		this->_mafSensorType = _mafdata.mafSensorType + " on GPIO:" + MAF_PIN;
@@ -263,7 +266,7 @@ void IRAM_ATTR Sensors::mafFreqCountISR() {
 
 
 /***********************************************************
- * Returns MAF signal in Millivolts
+ * @brief getMafMillivolts: Returns MAF signal in Millivolts
  ***/
 double Sensors::getMafMillivolts() {
 	
@@ -293,9 +296,9 @@ double Sensors::getMafMillivolts() {
 
 
 /***********************************************************
- * Returns RAW MAF Sensor value
+ * @brief Returns RAW MAF Sensor value
  *
- * MAF decode is done in Calculations.cpp
+ * @note MAF decode is done in Calculations.cpp
  ***/
 double Sensors::getMafValue() {
 	
@@ -351,7 +354,9 @@ double Sensors::getMafValue() {
 
 
 /***********************************************************
- * Returns temperature in Deg C
+ * @name getTempValue
+ * @brief Returns temperature in Deg C
+ * @return refTempDegC
  ***/
 double Sensors::getTempValue() {
 	
@@ -371,7 +376,7 @@ double Sensors::getTempValue() {
 		
 	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 
-		refTempDegC = _BMESensor.readFixedTempC() / 100;
+		refTempDegC = _BMESensor.readFixedTempC() / 100.00F;
 
 	#elif defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
@@ -389,16 +394,18 @@ double Sensors::getTempValue() {
 		refTempDegC = DEFAULT_TEMP_VALUE;
 	#endif
 	
-	// if (TEMP_FINE_ADJUST != 0) refTempDegC += TEMP_FINE_ADJUST;
+	if (TEMP_FINE_ADJUST != 0) refTempDegC += TEMP_FINE_ADJUST;
 	return refTempDegC;
 }
 
 
 
 /***********************************************************
-* Returns Barometric pressure in kPa
-* NOTE: 1 kPa = 10 hPa | 1 hPa = 1 millibar
-***/
+ * @name getBaroValue
+ * @brief Barometric pressure in hPa
+ * @returns baroPressureHpa
+ * @note 1 kPa = 10 hPa | 1 hPa = 1 millibar
+ ***/
 double Sensors::getBaroValue() {
 	
 	Hardware _hardware;
@@ -420,7 +427,7 @@ double Sensors::getBaroValue() {
 
 	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 
-		baroPressureHpa = _BMESensor.readFixedPressure() / 100; 
+		baroPressureHpa = _BMESensor.readFixedPressure() / 100.00F; 
 		
 	#elif defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
 		// No baro sensor defined so use value grabbed at startup from reference pressure sensor
@@ -436,7 +443,7 @@ double Sensors::getBaroValue() {
 	// int value = baroPressureKpa * 100 + .5;
     // return (double)value / 100;
 
-	// if (BARO_FINE_ADJUST != 0) baroPressureKpa += BARO_FINE_ADJUST;
+	if (BARO_FINE_ADJUST != 0) baroPressureKpa += BARO_FINE_ADJUST;
 	return baroPressureHpa;
 
 }
@@ -444,7 +451,9 @@ double Sensors::getBaroValue() {
 
 
 /***********************************************************
- * Returns Relative Humidity in %
+ * @name getRelHValue
+ * @brief Returns Relative Humidity in %
+ * @returns relativeHumidity
  ***/
 double Sensors::getRelHValue() {
 	
@@ -476,7 +485,7 @@ double Sensors::getRelHValue() {
 
 	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 
-		relativeHumidity = _BMESensor.readFixedHumidity() / 1000;
+		relativeHumidity = _BMESensor.readFixedHumidity() / 1000.00F;
 		
 	#else
 		// we don't have a sensor so use nominal fixed value 
@@ -484,7 +493,7 @@ double Sensors::getRelHValue() {
 	
 	#endif
 
-	// if (RELH_FINE_ADJUST != 0) relativeHumidity += RELH_FINE_ADJUST;
+	if (RELH_FINE_ADJUST != 0) relativeHumidity += RELH_FINE_ADJUST;
 	return relativeHumidity;
 	
 }
@@ -517,6 +526,7 @@ double Sensors::getPRefMillivolts() {
 	Hardware _hardware;
 
 	#if defined PREF_SRC_ADC && defined ADC_IS_ENABLED
+
 		refPressMillivolts = _hardware.getADCMillivolts(PREF_ADC_CHANNEL);
 				
 	#elif defined PREF_SRC_PIN	
@@ -545,7 +555,6 @@ double Sensors::getPRefMillivolts() {
 double Sensors::getPRefValue() {
 
 	Hardware _hardware;
-	Messages _message;
 	
 	double refPressureKpa = 0.0;
 	
@@ -557,9 +566,10 @@ double Sensors::getPRefValue() {
 		// Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007DP Datasheet)
 		// refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057;  
 		
-		if (!(Sensors::getPRefMillivolts() > 0) | !(_hardware.get5vSupplyMillivolts() > 0)) return 1; 
+		// REVIEW Not sure if we need to error check here
+//		if (!(Sensors::getPRefMillivolts() > 0) | !(_hardware.get5vSupplyMillivolts() > 0)) return 1; 
 
-		refPressureKpa = (((Sensors::getPRefMillivolts() / _hardware.get5vSupplyMillivolts() ) - 0.5) / 0.057);  
+		refPressureKpa = (((this->getPRefMillivolts() / _hardware.get5vSupplyMillivolts() ) - 0.5) / 0.057);  
 
 	#else
 		// No reference pressure sensor used so lets return a fixed value (so as not to throw maths out)
@@ -642,9 +652,11 @@ double Sensors::getPDiffValue() {
 		
 		#if defined ADC_TYPE_ADS1115
 			//scale for 16 bit ADC
-			if (!(Sensors::getPDiffMillivolts() > 0) | !(_hardware.get5vSupplyMillivolts() > 0)) return 1; 
+
+			// REVIEW Not sure if we need to error check here
+			// if (!(Sensors::getPDiffMillivolts() > 0) | !(_hardware.get5vSupplyMillivolts() > 0)) return 1; 
 			
-			diffPressureKpa = (((Sensors::getPDiffMillivolts() / _hardware.get5vSupplyMillivolts() ) - 0.5) / 0.057);  
+			diffPressureKpa = (((this->getPDiffMillivolts() / _hardware.get5vSupplyMillivolts() ) - 0.5) / 0.057);  
 			
 			
 		#elif defined ADC_TYPE_ADS1015
@@ -729,10 +741,13 @@ double Sensors::getPitotValue() {
 		pitotPressureKpa = pitotMillivolts * PITOT_ANALOG_SCALE;
 	
 	#elif defined PITOT_SENSOR_TYPE_MPXV7007DP
+
+		pitotMillivolts = this->getPitotMillivolts();
 		
-		if (!(Sensors::getPitotMillivolts() > 0) | !(_hardware.get5vSupplyMillivolts() > 0)) return 1; 
+		// REVIEW Not sure if we need to error check here
+		// if (!(pitotMillivolts > 0) | !(_hardware.get5vSupplyMillivolts() > 0)) return 1; 
 		
-		pitotPressureKpa = (((Sensors::getPitotMillivolts() / _hardware.get5vSupplyMillivolts() ) - 0.5) / 0.057);  
+		pitotPressureKpa = (((pitotMillivolts / _hardware.get5vSupplyMillivolts() ) - 0.5) / 0.057);  
 
 	#else
 		// No pitot probe used so lets return a fixed value

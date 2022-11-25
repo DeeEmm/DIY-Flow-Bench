@@ -42,6 +42,7 @@
 #include "constants.h"
 #include "configuration.h"
 #include "structs.h"
+#include "pins.h"
 
 #include "hardware.h"
 #include "sensors.h"
@@ -49,6 +50,7 @@
 #include "webserver.h"
 #include "messages.h"
 #include "API.h"
+#include "Wire.h"
 
 
 #include LANGUAGE_FILE
@@ -82,7 +84,9 @@ int sensorINT; // reusable INT for truncating to 2 decimal places
  
 
 /***********************************************************
- * TASK: Get bench sensor data
+ * @brief TASK: Get bench sensor data
+ * @param i2c_task_mutex Semaphore handshake with TASKpushData
+ * @struct sensorVal global struct containing sensor values
  * */	
 void TASKgetBenchData( void * parameter ){
 
@@ -108,7 +112,7 @@ void TASKgetBenchData( void * parameter ){
         // Get Pitot Pressure Value and truncate to 2DP
         sensorINT = _sensors.getPitotValue() * 100 + .5; 
         sensorVal.PitotKPA = (double)sensorINT / 100; 
-        xSemaphoreGive(i2c_task_mutex); // Release semaphore
+        xSemaphoreGive(i2c_task_mutex); // Release semaphore    
       }   
     }
   }
@@ -132,13 +136,9 @@ void TASKgetEnviroData( void * parameter ){
       if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
         status.bmePollTimer = millis() + BME_SCAN_DELAY_MS; // Only reset timer when task executes
         sensorVal.TempDegC = _sensors.getTempValue();
-        vTaskDelay(3);
         sensorVal.BaroHPA = _sensors.getBaroValue();
-        vTaskDelay(3);
         sensorVal.BaroKPA = sensorVal.BaroHPA / 10;
-        vTaskDelay(3);
         sensorVal.RelH = _sensors.getRelHValue();
-        vTaskDelay(3);
         xSemaphoreGive(i2c_task_mutex); // Release semaphore
       }
     }
@@ -183,6 +183,10 @@ void TASKpushData( void * parameter ){
  ***/
 void setup(void) {
   
+  // We need to call Wire globally so that it is available to both hardware and sensor classes
+  Wire.begin (SCA_PIN, SCL_PIN); 
+  Wire.setClock(400000);
+
   _hardware.begin();
   _sensors.begin();
 
@@ -221,7 +225,7 @@ void setup(void) {
   i2c_task_mutex = xSemaphoreCreateMutex();
 
   xTaskCreate(TASKgetEnviroData, "BME_TASK", 20480, NULL, 2, &bmeTaskHandle);
-  // xTaskCreate(TASKgetBenchData, "ADC_TASK", 20480, NULL, 2, &adcTaskHandle);
+  xTaskCreate(TASKgetBenchData, "ADC_TASK", 20480, NULL, 2, &adcTaskHandle);
   xTaskCreate(TASKpushData, "SSE_TASK", 20480, NULL, 2, &sseTaskHandle);
 
 }

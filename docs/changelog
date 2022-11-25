@@ -2,37 +2,34 @@
 Current build status
 ===================================================================
 
-Project compiles and runs but I2C is still returning unstable data despite isolating I2C to just BME
-The tinyBME library returns valid stable data when run in isolation from rest of code
-Data becomes corrupt when run along side ESPAsyncWebserver
-Interwebs has lots of comments RE AsyncWS + I2C corruption, so this could be one potential cause.
-Could also still be related to synchronous tasks / interrupts. I am unsure what ESPAsyncWS does under the hood.
-Need to spend some time working through disabling each part of the code until I can isolate the cause.
-Then I can engineer a fix.
-
-I have written several I2C libraries to try and overcome the issue, but perhaps what I really need to do
-is to write new webserver code. 
+Project compiles and runs and BME now returning stable data 
+ADAC I2C enabled and working for pressure sensors 
+Need to validate actual sensor readings
+MAF currently disabled
 
 ===================================================================
 Current work in progress
 ===================================================================
 
-Trying to isolate I2C + AsyncWS issue.
+MAF Decode
 
+===================================================================
+Info / References I want to save for later
+===================================================================
 
-Poss thread safe library for i2c BME280 + ADS1115 (recommended + official)
+Poss thread safe library for i2c BME280 + ADS1115 (recommended + official) ?!!
 https://github.com/UncleRus/esp-idf-lib
 https://esp-idf-lib.readthedocs.io/en/latest/groups/i2cdev.html
 https://esp-idf-lib.readthedocs.io/en/latest/
 https://esp-idf-lib.readthedocs.io/en/latest/groups/bmp280.html        
-
-Alternate https://github.com/epvuc/esp-fume-detector/blob/master/main/bme280_sup.c ????
 
 ===================================================================
 Items to sort before formal release
 ===================================================================
 
 - Update mafData files
+- REMOVE tags
+- REVIEW tags
 - Translations
 - Rename DIY-Flow-Bench.cpp to DIY-Flow-Bench.ino for Arduino IDE compatibility
 
@@ -46,6 +43,9 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+22112402        - Changed ADS1115 library to use ADS1115_lite
+                - removed support for ADS1105 (not supported by ADS1115_lite library)
+                - Fixed scaling bug in A2D voltage conversion
 22112401        - Solved I2C BME280 read issue - Redefinition of BME class within sensor read methods
 22112201        - Integrated tiny::BME library
                 - Created tasks for sensor read and data push
