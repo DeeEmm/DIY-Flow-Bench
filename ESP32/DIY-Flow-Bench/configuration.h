@@ -17,7 +17,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "22112401"
+#define BUILD_NUMBER "22112402"
 #define RELEASE "V.2.0-RC.3-WIP"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -153,7 +153,7 @@
 
 // const int BME280_I2C_ADDR = 0x76;                           
 const int BME280_I2C_ADDR = 0x77;       
-#define BME_SCAN_DELAY_MS 1000                                  // Does not need to be faster than this as sensor read speed is around 30 secs!!       
+#define BME_SCAN_DELAY_MS 1000                              // Does not need to be faster than this as sensor read speed is around 30 secs!!       
 
 
 
@@ -176,14 +176,14 @@ const int BME280_I2C_ADDR = 0x77;
 * NOTE: Check the report shown in serial monitor on boot for addresses of I2C devices and update ADC_I2C_ADDR accordingly
 ***/
 
-//#define ADC_IS_ENABLED                                      // Comment to disable ADC related code
+#define ADC_IS_ENABLED                                      // Comment to disable ADC related code
 
 const int ADC_I2C_ADDR = 0x48; 
-#define ADC_SCAN_DELAY_MS 100                                 // Need to allow enough time for ADC read (min 10ms)
+#define ADC_SCAN_DELAY_MS 100                               // Need to allow enough time for ADC read (min 10ms)
 #define ADC_MAX_RETRIES 10
 
-// #define ADC_TYPE_ADS1015 // 12 bit (3 mV/bit)
 #define ADC_TYPE_ADS1115 // 16 bit (188uV/bit)
+// #define ADC_TYPE_ADS1015 // 12 bit (3 mV/bit)            // UNTESTED (Not supported in ADS1115_lite library but might work)
 
 
 
@@ -199,18 +199,18 @@ const int ADC_I2C_ADDR = 0x48;
 // #define MAF_IS_ENABLED                                      // Comment to disable MAF related code
     
 // Uncomment One sensor only
-#define MAF_DATA_FILE "mafData/ACDELCO_92281162.h"        //default recommended sensor    
+#define MAF_DATA_FILE "mafData/ACDELCO_92281162.h"          //default recommended sensor    
 // #define MAF_DATA_FILE "mafData/ACDELCO_19330122.h" 
 // #define MAF_DATA_FILE "mafData/VDO_AFM_043.h"
-// #define MAF_DATA_FILE  "mafData/MH95_3000_100.h"       // PMAS MH95-3000 in 100mm housing              
-// #define MAF_DATA_FILE  "mafData/SIEMENS_5WK9605.h"        // Data from Tonys tests
-// #define MAF_DATA_FILE  "mafData/DELPHI_AF10118.h"      // kg/hr - Data from efidynotuning.com/maf.htm 
-// #define MAF_DATA_FILE  "mafData/TEST.h"                // Test Data
+// #define MAF_DATA_FILE  "mafData/MH95_3000_100.h"         // PMAS MH95-3000 in 100mm housing              
+// #define MAF_DATA_FILE  "mafData/SIEMENS_5WK9605.h"       // Data from Tonys tests
+// #define MAF_DATA_FILE  "mafData/DELPHI_AF10118.h"        // kg/hr - Data from efidynotuning.com/maf.htm 
+// #define MAF_DATA_FILE  "mafData/TEST.h"                  // Test Data
 
 
 // Set signal source (Uncomment One line only)
-#define MAF_SRC_IS_PIN
-//#define MAF_SRC_IS_ADC
+// #define MAF_SRC_IS_PIN
+#define MAF_SRC_IS_ADC
 
 
 #define MAF_MV_TRIMPOT 0.0                                  // Millivolt offset
@@ -227,7 +227,7 @@ const int ADC_I2C_ADDR = 0x48;
 * Recommended sensor is the MPXV7007DP
 ***/
 
-// #define PREF_IS_ENABLED                                     // Comment to disable reference pressure related code
+#define PREF_IS_ENABLED                                     // Comment to disable reference pressure related code
 
 #define DEFAULT_REF_PRESS_VALUE 1                           // Fixed pressure value in Pascals
 
@@ -256,13 +256,13 @@ const int ADC_I2C_ADDR = 0x48;
 * Recommended sensor is the MPXV7007DP
 ***/
 
-// #define DIFF_IS_ENABLED                                     //Comment to disable Differential pressure related code
+// #define DIFF_IS_ENABLED                                  //Comment to disable Differential pressure related code
 
 #define DEFAULT_DIFF_PRESS_VALUE 1                          // Fixed pressure value in Pascals
 
 // Set signal source (Uncomment One line only)
-#define PDIFF_SRC_IS_PIN
-//#define PDIFF_SRC_IS_ADC
+// #define PDIFF_SRC_IS_PIN
+#define PDIFF_SRC_IS_ADC
 
 // Set sensor type (Uncomment One line only)
 // #define PDIFF_SENSOR_NOT_USED            
@@ -285,11 +285,11 @@ const int ADC_I2C_ADDR = 0x48;
 * Recommended sensor is the MPXV7007DP
 ***/
 
-// #define PITOT_IS_ENABLED                                    // Comment to disable pitot related code
+#define PITOT_IS_ENABLED                                    // Comment to disable pitot related code
 
 // Set signal source (Uncomment One line only)
-#define PITOT_SRC_IS_PIN
-//#define PITOT_SRC_IS_ADC
+//#define PITOT_SRC_IS_PIN
+#define PITOT_SRC_IS_ADC
 
 // Set sensor type (Uncomment One line only)
 // #define PITOT_SENSOR_NOT_USED
