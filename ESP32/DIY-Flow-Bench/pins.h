@@ -1,23 +1,27 @@
 /***********************************************************
-* The DIY Flow Bench project
-* https://diyflowbench.com
-* 
-* pins.h - Define pin mappings
-*
-* Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
-* 
-* For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
-* Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions 
-* You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
-* 
-* This project and all associated files are provided for use under the GNU GPL3 license:
-* https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
-* 
-* 
-***/
+ * @name The DIY Flow Bench project
+ * @details Measure and display volumetric air flow using an ESP32 & Automotive MAF sensor
+ * @link https://diyflowbench.com
+ * @author DeeEmm aka Mick Percy deeemm@deeemm.com
+ * 
+ * @file pins.h
+ * 
+ * @brief define pin mappings for ESP32 boards
+ * 
+ * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+ * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
+ * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
+ * 
+ * @license This project and all associated files are provided for use under the GNU GPL3 license:
+ * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
+ * 
+ ***/
 #pragma once
 
 #include "configuration.h"
+
+
+
 
 /***********************************************************
 * OFFICIAL DIYFB Shield 
@@ -180,7 +184,7 @@
 * NOTE: FOR DEBUGGING IN VSCode with PlatformIO
 * Uses Officiel Expressif ESP32 WROVER Development KIT
 * Do not use on other boards as pin configuration is modded for debugging
-* NOTE: GPIO 12,13,14,15 are reserved for JTAG interface
+* NOTE: GPIO 12,13,14,15 are reserved for JTAG interface and so are unused in this map
 ***/
 #ifdef ESP32_WROVER_KIT
 
@@ -211,7 +215,7 @@
     #define MAF_PIN                     33                     // NOTE: I2C ADC is used instead
     #define REF_PRESSURE_PIN            33                     // NOTE: I2C ADC is used instead
     #define DIFF_PRESSURE_PIN           33                     // NOTE: I2C ADC is used instead
-    #define PITOT_PIN                   3                     // NOTE: I2C ADC is used instead
+    #define PITOT_PIN                   3                      // NOTE: I2C ADC is used instead
     
     // NOTE: These inputs are handled by BME280
     #define TEMPERATURE_PIN             33                     // NOTE: I2C BME280 used

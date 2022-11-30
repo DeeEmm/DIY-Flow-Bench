@@ -1,12 +1,21 @@
 /***********************************************************
-* The DIY Flow Bench project
-* https://diyflowbench.com
-*
-* configuration.h - define variables and configure hardware
-* 
-* Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
-*
-***/
+ * @name The DIY Flow Bench project
+ * @details Measure and display volumetric air flow using an ESP32 & Automotive MAF sensor
+ * @link https://diyflowbench.com
+ * @author DeeEmm aka Mick Percy deeemm@deeemm.com
+ * 
+ * @file configuration.h
+ * 
+ * @brief define variables and configure hardware
+ * 
+ * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+ * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
+ * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
+ * 
+ * @license This project and all associated files are provided for use under the GNU GPL3 license:
+ * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
+ * 
+ ***/
 #pragma once
 
 #include "constants.h"
@@ -17,7 +26,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "22112402"
+#define BUILD_NUMBER "22120101"
 #define RELEASE "V.2.0-RC.3-WIP"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -25,7 +34,7 @@
 
 /***********************************************************
 * SELECT BENCH TYPE
-* NOTE: Only MAF style bench working at this stage
+*  Only MAF style bench working at this stage
 ***/
 
 #define MAF_STYLE_BENCH
@@ -140,13 +149,11 @@
 
 
 
-
-
 /***********************************************************
 * CONFIGURE BME280
 *
-* Default address 0x76 / Alternate is usually 0x77
-* NOTE: Check the report shown in serial monitor on boot for addresses of I2C devices and update BME280_I2C_ADDR accordingly
+*  Default address 0x76 / Alternate is usually 0x77
+*  Check the report shown in serial monitor on boot for addresses of I2C devices and update BME280_I2C_ADDR accordingly
 ***/
 
 #define BME_IS_ENABLED                                      // Comment to disable BME related code
@@ -161,19 +168,19 @@ const int BME280_I2C_ADDR = 0x77;
 /***********************************************************
 * CONFIGURE ADC
 *
-* NOTE: standard shield can use ADS1015 (12 bit) or ADS1115 (16 bit) ADC's
-* MAF / P-Ref / P-Diff / Pitot sensors are all connected through the ADC (see below for channel designation)
-* NOTE: ADC is used at 5 Volts with an I2C level shifter to allow it to communicate on the 3.3v I2C bus of the ESP32. This allows for an easy way to run 5v sensors on the 3.3v ESP32
-* ADC communication can be found in Hardware->getADCRawData()
+*  standard shield can use ADS1015 (12 bit) or ADS1115 (16 bit) ADC's however ADS 1015 is untested with ADC1115-lite library
+*  MAF / P-Ref / P-Diff / Pitot sensors are all connected through the ADC (see MAF / PDiff / PRef / Pitot sections for channel designations)
+*  ADC is used at 5 Volts with an I2C level shifter to allow it to communicate on the 3.3v I2C bus of the ESP32. This allows for an easy way to run 5v sensors on the 3.3v ESP32
+*  ADC communication can be found in Hardware->getADCRawData()
 *
-* Default address is 0x48
+* Default device address is 0x48
 * Connect ADR pin as below to set alternate addresses
 * 0x48 (1001000) ADR -> GND
 * 0x49 (1001001) ADR -> VDD
 * 0x4A (1001010) ADR -> SDA
 * 0x4B (1001011) ADR -> SCL
 *
-* NOTE: Check the report shown in serial monitor on boot for addresses of I2C devices and update ADC_I2C_ADDR accordingly
+*  Check the report shown in serial monitor on boot for addresses of I2C devices and update ADC_I2C_ADDR accordingly
 ***/
 
 #define ADC_IS_ENABLED                                      // Comment to disable ADC related code
@@ -196,10 +203,10 @@ const int ADC_I2C_ADDR = 0x48;
 * NOTE: RC level software has only been tested with default recommended sensor (ACDELCO_92281162)
 ***/
 
-// #define MAF_IS_ENABLED                                      // Comment to disable MAF related code
+#define MAF_IS_ENABLED                                      // Comment to disable MAF related code
     
 // Uncomment One sensor only
-#define MAF_DATA_FILE "mafData/ACDELCO_92281162.h"          //default recommended sensor    
+#define MAF_DATA_FILE "mafData/ACDELCO_92281162.cpp"          //default recommended sensor    
 // #define MAF_DATA_FILE "mafData/ACDELCO_19330122.h" 
 // #define MAF_DATA_FILE "mafData/VDO_AFM_043.h"
 // #define MAF_DATA_FILE  "mafData/MH95_3000_100.h"         // PMAS MH95-3000 in 100mm housing              
@@ -227,9 +234,9 @@ const int ADC_I2C_ADDR = 0x48;
 * Recommended sensor is the MPXV7007DP
 ***/
 
-#define PREF_IS_ENABLED                                     // Comment to disable reference pressure related code
+#define PREF_IS_ENABLED                                       // Comment to disable reference pressure related code
 
-#define DEFAULT_REF_PRESS_VALUE 1                           // Fixed pressure value in Pascals
+#define FIXED_REF_PRESS_VALUE 1                           // Fixed pressure value in Pascals
 
 // Set signal source (Uncomment One line only)
 //#define PREF_SRC_PIN
@@ -256,9 +263,9 @@ const int ADC_I2C_ADDR = 0x48;
 * Recommended sensor is the MPXV7007DP
 ***/
 
-// #define DIFF_IS_ENABLED                                  //Comment to disable Differential pressure related code
+#define PDIFF_IS_ENABLED                                    //Comment to disable Differential pressure related code
 
-#define DEFAULT_DIFF_PRESS_VALUE 1                          // Fixed pressure value in Pascals
+#define FIXED_DIFF_PRESS_VALUE 1                            // Fixed pressure value in Pascals
 
 // Set signal source (Uncomment One line only)
 // #define PDIFF_SRC_IS_PIN
@@ -320,7 +327,7 @@ const int ADC_I2C_ADDR = 0x48;
 #define BARO_SENSOR_TYPE_BME280
 // #define BARO_SENSOR_TYPE_MPX4115                         // use absolute pressure sensor
 
-#define DEFAULT_BARO_VALUE 101.3529                         // Default pressure in kPa
+#define FIXED_BARO_VALUE 101.3529                         // Default pressure in kPa
 #define BARO_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 #define startupBaroScalingFactor 1                          // scaling factor when using reference pressure sensor for baro correction
 #define startupBaroScalingOffset 100                        // scaling offset when using reference pressure sensor for baro correction
@@ -342,7 +349,7 @@ const int ADC_I2C_ADDR = 0x48;
 
 #define TEMP_IS_ENABLED                                     // Comment to disable temperature related code.
 
-#define DEFAULT_TEMP_VALUE 21                               // Value to return if no sensor used
+#define FIXED_TEMP_VALUE 21                               // Value to return if no sensor used
 #define TEMP_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 
 // Uncomment One line only
@@ -366,7 +373,7 @@ const int ADC_I2C_ADDR = 0x48;
 
 #define RELH_IS_ENABLED                                     // Comment to disable humidity related code
 
-#define DEFAULT_RELH_VALUE 36                               // Value to return if no sensor used
+#define FIXED_RELH_VALUE 36                               // Value to return if no sensor used
 #define RELH_ANALOG_SCALE 1.0                               // Scaling factor for raw analog value
 
 // Uncomment ONE of the following

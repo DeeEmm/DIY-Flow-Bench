@@ -1,20 +1,21 @@
 /***********************************************************
-* The DIY Flow Bench project
-* https://diyflowbench.com
-* 
-* Structs.h - Data structure definitions header file
-*
-* Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
-* 
-* For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
-* Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions 
-* You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
-* 
-* This project and all associated files are provided for use under the GNU GPL3 license:
-* https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
-* 
-* 
-***/
+ * @name The DIY Flow Bench project
+ * @details Measure and display volumetric air flow using an ESP32 & Automotive MAF sensor
+ * @link https://diyflowbench.com
+ * @author DeeEmm aka Mick Percy deeemm@deeemm.com
+ * 
+ * @file structs.h
+ * 
+ * @brief Define Structs
+ * 
+ * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+ * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
+ * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
+ * 
+ * @license This project and all associated files are provided for use under the GNU GPL3 license:
+ * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
+ * 
+ ***/
 #pragma once
 
 #include "Arduino.h"
@@ -35,7 +36,7 @@ struct ConfigSettings {
   unsigned long wifi_timeout = 15000;             // Time in millisec's before falling back to AP mode
   int min_flow_rate = 3;                          // Flow rate at which bench is considered running
   int min_bench_pressure = 3;                     // Min bench pressure where bench is considered running
-  int maf_min_millivolts = 100;                   // Filter out results less than this
+  double maf_min_volts = 0.1;                     // Filter out results less than this
   int refresh_rate = 200;                         // Screen refresh rate in milliseconds (>180)
   double cal_ref_press = 10;                       // Calibration orifice refe pressure
   double cal_flow_rate = 14.4;                     // Calibration orifica flow rate
@@ -100,6 +101,9 @@ struct DeviceStatus {
   int serialData = 0;
   String statusMessage = BOOT_MESSAGE;
   bool apMode = false;
+  double HWMBME = 0.0;
+  double HWMADC = 0.0;
+  double HWMSSE = 0.0;
 };
 
 

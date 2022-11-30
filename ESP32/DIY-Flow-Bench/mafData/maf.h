@@ -11,23 +11,39 @@
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
 #pragma once
-#ifndef MAFDATA
-#define MAFDATA
+// #ifndef MAFDATAHEADER
+// #define MAFDATAHEADER
 
+#include <Arduino.h>
+#include <vector>
 #include "../constants.h"
+#include "../configuration.h"
 
+class Maf {
 
-class MafData {
+    friend class Sensors;
+    friend class Calculations;
+
+    protected: 
+
+        // static std::vector<std::vector<int>> *mafLookupTable;
+        // static const std::vector<std::vector<int>> mafLookupTable;
 
     public:
 
-        MafData();
-        static void begin();
+        Maf();
 
         String mafSensorType;
         int mafOutputType;
         int mafDataUnit;
-        int mafLookupTable[1024][2];
+
+        String getMafSensorType();
+        int getMafOutputType();
+        int getMafUnits();
+
+        static std::vector<std::vector<int>> mafLookupTable;
+
 
 };
-#endif
+
+// #endif

@@ -1,18 +1,19 @@
 /***********************************************************
- * The DIY Flow Bench project
- * https://diyflowbench.com
+ * @name The DIY Flow Bench project
+ * @details Measure and display volumetric air flow using an ESP32 & Automotive MAF sensor
+ * @link https://diyflowbench.com
+ * @author DeeEmm aka Mick Percy deeemm@deeemm.com
  * 
- * Hardware.cpp - Hardware class
- *
- * Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
+ * @file hardware.cpp
  * 
- * For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
- * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions 
+ * @brief Hardware class
+ * 
+ * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+ * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
  * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
  * 
- * This project and all associated files are provided for use under the GNU GPL3 license:
+ * @license This project and all associated files are provided for use under the GNU GPL3 license:
  * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
- * 
  * 
  ***/
 
@@ -149,8 +150,8 @@ void Hardware::initialise () {
   #ifdef ADC_IS_ENABLED
   _message.serialPrintf("Initialising ADS1115 \n");
 
-  // adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V);
-  // adc.setSampleRate(ADS1115_REG_CONFIG_DR_16SPS); // 16 samples / sec
+  adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
+  adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
   
   if (!adc.testConnection()) {
       _message.serialPrintf("ADS1115 Connection failed");
@@ -265,70 +266,104 @@ void Hardware::getBMERawData() {
 ***/
 int16_t Hardware::getADCRawData(int channel) {
 
+int16_t rawADCval;
+
   if (channel > 3) {
     return 0;
   }
 
-  adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V);
-  adc.setSampleRate(ADS1115_REG_CONFIG_DR_16SPS);
-
   switch (channel) // MUX - Multiplex channel
   {
     case (0):
-        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_0);
+        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_0); // 0x4000
     break;
 
     case (1):
-        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_1);
+        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_1); // 0x5000
     break;
 
     case (2):
-        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_2);
+        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_2); // 0x6000
     break;
 
     case (3):
-        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_3);
+        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_3); // 0x7000
     break;
   }
   
-  adc.triggerConversion(); //Start a conversion.  This immediatly returns
-  rawADCval = adc.getConversion(); //This polls the ADS1115 and wait for conversion to finish, THEN returns the value
+  adc.triggerConversion(); // Start a conversion. This immediately returns
+  rawADCval = adc.getConversion(); // This polls the ADS1115 and wait for conversion to finish, THEN returns the value
 
   return rawADCval;
-  
+
 }
 
 
+
+
+
+
+// DEPRECATED
+/***********************************************************
+ * @brief Get ADC millivolts
+ * @param channel ADC channel (0-3)
+ ***/
+//  double Hardware::getADCMillivolts(int channel) {
+
+//   double volts;
+//   double millivolts;
+//   const double ADC_GAIN = 6.144F;
+
+//   int16_t rawVal = getADCRawData(channel);
+  
+//   #if defined ADC_TYPE_ADS1115 // 16 bit
+//     // 16 bits - sign bit = 15 bits mantissa = 32767 | 6.144v = max voltage (gain) of ADC | 187.5 uV / LSB
+//     volts = rawVal * ADC_GAIN / 32767.00; //32767.00F
+//     millivolts = volts * 1000.00; //1000.00F
+  
+//   #elif defined ADC_TYPE_ADS1015 // 12 bit
+//     // 12 bits - sign bit = 11 bit mantissa = 2047 | 6.144v = max voltage (gain) of ADC
+//     volts = (rawVal * ADC_GAIN) / 2047; 
+//     millivolts = volts * 1000;
+  
+//   #endif
+  
+//   return millivolts;
+// }
 
 
 
 
 
 /***********************************************************
- * @brief Get ADC millivolts
+ * @brief Get ADC channel Voltage
+ * @param channel ADC channel (0-3)
  ***/
- double Hardware::getADCMillivolts(int channel) {
+ double Hardware::getADCVolts(int channel) {
 
   double volts;
-  double millivolts;
-  const double ADC_GAIN = 6.144F;
+  const double ADC_GAIN = 6.144;
 
-  int16_t rawVal = getADCRawData(channel);
+  int rawADCval = getADCRawData(channel);
   
-  #if defined ADC_TYPE_ADS1115 // 16 bit
+  #if defined ADC_TYPE_ADS1115 && defined ADC_IS_ENABLED 
     // 16 bits - sign bit = 15 bits mantissa = 32767 | 6.144v = max voltage (gain) of ADC | 187.5 uV / LSB
-    volts = rawVal * ADC_GAIN / 32767.00F;
-    millivolts = volts * 1000.00F;
+    volts = double(rawADCval) * (ADC_GAIN / 32767.00); 
   
-  #elif defined ADC_TYPE_ADS1015 // 12 bit
+  #elif defined ADC_TYPE_ADS1015 && defined ADC_IS_ENABLED 
     // 12 bits - sign bit = 11 bit mantissa = 2047 | 6.144v = max voltage (gain) of ADC
-    volts = (rawVal * ADC_GAIN) / 2047; 
-    millivolts = volts * 1000;
+    volts = double(rawADCval) * (ADC_GAIN / 2047); 
   
+  #else
+
+    return 1.0;
+
   #endif
   
-  return millivolts;
+  return volts;
 }
+
+
 
 
 
@@ -342,13 +377,13 @@ int16_t Hardware::getADCRawData(int channel) {
 *
 * NOTE: ESP32 has 12 bit ADC (0-3300mv = 0-4095)
 ***/
-double Hardware::get3v3SupplyMillivolts() {   
+double Hardware::get3v3SupplyVolts() {   
 
-  return 3300; //REMOVE: DEBUG: temp test !!!
+  return 3.3; //REMOVE: DEBUG: temp test !!!
 
   // long rawVoltageValue = analogRead(VCC_3V3_PIN);  
-  // double vcc3v3SupplyMillivolts = (rawVoltageValue * 0.805860805860806) ;
-  // return vcc3v3SupplyMillivolts + VCC_3V3_TRIMPOT;
+  // double vcc3v3SupplyVolts = (rawVoltageValue * 0.805860805860806) ;
+  // return vcc3v3SupplyVolts + VCC_3V3_TRIMPOT;
 }
 
 
@@ -361,14 +396,16 @@ double Hardware::get3v3SupplyMillivolts() {
 *
 * NOTE: ESP32 has 12 bit ADC (0-3300mv = 0-4095)
 ***/
-double Hardware::get5vSupplyMillivolts() {   
+double Hardware::get5vSupplyVolts() {   
 
-  return 5000; //REMOVE: DEBUG: temp test !!!
+  return 5.0; //REMOVE: DEBUG: temp test !!!
 
   // long rawVoltageValue = analogRead(VCC_5V_PIN);  
-  // double vcc5vSupplyMillivolts = (2 * rawVoltageValue * 0.805860805860806) ;
-  // return vcc5vSupplyMillivolts + VCC_5V_TRIMPOT;
+  // double vcc5vSupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
+  // return vcc5vSupplyVolts + VCC_5V_TRIMPOT;
 }
+
+
 
 
 
@@ -380,6 +417,7 @@ bool Hardware::benchIsRunning() {
     
   Messages _message;
   Calculations _calculations;
+  Sensors _sensors;
   
   extern struct ConfigSettings config;
   extern struct Translator translate;
@@ -388,7 +426,7 @@ bool Hardware::benchIsRunning() {
   // TODO: Check scope of these...
   double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INWG);
   
-  double mafFlowRateCFM = _calculations.calculateFlowCFM();
+  double mafFlowRateCFM = _calculations.calculateFlowCFM(_sensors.getMafRaw());
 
   if ((refPressure > config.min_bench_pressure))
   {

@@ -1,37 +1,36 @@
 /***********************************************************
-* The DIY Flow Bench project
-* https://diyflowbench.com
-* 
-* sensors.h - Sensors class header file
-*
-* Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
-* 
-* For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
-* Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions 
-* You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
-* 
-* This project and all associated files are provided for use under the GNU GPL3 license:
-* https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
-* 
-* 
-***/
+ * @name The DIY Flow Bench project
+ * @details Measure and display volumetric air flow using an ESP32 & Automotive MAF sensor
+ * @link https://diyflowbench.com
+ * @author DeeEmm aka Mick Percy deeemm@deeemm.com
+ * 
+ * @file sensors.h
+ * 
+ * @brief Sensors class header file
+ * 
+ * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+ * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
+ * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
+ * 
+ * @license This project and all associated files are provided for use under the GNU GPL3 license:
+ * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
+ * 
+ ***/
 #pragma once
 
 #include "constants.h"
 
-
 class Sensors {
-
-	friend class mafData;
 
 	private:
 		int _unit;
 		int _mafOutputType;
 		int _mafDataUnit;
-		double refPressMillivolts;
-		double pDiffMillivolts;
-		double pitotMillivolts;
-		double mafMillivolts;
+		// double refPressMillivolts;
+		// double pDiffMillivolts;
+		// double pitotMillivolts;
+		// double mafMillivolts;
+		int mafFlowRaw;
 
 		
 		String _mafSensorType;
@@ -101,21 +100,21 @@ class Sensors {
 		void begin();
 		void initialise();
 		void getBME280RawData();
-		int convertADCtoMillivolts(int rawVal);
+		// int convertADCtoMillivolts(int rawVal);
 		double BME280GetTemperature(void);
 		// double BME280GetPressure(void);
 		double BME280GetHumidity(void);
-		double getMafValue();
-		double getMafMillivolts();
+		int getMafRaw();
+		double getMafVolts();
 		double getTempValue();
 		double getBaroValue();
 		double getRelHValue();
 		double getAltitude();
-		double getPRefMillivolts();
+		double getPRefVolts();
 		double getPRefValue();
-		double getPDiffMillivolts();
+		double getPDiffVolts();
 		double getPDiffValue();
-		double getPitotMillivolts();
+		double getPitotVolts();
 		double getPitotValue();
 		
 		void mafFreqCountISR();

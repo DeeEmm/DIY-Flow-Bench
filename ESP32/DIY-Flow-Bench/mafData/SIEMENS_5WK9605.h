@@ -10,9 +10,8 @@
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
-#ifndef MAFDATA
-#define MAFDATA
-
+#ifndef MAFDATACLASS
+#define MAFDATACLASS
 
 #include "../constants.h"
 

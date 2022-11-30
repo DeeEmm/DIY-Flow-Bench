@@ -10,8 +10,8 @@
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
 ***/
-#ifndef MAFDATA
-#define MAFDATA
+#ifndef MAFDATACLASS
+#define MAFDATACLASS
 
 class mafData {
 
@@ -57,12 +57,12 @@ class mafData {
     *
     * The lookup table takes the form of {key, value}
     *
-    * Keys may represent analog units, millivolts, hertz, baked beans or or any other input value.
+    * Keys may represent analog units, volts, hertz, baked beans or or any other input value.
     * Data table length is not fixed 
     * Keys do not need to be contiguous nor linear
     * Keys do not need to start at 1
     * Keys do not need to finish at a specific value
-    * Whatever value you input into the getMafValue method will return the relevant lookup table value
+    * Whatever value you input into the getMafRaw method will return the relevant lookup table value
     *
     *
     * NOTE:

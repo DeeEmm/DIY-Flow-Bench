@@ -1,23 +1,21 @@
 /***********************************************************
-* The DIY Flow Bench project
-* https://diyflowbench.com
-* 
-* Sensors.cpp - Sensors class
-*
-* Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
-* 
-* For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
-* Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions 
-* You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
-* 
-* This project and all associated files are provided for use under the GNU GPL3 license:
-* https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
-* 
-* NOTE: Methods return sensor values in (SI) standard units. This allows any sensor to be integrated into the system
-*
-* TODO: Would like to implement PCNT pulse counter for frequency measurement
-* https://github.com/DavidAntliff/esp32-freqcount/blob/master/frequency_count.c
-***/
+ * @name The DIY Flow Bench project
+ * @details Measure and display volumetric air flow using an ESP32 & Automotive MAF sensor
+ * @link https://diyflowbench.com
+ * @author DeeEmm aka Mick Percy deeemm@deeemm.com
+ * 
+ * @file sensors.cpp
+ * 
+ * @brief Sensors class
+ * 
+ * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+ * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
+ * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
+ * 
+ * @license This project and all associated files are provided for use under the GNU GPL3 license:
+ * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
+ * 
+ ***/
 
 #include "Arduino.h"
 
@@ -34,9 +32,8 @@
 #include LANGUAGE_FILE
 
 #ifdef MAF_IS_ENABLED
-#include MAF_DATA_FILE
+#include "mafData/maf.h"
 #endif
-
 
 #ifdef BME_IS_ENABLED
 #define TINY_BME280_I2C
@@ -46,7 +43,9 @@ TwoWire I2CBME = TwoWire(0);
 #endif
 
 
-
+/***********************************************************
+ * Class constructor
+*/
 Sensors::Sensors() {
 
 }
@@ -77,15 +76,14 @@ void Sensors::begin () {
 void Sensors::initialise () {
 
 	Messages _message;
+
 	#ifdef MAF_IS_ENABLED
-	MafData _mafdata;
+	Maf _mafdata;
 	#endif
 
 	extern struct DeviceStatus status;
     extern struct Translator translate;
-	// extern int mafOutputType;
-
-	// _mafdata.begin();
+	extern int mafOutputType;
 	
 	//initialise BME
 	#ifdef BME_IS_ENABLED
@@ -116,7 +114,7 @@ void Sensors::initialise () {
 	// Note Frequency based MAFs are required to be attached direct to MAF pin for pulse counter to work
 	// This means 5v > 3.3v signal conditioning is required on MAF pin
 /* TODO: temp disabled - need to reenable	
-	if (_mafdata.mafOutputType == FREQUENCY) {	
+	if (_mafdata.getMafOutputType == FREQUENCY) {	
 		__mafVoodoo.mafSetupISR(MAF_PIN, []{__mafVoodoo.mafFreqCountISR();}, FALLING);
 		timer = timerBegin(0, 2, true);                                  
 		timerStart(timer);	
@@ -124,12 +122,12 @@ void Sensors::initialise () {
 */	
 
 
-	// Definitions for system status pane
+	// Sensor definitions for system status pane
 	// MAF Sensor
 	#if defined MAF_IS_ENABLED && defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
-		this->_mafSensorType = _mafdata.mafSensorType;
+		this->_mafSensorType = _mafdata.getMafSensorType();
 	#elif defined MAF_IS_ENABLED && defined MAF_SRC_IS_PIN
-		this->_mafSensorType = _mafdata.mafSensorType + " on GPIO:" + MAF_PIN;
+		this->_mafSensorType = _mafdata.getMafSensorType() + " on GPIO:" + MAF_PIN;
 	#else
 		this->_mafSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#endif
@@ -139,9 +137,9 @@ void Sensors::initialise () {
 		this->startupBaroPressure = this->getPRefValue();
 		this->_baroSensorType = translate.LANG_VAL_START_REF_PRESSURE;
 	#elif defined BARO_SENSOR_TYPE_FIXED_VALUE
-		this->startupBaroPressure = DEFAULT_BARO_VALUE;
+		this->startupBaroPressure = FIXED_BARO_VALUE;
 		this->_baroSensorType = translate.LANG_VAL_FIXED_VALUE;
-		this->_baroSensorType += DEFAULT_BARO_VALUE;
+		this->_baroSensorType += FIXED_BARO_VALUE;
 	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 		this->_baroSensorType = "BME280";
 	#elif defined BARO_SENSOR_TYPE_MPX4115
@@ -149,7 +147,7 @@ void Sensors::initialise () {
 	#elif defined BARO_SENSOR_TYPE_LINEAR_ANALOG
 		this->_baroSensorType = "ANALOG PIN: " + REF_BARO_PIN;
 	#else 
-		this->_baroSensorType = translate.LANG_VAL_FIXED_VALUE + DEFAULT_BARO_VALUE;
+		this->_baroSensorType = translate.LANG_VAL_FIXED_VALUE + FIXED_BARO_VALUE;
 	#endif
 	
 	//Temp Sensor
@@ -158,7 +156,7 @@ void Sensors::initialise () {
 		this->_tempSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#elif defined TEMP_SENSOR_TYPE_FIXED_VALUE
 		this->_tempSensorType = translate.LANG_VAL_FIXED_VALUE;
-		this->_tempSensorType += DEFAULT_TEMP_VALUE;
+		this->_tempSensorType += FIXED_TEMP_VALUE;
 	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 		this->_tempSensorType = "BME280";
 	#elif defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
@@ -166,7 +164,7 @@ void Sensors::initialise () {
 	#elif defined TEMP_SENSOR_TYPE_LINEAR_ANALOG
 		this->_tempSensorType = "ANALOG PIN: " + TEMPERATURE_PIN;
 	#else 
-		this->_tempSensorType = translate.LANG_VAL_FIXED_VALUE + DEFAULT_TEMP_VALUE;
+		this->_tempSensorType = translate.LANG_VAL_FIXED_VALUE + FIXED_TEMP_VALUE;
 	#endif
 	
 	// Rel Humidity Sensor
@@ -175,7 +173,7 @@ void Sensors::initialise () {
 		this->_relhSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#elif defined RELH_SENSOR_TYPE_FIXED_VALUE
 		this->_relhSensorType = translate.LANG_VAL_FIXED_VALUE;
-		this->_relhSensorType += DEFAULT_RELH_VALUE;
+		this->_relhSensorType += FIXED_RELH_VALUE;
 	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 		this->_relhSensorType = "BME280";
 	#elif defined RELH_SENSOR_TYPE_SIMPLE_TEMP_DHT11
@@ -183,7 +181,7 @@ void Sensors::initialise () {
 	#elif defined RELH_SENSOR_TYPE_LINEAR_ANALOG
 		this->_relhSensorType = "ANALOG PIN: " + HUMIDITY_PIN;
 	#else 
-		this->_relhSensorType = translate.LANG_VAL_FIXED_VALUE + DEFAULT_RELH_VALUE;
+		this->_relhSensorType = translate.LANG_VAL_FIXED_VALUE + FIXED_RELH_VALUE;
 	#endif
 
 	// reference pressure
@@ -234,7 +232,7 @@ void Sensors::initialise () {
 
 }
 
-
+// REVIEW
 /***********************************************************
  * Set up MAF ISR
  *
@@ -248,7 +246,7 @@ void Sensors::mafSetupISR(uint8_t irq_pin, void (*ISR_callback)(void), int value
 */
 
 
-
+// REVIEW
 /***********************************************************
 * Interrupt Service Routine for MAF Frequency measurement
 *
@@ -266,29 +264,31 @@ void IRAM_ATTR Sensors::mafFreqCountISR() {
 
 
 /***********************************************************
- * @brief getMafMillivolts: Returns MAF signal in Millivolts
+ * @brief getMafVolts: Returns MAF signal in Volts
  ***/
-double Sensors::getMafMillivolts() {
+double Sensors::getMafVolts() {
 	
 	Hardware _hardware;
+
+	double sensorVolts = 0.0;
 	
-	#if defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
-		mafMillivolts = _hardware.getADCMillivolts(MAF_ADC_CHANNEL);
+	#if defined MAF_SRC_IS_ADC && defined MAF_IS_ENABLED && defined ADC_IS_ENABLED
+		sensorVolts = _hardware.getADCVolts(MAF_ADC_CHANNEL);
 				
 	#elif defined MAF_SRC_IS_PIN	
 		long mafRaw = analogRead(MAF_PIN);
-		mafMillivolts = (mafRaw * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;
+		sensorVolts = mafRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
 	#else
-		mafMillivolts = 1;
-		return 1;
+		sensorVolts = 1.0;
+		return sensorVolts;
 	#endif
 	
 	// Lets make sure we have a valid value to return
-	if (mafMillivolts > 0) {
-		mafMillivolts += MAF_MV_TRIMPOT;
-		return mafMillivolts;
+	if (sensorVolts > 0) {
+		sensorVolts += MAF_MV_TRIMPOT;
+		return sensorVolts;
 	} else {
-		return 1;
+		return 1.0;
 	}	
 	
 }
@@ -296,59 +296,292 @@ double Sensors::getMafMillivolts() {
 
 
 /***********************************************************
- * @brief Returns RAW MAF Sensor value
+ * @brief Returns RAW MAF Sensor value (mass flow)
  *
  * @note MAF decode is done in Calculations.cpp
  ***/
-double Sensors::getMafValue() {
+int Sensors::getMafRaw() {
 	
 	Hardware _hardware;
 	#ifdef MAF_IS_ENABLED
-	MafData _mafdata;
-	
-	double mafFlow = 0.0;
+	Maf _mafdata;
 
-	switch (_mafdata.mafOutputType) {
+	switch (_mafdata.getMafOutputType()) {
 		
 		case VOLTAGE:
 		{
-			int mafMillivolts = 0;
-			
 			#if defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
-				//mafFlowRaw = _hardware.getADCRawData(MAF_ADC_CHANNEL);
-				mafMillivolts = _hardware.getADCMillivolts(MAF_ADC_CHANNEL);
+				mafFlowRaw = _hardware.getADCRawData(MAF_ADC_CHANNEL);
 				
 			#elif defined MAF_SRC_IS_PIN	
 				long mafFlowRaw = analogRead(MAF_PIN);
-				mafMillivolts = (mafFlowRaw * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;
 			#else
-				mafMillivolts = 1;
-				return 1;
+				mafFlowRaw = 1;
 			#endif
-
-			mafFlow = mafMillivolts + MAF_MV_TRIMPOT;			
-			return mafFlow;
 		}
 		break;
 		
 		case FREQUENCY:
 		{  
 			// TODO
-			mafFlow = 40000000.00 / PeriodCount;
-			//mafFlow = 40000000.00 / __mafVoodoo.PeriodCount; // NOTE: Do we need Voodoo?
-			mafFlow += MAF_MV_TRIMPOT;
-			return mafFlow;
+			mafFlowRaw = 40000000.00 / PeriodCount;
+			//mafFlowRaw = 40000000.00 / __mafVoodoo.PeriodCount; // NOTE: Do we need Voodoo?
 		}
 		break;
 		
 	}	
 	
-	return mafFlow;
+	return mafFlowRaw;
 
 	#endif
 
 	return 1; // MAF is disabled so lets return 1
 }
+
+
+
+
+
+
+
+/***********************************************************
+ * @brief get Reference Pressure sensor voltage
+ * @returns current PRef sensor value in Volts
+ ***/
+double Sensors::getPRefVolts() {
+
+	Hardware _hardware;
+
+	double sensorVolts = 0.0;
+
+	#if defined PREF_SRC_ADC && defined PREF_IS_ENABLED && defined ADC_IS_ENABLED // use ADC value
+
+		sensorVolts = _hardware.getADCVolts(PREF_ADC_CHANNEL);	
+
+	#elif defined PREF_SRC_PIN && defined PREF_IS_ENABLED // use raw pin value
+
+		long refPressRaw = analogRead(REF_PRESSURE_PIN);
+		sensorVolts = refPressRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
+
+	#else // return a fixed value
+	
+		sensorVolts = 1.0;
+		return sensorVolts;
+	#endif
+
+	// Lets make sure we have a valid value to return
+	if (sensorVolts > 0.0) { 
+		sensorVolts += PREF_MV_TRIMPOT;
+		return sensorVolts;
+	} else { 
+		return 1.0;
+	}
+
+
+}
+
+/***********************************************************
+ * @brief Process Reference Pressure sensor value depending on sensor type
+ * @returns Reference pressure in kPa
+ * @note Default sensor MPXV7007DP - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
+ ***/
+double Sensors::getPRefValue() {
+
+	Hardware _hardware;
+	
+	double sensorVal = 0.0;
+	double sensorVolts = this->getPRefVolts();
+	
+	// Convert value to kPa according to sensor type
+	#if defined PREF_SENSOR_TYPE_LINEAR_ANALOG
+		sensorVal = this->getPRefVolts() * PREF_ANALOG_SCALE;
+	
+	#elif defined PREF_SENSOR_TYPE_MPXV7007
+
+		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
+		// sensorVal = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
+		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+
+	#else
+
+		sensorVal = FIXED_REF_PRESS_VALUE;
+
+	#endif
+
+	// Lets make sure we have a valid value to return
+	if (sensorVal > 0 && sensorVolts > 0) { 
+		return sensorVal;
+	} else { 
+		return 1.0;
+	}
+
+
+}
+
+
+
+
+/***********************************************************
+ * @brief Get PDiff Volts
+ * @returns Differential Pressure in Volts
+ ***/
+double Sensors::getPDiffVolts() {
+	
+	Hardware _hardware;
+
+	double sensorVolts = 0.0;
+	
+	#if defined PDIFF_SRC_IS_ADC && defined PDIFF_IS_ENABLED && defined ADC_IS_ENABLED // use ADC value
+
+		sensorVolts = _hardware.getADCVolts(PDIFF_ADC_CHANNEL);
+				
+	#elif defined PDIFF_SRC_IS_PIN	// Use raw pin value
+
+		long pDiffRaw = analogRead(DIFF_PRESSURE_PIN);
+		sensorVolts = pDiffRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
+
+	#else // return a fixed value
+
+		sensorVolts = 1.0;
+		return sensorVolts;
+
+	#endif
+	
+	// Lets make sure we have a valid value to return
+	if (sensorVolts > 0) {
+		sensorVolts += PDIFF_MV_TRIMPOT;
+		return sensorVolts;
+	} else {
+		return 1;
+	}
+	
+}
+
+
+
+
+/***********************************************************
+ * @brief Get differential pressure in kPa
+ * @returns Differential pressure in kPa
+ * @note Default sensor is MPXV7007DP - Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
+ ***/
+double Sensors::getPDiffValue() {
+
+	Hardware _hardware;
+
+	double sensorVal = 0.0;
+	double sensorVolts = this->getPDiffVolts();
+
+	// Convert value to kPa according to sensor type
+	#if defined PDIFF_SENSOR_TYPE_LINEAR_ANALOG
+
+		diffPressureKpa = getPDiffVolts() * PDIFF_ANALOG_SCALE;
+	
+	#elif defined PDIFF_SENSOR_TYPE_MPXV7007 // Recommended sensor
+
+		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
+		// sensorVal = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
+		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+
+	#else // use fixed value
+
+		sensorVal = FIXED_PDIFF_PRESS;
+
+	#endif
+
+	// Lets make sure we have a valid value to return
+	if (sensorVal > 0) {
+		return sensorVal;
+	} else {
+		return 1.0;
+	}
+
+}
+
+
+
+
+/***********************************************************
+ * @brief Get pitot Volts
+ * @returns Pitot Pressure in Volts
+ ***/
+double Sensors::getPitotVolts() {
+
+	Hardware _hardware;
+
+	double sensorVolts = 0.0;
+	
+	#if defined PITOT_SRC_IS_ADC && defined PITOT_IS_ENABLED && defined ADC_IS_ENABLED // use ADC value
+
+		sensorVolts = _hardware.getADCVolts(PITOT_ADC_CHANNEL);
+
+	#elif defined PDIFF_SRC_IS_PIN	// use raw pin value
+
+		long pitotRaw = analogRead(PITOT_PIN);
+		sensorVolts = pitotRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
+
+	#else // use fixed value
+
+		sensorVolts = 1.0;
+		return sensorVolts;
+
+	#endif
+	
+	// Lets make sure we have a valid value to return
+	if (sensorVolts > 0) {
+		sensorVolts += PITOT_MV_TRIMPOT;
+		return sensorVolts;
+	} else {
+		return 1.0;
+	}
+	
+	
+}
+
+
+
+
+
+/***********************************************************
+ * @brief get Pitot value in kPa
+ * @returns Pitot pressure differential in kPa
+ * @note Default sensor MPXV7007DP - Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
+ ***/
+double Sensors::getPitotValue() {
+	
+	Hardware _hardware;
+
+	double sensorVal = 0.0;
+	double sensorVolts = this->getPitotVolts();
+	
+	// Convert value to kPa according to sensor type
+	#if defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
+
+		sensorVal = getPitotVolts() * PITOT_ANALOG_SCALE;
+	
+	#elif defined PITOT_SENSOR_TYPE_MPXV7007DP
+		
+		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
+		// sensorVal = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
+		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+
+
+	#else // use fixed value
+
+		sensorVal = FIXED_PITOT_VALUE;
+
+	#endif
+
+	// Lets make sure we have a valid value to return
+	if (sensorVal > 0) {
+		return sensorVal;
+	} else {
+		return 1.0;
+	}
+
+}
+
+
 
 
 
@@ -369,9 +602,9 @@ double Sensors::getTempValue() {
 	#ifdef TEMP_SENSOR_TYPE_LINEAR_ANALOG
 	
 		long rawTempValue = analogRead(TEMPERATURE_PIN);	
-		double tempMillivolts = (rawTempValue * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;	
-		tempMillivolts += TEMP_MV_TRIMPOT;		
-		refTempDegC = tempMillivolts * TEMP_ANALOG_SCALE;
+		double tempVolts = rawTempValue * (_hardware.get3v3SupplyVolts() / 4095.0);	
+		tempVolts += TEMP_MV_TRIMPOT;		
+		refTempDegC = tempVolts * TEMP_ANALOG_SCALE;
 		refTempDegC +=  TEMP_FINE_ADJUST;
 		
 	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
@@ -391,7 +624,7 @@ double Sensors::getTempValue() {
 
 	#else
 		// We don't have any temperature input so we will assume default
-		refTempDegC = DEFAULT_TEMP_VALUE;
+		refTempDegC = FIXED_TEMP_VALUE;
 	#endif
 	
 	if (TEMP_FINE_ADJUST != 0) refTempDegC += TEMP_FINE_ADJUST;
@@ -414,12 +647,12 @@ double Sensors::getBaroValue() {
 	#if defined BARO_SENSOR_TYPE_LINEAR_ANALOG
 		
 		long rawBaroValue = analogRead(REF_BARO_PIN);
-		double baroMillivolts = (rawBaroValue * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 10000;
-		baroMillivolts += BARO_MV_TRIMPOT;		
-		baroPressureHpa = baroMillivolts * BARO_ANALOG_SCALE;
+		double baroVolts = rawBaroValue * (_hardware.get3v3SupplyVolts() / 4095.0);
+		baroVolts += BARO_MV_TRIMPOT;		
+		baroPressureHpa = baroVolts * BARO_ANALOG_SCALE;
 		baroPressureHpa += BARO_FINE_ADJUST;
 	
-	#elif defined BARO_SENSOR_TYPE_MPX4115
+	#elif defined BARO_SENSOR_TYPE_MPX4115 && defined ADC_IS_ENABLED
 		// Datasheet - https://html.alldatasheet.es/html-pdf/5178/MOTOROLA/MPX4115/258/1/MPX4115.html
 		// Vout = VS (P x 0.009 – 0.095) --- Where VS = Supply Voltage (Formula from Datasheet)
 		baroPressureHpa = map(_hardware.getADCRawData(BARO_ADC_CHANNEL), 0, 4095, 15000, 115000);
@@ -436,7 +669,7 @@ double Sensors::getBaroValue() {
 		baroPressureKpa += BARO_FINE_ADJUST;
 	#else
 		// we don't have any sensor so use default - // NOTE: standard sea level baro pressure is 14.7 psi
-		baroPressureKpa = DEFAULT_BARO_VALUE;
+		baroPressureKpa = FIXED_BARO_VALUE;
 	#endif
 
 	// Truncate to 2 decimal places
@@ -460,15 +693,13 @@ double Sensors::getRelHValue() {
 	Hardware _hardware;
 
 	double relativeHumidity;
-
-	  // extern struct Translator translate;
 		
 	#ifdef RELH_SENSOR_TYPE_LINEAR_ANALOG
 	
 		long rawRelhValue = analogRead(HUMIDITY_PIN);
-		double relhMillivolts = (rawRelhValue * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;
-		relhMillivolts += RELH_MV_TRIMPOT;		
-		relativeHumidity = relhMillivolts * RELH_ANALOG_SCALE;
+		double relhVolts = rawRelhValue * (_hardware.get3v3SupplyVolts() / 4095.0);
+		relhVolts += RELH_MV_TRIMPOT;		
+		relativeHumidity = relhVolts * RELH_ANALOG_SCALE;
 		relativeHumidity += RELH_FINE_ADJUST;
 	
 	#elif defined RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
@@ -489,7 +720,7 @@ double Sensors::getRelHValue() {
 		
 	#else
 		// we don't have a sensor so use nominal fixed value 
-		relativeHumidity = DEFAULT_RELH_VALUE; // (36%)
+		relativeHumidity = FIXED_RELH_VALUE; // (36%)
 	
 	#endif
 
@@ -497,6 +728,8 @@ double Sensors::getRelHValue() {
 	return relativeHumidity;
 	
 }
+
+
 
 
 /***********************************************************
@@ -514,248 +747,3 @@ double Sensors::getAltitude() {
   double atmospheric = getRelHValue() / 100.0F;
   return 44330.0 * (1.0 - pow(atmospheric / SEALEVELPRESSURE_HPA, 0.1903));
 }
-
-
-
-/***********************************************************
- * getPRefMillivolts
- * Returns Reference pressure in Millivolts
- ***/
-double Sensors::getPRefMillivolts() {
-
-	Hardware _hardware;
-
-	#if defined PREF_SRC_ADC && defined ADC_IS_ENABLED
-
-		refPressMillivolts = _hardware.getADCMillivolts(PREF_ADC_CHANNEL);
-				
-	#elif defined PREF_SRC_PIN	
-		long refPressRaw = analogRead(REF_PRESSURE_PIN);
-		refPressMillivolts = (refPressRaw * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;
-	#else	
-		refPressMillivolts = 1;
-		return 1;
-	#endif
-
-	// Lets make sure we have a valid value to return
-	if (refPressMillivolts > 0) {
-		refPressMillivolts += PREF_MV_TRIMPOT;
-		return refPressMillivolts;
-	} else {
-		return 1;
-	}
-
-
-}
-
-/***********************************************************
- * getPRefValue
- * Returns Reference pressure in kPa
- ***/
-double Sensors::getPRefValue() {
-
-	Hardware _hardware;
-	
-	double refPressureKpa = 0.0;
-	
-	#if defined PREF_SENSOR_TYPE_LINEAR_ANALOG
-		refPressureKpa = getPRefMillivolts() * PREF_ANALOG_SCALE;
-	
-	#elif defined PREF_SENSOR_TYPE_MPXV7007
-		// Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
-		// Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007DP Datasheet)
-		// refPressureKpa = ((refPressMillivolts / supplyMillivolts ) - 0.5) / 0.057;  
-		
-		// REVIEW Not sure if we need to error check here
-//		if (!(Sensors::getPRefMillivolts() > 0) | !(_hardware.get5vSupplyMillivolts() > 0)) return 1; 
-
-		refPressureKpa = (((this->getPRefMillivolts() / _hardware.get5vSupplyMillivolts() ) - 0.5) / 0.057);  
-
-	#else
-		// No reference pressure sensor used so lets return a fixed value (so as not to throw maths out)
-		// refPressureKpa = 6.97448943333324; //28"
-		refPressureKpa = DEFAULT_REF_PRESS_VALUE;
-
-	#endif
-	
-	return refPressureKpa;
-
-}
-
-
-
-
-/***********************************************************
- * Returns Differential Pressure in Millivolts
- ***/
-double Sensors::getPDiffMillivolts() {
-	
-	Hardware _hardware;
-	
-	#if defined PDIFF_SRC_IS_ADC && defined ADC_IS_ENABLED
-		pDiffMillivolts = _hardware.getADCMillivolts(PDIFF_ADC_CHANNEL);
-				
-	#elif defined PDIFF_SRC_IS_PIN	
-		long pDiffRaw = analogRead(DIFF_PRESSURE_PIN);
-		pDiffMillivolts = (pDiffRaw * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;
-	#else
-		pDiffMillivolts = 1;
-		return 1;
-	#endif
-	
-	// Lets make sure we have a valid value to return
-	if (pDiffMillivolts > 0) {
-		pDiffMillivolts += PDIFF_MV_TRIMPOT;
-		return pDiffMillivolts;
-	} else {
-		return 1;
-	}
-	
-}
-
-
-
-
-/***********************************************************
- * Returns Pressure differential in kPa
- ***/
-double Sensors::getPDiffValue() {
-
-	Hardware _hardware;
-	Messages _message;
-
-	double diffPressureKpa = 0.0;
-	int diffPressMillivolts;
-	long diffPressRaw;	
-
-	#if defined PDIFF_SRC_IS_ADC && defined ADC_IS_ENABLED
-		diffPressMillivolts = getPDiffMillivolts();	
-	#elif defined PDIFF_SRC_IS_PIN	
-		diffPressRaw = analogRead(DIFF_PRESSURE_PIN);
-		diffPressMillivolts = (diffPressRaw * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;
-	#else
-		diffPressMillivolts = 1;
-		return 1;
-	#endif
-	
-//_message.serialPrintf("%s \n", diffPressRaw);	
-	
-	diffPressMillivolts += PDIFF_MV_TRIMPOT;
-
-	#if defined PDIFF_SENSOR_TYPE_LINEAR_ANALOG
-		diffPressureKpa = diffPressMillivolts * PDIFF_ANALOG_SCALE;
-	
-	#elif defined PDIFF_SENSOR_TYPE_MPXV7007
-		// RECOMMENDED SENSOR
-		// Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
-		// Vout = VS x (0.057 x P + 0.5) --- Where VS = Supply Voltage (Formula from MPXV7007DP Datasheet)
-		
-		#if defined ADC_TYPE_ADS1115
-			//scale for 16 bit ADC
-
-			// REVIEW Not sure if we need to error check here
-			// if (!(Sensors::getPDiffMillivolts() > 0) | !(_hardware.get5vSupplyMillivolts() > 0)) return 1; 
-			
-			diffPressureKpa = (((this->getPDiffMillivolts() / _hardware.get5vSupplyMillivolts() ) - 0.5) / 0.057);  
-			
-			
-		#elif defined ADC_TYPE_ADS1015
-			//scale for 12 bit ADC
-			diffPressureKpa = map(_hardware.getADCRawData(PREF_ADC_CHANNEL), 0, 4095, -7000, 7000); 
-		#endif
-		
-		 
-	#elif defined PDIFF_SENSOR_NOT_USED 
-	#else
-		// No reference pressure sensor used so lets return a value (so as not to throw maths out)
-		// refPressureKpa = 6.97448943333324; //28"
-		diffPressureKpa = DEFAULT_PDIFF_PRESS;
-
-	#endif
-
-	return diffPressureKpa;
-
-}
-
-
-
-
-/***********************************************************
- * Returns Pitot Pressure in Millivolts
- ***/
-double Sensors::getPitotMillivolts() {
-
-	Hardware _hardware;
-	
-	#if defined PITOT_SRC_IS_ADC && defined ADC_IS_ENABLED
-		pitotMillivolts = _hardware.getADCMillivolts(PITOT_ADC_CHANNEL);
-	#elif defined PDIFF_SRC_IS_PIN	
-		long pitotRaw = analogRead(PITOT_PIN);
-		pitotMillivolts = (pitotRaw * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;
-	#else
-		pitotMillivolts = 1;
-		return 1;
-	#endif
-	
-	// Lets make sure we have a valid value to return
-	if (pitotMillivolts > 0) {
-		pitotMillivolts += PITOT_MV_TRIMPOT;
-		return pitotMillivolts;
-	} else {
-		return 1;
-	}
-	
-	
-}
-
-
-
-
-
-/***********************************************************
- * Returns Pitot pressure differential in kPa
- ***/
-double Sensors::getPitotValue() {
-	
-	Hardware _hardware;
-
-
-	double pitotPressureKpa = 0.0;
- 	long pitotPressRaw;
-	double pitotMillivolts;
-	
-	
-	#if defined PITOT_SRC_IS_ADC && defined ADC_IS_ENABLED
-		pitotMillivolts = getPitotMillivolts();
-	#elif defined PITOT_SRC_IS_PIN	
-		pitotPressRaw = analogRead(PITOT_PIN);
-		pitotMillivolts = (pitotPressRaw * (_hardware.get3v3SupplyMillivolts() / 4095.0)) * 1000;
-	#else
-		pitotMillivolts = 1;
-		return 1;
-	#endif		
-	
-	pitotMillivolts += PITOT_MV_TRIMPOT;
-	
-	#if defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
-		pitotPressureKpa = pitotMillivolts * PITOT_ANALOG_SCALE;
-	
-	#elif defined PITOT_SENSOR_TYPE_MPXV7007DP
-
-		pitotMillivolts = this->getPitotMillivolts();
-		
-		// REVIEW Not sure if we need to error check here
-		// if (!(pitotMillivolts > 0) | !(_hardware.get5vSupplyMillivolts() > 0)) return 1; 
-		
-		pitotPressureKpa = (((pitotMillivolts / _hardware.get5vSupplyMillivolts() ) - 0.5) / 0.057);  
-
-	#else
-		// No pitot probe used so lets return a fixed value
-		pitotPressureKpa = DEFAULT_PITOT_VALUE;
-
-	#endif
-
-	return pitotPressureKpa;
-
-}
-

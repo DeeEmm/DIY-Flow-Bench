@@ -2,16 +2,15 @@
 Current build status
 ===================================================================
 
-Project compiles and runs and BME now returning stable data 
-ADAC I2C enabled and working for pressure sensors 
-Need to validate actual sensor readings
-MAF currently disabled
+Project compiles and runs ADC and BME now returning stable data 
+MAF flow data returning valid results
+Moving to ESPHome libraries has improved crash stability
 
 ===================================================================
 Current work in progress
 ===================================================================
 
-MAF Decode
+Code tidy in preparation for release
 
 ===================================================================
 Info / References I want to save for later
@@ -30,6 +29,7 @@ Items to sort before formal release
 - Update mafData files
 - REMOVE tags
 - REVIEW tags
+- TEST tags
 - Translations
 - Rename DIY-Flow-Bench.cpp to DIY-Flow-Bench.ino for Arduino IDE compatibility
 
@@ -43,6 +43,13 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+22120101        - Calculations code refactor
+22112901        - MAF code refactor. 
+                - Simplified sensor millivolt calcs to use volts
+                - Fixed int to double typecast canary panic in ADC & Sensor functions
+                - Added API call for uptime
+                - Added API Call for Xtask Stack HWM
+                - Changed AsyncTCP and AsyncWebServer libraries to use ESPHome as this is better supported
 22112402        - Changed ADS1115 library to use ADS1115_lite
                 - removed support for ADS1105 (not supported by ADS1115_lite library)
                 - Fixed scaling bug in A2D voltage conversion

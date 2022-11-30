@@ -1,18 +1,19 @@
 /***********************************************************
- * The DIY Flow Bench project
- * https://diyflowbench.com
+ * @name The DIY Flow Bench project
+ * @details Measure and display volumetric air flow using an ESP32 & Automotive MAF sensor
+ * @link https://diyflowbench.com
+ * @author DeeEmm aka Mick Percy deeemm@deeemm.com
  * 
- * API.ino - API functions
- *
- * Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
+ * @file api.cpp
  * 
- * For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
- * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions 
+ * @brief API Class - Serial API handler
+ * 
+ * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+ * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
  * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
  * 
- * This project and all associated files are provided for use under the GNU GPL3 license:
+ * @license This project and all associated files are provided for use under the GNU GPL3 license:
  * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
- * 
  * 
  ***/
 
@@ -21,7 +22,7 @@
 #include "configuration.h"
 
 #include "API.h"
-#include <esp32/rom/crc.h>
+#include <esp32/rom/crc.h> 
 #include "pins.h"
 #include "hardware.h"
 #include "sensors.h"
@@ -106,10 +107,15 @@ void API::ParseMessage(char apiMessage) {
   Hardware _hardware;
   Webserver _webserver;
   
+  extern TaskHandle_t bmeTaskHandle;
+  extern TaskHandle_t adcTaskHandle;
+  extern TaskHandle_t sseTaskHandle;
+  
   // define char arrays for response strings
   char apiResponse[API_RESPONSE_LENGTH];  //64
   char apiResponseBlob[API_BLOB_LENGTH];  //1024
   char charDataJSON[API_JSON_LENGTH];     //1020
+
   // Initialise arrays
   apiResponse[0] = 0;
   apiResponseBlob[0] = 0;
@@ -130,13 +136,14 @@ void API::ParseMessage(char apiMessage) {
   C : JSON Configuration Data
   d : Debug On / Off
   E : Enum
-  F : Flow Value
+  F : Flow Value in CFM
+  F : Flow Value in KG/H
   H : Humidity Value
   I : IP Address
   J : JSON Status Data
   L : Leak Test Calibration
   l : Leak Test
-  M : MAF Value
+  M : MAF RAW Value
   m : MAF Voltage
   N : Hostname
   O : Flow Offset Calibration
@@ -145,7 +152,9 @@ void API::ParseMessage(char apiMessage) {
   S : WiFi SSID
   T : Temperature in Celcius
   t : Temperature in Fahrenheit
+  U : Uptime in Minutes
   V : Version
+  X : xTask memory usage   
   ? : Help
   ~ : Restart
   @ : Stream Status
@@ -168,11 +177,11 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case '3': // Get 3v board supply voltage (mv) 'v.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "3%s%f", config.api_delim ,_hardware.get3v3SupplyMillivolts());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "3%s%f", config.api_delim ,_hardware.get3v3SupplyVolts());
       break;
       
       case '5': // Get 5v board supply voltage (mv) 'v.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "5%s%f", config.api_delim , _hardware.get5vSupplyMillivolts());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "5%s%f", config.api_delim , _hardware.get5vSupplyVolts());
       break;
       
       case 'B': // Get measured Baro Pressure in hPa'B.123.45\r\n'
@@ -199,7 +208,7 @@ void API::ParseMessage(char apiMessage) {
           // // Flow
           // apiResponse = ("E") + config.api_delim ;        
           // // Truncate to 2 decimal places
-          // flowCFM = _calculations.calculateFlowCFM() * 100;
+          // flowCFM = _calculations.calculateFlowCFM(_sensors.getMafRaw()) * 100;
           // apiResponse += (flowCFM / 100) + (config.api_delim);
           // // Reference Pressure
           // apiResponse += _calculations.convertPressure(_sensors.getPRefValue(), KPA) + (config.api_delim);
@@ -211,7 +220,7 @@ void API::ParseMessage(char apiMessage) {
           // apiResponse += _calculations.convertPressure(_sensors.getBaroValue(), KPA);
           
           snprintf(apiResponse, API_RESPONSE_LENGTH, "E%s%f%s%f%s%f%s%f%s%f", 
-          config.api_delim, _calculations.calculateFlowCFM() * 100, 
+          config.api_delim, sensorVal.FlowCFM, 
           config.api_delim, _calculations.convertPressure(sensorVal.PRefKPA, KPA), 
           config.api_delim, _calculations.convertTemperature(sensorVal.TempDegC, DEGC), 
           config.api_delim, _calculations.convertRelativeHumidity(sensorVal.RelH, PERCENT), 
@@ -219,7 +228,11 @@ void API::ParseMessage(char apiMessage) {
       break;      
       
       case 'F': // Get measured Flow 'F123.45\r\n'       
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "F%s%f", config.api_delim , _calculations.calculateFlowCFM());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "F%s%f", config.api_delim , sensorVal.FlowCFM);
+      break;
+
+      case 'f': // Get measured Flow 'F123.45\r\n'       
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "fF%s%f", config.api_delim , sensorVal.FlowMASS);
       break;
 
       case 'H': // Get measured Humidity 'H.123.45\r\n'
@@ -249,17 +262,12 @@ void API::ParseMessage(char apiMessage) {
           // TODO: confirm Leak Test success in response
       break;
       
-      case 'M': // Get MAF sensor data'  
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "M%s", config.api_delim );   
-          if (streamMafData == false) {
-              streamMafData = true;
-              _calculations.calculateFlowCFM();
-              streamMafData = false;         
-          }
+      case 'M': // Get MAF raw sensor data'  
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "M%s%f", config.api_delim, sensorVal.MAF);   
       break;
       
       case 'm': // Get MAF output voltage'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "m%s%f", config.api_delim , ((_sensors.getMafMillivolts() * (_hardware.get5vSupplyMillivolts() / 4095.0)) * 1000));
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "m%s%f", config.api_delim , _sensors.getMafVolts());
       break;     
       
       case 'N': // Hostname
@@ -278,7 +286,7 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'r': // Get Reference Pressure sensor output voltage          
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "r%s%f", config.api_delim , _sensors.getPRefMillivolts());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "r%s%f", config.api_delim , _sensors.getPRefVolts());
       break;      
       
       case 'S': // WiFi SSID
@@ -299,8 +307,16 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "t%s%f", config.api_delim , TdegF);
       break;      
       
+      case 'U': // Uptime          
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "U%sUptime %u minutes", config.api_delim , (millis() - status.boot_time) / 60000);
+      break;
+
       case 'V': // Get Version 'VMmYYMMDDXX\r\n'          
           snprintf(apiResponse, API_RESPONSE_LENGTH, "V%s%s.%s.%s", config.api_delim , MAJOR_VERSION, MINOR_VERSION, BUILD_NUMBER);
+      break;
+
+      case 'X': // Print xTask memory usage (Stack high water mark) to serial monitor 
+          snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack HWM BMETask=%d / ADCTask=%d / SSETask=%d", config.api_delim , uxTaskGetStackHighWaterMark(bmeTaskHandle), uxTaskGetStackHighWaterMark(adcTaskHandle), uxTaskGetStackHighWaterMark(sseTaskHandle)); 
       break;
 
       case '@': // Status Print Mode (Stream status messages to serial)

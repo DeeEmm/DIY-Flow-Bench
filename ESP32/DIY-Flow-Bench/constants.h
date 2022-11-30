@@ -1,27 +1,21 @@
 /***********************************************************
-* The DIY Flow Bench project
-* https://diyflowbench.com
-* 
-* Constants.h - constant definitions header file
-*
-* Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
-* 
-* For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
-* Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions 
-* You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
-* 
-* This project and all associated files are provided for use under the GNU GPL3 license:
-* https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
-* 
-* 
-* NOTE: Many constants are simply named integers which makes reading through the code flow much easier to understand
-* as instead of seeing things like select (case) 1, 2, 3, etc the code reads select (case) SAVE_CONFIG, FILE_DELETE, etc.
-* It should be noted that these constants are used without parenthesis (which would turn them into strings).
-* When adding values to a collection of constants, be sure to use a unique number for that collection. Each collection is
-* grouped by usage / type under its own heading. Each number is arbitrary, the actual value is unimportant.
-*
-*
-***/
+ * @name The DIY Flow Bench project
+ * @details Measure and display volumetric air flow using an ESP32 & Automotive MAF sensor
+ * @link https://diyflowbench.com
+ * @author DeeEmm aka Mick Percy deeemm@deeemm.com
+ * 
+ * @file constants.h
+ * 
+ * @brief Define constants
+ * 
+ * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+ * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
+ * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
+ * 
+ * @license This project and all associated files are provided for use under the GNU GPL3 license:
+ * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
+ * 
+ ***/
 #pragma once
 
 #include <stdint.h>
@@ -31,6 +25,16 @@
  * General
  ***/
 #define ARDUINOJSON_ENABLE_STD_STRING 1 // allow support for std::string
+
+
+/***********************************************************
+ * Physical constants
+ ***/
+#define MOLAR_MASS_DRY_AIR 28.96469 // g/mole
+#define SPECIFIC_GAS_CONSTANT_DRY_AIR 287.058  // J/ (kg.K).
+#define SPECIFIC_GRAVITY_DRY_AIR 0.0013 // SG
+#define UNIVERSAL_GAS_FLOW_CONSTANT 8.3144598 // (48) J⋅mol^−1⋅K^−1.
+#define MOLAR_MASS_WATER_VAPOUR 18.01528 //(33) g/mol
 
 
 /***********************************************************
@@ -47,7 +51,7 @@
 #define  PERCENT 7
 #define  BAR 8
 #define  HPA 9
-
+#define  KELVIN 10
 
 
 /***********************************************************
