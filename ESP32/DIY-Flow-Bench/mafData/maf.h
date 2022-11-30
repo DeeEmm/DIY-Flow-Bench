@@ -11,8 +11,6 @@
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
 #pragma once
-// #ifndef MAFDATAHEADER
-// #define MAFDATAHEADER
 
 #include <Arduino.h>
 #include <vector>
@@ -45,5 +43,3 @@ class Maf {
 
 
 };
-
-// #endif

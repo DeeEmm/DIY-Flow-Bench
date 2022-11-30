@@ -13,41 +13,66 @@
 #ifndef MAFDATACLASS
 #define MAFDATACLASS
 
-//#ifdef DELPHI_AF10118
+#include <Arduino.h>
+#include "../constants.h"
+#include "mafData/maf.h"
 
 
- /***********************************************************
-  * MAF Type
-  *
-  ***/
- #define MAF_SENSOR_TYPE "DELPHI_AF10118"
+
+/***********************************************************
+ * @brief MAF Class Constructor
+ * @note: See exampleMafData.h for explaination and example
+ * 
+ ***/
+Maf::Maf() {
+}
+
+
+
+/***********************************************************
+ * @brief MAF Type
+ * 
+ * @note Description of MAF type
+ *
+ ***/
+String Maf::getMafSensorType() {
+    return "DELPHI_AF10118";
+}
+
  
  
 /***********************************************************
- * MAF Output Type
+ * @brief MAF Output Type
  *
+ * @note Valid options:
  * VOLTAGE
  * FREQUENCY
  ***/
-
-int mafOutputType = VOLTAGE;
+int Maf::getMafOutputType() {
+    return VOLTAGE;
+}
 
 
 
 /***********************************************************
- * MAF Units
+ * @brief MAF Units
  * 
+ * @note: Valid options:
  * KG_H
  * MG_S
  ***/
+int Maf::getMafUnits() {
+    return KG_H;
+}
 
-int mafDataUnit = KG_H;
 
 
 /***********************************************************
- * MAF Data
+ * @brief mafLookupTable
+ * @note Global vector of vectors containing MAF>Flow key>value pairs
  ***/
-long mafLookupTable[27][2] = {
+ std::vector<std::vector<int>> mafLookupTable = {{ 
+{0,0},
 {600,5620},
 {800,8982},
 {940,10711},

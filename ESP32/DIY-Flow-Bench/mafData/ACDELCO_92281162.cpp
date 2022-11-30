@@ -1100,7 +1100,4 @@ int Maf::getMafUnits() {
     {1024,160775}
     }};
 
-
-
-
 #endif
