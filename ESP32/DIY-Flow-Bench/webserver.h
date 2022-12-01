@@ -37,18 +37,15 @@ class Webserver {
 	friend class AsyncEventSource;
 	friend class ArduinoJSON;
 	
-	
 	protected:
 
 		void loop();
 
     	AsyncWebServer *server;
+		StaticJsonDocument<1024> dataJson; 
 
 		String getFileListJSON ();
-		String getSystemStatusJSON();
-		
-		StaticJsonDocument<1024> dataJson; 
-		
+		String getSystemStatusJSON();		
 		String byteDecode(size_t bytes);
 		void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
@@ -57,16 +54,11 @@ class Webserver {
 		int decodeMessageHeader (char *data);
 		static String processTemplate(const String& var);
 		
-		// void Handler(String languageString);
-
 	
 	private:
 		
-		#define FILESYSTEM SPIFFS
-		
 		void sendIndexPage();
 		void uploadFile();
-		// void onBody();
 		String index_html;
 		
 		
@@ -74,11 +66,9 @@ class Webserver {
 	
 		Webserver() {
 			server = NULL;
-			webskt = NULL;
 			events = NULL;
 		}
 		
-		AsyncWebSocket *webskt;
 		AsyncEventSource *events;
 		
 		void begin();
@@ -91,5 +81,4 @@ class Webserver {
 		void createConfigFile ();
 
 		
-
 };

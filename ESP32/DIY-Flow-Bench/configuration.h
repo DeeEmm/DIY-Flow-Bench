@@ -26,7 +26,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "22120101"
+#define BUILD_NUMBER "22120103"
 #define RELEASE "V.2.0-RC.3-WIP"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -34,7 +34,7 @@
 
 /***********************************************************
 * SELECT BENCH TYPE
-*  Only MAF style bench working at this stage
+* NOTE: Only MAF style bench working at this stage
 ***/
 
 #define MAF_STYLE_BENCH
@@ -52,9 +52,11 @@
 * NOTE: If defining new board make sure to add board type definition to Hardware::begin
 ***/
 
-//#define DIYFB_SHIELD                    
-//#define ESP32DUINO
-#define ESP32_WROVER_KIT // DEBUG BUILD
+#define WEMOS_D1_R32 // Using official Shield
+// #define ARDUCAM_ESP32S // Using official Shield // TODO Finalise pin mapping (copied from WEMOS_D1_R32 but pins are not correctly mapped yet)
+// #define ESP32DUINO // Generic pin mapping for ESP32 UNO style footprint. 
+// #define ESP32_WROVER_KIT // DEBUG BUILD ONLY
+
 
 
 
@@ -104,26 +106,7 @@
 #define MAX_SEMAPHORE_DELAY 1000                          // Define max value rather than just use portMAX_DELAY
 #define WEBSOCK_CLEAN_FREQ 600000
 #define STATUS_UPDATE_RATE 100
-
-
-
-
-
-/***********************************************************
-* What orifices are used?
-* 
-* TODO: Move into configuration data
-*
-* {diameter_in_mm, cfm_flow@15"}
-***/
-// double orificeData [][2] = {
-//     {51.85,209.5},
-//     {42.38,139.5},
-//     {29.98,70.4},
-//     {21.16,35.5},
-//     {9.92,7.8}
-// };
-
+#define FILESYSTEM SPIFFS
 
 
 
@@ -136,14 +119,15 @@
 
 
 /***********************************************************
-* TUNE HARDWARE 
+* GENERAL HARDWARE SETTINGS
 *
 * Adjustment figures for voltage regulators etc
 ***/
 
 #define VCC_3V3_TRIMPOT 0.0                                 // volts
 #define VCC_5V_TRIMPOT 0.0                                  // volts
-
+#define USE_FIXED_3_3V_VALUE                                // Useful for testing
+#define USE_FIXED_5V_VALUE                                  // Useful for testing
 
 
 
@@ -158,8 +142,8 @@
 
 #define BME_IS_ENABLED                                      // Comment to disable BME related code
 
-// const int BME280_I2C_ADDR = 0x76;                           
-const int BME280_I2C_ADDR = 0x77;       
+const int BME280_I2C_ADDR = 0x76;                           
+// const int BME280_I2C_ADDR = 0x77;       
 #define BME_SCAN_DELAY_MS 1000                              // Does not need to be faster than this as sensor read speed is around 30 secs!!       
 
 
@@ -196,12 +180,13 @@ const int ADC_I2C_ADDR = 0x48;
 
 
 /***********************************************************
-* CONFIGURE MAF
-* If you want to modify the code to include additional MAF sensors
-* You will need to create your own MAF data file. Use exampleMafData.h as an example
-*
-* NOTE: RC level software has only been tested with default recommended sensor (ACDELCO_92281162)
-***/
+ * CONFIGURE MAF
+ * If you want to modify the code to include additional MAF sensors
+ * You will need to create your own MAF data file. Use exampleMafData.h as an example
+ *
+ * NOTE: RC level software has only been tested with default recommended sensor (ACDELCO_92281162)
+ * NOTE: Currently onbly VOLTAGE based MAF sensors are working
+ ***/
 
 #define MAF_IS_ENABLED                                      // Comment to disable MAF related code
     
@@ -249,7 +234,7 @@ const int ADC_I2C_ADDR = 0x48;
 
 #define PREF_MV_TRIMPOT 0.0                                 // Millivolt offset
 #define PREF_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
-#define PREF_ADC_CHANNEL 2                                  // TODO: TEMP SWAPPED WITH PDIFF (ERROR ON PCB)
+#define PREF_ADC_CHANNEL 2                                  // BUG: TEMP SWAPPED WITH PDIFF (ERROR ON PCB)
 
 
 
@@ -387,6 +372,7 @@ const int ADC_I2C_ADDR = 0x48;
 #define RELH_FINE_ADJUST 0.0                                // Adjust end value
 
 
+// REVIEW
 /***********************************************************
 * ADVANCED CALIBRATION SETTINGS
 *
@@ -403,3 +389,22 @@ const int ADC_I2C_ADDR = 0x48;
 #define calibrationPlateHighCFM 100                         // Flow rate for large calibration orifice
 #define calibrationPlateMidCFM 50                           // Flow rate for med calibration orifice
 #define calibrationPlateLowCFM 10                           // Flow rate for small calibration orifice
+
+
+
+// REVIEW
+/***********************************************************
+* What orifices are used?
+* 
+* TODO: Move into configuration data
+*
+* {diameter_in_mm, cfm_flow@15"}
+***/
+// double orificeData [][2] = {
+//     {51.85,209.5},
+//     {42.38,139.5},
+//     {29.98,70.4},
+//     {21.16,35.5},
+//     {9.92,7.8}
+// };
+

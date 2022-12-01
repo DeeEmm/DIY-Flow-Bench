@@ -44,8 +44,8 @@ TwoWire I2CBME = TwoWire(0);
 
 
 /***********************************************************
- * Class constructor
-*/
+ * @brief Class constructor
+ ***/
 Sensors::Sensors() {
 
 }
@@ -53,7 +53,7 @@ Sensors::Sensors() {
 
 /***********************************************************
  * @brief Sensor begin method
-*/
+ ***/
 void Sensors::begin () {
 
 	Messages _message;
@@ -62,17 +62,17 @@ void Sensors::begin () {
 	_message.serialPrintf("Sensors Initialised \n");
 }
 
-
+// REVIEW
 // NOTE: Voodoo needed to get interrupt to work within class structure for frequency measurement. 
 // We declare a new instance of the Sensor class so that we can use it for the MAF ISR
 // https://forum.arduino.cc/t/pointer-to-member-function/365758
 // Sensors __mafVoodoo;
 
 
-
+ 
 /***********************************************************
- * @brief Sensor initialise method 
-*/
+ * @brief Initialise sensors 
+ ***/
 void Sensors::initialise () {
 
 	Messages _message;
@@ -110,10 +110,11 @@ void Sensors::initialise () {
 	#endif
 
 
+	// REVIEW temp disabled - need to reenable
 	// Set up the MAF ISR if required
 	// Note Frequency based MAFs are required to be attached direct to MAF pin for pulse counter to work
 	// This means 5v > 3.3v signal conditioning is required on MAF pin
-/* TODO: temp disabled - need to reenable	
+/* temp disabled - need to reenable	
 	if (_mafdata.getMafOutputType == FREQUENCY) {	
 		__mafVoodoo.mafSetupISR(MAF_PIN, []{__mafVoodoo.mafFreqCountISR();}, FALLING);
 		timer = timerBegin(0, 2, true);                                  
@@ -342,8 +343,6 @@ int Sensors::getMafRaw() {
 
 
 
-
-
 /***********************************************************
  * @brief get Reference Pressure sensor voltage
  * @returns current PRef sensor value in Volts
@@ -379,6 +378,10 @@ double Sensors::getPRefVolts() {
 
 
 }
+
+
+
+
 
 /***********************************************************
  * @brief Process Reference Pressure sensor value depending on sensor type
@@ -417,6 +420,7 @@ double Sensors::getPRefValue() {
 
 
 }
+
 
 
 
@@ -584,8 +588,6 @@ double Sensors::getPitotValue() {
 
 
 
-
-
 /***********************************************************
  * @name getTempValue
  * @brief Returns temperature in Deg C
@@ -731,7 +733,7 @@ double Sensors::getRelHValue() {
 
 
 
-
+// DEPRECATED
 /***********************************************************
  * Returns altitude based on pressure difference from local sea level
  ***/

@@ -73,7 +73,6 @@ Messages _message;
 Sensors _sensors;
 Webserver _webserver;
 
-
 // Set up semaphore signalling between tasks
 SemaphoreHandle_t i2c_task_mutex;
 TaskHandle_t bmeTaskHandle = NULL;
@@ -204,14 +203,15 @@ void TASKpushSseData( void * parameter ){
 
 
 /***********************************************************
- * @brief setup
- * @note initialise system and set up core tasks
+ * @brief Default setup function
+ * @details Initialises system and sets up core tasks
+ * @note We can assign tasks to specific cores if required (currently disabled)
  ***/
 void setup(void) {
   
   _message.serialPrintf("\r\nDIY Flow Bench \nVersion: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);    
 
-  // We need to call Wire globally so that it is available to both hardware and sensor classes
+  // We need to call Wire globally so that it is available to both hardware and sensor classes so lets do that here
   Wire.begin (SCA_PIN, SCL_PIN); 
   Wire.setClock(400000);
 
@@ -224,23 +224,23 @@ void setup(void) {
   uint8_t defaultCore = xPortGetCoreID();                   // This core (1)
   uint8_t secondaryCore = (defaultCore > 0 ? 0 : 1);        // Free core (0)
 
-  // Set up semaphore
+  // Set up semaphore handshaking
   i2c_task_mutex = xSemaphoreCreateMutex();
 
-  #ifdef WEBSERVER_ENABLED
+  #ifdef WEBSERVER_ENABLED // Compile time directive used for testing
   _webserver.begin();
-  xTaskCreate(TASKpushSseData, "PUSH_SSE_DATA", 1200, NULL, 2, &sseTaskHandle); //600
-  // xTaskCreatePinnedToCore(TASKpushSseData, "PUSH_SSE_DATA", 1200, NULL, 2, &sseTaskHandle, defaultCore); //600
+  xTaskCreate(TASKpushSseData, "PUSH_SSE_DATA", 1200, NULL, 2, &sseTaskHandle); 
+  // xTaskCreatePinnedToCore(TASKpushSseData, "PUSH_SSE_DATA", 1200, NULL, 2, &sseTaskHandle, defaultCore);  // Assign to default core
   #endif
 
-  #ifdef ADC_IS_ENABLED
-  xTaskCreate(TASKgetBenchData, "GET_BENCH_DATA", 2800, NULL, 2, &adcTaskHandle); //1336
-  // xTaskCreatePinnedToCore(TASKgetBenchData, "GET_BENCH_DATA", 1200, NULL, 2, &adcTaskHandle, secondaryCore); //600
+  #ifdef ADC_IS_ENABLED // Compile time directive used for testing
+  xTaskCreate(TASKgetBenchData, "GET_BENCH_DATA", 2800, NULL, 2, &adcTaskHandle); 
+  // xTaskCreatePinnedToCore(TASKgetBenchData, "GET_BENCH_DATA", 1200, NULL, 2, &adcTaskHandle, secondaryCore);  // Assign to secondary core
   #endif
 
-  #ifdef BME_IS_ENABLED
-  xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle); //960
-  // xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle, secondaryCore);
+  #ifdef BME_IS_ENABLED // Compile time directive used for testing
+  xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle); 
+  // xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle, secondaryCore); // Assign to secondary core
   #endif
   
 }
@@ -249,7 +249,8 @@ void setup(void) {
 
 
 /***********************************************************
- * MAIN LOOP
+ * @brief MAIN LOOP
+ * @details Process non-critical tasks here 
  * 
  * NOTE: Use non-breaking delays for throttling events
  ***/

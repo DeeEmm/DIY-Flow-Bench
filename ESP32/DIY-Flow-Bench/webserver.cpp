@@ -40,11 +40,7 @@
 
 
 /***********************************************************
- * INITIALISE SERVER
- *
- * NOTE: https://github.com/me-no-dev/ESPAsyncWebServer/issues/225
- * NOTE: https://github.com/me-no-dev/ESPAsyncWebServer/issues/978
- * https://stackoverflow.com/questions/73063497/encapsulate-asyncwebserver-and-asyncwebsocket-in-c-class
+ * @brief INITIALISE SERVER
  *
  ***/
 void Webserver::begin()
@@ -290,8 +286,9 @@ void Webserver::begin()
 
 
 /***********************************************************
- * byteDecode
- * Byte Decode (returns string)
+ * @brief byteDecode
+ * @param bytes size to be decoded
+ * @details Byte Decode (returns string i.e '52 GB')
  ***/
 String Webserver::byteDecode(size_t bytes)
 {
@@ -307,9 +304,8 @@ String Webserver::byteDecode(size_t bytes)
 
 
 /***********************************************************
- * Process File Upload
- * 
- * Redirects browser back to Upload modal unless upload is index file
+ * @brief Process File Upload
+ * @note Redirects browser back to Upload modal unless upload is index file
  ***/
 void Webserver::processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
@@ -358,7 +354,8 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
 
 /***********************************************************
-* Parse Config Data
+* @brief Parse Config Data
+* @param configData JSON document containing config data
 ***/
 void Webserver::parseConfigData(StaticJsonDocument<1024> configData) {
 
@@ -389,8 +386,8 @@ void Webserver::parseConfigData(StaticJsonDocument<1024> configData) {
 
 
 /***********************************************************
-* loadConfig
-* read configuration data from config.json file
+* @brief loadConfig
+* @details read configuration data from config.json file
 ***/ 
 StaticJsonDocument<1024> Webserver::loadConfig () {
 
@@ -406,10 +403,9 @@ StaticJsonDocument<1024> Webserver::loadConfig () {
 
 
 /***********************************************************
-* createConfig
-* 
-* Create configuration json file
-* Called from Webserver::Initialise() if config.json not found
+* @brief createConfig
+* @details Create configuration json file
+* @note Called from Webserver::Initialise() if config.json not found
 ***/
 void Webserver::createConfigFile () {
 
@@ -448,7 +444,10 @@ void Webserver::createConfigFile () {
 
 
 /***********************************************************
- * saveConfig
+ * @brief saveConfig
+ * @details Saves configuration data to config.json file
+ * @note Creates file if it does not exist
+ * @note Redirects browser to file list
  * 
  ***/
 void Webserver::saveConfig(AsyncWebServerRequest *request)
@@ -505,9 +504,8 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
 
 
 /***********************************************************
- * getFileListJSON
- * 
- * Get SPIFFS File List in JSON format
+ * @brief getFileListJSON
+ * @details Get SPIFFS File List in JSON format
  ***/
 String Webserver::getFileListJSON()
 {
@@ -517,7 +515,6 @@ String Webserver::getFileListJSON()
   size_t fileSize;
 
   StaticJsonDocument<1024> dataJson;
-  // dataJson["HEADER"] = FILE_LIST;
 
   Messages _message;
 
@@ -540,9 +537,8 @@ String Webserver::getFileListJSON()
 
 
 /***********************************************************
- * getDataJSON
- * 
- * Package up current bench data into JSON string
+ * @brief getDataJSON
+ * @details Package up current bench data into JSON string
  ***/
 String Webserver::getDataJSON()
 {
@@ -558,8 +554,6 @@ String Webserver::getDataJSON()
   Sensors _sensors;
 
   _message.debugPrintf("Webserver::getDataJSON() \n");
-
-  // double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INWG);
 
   double mafFlowCFM = sensorVal.MAF;
 
@@ -577,6 +571,7 @@ String Webserver::getDataJSON()
   dataJson["BARO"] = sensorVal.BaroKPA;
   dataJson["RELH"] = sensorVal.RelH;
 
+  // REVIEW
   // Pitot
   // NOT USED: double pitotPressure = _calculations.calculatePitotPressure(INWG);
   // Pitot probe displays as a percentage of the reference pressure
@@ -586,6 +581,7 @@ String Webserver::getDataJSON()
   // Reference pressure
   dataJson["PREF"] = sensorVal.PRefKPA;
 
+  // REVIEW
   // Adjusted Flow
   // get the desired bench test pressure
   // double desiredRefPressureInWg = menuARef.getCurrentValue(); //TODO:: Add ref pressure setting to UI & Config
@@ -599,6 +595,7 @@ String Webserver::getDataJSON()
   dataJson["PREF_MV"] = sensorVal.PRefMv;
   dataJson["PITOT_MV"] = sensorVal.PitotMv;
 
+  // REVIEW 
   // TODO: need to add PDIFF_MV
   // PDiff Voltage
   // dataJson["PDIFF_MV"] = String(sensorVal.PDiffMv);
@@ -611,10 +608,10 @@ String Webserver::getDataJSON()
 }
 
 
+// DEPRECATED We no longer serve gzipped files as we cannot use ESPAsyncWebserver template system
 /***********************************************************
- * onBody
- * 
- * Serves gzipped page if available
+ * @brief onBody
+ * @details Serves gzipped page if available
  ***/
 void Webserver::onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
 {
@@ -629,9 +626,8 @@ void Webserver::onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len
 
 
 /***********************************************************
- * writeJSONFile
- * 
- * write JSON string to file
+ * @brief writeJSONFile
+ * @details write JSON string to file
  ***/
 void Webserver::writeJSONFile(String data, String filename)
 {
@@ -652,9 +648,8 @@ void Webserver::writeJSONFile(String data, String filename)
 
 
 /***********************************************************
- * loadJSONFile
- * 
- * loads JSON data from file
+ * @brief loadJSONFile
+ * @details Loads JSON data from file
  ***/
 StaticJsonDocument<1024> Webserver::loadJSONFile(String filename)
 {
@@ -688,9 +683,6 @@ StaticJsonDocument<1024> Webserver::loadJSONFile(String filename)
       jsonFile.close();
       return jsonData;
 
-      // String jsonString;
-      // serializeJson(jsonData, jsonString);
-      // return jsonString;
     }
     jsonFile.close();
   }  else  {
@@ -702,11 +694,10 @@ StaticJsonDocument<1024> Webserver::loadJSONFile(String filename)
 
 
 /***********************************************************
- * processTemplate
- *
- * Processes template placeholders
- * %PLACEHOLDER_FORMAT%
- * NOTE: Custom placeholder set in configuration.h
+ * @brief processTemplate
+ * @details Replaces template placeholders with variable values
+ * @param &var HTML payload 
+ * @note %PLACEHOLDER_FORMAT%
  ***/
 String Webserver::processTemplate(const String &var)
 {
@@ -765,7 +756,7 @@ String Webserver::processTemplate(const String &var)
   if (var == "FLOW_OFFSET") return String(calibration.flow_offset);
   if (var == "LEAK_CAL_VAL") return String(calibration.leak_cal_val);
 
-  // File list
+  // Generate file list HTML code
   if (var == "FILE_LIST"){
 
     String fileList;

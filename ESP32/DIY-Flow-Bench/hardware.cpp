@@ -6,7 +6,7 @@
  * 
  * @file hardware.cpp
  * 
- * @brief Hardware class
+ * @brief Hardware class - integration of physical hardware devices
  * 
  * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
  * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
@@ -31,19 +31,17 @@
 #include "messages.h"
 #include LANGUAGE_FILE
 
-
-// NOTE: I2C code should be brought into hardware.cpp
-// NOTE: If we replace I2Cdev with wire we need to rewrite the ADC Code
-// #include <I2Cdev.h>
-
 #ifdef ADC_IS_ENABLED
 #include <ADS1115_lite.h>
 ADS1115_lite adc(ADC_I2C_ADDR);
 #endif
 
+
+
+
 /***********************************************************
-* CONSTRUCTOR
-*/
+ * @brief CONSTRUCTOR
+ ***/
 Hardware::Hardware() {
   
 }
@@ -51,9 +49,9 @@ Hardware::Hardware() {
 
 
 /***********************************************************
-* Configure pins
-*
-***/
+ * @brief Configure pins
+ *
+ ***/
 void Hardware::configurePins () {
  
   // Inputs
@@ -88,19 +86,14 @@ void Hardware::configurePins () {
   pinMode(AVO_DIR_PIN, OUTPUT);
   pinMode(VAC_BANK_1_PIN, OUTPUT);
 
-  #ifdef ESP32_WROVER_KIT
-    // Disable pins for use with JTAG Debugger (sets to high impedance)
-    // pinMode(12, INPUT);
-    // pinMode(13, INPUT);
-    // pinMode(14, INPUT);
-    // pinMode(15, INPUT);    
-  #endif
 
 }
 
 
+
+
 /***********************************************************
- * @brief begin method
+ * @brief begin function
  * 
  * TODO: Need to move ALL hardware initialisation into here
  **/
@@ -124,8 +117,10 @@ void Hardware::begin () {
   #endif
 
   // Board definitions for system status pane
-  #if defined DIYFB_SHIELD                    
-    status.boardType = "DIYFB Shield";
+  #if defined WEMOS_D1_R32                    
+    status.boardType = "WEMOS_D1_R32";
+  #elif defined ARDUCAM_ESP32S
+    status.boardType = "ARDUCAM_ESP32S";
   #elif defined ESP32DUINO
     status.boardType = "ESP32DUINO";
   #elif defined ESP32_WROVER_KIT 
@@ -135,9 +130,11 @@ void Hardware::begin () {
 }
 
 
+
+
 /***********************************************************
  * @brief Initialise hardware
-*/
+ ***/
 void Hardware::initialise () {
 
   Messages _message;
@@ -170,17 +167,15 @@ void Hardware::initialise () {
 
 
 /***********************************************************
-* Begin Serial
-*
-* Default port Serial0 (U0UXD) used. (Same as programming port / usb)
-* NOTE: Serial1 reserved for SPI
-* NOTE: Serial2 reserved for gauge comms
-*
-* Serial.begin(baud-rate, protocol, RX pin, TX pin);
-*
-* TODO:  Should we move into hardware? 
-* Serial port is not specifically tied to messages and is also shared with API
-*/
+ * @brief Begin Serial
+ *
+ * @note Default port Serial0 (U0UXD) is used. (Same as programming port / usb)
+ * @note Serial1 is reserved for SPI
+ * @note Serial2 is reserved for gauge comms
+ *
+ * @note Serial.begin(baud-rate, protocol, RX pin, TX pin);
+ *
+ ***/
 void Hardware::beginSerial(void) {
 	
 	#if defined SERIAL0_ENABLED
@@ -191,8 +186,8 @@ void Hardware::beginSerial(void) {
 
 
 
+
 /***********************************************************
- * Get list of I2C devices 
  * @brief Loop through I2C addresses and print list of devices to serial
  * @remark Based on: https://www.esp32.com/viewtopic.php?t=4742
  * @note Wire is required but glbally called in main setup in DIY-Flow-Bench.cpp
@@ -219,51 +214,11 @@ void Hardware::getI2CList() {
 
 
 
-
-
-
 /***********************************************************
-* GET BME Data
-* Fetch raw BME data
-***/
-void Hardware::getBMERawData() {
-  
-}
-
-
-
-// /** Get operational status.
-//  * from - https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/ADS1115/ADS1115.cpp
-//  * @return Current operational status (false for active conversion, true for inactive)
-//  * @see ADS1115_RA_CONFIG
-//  * @see ADS1115_CFG_OS_BIT
-//  */
-// bool Hardware::isADCConversionReady() {
-//     // I2Cdev::readBit(ADC_I2C_ADDR, 0x01, 15, buffer);
-//     return buffer[0];
-// }
-
-// /** Poll the operational status bit until the conversion is finished
-//  * from - https://github.com/jrowberg/i2cdevlib/blob/master/Arduino/ADS1115/ADS1115.cpp
-//  * Retry at most 'max_retries' times
-//  * conversion is finished, then return true;
-//  * @see ADS1115_CFG_OS_BIT
-//  * @return True if data is available, false otherwise
-//  */
-// bool Hardware::pollADCConversion(uint16_t max_retries) {  
-//   for(uint16_t i = 0; i < max_retries; i++) {
-//     if (isADCConversionReady()) return true;
-//   }
-//   return false;
-// }
-
-
-
-/***********************************************************
-* @brief GET ADS1015 ADC value
-* @note uses ADC1115-lite library - https://github.com/terryjmyers/ADS1115-Lite
-*
-***/
+ * @brief GET ADS1015 ADC value
+ * @note uses ADC1115-lite library - https://github.com/terryjmyers/ADS1115-Lite
+ *
+ ***/
 int16_t Hardware::getADCRawData(int channel) {
 
 int16_t rawADCval;
@@ -301,40 +256,6 @@ int16_t rawADCval;
 
 
 
-
-
-// DEPRECATED
-/***********************************************************
- * @brief Get ADC millivolts
- * @param channel ADC channel (0-3)
- ***/
-//  double Hardware::getADCMillivolts(int channel) {
-
-//   double volts;
-//   double millivolts;
-//   const double ADC_GAIN = 6.144F;
-
-//   int16_t rawVal = getADCRawData(channel);
-  
-//   #if defined ADC_TYPE_ADS1115 // 16 bit
-//     // 16 bits - sign bit = 15 bits mantissa = 32767 | 6.144v = max voltage (gain) of ADC | 187.5 uV / LSB
-//     volts = rawVal * ADC_GAIN / 32767.00; //32767.00F
-//     millivolts = volts * 1000.00; //1000.00F
-  
-//   #elif defined ADC_TYPE_ADS1015 // 12 bit
-//     // 12 bits - sign bit = 11 bit mantissa = 2047 | 6.144v = max voltage (gain) of ADC
-//     volts = (rawVal * ADC_GAIN) / 2047; 
-//     millivolts = volts * 1000;
-  
-//   #endif
-  
-//   return millivolts;
-// }
-
-
-
-
-
 /***********************************************************
  * @brief Get ADC channel Voltage
  * @param channel ADC channel (0-3)
@@ -366,45 +287,45 @@ int16_t rawADCval;
 
 
 
-
-
-
 /***********************************************************
-* @brief GET 3.3V SUPPLY VOLTAGE
-* Measures 3.3v supply buck power to ESP32 
-* 3.3v buck connected directly to ESP32 input
-* Use a 0.1uf cap on input to help filter noise
-*
-* NOTE: ESP32 has 12 bit ADC (0-3300mv = 0-4095)
-***/
+ * @brief GET 3.3V SUPPLY VOLTAGE
+ * @details Measures 3.3v supply buck power to ESP32 
+ * @note 3.3v buck connected directly to ESP32 input
+ * @note Use a 0.1uf cap on input to help filter noise
+ * @note ESP32 has 12 bit ADC (0-3300mv = 0-4095)
+ ***/
 double Hardware::get3v3SupplyVolts() {   
 
-  return 3.3; //REMOVE: DEBUG: temp test !!!
-
-  // long rawVoltageValue = analogRead(VCC_3V3_PIN);  
-  // double vcc3v3SupplyVolts = (rawVoltageValue * 0.805860805860806) ;
-  // return vcc3v3SupplyVolts + VCC_3V3_TRIMPOT;
+  #ifdef USE_FIXED_3_3V_VALUE
+    return 3.3; 
+  #else
+    long rawVoltageValue = analogRead(VCC_3V3_PIN);  
+    double vcc3v3SupplyVolts = (rawVoltageValue * 0.805860805860806) ;
+    return vcc3v3SupplyVolts + VCC_3V3_TRIMPOT;
+  #endif
 }
+
+
 
 
 /***********************************************************
-* @brief GET 5V SUPPLY VOLTAGE
-* Measures 5v supply buck power to ESP32 via voltage divider
-* We use a 10k-10k divider on the official shield
-* This gives a max of 2.5v which is fine for the ESP32's 3.3v logic
-* Use a 0.1uf cap on input to help filter noise
-*
-* NOTE: ESP32 has 12 bit ADC (0-3300mv = 0-4095)
-***/
+ * @brief GET 5V SUPPLY VOLTAGE
+ * @details Measures 5v supply buck power to ESP32 via voltage divider
+ * @note We use a 10k-10k divider on the official shield. This gives a max of 2.5v which is fine for the ESP32's 3.3v logic
+ * @note Use a 0.1uf cap on input to help filter noise
+ *
+ * NOTE: ESP32 has 12 bit ADC (0-3300mv = 0-4095)
+ ***/
 double Hardware::get5vSupplyVolts() {   
 
-  return 5.0; //REMOVE: DEBUG: temp test !!!
-
-  // long rawVoltageValue = analogRead(VCC_5V_PIN);  
-  // double vcc5vSupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
-  // return vcc5vSupplyVolts + VCC_5V_TRIMPOT;
+  #ifdef USE_FIXED_5V_VALUE
+    return 5.0; 
+  #else
+    long rawVoltageValue = analogRead(VCC_5V_PIN);  
+    double vcc5vSupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
+    return vcc5vSupplyVolts + VCC_5V_TRIMPOT;
+  #endif
 }
-
 
 
 
@@ -412,7 +333,8 @@ double Hardware::get5vSupplyVolts() {
 /***********************************************************
  * @brief BENCH IS RUNNING
  * @return bool:bench is running
-*/
+ * @note used by calibration function in API.cpp
+ ***/
 bool Hardware::benchIsRunning() {
     
   Messages _message;
@@ -425,7 +347,6 @@ bool Hardware::benchIsRunning() {
   
   // TODO: Check scope of these...
   double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INWG);
-  
   double mafFlowRateCFM = _calculations.calculateFlowCFM(_sensors.getMafRaw());
 
   if ((refPressure > config.min_bench_pressure))
@@ -440,9 +361,9 @@ bool Hardware::benchIsRunning() {
 
 
 /***********************************************************
-* CHECK REFERENCE PRESSURE
-* Make sure that reference pressure is within limits
-***/
+ * @brief CHECK REFERENCE PRESSURE
+ * @details Check that reference pressure is within limits
+ ***/
 void Hardware::checkRefPressure() {
   
   Messages _message;
@@ -454,6 +375,7 @@ void Hardware::checkRefPressure() {
   
   double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INWG);
     
+  // REVIEW 
   // Check that pressure does not fall below limit set by MIN_TEST_PRESSURE_PERCENTAGE when bench is running
   // note alarm commented out in alarm function as 'nag' can get quite annoying
   // Is this a redundant check? Maybe a different alert would be more appropriate
@@ -467,18 +389,19 @@ void Hardware::checkRefPressure() {
 
 
 /***********************************************************
-* benchOn
-*
-*/
+ * @brief benchOn
+ * @details Switches Vac Motor output on
+ * 
+ ***/
 void Hardware::benchOn() {
   digitalWrite(VAC_BANK_1_PIN, HIGH);
 }
 
 
 /***********************************************************
-* benchOff
-*
-*/
+ * @brief benchOff
+ * @details Switches vac motor 1 output off
+ ***/
 void Hardware::benchOff() {
   digitalWrite(VAC_BANK_1_PIN, LOW);
 }

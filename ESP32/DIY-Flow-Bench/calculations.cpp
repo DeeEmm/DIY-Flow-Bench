@@ -273,7 +273,7 @@ double Calculations::calculateFlowCFM(int mafValue, int maxValue ) {
   extern CalibrationSettings calibration;
   extern struct SensorData sensorVal;
 
-  Messages _message;
+  Messages _message; // REMOVE
   
 	#ifdef MAF_IS_ENABLED
 	Maf _maf;
@@ -321,7 +321,7 @@ double Calculations::calculateFlowCFM(int mafValue, int maxValue ) {
         double LVP = mafLookupTable.at(rowNum - 1).at(0); // Lookup value for the previous row
         double FVP = mafLookupTable.at(rowNum - 1).at(1); // Flow value for the previous row
 
-        flowRateRAW = FVP + (refValue - LVP) * ((FV-FVP)/(LV-LVP)); 
+        flowRateRAW = FVP + (refValue - LVP) * ((FV-FVP)/(LV-LVP)); // Linear interpolation
         
       }
 
@@ -345,14 +345,14 @@ double Calculations::calculateFlowCFM(int mafValue, int maxValue ) {
     flowRateKGH = flowRateMGS / 277.8;
   }
 
-  // _message.serialPrintf("flowRateKGH: %f ", flowRateKGH); // REMOVE
+  //  _message.serialPrintf("flowRateKGH: %f ", flowRateKGH); // REMOVE
 
   sensorVal.FlowMASS = flowRateKGH;
 
   // Now we need to convert from kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
   flowRateCFM = convertMassFlowToVolumetric(flowRateKGH);
 
-    // _message.serialPrintf("flowRateCFM: %f\n", flowRateCFM); // REMOVE
+  //  _message.serialPrintf("flowRateCFM: %f\n", flowRateCFM); // REMOVE
 
 /*** Orifice Style Bench ***/
 #elif defined ORIFICE_STYLE_BENCH //ratiometric
@@ -420,7 +420,7 @@ double Calculations::calculateFlowCFM(int mafValue, int maxValue ) {
  * We can now multiply our CFM values at 28" of water by .945 to obtain the theoretical CFM values at 25" of water.
  * Source: http://www.flowspeed.com/cfm-numbers.htm
 */
-// TODO renable and...
+// TODO re-enable and...
 // TEST
 double Calculations::convertFlowDepression(double oldPressure, double newPressure, double inputFlow) {
 

@@ -24,44 +24,32 @@ class Hardware {
 	friend class Maths;
 
 	protected:
-		// Instance-specific properties
 		uint8_t		_i2cAddress;
 		uint16_t	_gain;
 		uint16_t	_mux;
 		uint8_t		_rate;			  
         uint16_t 	_config;
 
-
 	public:
 		Hardware();
 		void begin ();
 		void initialise ();
-		//TODO: return array of I2C devices
-		//int * getI2CList();
 		void beginSerial(void);
 		void getI2CList();
 		void getI2CDeviceList();
-		bool isADCConversionReady();
-		bool pollADCConversion(uint16_t max_retries);
-		void getBMERawData();
 		
 		int16_t getADCRawData(int channel);
 		double get3v3SupplyVolts();
 		double get5vSupplyVolts();
 		double getADCVolts(int channel);
-		// double getADCMillivolts(int channel);
 		bool benchIsRunning();	
 		void checkRefPressure();
 		
 		void benchOn();
 		void benchOff();
 
-
-
 	private:
 		void configurePins ();
-		uint8_t buffer[3];
-		uint8_t m_bitShift; 
-		// int16_t rawADCval;
-		// int32_t rawADCval;
+
+
 };

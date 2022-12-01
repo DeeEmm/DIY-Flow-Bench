@@ -5,12 +5,32 @@ Current build status
 Project compiles and runs ADC and BME now returning stable data 
 MAF flow data returning valid results
 Moving to ESPHome libraries has improved crash stability
+Need to validate bench readings with calibrated source
+Some stability / connection issues discovered after moving from
+DEV board to Wemos ESP32 (see below)
 
 ===================================================================
 Current work in progress
 ===================================================================
 
 Code tidy in preparation for release
+Working through identified issues (see below)
+
+===================================================================
+Known Issues
+===================================================================
+
+Initial connection to webserver from browser is now unreliable and
+can take several attempts. Suspect this is related to task handling
+
+ERROR: Too many messages queued (in serial monitor)
+Possibly also related to task handling / timing
+
+===================================================================
+TODO
+===================================================================
+
+Calibration
 
 ===================================================================
 Info / References I want to save for later
@@ -26,10 +46,11 @@ https://esp-idf-lib.readthedocs.io/en/latest/groups/bmp280.html
 Items to sort before formal release
 ===================================================================
 
-- Update mafData files
 - REMOVE tags
 - REVIEW tags
 - TEST tags
+- BUG tags
+- KNOWN ISSUES
 - Translations
 - Rename DIY-Flow-Bench.cpp to DIY-Flow-Bench.ino for Arduino IDE compatibility
 
@@ -43,6 +64,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+22120103        - General code Tidy
 22120102        - Updated MAF files
 22120101        - Calculations code refactor
 22112901        - MAF code refactor. 

@@ -26,13 +26,8 @@ class Sensors {
 		int _unit;
 		int _mafOutputType;
 		int _mafDataUnit;
-		// double refPressMillivolts;
-		// double pDiffMillivolts;
-		// double pitotMillivolts;
-		// double mafMillivolts;
 		int mafFlowRaw;
 
-		
 		String _mafSensorType;
 		String _tempSensorType;
 		String _baroSensorType;
@@ -40,69 +35,13 @@ class Sensors {
 		String _prefSensorType;
 		String _pdiffSensorType;
 		String _pitotSensorType;    
-		
-		// Temperature coefficients
-		uint16_t dig_T1;
-		int16_t dig_T2;
-		int16_t dig_T3;
-		int32_t t_fine;
-		int32_t t_var1;
-		int32_t t_var2;
-
-		//long adc_t;
-		
-		
-		// Pressure coefficients
-		uint16_t dig_P1;
-		int16_t dig_P2;
-		int16_t dig_P3;
-		int16_t dig_P4;
-		int16_t dig_P5;
-		int16_t dig_P6;
-		int16_t dig_P7;
-		int16_t dig_P8;
-		int16_t dig_P9;
-		long adc_p;
-		
-		// Humidity
-		uint8_t dig_H1;
-		int16_t dig_H2;
-		uint8_t dig_H3;
-		int16_t dig_H4;
-		int16_t dig_H5;
-		int8_t  dig_H6;
-		long adc_h;
-		double var_H;
-
-		// ADC
-		double adc_min;
-		double adc_fsd;
-
-		// BME280 
-		
-		// private functions
-		bool BME280init(void);
-		uint8_t BME280Read8(uint8_t reg);
-		uint16_t BME280Read16(uint8_t reg);
-		uint16_t BME280Read16LE(uint8_t reg);
-		int16_t BME280ReadS16(uint8_t reg);
-		int16_t BME280ReadS16LE(uint8_t reg);
-		uint32_t BME280Read24(uint8_t reg);
-		void writeRegister(uint8_t reg, uint8_t val);
-		void BME280WriteRegister(uint8_t reg, uint8_t val);
-		
-		//unsigned int data[8];
-		//unsigned int buffer[25];
-
 
 	public:
 		Sensors();
 		void begin();
 		void initialise();
 		void getBME280RawData();
-		// int convertADCtoMillivolts(int rawVal);
 		double BME280GetTemperature(void);
-		// double BME280GetPressure(void);
 		double BME280GetHumidity(void);
 		int getMafRaw();
 		double getMafVolts();
@@ -116,7 +55,6 @@ class Sensors {
 		double getPDiffValue();
 		double getPitotVolts();
 		double getPitotValue();
-		
 		void mafFreqCountISR();
 		void mafSetupISR(uint8_t irq_pin, void (*ISR_callback)(void), int value);
 		
@@ -124,8 +62,7 @@ class Sensors {
 		volatile uint64_t StartValue;                 
 		volatile uint64_t PeriodCount; 
 		hw_timer_t * timer;         
-		bool isTransport_OK;          
-		// double refTempDegC;
+       
 		double baroPressureKpa;
 		double baroPressureHpa;
 		double baroPressurePa;
