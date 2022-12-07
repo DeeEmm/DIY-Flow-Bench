@@ -26,7 +26,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "22120103"
+#define BUILD_NUMBER "22120801"
 #define RELEASE "V.2.0-RC.3-WIP"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -88,8 +88,9 @@
 
 
 /***********************************************************
-* SYSTEM SETTINGS
-***/
+ * SYSTEM SETTINGS
+ * NOTE: Some of these settings may break operation. Change with care.
+ ***/
 #define BOOT_MESSAGE "May the flow be with you..."
 #define PAGE_TITLE "DIY Flow Bench"
 #define LANGUAGE_FILE "language/EN_language.h"
@@ -100,13 +101,15 @@
 #define API_RESPONSE_LENGTH 64
 #define API_STATUS_LENGTH 128
 #define API_JSON_LENGTH 1020
-#define API_SCAN_DELAY_MS 100
+#define API_SCAN_DELAY_MS 250
 #define PRINT_BUFFER_LENGTH 128
 //#define API_CHECKSUM_IS_ENABLED                           // Add checksum to serial API response TODO: UPDATE CHECKSUM TO NATIVE ESP32 CRC32
-#define MAX_SEMAPHORE_DELAY 1000                          // Define max value rather than just use portMAX_DELAY
 #define WEBSOCK_CLEAN_FREQ 600000
-#define STATUS_UPDATE_RATE 100
+#define STATUS_UPDATE_RATE 50
 #define FILESYSTEM SPIFFS
+#define VTASK_DELAY_ADC 1
+#define VTASK_DELAY_BME 1
+#define VTASK_DELAY_SSE 1
 
 
 
@@ -170,7 +173,7 @@ const int BME280_I2C_ADDR = 0x76;
 #define ADC_IS_ENABLED                                      // Comment to disable ADC related code
 
 const int ADC_I2C_ADDR = 0x48; 
-#define ADC_SCAN_DELAY_MS 100                               // Need to allow enough time for ADC read (min 10ms)
+#define ADC_SCAN_DELAY_MS 250                               // Need to allow enough time for ADC read (min 10ms)
 #define ADC_MAX_RETRIES 10
 
 #define ADC_TYPE_ADS1115 // 16 bit (188uV/bit)
