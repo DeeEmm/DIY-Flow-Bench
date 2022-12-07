@@ -608,22 +608,6 @@ String Webserver::getDataJSON()
 }
 
 
-// DEPRECATED We no longer serve gzipped files as we cannot use ESPAsyncWebserver template system
-/***********************************************************
- * @brief onBody
- * @details Serves gzipped page if available
- ***/
-void Webserver::onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
-{
-  if (SPIFFS.exists("/index.html.gz"))  {
-    AsyncWebServerResponse *response = request->beginResponse(SPIFFS, "/index.html.gz", "text/html", false);
-    response->addHeader("Content-Encoding", "gzip");
-    request->send(response);
-  }  else  {
-    request->send(SPIFFS, "/index.html", "text/html");
-  }
-}
-
 
 /***********************************************************
  * @brief writeJSONFile

@@ -125,6 +125,8 @@ void Hardware::begin () {
     status.boardType = "ESP32DUINO";
   #elif defined ESP32_WROVER_KIT 
     status.boardType = "ESP32_WROVER_KIT";
+  #else
+    status.boardType = "CUSTOM_PIN_MAPPING";
   #endif
   
 }
@@ -221,7 +223,9 @@ void Hardware::getI2CList() {
  ***/
 int16_t Hardware::getADCRawData(int channel) {
 
-int16_t rawADCval;
+  int16_t rawADCval = 0;
+
+  #ifdef ADC_IS_ENABLED
 
   if (channel > 3) {
     return 0;
@@ -248,6 +252,8 @@ int16_t rawADCval;
   
   adc.triggerConversion(); // Start a conversion. This immediately returns
   rawADCval = adc.getConversion(); // This polls the ADS1115 and wait for conversion to finish, THEN returns the value
+
+  #endif
 
   return rawADCval;
 

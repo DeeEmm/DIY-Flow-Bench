@@ -84,9 +84,10 @@ portMUX_TYPE mmux = portMUX_INITIALIZER_UNLOCKED;
 
 
 /***********************************************************
- * @brief TASK: Get bench sensor data
+ * @brief TASK: Get bench sensor data (ADS1115 - MAF/RefP/DiffP/Pitot)
  * @param i2c_task_mutex Semaphore handshake with TASKpushData / TASKgetEnviroData
  * @struct sensorVal global struct containing sensor values
+ * @remarks Interrogates ADS1115 ADC and saves sensor values to struct
  * */	
 void TASKgetBenchData( void * parameter ){
 
@@ -131,16 +132,17 @@ void TASKgetBenchData( void * parameter ){
       }   
     }
   }
-    vTaskDelay( 1 );  // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
+    vTaskDelay( VTASK_DELAY_ADC );  // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
 }
 
 
 
 /***********************************************************
- * @brief TASK: Get environental sensor data
+ * @brief TASK: Get environental sensor data (BME280 - Temp/Baro/RelH)
  * @param i2c_task_mutex Semaphore handshake with TASKpushData / TASKgetBenchData
  * @struct sensorVal global struct containing sensor values
  * @struct status global struct containing system status values
+ * @remarks Interrogates BME280 and saves sensor data to struct
  * */	
 void TASKgetEnviroData( void * parameter ){
 
@@ -159,7 +161,7 @@ void TASKgetEnviroData( void * parameter ){
         xSemaphoreGive(i2c_task_mutex); // Release semaphore
       }
     }
-    vTaskDelay( 1 ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
+    vTaskDelay( VTASK_DELAY_BME ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
 	}
 }
 
@@ -170,6 +172,7 @@ void TASKgetEnviroData( void * parameter ){
  * @param i2c_task_mutex Semaphore handshake with TASKgetEnviroData / TASKgetBenchData
  * @param sensorVal global struct containing sensor values
  * @struct status global struct containing system status values
+ * @remarks Pushes sensor values to browser using SSE
 */
 void TASKpushSseData( void * parameter ){ 
 
@@ -195,7 +198,7 @@ void TASKpushSseData( void * parameter ){
         xSemaphoreGive(i2c_task_mutex); // Release semaphore
       }
     }
-    vTaskDelay( 1 ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
+    vTaskDelay( VTASK_DELAY_SSE ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
 	}
 
 }
@@ -209,11 +212,11 @@ void TASKpushSseData( void * parameter ){
  ***/
 void setup(void) {
   
-  _message.serialPrintf("\r\nDIY Flow Bench \nVersion: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);    
-
   // We need to call Wire globally so that it is available to both hardware and sensor classes so lets do that here
   Wire.begin (SCA_PIN, SCL_PIN); 
   Wire.setClock(400000);
+
+  _message.serialPrintf("\r\nDIY Flow Bench \nVersion: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);    
 
   _hardware.begin();
   _sensors.begin();
@@ -229,18 +232,18 @@ void setup(void) {
 
   #ifdef WEBSERVER_ENABLED // Compile time directive used for testing
   _webserver.begin();
-  xTaskCreate(TASKpushSseData, "PUSH_SSE_DATA", 1200, NULL, 2, &sseTaskHandle); 
-  // xTaskCreatePinnedToCore(TASKpushSseData, "PUSH_SSE_DATA", 1200, NULL, 2, &sseTaskHandle, defaultCore);  // Assign to default core
+  // xTaskCreate(TASKpushSseData, "PUSH_SSE_DATA", 1200, NULL, 2, &sseTaskHandle); 
+  xTaskCreatePinnedToCore(TASKpushSseData, "PUSH_SSE_DATA", 1200, NULL, 10, &sseTaskHandle, defaultCore);  // Assign to default core
   #endif
 
   #ifdef ADC_IS_ENABLED // Compile time directive used for testing
-  xTaskCreate(TASKgetBenchData, "GET_BENCH_DATA", 2800, NULL, 2, &adcTaskHandle); 
-  // xTaskCreatePinnedToCore(TASKgetBenchData, "GET_BENCH_DATA", 1200, NULL, 2, &adcTaskHandle, secondaryCore);  // Assign to secondary core
+  // xTaskCreate(TASKgetBenchData, "GET_BENCH_DATA", 2800, NULL, 2, &adcTaskHandle); 
+  xTaskCreatePinnedToCore(TASKgetBenchData, "GET_BENCH_DATA", 2800, NULL, 10, &adcTaskHandle, secondaryCore);  // Assign to secondary core
   #endif
 
   #ifdef BME_IS_ENABLED // Compile time directive used for testing
-  xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle); 
-  // xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle, secondaryCore); // Assign to secondary core
+  // xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle); 
+  xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 10, &bmeTaskHandle, secondaryCore); // Assign to secondary core
   #endif
   
 }

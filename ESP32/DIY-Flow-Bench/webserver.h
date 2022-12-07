@@ -50,7 +50,6 @@ class Webserver {
 		void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 		static void saveConfig(AsyncWebServerRequest *request);
-		void onBody(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
 		int decodeMessageHeader (char *data);
 		static String processTemplate(const String& var);
 		

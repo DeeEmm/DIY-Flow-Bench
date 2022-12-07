@@ -48,7 +48,6 @@ class Sensors {
 		double getTempValue();
 		double getBaroValue();
 		double getRelHValue();
-		double getAltitude();
 		double getPRefVolts();
 		double getPRefValue();
 		double getPDiffVolts();

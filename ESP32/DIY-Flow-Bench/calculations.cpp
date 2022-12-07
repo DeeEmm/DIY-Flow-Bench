@@ -50,7 +50,6 @@ Calculations::Calculations() {
 *
 * @note Accepts input in kPa returns converted pressure 
 * @note Units - HPA / BAR / PSIA / INWG
-*
 ***/
 double Calculations::convertPressure(double pressureKpa, int units) {
 
@@ -149,7 +148,6 @@ double Calculations::convertRelativeHumidity(double relativeHumidity, int units)
  * 
  * @note Tetans Equation
  * @example P(kPa) = 0.61078EXP * ((17.27 * Temp(C) / Temp(C) + 237.3)
- * 
  ***/
 double Calculations::calculateVaporPressure(int units) {
 
@@ -183,7 +181,6 @@ double Calculations::calculateVaporPressure(int units) {
  * @brief CALCULATE SPECIFIC GRAVITY
  * 
  * @example SG = 1-(0.378 * RH(%) * vaporPressure(psia)) / baroPressure(psia)
- * 
  ***/
 double Calculations::calculateSpecificGravity() {
 
@@ -207,7 +204,6 @@ double Calculations::calculateSpecificGravity() {
  * 
  * @note Ideal gas law
  * @example airDensity(kg/m3) = absPressurePa / (SPECIFIC_GAS_CONSTANT_DRY_AIR * absTempKelvin)
- * 
  ***/
 double Calculations::calculateAirDensity() {
 
@@ -272,8 +268,6 @@ double Calculations::calculateFlowCFM(int mafValue, int maxValue ) {
 
   extern CalibrationSettings calibration;
   extern struct SensorData sensorVal;
-
-  Messages _message; // REMOVE
   
 	#ifdef MAF_IS_ENABLED
 	Maf _maf;
@@ -345,14 +339,10 @@ double Calculations::calculateFlowCFM(int mafValue, int maxValue ) {
     flowRateKGH = flowRateMGS / 277.8;
   }
 
-  //  _message.serialPrintf("flowRateKGH: %f ", flowRateKGH); // REMOVE
-
   sensorVal.FlowMASS = flowRateKGH;
 
   // Now we need to convert from kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
   flowRateCFM = convertMassFlowToVolumetric(flowRateKGH);
-
-  //  _message.serialPrintf("flowRateCFM: %f\n", flowRateCFM); // REMOVE
 
 /*** Orifice Style Bench ***/
 #elif defined ORIFICE_STYLE_BENCH //ratiometric

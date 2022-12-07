@@ -21,9 +21,9 @@ Known Issues
 ===================================================================
 
 Initial connection to webserver from browser is now unreliable and
-can take several attempts. Suspect this is related to task handling
+can take several attempts. Suspect this is related to task handling priority
 
-ERROR: Too many messages queued (in serial monitor)
+Error message in serial monitor - "ERROR: Too many messages queued" 
 Possibly also related to task handling / timing
 
 ===================================================================
@@ -43,17 +43,26 @@ https://esp-idf-lib.readthedocs.io/en/latest/
 https://esp-idf-lib.readthedocs.io/en/latest/groups/bmp280.html        
 
 ===================================================================
-Items to sort before formal release
+Items to sort before formal RC release
 ===================================================================
 
-- REMOVE tags
-- REVIEW tags
-- TEST tags
-- BUG tags
-- KNOWN ISSUES
-- Translations
-- Rename DIY-Flow-Bench.cpp to DIY-Flow-Bench.ino for Arduino IDE compatibility
-
+- [X]   REMOVE tags
+- [ ]   REVIEW tags
+- [ ]   TEST tags
+- [ ]   BUG tags
+- [ ]   KNOWN ISSUES
+- [ ]   Translations
+- [ ]   Rename DIY-Flow-Bench.cpp to DIY-Flow-Bench.ino for Arduino IDE compatibility
+- [ ]   Shield Unit Tests...
+- [X]   BME280
+- [ ]   ADS1115 (MAF / Pref / Pdiff / Pitot)
+- [ ]   3.3V Buck + voltage feedback
+- [ ]   5V Buck + voltage feedback
+- [ ]   ULN2003 outputs
+- [ ]   DRV8825 stepper driver (valve adjust)
+- [ ]   DRV8825 stepper driver (Flow Valve?????)
+- [ ]   High speed input (Turbo speed)
+ 
 ===================================================================
 !! Don't forget to update the build number in configuration.h !!
 ===================================================================
@@ -64,6 +73,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+22120801        - Fixed ADC disable
 22120103        - General code Tidy
 22120102        - Updated MAF files
 22120101        - Calculations code refactor

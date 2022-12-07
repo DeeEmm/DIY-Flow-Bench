@@ -731,21 +731,3 @@ double Sensors::getRelHValue() {
 	
 }
 
-
-
-// DEPRECATED
-/***********************************************************
- * Returns altitude based on pressure difference from local sea level
- ***/
-double Sensors::getAltitude() {
-  // Equation taken from BMP180 datasheet (page 16):
-  //  http://www.adafruit.com/datasheets/BST-BMP180-DS000-09.pdf
-
-  // Note that using the equation from wikipedia can give bad results
-  // at high altitude. See this thread for more information:
-  //  http://forums.adafruit.com/viewtopic.php?f=22&t=58064
-
-  //TODO: BREAK PRESSURE OUT TO CONFIG VALUE THAT CAN BE SET IN GUI
-  double atmospheric = getRelHValue() / 100.0F;
-  return 44330.0 * (1.0 - pow(atmospheric / SEALEVELPRESSURE_HPA, 0.1903));
-}

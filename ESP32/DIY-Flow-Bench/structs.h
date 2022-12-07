@@ -45,7 +45,7 @@ struct ConfigSettings {
   int leak_test_tolerance = 2;                    // Leak test tolerance
   int leak_test_threshold = 10;                   // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
   bool show_alarms = true;                        // Display Alarms?
-  bool debug_mode = false;                         // Global debug print override //REMOVE: (DISABLE)
+  bool debug_mode = false;                         // Global debug print override
   bool dev_mode = false;                          // Developer mode
   bool status_print_mode = false;                 // Stream status data to serial
   bool api_enabled = true;                        // Can disable serial API if required
