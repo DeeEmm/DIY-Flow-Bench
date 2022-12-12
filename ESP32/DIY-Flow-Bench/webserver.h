@@ -59,7 +59,8 @@ class Webserver {
 		void sendIndexPage();
 		void uploadFile();
 		String index_html;
-		
+		void resetWifi ( void );
+		bool getWifiConnection();
 		
 	public:
 	

@@ -33,31 +33,31 @@
 struct ConfigSettings {
   int api_response_length = 64;                   // API Serial comms message length
   long serial_baud_rate = 115200;                 // Default baud rate 
-  unsigned long wifi_timeout = 15000;             // Time in millisec's before falling back to AP mode
+  unsigned long wifi_timeout = 30000;             // Wifi timeout in millisec's
   int min_flow_rate = 3;                          // Flow rate at which bench is considered running
   int min_bench_pressure = 3;                     // Min bench pressure where bench is considered running
   double maf_min_volts = 0.1;                     // Filter out results less than this
   int refresh_rate = 200;                         // Screen refresh rate in milliseconds (>180)
-  double cal_ref_press = 10;                       // Calibration orifice refe pressure
-  double cal_flow_rate = 14.4;                     // Calibration orifica flow rate
-  double cal_offset = 0;                           // Calibration offset
+  double cal_ref_press = 10;                      // Calibration orifice refe pressure
+  double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
+  double cal_offset = 0;                          // Calibration offset
   int cyc_av_buffer = 3;                          // [5] Scan # over which to average output (helps smooth results)
   int leak_test_tolerance = 2;                    // Leak test tolerance
   int leak_test_threshold = 10;                   // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
   bool show_alarms = true;                        // Display Alarms?
-  bool debug_mode = false;                         // Global debug print override
+  bool debug_mode = false;                        // Global debug print override
   bool dev_mode = false;                          // Developer mode
   bool status_print_mode = false;                 // Stream status data to serial
   bool api_enabled = true;                        // Can disable serial API if required
   int tatltuae = 42;
   int parsecs = 12;
-  char pageTitle[32] = "DIY Flow Bench";       // Display name for software
-  char wifi_ssid[32] = "WIFI-SSID";            // Your Wifi SSID
-  char wifi_pswd[32] = "<WIFI-PSWD>";          // Your Wifi Password
-  char wifi_ap_pswd[32] = "123456789";         // Default Access Point Password
-  char hostname[32] = "diyfb";                 // Default Hostname
-  char api_delim[2] = ":";                    // API Serial comms delimiter
-  char wifi_ap_ssid[32] = "DIYFB";             // Default Access Point name
+  char pageTitle[32] = "DIY Flow Bench";          // Display name for software
+  char wifi_ssid[32] = "WIFI-SSID";               // Your Wifi SSID
+  char wifi_pswd[32] = "<WIFI-PSWD>";             // Your Wifi Password
+  char wifi_ap_pswd[32] = "123456789";            // Default Access Point Password
+  char hostname[32] = "diyfb";                    // Default Hostname
+  char api_delim[2] = ":";                        // API Serial comms delimiter
+  char wifi_ap_ssid[32] = "DIYFB";                // Default Access Point name
 };
 
 

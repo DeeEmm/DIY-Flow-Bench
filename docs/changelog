@@ -73,6 +73,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+22121201        - Fixed bug #111 wifi connection improvements
 22120801        - Fixed ADC disable
 22120103        - General code Tidy
 22120102        - Updated MAF files
