@@ -17,6 +17,7 @@
  * 
  ***/
 #include "Arduino.h"
+#include <rom/rtc.h>
 
 #include "configuration.h"
 #include "constants.h"
@@ -38,6 +39,7 @@
 #include "calculations.h"
 #include LANGUAGE_FILE
 
+// RTC_DATA_ATTR int bootCount; // flash mem
 
 /***********************************************************
  * @brief INITIALISE SERVER
@@ -55,6 +57,7 @@ void Webserver::begin()
 
   Messages _message;
   Calibration _calibration;
+
 
   // Filesystem
   _message.serialPrintf("File System Initialisation...\n");
@@ -88,22 +91,17 @@ void Webserver::begin()
   _message.serialPrintf("Total space used: %s \n", byteDecode(status.spiffs_mem_used));
 
   // WiFi
-  status.apMode = false;
-  unsigned long timeOut;
-  timeOut = millis() + config.wifi_timeout;
-  _message.serialPrintf("Connecting to WiFi...\n");
+  status.apMode = false;   
+  _message.serialPrintf("Connecting to WiFi");
+  this->resetWifi();
   WiFi.mode(WIFI_STA);
-  WiFi.begin(config.wifi_ssid, config.wifi_pswd);
-  while (WiFi.status() != WL_CONNECTED && millis() < timeOut) {
-    delay(500);
-    _message.serialPrintf(">");
-  }
-
-  if (WiFi.status() == WL_CONNECTED) {
+  
+  if (this->getWifiConnection() == true) {
     // Connection success
     _message.serialPrintf("\nConnected to %s \n", config.wifi_ssid);
     status.local_ip_address = WiFi.localIP().toString().c_str();
     _message.serialPrintf("IP address: %s \n", WiFi.localIP().toString().c_str());
+    WiFi.persistent(true);
   }  else  {
     // Did not connect - Go into AP Mode
     status.apMode = true;
@@ -761,4 +759,61 @@ String Webserver::processTemplate(const String &var)
 
 
   return String();
+}
+
+
+
+/***********************************************************
+ * @brief reset wifi connection
+ * @note helps to overcome ESP32/Arduino Wifi bug [#111]
+ * @note https://github.com/espressif/arduino-esp32/issues/2501
+ ***/
+void Webserver::resetWifi ( void ) {
+	WiFi.persistent(false);
+  WiFi.disconnect(true, true);
+	WiFi.mode(WIFI_OFF);
+
+  // Force connection reset
+  WiFi.begin();
+  while (WiFi.status() == WL_DISCONNECTED) {
+    vTaskDelay (250);
+  }
+
+}
+
+
+
+
+
+/***********************************************************
+ * @brief get wifi connection
+ ***/
+bool Webserver::getWifiConnection(){
+
+  Messages _message;
+  extern struct ConfigSettings config;
+  uint8_t wifiConnectionAttempt = 0;
+  uint8_t wifiConnectionStatus;
+
+  unsigned long timeOut;
+  timeOut = millis() + config.wifi_timeout;
+
+  while (WiFi.status() != WL_CONNECTED && millis() < timeOut) {
+
+    WiFi.begin(config.wifi_ssid, config.wifi_pswd);
+    _message.serialPrintf(".");
+    vTaskDelay (3000); // allow reasonable time for Wifi to connect before retrying
+    if(wifiConnectionAttempt == 10) {
+      this->resetWifi(); // force reset
+    } else {
+      wifiConnectionAttempt++;
+    }
+
+  }
+
+  wifiConnectionStatus = WiFi.status();
+  
+  return (wifiConnectionStatus == WL_CONNECTED ? true : false);
+
+
 }
