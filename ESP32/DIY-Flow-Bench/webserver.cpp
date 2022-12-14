@@ -93,7 +93,9 @@ void Webserver::begin()
   // WiFi
   status.apMode = false;   
   _message.serialPrintf("Connecting to WiFi");
+  
   this->resetWifi();
+  // WiFi.useStaticBuffers(true); 
   WiFi.mode(WIFI_STA);
   
   if (this->getWifiConnection() == true) {
@@ -117,7 +119,7 @@ void Webserver::begin()
     _message.serialPrintf("Error starting mDNS \n");
   }  else  {
     status.hostname = config.hostname;
-    _message.serialPrintf("Access via: http://%s.local \n", status.hostname);
+    _message.serialPrintf("Multicast: http://%s.local \n", status.hostname);
   }
 
   // API request handlers [JSON confirmation response]
@@ -569,7 +571,7 @@ String Webserver::getDataJSON()
   dataJson["BARO"] = sensorVal.BaroKPA;
   dataJson["RELH"] = sensorVal.RelH;
 
-  // REVIEW
+  // REVIEW - Pitot maths
   // Pitot
   // NOT USED: double pitotPressure = _calculations.calculatePitotPressure(INWG);
   // Pitot probe displays as a percentage of the reference pressure
@@ -579,7 +581,7 @@ String Webserver::getDataJSON()
   // Reference pressure
   dataJson["PREF"] = sensorVal.PRefKPA;
 
-  // REVIEW
+  // TODO - Adjusted flow value [convert flow to different ref depression] - need to add to GUI
   // Adjusted Flow
   // get the desired bench test pressure
   // double desiredRefPressureInWg = menuARef.getCurrentValue(); //TODO:: Add ref pressure setting to UI & Config
@@ -593,7 +595,7 @@ String Webserver::getDataJSON()
   dataJson["PREF_MV"] = sensorVal.PRefMv;
   dataJson["PITOT_MV"] = sensorVal.PitotMv;
 
-  // REVIEW 
+  // REVIEW - PDiff millivolts
   // TODO: need to add PDIFF_MV
   // PDiff Voltage
   // dataJson["PDIFF_MV"] = String(sensorVal.PDiffMv);
@@ -773,12 +775,6 @@ void Webserver::resetWifi ( void ) {
   WiFi.disconnect(true, true);
 	WiFi.mode(WIFI_OFF);
 
-  // Force connection reset
-  WiFi.begin();
-  while (WiFi.status() == WL_DISCONNECTED) {
-    vTaskDelay (250);
-  }
-
 }
 
 
@@ -787,33 +783,41 @@ void Webserver::resetWifi ( void ) {
 
 /***********************************************************
  * @brief get wifi connection
+ * @return true if connection to STA successful
+ * @var wifi_retries : number of retry attempts
+ * @var wifi_timeout : duration of connection attempt
+ * @note Starts with WiFi double hit (workaround for known bug in ESPAws)
+ * @note Retries connection multiple times for duration of predefined milliseconds
+ * @note Resets connection three times if not successful (max attempts / 3)
  ***/
 bool Webserver::getWifiConnection(){
 
   Messages _message;
   extern struct ConfigSettings config;
+  
   uint8_t wifiConnectionAttempt = 0;
   uint8_t wifiConnectionStatus;
-
   unsigned long timeOut;
-  timeOut = millis() + config.wifi_timeout;
 
-  while (WiFi.status() != WL_CONNECTED && millis() < timeOut) {
+  // Double hit WiFi connection - hit #1
+  WiFi.begin(config.wifi_ssid, config.wifi_pswd);
+  this->resetWifi(); // force reset
 
-    WiFi.begin(config.wifi_ssid, config.wifi_pswd);
+  // Double hit WiFi connection - hit #2 and keep hitting if not succesful
+  while (WiFi.status() != WL_CONNECTED && wifiConnectionAttempt < config.wifi_retries) {
+    WiFi.begin(config.wifi_ssid, config.wifi_pswd); 
     _message.serialPrintf(".");
-    vTaskDelay (3000); // allow reasonable time for Wifi to connect before retrying
-    if(wifiConnectionAttempt == 10) {
-      this->resetWifi(); // force reset
+    vTaskDelay (config.wifi_timeout);
+    // force reset 
+    if((wifiConnectionAttempt == config.wifi_retries / 3) || (wifiConnectionAttempt == (config.wifi_retries / 3) * 2)) { 
+      this->resetWifi(); 
     } else {
       wifiConnectionAttempt++;
     }
-
   }
 
   wifiConnectionStatus = WiFi.status();
   
   return (wifiConnectionStatus == WL_CONNECTED ? true : false);
-
 
 }

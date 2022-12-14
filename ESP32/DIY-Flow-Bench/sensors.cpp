@@ -62,7 +62,7 @@ void Sensors::begin () {
 	_message.serialPrintf("Sensors Initialised \n");
 }
 
-// REVIEW
+// REVIEW - Frequency style MAF Begin
 // NOTE: Voodoo needed to get interrupt to work within class structure for frequency measurement. 
 // We declare a new instance of the Sensor class so that we can use it for the MAF ISR
 // https://forum.arduino.cc/t/pointer-to-member-function/365758
@@ -233,13 +233,13 @@ void Sensors::initialise () {
 
 }
 
-// REVIEW
+// REVIEW - MAF Interrupt service routine setup
 /***********************************************************
- * Set up MAF ISR
- *
- * We cannot call a non-static member function directly so we need to encapsulate it
- * This is part of the Voodoo
- ***/
+  * @brief Set up MAF ISR
+  *
+  * We cannot call a non-static member function directly so we need to encapsulate it
+  * This is part of the Voodoo
+  ***/
 /* TODO: temp disabled - need to reenable	
 void Sensors::mafSetupISR(uint8_t irq_pin, void (*ISR_callback)(void), int value) {
   attachInterrupt(digitalPinToInterrupt(irq_pin), ISR_callback, value);
@@ -247,12 +247,12 @@ void Sensors::mafSetupISR(uint8_t irq_pin, void (*ISR_callback)(void), int value
 */
 
 
-// REVIEW
+// REVIEW - MAF Interrupt service routine
 /***********************************************************
-* Interrupt Service Routine for MAF Frequency measurement
-*
-* Determine how long since last triggered (Resides in RAM memory as it is faster)
-***/
+ * @brief Interrupt Service Routine for MAF Frequency measurement
+ *
+ * Determine how long since last triggered (Resides in RAM memory as it is faster)
+ ***/
 // TODO: Add IRAM_ATTR to Nova-Arduino 
 /* TODO: temp disabled - need to reenable	
 void IRAM_ATTR Sensors::mafFreqCountISR() {

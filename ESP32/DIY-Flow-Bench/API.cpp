@@ -152,7 +152,7 @@ void API::ParseMessage(char apiMessage) {
   S : WiFi SSID
   T : Temperature in Celcius
   t : Temperature in Fahrenheit
-  U : Uptime in Minutes
+  U : Uptime in hhhh.mm
   V : Version
   X : xTask memory usage   
   ? : Help
@@ -183,7 +183,7 @@ void API::ParseMessage(char apiMessage) {
       case '5': // Get 5v board supply voltage (mv) 'v.123.45\r\n'
           snprintf(apiResponse, API_RESPONSE_LENGTH, "5%s%f", config.api_delim , _hardware.get5vSupplyVolts());
       break;
-      
+
       case 'B': // Get measured Baro Pressure in hPa'B.123.45\r\n'
           snprintf(apiResponse, API_RESPONSE_LENGTH, "B%s%f", config.api_delim , sensorVal.BaroHPA);
       break;
@@ -297,18 +297,22 @@ void API::ParseMessage(char apiMessage) {
           }
       break;
       
-      case 'T': // Get measured Temperature in Celcius 'T.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "T%s%f", config.api_delim , sensorVal.TempDegC);
-      break;
-      
       case 't': // Get measured Temperature in Fahrenheit 'F.123.45\r\n'
           double TdegF;
           TdegF = _calculations.convertTemperature(sensorVal.TempDegC, DEGF);
           snprintf(apiResponse, API_RESPONSE_LENGTH, "t%s%f", config.api_delim , TdegF);
       break;      
       
-      case 'U': // Uptime          
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "U%sUptime %u minutes", config.api_delim , (millis() - status.boot_time) / 60000);
+      case 'T': // Get measured Temperature in Celcius 'T.123.45\r\n'
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "T%s%f", config.api_delim , sensorVal.TempDegC);
+      break;
+      
+      case 'u': // Uptime in minutes     
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "u%s%u", config.api_delim , (millis() - status.boot_time) / 60000);
+      break;
+
+      case 'U': // Uptime in hhhh.mm      
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "U%s%g", config.api_delim , _hardware.uptime() );
       break;
 
       case 'V': // Get Version 'VMmYYMMDDXX\r\n'          

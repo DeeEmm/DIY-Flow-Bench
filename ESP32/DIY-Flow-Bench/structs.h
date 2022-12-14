@@ -33,11 +33,12 @@
 struct ConfigSettings {
   int api_response_length = 64;                   // API Serial comms message length
   long serial_baud_rate = 115200;                 // Default baud rate 
-  unsigned long wifi_timeout = 30000;             // Wifi timeout in millisec's
+  unsigned long wifi_timeout = 3500;              // Duration of Wifi connection attempt in millisec's
+  unsigned long wifi_retries = 10;                // Number of attempts to connect to Wifi
   int min_flow_rate = 3;                          // Flow rate at which bench is considered running
   int min_bench_pressure = 3;                     // Min bench pressure where bench is considered running
   double maf_min_volts = 0.1;                     // Filter out results less than this
-  int refresh_rate = 200;                         // Screen refresh rate in milliseconds (>180)
+  int refresh_rate = 250;                         // Screen refresh rate in milliseconds (>180)
   double cal_ref_press = 10;                      // Calibration orifice refe pressure
   double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
   double cal_offset = 0;                          // Calibration offset
@@ -95,7 +96,7 @@ struct DeviceStatus {
   long adcPollTimer = 0;
   long bmePollTimer = 0;
   long apiPollTimer = 0;
-  long statusUpdateRate = 50;
+  long browserUpdateTimer = 0;
   long wsCLeanPollTimer = 0;
   int pollTimer = 0;
   int serialData = 0;

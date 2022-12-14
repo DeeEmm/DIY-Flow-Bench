@@ -179,9 +179,9 @@ void TASKpushSseData( void * parameter ){
   extern struct DeviceStatus status;
 
   for( ;; ) {
-    if (millis() > status.statusUpdateRate) {        
+    if (millis() > status.browserUpdateTimer) {        
       if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE){ // Check if semaphore available
-        status.statusUpdateRate = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes
+        status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes
         
         #ifdef WEBSERVER_ENABLED
           #ifdef MAF_STYLE_BENCH
@@ -214,7 +214,8 @@ void setup(void) {
   
   // We need to call Wire globally so that it is available to both hardware and sensor classes so lets do that here
   Wire.begin (SCA_PIN, SCL_PIN); 
-  Wire.setClock(400000);
+  Wire.setClock(300000);
+  // Wire.setClock(400000);
 
   _message.serialPrintf("\r\nDIY Flow Bench \nVersion: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);    
 
@@ -233,17 +234,17 @@ void setup(void) {
   #ifdef WEBSERVER_ENABLED // Compile time directive used for testing
   _webserver.begin();
   // xTaskCreate(TASKpushSseData, "PUSH_SSE_DATA", 1200, NULL, 2, &sseTaskHandle); 
-  xTaskCreatePinnedToCore(TASKpushSseData, "PUSH_SSE_DATA", 1200, NULL, 10, &sseTaskHandle, defaultCore);  // Assign to default core
+  xTaskCreatePinnedToCore(TASKpushSseData, "PUSH_SSE_DATA", 1200, NULL, 2, &sseTaskHandle, secondaryCore);  // Assign to default core
   #endif
 
   #ifdef ADC_IS_ENABLED // Compile time directive used for testing
   // xTaskCreate(TASKgetBenchData, "GET_BENCH_DATA", 2800, NULL, 2, &adcTaskHandle); 
-  xTaskCreatePinnedToCore(TASKgetBenchData, "GET_BENCH_DATA", 2800, NULL, 10, &adcTaskHandle, secondaryCore);  // Assign to secondary core
+  xTaskCreatePinnedToCore(TASKgetBenchData, "GET_BENCH_DATA", 2800, NULL, 2, &adcTaskHandle, defaultCore);  // Assign to secondary core
   #endif
 
   #ifdef BME_IS_ENABLED // Compile time directive used for testing
   // xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle); 
-  xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 10, &bmeTaskHandle, secondaryCore); // Assign to secondary core
+  xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle, defaultCore); // Assign to secondary core
   #endif
   
 }

@@ -410,16 +410,11 @@ double Calculations::calculateFlowCFM(int mafValue, int maxValue ) {
  * We can now multiply our CFM values at 28" of water by .945 to obtain the theoretical CFM values at 25" of water.
  * Source: http://www.flowspeed.com/cfm-numbers.htm
 */
-// TODO re-enable and...
-// TEST
 double Calculations::convertFlowDepression(double oldPressure, double newPressure, double inputFlow) {
 
-  //double outputFlow;
-  //double pressureRatio = (newPressure / oldPressure);
-  //outputFlow = (sqrt(pressureRatio) * inputFlow);
-
-  //return outputFlow;
+  double outputFlow;
+  double pressureRatio = (newPressure / oldPressure);
+  outputFlow = (sqrt(pressureRatio) * inputFlow);
+  return outputFlow;
   
-  return 1;
-
 }

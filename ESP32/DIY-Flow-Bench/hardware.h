@@ -47,6 +47,7 @@ class Hardware {
 		
 		void benchOn();
 		void benchOff();
+		float uptime();
 
 	private:
 		void configurePins ();

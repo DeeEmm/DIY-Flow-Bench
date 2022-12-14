@@ -26,7 +26,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "22121201"
+#define BUILD_NUMBER "22121501"
 #define RELEASE "V.2.0-RC.3-WIP"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -95,7 +95,7 @@
 #define PAGE_TITLE "DIY Flow Bench"
 #define LANGUAGE_FILE "language/EN_language.h"
 #define SHOW_ALARMS true
-#define MIN_REFRESH_RATE 100
+#define MIN_REFRESH_RATE 250
 #define API_IS_ENABLED                                  
 #define API_BLOB_LENGTH 1024
 #define API_RESPONSE_LENGTH 64
@@ -105,7 +105,7 @@
 #define PRINT_BUFFER_LENGTH 128
 //#define API_CHECKSUM_IS_ENABLED                           // Add checksum to serial API response TODO: UPDATE CHECKSUM TO NATIVE ESP32 CRC32
 #define WEBSOCK_CLEAN_FREQ 600000
-#define STATUS_UPDATE_RATE 50
+#define STATUS_UPDATE_RATE 250                              // time between SSE push in milliseconds
 #define FILESYSTEM SPIFFS
 #define VTASK_DELAY_ADC 1
 #define VTASK_DELAY_BME 1
@@ -375,7 +375,7 @@ const int ADC_I2C_ADDR = 0x48;
 #define RELH_FINE_ADJUST 0.0                                // Adjust end value
 
 
-// REVIEW
+// REVIEW - Advanced calibration settings
 /***********************************************************
 * ADVANCED CALIBRATION SETTINGS
 *
@@ -395,14 +395,14 @@ const int ADC_I2C_ADDR = 0x48;
 
 
 
-// REVIEW
+// REVIEW - Orifice data
 /***********************************************************
-* What orifices are used?
-* 
-* TODO: Move into configuration data
-*
-* {diameter_in_mm, cfm_flow@15"}
-***/
+ * @brief Orifice data for DP bench
+ * @note {diameter_in_mm, cfm_flow@15"}
+ * 
+ * TODO: Move into configuration data or into stand alone file
+ *
+ ***/
 // double orificeData [][2] = {
 //     {51.85,209.5},
 //     {42.38,139.5},

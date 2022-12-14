@@ -4,27 +4,23 @@ Current build status
 
 Project compiles and runs ADC and BME now returning stable data 
 MAF flow data returning valid results
+Connectivity issues addressed with more robuse Wifi connection handling
 Moving to ESPHome libraries has improved crash stability
+
 Need to validate bench readings with calibrated source
-Some stability / connection issues discovered after moving from
-DEV board to Wemos ESP32 (see below)
 
 ===================================================================
 Current work in progress
 ===================================================================
 
 Code tidy in preparation for release
-Working through identified issues (see below)
+Working through unit tests (see below)
 
 ===================================================================
 Known Issues
 ===================================================================
 
-Initial connection to webserver from browser is now unreliable and
-can take several attempts. Suspect this is related to task handling priority
-
-Error message in serial monitor - "ERROR: Too many messages queued" 
-Possibly also related to task handling / timing
+ADC Channels PREF swapped with PDIFF (ERROR ON SHIELD PCB)
 
 ===================================================================
 TODO
@@ -47,10 +43,10 @@ Items to sort before formal RC release
 ===================================================================
 
 - [X]   REMOVE tags
-- [ ]   REVIEW tags
-- [ ]   TEST tags
-- [ ]   BUG tags
-- [ ]   KNOWN ISSUES
+- [X]   REVIEW tags
+- [X]   TEST tags
+- [X]   BUG tags
+- [X]   KNOWN ISSUES
 - [ ]   Translations
 - [ ]   Rename DIY-Flow-Bench.cpp to DIY-Flow-Bench.ino for Arduino IDE compatibility
 - [ ]   Shield Unit Tests...
@@ -73,6 +69,9 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+22121501        - Added uptime decode
+                - Wifi connection improvements
+22121401        - Updated esphome library versions to use latest
 22121201        - Fixed bug #111 wifi connection improvements
 22120801        - Fixed ADC disable
 22120103        - General code Tidy

@@ -381,7 +381,7 @@ void Hardware::checkRefPressure() {
   
   double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INWG);
     
-  // REVIEW 
+  // REVIEW  - Ref pressure check
   // Check that pressure does not fall below limit set by MIN_TEST_PRESSURE_PERCENTAGE when bench is running
   // note alarm commented out in alarm function as 'nag' can get quite annoying
   // Is this a redundant check? Maybe a different alert would be more appropriate
@@ -410,5 +410,34 @@ void Hardware::benchOn() {
  ***/
 void Hardware::benchOff() {
   digitalWrite(VAC_BANK_1_PIN, LOW);
+}
+
+
+
+/***********************************************************
+ * @brief Uptime
+ * @return double uptimeResponse in format hhhhhh.mm
+ * @note uses ints to truncate fractional part of value
+ ***/
+float Hardware::uptime() {
+
+  extern struct DeviceStatus status;
+  
+  int minutesUp;
+  int hoursUp;
+  float fractional = 0.0;
+  float uptimeResponse = 0.0;
+
+  minutesUp =  (millis() - status.boot_time) / 60000;
+  hoursUp = minutesUp / 60;
+  if (hoursUp >= 1) {
+    minutesUp = minutesUp - (hoursUp * 60);
+  }
+  fractional = minutesUp / 100.00F;
+
+  uptimeResponse = hoursUp + fractional;
+
+  return uptimeResponse;
+
 }
 
