@@ -61,23 +61,23 @@ Messages::Messages() {
 
 
 /***********************************************************
-* Message Handler
-*
-* Processes translated status messages for display in the browser
-* Example:
-*   _message.Handler(translate.LANG_VAL_SAVING_CONFIG);
-*
-* NOTE: Language strings are defined in the current language file i.e. /language/XX_Language.h
-* TODO: Store last message received for later recall / Store several message that are displayed on rotation
-*/
+ * @brief Message Handler
+ *
+ * @details translated status messages for display in the browser
+ * @example _message.Handler(translate.LANG_VAL_SAVING_CONFIG);
+ * @note - Language strings are defined in the current language file i.e. /language/XX_Language.h
+ * @note - statusMessage is pushed to client as part of JSON data created in webserver::getJsonData()
+ * 
+ * TODO: Store last message received for later recall / Store several message that are displayed on rotation
+ ***/
 void Messages::Handler(const String langPhrase) {
 
 	extern struct DeviceStatus status;
 
-	// Push the string to the Status Message
+	// store the string to the Status Message global struct
 	status.statusMessage = langPhrase;
 	
-	//If we have debug enabled send the message to the serial port
+	// If we have debug enabled send the message to the serial port
 	#if defined DEBUG && defined SERIAL0_ENABLED
 		this->serialPrintf("%s  \n", langPhrase); 
 	#endif
@@ -86,10 +86,10 @@ void Messages::Handler(const String langPhrase) {
 
 
 /***********************************************************
-* serialPrintf
-* Always prints to serial port
+* @brief serialPrintf
+* @details Always prints to serial port
 * 
-* Encapsulates vsnprintf method and uses standard c++ xxprintf formatting
+* @note Encapsulates vsnprintf method and uses standard c++ xxprintf formatting
 *
 * Based on...
 * https://forum.arduino.cc/t/esp32-where-can-i-find-the-reference-for-serial-printf-the-print-with-the-f-as-a-suffix/1007598/8
@@ -120,10 +120,10 @@ size_t Messages::serialPrintf(const std::string format, ...) {
 
 
 /***********************************************************
-* blobPrintf
-* Prints blob to serial port
+* @brief blobPrintf
+* @details Prints blob to serial port
 * 
-* Follows same formatting as serialPrintf
+* @note Follows same formatting as serialPrintf
 */
 size_t Messages::blobPrintf(std::string format, ...) {
 
@@ -143,10 +143,10 @@ size_t Messages::blobPrintf(std::string format, ...) {
 
 
 /***********************************************************
-* statusPrintf
-* Prints to serial port if status_print_mode enabled
+* @brief statusPrintf
+* @details Prints to serial port if status_print_mode enabled
 * 
-* Follows same formatting as serialPrintf
+* @note Follows same formatting as serialPrintf
 */
 size_t Messages::statusPrintf(const std::string format, ...) {
 
@@ -172,10 +172,10 @@ size_t Messages::statusPrintf(const std::string format, ...) {
 
 
 /***********************************************************
-* debugPrintf
-* Prints to serial port if debug_mode enabled
+* @brief debugPrintf
+* @details Prints to serial port if debug_mode enabled
 * 
-* Follows same formatting as serialPrintf
+* @note Follows same formatting as serialPrintf
 */
 size_t Messages::debugPrintf(const std::string format, ...) {
 
@@ -205,11 +205,7 @@ size_t Messages::debugPrintf(const std::string format, ...) {
 
 
 
-
-
-
-
-
+// DEPRECATED
 /***********************************************************
 * serialPrintf
 * 

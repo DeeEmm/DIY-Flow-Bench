@@ -26,7 +26,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "22121501"
+#define BUILD_NUMBER "22121801"
 #define RELEASE "V.2.0-RC.3-WIP"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -76,13 +76,13 @@
 *
 ***/
 
-#define SERIAL0_ENABLED                                  // Default serial comms (API & status)
+#define SERIAL0_ENABLED                                     // Default serial comms (API & status)
 // #define SERIAL2_ENABLED                                  // Digital guage serial protocol
 
 #define SERIAL0_BAUD 115200
 #define SERIAL2_BAUD 9600
 
-#define WEBSERVER_ENABLED
+#define WEBSERVER_ENABLED                                   // Disable if running headless
 
 
 
@@ -107,9 +107,9 @@
 #define WEBSOCK_CLEAN_FREQ 600000
 #define STATUS_UPDATE_RATE 250                              // time between SSE push in milliseconds
 #define FILESYSTEM SPIFFS
-#define VTASK_DELAY_ADC 1
-#define VTASK_DELAY_BME 1
-#define VTASK_DELAY_SSE 1
+#define VTASK_DELAY_ADC 100
+#define VTASK_DELAY_BME 100
+#define VTASK_DELAY_SSE 100
 
 
 

@@ -2,11 +2,6 @@
 Current build status
 ===================================================================
 
-Project compiles and runs ADC and BME now returning stable data 
-MAF flow data returning valid results
-Connectivity issues addressed with more robuse Wifi connection handling
-Moving to ESPHome libraries has improved crash stability
-
 Need to validate bench readings with calibrated source
 
 ===================================================================
@@ -69,7 +64,10 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-22121501        - Added uptime decode
+22121801        - Added startup delay to allow device to wake
+                - Move SSE Push into main loop to improve network stability
+                - Combined SSE events into single SSE event in JSON format
+22121501        - Added uptime decode & status message
                 - Wifi connection improvements
 22121401        - Updated esphome library versions to use latest
 22121201        - Fixed bug #111 wifi connection improvements

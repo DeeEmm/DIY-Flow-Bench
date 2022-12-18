@@ -52,6 +52,7 @@ void Webserver::begin()
   extern struct Translator translate;
   extern DeviceStatus status;
 
+
   server = new AsyncWebServer(80);
   events = new AsyncEventSource("/events");
 
@@ -546,40 +547,35 @@ String Webserver::getDataJSON()
   extern struct DeviceStatus status;
   extern struct ConfigSettings config;
   extern struct SensorData sensorVal;
+
+  Hardware _hardware;
+
   String jsonString;
 
-  Calculations _calculations;
-  Hardware _hardware;
-  Messages _message;
-  Sensors _sensors;
+  StaticJsonDocument<1500> dataJson;
 
-  _message.debugPrintf("Webserver::getDataJSON() \n");
-
-  double mafFlowCFM = sensorVal.MAF;
-
-  StaticJsonDocument<1024> dataJson;
-
-  dataJson["STATUS_MESSAGE"] = status.statusMessage;
   // Flow Rate
+  double mafFlowCFM = sensorVal.MAF;
   if (mafFlowCFM > config.min_flow_rate)  {
     dataJson["FLOW"] = mafFlowCFM;
   }  else  {
     dataJson["FLOW"] = 0;
   }
+
+  // TODO allow user to choose deg C or F
   dataJson["TEMP"] = sensorVal.TempDegC;
-  // dataJson["TEMP"] = String(_calculations.convertTemperature(sensorVal.tempDegC, DEGC);
   dataJson["BARO"] = sensorVal.BaroKPA;
   dataJson["RELH"] = sensorVal.RelH;
 
-  // REVIEW - Pitot maths
   // Pitot
-  // NOT USED: double pitotPressure = _calculations.calculatePitotPressure(INWG);
-  // Pitot probe displays as a percentage of the reference pressure
-  // double pitotPercentage = (_calculations.convertPressure(sensorVal.PitotKPA, INWG) / refPressure);
   dataJson["PITOT"] = sensorVal.PitotKPA;
 
   // Reference pressure
   dataJson["PREF"] = sensorVal.PRefKPA;
+
+  // Differential pressure
+  dataJson["PDIFF"] = sensorVal.PDiffKPA;
+
 
   // TODO - Adjusted flow value [convert flow to different ref depression] - need to add to GUI
   // Adjusted Flow
@@ -590,19 +586,25 @@ String Webserver::getDataJSON()
   // Send it to the display
   // dataJson["AFLOW"] = String(adjustedFlow);
 
-  dataJson["RELEASE"] = RELEASE;
-  dataJson["BUILD_NUMBER"] = BUILD_NUMBER;
-  dataJson["PREF_MV"] = sensorVal.PRefMv;
-  dataJson["PITOT_MV"] = sensorVal.PitotMv;
+  // DEPRECATED - We only need to stream sensor data to the browser - this does not need to be streamed
+  // dataJson["RELEASE"] = RELEASE;
+  // dataJson["BUILD_NUMBER"] = BUILD_NUMBER;
 
-  // REVIEW - PDiff millivolts
-  // TODO: need to add PDIFF_MV
-  // PDiff Voltage
+
+  // DEPRECATED - Not really necessary to send millivolts to display in browser - can access this via API if required for debugging
+  // dataJson["PREF_MV"] = sensorVal.PRefMv;
+  // dataJson["PITOT_MV"] = sensorVal.PitotMv;
   // dataJson["PDIFF_MV"] = String(sensorVal.PDiffMv);
 
-  serializeJson(dataJson, jsonString);
 
-  _message.statusPrintf("JSON Data Created \n");
+  if (1!=1) {  // TODO if message handler is active display the active message
+    dataJson["STATUS_MESSAGE"] = status.statusMessage;
+  } else { // just report the uptime
+    dataJson["STATUS_MESSAGE"] = "Uptime: " + String(_hardware.uptime()) + " (hh.mm)";      
+  }
+
+
+  serializeJson(dataJson, jsonString);
 
   return jsonString;
 }
@@ -774,7 +776,7 @@ void Webserver::resetWifi ( void ) {
 	WiFi.persistent(false);
   WiFi.disconnect(true, true);
 	WiFi.mode(WIFI_OFF);
-
+  WiFi.mode(WIFI_MODE_NULL);
 }
 
 

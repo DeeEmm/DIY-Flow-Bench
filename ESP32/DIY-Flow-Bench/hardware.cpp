@@ -141,6 +141,7 @@ void Hardware::initialise () {
 
   Messages _message;
 
+  _message.serialPrintf("\r\nDIY Flow Bench \nVersion: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);    
   _message.serialPrintf("Initialising Hardware \n");
 
   configurePins(); // Load pin definitions from pins.h

@@ -232,7 +232,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'f': // Get measured Flow 'F123.45\r\n'       
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "fF%s%f", config.api_delim , sensorVal.FlowMASS);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", config.api_delim , sensorVal.FlowMASS);
       break;
 
       case 'H': // Get measured Humidity 'H.123.45\r\n'
@@ -244,12 +244,8 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'J': // JSON Data
-          // _webserver.getDataJSON().toCharArray(charDataJSON, API_JSON_LENGTH);
-          // snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", config.api_delim, charDataJSON);
           jsonString = _webserver.getDataJSON();
-          jsonString.toCharArray(charDataJSON, API_JSON_LENGTH);
-          snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", config.api_delim, charDataJSON);
-
+          snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", config.api_delim, String(jsonString).c_str());
       break;
       
       case 'L': // Perform Leak Test Calibration 'L\r\n'
@@ -320,7 +316,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'X': // Print xTask memory usage (Stack high water mark) to serial monitor 
-          snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack HWM BMETask=%d / ADCTask=%d / SSETask=%d", config.api_delim , uxTaskGetStackHighWaterMark(bmeTaskHandle), uxTaskGetStackHighWaterMark(adcTaskHandle), uxTaskGetStackHighWaterMark(sseTaskHandle)); 
+          snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack HWM BMETask=%d / ADCTask=%d ", config.api_delim , uxTaskGetStackHighWaterMark(bmeTaskHandle), uxTaskGetStackHighWaterMark(adcTaskHandle)); 
       break;
 
       case '@': // Status Print Mode (Stream status messages to serial)

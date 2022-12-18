@@ -28,40 +28,21 @@ var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton
 if (!!window.EventSource) {
   var source = new EventSource('/events');
 
-  source.addEventListener('FLOW', function(e) {
-    document.getElementById("FLOW").innerHTML = e.data;
-  }, false);
+  source.addEventListener('JSON_DATA', function(e) {
+    var myObj = JSON.parse(e.data);
+    for (key in myObj) {
+      try {
+        if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
+          document.getElementById(key).innerHTML = myObj[key];
+        } else {
+          document.getElementById(key).innerHTML = myObj[key].toFixed(2); 
+        }
+        // console.log(key + ' : ' + myObj[key]);
+      } catch (error) {
+        console.log('Missing or incorrect data');
+      }
+    } 
 
-  source.addEventListener('PREF', function(e) {
-    document.getElementById("PREF").innerHTML = e.data;
-  }, false);
-  
-  source.addEventListener('PITOT', function(e) {
-    document.getElementById("PITOT").innerHTML = e.data;
-  }, false);
-  
-  source.addEventListener('PDIFF', function(e) {
-    document.getElementById("PDIFF").innerHTML = e.data;
-  }, false); 
-
-  source.addEventListener('TEMP', function(e) {
-    document.getElementById("TEMP").innerHTML = e.data;
-  }, false);
-
-  source.addEventListener('RELH', function(e) {
-    document.getElementById("RELH").innerHTML = e.data;
-  }, false);
-
-  source.addEventListener('BARO', function(e) {
-    document.getElementById("BARO").innerHTML = e.data;
-  }, false);
-
-  source.addEventListener('STATUS_MESSAGE', function(e) {
-    document.getElementById("STATUS_MESSAGE").innerHTML = e.data;
-  }, false);
-
-  source.addEventListener('PING', function(e) {
-    console.log("PING", e.data);
   }, false);
 
 }

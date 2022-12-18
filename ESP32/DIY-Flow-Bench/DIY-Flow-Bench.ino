@@ -78,10 +78,10 @@ SemaphoreHandle_t i2c_task_mutex;
 TaskHandle_t bmeTaskHandle = NULL;
 TaskHandle_t adcTaskHandle = NULL;
 TaskHandle_t sseTaskHandle = NULL;
-portMUX_TYPE mmux = portMUX_INITIALIZER_UNLOCKED;
+// portMUX_TYPE mmux = portMUX_INITIALIZER_UNLOCKED;
 
-
-
+char charDataJSON[256];
+String jsonString;
 
 /***********************************************************
  * @brief TASK: Get bench sensor data (ADS1115 - MAF/RefP/DiffP/Pitot)
@@ -99,7 +99,8 @@ void TASKgetBenchData( void * parameter ){
   for( ;; ) {
     // Check if semaphore available
     if (millis() > status.adcPollTimer){
-      if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
+      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
+      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
         status.adcPollTimer = millis() + ADC_SCAN_DELAY_MS; // Only reset timer when task executes
 
         #ifdef MAF_IS_ENABLED
@@ -151,7 +152,8 @@ void TASKgetEnviroData( void * parameter ){
 
   for( ;; ) {
     if (millis() > status.bmePollTimer){
-      if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
+      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
+      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
         status.bmePollTimer = millis() + BME_SCAN_DELAY_MS; // Only reset timer when task executes
         
         sensorVal.TempDegC = _sensors.getTempValue();
@@ -167,42 +169,6 @@ void TASKgetEnviroData( void * parameter ){
 
 
 
-/***********************************************************
- * @brief Push data to browser using Server Side Events (SSE)
- * @param i2c_task_mutex Semaphore handshake with TASKgetEnviroData / TASKgetBenchData
- * @param sensorVal global struct containing sensor values
- * @struct status global struct containing system status values
- * @remarks Pushes sensor values to browser using SSE
-*/
-void TASKpushSseData( void * parameter ){ 
-
-  extern struct DeviceStatus status;
-
-  for( ;; ) {
-    if (millis() > status.browserUpdateTimer) {        
-      if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE){ // Check if semaphore available
-        status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes
-        
-        #ifdef WEBSERVER_ENABLED
-          #ifdef MAF_STYLE_BENCH
-          _webserver.events->send(String(sensorVal.FlowCFM).c_str(),(char*)"FLOW", millis());
-          #else
-          _webserver.events->send(String(sensorVal.PDiffKPA).c_str(),(char*)"PDIFF", millis());
-          #endif
-          _webserver.events->send(String(sensorVal.PRefKPA).c_str(),(char*)"PREF", millis());
-          _webserver.events->send(String(sensorVal.PitotKPA).c_str(),(char*)"PITOT", millis());
-          _webserver.events->send(String(sensorVal.TempDegC).c_str(),(char*)"TEMP", millis()); 
-          _webserver.events->send(String(sensorVal.BaroHPA).c_str(),"BARO",millis()); 
-          _webserver.events->send(String(sensorVal.RelH).c_str(),"RELH",millis());         
-        #endif
-        xSemaphoreGive(i2c_task_mutex); // Release semaphore
-      }
-    }
-    vTaskDelay( VTASK_DELAY_SSE ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
-	}
-
-}
-
 
 
 /***********************************************************
@@ -216,37 +182,31 @@ void setup(void) {
   Wire.begin (SCA_PIN, SCL_PIN); 
   Wire.setClock(300000);
   // Wire.setClock(400000);
-
-  _message.serialPrintf("\r\nDIY Flow Bench \nVersion: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);    
-
+    
   _hardware.begin();
   _sensors.begin();
 
-  if (config.api_enabled) _message.serialPrintf("Serial API Enabled \n");
-
-  // Confirm default core - NOTE: setup() and loop() are automatically created on default core 
+    // Confirm default core - NOTE: setup() and loop() are automatically created on default core 
   uint8_t defaultCore = xPortGetCoreID();                   // This core (1)
-  uint8_t secondaryCore = (defaultCore > 0 ? 0 : 1);        // Free core (0)
+  uint8_t secondaryCore = (defaultCore > 0 ? 0 : 1);        // Secondary core (0)
 
   // Set up semaphore handshaking
   i2c_task_mutex = xSemaphoreCreateMutex();
 
   #ifdef WEBSERVER_ENABLED // Compile time directive used for testing
   _webserver.begin();
-  // xTaskCreate(TASKpushSseData, "PUSH_SSE_DATA", 1200, NULL, 2, &sseTaskHandle); 
-  xTaskCreatePinnedToCore(TASKpushSseData, "PUSH_SSE_DATA", 1200, NULL, 2, &sseTaskHandle, secondaryCore);  // Assign to default core
   #endif
 
   #ifdef ADC_IS_ENABLED // Compile time directive used for testing
   // xTaskCreate(TASKgetBenchData, "GET_BENCH_DATA", 2800, NULL, 2, &adcTaskHandle); 
-  xTaskCreatePinnedToCore(TASKgetBenchData, "GET_BENCH_DATA", 2800, NULL, 2, &adcTaskHandle, defaultCore);  // Assign to secondary core
+  xTaskCreatePinnedToCore(TASKgetBenchData, "GET_BENCH_DATA", 1700, NULL, 2, &adcTaskHandle, secondaryCore);  
   #endif
 
   #ifdef BME_IS_ENABLED // Compile time directive used for testing
   // xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle); 
-  xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle, defaultCore); // Assign to secondary core
+  xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle, secondaryCore); 
   #endif
-  
+
 }
 
 
@@ -254,9 +214,10 @@ void setup(void) {
 
 /***********************************************************
  * @brief MAIN LOOP
- * @details Process non-critical tasks here 
+ * @details processes API requests 
+ * @details pushes data to clients via SSE
  * 
- * NOTE: Use non-breaking delays for throttling events
+ * @note Use non-breaking delays for throttling events
  ***/
 void loop () {
   
@@ -273,7 +234,21 @@ void loop () {
   }
   
   // TODO: PID Vac source Analog VFD control [if PREF not within limits]
+  
+  #ifdef WEBSERVER_ENABLED
+  if (millis() > status.browserUpdateTimer) {        
+      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE){ // Check if semaphore available
+      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
+        status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes
+        
+        // Push data to client using Server Side Events (SSE)
+        jsonString = _webserver.getDataJSON();
+        _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis());
 
+        xSemaphoreGive(i2c_task_mutex); // Release semaphore
+      }
+  }
+  #endif
   
   vTaskDelay( 1 );  //mSec delay to prevent Watch Dog Timer (WDT) triggering for empty task
   
