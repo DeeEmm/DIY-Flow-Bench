@@ -109,6 +109,26 @@ function initialiseButtons() {
     document.getElementById('infoModal').style.display='block';
   });
 
+  document.getElementById('flow-tile').addEventListener('click', function(){
+    document.getElementById('flow-tile').style.display='none';
+    document.getElementById('aflow-tile').style.display='block';
+  });
+
+  document.getElementById('aflow-tile').addEventListener('click', function(){
+    document.getElementById('aflow-tile').style.display='none';
+    document.getElementById('flow-tile').style.display='block';
+  });
+
+  document.getElementById('tile-pitot').addEventListener('click', function(){
+    document.getElementById('tile-pitot').style.display='none';
+    document.getElementById('tile-pdiff').style.display='block';
+  });
+
+  document.getElementById('tile-pdiff').addEventListener('click', function(){
+    document.getElementById('tile-pdiff').style.display='none';
+    document.getElementById('tile-pitot').style.display='block';
+  });
+
   document.getElementById('on-button').addEventListener('click', function(){
     console.log('Bench On');
     xhr.open('GET', '/api/bench/on');

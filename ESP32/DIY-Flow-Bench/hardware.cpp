@@ -266,6 +266,8 @@ int16_t Hardware::getADCRawData(int channel) {
 /***********************************************************
  * @brief Get ADC channel Voltage
  * @param channel ADC channel (0-3)
+ * @note 1115: 16 bits less sign bit = 15 bits mantissa = 32767 | 6.144v = max voltage (gain) of ADC | 187.5 uV / LSB
+ * @note 1015: 12 bits less sign bit = 11 bit mantissa = 2047 | 6.144v = max voltage (gain) of ADC
  ***/
  double Hardware::getADCVolts(int channel) {
 
@@ -275,16 +277,16 @@ int16_t Hardware::getADCRawData(int channel) {
   int rawADCval = getADCRawData(channel);
   
   #if defined ADC_TYPE_ADS1115 && defined ADC_IS_ENABLED 
-    // 16 bits - sign bit = 15 bits mantissa = 32767 | 6.144v = max voltage (gain) of ADC | 187.5 uV / LSB
-    volts = double(rawADCval) * (ADC_GAIN / 32767.00); 
+    
+    volts = rawADCval * ADC_GAIN / 32767.00F; 
   
   #elif defined ADC_TYPE_ADS1015 && defined ADC_IS_ENABLED 
-    // 12 bits - sign bit = 11 bit mantissa = 2047 | 6.144v = max voltage (gain) of ADC
-    volts = double(rawADCval) * (ADC_GAIN / 2047); 
+
+    volts = rawADCval * ADC_GAIN / 2047.00F; 
   
   #else
 
-    return 1.0;
+    return 1.00F;
 
   #endif
   
@@ -303,11 +305,12 @@ int16_t Hardware::getADCRawData(int channel) {
  ***/
 double Hardware::get3v3SupplyVolts() {   
 
+  long rawVoltageValue = analogRead(VCC_3V3_PIN);  
+  double vcc3v3SupplyVolts = (rawVoltageValue * 0.805860805860806) ;
+
   #ifdef USE_FIXED_3_3V_VALUE
     return 3.3; 
   #else
-    long rawVoltageValue = analogRead(VCC_3V3_PIN);  
-    double vcc3v3SupplyVolts = (rawVoltageValue * 0.805860805860806) ;
     return vcc3v3SupplyVolts + VCC_3V3_TRIMPOT;
   #endif
 }
@@ -325,11 +328,12 @@ double Hardware::get3v3SupplyVolts() {
  ***/
 double Hardware::get5vSupplyVolts() {   
 
+  long rawVoltageValue = analogRead(VCC_5V_PIN);  
+  double vcc5vSupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
+
   #ifdef USE_FIXED_5V_VALUE
     return 5.0; 
   #else
-    long rawVoltageValue = analogRead(VCC_5V_PIN);  
-    double vcc5vSupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
     return vcc5vSupplyVolts + VCC_5V_TRIMPOT;
   #endif
 }

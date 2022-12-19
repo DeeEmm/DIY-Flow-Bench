@@ -147,12 +147,24 @@ hr {
 	color: #333
 }
 
-.tile-pdiff {
-  display:none;
+
+#flow-tile {
+  cursor: pointer;
 }
 
-.tile-pitot {
+#aflow-tile {
+  display:none;
+  cursor: pointer;
+}
+
+#tile-pdiff {
+  display:none;
+  cursor: pointer;
+}
+
+#tile-pitot {
   display:block;
+  cursor: pointer;
 }
 
 .config-panel {
@@ -181,7 +193,7 @@ hr {
 }
 
 .config-select {
-  width: 41.5vw;
+  width: 208px;
   float: right;
 }
 

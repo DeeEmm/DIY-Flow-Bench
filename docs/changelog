@@ -64,6 +64,13 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+22121901        - Renamed MAF Vars to remove ambiguity
+                - Added ability to change temperature units in GUI
+                - Minor bugfixes
+                - Code tidying
+                - #8 Reference pressure selection for adjusted flow
+22121802        - Corrections to MAF flow calcs
+                - Fixed adjusted flow and added to GUI
 22121801        - Added startup delay to allow device to wake
                 - Move SSE Push into main loop to improve network stability
                 - Combined SSE events into single SSE event in JSON format

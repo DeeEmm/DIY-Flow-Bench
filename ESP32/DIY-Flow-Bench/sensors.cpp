@@ -271,7 +271,7 @@ double Sensors::getMafVolts() {
 	
 	Hardware _hardware;
 
-	double sensorVolts = 0.0;
+	double sensorVolts = 0.00F;
 	
 	#if defined MAF_SRC_IS_ADC && defined MAF_IS_ENABLED && defined ADC_IS_ENABLED
 		sensorVolts = _hardware.getADCVolts(MAF_ADC_CHANNEL);

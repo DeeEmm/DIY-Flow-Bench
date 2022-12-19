@@ -259,7 +259,7 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'M': // Get MAF raw sensor data'  
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "M%s%f", config.api_delim, sensorVal.MAF);   
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "M%s%f", config.api_delim, sensorVal.MafRAW);   
       break;
       
       case 'm': // Get MAF output voltage'

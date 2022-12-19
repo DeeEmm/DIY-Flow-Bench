@@ -104,29 +104,23 @@ void TASKgetBenchData( void * parameter ){
         status.adcPollTimer = millis() + ADC_SCAN_DELAY_MS; // Only reset timer when task executes
 
         #ifdef MAF_IS_ENABLED
-        // Get MAF Value and truncate to 2DP
-        sensorVal.MAF = _sensors.getMafRaw();
-        sensorVal.FlowCFM = _calculations.calculateFlowCFM(sensorVal.MAF);
+        sensorVal.MafRAW = _sensors.getMafRaw();
+        sensorVal.FlowCFM = _calculations.calculateFlowCFM(sensorVal.MafRAW);
+
+        double currentRefPressureInWg = _calculations.convertPressure(sensorVal.PRefKPA, INWG);
+        sensorVal.FlowADJ = _calculations.convertFlowDepression(currentRefPressureInWg, config.adj_flow_depression, sensorVal.FlowCFM);
+
         #endif
         
         #ifdef PREF_IS_ENABLED 
-        // Get Ref Pressure Value and truncate to 2DP by casting to int
-        // sensorINT = int(_sensors.getPRefValue() * 100 + .5); 
-        // sensorVal.PRefKPA = (double)sensorINT / 100; 
         sensorVal.PRefKPA = _sensors.getPRefValue();
         #endif
 
         #ifdef PDIFF_IS_ENABLED
-        // Get Differential Pressure Value and truncate to 2DP
-        // sensorINT = _sensors.getPDiffValue() * 100 + .5; 
-        // sensorVal.PDiffKPA = (double)sensorINT / 100; 
         sensorVal.PDiffKPA = _sensors.getPDiffValue();
         #endif
 
         #ifdef PITOT_IS_ENABLED
-        // Get Pitot Pressure Value and truncate to 2DP
-        // sensorINT = _sensors.getPitotValue() * 100 + .5; 
-        // sensorVal.PitotKPA = (double)sensorINT / 100; 
         sensorVal.PitotKPA = _sensors.getPitotValue();
         #endif
         xSemaphoreGive(i2c_task_mutex); // Release semaphore        
@@ -149,6 +143,7 @@ void TASKgetEnviroData( void * parameter ){
 
   extern struct DeviceStatus status;
   extern struct SensorData sensorVal;
+  Calculations _calculations;
 
   for( ;; ) {
     if (millis() > status.bmePollTimer){
@@ -157,6 +152,7 @@ void TASKgetEnviroData( void * parameter ){
         status.bmePollTimer = millis() + BME_SCAN_DELAY_MS; // Only reset timer when task executes
         
         sensorVal.TempDegC = _sensors.getTempValue();
+        sensorVal.TempDegF = _calculations.convertTemperature(_sensors.getTempValue(), DEGF);
         sensorVal.BaroHPA = _sensors.getBaroValue();
         sensorVal.BaroKPA = sensorVal.BaroHPA / 10;
         sensorVal.RelH = _sensors.getRelHValue();

@@ -78,29 +78,34 @@
       <div class="content">
         <div class="tile-grid">
           <div class="tile tile-pref">
-            <p class="tile-title">Ref Pressure</p>
+            <p class="tile-title">Depression</p>
             <p><span class="tile-value" id="PREF">&nbsp;</span></p>
-            <p class="units">In/Aq</p>
+            <p class="units">inH2O</p>
           </div>
-          <div class="tile tile-flow">
+          <div class="tile tile-flow" id="flow-tile">
             <p class="tile-title">Flow Rate</p>
             <p><span class="tile-value" id="FLOW">&nbsp;</span></p>
             <p class="units">cfm</p>
           </div>
-          <div class="tile tile-pdiff">
-            <p class="tile-title">Diff Pressure</p>
-            <p><span class="tile-value" id="PDIFF">&nbsp;</span></p>
-            <p class="units">In/Aq</p>
+          <div class="tile tile-aflow" id="aflow-tile">
+            <p class="tile-title">Adjusted Flow</p>
+            <p><span class="tile-value" id="AFLOW">&nbsp;</span></p>
+            <p class="units">cfm&nbsp;&commat;&nbsp;<span id="PADJUST">28</span>&nbsp;inH2O</p>
           </div>
-          <div class="tile tile-pitot">
+          <div class="tile tile-pitot" id="tile-pitot">
             <p class="tile-title">Pitot</p>
             <p><span class="tile-value" id="PITOT">&nbsp;</span></p>
-            <p class="units">In/Aq</p>
+            <p class="units">inH2O</p>
+          </div>
+          <div class="tile tile-pdiff" id="tile-pdiff">
+            <p class="tile-title">Diff Pressure</p>
+            <p><span class="tile-value" id="PDIFF">&nbsp;</span></p>
+            <p class="units">inH2O</p>
           </div>
           <div class="tile tile-temp">
             <p class="tile-title">Temperature</p>
             <p><span class="tile-value" id="TEMP">&nbsp;</span></p>
-            <p class="units">Deg C</p>
+            <p class="units">%TEMP_UNIT%</p>
           </div>
           <div class="tile tile-baro">
             <p class="tile-title">Baro Pressure</p>
@@ -110,7 +115,7 @@
           <div class="tile tile-relh">
             <p class="tile-title">Humidity</p>
             <p><span class="tile-value" id="RELH">&nbsp;</span></p>
-            <p class="units">&percnt;RH</p>
+            <p class="units">&percnt;RelH</p>
           </div>
         </div>  
       </div>          
@@ -266,6 +271,8 @@
           <br>
           <h3>Bench Settings</h3>
           <div class="config-row tooltip"><label class="config-label">Refresh Rate:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="%CONF_REFRESH_RATE%" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
+          <div class="config-row tooltip"><label class="config-label">Conversion Depression:</label>&nbsp;<input type="text" id="ADJ_FLOW_DEPRESSION" name="ADJ_FLOW_DEPRESSION" value="%ADJ_FLOW_DEPRESSION%" class="config-text"><span class="tooltiptext">Bench depression used for adjusted flow calcs</span></div>
+          <div class="config-row tooltip"><label class="config-label">Temperature Unit:</label><span>%TEMPERATURE_DROPDOWN%</span><span class="tooltiptext">Display unit of temperature</span></div>
           <br>
           <h3>Calibration Settings</h3>
           <div class="config-row tooltip"><label class="config-label">Orifice Flow Rate:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="%CONF_CAL_FLOW_RATE%" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice in cfm</span></div>

@@ -435,7 +435,9 @@ void Webserver::createConfigFile () {
   configData["CONF_LEAK_TEST_THRESHOLD"] = config.leak_test_threshold;
   configData["CONF_CAL_REF_PRESS"] = config.cal_ref_press;
   configData["CONF_CAL_FLOW_RATE"] = config.cal_flow_rate;
-  
+  configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
+  configData["TEMP_UNIT"] = config.temp_unit;
+    
   serializeJsonPretty(configData, jsonString);
   writeJSONFile(jsonString, "/config.json");
   
@@ -491,6 +493,9 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
   config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
   config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
 //  config.cal_offset = configData["CONF_CAL_OFFSET"].as<double>();
+  config.adj_flow_depression = configData["ADJ_FLOW_DEPRESSION"].as<int>();
+  // config.temp_unit = configData["TEMP_UNIT"].as<int>();
+  strcpy(config.temp_unit, configData["TEMP_UNIT"]);
 
   // save settings to config file
   serializeJsonPretty(configData, jsonString);
@@ -549,21 +554,29 @@ String Webserver::getDataJSON()
   extern struct SensorData sensorVal;
 
   Hardware _hardware;
+  Calculations _calculations;
 
   String jsonString;
 
   StaticJsonDocument<1500> dataJson;
 
   // Flow Rate
-  double mafFlowCFM = sensorVal.MAF;
-  if (mafFlowCFM > config.min_flow_rate)  {
-    dataJson["FLOW"] = mafFlowCFM;
+  if (sensorVal.FlowCFM > config.min_flow_rate)  {
+    dataJson["FLOW"] = sensorVal.FlowCFM;
   }  else  {
     dataJson["FLOW"] = 0;
   }
 
-  // TODO allow user to choose deg C or F
-  dataJson["TEMP"] = sensorVal.TempDegC;
+  // Adjusted Flow Rate
+  dataJson["AFLOW"] = sensorVal.FlowADJ;
+  dataJson["PADJUST"] = config.adj_flow_depression;
+
+  // Temperature deg C or F
+  if (strstr(String(config.temp_unit).c_str(), String("Celcius").c_str())){
+    dataJson["TEMP"] = sensorVal.TempDegC;
+  } else {
+    dataJson["TEMP"] = sensorVal.TempDegF;
+  }
   dataJson["BARO"] = sensorVal.BaroKPA;
   dataJson["RELH"] = sensorVal.RelH;
 
@@ -576,33 +589,11 @@ String Webserver::getDataJSON()
   // Differential pressure
   dataJson["PDIFF"] = sensorVal.PDiffKPA;
 
-
-  // TODO - Adjusted flow value [convert flow to different ref depression] - need to add to GUI
-  // Adjusted Flow
-  // get the desired bench test pressure
-  // double desiredRefPressureInWg = menuARef.getCurrentValue(); //TODO:: Add ref pressure setting to UI & Config
-  // convert from the existing bench test
-  // double adjustedFlow = convertFlowDepression(refPressure, desiredRefPressureInWg, mafFlowCFM);
-  // Send it to the display
-  // dataJson["AFLOW"] = String(adjustedFlow);
-
-  // DEPRECATED - We only need to stream sensor data to the browser - this does not need to be streamed
-  // dataJson["RELEASE"] = RELEASE;
-  // dataJson["BUILD_NUMBER"] = BUILD_NUMBER;
-
-
-  // DEPRECATED - Not really necessary to send millivolts to display in browser - can access this via API if required for debugging
-  // dataJson["PREF_MV"] = sensorVal.PRefMv;
-  // dataJson["PITOT_MV"] = sensorVal.PitotMv;
-  // dataJson["PDIFF_MV"] = String(sensorVal.PDiffMv);
-
-
   if (1!=1) {  // TODO if message handler is active display the active message
     dataJson["STATUS_MESSAGE"] = status.statusMessage;
-  } else { // just report the uptime
+  } else { // else lets just show the uptime
     dataJson["STATUS_MESSAGE"] = "Uptime: " + String(_hardware.uptime()) + " (hh.mm)";      
   }
-
 
   serializeJson(dataJson, jsonString);
 
@@ -684,6 +675,7 @@ StaticJsonDocument<1024> Webserver::loadJSONFile(String filename)
  * @details Replaces template placeholders with variable values
  * @param &var HTML payload 
  * @note %PLACEHOLDER_FORMAT%
+ * @note using IF statements for this sucks but C++ switch statement cannot handle text operators
  ***/
 String Webserver::processTemplate(const String &var)
 {
@@ -698,7 +690,9 @@ String Webserver::processTemplate(const String &var)
 
   String fileList;
 
-  // Status
+  // Serial.println(var);
+
+  // Config Info
   if (var == "RELEASE") return RELEASE;
   if (var == "BUILD_NUMBER") return BUILD_NUMBER;
   if (var == "SPIFFS_MEM_SIZE") return String(status.spiffs_mem_size);
@@ -709,6 +703,8 @@ String Webserver::processTemplate(const String &var)
   if (var == "BENCHTYPE") return String(status.benchType);
   if (var == "BOARDTYPE") return String(status.boardType);
   if (var == "BOOT_TIME") return String(status.boot_time);
+
+  // Sensor Values
   if (var == "MAF_SENSOR") return String(status.mafSensor);
   if (var == "PREF_SENSOR") return String(status.prefSensor);
   if (var == "TEMP_SENSOR") return String(status.tempSensor);
@@ -718,27 +714,43 @@ String Webserver::processTemplate(const String &var)
   if (var == "PDIFF_SENSOR") return String(status.pdiffSensor);
   if (var == "STATUS_MESSAGE") return String(status.statusMessage);
 
-
-  // Config Settings
+  // Wifi Settings
   if (var == "CONF_WIFI_SSID") return String(config.wifi_ssid);
   if (var == "CONF_WIFI_PSWD") return String(config.wifi_pswd);
   if (var == "CONF_WIFI_AP_SSID") return String(config.wifi_ap_ssid);
   if (var == "CONF_WIFI_AP_PSWD") return String(config.wifi_ap_pswd);
   if (var == "CONF_HOSTNAME") return String(config.hostname);
   if (var == "CONF_WIFI_TIMEOUT") return String(config.wifi_timeout);
+
+  // API Settings
   if (var == "CONF_API_DELIM") return String(config.api_delim);
   if (var == "CONF_SERIAL_BAUD_RATE") return String(config.serial_baud_rate);
+
+  // Data Filters
   if (var == "CONF_MIN_FLOW_RATE") return String(config.min_flow_rate);
   if (var == "CONF_MIN_BENCH_PRESSURE") return String(config.min_bench_pressure);
   if (var == "CONF_MAF_MIN_VOLTS") return String(config.maf_min_volts);
   if (var == "CONF_CYCLIC_AVERAGE_BUFFER") return String(config.cyc_av_buffer);
+
+  // Bench Settings
   if (var == "CONF_REFRESH_RATE") return String(config.refresh_rate);
+  if (var == "ADJ_FLOW_DEPRESSION") return String(config.adj_flow_depression);
+  if (var == "TEMP_UNIT") return String(config.temp_unit);
+  if (var == "TEMPERATURE_DROPDOWN"){
+    if (strstr(String(config.temp_unit).c_str(), String("Celcius").c_str())){
+      return String( "<select name='TEMP_UNIT' class='config-select' id='TEMP_UNIT'><option value='Celcius' selected>Celcius </option><option value='Farenheit'>Farenheit </option></select>");
+    } else {
+      return String("<select name='TEMP_UNIT' class='config-select' id='TEMP_UNIT'><option value='Celcius'>Celcius </option><option value='Farenheit' selected>Farenheit </option></select>");
+    }
+  }
+
+  // Calibration Settings
   if (var == "CONF_CAL_FLOW_RATE") return String(config.cal_flow_rate);
   if (var == "CONF_CAL_REF_PRESS") return String(config.cal_ref_press);
   if (var == "CONF_LEAK_TEST_TOLERANCE") return String(config.leak_test_tolerance);
   if (var == "CONF_LEAK_TEST_THRESHOLD") return String(config.leak_test_threshold);
 
-  // Calibration Settings
+  // Calibration Data
   if (var == "FLOW_OFFSET") return String(calibration.flow_offset);
   if (var == "LEAK_CAL_VAL") return String(calibration.leak_cal_val);
 

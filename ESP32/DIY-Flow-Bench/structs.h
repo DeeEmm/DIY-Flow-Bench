@@ -39,7 +39,8 @@ struct ConfigSettings {
   int min_bench_pressure = 3;                     // Min bench pressure where bench is considered running
   double maf_min_volts = 0.1;                     // Filter out results less than this
   int refresh_rate = 250;                         // Screen refresh rate in milliseconds (>180)
-  double cal_ref_press = 10;                      // Calibration orifice refe pressure
+  int adj_flow_depression = 28;                   // Adjusted flow depression in inches of water
+  double cal_ref_press = 10;                      // Calibration orifice ref pressure
   double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
   double cal_offset = 0;                          // Calibration offset
   int cyc_av_buffer = 3;                          // [5] Scan # over which to average output (helps smooth results)
@@ -59,6 +60,7 @@ struct ConfigSettings {
   char hostname[32] = "diyfb";                    // Default Hostname
   char api_delim[2] = ":";                        // API Serial comms delimiter
   char wifi_ap_ssid[32] = "DIYFB";                // Default Access Point name
+  char temp_unit[11] = "Celcius";                 // Defalt display unit of temperature
 };
 
 
@@ -125,11 +127,13 @@ struct FileUploadData {
  * Sensor data
  ***/
 struct SensorData {
-  double MAF;
+  double MafRAW;
   double FlowMASS;
   double FlowCFM;
+  double FlowADJ;
   double MafMv;
   double TempDegC;
+  double TempDegF;
   double RelH;
   double BaroKPA;
   double BaroHPA;
