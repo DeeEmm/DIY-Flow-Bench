@@ -55,12 +55,13 @@ struct ConfigSettings {
   int parsecs = 12;
   char pageTitle[32] = "DIY Flow Bench";          // Display name for software
   char wifi_ssid[32] = "WIFI-SSID";               // Your Wifi SSID
-  char wifi_pswd[32] = "<WIFI-PSWD>";             // Your Wifi Password
+  char wifi_pswd[32] = "WIFI-PASS";               // Your Wifi Password
   char wifi_ap_pswd[32] = "123456789";            // Default Access Point Password
   char hostname[32] = "diyfb";                    // Default Hostname
   char api_delim[2] = ":";                        // API Serial comms delimiter
   char wifi_ap_ssid[32] = "DIYFB";                // Default Access Point name
   char temp_unit[11] = "Celcius";                 // Defalt display unit of temperature
+  bool ap_mode = true;                            // Default WiFi connection mode is accesspoint mode
 };
 
 
@@ -82,6 +83,7 @@ struct DeviceStatus {
   bool debug = true;
   int spiffs_mem_size = 0;
   int spiffs_mem_used = 0;
+  int pageSize = 0;
   String local_ip_address;
   String hostname;
   String boardType;
@@ -127,20 +129,39 @@ struct FileUploadData {
  * Sensor data
  ***/
 struct SensorData {
-  double MafRAW;
-  double FlowMASS;
-  double FlowCFM;
-  double FlowADJ;
-  double MafMv;
-  double TempDegC;
-  double TempDegF;
-  double RelH;
-  double BaroKPA;
-  double BaroHPA;
-  double PRefKPA;
-  double PRefMv;
-  double PDiffKPA;
-  double PDiffMv;
-  double PitotKPA;
-  double PitotMv;
+  double MafRAW = 0.0;
+  double FlowMASS = 0.0;
+  double FlowCFM = 0.0;
+  double FlowADJ = 0.0;
+  double MafMv = 0.0;
+  double TempDegC = 0.0;
+  double TempDegF = 0.0;
+  double RelH = 0.0;
+  double BaroKPA = 0.0;
+  double BaroHPA = 0.0;
+  double PRefKPA = 0.0;
+  double PRefMv = 0.0;
+  double PDiffKPA = 0.0;
+  double PDiffMv = 0.0;
+  double PitotKPA = 0.0;
+  double PitotMv = 0.0;
+};
+
+
+/***********************************************************
+ * Orifice data
+ ***/
+struct OrificeData {
+  double OrificeOneFlow;
+  double OrificeOneDepression;
+  double OrificeTwoFlow;
+  double OrificeTwoDepression;
+  double OrificeThreeFlow;
+  double OrificeThreeDepression;
+  double OrificeFourFlow;
+  double OrificeFourDepression;
+  double OrificeFiveFlow;
+  double OrificeFiveDepression;
+  double OrificeSixFlow;
+  double OrificeSixDepression;
 };

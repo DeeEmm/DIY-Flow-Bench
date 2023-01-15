@@ -106,10 +106,6 @@ void TASKgetBenchData( void * parameter ){
         #ifdef MAF_IS_ENABLED
         sensorVal.MafRAW = _sensors.getMafRaw();
         sensorVal.FlowCFM = _calculations.calculateFlowCFM(sensorVal.MafRAW);
-
-        double currentRefPressureInWg = _calculations.convertPressure(sensorVal.PRefKPA, INWG);
-        sensorVal.FlowADJ = _calculations.convertFlowDepression(currentRefPressureInWg, config.adj_flow_depression, sensorVal.FlowCFM);
-
         #endif
         
         #ifdef PREF_IS_ENABLED 
@@ -123,6 +119,12 @@ void TASKgetBenchData( void * parameter ){
         #ifdef PITOT_IS_ENABLED
         sensorVal.PitotKPA = _sensors.getPitotValue();
         #endif
+
+        double currentRefPressureINH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
+        sensorVal.FlowADJ = _calculations.convertFlowDepression(currentRefPressureINH2O, config.adj_flow_depression, sensorVal.FlowCFM);
+
+
+
         xSemaphoreGive(i2c_task_mutex); // Release semaphore        
       }   
     }
@@ -239,6 +241,7 @@ void loop () {
         
         // Push data to client using Server Side Events (SSE)
         jsonString = _webserver.getDataJSON();
+
         _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis());
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore

@@ -195,7 +195,7 @@
     //STEPPER MOTOR CONTROLLER
     #define AVO_ENBL_PIN                18                     
     #define AVO_STEP_PIN                19
-    #define AVO_DIR_PIN                23
+    #define AVO_DIR_PIN                 23
     
     #define VCC_3V3_PIN                 35                      // TODO: Define pin
     #define VCC_5V_PIN                  35                      // 10k-10k divider across 5v across 5v supply

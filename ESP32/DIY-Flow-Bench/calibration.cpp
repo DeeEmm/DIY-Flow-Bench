@@ -60,7 +60,7 @@ bool Calibration::setFlowOffset() {
   // TODO: need to determine what flow sensors are active (MAF / Orifice / Pitot)
   double MafFlowCFM = _calculations.calculateFlowCFM(_sensors.getMafRaw());
   // Get the current reference pressure
-  double RefPressure = _calculations.convertPressure(_sensors.getPRefValue(), INWG);
+  double RefPressure = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);
   
   // convert the calibration orifice flow value  to our current ref pressure  
   double convertedOrificeFlowCFM = _calculations.convertFlowDepression(config.cal_ref_press, RefPressure,  config.cal_flow_rate);
@@ -113,7 +113,7 @@ bool Calibration::setLeakTestPressure() {
   Sensors _sensors;
   Messages _message;
   
-  calibration.leak_cal_val = _calculations.convertPressure(_sensors.getPRefValue(), INWG);  
+  calibration.leak_cal_val = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
 
   _message.Handler(translate.LANG_VAL_LEAK_CAL_VALUE + calibration.leak_cal_val);
 

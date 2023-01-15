@@ -205,6 +205,7 @@ hr {
 .status_message {
   font-size: 1.2rem;
   color:#666;
+  margin-bottom: 28px;
 }
 
 #footer {
@@ -321,7 +322,7 @@ hr {
   content: "";
   position: absolute;
   top: 100vh;
-  left: 50vw;
+  left: 50%;
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
@@ -506,3 +507,75 @@ svg.graph .labels.y-labels {
   font-size: 2.1rem;
   font-weight: bold;
 }
+
+
+
+
+/* radio button code */
+
+.switch-field {
+	margin-top: 18px;
+	margin-bottom: 18px;
+}
+
+.switch-field input {
+	position: absolute !important;
+	clip: rect(0, 0, 0, 0);
+	height: 1px;
+	width: 1px;
+	border: 0;
+	overflow: hidden;
+}
+
+.switch-field label {
+	background-color: #989898;
+	color: #FFF;
+	font-size: 22px;
+	line-height: 1;
+	text-align: center;
+	padding: 8px 16px;
+	margin-right: -1px;
+	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+	transition: all 0.1s ease-in-out;
+}
+
+.switch-field label:hover {
+	cursor: pointer;
+}
+
+.switch-field input:checked + label {
+	background-color: #44b113;
+	box-shadow: none;
+}
+
+.switch-field label:first-of-type {
+	border-radius: 4px 0 0 4px;
+}
+
+.switch-field label:last-of-type {
+	border-radius: 0 4px 4px 0;
+}
+
+/* This is just for CodePen. */
+
+.form {
+	max-width: 600px;
+	font-family: "Lucida Grande", Tahoma, Verdana, sans-serif;
+	font-weight: normal;
+	line-height: 1.625;
+	margin: 8px auto;
+	padding: 16px;
+}
+
+h2 {
+	font-size: 18px;
+	margin-bottom: 8px;
+}
+
+#orifice-data {
+  font-size: 22px;
+  color: #666;
+  margin-bottom: 18px;
+}
+
+/* radio button code */

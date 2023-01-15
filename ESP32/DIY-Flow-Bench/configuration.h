@@ -105,7 +105,7 @@
 #define PRINT_BUFFER_LENGTH 128
 //#define API_CHECKSUM_IS_ENABLED                           // Add checksum to serial API response TODO: UPDATE CHECKSUM TO NATIVE ESP32 CRC32
 #define WEBSOCK_CLEAN_FREQ 600000
-#define STATUS_UPDATE_RATE 250                              // time between SSE push in milliseconds
+#define STATUS_UPDATE_RATE 500                              // time between SSE push in milliseconds
 #define FILESYSTEM SPIFFS
 #define VTASK_DELAY_ADC 100
 #define VTASK_DELAY_BME 100
@@ -117,6 +117,7 @@
 * BENCH SETTINGS
 ***/
 #define MIN_TEST_PRESSURE_PERCENTAGE 80                     // Lowest test pressure bench will generate accurate results. Please see note in wiki
+#define PIPE_RADIUS_IN_FEET 0.328084                        // radius of duct in feet (used for pitot & venturi benches)
 
  
 
@@ -194,7 +195,7 @@ const int ADC_I2C_ADDR = 0x48;
 #define MAF_IS_ENABLED                                      // Comment to disable MAF related code
     
 // Uncomment One sensor only
-#define MAF_DATA_FILE "mafData/ACDELCO_92281162.cpp"          //default recommended sensor    
+#define MAF_DATA_FILE "mafData/ACDELCO_92281162.cpp"        //default recommended sensor    
 // #define MAF_DATA_FILE "mafData/ACDELCO_19330122.h" 
 // #define MAF_DATA_FILE "mafData/VDO_AFM_043.h"
 // #define MAF_DATA_FILE  "mafData/MH95_3000_100.h"         // PMAS MH95-3000 in 100mm housing              
@@ -222,9 +223,9 @@ const int ADC_I2C_ADDR = 0x48;
 * Recommended sensor is the MPXV7007DP
 ***/
 
-#define PREF_IS_ENABLED                                       // Comment to disable reference pressure related code
+#define PREF_IS_ENABLED                                     // Comment to disable reference pressure related code
 
-#define FIXED_REF_PRESS_VALUE 1                           // Fixed pressure value in Pascals
+#define FIXED_REF_PRESS_VALUE 1                             // Fixed pressure value in Pascals
 
 // Set signal source (Uncomment One line only)
 //#define PREF_SRC_PIN
@@ -235,9 +236,9 @@ const int ADC_I2C_ADDR = 0x48;
 // #define PREF_SENSOR_TYPE_LINEAR_ANALOG 
 #define PREF_SENSOR_TYPE_MPXV7007        
 
-#define PREF_MV_TRIMPOT 0.0                                 // Millivolt offset
-#define PREF_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
-#define PREF_ADC_CHANNEL 2                                  // BUG: TEMP SWAPPED WITH PDIFF (ERROR ON PCB)
+#define PREF_MV_TRIMPOT 0.0                               // Millivolt offset
+#define PREF_ANALOG_SCALE 1.0                             // Scaling factor used for raw analog value
+#define PREF_ADC_CHANNEL 2                                // BUG: TEMP SWAPPED WITH PDIFF (ERROR ON PCB)
 
 
 
@@ -251,9 +252,9 @@ const int ADC_I2C_ADDR = 0x48;
 * Recommended sensor is the MPXV7007DP
 ***/
 
-#define PDIFF_IS_ENABLED                                    //Comment to disable Differential pressure related code
+#define PDIFF_IS_ENABLED                                  // Comment to disable Differential pressure related code
 
-#define FIXED_DIFF_PRESS_VALUE 1                            // Fixed pressure value in Pascals
+#define FIXED_DIFF_PRESS_VALUE 1                          // Fixed pressure value in Pascals
 
 // Set signal source (Uncomment One line only)
 // #define PDIFF_SRC_IS_PIN
@@ -264,9 +265,9 @@ const int ADC_I2C_ADDR = 0x48;
 // #define PDIFF_SENSOR_TYPE_LINEAR_ANALOG 
 #define PDIFF_SENSOR_TYPE_MPXV7007          
 
-#define PDIFF_MV_TRIMPOT 0.0                                // Millivolt offset
-#define PDIFF_ANALOG_SCALE 1.0                              // Scaling factor used for raw analog value
-#define PDIFF_ADC_CHANNEL 1                                 // TODO: TEMP SWAPPED WITH PREF (ERROR ON PCB)
+#define PDIFF_MV_TRIMPOT 0.0                              // Millivolt offset
+#define PDIFF_ANALOG_SCALE 1.0                            // Scaling factor used for raw analog value
+#define PDIFF_ADC_CHANNEL 1                               // TODO: TEMP SWAPPED WITH PREF (ERROR ON PCB)
 
 
 
@@ -280,7 +281,7 @@ const int ADC_I2C_ADDR = 0x48;
 * Recommended sensor is the MPXV7007DP
 ***/
 
-#define PITOT_IS_ENABLED                                    // Comment to disable pitot related code
+#define PITOT_IS_ENABLED                                  // Comment to disable pitot related code
 
 // Set signal source (Uncomment One line only)
 //#define PITOT_SRC_IS_PIN
@@ -288,11 +289,11 @@ const int ADC_I2C_ADDR = 0x48;
 
 // Set sensor type (Uncomment One line only)
 // #define PITOT_SENSOR_NOT_USED
-// #define PITOT_SENSOR_TYPE_LINEAR_ANALOG                  // Use analog signal from PITOT_PIN
+// #define PITOT_SENSOR_TYPE_LINEAR_ANALOG                // Use analog signal from PITOT_PIN
 #define PITOT_SENSOR_TYPE_MPXV7007DP
 
-#define PITOT_MV_TRIMPOT 0.0                                // Millivolt offset
-#define PITOT_ANALOG_SCALE 1.0                              // Scaling factor used for raw analog value
+#define PITOT_MV_TRIMPOT 0.0                              // Millivolt offset
+#define PITOT_ANALOG_SCALE 1.0                            // Scaling factor used for raw analog value
 #define PITOT_ADC_CHANNEL 3
 
 
@@ -315,7 +316,7 @@ const int ADC_I2C_ADDR = 0x48;
 #define BARO_SENSOR_TYPE_BME280
 // #define BARO_SENSOR_TYPE_MPX4115                         // use absolute pressure sensor
 
-#define FIXED_BARO_VALUE 101.3529                         // Default pressure in kPa
+#define FIXED_BARO_VALUE 101.3529                           // Default pressure in kPa
 #define BARO_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 #define startupBaroScalingFactor 1                          // scaling factor when using reference pressure sensor for baro correction
 #define startupBaroScalingOffset 100                        // scaling offset when using reference pressure sensor for baro correction
@@ -337,7 +338,7 @@ const int ADC_I2C_ADDR = 0x48;
 
 #define TEMP_IS_ENABLED                                     // Comment to disable temperature related code.
 
-#define FIXED_TEMP_VALUE 21                               // Value to return if no sensor used
+#define FIXED_TEMP_VALUE 21                                 // Value to return if no sensor used
 #define TEMP_ANALOG_SCALE 1.0                               // Scaling factor used for raw analog value
 
 // Uncomment One line only
@@ -361,7 +362,7 @@ const int ADC_I2C_ADDR = 0x48;
 
 #define RELH_IS_ENABLED                                     // Comment to disable humidity related code
 
-#define FIXED_RELH_VALUE 36                               // Value to return if no sensor used
+#define FIXED_RELH_VALUE 36                                 // Value to return if no sensor used
 #define RELH_ANALOG_SCALE 1.0                               // Scaling factor for raw analog value
 
 // Uncomment ONE of the following

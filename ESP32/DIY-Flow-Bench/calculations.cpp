@@ -19,6 +19,7 @@
 
 #include <Arduino.h>
 #include <vector>
+#include <math.h>
 
 #include "constants.h"
 #include "structs.h"
@@ -46,41 +47,72 @@ Calculations::Calculations() {
 
 
 /***********************************************************
-* @brief CONVERT PRESSURE
-*
-* @note Accepts input in kPa returns converted pressure 
-* @note Units - HPA / BAR / PSIA / INWG
-***/
-double Calculations::convertPressure(double pressureKpa, int units) {
+ * @brief CONVERT PRESSURE
+ * @param inputPressure Input value to be converted
+ * @param unitsIn Input value units (default kPa)
+ * @param unitsOut Desired output format (default INH2O)
+ * ***/
+double Calculations::convertPressure(double inputPressure, int unitsOut, int unitsIn) {
 
+  double inputPressureKpa;
   double convertedPressure;
 
-
-  switch (units)
+  // First convert input pressure to kPa
+  switch (unitsIn)
   {
     case HPA:
-      convertedPressure = pressureKpa * 10;
+      inputPressureKpa = inputPressure * 0.1;
+      break;
+
+    case BAR:
+      inputPressureKpa = inputPressure * 100;
+      break;
+
+    case PSIA:
+      inputPressureKpa = inputPressure * 6.89476;
+      break;
+
+    case INH2O:
+      inputPressureKpa = inputPressure * 0.24884;
+      break;
+
+    default:
+      inputPressureKpa = inputPressure;
+      break;
+
+  }
+
+  // Then convert kPa to required output and return result
+  switch (unitsOut)
+  {
+    case HPA:
+      convertedPressure = inputPressureKpa * 10;
       return convertedPressure;
       break;
 
     case BAR:
-      convertedPressure = pressureKpa * 0.01 ;
+      convertedPressure = inputPressureKpa * 0.01;
       return convertedPressure;
       break;
 
     case PSIA:
-      convertedPressure = pressureKpa * 0.145038;
+      convertedPressure = inputPressureKpa * 0.145037738;
       return convertedPressure;
       break;
       
-    case INWG:
+    case KPA:
+      return inputPressureKpa;
+      break;
+
+    case INH2O:
     default:
-      convertedPressure = pressureKpa * 4.0146307866177;
+      convertedPressure = inputPressureKpa * 4.01463;
       return convertedPressure;
       break;
+
   }
 
-  return pressureKpa;
+  return 0.00001; // else return small non zero value which will get filtered out as zero
 
 }
 
@@ -89,32 +121,67 @@ double Calculations::convertPressure(double pressureKpa, int units) {
 
 /***********************************************************
  * @brief CONVERT TEMPERATURE
+ * @param refTemp Input value to be converted
+ * @param unitsOut Desired output format (default degC)
+ * @param unitsIn Input value units (default degC)
  ***/
-double Calculations::convertTemperature(double refTempDegC, int units) {
+double Calculations::convertTemperature(double refTemp, int unitsOut, int unitsIn) {
 
   double refTempDegF;
   double refTempRankine;
 
-  switch (units) 	{
+  double inputTempDegC;
+  double convertedTemp;
+
+
+    // First convert input Temperature to DegC
+  switch (unitsIn) {
 
     case DEGF:
-      refTempDegF = refTempDegC * 1.8;
-      return refTempDegF;
+      inputTempDegC = (refTemp - 32) * 0.5556;
       break;
 
     case RANKINE:
-      refTempRankine = (refTempDegC + 273.15 ) * 9 / 5;
-      return refTempRankine;
+      inputTempDegC = (refTemp - 491.67) * 0.5556;
       break;
 
     case KELVIN:
+      inputTempDegC = refTemp - 273.15;
+      break;
+
+    default: // DEGC
+      inputTempDegC = refTemp;
+      break;
+
+
+  }
+
+  // Then convert DegC to required value and return
+  switch (unitsOut) 	{
+
+    case DEGF:
+      convertedTemp = (inputTempDegC * 1.8) + 32;
+      return convertedTemp;
+      break;
+
+    case RANKINE:
+      convertedTemp = (inputTempDegC + 273.15 ) * 1.8;
+      return convertedTemp;
+      break;
+
+    case KELVIN:
+      convertedTemp = inputTempDegC + 273.15;
+      return convertedTemp;
+      break;
+
+    case DEGC:
     default:
-      return refTempDegC + 273.15;
+      return inputTempDegC;
       break;
 
   }
 
-  return refTempDegC;
+  return 0.00001; // else return small non zero value which will get filtered out as zero
 }
 
 
@@ -345,40 +412,62 @@ double Calculations::calculateFlowCFM(int mafValue, int maxValue ) {
   flowRateCFM = convertMassFlowToVolumetric(flowRateKGH);
 
 /*** Orifice Style Bench ***/
-#elif defined ORIFICE_STYLE_BENCH //ratiometric
+// NOTE Ideally orifice should not be larger than 50% of your pipe size
+#elif defined ORIFICE_STYLE_BENCH // ratiometric
 
-  // We use the ref pressure + differential pressure (pressure drop) across the orifice to calculate the flow. The pressure drop across an orifice is the square of the flow. If flow doubles, pressure goes up 4 times, therefore the scale is exponential.
-  // Assuming that the test pressure = pressure that orifices were calibrated at...
-  // If diff pressure = 0 and the bench is running we must be flowing 100% of calibrated orifice flow rate
-  // If diff pressure is equal to the ref pressure we must be flowing zero
-  // All other values are somewhere in between and can be expressed as an exponent (ratio) of the orifice's calibrated flow rate
-  // #1 We need to know what orifice we are using - Get selected orifice flow + ref pressure it was calibrated at
-  // #2 Convert orifice flow for current test (ref) pressure
-  // #3 Calculate flow as percentage of the reference orifice flow rate
 
-  flowRateCFM = 0;
+  double refPressure = sensorVal.PRefKPA;
+  double diffPressure = sensorVal.PDiffKPA;
 
-  // TODO: we should convert CFM to MASS flow and also report this figure as ultimately it is more useful
+  //get currently selected orifice + calibration depression
+
+  //Simplified Flow calculation. Source - https://www.youtube.com/watch?v=Dn16HZ_oHEo
+  // flowRateCFM = OrificeCalibratedflowCFM * SQRT(diffPressure / OrificeCalibratedPressure);
+
 
 
 /*** Venturi Style Bench ***/
-#elif defined VENTURI_STYLE_BENCH  //ratiometric
+// NOTE Ideally venturi should not be larger than 50% of your pipe size
+// https://www.engineersedge.com/fluid_flow/venturi_flow_equation_and_calculator_14001.htm
+#elif defined VENTURI_STYLE_BENCH  // ratiometric
 
-  // same process as per orifice style bench. Different size orifices are used for different flow rates
+  double refPressure = sensorVal.PRef;
+  double diffPressure = sensorVal.PDiff;
 
-  flowRateCFM = 0;
+  //Simplified Flow calculation. Source - https://www.youtube.com/watch?v=Dn16HZ_oHEo
+  flowRateCFM = OrificeCalibratedflowCFM * SQRT(diffPressure / OrificeCalibratedPressure);
 
-  // TODO: we should convert CFM to MASS flow and also report this figure as ultimately it is more useful
-
+  
 
 /*** Pitot Style Bench ***/
-#elif defined PITOT_STYLE_BENCH //ratiometric
+// Diameter of pipe is required (set in config)
+#elif defined PITOT_STYLE_BENCH // ratiometric
 
-  // Similar process to both orifice and Venturi but requires static pressure data
+  /*
+  
+  https://www.youtube.com/watch?v=Dn16HZ_oHEo
 
-  flowRateCFM = 0;
+  Vfpm = SQRT(P1-P2) * 40004.4 * Kf
 
-  // TODO: we should convert CFM to MASS flow and also report this figure as ultimately it is more useful
+  Where:
+  P1 = Stagnation pressure [Pitot]
+  P2 = Static pressure [PRef]
+  P1-P2 = Dynamic pressure
+  Kf = Correction factor for pitot tube (or test pressure )
+  Vfpm = Velocity in feet per second
+
+  CFM = Vfpm * Pi*R^2 
+
+  Where:
+  R = radius of pipe in feet
+
+
+  */
+  
+  Vfpm = SQRT(P1-P2) * 40004.4 * Kf;
+
+  flowRateCFM = convertVelocityToVolumetric(Vfpm, PIPE_RADIUS_IN_FEET);
+
 
 #endif
 
@@ -416,5 +505,23 @@ double Calculations::convertFlowDepression(double oldPressure, double newPressur
   double pressureRatio = (newPressure / oldPressure);
   outputFlow = (sqrt(pressureRatio) * inputFlow);
   return outputFlow;
+  
+}
+
+
+
+/***********************************************************
+ * @brief Convert velocity to volumetric flow
+ * @param velocity Velocity of air in feet per minute
+ * @param pipeRadius radius of pipe in feet
+ ***/
+
+double Calculations::convertVelocityToVolumetric(double velocityFpm, double pipeRadiusFt) {
+
+  double CFM;
+  
+  CFM = velocityFpm * pow(PI * pipeRadiusFt, 2) ;
+
+  return CFM;
   
 }

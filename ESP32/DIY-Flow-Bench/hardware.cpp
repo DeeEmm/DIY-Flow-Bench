@@ -357,7 +357,7 @@ bool Hardware::benchIsRunning() {
   extern struct SensorData sensorVal;
   
   // TODO: Check scope of these...
-  double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INWG);
+  double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
   double mafFlowRateCFM = _calculations.calculateFlowCFM(_sensors.getMafRaw());
 
   if ((refPressure > config.min_bench_pressure))
@@ -384,7 +384,7 @@ void Hardware::checkRefPressure() {
   extern struct ConfigSettings config;
   extern struct Translator translate;
   
-  double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INWG);
+  double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
     
   // REVIEW  - Ref pressure check
   // Check that pressure does not fall below limit set by MIN_TEST_PRESSURE_PERCENTAGE when bench is running

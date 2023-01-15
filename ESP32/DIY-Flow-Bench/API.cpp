@@ -156,7 +156,8 @@ void API::ParseMessage(char apiMessage) {
   V : Version
   X : xTask memory usage   
   ? : Help
-  ~ : Restart
+  ~ : Restart ESP
+  $ : Reset WiFi
   @ : Stream Status
   ! : Debug Mode
   < : Last Error
@@ -278,7 +279,7 @@ void API::ParseMessage(char apiMessage) {
       break;      
   
       case 'R': // Get measured Reference Pressure 'R.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "R%s%f", config.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INWG));
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "R%s%f", config.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INH2O));
       break;
       
       case 'r': // Get Reference Pressure sensor output voltage          
@@ -353,13 +354,20 @@ void API::ParseMessage(char apiMessage) {
         snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s\n", apiHelpText);
       break;
       
-      case '<': //Display last error
-        snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s\n", "No error in buffer");
+      case '<': // Display last error
+        snprintf(apiResponseBlob, API_BLOB_LENGTH, "%s", "No error in buffer");
       break;
       
-      case '~': //Restart
-        snprintf(apiResponse, API_RESPONSE_LENGTH, "\n%s\n", "Restarting...");
+      case '~': //ESP Restart
+        snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", "Restarting...");
         ESP.restart();
+      break;
+
+      case '$': // Recover server
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", "Attempting to recover WiFi Connection");
+          // config.api_enabled = false;
+          _webserver.wifiReconnect();
+          // config.api_enabled = true;
       break;
       
       // We've got here without a valid API request so lets get outta here before we send garbage to the serial comms

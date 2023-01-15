@@ -37,9 +37,9 @@ if (!!window.EventSource) {
         } else {
           document.getElementById(key).innerHTML = myObj[key].toFixed(2); 
         }
-        // console.log(key + ' : ' + myObj[key]);
       } catch (error) {
         console.log('Missing or incorrect data');
+        console.log(key + ' : ' + myObj[key]);
       }
     } 
 

@@ -50,6 +50,7 @@ class Webserver {
 		void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 		static void saveConfig(AsyncWebServerRequest *request);
+		static void setOrifice(AsyncWebServerRequest *request);
 		int decodeMessageHeader (char *data);
 		static String processTemplate(const String& var);
 		
@@ -59,7 +60,6 @@ class Webserver {
 		void sendIndexPage();
 		void uploadFile();
 		String index_html;
-		void resetWifi ( void );
 		bool getWifiConnection();
 		
 	public:
@@ -79,6 +79,9 @@ class Webserver {
 		void parseConfigData(StaticJsonDocument<1024> configData);
 		StaticJsonDocument<1024> loadConfig ();
 		void createConfigFile ();
+		void resetWifi ( void );
+		void wifiReconnect ( void );
+
 		
 
 		

@@ -63,7 +63,16 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 !! Most recent entry at top !!
 
 Build #         - Description of Change
-
+                
+23011501        - #114 default to AP mode if Wifi pass unedited
+23010601        - Changed template delimiter to use ~ instead of %
+23010201        - Added WiFi recovery command to API
+                - Changed INWG to INH2O for continuity in terminology
+                - Added default output for convert pressure calc
+                - Fixed ADS / ADC reference bug
+22122401        - Started on development of differential pressure code
+                - Basic orifice control implemented
+22122001        - Updated temperature and pressure conversions to accept variable input types
 22121901        - Renamed MAF Vars to remove ambiguity
                 - Added ability to change temperature units in GUI
                 - Minor bugfixes

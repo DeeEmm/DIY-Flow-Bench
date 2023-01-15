@@ -52,13 +52,11 @@ void Webserver::begin()
   extern struct Translator translate;
   extern DeviceStatus status;
 
-
   server = new AsyncWebServer(80);
   events = new AsyncEventSource("/events");
 
   Messages _message;
   Calibration _calibration;
-
 
   // Filesystem
   _message.serialPrintf("File System Initialisation...\n");
@@ -83,6 +81,13 @@ void Webserver::begin()
   this->loadConfig();
   _calibration.loadCalibration();
 
+  // if WiFi pass is unedited or blank fall back to AP mode
+  if ((strstr(String(config.wifi_pswd).c_str(), String("WIFI-PASS").c_str())) || (String(config.wifi_pswd).c_str() == "")) {
+    config.ap_mode = true;
+  } else {
+    config.ap_mode = false;
+  }
+
   // Filesystem info
   status.spiffs_mem_size = SPIFFS.totalBytes();
   status.spiffs_mem_used = SPIFFS.usedBytes();
@@ -99,20 +104,26 @@ void Webserver::begin()
   // WiFi.useStaticBuffers(true); 
   WiFi.mode(WIFI_STA);
   
-  if (this->getWifiConnection() == true) {
+  // Connect to Wifi if WiFi password has been edited, otherwise create an accesspoint
+  if (this->getWifiConnection() == true && config.ap_mode != true) { 
     // Connection success
     _message.serialPrintf("\nConnected to %s \n", config.wifi_ssid);
     status.local_ip_address = WiFi.localIP().toString().c_str();
     _message.serialPrintf("IP address: %s \n", WiFi.localIP().toString().c_str());
+    WiFi.setAutoReconnect(true);
     WiFi.persistent(true);
   }  else  {
-    // Did not connect - Go into AP Mode
-    status.apMode = true;
-    _message.serialPrintf("\nFailed to connect to Wifi \n");
+    // Go into AP Mode
+    if (config.ap_mode == true) {
+      _message.serialPrintf("\nDefaulting to AP Mode \n");
+    } else {
+      _message.serialPrintf("\nFailed to connect to Wifi \n");
+    }
     _message.serialPrintf("Creating WiFi Access Point:  %s  \n", config.wifi_ap_ssid); // NOTE: Default AP SSID / PW = DIYFB / 123456789
     WiFi.softAP(config.wifi_ap_ssid, config.wifi_ap_pswd);
     status.local_ip_address = WiFi.localIP().toString().c_str();
     _message.serialPrintf("Access Point IP address: %s \n", WiFi.localIP().toString().c_str());
+    status.apMode = true;
   }
 
   // Set up Multicast DNS
@@ -254,6 +265,9 @@ void Webserver::begin()
   // Save Configuration Form
   server->on("/api/saveconfig", HTTP_POST, saveConfig);
 
+  // Save Orifice Form
+  server->on("/api/setorifice", HTTP_POST, setOrifice);
+
   server->rewrite("/index.html", "/");
 
   // Style sheet request handler
@@ -273,9 +287,9 @@ void Webserver::begin()
   server->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
       if (SPIFFS.exists("/index.html")) {
         request->send(SPIFFS, "/index.html", "text/html", false, processTemplate);
-      } else {
+       } else {
         request->send(200, "text/html", LANG_VAL_INDEX_HTML); 
-      } });
+      }});
 
   server->onFileUpload(processUpload);
   server->addHandler(events);
@@ -508,6 +522,35 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
 }
 
 
+/***********************************************************
+ * @brief setOrifice
+ * @details Sets selected orifice and loads orifice data
+ ***/
+void Webserver::setOrifice(AsyncWebServerRequest *request)
+{
+
+  Messages _message;
+  Webserver _webserver;
+
+  int params = request->params();
+
+  // Convert POST vars to JSON 
+  for(int i=0;i<params;i++){
+
+    // Test to see which radio is selected
+    
+    AsyncWebParameter* p = request->getParam(i);
+      // configData[p->name().c_str()] = p->value().c_str();
+
+    // Then load orifice data into memory 
+  }
+
+}
+
+
+
+
+
 
 /***********************************************************
  * @brief getFileListJSON
@@ -689,6 +732,7 @@ String Webserver::processTemplate(const String &var)
   DynamicJsonDocument doc(1024);
 
   String fileList;
+  String orificeList;
 
   // Serial.println(var);
 
@@ -714,6 +758,33 @@ String Webserver::processTemplate(const String &var)
   if (var == "PDIFF_SENSOR") return String(status.pdiffSensor);
   if (var == "STATUS_MESSAGE") return String(status.statusMessage);
 
+  // Orifice Settings
+  #ifdef ORIFICE_STYLE_BENCH
+  if (var == "ORIFICE_LIST"){ 
+    orificeList =  R"END(
+    <form method="POST" action="/api/setorifice">
+      <div class="switch-field">
+        <input type="radio" id="orifice-one" name="switch-one" value="1" checked/>
+        <label for="orifice-one">1</label>
+        <input type="radio" id="orifice-two" name="switch-one" value="2" />
+        <label for="orifice-two">2</label>
+        <input type="radio" id="orifice-three" name="switch-one" value="3"/>
+        <label for="orifice-three">3</label>
+        <input type="radio" id="orifice-four" name="switch-one" value="4" />
+        <label for="orifice-four">4</label>
+        <input type="radio" id="orifice-five" name="switch-one" value="5" />
+        <label for="orifice-five">5</label>
+        <input type="radio" id="orifice-six" name="switch-one" value="6" />
+        <label for="orifice-six">6</label>
+      </div>
+      <div id="orifice-data">Orifice #%SELECTED_ORIFICE% Flow Max: %ORIFICE_MAX_FLOW%cfm @ %ORIFICE_CALIBRATED_DEPRESSION%"</div>
+    </form>
+    )END" ;
+
+    return orificeList;
+  }
+  #endif
+  
   // Wifi Settings
   if (var == "CONF_WIFI_SSID") return String(config.wifi_ssid);
   if (var == "CONF_WIFI_PSWD") return String(config.wifi_pswd);
@@ -794,6 +865,22 @@ void Webserver::resetWifi ( void ) {
 
 
 
+/***********************************************************
+ * @brief reset wifi connection
+ * @note helps to overcome ESP32/Arduino Wifi bug [#111]
+ * @note https://github.com/espressif/arduino-esp32/issues/2501
+ * @note instantiated via API call
+ * @todo instatiate via I/O (pushbutton)
+ ***/
+void Webserver::wifiReconnect ( void ) {
+
+  WiFi.reconnect();
+    
+}
+
+
+
+
 
 /***********************************************************
  * @brief get wifi connection
@@ -831,7 +918,7 @@ bool Webserver::getWifiConnection(){
   }
 
   wifiConnectionStatus = WiFi.status();
-  
+ 
   return (wifiConnectionStatus == WL_CONNECTED ? true : false);
 
 }

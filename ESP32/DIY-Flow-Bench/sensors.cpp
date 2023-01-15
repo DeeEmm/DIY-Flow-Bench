@@ -188,9 +188,9 @@ void Sensors::initialise () {
 	// reference pressure
 	#ifdef PREF_SENSOR_NOT_USED
 		this->_prefSensorType = translate.LANG_VAL_NOT_ENABLED;
-	#elif defined PREF_SENSOR_TYPE_MPXV7007 && defined ADS_IS_ENABLED
+	#elif defined PREF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_prefSensorType = "SMPXV7007";
-	#elif defined PREF_SENSOR_TYPE_MPX4250 && defined ADS_IS_ENABLED
+	#elif defined PREF_SENSOR_TYPE_MPX4250 && defined ADC_IS_ENABLED
 		this->_prefSensorType = "MPX4250";
 	#elif defined PREF_SENSOR_TYPE_LINEAR_ANALOG
 		this->_prefSensorType = "ANALOG PIN: " + REF_PRESSURE_PIN;
@@ -201,7 +201,7 @@ void Sensors::initialise () {
 	// differential pressure
 	#ifdef PDIFF_SENSOR_NOT_USED
 		this->_pdiffSensorType = translate.LANG_VAL_NOT_ENABLED;
-	#elif defined PDIFF_SENSOR_TYPE_MPXV7007 && defined ADS_IS_ENABLED
+	#elif defined PDIFF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_pdiffSensorType = "SMPXV7007";
 	#elif defined PDIFF_SENSOR_TYPE_LINEAR_ANALOG
 		this->_pdiffSensorType = "ANALOG PIN: " + DIFF_PRESSURE_PIN;
@@ -212,7 +212,7 @@ void Sensors::initialise () {
 	// pitot pressure differential
     #ifdef PITOT_SENSOR_NOT_USED
 		this->_pitotSensorType = translate.LANG_VAL_NOT_ENABLED;
-	#elif defined PITOT_SENSOR_TYPE_MPXV7007 && defined ADS_IS_ENABLED
+	#elif defined PITOT_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_pitotSensorType = "SMPXV7007";
 	#elif defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
 		this->_pitotSensorType = "ANALOG PIN: " + PITOT_PIN;
@@ -289,7 +289,7 @@ double Sensors::getMafVolts() {
 		sensorVolts += MAF_MV_TRIMPOT;
 		return sensorVolts;
 	} else {
-		return 1.0;
+		return 0.0;
 	}	
 	
 }
@@ -336,7 +336,7 @@ int Sensors::getMafRaw() {
 
 	#endif
 
-	return 1; // MAF is disabled so lets return 1
+	return 0; // MAF is disabled so lets return 1
 }
 
 
@@ -373,7 +373,7 @@ double Sensors::getPRefVolts() {
 		sensorVolts += PREF_MV_TRIMPOT;
 		return sensorVolts;
 	} else { 
-		return 1.0;
+		return 0.0;
 	}
 
 
@@ -402,7 +402,7 @@ double Sensors::getPRefValue() {
 	#elif defined PREF_SENSOR_TYPE_MPXV7007
 
 		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
-		// sensorVal = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
+		// sensorVal (kPa) = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
 		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
 
 	#else
@@ -412,10 +412,10 @@ double Sensors::getPRefValue() {
 	#endif
 
 	// Lets make sure we have a valid value to return
-	if (sensorVal > 0 && sensorVolts > 0) { 
+	if (sensorVal > 0) { 
 		return sensorVal;
 	} else { 
-		return 1.0;
+		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in display)
 	}
 
 
@@ -456,7 +456,7 @@ double Sensors::getPDiffVolts() {
 		sensorVolts += PDIFF_MV_TRIMPOT;
 		return sensorVolts;
 	} else {
-		return 1;
+		return 0;
 	}
 	
 }
@@ -497,7 +497,7 @@ double Sensors::getPDiffValue() {
 	if (sensorVal > 0) {
 		return sensorVal;
 	} else {
-		return 1.0;
+		return 0.0001;
 	}
 
 }
@@ -536,7 +536,7 @@ double Sensors::getPitotVolts() {
 		sensorVolts += PITOT_MV_TRIMPOT;
 		return sensorVolts;
 	} else {
-		return 1.0;
+		return 0.0;
 	}
 	
 	
@@ -580,7 +580,7 @@ double Sensors::getPitotValue() {
 	if (sensorVal > 0) {
 		return sensorVal;
 	} else {
-		return 1.0;
+		return 0.0001;
 	}
 
 }

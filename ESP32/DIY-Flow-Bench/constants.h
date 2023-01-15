@@ -42,7 +42,7 @@
  ***/
 #define  RAW 0
 #define  DECI 0
-#define  INWG 1
+#define  INH2O 1
 #define  KPA 2
 #define  PSIA 3
 #define  DEGC 4
