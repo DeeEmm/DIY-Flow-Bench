@@ -44,6 +44,15 @@
 /***********************************************************
  * @brief INITIALISE SERVER
  *
+ * Value	Constant	Meaning
+ * 0	WL_IDLE_STATUS	temporary status assigned when WiFi.begin() is called
+ * 1	WL_NO_SSID_AVAIL	 when no SSID are available
+ * 2	WL_SCAN_COMPLETED	scan networks is completed
+ * 3	WL_CONNECTED	when connected to a WiFi network
+ * 4	WL_CONNECT_FAILED	when the connection fails for all the attempts
+ * 5	WL_CONNECTION_LOST	when the connection is lost
+ * 6	WL_DISCONNECTED	when disconnected from a network
+ * 
  ***/
 void Webserver::begin()
 {
@@ -51,6 +60,8 @@ void Webserver::begin()
   extern struct ConfigSettings config;
   extern struct Translator translate;
   extern DeviceStatus status;
+
+  int wifiStatusCode;
 
   server = new AsyncWebServer(80);
   events = new AsyncEventSource("/events");
@@ -81,7 +92,7 @@ void Webserver::begin()
   this->loadConfig();
   _calibration.loadCalibration();
 
-  // if WiFi pass is unedited or blank fall back to AP mode
+  // if WiFi pass is unedited or blank force AP mode
   if ((strstr(String(config.wifi_pswd).c_str(), String("WIFI-PASS").c_str())) || (String(config.wifi_pswd).c_str() == "")) {
     config.ap_mode = true;
   } else {
@@ -103,10 +114,13 @@ void Webserver::begin()
   this->resetWifi();
   // WiFi.useStaticBuffers(true); 
   WiFi.mode(WIFI_STA);
+
+  // Connect to Wifi otherwise create an accesspoint
+  wifiStatusCode = this->getWifiConnection();
   
-  // Connect to Wifi if WiFi password has been edited, otherwise create an accesspoint
-  if (this->getWifiConnection() == true && config.ap_mode != true) { 
-    // Connection success
+  // Report connection success otherwise create an accesspoint
+  if (wifiStatusCode == 3 && config.ap_mode != true) { 
+    // STA Connection success
     _message.serialPrintf("\nConnected to %s \n", config.wifi_ssid);
     status.local_ip_address = WiFi.localIP().toString().c_str();
     _message.serialPrintf("IP address: %s \n", WiFi.localIP().toString().c_str());
@@ -118,6 +132,9 @@ void Webserver::begin()
       _message.serialPrintf("\nDefaulting to AP Mode \n");
     } else {
       _message.serialPrintf("\nFailed to connect to Wifi \n");
+      _message.serialPrintf("Wifi Status message: ");
+      _message.serialPrintf(String(wifiStatusCode).c_str());
+      _message.serialPrintf("\n");
     }
     _message.serialPrintf("Creating WiFi Access Point:  %s  \n", config.wifi_ap_ssid); // NOTE: Default AP SSID / PW = DIYFB / 123456789
     WiFi.softAP(config.wifi_ap_ssid, config.wifi_ap_pswd);
@@ -884,14 +901,14 @@ void Webserver::wifiReconnect ( void ) {
 
 /***********************************************************
  * @brief get wifi connection
- * @return true if connection to STA successful
+ * @return status value
  * @var wifi_retries : number of retry attempts
  * @var wifi_timeout : duration of connection attempt
  * @note Starts with WiFi double hit (workaround for known bug in ESPAws)
  * @note Retries connection multiple times for duration of predefined milliseconds
  * @note Resets connection three times if not successful (max attempts / 3)
  ***/
-bool Webserver::getWifiConnection(){
+int Webserver::getWifiConnection(){
 
   Messages _message;
   extern struct ConfigSettings config;
@@ -899,26 +916,45 @@ bool Webserver::getWifiConnection(){
   uint8_t wifiConnectionAttempt = 0;
   uint8_t wifiConnectionStatus;
   unsigned long timeOut;
+  uint8_t status;
 
   // Double hit WiFi connection - hit #1
   WiFi.begin(config.wifi_ssid, config.wifi_pswd);
   this->resetWifi(); // force reset
 
+  // DEPRECATED ????
   // Double hit WiFi connection - hit #2 and keep hitting if not succesful
-  while (WiFi.status() != WL_CONNECTED && wifiConnectionAttempt < config.wifi_retries) {
-    WiFi.begin(config.wifi_ssid, config.wifi_pswd); 
-    _message.serialPrintf(".");
-    vTaskDelay (config.wifi_timeout);
-    // force reset 
-    if((wifiConnectionAttempt == config.wifi_retries / 3) || (wifiConnectionAttempt == (config.wifi_retries / 3) * 2)) { 
-      this->resetWifi(); 
-    } else {
-      wifiConnectionAttempt++;
-    }
+  // while (WiFi.status() != WL_CONNECTED && wifiConnectionAttempt < config.wifi_retries) {
+  //   WiFi.begin(config.wifi_ssid, config.wifi_pswd); 
+  //   _message.serialPrintf(".");
+  //   vTaskDelay (config.wifi_timeout);
+  //   // force reset 
+  //   if((wifiConnectionAttempt == config.wifi_retries / 3) || (wifiConnectionAttempt == (config.wifi_retries / 3) * 2)) { 
+  //     this->resetWifi(); 
+  //   } else {
+  //     wifiConnectionAttempt++;
+  //   }
+  // }
+
+
+  // REVIEW - Test using waitForConnectResult() to address issue reported by blacktop in discussion #104
+  for(;;) {
+          
+          WiFi.begin(config.wifi_ssid, config.wifi_pswd); 
+          _message.serialPrintf(".");
+          // vTaskDelay (config.wifi_timeout); // is timeout needed with waitForConnectResult() ????
+
+          wifiConnectionStatus = WiFi.waitForConnectResult();
+
+          // NOTE we can print connection status to serial monitor here if needed
+
+          if (wifiConnectionStatus == WL_CONNECTED || wifiConnectionAttempt > config.wifi_retries)  break;
+
+          wifiConnectionAttempt++;
   }
 
-  wifiConnectionStatus = WiFi.status();
  
-  return (wifiConnectionStatus == WL_CONNECTED ? true : false);
+  // return (wifiConnectionStatus == WL_CONNECTED ? true : false);
+  return wifiConnectionStatus;
 
 }

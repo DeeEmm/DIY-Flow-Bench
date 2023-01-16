@@ -60,7 +60,7 @@ class Webserver {
 		void sendIndexPage();
 		void uploadFile();
 		String index_html;
-		bool getWifiConnection();
+		int getWifiConnection();
 		
 	public:
 	
