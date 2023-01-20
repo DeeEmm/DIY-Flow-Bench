@@ -35,7 +35,7 @@ Maf::Maf() {
  * @note Description of MAF type
  *
  ***/
-String Maf::getMafSensorType() {
+String Maf::sensorType() {
     return "ACDELCO_92281162";
 }
 
@@ -48,7 +48,7 @@ String Maf::getMafSensorType() {
  * VOLTAGE
  * FREQUENCY
  ***/
-int Maf::getMafOutputType() {
+int Maf::outputType() {
     return VOLTAGE;
 }
 
@@ -61,7 +61,7 @@ int Maf::getMafOutputType() {
  * KG_H
  * MG_S
  ***/
-int Maf::getMafUnits() {
+int Maf::mafUnits() {
     return MG_S;
 }
 

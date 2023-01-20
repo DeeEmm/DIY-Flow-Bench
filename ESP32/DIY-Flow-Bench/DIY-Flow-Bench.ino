@@ -184,7 +184,7 @@ void setup(void) {
   _hardware.begin();
   _sensors.begin();
 
-    // Confirm default core - NOTE: setup() and loop() are automatically created on default core 
+  // Confirm default core - NOTE: setup() and loop() are automatically created on default core 
   uint8_t defaultCore = xPortGetCoreID();                   // This core (1)
   uint8_t secondaryCore = (defaultCore > 0 ? 0 : 1);        // Secondary core (0)
 

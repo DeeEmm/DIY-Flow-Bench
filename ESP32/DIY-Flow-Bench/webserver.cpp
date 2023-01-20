@@ -913,16 +913,15 @@ int Webserver::getWifiConnection(){
   Messages _message;
   extern struct ConfigSettings config;
   
-  uint8_t wifiConnectionAttempt = 0;
+  uint8_t wifiConnectionAttempt = 1;
   uint8_t wifiConnectionStatus;
   unsigned long timeOut;
   uint8_t status;
 
-  // Double hit WiFi connection - hit #1
-  WiFi.begin(config.wifi_ssid, config.wifi_pswd);
-  this->resetWifi(); // force reset
-
   // DEPRECATED ????
+  // Double hit WiFi connection - hit #1
+  // WiFi.begin(config.wifi_ssid, config.wifi_pswd);
+  // this->resetWifi(); // force reset
   // Double hit WiFi connection - hit #2 and keep hitting if not succesful
   // while (WiFi.status() != WL_CONNECTED && wifiConnectionAttempt < config.wifi_retries) {
   //   WiFi.begin(config.wifi_ssid, config.wifi_pswd); 
@@ -938,18 +937,17 @@ int Webserver::getWifiConnection(){
 
 
   // REVIEW - Test using waitForConnectResult() to address issue reported by blacktop in discussion #104
+  // Initial observations are that this method is much faster and more robust. Suspect using wifi.status() may have led to timing issue??
   for(;;) {
           
           WiFi.begin(config.wifi_ssid, config.wifi_pswd); 
-          _message.serialPrintf(".");
           // vTaskDelay (config.wifi_timeout); // is timeout needed with waitForConnectResult() ????
-
           wifiConnectionStatus = WiFi.waitForConnectResult();
 
           // NOTE we can print connection status to serial monitor here if needed
 
           if (wifiConnectionStatus == WL_CONNECTED || wifiConnectionAttempt > config.wifi_retries)  break;
-
+          _message.serialPrintf(".");
           wifiConnectionAttempt++;
   }
 

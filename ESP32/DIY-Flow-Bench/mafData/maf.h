@@ -35,9 +35,9 @@ class Maf {
         int mafOutputType;
         int mafDataUnit;
 
-        String getMafSensorType();
-        int getMafOutputType();
-        int getMafUnits();
+        String sensorType();
+        int outputType();
+        int mafUnits();
 
         static std::vector<std::vector<int>> mafLookupTable;
 

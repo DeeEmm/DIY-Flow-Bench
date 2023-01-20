@@ -34,7 +34,7 @@ Maf::Maf() {
  * @note Description of MAF type
  *
  ***/
-String Maf::getMafSensorType() {
+String Maf::sensorType() {
     return "SIEMENS_5WK9605";
 }
  
@@ -47,7 +47,7 @@ String Maf::getMafSensorType() {
  * VOLTAGE
  * FREQUENCY
  ***/
-int Maf::getMafOutputType() {
+int Maf::outputType() {
     return VOLTAGE;
 }
 
@@ -60,7 +60,7 @@ int Maf::getMafOutputType() {
  * KG_H
  * MG_S
  ***/
-int Maf::getMafUnits() {
+int Maf::mafUnits() {
     return KG_H;
 }
 

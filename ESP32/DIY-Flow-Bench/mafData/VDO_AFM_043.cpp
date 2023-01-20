@@ -33,7 +33,7 @@ Maf::Maf() {
  * @note Description of MAF type
  *
  ***/
-String Maf::getMafSensorType() {
+String Maf::sensorType() {
     return "VDO_AFM_043";
 }
 
@@ -46,7 +46,7 @@ String Maf::getMafSensorType() {
  * VOLTAGE
  * FREQUENCY
  ***/
-int Maf::getMafOutputType() {
+int Maf::outputType() {
     return FREQUENCY;
 }
 
@@ -59,7 +59,7 @@ int Maf::getMafOutputType() {
  * KG_H
  * MG_S
  ***/
-int Maf::getMafUnits() {
+int Maf::mafUnits() {
     return MG_S;
 }
 

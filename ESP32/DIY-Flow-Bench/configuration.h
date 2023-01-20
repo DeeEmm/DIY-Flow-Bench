@@ -26,7 +26,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "23011601"
+#define BUILD_NUMBER "23012001"
 #define RELEASE "V.2.0-RC.3-WIP"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
@@ -235,6 +235,7 @@ const int ADC_I2C_ADDR = 0x48;
 // #define PREF_SENSOR_NOT_USED
 // #define PREF_SENSOR_TYPE_LINEAR_ANALOG 
 #define PREF_SENSOR_TYPE_MPXV7007        
+
 
 #define PREF_MV_TRIMPOT 0.0                               // Millivolt offset
 #define PREF_ANALOG_SCALE 1.0                             // Scaling factor used for raw analog value

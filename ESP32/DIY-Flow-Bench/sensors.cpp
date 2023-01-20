@@ -115,7 +115,7 @@ void Sensors::initialise () {
 	// Note Frequency based MAFs are required to be attached direct to MAF pin for pulse counter to work
 	// This means 5v > 3.3v signal conditioning is required on MAF pin
 /* temp disabled - need to reenable	
-	if (_mafdata.getMafOutputType == FREQUENCY) {	
+	if (_mafdata.outputType == FREQUENCY) {	
 		__mafVoodoo.mafSetupISR(MAF_PIN, []{__mafVoodoo.mafFreqCountISR();}, FALLING);
 		timer = timerBegin(0, 2, true);                                  
 		timerStart(timer);	
@@ -126,9 +126,9 @@ void Sensors::initialise () {
 	// Sensor definitions for system status pane
 	// MAF Sensor
 	#if defined MAF_IS_ENABLED && defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
-		this->_mafSensorType = _mafdata.getMafSensorType();
+		this->_mafSensorType = _mafdata.sensorType();
 	#elif defined MAF_IS_ENABLED && defined MAF_SRC_IS_PIN
-		this->_mafSensorType = _mafdata.getMafSensorType() + " on GPIO:" + MAF_PIN;
+		this->_mafSensorType = _mafdata.sensorType() + " on GPIO:" + MAF_PIN;
 	#else
 		this->_mafSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#endif
@@ -307,7 +307,7 @@ int Sensors::getMafRaw() {
 	#ifdef MAF_IS_ENABLED
 	Maf _mafdata;
 
-	switch (_mafdata.getMafOutputType()) {
+	switch (_mafdata.outputType()) {
 		
 		case VOLTAGE:
 		{
@@ -334,9 +334,11 @@ int Sensors::getMafRaw() {
 	
 	return mafFlowRaw;
 
-	#endif
+	#else
 
 	return 0; // MAF is disabled so lets return 1
+
+	#endif
 }
 
 

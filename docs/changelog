@@ -64,6 +64,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
                 
+23012001        - Changed variable names in mafData files
+                - Updated readme
 23011601        - Changed wifi connection to return status value 
                 - Changed wifi connection to use waitForConnectResult() instead of status()
 23011501        - #114 default to AP mode if Wifi pass unedited
