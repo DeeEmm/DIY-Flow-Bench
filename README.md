@@ -2,7 +2,7 @@
 
 ![DIY Flow Bench Web Interface](https://user-images.githubusercontent.com/3038710/126745200-fead302f-e0aa-48b6-8165-f72902b1edac.png)
 
-![Discord](https://img.shields.io/discord/762838042447708182?logo=discord)
+![GitHub forks](https://img.shields.io/github/forks/deeemm/diy-flow-bench?style=social) &nbsp;&nbsp; ![GitHub Repo stars](https://img.shields.io/github/stars/deeemm/diy-flow-bench?style=social) &nbsp;&nbsp; ![GitHub all releases](https://img.shields.io/github/downloads/DeeEmm/DIY-Flow-Bench/total?logo=github) &nbsp;&nbsp; ![GitHub issues](https://img.shields.io/github/issues-raw/deeemm/diy-flow-bench?logo=github) &nbsp;&nbsp; ![GitHub contributors](https://img.shields.io/github/contributors/deeemm/diy-flow-bench?logo=github) &nbsp;&nbsp; ![Discord](https://img.shields.io/discord/762654320444440587?logo=discord) &nbsp;&nbsp; ![GitHub](https://img.shields.io/github/license/deeemm/diy-flow-bench?logo=gnu) 
 
 ## Version Information
 ###
@@ -82,6 +82,13 @@ If you find an issue, or have a feature request, please [raise an issue](https:/
 ###
 
 This software is released under the GPLV3 license. For details on usage please refer to the license file included with this project
+
+## Demo
+###
+
+You can view an online demo of the Web UI at the followng link
+
+[https://diyflowbench.com/demo/](https://diyflowbench.com/demo/)
 
 
 
