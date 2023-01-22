@@ -47,6 +47,8 @@ TwoWire I2CBME = TwoWire(0);
  * @brief Class constructor
  ***/
 Sensors::Sensors() {
+	
+	Messages _message;
 
 }
 
@@ -264,6 +266,30 @@ void IRAM_ATTR Sensors::mafFreqCountISR() {
 
 
 
+
+/***********************************************************
+ * Convert ADC value to millivolts
+ ***/
+ int Sensors::convertADCtoMillivolts(int rawVal) {
+
+	int millivolts;
+	
+	#if defined ADC_TYPE_ADS1015 // 12 bit
+		// 12 bits - sign bit = 11 bit mantissa = 2047 | 6.144v = max voltage (gain) of ADC
+		// millivolts = ((rawVal * (6.144 / 2047)) * 1000); 
+		millivolts = rawVal * 3.0014; 
+	#elif defined ADC_TYPE_ADS1115 // 16 bit
+		// 16 bits - sign bit = 15 bits mantissa = 32767 | 6.144v = max voltage (gain) of ADC
+		// millivolts = ((rawVal * (6.144 / 32767)) * 1000); 
+		millivolts = rawVal * 0.1875057;
+	#endif
+	
+	return millivolts;
+}
+
+
+
+
 /***********************************************************
  * @brief getMafVolts: Returns MAF signal in Volts
  ***/
@@ -341,6 +367,137 @@ int Sensors::getMafRaw() {
 	#endif
 }
 
+
+
+
+/***********************************************************
+ * Read BME280
+ *
+ * Based on: http://www.esp32learning.com/code/esp32-and-bme280-temperature-sensor-example.php
+ ***/
+void Sensors::getBME280RawData() {
+	
+	unsigned int buffer[24];
+	
+	for(int i = 0; i < 24; i++){
+		// Start I2C Transmission
+		Wire.beginTransmission(BME280_I2C_ADDR);
+		// Select data register
+		Wire.write((136+i));
+		// Stop I2C Transmission
+		Wire.endTransmission();
+		 
+		// Request 1 byte of data
+		Wire.requestFrom(BME280_I2C_ADDR, 1);
+		 
+		// Read 24 bytes of data
+		if(Wire.available() == 1){
+			buffer[i] = Wire.read();
+		}
+	}
+	 
+	// Convert the data
+	// temp coefficients
+	this->dig_T1 = (buffer[0] & 0xff) + ((buffer[1] & 0xff) * 256);
+	this->dig_T2 = buffer[2] + (buffer[3] * 256);
+	this->dig_T3 = buffer[4] + (buffer[5] * 256);
+	 
+	// pressure coefficients
+	this->dig_P1 = (buffer[6] & 0xff) + ((buffer[7] & 0xff ) * 256);
+	this->dig_P2 = buffer[8] + (buffer[9] * 256);
+	this->dig_P3 = buffer[10] + (buffer[11] * 256);
+	this->dig_P4 = buffer[12] + (buffer[13] * 256);
+	this->dig_P5 = buffer[14] + (buffer[15] * 256);
+	this->dig_P6 = buffer[16] + (buffer[17] * 256);
+	this->dig_P7 = buffer[18] + (buffer[19] * 256);
+	this->dig_P8 = buffer[20] + (buffer[21] * 256);
+	this->dig_P9 = buffer[22] + (buffer[23] * 256);
+	 
+	// Start I2C Transmission
+	Wire.beginTransmission(BME280_I2C_ADDR);
+	// Select data register
+	Wire.write(161);
+	// Stop I2C Transmission
+	Wire.endTransmission();
+	 
+	// Request 1 byte of data
+	Wire.requestFrom(BME280_I2C_ADDR, 1);
+	 
+	// Read 1 byte of data
+	if(Wire.available() == 1){
+		this->dig_H1 = Wire.read();
+	}
+	 
+	for(int i = 0; i < 7; i++) {
+		// Start I2C Transmission
+		Wire.beginTransmission(BME280_I2C_ADDR);
+		// Select data register
+		Wire.write((225+i));
+		// Stop I2C Transmission
+		Wire.endTransmission();
+		 
+		// Request 1 byte of data
+		Wire.requestFrom(BME280_I2C_ADDR, 1);
+		 
+		// Read 7 bytes of data
+		if(Wire.available() == 1) {
+			buffer[i] = Wire.read();
+		}
+	}
+	 
+	// Convert the data
+	// humidity coefficients
+	int dig_H2 = buffer[0] + (buffer[1] * 256);
+	unsigned int dig_H3 = buffer[2] & 0xFF ;
+	int dig_H4 = (buffer[3] * 16) + (buffer[4] & 0xF);
+	int dig_H5 = (buffer[4] / 16) + (buffer[5] * 16);
+	int dig_H6 = buffer[6];
+	 
+	// Start I2C Transmission
+	Wire.beginTransmission(BME280_I2C_ADDR);
+	// Select control humidity register
+	Wire.write(0xF2);
+	// Humidity over sampling rate = 1
+	Wire.write(0x01);
+	// Stop I2C Transmission
+	Wire.endTransmission();
+	 
+	// Start I2C Transmission
+	Wire.beginTransmission(BME280_I2C_ADDR);
+	// Select control measurement register
+	Wire.write(0xF4);
+	// Normal mode, temp and pressure over sampling rate = 1
+	Wire.write(0x27);
+	// Stop I2C Transmission
+	Wire.endTransmission();
+	 
+	// Start I2C Transmission
+	Wire.beginTransmission(BME280_I2C_ADDR);
+	// Select config register
+	Wire.write(0xF5);
+	// Stand_by time = 1000ms
+	Wire.write(0xA0);
+	// Stop I2C Transmission
+	Wire.endTransmission();
+	 
+	for(int i = 0; i < 8; i++) {
+		// Start I2C Transmission
+		Wire.beginTransmission(BME280_I2C_ADDR);
+		// Select data register
+		Wire.write((247+i));
+		// Stop I2C Transmission
+		Wire.endTransmission();
+		 
+		// Request 1 byte of data
+		Wire.requestFrom(BME280_I2C_ADDR, 1);
+		 
+		// Read 8 bytes of data
+		if(Wire.available() == 1) {
+			data[i] = Wire.read();
+		}
+	}
+	
+}
 
 
 
@@ -732,4 +889,7 @@ double Sensors::getRelHValue() {
 	return relativeHumidity;
 	
 }
+
+
+
 

@@ -168,7 +168,6 @@ void Hardware::initialise () {
 
 
 
-
 /***********************************************************
  * @brief Begin Serial
  *
@@ -189,6 +188,14 @@ void Hardware::beginSerial(void) {
 
 
 
+/***********************************************************
+* GET ADS1015 ADC value
+*
+* Based on: https://github.com/sparkfun/SparkFun_ADS1015_Arduino_Library/blob/master/src/SparkFun_ADS1015_Arduino_Library.cpp
+* and :https://github.com/adafruit/Adafruit_ADS1X15/blob/master/Adafruit_ADS1X15.cpp
+*
+ ***/
+int Hardware::getADCRawData(int channel) {
 
 /***********************************************************
  * @brief Loop through I2C addresses and print list of devices to serial
