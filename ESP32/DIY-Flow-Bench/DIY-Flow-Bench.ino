@@ -242,7 +242,7 @@ void loop () {
         // Push data to client using Server Side Events (SSE)
         jsonString = _webserver.getDataJSON();
 
-        _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis());
+        _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore
       }

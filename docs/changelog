@@ -64,6 +64,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
                 
+23012301        - Updated platformio.ini
 23012001        - Changed variable names in mafData files
                 - Updated readme
 23011601        - Changed wifi connection to return status value 
