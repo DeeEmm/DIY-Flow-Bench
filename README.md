@@ -59,19 +59,20 @@ This branch contains the current release candidate and is based on the ESP32 por
 
 After unit and peer testing is concluded and all bugs are resolved, this version will become the official DIYFB V2 release.
 
-If you use this code and have found issues or have comments relating to the release, please raise an issue in the bugtracker.
+If you use this code and have found issues or have comments relating to the release, please raise an issue in the bugtracker, comment in the support thread for the current version or hit us up at our Discord channel.
 
 - [Bugtracker](https://github.com/DeeEmm/DIY-Flow-Bench/issues)
-- [Discussion for this version](https://github.com/DeeEmm/DIY-Flow-Bench/discussions/49)
+- [Discussion for current version](https://github.com/DeeEmm/DIY-Flow-Bench/discussions) (Pinned to top of page)
 - [Discord Chat](https://discord.gg/eAbktJj)
 
+Please note that support is only provided for the current release so make sure that you are up to date and running the most [current version](https://github.com/DeeEmm/DIY-Flow-Bench/releases).
 
 
 ## Support
 
 Documentation is provided for installation, configuration and use in the [WIKI](https://github.com/DeeEmm/DIY-Flow-Bench/wiki).
 
-If you get stuck, feel free to create a [discussion](https://github.com/DeeEmm/DIY-Flow-Bench/discussions/) in the support forum, or hit us up over on the [Discord](https://discord.gg/eAbktJj) channel.
+If you get stuck, feel free to create a [discussion](https://github.com/DeeEmm/DIY-Flow-Bench/discussions/) in the support forum, or see if anyone is available over on the [Discord](https://discord.gg/eAbktJj) channel.
 
 If you find an issue, or have a feature request, please [raise an issue](https://github.com/DeeEmm/DIY-Flow-Bench/issues)
 
