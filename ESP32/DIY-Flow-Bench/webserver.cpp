@@ -27,7 +27,7 @@
 #include <ESPmDNS.h>
 
 #include <AsyncTCP.h>
-#include <ESPAsyncWebserver.h>
+#include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
 #include "Webserver.h"
@@ -621,6 +621,9 @@ String Webserver::getDataJSON()
 
   StaticJsonDocument<1500> dataJson;
 
+  // Reference pressure
+  dataJson["PREF"] = sensorVal.PRefH2O;
+
   // Flow Rate
   if (sensorVal.FlowCFM > config.min_flow_rate)  {
     dataJson["FLOW"] = sensorVal.FlowCFM;
@@ -643,9 +646,6 @@ String Webserver::getDataJSON()
 
   // Pitot
   dataJson["PITOT"] = sensorVal.PitotKPA;
-
-  // Reference pressure
-  dataJson["PREF"] = sensorVal.PRefKPA;
 
   // Differential pressure
   dataJson["PDIFF"] = sensorVal.PDiffKPA;

@@ -26,8 +26,8 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "23012301"
-#define RELEASE "V.2.0-RC.3-WIP"
+#define BUILD_NUMBER "31012301"
+#define RELEASE "V.2.0-RC.4"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
 
 
@@ -103,7 +103,7 @@
 #define API_JSON_LENGTH 1020
 #define API_SCAN_DELAY_MS 250
 #define PRINT_BUFFER_LENGTH 128
-//#define API_CHECKSUM_IS_ENABLED                           // Add checksum to serial API response TODO: UPDATE CHECKSUM TO NATIVE ESP32 CRC32
+// #define API_CHECKSUM_IS_ENABLED                       
 #define WEBSOCK_CLEAN_FREQ 600000
 #define STATUS_UPDATE_RATE 500                              // time between SSE push in milliseconds
 #define FILESYSTEM SPIFFS

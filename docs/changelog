@@ -63,7 +63,13 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 !! Most recent entry at top !!
 
 Build #         - Description of Change
-                
+
+31012301        - Fixed MAF unit error
+                - Fix Ref depression unit error
+                - Added bench running check to adjusted flow calc
+23012701        - Renamed TASKgetBenchData to TASKgetSensorData
+23012501        - Fixed checksum (CRC32)     
+23012401        - Updated ESP library names for Arduino platform
 23012301        - Updated platformio.ini
 23012001        - Changed variable names in mafData files
                 - Updated readme

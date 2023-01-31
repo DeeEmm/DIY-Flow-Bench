@@ -129,7 +129,7 @@ struct FileUploadData {
  * Sensor data
  ***/
 struct SensorData {
-  double MafRAW = 0.0;
+  long MafRAW = 0;
   double FlowMASS = 0.0;
   double FlowCFM = 0.0;
   double FlowADJ = 0.0;
@@ -141,6 +141,7 @@ struct SensorData {
   double BaroHPA = 0.0;
   double PRefKPA = 0.0;
   double PRefMv = 0.0;
+  double PRefH2O = 0.0;
   double PDiffKPA = 0.0;
   double PDiffMv = 0.0;
   double PitotKPA = 0.0;

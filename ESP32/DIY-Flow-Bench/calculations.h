@@ -30,7 +30,7 @@ class Calculations {
 		
 	public:
 		Calculations();
-		double convertFlowDepression(double oldPressure, double newPressure, double inputFlow);
+		double convertFlowDepression(double oldPressure, double newPressure, double inputFlowCFM);
 		double convertPressure(double inputPressure, int unitsOut, int unitsIn = KPA);
 		double convertTemperature(double refTempDegC, int unitsOut, int unitsIn = DEGC);
 		double convertRelativeHumidity(double relativeHumidity, int units = DECI);
@@ -39,7 +39,7 @@ class Calculations {
 		double calculateSpecificGravity();
 		double convertMassFlowToVolumetric(double massFlowKgh);
 		double convertVelocityToVolumetric(double velocityFpm, double pipeRadiusFt);
-		double calculateFlowCFM(int mafValue, int maxValue = 32767);
+		double calculateFlowCFM(long mafValue, long maxValue = 32767);
 		double calculateAirDensity();
 
 		double startupBaroPressure;

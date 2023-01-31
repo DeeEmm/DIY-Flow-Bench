@@ -301,7 +301,7 @@ double Sensors::getMafVolts() {
  *
  * @note MAF decode is done in Calculations.cpp
  ***/
-int Sensors::getMafRaw() {
+long Sensors::getMafRaw() {
 	
 	Hardware _hardware;
 	#ifdef MAF_IS_ENABLED
