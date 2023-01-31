@@ -41,14 +41,14 @@ API::API() {
 
 
 /***********************************************************
- * CREATE CRC32 CHECKSUM
- *
- * Source: https://techoverflow.net/2022/08/05/how-to-compute-crc32-with-ethernet-polynomial-0x04c11db7-on-esp32-crc-h/
- *
+ * @name CREATE CRC32 CHECKSUM
+ * @brief Compute checksum using ESP32 ROM CRC library
+ * @returns CRC32 hash derived from *str
+ * @implements <esp32/rom/crc.h>
  ***/
-uint16_t API::calcCRC (char* str) {
+uint32_t API::calcCRC (const char* str) {
 
-  CRC = (~crc32_le((uint32_t)~(0xffffffff), (const uint8_t*)str, 8))^0xffffffFF;
+  CRC = (crc32_le(0, (const uint8_t*)str, 4));
 
   return CRC;
 }
@@ -228,11 +228,11 @@ void API::ParseMessage(char apiMessage) {
           config.api_delim, _calculations.convertPressure(sensorVal.BaroKPA, KPA));
       break;      
       
-      case 'F': // Get measured Flow 'F123.45\r\n'       
+      case 'F': // Get measured Flow in CFM 'F123.45\r\n'       
           snprintf(apiResponse, API_RESPONSE_LENGTH, "F%s%f", config.api_delim , sensorVal.FlowCFM);
       break;
 
-      case 'f': // Get measured Flow 'F123.45\r\n'       
+      case 'f': // Get measured Mass Flow 'F123.45\r\n'       
           snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", config.api_delim , sensorVal.FlowMASS);
       break;
 
@@ -382,15 +382,16 @@ void API::ParseMessage(char apiMessage) {
   
   // Send API Response
   #if defined API_CHECKSUM_IS_ENABLED
-      // TODO: FIX CHECKSUM
-      crcValue = calcCRC(apiResponse);
+
+      uint32_t crcValue = calcCRC(apiResponse);
+
       if (*apiResponseBlob != 0)   {
-        _message.blobPrintf("%s%s%s\n", apiResponseBlob, config.api_delim, crcValue);              
+        _message.blobPrintf("%s%s%s\n", apiResponseBlob, config.api_delim, (String)crcValue);              
       } else if (*apiResponse != 0) {
-        _message.serialPrintf("%s%s%s\n", apiResponse, config.api_delim, crcValue);      
+        _message.serialPrintf("%s%s%s\n", apiResponse, config.api_delim, (String)crcValue);      
       } else {
         //invalid response
-        _message.serialPrintf("%s%s%s\n", "Invalid Response", config.api_delim, crcValue);
+        _message.serialPrintf("%s%s%s\n", "Invalid Response", config.api_delim, (String)crcValue);
       }
   #else
       if (*apiResponseBlob != 0) {

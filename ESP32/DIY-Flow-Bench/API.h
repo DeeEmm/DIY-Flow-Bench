@@ -30,7 +30,7 @@ class API {
 	friend class Webserver;
 
 	private:
-		uint16_t calcCRC (char* str);
+		uint32_t calcCRC (const char* str);
 		String getConfigJSON();
 
 		bool streamMafData;

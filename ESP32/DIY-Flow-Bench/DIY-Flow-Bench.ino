@@ -89,7 +89,7 @@ String jsonString;
  * @struct sensorVal global struct containing sensor values
  * @remarks Interrogates ADS1115 ADC and saves sensor values to struct
  * */	
-void TASKgetBenchData( void * parameter ){
+void TASKgetSensorData( void * parameter ){
 
   extern struct DeviceStatus status;
   extern struct SensorData sensorVal;
@@ -120,8 +120,8 @@ void TASKgetBenchData( void * parameter ){
         sensorVal.PitotKPA = _sensors.getPitotValue();
         #endif
 
-        double currentRefPressureINH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
-        sensorVal.FlowADJ = _calculations.convertFlowDepression(currentRefPressureINH2O, config.adj_flow_depression, sensorVal.FlowCFM);
+        sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
+        sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, config.adj_flow_depression, sensorVal.FlowCFM);
 
 
 
@@ -136,7 +136,7 @@ void TASKgetBenchData( void * parameter ){
 
 /***********************************************************
  * @brief TASK: Get environental sensor data (BME280 - Temp/Baro/RelH)
- * @param i2c_task_mutex Semaphore handshake with TASKpushData / TASKgetBenchData
+ * @param i2c_task_mutex Semaphore handshake with TASKpushData / TASKgetSensorData
  * @struct sensorVal global struct containing sensor values
  * @struct status global struct containing system status values
  * @remarks Interrogates BME280 and saves sensor data to struct
@@ -196,8 +196,8 @@ void setup(void) {
   #endif
 
   #ifdef ADC_IS_ENABLED // Compile time directive used for testing
-  // xTaskCreate(TASKgetBenchData, "GET_BENCH_DATA", 2800, NULL, 2, &adcTaskHandle); 
-  xTaskCreatePinnedToCore(TASKgetBenchData, "GET_BENCH_DATA", 1700, NULL, 2, &adcTaskHandle, secondaryCore);  
+  // xTaskCreate(TASKgetSensorData, "GET_BENCH_DATA", 2800, NULL, 2, &adcTaskHandle); 
+  xTaskCreatePinnedToCore(TASKgetSensorData, "GET_BENCH_DATA", 1700, NULL, 2, &adcTaskHandle, secondaryCore);  
   #endif
 
   #ifdef BME_IS_ENABLED // Compile time directive used for testing

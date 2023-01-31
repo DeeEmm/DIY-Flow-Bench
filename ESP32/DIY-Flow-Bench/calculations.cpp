@@ -323,15 +323,15 @@ double Calculations::convertMassFlowToVolumetric(double massFlowKgh) {
 /***********************************************************
  * @brief CALCULATE FLOW in CFM
  * 
- * @param mafValue RAW reference value (15bit value from ADS1115 ADC)
+ * @param mafRAW RAW reference value (15bit value from ADS1115 ADC)
  * @param maxValue Max reference value (default 32767 for 15 bit resolution)
  * @return flowRateCFM
- * @note  mafLookupTable is lookup vector from MafData file (val > flow data pairs)
+ * @note mafLookupTable is lookup vector from MafData file (val > flow data pairs)
  * @note Supported bench types - MAF 
  * @note Future support for Orifice / Pitot / Venturi benches planned
  * 
  ***/
-double Calculations::calculateFlowCFM(int mafValue, int maxValue ) {
+double Calculations::calculateFlowCFM(long mafRAW, long maxADC ) {
 
   extern CalibrationSettings calibration;
   extern struct SensorData sensorVal;
@@ -355,54 +355,54 @@ double Calculations::calculateFlowCFM(int mafValue, int maxValue ) {
   // get size of the data table
   numRows = mafLookupTable.size();
 
-  // scale sensor reading to data table size using map function
-  refValue =  map(mafValue, 0, maxValue, 0, numRows -1 );
- 
+  // get highest MAF input value from data table
+  long maxMAF =  mafLookupTable[numRows -1][0];
+
+  // scale sensor reading to data table size using map function (0-ADC Max -> 0-MAF Max))
+  refValue =  map(mafRAW, 0, maxADC, 0, maxMAF );
+
   for (int rowNum = 0; rowNum < numRows; rowNum++) { // iterate the data table comparing the Lookup Value to the refValue for each row
 
-    double LV = mafLookupTable.at(rowNum).at(0); // Lookup Value for this row
-    double FV = mafLookupTable.at(rowNum).at(1); // Flow Value for this row
+    long LV = mafLookupTable[rowNum][0]; // Lookup Value for this row (x2)
+    long FV = mafLookupTable[rowNum][1]; // Flow Value for this row (y2)
 
     // Did we get a match??
     if (refValue == LV) { // Great!!! we've got the exact value
-      
+
       flowRateRAW = FV;
       break;
       
-    } else if ( LV > refValue ) { // we've passed our refValue so we need to interpolate 
+    // } else if ( LV > refValue && rowNum == 0) { // we were only on the first row so there is no previous value to interpolate with, so lets set the flow value to zero and consider it no flow
 
-      if (rowNum == 0) { // we were only on the first row so there is no previous value to interpolate with, so lets set the flow value to zero and consider it no flow
+    //   flowRateRAW = 0.0;
+    //   return flowRateRAW;
+    //   break;
 
-        flowRateRAW = 0.0;
-        return flowRateRAW;
-        break;
+    } else if (LV > refValue) { // The value is somewhere between this and the previous value so let's use linear interpolation to calculate the actual value: 
 
-      } else { // The value is somewhere between this and the previous value so let's use linear interpolation to calculate the actual value: 
+      long LVP = mafLookupTable[rowNum - 1][0]; // Lookup value for the previous row (x1)
+      long FVP = mafLookupTable[rowNum - 1][1]; // Flow value for the previous row (y1)
 
-        double LVP = mafLookupTable.at(rowNum - 1).at(0); // Lookup value for the previous row
-        double FVP = mafLookupTable.at(rowNum - 1).at(1); // Flow value for the previous row
-
-        flowRateRAW = FVP + (refValue - LVP) * ((FV-FVP)/(LV-LVP)); // Linear interpolation
-        
-      }
-
-      break;
+      // Linear interpolation y = y1 + (x-x1)((y2-y1)/(x2-x1)) where x1+y1 are coord1 and x2_y2 are coord2
+      flowRateRAW = FVP + (refValue - LVP)*((FV-FVP)/(LV-LVP));
+      break;   
     }
 
   } //endfor
 
 
   // Now that we have a flow value, we need to scale it and convert it.
-  if (_maf.mafDataUnit == KG_H) {
+  if (_maf.mafUnits() == KG_H) {
 
     // convert RAW datavalue back into kg/h
     flowRateKGH = double(flowRateRAW / 1000);
 
-  } else if (_maf.mafDataUnit == MG_S) {
+  } else if (_maf.mafUnits() == MG_S) {
 
     // Convert RAW datavalue back into mg/s
     flowRateMGS = flowRateRAW / 10;
-    //  convert mg/s value into kg/h
+
+    // convert mg/s value into kg/h
     flowRateKGH = flowRateMGS / 277.8;
   }
 
@@ -478,7 +478,7 @@ double Calculations::calculateFlowCFM(int mafValue, int maxValue ) {
 
   sensorVal.FlowCFM = flowRateCFM;
 
-   return flowRateCFM;
+  return flowRateCFM;
 }
 
 
@@ -499,12 +499,19 @@ double Calculations::calculateFlowCFM(int mafValue, int maxValue ) {
  * We can now multiply our CFM values at 28" of water by .945 to obtain the theoretical CFM values at 25" of water.
  * Source: http://www.flowspeed.com/cfm-numbers.htm
 */
-double Calculations::convertFlowDepression(double oldPressure, double newPressure, double inputFlow) {
+double Calculations::convertFlowDepression(double oldPressure, double newPressure, double inputFlowCFM) {
 
-  double outputFlow;
-  double pressureRatio = (newPressure / oldPressure);
-  outputFlow = (sqrt(pressureRatio) * inputFlow);
-  return outputFlow;
+  Calculations _calculations;
+  Hardware _hardware;
+
+  if (_hardware.benchIsRunning()) {
+    double outputFlow;
+    double pressureRatio = (newPressure / oldPressure);
+    outputFlow = sqrt(pressureRatio) * inputFlowCFM;
+    return outputFlow;
+  } else {
+    return 0.0;
+  }
   
 }
 
