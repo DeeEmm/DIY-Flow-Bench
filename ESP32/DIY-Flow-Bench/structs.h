@@ -1,20 +1,21 @@
 /***********************************************************
-* The DIY Flow Bench project
-* https://diyflowbench.com
-* 
-* Structs.h - Data structure definitions header file
-*
-* Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
-* 
-* For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
-* Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions 
-* You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
-* 
-* This project and all associated files are provided for use under the GNU GPL3 license:
-* https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
-* 
-* 
-***/
+ * @name The DIY Flow Bench project
+ * @details Measure and display volumetric air flow using an ESP32 & Automotive MAF sensor
+ * @link https://diyflowbench.com
+ * @author DeeEmm aka Mick Percy deeemm@deeemm.com
+ * 
+ * @file structs.h
+ * 
+ * @brief Define Structs
+ * 
+ * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+ * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
+ * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
+ * 
+ * @license This project and all associated files are provided for use under the GNU GPL3 license:
+ * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
+ * 
+ ***/
 #pragma once
 
 #include "Arduino.h"
@@ -22,46 +23,55 @@
 
 
 /***********************************************************
- * Configuration Settings
+ * Default / Fallback Configuration Settings
  *
- * NOTE: Do not edit these! Used to create default config file! 
- * You can easily edit the config file via the browser after you connect!
+ * NOTE: Do not edit these! Please leave the default values.
+ * These are used to generate the default config settings in the event of a system crash.
+ * If you edit these, you may get locked out of your system or brick your device.
+ * You can easily edit the config settings via the browser after you connect!
  ***/
 struct ConfigSettings {
-  String pageTitle = PAGE_TITLE;
-  String wifi_ssid = "WIFI-SSID";           // Your Wifi SSID
-  String wifi_pswd = "<WIFI-PSWD>";         // Your Wifi Password
-  String wifi_ap_ssid = "DIYFB";            // Default Access Point name
-  String wifi_ap_pswd = "123456789";        // Default Access Point Password
-  String hostname = "diyfb";                // Default Hostname
-  String api_delim = ":";                   // API Serial comms delimiter
-  long serial_baud_rate = 115200;           // Default baud rate 
-  unsigned long wifi_timeout = 10000;       // Time in millisec's before falling back to AP mode
-  int min_flow_rate = 3;                    // Flow rate at which bench is considered running
-  int min_bench_pressure = 0;               // Min bench pressure where bench is considered running
-  int maf_min_millivolts = 100;             // Filter out results less than this
-  int refresh_rate = 250;                   // Screen refresh rate in milliseconds (>180)
-  float cal_ref_press = 10;                 // Calibration orifice refe pressure
-  float cal_flow_rate = 14.4;               // Calibration orifica flow rate
-  float cal_offset = 0;                     // Calibration offset
-  int cyc_av_buffer = 5;                    // Scan # over which to average output (helps smooth results)
-  int leak_test_tolerance = 2;              // Leak test tolerance
-  int leak_test_threshold = 10;             // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
-  bool show_alarms = true;                  // Display Alarms?
-  bool debug_mode = false;
-  bool api_enabled = true;
+  int api_response_length = 64;                   // API Serial comms message length
+  long serial_baud_rate = 115200;                 // Default baud rate 
+  unsigned long wifi_timeout = 3500;              // Duration of Wifi connection attempt in millisec's
+  unsigned long wifi_retries = 10;                // Number of attempts to connect to Wifi
+  int min_flow_rate = 3;                          // Flow rate at which bench is considered running
+  int min_bench_pressure = 3;                     // Min bench pressure where bench is considered running
+  double maf_min_volts = 0.1;                     // Filter out results less than this
+  int refresh_rate = 250;                         // Screen refresh rate in milliseconds (>180)
+  int adj_flow_depression = 28;                   // Adjusted flow depression in inches of water
+  double cal_ref_press = 10;                      // Calibration orifice ref pressure
+  double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
+  double cal_offset = 0;                          // Calibration offset
+  int cyc_av_buffer = 3;                          // [5] Scan # over which to average output (helps smooth results)
+  int leak_test_tolerance = 2;                    // Leak test tolerance
+  int leak_test_threshold = 10;                   // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
+  bool show_alarms = true;                        // Display Alarms?
+  bool debug_mode = false;                        // Global debug print override
+  bool dev_mode = false;                          // Developer mode
+  bool status_print_mode = false;                 // Stream status data to serial
+  bool api_enabled = true;                        // Can disable serial API if required
   int tatltuae = 42;
   int parsecs = 12;
+  char pageTitle[32] = "DIY Flow Bench";          // Display name for software
+  char wifi_ssid[32] = "WIFI-SSID";               // Your Wifi SSID
+  char wifi_pswd[32] = "WIFI-PASS";               // Your Wifi Password
+  char wifi_ap_pswd[32] = "123456789";            // Default Access Point Password
+  char hostname[32] = "diyfb";                    // Default Hostname
+  char api_delim[2] = ":";                        // API Serial comms delimiter
+  char wifi_ap_ssid[32] = "DIYFB";                // Default Access Point name
+  char temp_unit[11] = "Celcius";                 // Defalt display unit of temperature
+  bool ap_mode = true;                            // Default WiFi connection mode is accesspoint mode
 };
 
-//ConfigSettings config;
+
 
 /***********************************************************
  * Calibration Settings
  ***/
 struct CalibrationSettings { 
-  float flow_offset = 0.0;         
-  float leak_cal_val = 0.0;  
+  double flow_offset = 0.0;         
+  double leak_cal_val = 0.0;  
 };
 
 
@@ -73,8 +83,11 @@ struct DeviceStatus {
   bool debug = true;
   int spiffs_mem_size = 0;
   int spiffs_mem_used = 0;
+  int pageSize = 0;
   String local_ip_address;
+  String hostname;
   String boardType;
+  String benchType;
   String mafSensor;
   String prefSensor;
   String pdiffSensor;
@@ -83,21 +96,19 @@ struct DeviceStatus {
   String baroSensor;
   String pitotSensor;
   int boot_time = millis();
-  bool liveStream = false;
+  bool liveStream = true;
+  long adcPollTimer = 0;
+  long bmePollTimer = 0;
+  long apiPollTimer = 0;
+  long browserUpdateTimer = 0;
+  long wsCLeanPollTimer = 0;
   int pollTimer = 0;
   int serialData = 0;
   String statusMessage = BOOT_MESSAGE;
   bool apMode = false;
-};
-
-
-
-/***********************************************************
- * Websocket data
- ***/
-struct WebsocketData {
- String file_name;
-  int length = 0;
+  double HWMBME = 0.0;
+  double HWMADC = 0.0;
+  double HWMSSE = 0.0;
 };
 
 
@@ -106,9 +117,52 @@ struct WebsocketData {
  * File upload data
  ***/
 struct FileUploadData {
- String file_name;
+  String file_name;
   bool upload_error = false;
   int file_size = 0;
 };
 
 
+
+
+/***********************************************************
+ * Sensor data
+ ***/
+struct SensorData {
+  long MafRAW = 0;
+  double FlowMASS = 0.0;
+  double FlowCFM = 0.0;
+  double FlowADJ = 0.0;
+  double MafMv = 0.0;
+  double TempDegC = 0.0;
+  double TempDegF = 0.0;
+  double RelH = 0.0;
+  double BaroKPA = 0.0;
+  double BaroHPA = 0.0;
+  double PRefKPA = 0.0;
+  double PRefMv = 0.0;
+  double PRefH2O = 0.0;
+  double PDiffKPA = 0.0;
+  double PDiffMv = 0.0;
+  double PitotKPA = 0.0;
+  double PitotMv = 0.0;
+};
+
+
+/***********************************************************
+ * Orifice data
+ ***/
+struct OrificeData {
+  double OrificeOneFlow;
+  double OrificeOneDepression;
+  double OrificeTwoFlow;
+  double OrificeTwoDepression;
+  double OrificeThreeFlow;
+  double OrificeThreeDepression;
+  double OrificeFourFlow;
+  double OrificeFourDepression;
+  double OrificeFiveFlow;
+  double OrificeFiveDepression;
+  double OrificeSixFlow;
+  double OrificeSixDepression;
+};

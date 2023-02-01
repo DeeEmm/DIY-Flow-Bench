@@ -10,45 +10,69 @@
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
-#ifndef MAFDATA
-#define MAFDATA
+#ifndef MAFDATACLASS
+#define MAFDATACLASS
 
-//#ifdef DELPHI_AF10118
+#include <Arduino.h>
+#include "../constants.h"
+#include "mafData/maf.h"
 
 
- /***********************************************************
-  * MAF Type
-  *
-  ***/
- #define MAF_SENSOR_TYPE "DELPHI_AF10118"
+
+/***********************************************************
+ * @brief MAF Class Constructor
+ * @note: See exampleMafData.h for explaination and example
+ * 
+ ***/
+Maf::Maf() {
+}
+
+
+
+/***********************************************************
+ * @brief MAF Type
+ * 
+ * @note Description of MAF type
+ *
+ ***/
+String Maf::sensorType() {
+    return "DELPHI_AF10118";
+}
+
  
  
 /***********************************************************
- * MAF Output Type
+ * @brief MAF Output Type
  *
+ * @note Valid options:
  * VOLTAGE
  * FREQUENCY
  ***/
-
-int MAFoutputType = VOLTAGE;
+int Maf::outputType() {
+    return VOLTAGE;
+}
 
 
 
 /***********************************************************
- * MAF Units
+ * @brief MAF Units
  * 
+ * @note: Valid options:
  * KG_H
  * MG_S
  ***/
+int Maf::mafUnits() {
+    return KG_H;
+}
 
-int MAFdataUnit = KG_H;
 
 
 /***********************************************************
- * MAF Data
+ * @brief mafLookupTable
+ * @note Global vector of vectors containing MAF>Flow key>value pairs
  ***/
-long mafLookupTable[][2] = {
-{0,3650},
+ std::vector<std::vector<int>> mafLookupTable = {{ 
+{0,0},
 {600,5620},
 {800,8982},
 {940,10711},

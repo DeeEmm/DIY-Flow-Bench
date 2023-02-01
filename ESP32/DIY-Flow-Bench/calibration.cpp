@@ -1,29 +1,31 @@
 /***********************************************************
- * The DIY Flow Bench project
- * https://diyflowbench.com
+ * @name The DIY Flow Bench project
+ * @details Measure and display volumetric air flow using an ESP32 & Automotive MAF sensor
+ * @link https://diyflowbench.com
+ * @author DeeEmm aka Mick Percy deeemm@deeemm.com
  * 
- * Calibration.cpp - Calibration class
- *
- * Open source flow bench project to measure and display volumetric air flow using an ESP32 / Arduino.
+ * @file calibration.app
  * 
- * For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
- * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions 
+ * @brief Calibration class
+ * 
+ * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
+ * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
  * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
  * 
- * This project and all associated files are provided for use under the GNU GPL3 license:
+ * @license This project and all associated files are provided for use under the GNU GPL3 license:
  * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
  * 
- * 
  ***/
+
+#include "configuration.h"
+#include "constants.h"
+#include "structs.h"
 
 #include "calibration.h"
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
-#include "configuration.h"
-#include "constants.h"
-#include "structs.h"
 #include "sensors.h"
-#include "maths.h"
+#include "calculations.h"
 #include "messages.h"
 #include "webserver.h"
 #include LANGUAGE_FILE
@@ -35,13 +37,11 @@ Calibration::Calibration () {
 
 
 
-
-
 /***********************************************************
 * Perform Flow Calibration
 *
 * Called from API.ino
-* Called from ProcessWebSocketMessage in server.ino
+* Called from processWebSocketMessage in server.ino
 *
 * TODO: #75 The calibration handling needs to be rewritten. https://github.com/DeeEmm/DIY-Flow-Bench/issues/75
 * 
@@ -50,28 +50,31 @@ bool Calibration::setFlowOffset() {
 
   extern struct CalibrationSettings calibration;
   extern struct ConfigSettings config;
+  extern struct Translator translate;
   
-  Sensors _sensor; 
-  Maths _maths;
-  Webserver _webserver;
+  Sensors _sensors; 
+  Calculations _calculations;
+  Messages _message;
   
   // Get the current flow value
   // TODO: need to determine what flow sensors are active (MAF / Orifice / Pitot)
-  float MafFlowCFM = _maths.calculateFlowCFM();
+  double MafFlowCFM = _calculations.calculateFlowCFM(_sensors.getMafRaw());
   // Get the current reference pressure
-  float RefPressure = _maths.calculateRefPressure(INWG);
+  double RefPressure = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);
   
   // convert the calibration orifice flow value  to our current ref pressure  
-  float convertedOrificeFlowCFM = _maths.convertFlowDepression(config.cal_ref_press, RefPressure,  config.cal_flow_rate);
+  double convertedOrificeFlowCFM = _calculations.convertFlowDepression(config.cal_ref_press, RefPressure,  config.cal_flow_rate);
  
   // compare it to the measured flow to generate our flow offset
-  float flowCalibrationOffset = convertedOrificeFlowCFM - MafFlowCFM;
+  double flowCalibrationOffset = convertedOrificeFlowCFM - MafFlowCFM;
   
   // update config var
   calibration.flow_offset = flowCalibrationOffset;
   
   // TODO: Save cal.json
   saveCalibration();    
+
+  _message.Handler(translate.LANG_VAL_CAL_OFFET_VALUE + flowCalibrationOffset);
   
   return true;
   
@@ -83,7 +86,7 @@ bool Calibration::setFlowOffset() {
 * Get Flow offset
 * 
 ***/
-float Calibration::getFlowOffset() {
+double Calibration::getFlowOffset() {
 
   extern struct CalibrationSettings calibration;
   
@@ -104,9 +107,15 @@ float Calibration::getFlowOffset() {
 bool Calibration::setLeakTestPressure() {
   
   extern struct CalibrationSettings calibration;
-  Maths _maths;
+  extern struct Translator translate;
+
+  Calculations _calculations;
+  Sensors _sensors;
+  Messages _message;
   
-  calibration.leak_cal_val = _maths.calculateRefPressure(INWG);  
+  calibration.leak_cal_val = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
+
+  _message.Handler(translate.LANG_VAL_LEAK_CAL_VALUE + calibration.leak_cal_val);
 
   return true;
 }
@@ -116,7 +125,7 @@ bool Calibration::setLeakTestPressure() {
 /***********************************************************
 * Get leakTest
 ***/
-float Calibration::getLeakTestPressure() {
+double Calibration::getLeakTestPressure() {
 
   extern struct CalibrationSettings calibration;
   
@@ -143,7 +152,7 @@ void Calibration::createCalibrationFile () {
   String jsonString;
   StaticJsonDocument<1024> calibrationData;
   
-  _message.DebugPrintLn("Creating cal.json file..."); 
+  _message.statusPrintf("Creating cal.json file... \n"); 
   
   calibrationData["FLOW_OFFSET"] = calibration.flow_offset;
   calibrationData["LEAK_CAL_VAL"] = calibration.leak_cal_val;
@@ -162,6 +171,7 @@ void Calibration::createCalibrationFile () {
 void Calibration::saveCalibration() {
   
   extern struct CalibrationSettings calibration;
+  extern struct Translator translate;
   
   Messages _message;
   Webserver _webserver;
@@ -172,7 +182,7 @@ void Calibration::saveCalibration() {
   calibrationData["flow_offset"] = calibration.flow_offset; 
   calibrationData["leak_cal_val"] = calibration.leak_cal_val; 
 
-  _message.Handler(LANG_SAVING_CALIBRATION);
+  _message.Handler(translate.LANG_VAL_SAVING_CALIBRATION);
   
   serializeJsonPretty(calibrationData, jsonString);
   
@@ -190,10 +200,10 @@ void Calibration::parseCalibrationData(StaticJsonDocument<1024> calibrationData)
 
   extern struct CalibrationSettings calibration;  
   Messages _message;
-  _message.DebugPrintLn("Calibration::parseCalibrationData");
+  _message.statusPrintf("Calibration::parseCalibrationData \n");
   
-  calibration.flow_offset = calibrationData["FLOW_OFFSET"].as<float>();
-  calibration.leak_cal_val = calibrationData["LEAK_CAL_VAL"].as<float>();
+  calibration.flow_offset = calibrationData["FLOW_OFFSET"].as<double>();
+  calibration.leak_cal_val = calibrationData["LEAK_CAL_VAL"].as<double>();
   
 }
 
@@ -207,7 +217,7 @@ StaticJsonDocument<1024> Calibration::loadCalibration () {
 
   Webserver _webserver;
   Messages _message;
-  _message.DebugPrintLn("Calibration::loadCalibration");
+  _message.statusPrintf("Calibration::loadCalibration \n");
   
   StaticJsonDocument<1024> calibrationData;
   calibrationData = _webserver.loadJSONFile("/cal.json");

@@ -1,62 +1,76 @@
 /***********************************************************
- * TEST.h
+ * SIEMENS_5WK9605.h
  *
- * Manufacturer: 
- * Part#: 
+ * Manufacturer: Siemens
+ * Part#: 5WK9605
  * MAF file for type: 
  * File units = 1000 * kg/hr
- * Comments: Basic test data
- * Status:
+ * Comments:  Data calculated on 3 point data measured on flow bench by Tony Donn. 
+ * Status: Unvalidated.
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
-#ifndef MAFDATA
-#define MAFDATA
+#ifndef MAFDATACLASS
+#define MAFDATACLASS
 
-//#ifdef TEST
-
+#include <Arduino.h>
 #include "../constants.h"
-
-
-
-
-/***********************************************************
-* MAF Type
-*
-***/
-
-String mafSensorType = "TEST";
+#include "mafData/maf.h"
 
 
 
 /***********************************************************
-* MAF Output Type
-*
-* VOLTAGE
-* FREQUENCY
-***/
+ * @brief MAF Class Constructor
+ * @note: See exampleMafData.h for explaination and example
+ * 
+ ***/
+Maf::Maf() {
+}
 
-int MAFoutputType = VOLTAGE;
+
+/***********************************************************
+ * @brief MAF Type
+ * 
+ * @note Description of MAF type
+ *
+ ***/
+String Maf::sensorType() {
+    return "SIEMENS_5WK9605";
+}
+ 
+ 
+
+/***********************************************************
+ * @brief MAF Output Type
+ *
+ * @note Valid options:
+ * VOLTAGE
+ * FREQUENCY
+ ***/
+int Maf::outputType() {
+    return VOLTAGE;
+}
 
 
 
 /***********************************************************
-* MAF Units
-* 
-* KG_H
-* MG_S
-***/
-
-int MAFdataUnit = KG_H;
-
+ * @brief MAF Units
+ * 
+ * @note: Valid options:
+ * KG_H
+ * MG_S
+ ***/
+int Maf::mafUnits() {
+    return KG_H;
+}
 
 
 /***********************************************************
-* Kay>Val MAF Data 
-*
-***/
-    
-long mafLookupTable [][2] = {
+ * @brief mafLookupTable
+ * @note Global vector of vectors containing MAF>Flow key>value pairs
+ ***/
+ std::vector<std::vector<int>> mafLookupTable = {{ 
+{0,0},
 {100,6226},
 {200,6745},
 {300,7307},
@@ -107,8 +121,6 @@ long mafLookupTable [][2] = {
 {4800,268644},
 {4900,291048},
 {5000,315320}
-};
-            
+}};
 
-//#endif
 #endif
