@@ -3,7 +3,7 @@ name: MAF Data
 about: Submit a MAF data file
 title: "[MAF DATA]"
 labels: enhancement
-assignees: 'DeeEmm'
+assignees: DeeEmm
 
 ---
 
@@ -12,8 +12,6 @@ assignees: 'DeeEmm'
 - BUILD_NUMBER (e.g. Build 31012301)
 
 NOTE: Both can be found in configuration.h or by presing hte 'Info' button on the configuration page in the GUI
-
----
 
 Please cut and paste your MAF data file below.
 

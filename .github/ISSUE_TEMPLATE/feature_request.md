@@ -1,9 +1,9 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: '[FEATURE REQUEST]'
-labels: 'Feature Request'
-assignees: 'DeeEmm'
+title: "[FEATURE REQUEST]"
+labels: enhancement
+assignees: DeeEmm
 
 ---
 
@@ -12,8 +12,6 @@ assignees: 'DeeEmm'
 - BUILD_NUMBER (e.g. Build 31012301)
 
 NOTE: Both can be found in configuration.h or by presing hte 'Info' button on the configuration page in the GUI
-
----
 
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. e.g. I'm always frustrated when [...]
