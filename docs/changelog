@@ -64,7 +64,12 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-31012301        - Fixed MAF unit error
+23020101        - Updated ReadMe 
+                - Updated DEV_BRANCH in configuration.h
+                - Updated MAF Data vectors to long datatype
+                - Fixed incorrect build number for RC4 (NOTE prev 31012301)
+23013101        - Release Candidate 4
+                - Fixed MAF unit error
                 - Fix Ref depression unit error
                 - Added bench running check to adjusted flow calc
 23012701        - Renamed TASKgetBenchData to TASKgetSensorData

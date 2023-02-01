@@ -71,7 +71,6 @@ int Maf::mafUnits() {
  * @brief mafLookupTable
  * @note Global vector of vectors containing MAF>Flow key>value pairs
  ***/
-// std::vector<std::vector<int>> Maf::mafLookupTable = new std::vector<std::vector<int>> {{ // declare on heap using pointer
  std::vector<std::vector<long>> mafLookupTable = {{ 
     {0,0},
     {1,177},

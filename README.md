@@ -52,7 +52,6 @@ The DIYFB system can be used on any flow bench and makes an ideal retrofit for o
 - DIY Shield kits available to purchase.
 
 
-
 ## Development Info
 
 This branch contains the current release candidate and is based on the ESP32 port of the original project.
@@ -77,8 +76,6 @@ If you get stuck, feel free to create a [discussion](https://github.com/DeeEmm/D
 If you find an issue, or have a feature request, please [raise an issue](https://github.com/DeeEmm/DIY-Flow-Bench/issues)
 
 
-
-
 ## License
 ###
 
@@ -90,7 +87,6 @@ This software is released under the GPLV3 license. For details on usage please r
 You can view an online demo of the Web UI at the followng link
 
 [https://diyflowbench.com/demo/](https://diyflowbench.com/demo/)
-
 
 
 ## Further Information

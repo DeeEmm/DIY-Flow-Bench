@@ -26,9 +26,9 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "31012301"
+#define BUILD_NUMBER "23020101"
 #define RELEASE "V.2.0-RC.4"
-#define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
+#define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"
 
 
 
