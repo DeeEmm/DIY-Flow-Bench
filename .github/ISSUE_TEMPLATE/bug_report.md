@@ -11,7 +11,7 @@ assignees: DeeEmm
 - RELEASE (e.g. V.2.0-RC.4) 
 - BUILD_NUMBER (e.g. Build 31012301)
 
-NOTE: Both can be found in configuration.h or by presing hte 'Info' button on the configuration page in the GUI
+NOTE: Both can be found in configuration.h or by pressing the 'Info' button on the configuration page in the GUI
 
 **Describe the bug**
 A clear and concise description of what the bug is.
