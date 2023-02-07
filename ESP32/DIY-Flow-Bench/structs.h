@@ -35,8 +35,8 @@ struct ConfigSettings {
   long serial_baud_rate = 115200;                 // Default baud rate 
   unsigned long wifi_timeout = 3500;              // Duration of Wifi connection attempt in millisec's
   unsigned long wifi_retries = 10;                // Number of attempts to connect to Wifi
-  int min_flow_rate = 3;                          // Flow rate at which bench is considered running
-  int min_bench_pressure = 3;                     // Min bench pressure where bench is considered running
+  int min_flow_rate = 1;                          // Flow rate at which bench is considered running
+  int min_bench_pressure = 1;                     // Min bench pressure where bench is considered running
   double maf_min_volts = 0.1;                     // Filter out results less than this
   int refresh_rate = 250;                         // Screen refresh rate in milliseconds (>180)
   int adj_flow_depression = 28;                   // Adjusted flow depression in inches of water
@@ -109,6 +109,10 @@ struct DeviceStatus {
   double HWMBME = 0.0;
   double HWMADC = 0.0;
   double HWMSSE = 0.0;
+  long mafDataTableRows = 0;
+  long mafDataValMax = 0;
+  long mafDataKeyMax = 0;
+  int mafUnits = 0;
 };
 
 
@@ -130,7 +134,7 @@ struct FileUploadData {
  ***/
 struct SensorData {
   long MafRAW = 0;
-  double FlowMASS = 0.0;
+  double FlowKGH = 0.0;
   double FlowCFM = 0.0;
   double FlowADJ = 0.0;
   double MafMv = 0.0;

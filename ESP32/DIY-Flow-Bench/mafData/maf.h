@@ -40,6 +40,7 @@ class Maf {
         int mafUnits();
 
         static std::vector<std::vector<int>> mafLookupTable;
+        // std::vector<std::vector<int>> mafLookupTable;
 
 
 };

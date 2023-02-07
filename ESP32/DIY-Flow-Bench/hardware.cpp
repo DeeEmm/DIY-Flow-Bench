@@ -222,9 +222,9 @@ void Hardware::getI2CList() {
  * @note uses ADC1115-lite library - https://github.com/terryjmyers/ADS1115-Lite
  *
  ***/
-int16_t Hardware::getADCRawData(int channel) {
+int32_t Hardware::getADCRawData(int channel) {
 
-  int16_t rawADCval = 0;
+  int32_t rawADCval = 0;
 
   #ifdef ADC_IS_ENABLED
 
@@ -272,7 +272,6 @@ int16_t Hardware::getADCRawData(int channel) {
  double Hardware::getADCVolts(int channel) {
 
   double volts;
-  const double ADC_GAIN = 6.144;
 
   int rawADCval = getADCRawData(channel);
   
@@ -291,28 +290,6 @@ int16_t Hardware::getADCRawData(int channel) {
   #endif
   
   return volts;
-}
-
-
-
-
-/***********************************************************
- * @brief GET 3.3V SUPPLY VOLTAGE
- * @details Measures 3.3v supply buck power to ESP32 
- * @note 3.3v buck connected directly to ESP32 input
- * @note Use a 0.1uf cap on input to help filter noise
- * @note ESP32 has 12 bit ADC (0-3300mv = 0-4095)
- ***/
-double Hardware::get3v3SupplyVolts() {   
-
-  long rawVoltageValue = analogRead(VCC_3V3_PIN);  
-  double vcc3v3SupplyVolts = (rawVoltageValue * 0.805860805860806) ;
-
-  #ifdef USE_FIXED_3_3V_VALUE
-    return 3.3; 
-  #else
-    return vcc3v3SupplyVolts + VCC_3V3_TRIMPOT;
-  #endif
 }
 
 
@@ -342,6 +319,29 @@ double Hardware::get5vSupplyVolts() {
 
 
 /***********************************************************
+ * @brief GET 3.3V SUPPLY VOLTAGE
+ * @details Measures 3.3v supply buck power to ESP32 via voltage divider
+ * @note We use a 10k-10k divider on the official shield. This helps to capture voltages above +Vcc
+ * @note Use a 0.1uf cap on input to help filter noise
+ * @note ESP32 has 12 bit ADC (0-3300mv = 0-4095)
+ ***/
+double Hardware::get3v3SupplyVolts() {   
+
+  long rawVoltageValue = analogRead(VCC_3V3_PIN);  
+  double vcc3v3SupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
+
+  #ifdef USE_FIXED_3_3V_VALUE
+    return 3.3; 
+  #else
+    return vcc3v3SupplyVolts + VCC_3V3_TRIMPOT;
+  #endif
+}
+
+
+
+
+
+/***********************************************************
  * @brief BENCH IS RUNNING
  * @return bool:bench is running
  * @note used by calibration function in API.cpp
@@ -358,7 +358,7 @@ bool Hardware::benchIsRunning() {
   
   // TODO: Check scope of these...
   double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
-  double mafFlowRateCFM = _calculations.calculateFlowCFM(_sensors.getMafRaw());
+  double mafFlowRateCFM = _calculations.convertKGHtoCFM(_sensors.getMafFlow());
 
   if ((refPressure > config.min_bench_pressure))
   {

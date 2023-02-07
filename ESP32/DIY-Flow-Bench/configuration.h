@@ -26,8 +26,8 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "23020101"
-#define RELEASE "V.2.0-RC.4"
+#define BUILD_NUMBER "23020701"
+#define RELEASE "V.2.0-RC.5"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"
 
 
@@ -176,6 +176,8 @@ const int BME280_I2C_ADDR = 0x76;
 const int ADC_I2C_ADDR = 0x48; 
 #define ADC_SCAN_DELAY_MS 250                               // Need to allow enough time for ADC read (min 10ms)
 #define ADC_MAX_RETRIES 10
+#define ADC_RANGE 32767    
+#define ADC_GAIN 6.144                                // 16bit range for 1115
 
 #define ADC_TYPE_ADS1115 // 16 bit (188uV/bit)
 // #define ADC_TYPE_ADS1015 // 12 bit (3 mV/bit)            // UNTESTED (Not supported in ADS1115_lite library but might work)

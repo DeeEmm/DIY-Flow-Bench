@@ -39,8 +39,10 @@ class Calculations {
 		double calculateSpecificGravity();
 		double convertMassFlowToVolumetric(double massFlowKgh);
 		double convertVelocityToVolumetric(double velocityFpm, double pipeRadiusFt);
-		double calculateFlowCFM(long mafValue, long maxValue = 32767);
 		double calculateAirDensity();
+
+		double convertMassFlowUnits(double massFlowKGH, int units = KG_H);
+		double convertKGHtoCFM(double massFlowKGH);
 
 		double startupBaroPressure;
 

@@ -30,9 +30,10 @@
 #include "hardware.h"
 #include "messages.h"
 
-#ifdef MAF_IS_ENABLED
-#include MAF_DATA_FILE
-#endif
+//DEPRECATED
+// #ifdef MAF_IS_ENABLED
+// #include MAF_DATA_FILE
+// #endif
 
 
 
@@ -76,6 +77,10 @@ double Calculations::convertPressure(double inputPressure, int unitsOut, int uni
       inputPressureKpa = inputPressure * 0.24884;
       break;
 
+    case ATM:
+      inputPressureKpa = inputPressure * 101.325;
+      break;
+
     default:
       inputPressureKpa = inputPressure;
       break;
@@ -102,6 +107,10 @@ double Calculations::convertPressure(double inputPressure, int unitsOut, int uni
       
     case KPA:
       return inputPressureKpa;
+      break;
+
+    case ATM:
+      inputPressureKpa = inputPressure * 0.00986923;
       break;
 
     case INH2O:
@@ -215,6 +224,7 @@ double Calculations::convertRelativeHumidity(double relativeHumidity, int units)
  * 
  * @note Tetans Equation
  * @example P(kPa) = 0.61078EXP * ((17.27 * Temp(C) / Temp(C) + 237.3)
+ * 
  ***/
 double Calculations::calculateVaporPressure(int units) {
 
@@ -247,7 +257,15 @@ double Calculations::calculateVaporPressure(int units) {
 /***********************************************************
  * @brief CALCULATE SPECIFIC GRAVITY
  * 
- * @example SG = 1-(0.378 * RH(%) * vaporPressure(psia)) / baroPressure(psia)
+ * SG = 1 - 0.378 RHa PVa / Pb
+ * Where:
+ * SG = specific gravity
+ * RHa = relative humidity in % (e.g. 0.36)
+ * PVa = Vapor pressure of water at actual temperature in psia
+ * Pb = barometric pressure in psia
+ * 
+ * SG = 1-(0.378 * RH(%) * vaporPressure(psia)) / baroPressure(psia)
+ * 
  ***/
 double Calculations::calculateSpecificGravity() {
 
@@ -258,7 +276,7 @@ double Calculations::calculateSpecificGravity() {
   double relativeHumidity = this->convertRelativeHumidity(sensorVal.RelH, DECI);
   double baroPressurePsia = this->convertPressure(sensorVal.BaroKPA, PSIA);
 
-  specificGravity = (1 - (0.378 * relativeHumidity * vaporPressurePsia) / baroPressurePsia);
+  specificGravity = 1 - (0.378 * relativeHumidity * vaporPressurePsia) / baroPressurePsia;
 
   return specificGravity;
 
@@ -269,16 +287,30 @@ double Calculations::calculateSpecificGravity() {
 /***********************************************************
  * @brief CALCULATE DENSITY OF AIR
  * 
+ * @todo needs review - https://en.wikipedia.org/wiki/Density_of_air
+ * 
  * @note Ideal gas law
  * @example airDensity(kg/m3) = absPressurePa / (SPECIFIC_GAS_CONSTANT_DRY_AIR * absTempKelvin)
+ * 
+ * 
+ * ρ = [(Pd / (Rd * T)) + (Pv / (Rv * T))]
+ * where:
+ * Pd = Pressure of dry air
+ * Pv = Water vapor pressure 
+ * T = Temperature in Kelvins
+ * Rd = Specific gas constant for dry air [287.058 J/(kg·K)]
+ * Rv = Specific gas constant for water [461.495 J/(kg·K)]
+ * 
+ * 
  ***/
 double Calculations::calculateAirDensity() {
 
   extern struct SensorData sensorVal;
 
-  // double airDensity = (sensorVal.BaroKPA / 100) / (SPECIFIC_GAS_CONSTANT_DRY_AIR * convertTemperature(sensorVal.TempDegC, KELVIN)); // density of dry air
+  // original 
+  // double airDensity = ((convertPressure(sensorVal.BaroKPA, PSIA)) * MOLAR_MASS_DRY_AIR + calculateVaporPressure(PSIA) * MOLAR_MASS_WATER_VAPOUR) / UNIVERSAL_GAS_FLOW_CONSTANT * convertTemperature(sensorVal.TempDegC, KELVIN);
 
-  double airDensity = ((convertPressure(sensorVal.BaroKPA, PSIA)) * MOLAR_MASS_DRY_AIR + calculateVaporPressure(PSIA) * MOLAR_MASS_WATER_VAPOUR) / UNIVERSAL_GAS_FLOW_CONSTANT * convertTemperature(sensorVal.TempDegC, KELVIN);
+  double airDensity = (convertPressure(sensorVal.BaroKPA, PSIA) / (287.058 * convertTemperature(sensorVal.TempDegC, KELVIN))) + (calculateVaporPressure(PSIA) / (461.495 * convertTemperature(sensorVal.TempDegC, KELVIN)));
 
   return airDensity;
 
@@ -286,14 +318,92 @@ double Calculations::calculateAirDensity() {
 
 
 
+/***********************************************************
+ * @brief CONVERT BETWEEN MASS FLOW UNITS
+ * @param massflowKgh Mass flow in KG/H
+ ***/
+double Calculations::convertMassFlowUnits(double massFlowKGH, int units) {
+
+  double convertedFlow = 0.0;
+
+  switch (units) {
+
+    case MG_S:
+      convertedFlow = massFlowKGH * 277.8;
+      break;
+
+    case GM_M:
+      convertedFlow = massFlowKGH * 16.667;
+      break;
+
+    case KG_H:
+    default:
+      convertedFlow = massFlowKGH;
+      break;
+  }
+
+  return convertedFlow;
+
+}
+
+
+
+/***********************************************************
+ * @brief CONVERT KGH TO CFM
+ * @note Convert mass flow to volumetric using ideal gas law
+ * 
+ * Q = nRT/mP * ṁ
+ * Where:
+ * Q = Volumetric flow (SCCM)
+ * n = number of moles of gas
+ * R = Gas constant (litres . atm . mole . oK or cm3 . atm/mole . oK)
+ * T = absolute temperature in Kelvin
+ * m = mass in grams
+ * P = Pressure
+ * ṁ = Mass flow (grams / min)
+ * 
+ ***/
+// REVIEW
+// NOTE This is tested and works for injected values. It is however a simplistic conversion
+double Calculations::convertKGHtoCFM(double massFlowKGH) {
+
+  extern struct SensorData sensorVal;
+
+  double FlowCFM;
+  double flowCMM;
+  double massFlowGM_M = convertMassFlowUnits(massFlowKGH, GM_M);
+
+  double tempInKelvin = this->convertTemperature(sensorVal.TempDegC, DEGC, KELVIN);
+  double baroPressureHpa = this->convertPressure(sensorVal.BaroKPA, HPA);
+
+  flowCMM  = massFlowGM_M * 82.1 * tempInKelvin / 28.949 * baroPressureHpa;
+
+  // convert cm3/min to CFM
+  FlowCFM = flowCMM * 0.000035314666721489 * -0.001;
+
+  return FlowCFM;
+
+}
+
 
 /***********************************************************
  * @brief CONVERT MASS FLOW TO VOLUMETRIC FLOW
  * @param massflowKgh Mass flow in KG/h
  * @note Calculate flow using ideal gas law:
+ * V̇  = ṁ nRT / mP
+ * Q = mRTZ/144P
+ * where:
+ * Q = flow in CFM
+ * P = pressure in PSIA
+ * m = mass flow in lb/min
+ * R = universal gas constant Ru/MW
+ * T = temperature in Rankine
+ * Z = compressibility 
+ * flowCFM = (massFlow * UniversalGasFlowConstant * GasTempInRankine * CompressibilityFactor(1))/ 144 * PressurePSIA
  * @ref https://www.pdblowers.com/tech-talk/volume-and-mass-flow-calculations-for-gases/
- * @ref flowCFM = (massFlow * UniversalGasFlowConstant * GasTempInRankine * CompressibilityFactor(1))/ 144 * PressurePSIA
+ * @todo review !!!!!!
  ***/
+// REVIEW
 double Calculations::convertMassFlowToVolumetric(double massFlowKgh) {
   
   extern struct SensorData sensorVal;
@@ -301,186 +411,24 @@ double Calculations::convertMassFlowToVolumetric(double massFlowKgh) {
   double mafFlowCFM;
   double gasPressure;
 
-  double tempInRankine = this->convertTemperature(sensorVal.TempDegC, RANKINE);
+  double tempInRankine = this->convertTemperature(sensorVal.TempDegC, DEGC, RANKINE);
   double specificGravity = this->calculateSpecificGravity(); //tested ok
-  double molecularWeight = MOLAR_MASS_DRY_AIR * specificGravity; //tested ok
+  double molecularWeightAir = MOLAR_MASS_DRY_AIR * specificGravity; //tested ok
   double baroPressurePsia = this->convertPressure(sensorVal.BaroKPA, PSIA);
-  double refPressure = this->convertPressure(sensorVal.PRefKPA, PSIA);
+  double refPressurePsia = this->convertPressure(sensorVal.PRefKPA, PSIA);
   double massFlowLbm = massFlowKgh * 0.03674371036415;
+  double universalGasConstant = 1545 / molecularWeightAir;
 
-  // gasPressure = baroPressure + refPressure; // TODO: need to validate refPressure (should be a negative number)
+  // gasPressure = baroPressurePsia + refPressurePsia; // Adjusted value includes reference depression
   gasPressure = baroPressurePsia;
 
-  mafFlowCFM = ((massFlowLbm * 1545 * tempInRankine) / (molecularWeight * 144 * gasPressure)); 
+  // mafFlowCFM = ((massFlowLbm * 1545 * tempInRankine) / (molecularWeightAir * 144 * gasPressure)); // original
+  mafFlowCFM = ((massFlowLbm * universalGasConstant * tempInRankine) / (144 * gasPressure)); // this is a test
+  mafFlowCFM = mafFlowCFM * -1; // get rid of negative value from test
 
   return mafFlowCFM;
 
 }
-
-
-
-
-/***********************************************************
- * @brief CALCULATE FLOW in CFM
- * 
- * @param mafRAW RAW reference value (15bit value from ADS1115 ADC)
- * @param maxValue Max reference value (default 32767 for 15 bit resolution)
- * @return flowRateCFM
- * @note mafLookupTable is lookup vector from MafData file (val > flow data pairs)
- * @note Supported bench types - MAF 
- * @note Future support for Orifice / Pitot / Venturi benches planned
- * 
- ***/
-double Calculations::calculateFlowCFM(long mafRAW, long maxADC ) {
-
-  extern CalibrationSettings calibration;
-  extern struct SensorData sensorVal;
-  
-	#ifdef MAF_IS_ENABLED
-	Maf _maf;
-	#endif
-
-  double flowRateCFM = 0.0;
-  double flowRateMGS = 0.0;
-  double flowRateKGH = 0.0;
-  double flowRateRAW = 0.0;
-
-
-/*** MAF Style Bench ***/
-#if defined MAF_STYLE_BENCH && defined MAF_IS_ENABLED
-
-  int refValue;
-  int numRows;
-
-  // get size of the data table
-  numRows = mafLookupTable.size();
-
-  // get highest MAF input value from data table
-  long maxMAF =  mafLookupTable[numRows -1][0];
-
-  // scale sensor reading to data table size using map function (0-ADC Max -> 0-MAF Max))
-  refValue =  map(mafRAW, 0, maxADC, 0, maxMAF );
-
-  for (int rowNum = 0; rowNum < numRows; rowNum++) { // iterate the data table comparing the Lookup Value to the refValue for each row
-
-    long LV = mafLookupTable[rowNum][0]; // Lookup Value for this row (x2)
-    long FV = mafLookupTable[rowNum][1]; // Flow Value for this row (y2)
-
-    // Did we get a match??
-    if (refValue == LV) { // Great!!! we've got the exact value
-
-      flowRateRAW = FV;
-      break;
-      
-    // } else if ( LV > refValue && rowNum == 0) { // we were only on the first row so there is no previous value to interpolate with, so lets set the flow value to zero and consider it no flow
-
-    //   flowRateRAW = 0.0;
-    //   return flowRateRAW;
-    //   break;
-
-    } else if (LV > refValue) { // The value is somewhere between this and the previous value so let's use linear interpolation to calculate the actual value: 
-
-      long LVP = mafLookupTable[rowNum - 1][0]; // Lookup value for the previous row (x1)
-      long FVP = mafLookupTable[rowNum - 1][1]; // Flow value for the previous row (y1)
-
-      // Linear interpolation y = y1 + (x-x1)((y2-y1)/(x2-x1)) where x1+y1 are coord1 and x2_y2 are coord2
-      flowRateRAW = FVP + (refValue - LVP)*((FV-FVP)/(LV-LVP));
-      break;   
-    }
-
-  } //endfor
-
-
-  // Now that we have a flow value, we need to scale it and convert it.
-  if (_maf.mafUnits() == KG_H) {
-
-    // convert RAW datavalue back into kg/h
-    flowRateKGH = double(flowRateRAW / 1000);
-
-  } else if (_maf.mafUnits() == MG_S) {
-
-    // Convert RAW datavalue back into mg/s
-    flowRateMGS = flowRateRAW / 10;
-
-    // convert mg/s value into kg/h
-    flowRateKGH = flowRateMGS / 277.8;
-  }
-
-  sensorVal.FlowMASS = flowRateKGH;
-
-  // Now we need to convert from kg/h into cfm (NOTE this is approx 0.4803099 cfm per kg/h @ sea level)
-  flowRateCFM = convertMassFlowToVolumetric(flowRateKGH);
-
-/*** Orifice Style Bench ***/
-// NOTE Ideally orifice should not be larger than 50% of your pipe size
-#elif defined ORIFICE_STYLE_BENCH // ratiometric
-
-
-  double refPressure = sensorVal.PRefKPA;
-  double diffPressure = sensorVal.PDiffKPA;
-
-  //get currently selected orifice + calibration depression
-
-  //Simplified Flow calculation. Source - https://www.youtube.com/watch?v=Dn16HZ_oHEo
-  // flowRateCFM = OrificeCalibratedflowCFM * SQRT(diffPressure / OrificeCalibratedPressure);
-
-
-
-/*** Venturi Style Bench ***/
-// NOTE Ideally venturi should not be larger than 50% of your pipe size
-// https://www.engineersedge.com/fluid_flow/venturi_flow_equation_and_calculator_14001.htm
-#elif defined VENTURI_STYLE_BENCH  // ratiometric
-
-  double refPressure = sensorVal.PRef;
-  double diffPressure = sensorVal.PDiff;
-
-  //Simplified Flow calculation. Source - https://www.youtube.com/watch?v=Dn16HZ_oHEo
-  flowRateCFM = OrificeCalibratedflowCFM * SQRT(diffPressure / OrificeCalibratedPressure);
-
-  
-
-/*** Pitot Style Bench ***/
-// Diameter of pipe is required (set in config)
-#elif defined PITOT_STYLE_BENCH // ratiometric
-
-  /*
-  
-  https://www.youtube.com/watch?v=Dn16HZ_oHEo
-
-  Vfpm = SQRT(P1-P2) * 40004.4 * Kf
-
-  Where:
-  P1 = Stagnation pressure [Pitot]
-  P2 = Static pressure [PRef]
-  P1-P2 = Dynamic pressure
-  Kf = Correction factor for pitot tube (or test pressure )
-  Vfpm = Velocity in feet per second
-
-  CFM = Vfpm * Pi*R^2 
-
-  Where:
-  R = radius of pipe in feet
-
-
-  */
-  
-  Vfpm = SQRT(P1-P2) * 40004.4 * Kf;
-
-  flowRateCFM = convertVelocityToVolumetric(Vfpm, PIPE_RADIUS_IN_FEET);
-
-
-#endif
-
-
-
-
-  flowRateCFM += calibration.flow_offset;
-
-  sensorVal.FlowCFM = flowRateCFM;
-
-  return flowRateCFM;
-}
-
 
 
 

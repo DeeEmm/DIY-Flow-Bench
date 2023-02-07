@@ -31,9 +31,15 @@
 #include "driver/pcnt.h"
 #include LANGUAGE_FILE
 
+// #ifdef MAF_IS_ENABLED
+// #include "mafData/maf.h"
+// #endif
+
 #ifdef MAF_IS_ENABLED
-#include "mafData/maf.h"
+#include MAF_DATA_FILE
 #endif
+
+
 
 #ifdef BME_IS_ENABLED
 #define TINY_BME280_I2C
@@ -77,13 +83,26 @@ void Sensors::initialise () {
 
 	Messages _message;
 
-	#ifdef MAF_IS_ENABLED
-	Maf _mafdata;
-	#endif
-
 	extern struct DeviceStatus status;
     extern struct Translator translate;
 	extern int mafOutputType;
+
+	// Initialise  MAF data
+	#ifdef MAF_IS_ENABLED
+		Maf _maf;
+		
+		// get size of the MAF datatable
+  		status.mafDataTableRows = mafLookupTable.size() -1;
+
+		// get highest MAF input value from data table
+		status.mafDataValMax = mafLookupTable[status.mafDataTableRows][1];
+		status.mafDataKeyMax = mafLookupTable[status.mafDataTableRows][0];
+		
+		// get MAF units
+		status.mafUnits = _maf.mafUnits();
+	#endif
+
+
 	
 	//initialise BME
 	#ifdef BME_IS_ENABLED
@@ -110,12 +129,14 @@ void Sensors::initialise () {
 	#endif
 
 
+
+
 	// REVIEW temp disabled - need to reenable
 	// Set up the MAF ISR if required
 	// Note Frequency based MAFs are required to be attached direct to MAF pin for pulse counter to work
 	// This means 5v > 3.3v signal conditioning is required on MAF pin
 /* temp disabled - need to reenable	
-	if (_mafdata.outputType == FREQUENCY) {	
+	if (_maf.outputType == FREQUENCY) {	
 		__mafVoodoo.mafSetupISR(MAF_PIN, []{__mafVoodoo.mafFreqCountISR();}, FALLING);
 		timer = timerBegin(0, 2, true);                                  
 		timerStart(timer);	
@@ -126,9 +147,9 @@ void Sensors::initialise () {
 	// Sensor definitions for system status pane
 	// MAF Sensor
 	#if defined MAF_IS_ENABLED && defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
-		this->_mafSensorType = _mafdata.sensorType();
+		this->_mafSensorType = _maf.sensorType();
 	#elif defined MAF_IS_ENABLED && defined MAF_SRC_IS_PIN
-		this->_mafSensorType = _mafdata.sensorType() + " on GPIO:" + MAF_PIN;
+		this->_mafSensorType = _maf.sensorType() + " on GPIO:" + MAF_PIN;
 	#else
 		this->_mafSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#endif
@@ -264,6 +285,40 @@ void IRAM_ATTR Sensors::mafFreqCountISR() {
 
 
 
+
+/***********************************************************
+ * @brief Returns RAW MAF Sensor value (ADC Value)
+ *
+ ***/
+long Sensors::getMafRaw() {
+	
+	Hardware _hardware;
+	extern struct SensorData sensorVal;
+
+	#ifdef MAF_IS_ENABLED
+	Maf _maf;
+
+	#if defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
+		sensorVal.MafRAW = _hardware.getADCRawData(MAF_ADC_CHANNEL);
+		
+	#elif defined MAF_SRC_IS_PIN	
+		long mafFlowRaw = analogRead(MAF_PIN);
+	#else
+		mafFlowRaw = 1;
+	#endif
+
+	return sensorVal.MafRAW;
+
+	#else
+
+	return 0; // MAF is disabled so lets return 1
+
+	#endif
+}
+
+
+
+
 /***********************************************************
  * @brief getMafVolts: Returns MAF signal in Volts
  ***/
@@ -296,54 +351,82 @@ double Sensors::getMafVolts() {
 
 
 
+
+
 /***********************************************************
- * @brief Returns RAW MAF Sensor value (mass flow)
+ * @brief Returns MAF mass flow value in KG/H 
+ * @note Interpolates lookupvalue from datatable key>value pairs
  *
- * @note MAF decode is done in Calculations.cpp
  ***/
-long Sensors::getMafRaw() {
-	
+int32_t Sensors::getMafFlow(int units) {
+
+	extern struct DeviceStatus status;
+	extern struct SensorData sensorVal;
+
 	Hardware _hardware;
-	#ifdef MAF_IS_ENABLED
-	Maf _mafdata;
 
-	switch (_mafdata.outputType()) {
-		
-		case VOLTAGE:
-		{
-			#if defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
-				mafFlowRaw = _hardware.getADCRawData(MAF_ADC_CHANNEL);
-				
-			#elif defined MAF_SRC_IS_PIN	
-				long mafFlowRaw = analogRead(MAF_PIN);
-			#else
-				mafFlowRaw = 1;
-			#endif
-		}
+	double flowRateCFM = 0.0;
+	double flowRateMGS = 0.0;
+	double flowRateKGH = 0.0;
+	double lookupValue = 0.0;
+
+	// scale sensor reading to data table size using map function (0-5v : 0-keymax)
+	// long refValue =  map(this->getMafVolts(), 0, _hardware.get5vSupplyVolts(), 0, status.mafDataKeyMax ); 
+	long refValue =  map(this->getMafVolts(), 0, _hardware.get3v3SupplyVolts(), 0, status.mafDataKeyMax ); // REMOVE - TEST FOR V1 SHIELD w/3.3v ADC
+
+refValue = 512; // REMOVE - TEST
+
+	for (int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { // iterate the data table comparing the Lookup Value to the refValue for each row
+
+		long Key = mafLookupTable[rowNum][0]; // Key Value for this row (x2)
+		long Val = mafLookupTable[rowNum][1]; // Flow Value for this row (y2)
+
+		// Did we get a match??
+		if (refValue == Key) { // Great!!! we've got the exact key value
+
+		lookupValue = Val; // lets use the associated lookup value
 		break;
 		
-		case FREQUENCY:
-		{  
-			// TODO
-			mafFlowRaw = 40000000.00 / PeriodCount;
-			//mafFlowRaw = 40000000.00 / __mafVoodoo.PeriodCount; // NOTE: Do we need Voodoo?
+		} else if ( Key > refValue && rowNum == 0) { // we were only on the first row so there is no previous value to interpolate with, so lets set the flow value to zero and consider it no flow
+
+		  return 0.0; 
+		  break;
+
+		} else if (Key > refValue && rowNum > 0) { // The value is somewhere between this and the previous key value so let's use linear interpolation to calculate the actual value: 
+
+		long KeyPrev = mafLookupTable[rowNum - 1][0]; // Key value for the previous row (x1)
+		long ValPrev = mafLookupTable[rowNum - 1][1]; // Flow value for the previous row (y1)
+
+		// Linear interpolation y = y1 + (x-x1)((y2-y1)/(x2-x1)) where x1+y1 are coord1 and x2_y2 are coord2
+		lookupValue = ValPrev + (refValue - KeyPrev)*((Val-ValPrev)/(Key-KeyPrev));
+		break;   
 		}
-		break;
-		
-	}	
-	
-	return mafFlowRaw;
 
-	#else
+	} 
 
-	return 0; // MAF is disabled so lets return 1
 
-	#endif
+	// Now that we have a flow value, we need to scale it and convert it.
+	if (status.mafUnits == KG_H) {
+
+		// convert RAW datavalue back into kg/h
+		flowRateKGH = double(lookupValue / 1000);
+
+	} else if (status.mafUnits == MG_S) {
+
+		// Convert RAW datavalue back into mg/s
+		// flowRateMGS = lookupValue / 10;
+		flowRateMGS = lookupValue;
+
+		// convert mg/s value into kg/h
+		flowRateKGH = flowRateMGS / 277.8;
+
+	}
+
+
+	return flowRateKGH;
+
+
 }
-
-
-
-
 
 /***********************************************************
  * @brief get Reference Pressure sensor voltage

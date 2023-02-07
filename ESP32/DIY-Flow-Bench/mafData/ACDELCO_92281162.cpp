@@ -9,6 +9,7 @@
  * Status: Validated
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
+ * 160777 mg/s is Approx 263cfm 
  ***/
 #ifndef MAFDATACLASS
 #define MAFDATACLASS

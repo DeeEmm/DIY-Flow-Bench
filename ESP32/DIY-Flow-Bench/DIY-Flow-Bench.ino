@@ -75,9 +75,8 @@ Webserver _webserver;
 
 // Set up semaphore signalling between tasks
 SemaphoreHandle_t i2c_task_mutex;
-TaskHandle_t bmeTaskHandle = NULL;
-TaskHandle_t adcTaskHandle = NULL;
-TaskHandle_t sseTaskHandle = NULL;
+TaskHandle_t sensorDataTask = NULL;
+TaskHandle_t enviroDataTask = NULL;
 // portMUX_TYPE mmux = portMUX_INITIALIZER_UNLOCKED;
 
 char charDataJSON[256];
@@ -103,9 +102,10 @@ void TASKgetSensorData( void * parameter ){
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
         status.adcPollTimer = millis() + ADC_SCAN_DELAY_MS; // Only reset timer when task executes
 
+        // TODO integration for non maf style benches
         #ifdef MAF_IS_ENABLED
-        sensorVal.MafRAW = _sensors.getMafRaw();
-        sensorVal.FlowCFM = _calculations.calculateFlowCFM(sensorVal.MafRAW);
+        sensorVal.FlowKGH = _sensors.getMafFlow();
+        sensorVal.FlowCFM = _calculations.convertKGHtoCFM(sensorVal.FlowKGH);
         #endif
         
         #ifdef PREF_IS_ENABLED 
@@ -196,13 +196,11 @@ void setup(void) {
   #endif
 
   #ifdef ADC_IS_ENABLED // Compile time directive used for testing
-  // xTaskCreate(TASKgetSensorData, "GET_BENCH_DATA", 2800, NULL, 2, &adcTaskHandle); 
-  xTaskCreatePinnedToCore(TASKgetSensorData, "GET_BENCH_DATA", 1700, NULL, 2, &adcTaskHandle, secondaryCore);  
+  xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENSOR_DATA", 2200, NULL, 2, &sensorDataTask, secondaryCore); 
   #endif
 
   #ifdef BME_IS_ENABLED // Compile time directive used for testing
-  // xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle); 
-  xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle, secondaryCore); 
+  xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", 1800, NULL, 2, &enviroDataTask, secondaryCore); 
   #endif
 
 }

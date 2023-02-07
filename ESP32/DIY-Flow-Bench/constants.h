@@ -52,6 +52,7 @@
 #define  BAR 8
 #define  HPA 9
 #define  KELVIN 10
+#define  ATM 11
 
 
 /***********************************************************
@@ -76,6 +77,7 @@
 #define  RAW_ANALOG 2
 #define  KG_H 1
 #define  MG_S 2
+#define  GM_M 3
 
 
 /***********************************************************

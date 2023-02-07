@@ -107,9 +107,8 @@ void API::ParseMessage(char apiMessage) {
   Hardware _hardware;
   Webserver _webserver;
   
-  extern TaskHandle_t bmeTaskHandle;
-  extern TaskHandle_t adcTaskHandle;
-  extern TaskHandle_t sseTaskHandle;
+  extern TaskHandle_t sensorDataTask;
+  extern TaskHandle_t enviroDataTask;
   
   // define char arrays for response strings
   char apiResponse[API_RESPONSE_LENGTH];  //64
@@ -134,10 +133,11 @@ void API::ParseMessage(char apiMessage) {
   5 : 5V Voltage Value
   B : Barometric Pressure
   C : JSON Configuration Data
-  d : Debug On / Off
+  D : MAF data max value
+  d : MAF data key max value
   E : Enum
   F : Flow Value in CFM
-  F : Flow Value in KG/H
+  f : Flow Value in KG/H
   H : Humidity Value
   I : IP Address
   J : JSON Status Data
@@ -195,14 +195,12 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponseBlob, API_BLOB_LENGTH, "C%s%s", config.api_delim, charDataJSON);
       break;
       
-      case 'd': // DEBUG ON/OFF'
-        if (streamMafData == false) {
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%s", config.api_delim, "Debug Mode On" );
-          streamMafData = true;
-        } else {
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%s", config.api_delim, "Debug Mode Off" );
-          streamMafData = false;
-        }
+      case 'D': // mafdata max value
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%u", config.api_delim , status.mafDataValMax);
+      break;      
+
+      case 'd': // mafdata max key value
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%u", config.api_delim , status.mafDataKeyMax);
       break;      
 
       case 'E': // Enum - Flow:Ref:Temp:Humidity:Baro
@@ -233,7 +231,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'f': // Get measured Mass Flow 'F123.45\r\n'       
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", config.api_delim , sensorVal.FlowMASS);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", config.api_delim , sensorVal.FlowKGH);
       break;
 
       case 'H': // Get measured Humidity 'H.123.45\r\n'
@@ -260,11 +258,11 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'M': // Get MAF raw sensor data'  
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "M%s%f", config.api_delim, sensorVal.MafRAW);   
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "M%s%u", config.api_delim, _hardware.getADCRawData(MAF_ADC_CHANNEL));   
       break;
       
       case 'm': // Get MAF output voltage'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "m%s%f", config.api_delim , _sensors.getMafVolts());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "m%s%f", config.api_delim , _hardware.getADCVolts(MAF_ADC_CHANNEL));
       break;     
       
       case 'N': // Hostname
@@ -317,7 +315,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'X': // Print xTask memory usage (Stack high water mark) to serial monitor 
-          snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack HWM BMETask=%d / ADCTask=%d ", config.api_delim , uxTaskGetStackHighWaterMark(bmeTaskHandle), uxTaskGetStackHighWaterMark(adcTaskHandle)); 
+          snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack HWM EnviroTask=%d / SensorTask=%d ", config.api_delim , uxTaskGetStackHighWaterMark(enviroDataTask), uxTaskGetStackHighWaterMark(sensorDataTask)); 
       break;
 
       case '@': // Status Print Mode (Stream status messages to serial)
