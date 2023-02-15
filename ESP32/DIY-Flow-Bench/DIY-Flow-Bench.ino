@@ -105,6 +105,7 @@ void TASKgetSensorData( void * parameter ){
         // TODO integration for non maf style benches
         #ifdef MAF_IS_ENABLED
         sensorVal.FlowKGH = _sensors.getMafFlow();
+        // sensorVal.FlowCFM = _calculations.convertMassFlowToVolumetric(sensorVal.FlowKGH);
         sensorVal.FlowCFM = _calculations.convertKGHtoCFM(sensorVal.FlowKGH);
         #endif
         
@@ -176,9 +177,11 @@ void TASKgetEnviroData( void * parameter ){
  ***/
 void setup(void) {
   
+
   // We need to call Wire globally so that it is available to both hardware and sensor classes so lets do that here
-  Wire.begin (SCA_PIN, SCL_PIN); 
-  Wire.setClock(300000);
+  Wire.begin (SDA_PIN, SCL_PIN); 
+  Wire.setClock(100000);
+  // Wire.setClock(300000); // ok for wemos D1
   // Wire.setClock(400000);
     
   _hardware.begin();
@@ -230,6 +233,8 @@ void loop () {
   }
   
   // TODO: PID Vac source Analog VFD control [if PREF not within limits]
+  // _hardware.setVFDRef();
+  // _hardware.setBleedValveRef();
   
   #ifdef WEBSERVER_ENABLED
   if (millis() > status.browserUpdateTimer) {        

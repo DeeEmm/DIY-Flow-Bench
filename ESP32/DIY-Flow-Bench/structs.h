@@ -33,8 +33,8 @@
 struct ConfigSettings {
   int api_response_length = 64;                   // API Serial comms message length
   long serial_baud_rate = 115200;                 // Default baud rate 
-  unsigned long wifi_timeout = 3500;              // Duration of Wifi connection attempt in millisec's
-  unsigned long wifi_retries = 10;                // Number of attempts to connect to Wifi
+  unsigned long wifi_timeout = 4000;              // Duration of Wifi connection attempt in millisec's
+  unsigned long wifi_retries = 10;                // Number of attempts to connect to Wifi before creating AP
   int min_flow_rate = 1;                          // Flow rate at which bench is considered running
   int min_bench_pressure = 1;                     // Min bench pressure where bench is considered running
   double maf_min_volts = 0.1;                     // Filter out results less than this
@@ -55,13 +55,13 @@ struct ConfigSettings {
   int parsecs = 12;
   char pageTitle[32] = "DIY Flow Bench";          // Display name for software
   char wifi_ssid[32] = "WIFI-SSID";               // Your Wifi SSID
-  char wifi_pswd[32] = "WIFI-PASS";               // Your Wifi Password
+  char wifi_pswd[32] = "PASSWORD";               // Your Wifi Password
   char wifi_ap_pswd[32] = "123456789";            // Default Access Point Password
   char hostname[32] = "diyfb";                    // Default Hostname
   char api_delim[2] = ":";                        // API Serial comms delimiter
   char wifi_ap_ssid[32] = "DIYFB";                // Default Access Point name
   char temp_unit[11] = "Celcius";                 // Defalt display unit of temperature
-  bool ap_mode = true;                            // Default WiFi connection mode is accesspoint mode
+  bool ap_mode = false;                           // Default WiFi connection mode is accesspoint mode
 };
 
 

@@ -44,6 +44,8 @@ class Hardware {
 		double getADCVolts(int channel);
 		bool benchIsRunning();	
 		void checkRefPressure();
+		void setVFDRef();
+		void setBleedValveRef();
 		
 		void benchOn();
 		void benchOff();

@@ -50,20 +50,37 @@ Hardware::Hardware() {
 
 /***********************************************************
  * @brief Configure pins
+ * @note Conditional configiration based on board type and hardware
  *
  ***/
 void Hardware::configurePins () {
  
   // Inputs
-  //TODO
-//  pinMode(MAF_PIN, INPUT); 
   pinMode(VCC_3V3_PIN, INPUT); 
   pinMode(VCC_5V_PIN, INPUT); 
+
   pinMode(SPEED_SENSOR_PIN, INPUT); 
-//  pinMode(REF_PRESSURE_PIN, INPUT); 
-//  pinMode(DIFF_PRESSURE_PIN, INPUT); 
-//  pinMode(PITOT_PIN, INPUT); 
-  
+  pinMode(ORIFICE_BCD_BIT1_PIN, INPUT); 
+  pinMode(ORIFICE_BCD_BIT2_PIN, INPUT); 
+  pinMode(ORIFICE_BCD_BIT3_PIN, INPUT); 
+
+
+  #ifdef MAF_SRC_IS_PIN
+  pinMode(MAF_PIN, INPUT); 
+  #endif
+
+  #ifdef PREF_SRC_PIN
+  pinMode(REF_PRESSURE_PIN, INPUT); 
+  #endif
+
+  #ifdef PDIFF_SRC_IS_PIN
+  pinMode(DIFF_PRESSURE_PIN, INPUT); 
+  #endif
+
+  #ifdef PITOT_SRC_IS_PIN
+  pinMode(PITOT_PIN, INPUT); 
+  #endif
+
   #if defined TEMP_SENSOR_TYPE_LINEAR_ANALOG || defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
     pinMode(TEMPERATURE_PIN, INPUT); 
   #endif
@@ -79,12 +96,17 @@ void Hardware::configurePins () {
   pinMode(VAC_BANK_1_PIN, OUTPUT);
   pinMode(VAC_BANK_2_PIN, OUTPUT);
   pinMode(VAC_BANK_3_PIN, OUTPUT);
+  
   pinMode(VAC_SPEED_PIN, OUTPUT);
   pinMode(VAC_BLEED_VALVE_PIN, OUTPUT);
-  pinMode(AVO_ENBL_PIN, OUTPUT);
+
   pinMode(AVO_STEP_PIN, OUTPUT);
   pinMode(AVO_DIR_PIN, OUTPUT);
-  pinMode(VAC_BANK_1_PIN, OUTPUT);
+
+  pinMode(FLOW_VALVE_STEP_PIN, OUTPUT);
+  pinMode(FLOW_VALVE_DIR_PIN, OUTPUT);
+
+
 
 
 }
@@ -191,9 +213,9 @@ void Hardware::beginSerial(void) {
 
 
 /***********************************************************
- * @brief Loop through I2C addresses and print list of devices to serial
+ * @brief Scan through I2C addresses and print list of devices found to serial
  * @remark Based on: https://www.esp32.com/viewtopic.php?t=4742
- * @note Wire is required but glbally called in main setup in DIY-Flow-Bench.cpp
+ * @note Wire is required but globally called in main setup in DIY-Flow-Bench.cpp
  ***/ 
 void Hardware::getI2CList() {   
   
@@ -201,11 +223,15 @@ void Hardware::getI2CList() {
 
   _message.serialPrintf("Scanning for I2C devices...\n");
   byte count = 0;
-  
-  for (byte i = 8; i < 120; i++)   {
-    Wire.beginTransmission (i);          
-    if (Wire.endTransmission () == 0)  {  
-      _message.serialPrintf("Found address: %u (0x%X)\n", i, i);
+  byte error;
+
+  for (byte address = 1; address < 127; address++)   {
+    Wire.beginTransmission (address);          
+    // if (Wire.endTransmission () == 0)  {  
+    error = Wire.endTransmission ();
+    // _message.serialPrintf("Error: %u (0x%X)\n", error, address); // Uncomment to report all failed addresses
+    if (error == 0)  {  
+      _message.serialPrintf("Found address: %u (0x%X)\n", address, address);
       count++;
     }
   }
@@ -446,3 +472,22 @@ float Hardware::uptime() {
 
 }
 
+
+/***********************************************************
+ * @brief Sets VFD reference voltage DAC1
+ * @note need to utilise PID control to compare target depression with actual and adjust reference
+ * @ref https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/dac.html
+ ***/
+
+void Hardware::setVFDRef() {
+}
+
+
+/***********************************************************
+ * @brief Sets Bleed Valve reference voltage using DAC2
+ * @note need to utilise PID control to compare target depression with actual and adjust reference
+ * @ref https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/dac.html
+ ***/
+void Hardware::setBleedValveRef() {
+
+}

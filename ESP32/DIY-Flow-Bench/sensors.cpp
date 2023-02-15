@@ -131,10 +131,18 @@ void Sensors::initialise () {
 
 
 
-	// REVIEW temp disabled - need to reenable
+	// REVIEW FREQUENCY BASED MAF - temporarily disabled - need to fix & reenable
 	// Set up the MAF ISR if required
 	// Note Frequency based MAFs are required to be attached direct to MAF pin for pulse counter to work
-	// This means 5v > 3.3v signal conditioning is required on MAF pin
+	// This means 5v > 3.3v signal conditioning is required on MAF pin (possible simple voltage divider + filter)
+	// Need to check out use of ESP PCNT function - https://docs.espressif.com/projects/esp-idf/en/v4.4/esp32/api-reference/peripherals/pcnt.html
+	// ESP32 has max PCNT frequency of 40MHz (half clock speed - 80MHz)
+	// Typical MAF is 30Hz -  150Hz
+	// Example - https://github.com/espressif/esp-idf/blob/v4.4/examples/peripherals/pcnt/pulse_count_event/main/pcnt_event_example_main.c
+	// also this... https://blog.adafruit.com/2018/12/27/frequency-measurement-on-an-esp32-in-micropython-esp32-micropython-python/
+	// and this... https://forum.micropython.org/viewtopic.php?f=18&t=5724&p=32921
+	// (which has example without interrupts)
+
 /* temp disabled - need to reenable	
 	if (_maf.outputType == FREQUENCY) {	
 		__mafVoodoo.mafSetupISR(MAF_PIN, []{__mafVoodoo.mafFreqCountISR();}, FALLING);
@@ -190,7 +198,7 @@ void Sensors::initialise () {
 	#endif
 	
 	// Rel Humidity Sensor
-	#ifdef RELH_SENSOR_NOT_USED
+	#ifndef RELH_IS_ENABLED
 		this->startupBaroPressure = this->getPRefValue();
 		this->_relhSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#elif defined RELH_SENSOR_TYPE_FIXED_VALUE
@@ -207,7 +215,7 @@ void Sensors::initialise () {
 	#endif
 
 	// reference pressure
-	#ifdef PREF_SENSOR_NOT_USED
+	#ifndef PREF_IS_ENABLED
 		this->_prefSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#elif defined PREF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_prefSensorType = "SMPXV7007";
@@ -220,7 +228,7 @@ void Sensors::initialise () {
 	#endif
 	
 	// differential pressure
-	#ifdef PDIFF_SENSOR_NOT_USED
+	#ifndef PDIFF_IS_ENABLED
 		this->_pdiffSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#elif defined PDIFF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_pdiffSensorType = "SMPXV7007";
@@ -231,7 +239,7 @@ void Sensors::initialise () {
 	#endif
 	
 	// pitot pressure differential
-    #ifdef PITOT_SENSOR_NOT_USED
+    #ifndef PITOT_IS_ENABLED
 		this->_pitotSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#elif defined PITOT_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_pitotSensorType = "SMPXV7007";
@@ -371,10 +379,7 @@ int32_t Sensors::getMafFlow(int units) {
 	double lookupValue = 0.0;
 
 	// scale sensor reading to data table size using map function (0-5v : 0-keymax)
-	// long refValue =  map(this->getMafVolts(), 0, _hardware.get5vSupplyVolts(), 0, status.mafDataKeyMax ); 
-	long refValue =  map(this->getMafVolts(), 0, _hardware.get3v3SupplyVolts(), 0, status.mafDataKeyMax ); // REMOVE - TEST FOR V1 SHIELD w/3.3v ADC
-
-refValue = 512; // REMOVE - TEST
+	long refValue =  map(this->getMafVolts(), 0, _hardware.get5vSupplyVolts(), 0, status.mafDataKeyMax ); 
 
 	for (int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { // iterate the data table comparing the Lookup Value to the refValue for each row
 
@@ -387,10 +392,10 @@ refValue = 512; // REMOVE - TEST
 		lookupValue = Val; // lets use the associated lookup value
 		break;
 		
-		} else if ( Key > refValue && rowNum == 0) { // we were only on the first row so there is no previous value to interpolate with, so lets set the flow value to zero and consider it no flow
+		// } else if ( Key > refValue && rowNum == 0) { // we were only on the first row so there is no previous value to interpolate with, so lets set the flow value to zero and consider it no flow
 
-		  return 0.0; 
-		  break;
+		//   return 0.0; 
+		//   break;
 
 		} else if (Key > refValue && rowNum > 0) { // The value is somewhere between this and the previous key value so let's use linear interpolation to calculate the actual value: 
 
@@ -648,7 +653,7 @@ double Sensors::getPitotValue() {
 
 		sensorVal = getPitotVolts() * PITOT_ANALOG_SCALE;
 	
-	#elif defined PITOT_SENSOR_TYPE_MPXV7007DP
+	#elif defined PITOT_SENSOR_TYPE_MPXV7007
 		
 		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
 		// sensorVal = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
@@ -657,7 +662,7 @@ double Sensors::getPitotValue() {
 
 	#else // use fixed value
 
-		sensorVal = FIXED_PITOT_VALUE;
+		sensorVal = 0.0001;
 
 	#endif
 

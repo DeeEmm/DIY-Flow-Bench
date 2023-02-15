@@ -22,6 +22,17 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+23021501        - Outline of VFD control
+                - Added adjustment for absolute humidity in flow conversion
+                - Finalised pin mapping for Wemos D1
+23021301        - Added pin outs for Arducam boards (UNTESTED)
+                - Updated README
+                - Fixed sensor type display on info page
+                - Tidied pinouts from Wemos D1 (For shield compatibility)
+23020901        - Display MAC Address
+                - Some improvements to WiFi
+                - Changed default STA Password
+23020801        - Substituted sensors->getMAFvolts for hardware->getADCvolts
 23020701        - Changed conversion from mass flow to volumetric
                 - Fixed syntax errors in MAF Data files
                 - Renamed main tasks for continuity

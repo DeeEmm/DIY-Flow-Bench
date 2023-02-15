@@ -203,20 +203,16 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%u", config.api_delim , status.mafDataKeyMax);
       break;      
 
+      case 'e': // Enum - Vapour Pressure:Absolute Humidity:Specific Gravity:Air Density
+          
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "e%s%f%s%f%s%f%s%f", 
+          config.api_delim, _calculations.calculateVaporPressure(KPA), 
+          config.api_delim, _calculations.calculateAbsoluteHumidity(), 
+          config.api_delim, _calculations.calculateSpecificGravity(), 
+          config.api_delim, _calculations.calculateAirDensity());
+      break;     
+
       case 'E': // Enum - Flow:Ref:Temp:Humidity:Baro
-          // // Flow
-          // apiResponse = ("E") + config.api_delim ;        
-          // // Truncate to 2 decimal places
-          // flowCFM = _calculations.calculateFlowCFM(_sensors.getMafRaw()) * 100;
-          // apiResponse += (flowCFM / 100) + (config.api_delim);
-          // // Reference Pressure
-          // apiResponse += _calculations.convertPressure(_sensors.getPRefValue(), KPA) + (config.api_delim);
-          // // Temperature
-          // apiResponse += _calculations.convertTemperature(_sensors.getTempValue(), DEGC) + (config.api_delim);
-          // // Humidity
-          // apiResponse += _calculations.convertRelativeHumidity(_sensors.getRelHValue(), PERCENT) + (config.api_delim);
-          // // Barometric Pressure
-          // apiResponse += _calculations.convertPressure(_sensors.getBaroValue(), KPA);
           
           snprintf(apiResponse, API_RESPONSE_LENGTH, "E%s%f%s%f%s%f%s%f%s%f", 
           config.api_delim, sensorVal.FlowCFM, 
@@ -262,7 +258,7 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'm': // Get MAF output voltage'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "m%s%f", config.api_delim , _hardware.getADCVolts(MAF_ADC_CHANNEL));
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "m%s%f", config.api_delim , _sensors.getMafVolts());
       break;     
       
       case 'N': // Hostname
@@ -315,7 +311,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'X': // Print xTask memory usage (Stack high water mark) to serial monitor 
-          snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack HWM EnviroTask=%d / SensorTask=%d ", config.api_delim , uxTaskGetStackHighWaterMark(enviroDataTask), uxTaskGetStackHighWaterMark(sensorDataTask)); 
+          snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack Free Memory EnviroTask=%d / SensorTask=%d ", config.api_delim , uxTaskGetStackHighWaterMark(enviroDataTask), uxTaskGetStackHighWaterMark(sensorDataTask)); 
       break;
 
       case '@': // Status Print Mode (Stream status messages to serial)

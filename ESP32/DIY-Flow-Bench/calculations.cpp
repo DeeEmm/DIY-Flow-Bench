@@ -30,11 +30,6 @@
 #include "hardware.h"
 #include "messages.h"
 
-//DEPRECATED
-// #ifdef MAF_IS_ENABLED
-// #include MAF_DATA_FILE
-// #endif
-
 
 
 
@@ -43,7 +38,6 @@
 */
 Calculations::Calculations() {
 }
-
 
 
 
@@ -220,10 +214,13 @@ double Calculations::convertRelativeHumidity(double relativeHumidity, int units)
 
 
 /***********************************************************
- * @brief CALCULATE VAPOUR PRESSURE
+ * @brief CALCULATE VAPOUR PRESSURE (nominally 101.325kPa)
  * 
  * @note Tetans Equation
- * @example P(kPa) = 0.61078EXP * ((17.27 * Temp(C) / Temp(C) + 237.3)
+ * @example P(kPa) = 0.61078 * EXP((17.27 * Temp(C) / Temp(C) + 237.3)
+ * 
+ * @note Magnus-Tetan Equation
+ * @example P(kPa) = 0.61094 * EXP((17.625 * Temp(C) / Temp(C) + 243.04)
  * 
  ***/
 double Calculations::calculateVaporPressure(int units) {
@@ -233,10 +230,15 @@ double Calculations::calculateVaporPressure(int units) {
   double vapourPressureKpa;
   double vapourPressurePsia;
 
-  vapourPressureKpa = 0.61078 * exp ((17.27 * sensorVal.TempDegC) / (sensorVal.TempDegC + 237.3));
+  // vapourPressureKpa = 0.61078 * exp((17.27 * sensorVal.TempDegC) / (sensorVal.TempDegC + 237.3)); // Tetan 
+  vapourPressureKpa = 0.61094 * exp((17.625 * sensorVal.TempDegC) / (sensorVal.TempDegC + 243.04)); // Magnus
 
   switch (units)
   {
+    case PASCALS:
+      return vapourPressureKpa * 1000;
+      break;
+
     case KPA:
       return vapourPressureKpa;
       break;
@@ -254,12 +256,41 @@ double Calculations::calculateVaporPressure(int units) {
 
 
 
+
 /***********************************************************
- * @brief CALCULATE SPECIFIC GRAVITY
+ * @brief CALCULATE ABSOLUTE HUMIDITY 
+ * 
+ * AH = (RH × P)/(Rw × T × 100)
+ * 
+ * Where:
+ * AH = Absolute Humdity g/m³  
+ * RH = Relative Humidity
+ * Rw = specific gas constant for water
+ * P = Saturation Vapour Pressure in Pascals
+ * T = Temperature 
+ * 
+ ***/
+double Calculations::calculateAbsoluteHumidity() {
+
+  extern struct SensorData sensorVal;
+  
+  double vapourPressure = this->calculateVaporPressure(KPA);
+
+  double absoluteHumidity = (convertRelativeHumidity(sensorVal.RelH, PERCENT) * vapourPressure) / SPECIFIC_GAS_CONSTANT_WATER_VAPOUR * sensorVal.TempDegC;
+
+  return absoluteHumidity;
+
+}
+
+
+
+
+/***********************************************************
+ * @brief CALCULATE SPECIFIC GRAVITY (ratio of densities of air to water)
  * 
  * SG = 1 - 0.378 RHa PVa / Pb
  * Where:
- * SG = specific gravity
+ * SG = specific gravity 
  * RHa = relative humidity in % (e.g. 0.36)
  * PVa = Vapor pressure of water at actual temperature in psia
  * Pb = barometric pressure in psia
@@ -272,7 +303,7 @@ double Calculations::calculateSpecificGravity() {
   extern struct SensorData sensorVal;
   double specificGravity;
 
-  double vaporPressurePsia = this->calculateVaporPressure();
+  double vaporPressurePsia = this->calculateVaporPressure(PSIA);
   double relativeHumidity = this->convertRelativeHumidity(sensorVal.RelH, DECI);
   double baroPressurePsia = this->convertPressure(sensorVal.BaroKPA, PSIA);
 
@@ -281,6 +312,7 @@ double Calculations::calculateSpecificGravity() {
   return specificGravity;
 
 }
+
 
 
 
@@ -356,15 +388,14 @@ double Calculations::convertMassFlowUnits(double massFlowKGH, int units) {
  * Where:
  * Q = Volumetric flow (SCCM)
  * n = number of moles of gas
- * R = Gas constant (litres . atm . mole . oK or cm3 . atm/mole . oK)
+ * R = Gas constant (litres . atm . mole . oK or cm3 . atm/mole . oK) | R = 82.1 (cm3 x atm) / (mole x K) | (m3 x Pa) / (mole x K)
  * T = absolute temperature in Kelvin
  * m = mass in grams
  * P = Pressure
  * ṁ = Mass flow (grams / min)
  * 
+ * 
  ***/
-// REVIEW
-// NOTE This is tested and works for injected values. It is however a simplistic conversion
 double Calculations::convertKGHtoCFM(double massFlowKGH) {
 
   extern struct SensorData sensorVal;
@@ -375,8 +406,12 @@ double Calculations::convertKGHtoCFM(double massFlowKGH) {
 
   double tempInKelvin = this->convertTemperature(sensorVal.TempDegC, DEGC, KELVIN);
   double baroPressureHpa = this->convertPressure(sensorVal.BaroKPA, HPA);
+  double absoluteHumidity = calculateAbsoluteHumidity(); // grams / m3 of water vapour in air
 
-  flowCMM  = massFlowGM_M * 82.1 * tempInKelvin / 28.949 * baroPressureHpa;
+  // adjust molar mass based on volume of water vapour in air
+  double molarMassAir = ((100 - absoluteHumidity) * MOLAR_MASS_DRY_AIR / 100) + (absoluteHumidity * MOLAR_MASS_WATER_VAPOUR / 100);
+
+  flowCMM  = massFlowGM_M * 82.1 * tempInKelvin / molarMassAir * baroPressureHpa;
 
   // convert cm3/min to CFM
   FlowCFM = flowCMM * 0.000035314666721489 * -0.001;
@@ -403,7 +438,7 @@ double Calculations::convertKGHtoCFM(double massFlowKGH) {
  * @ref https://www.pdblowers.com/tech-talk/volume-and-mass-flow-calculations-for-gases/
  * @todo review !!!!!!
  ***/
-// REVIEW
+// DEPRECATED Replaced by convertKGHtoCFM conversion
 double Calculations::convertMassFlowToVolumetric(double massFlowKgh) {
   
   extern struct SensorData sensorVal;
