@@ -6,7 +6,7 @@
  * MAF file for type: Make / Model
  * File units = 10 * mg/sec
  * Comments: Example Data
- * Status: 
+ * Status: Unvalidated
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
 ***/
@@ -63,14 +63,13 @@ int Maf::mafUnits() {
 
 
 /***********************************************************
-* MAF Data
+* @brief MAF Data
 *
-* The lookup table takes the form of {key, value}
+* @note The lookup table takes the form of {key, value}
 *
 * Keys may represent analog units, volts, hertz, baked beans or or any other input value.
 * Data table length is not fixed 
 * Keys do not need to be contiguous nor linear
-* Keys do not need to start at 1
 * Keys do not need to finish at a specific value
 * Whatever value you input into the getMafRaw method will return the relevant lookup table value
 *
@@ -91,8 +90,8 @@ int Maf::mafUnits() {
  * @brief mafLookupTable
  * @note Global vector of vectors containing MAF>Flow key>value pairs
  ***/
-// std::vector<std::vector<int>> Maf::mafLookupTable = new std::vector<std::vector<int>> {{ // declare on heap using pointer
- std::vector<std::vector<int>> mafLookupTable = {{ 
+ std::vector<std::vector<long>> mafLookupTable = {{ 
+    
     {0,0},
     {1,177},
     {2,181},
@@ -102,7 +101,7 @@ int Maf::mafUnits() {
     {6,195},
     {7,199},
 
-    ... etc ...
+    /// etc ///
 
     {1018,157897},
     {1019,158374},

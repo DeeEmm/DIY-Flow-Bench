@@ -15,7 +15,7 @@
 
 #include <Arduino.h>
 #include "../constants.h"
-#include "mafData/m
+#include "mafData/maf.h"
 
 
 
@@ -71,7 +71,7 @@ int Maf::mafUnits() {
  * @brief mafLookupTable
  * @note Global vector of vectors containing MAF>Flow key>value pairs
  ***/
- std::vector<std::vector<int>> mafLookupTable = {{ 
+ std::vector<std::vector<long>> mafLookupTable = {{ 
 {0,0},
 {880,1156},
 {896,1271},

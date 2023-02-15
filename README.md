@@ -21,23 +21,27 @@ NOTE: This project is still in active development and is currently at Release Ca
 
 A Flow Bench is a basic system to measure and display volumetric air flow.
 
-It is used as a tool for measuring and quantifying modifications and improvements made to items like automotive cylinder heads and carburettors by measuring the amount of air that they can flow. By measuring the volume of air that can be passed through the item the user can determine if modifications made to the item help improve air flow characteristics.
+It is used as a tool for measuring and quantifying modifications and improvements made to items suxh as automotive cylinder heads and carburettors by measuring the volume of air that they can flow within a set time period. By measuring the volume of air that can be passed through the item the user can determine if modifications made to the item help improve air flow characteristics.
 
-Traditionally constructed of a manometer and calibrated flow orifices, volumetric flow was calculated using mathematical methods. Modern flow benches use sensors to detect flow and reference pressures and flow calculations are now undertaken by microprocessor.
+Traditional flow benches utilise a manometer and regulate the reference pressure using calibrated flow orifices. Volumetric flow is then calculated using mathematical methods to convert the pressure drop across the testpiece into flow. 
+
+Modern flow benches use sensors to measure flow and reference pressures and then calculate flow in real time by microprocessor.
 
 ## What is the DIY Flow Bench Project?
 ###
 
 The DIY Flow Bench project (DIYFB) is a professional quality flow bench controller that produces results comparable with, and in some cases exceeding commercial grade systems. It uses high grade sensors and a WiFi enabled ESP32 microprocessor to display flow data and control bench operation via a web browser on any web enabled device. 
 
-This repository contains the hardware schematics and software code needed to build a volumetric flow bench based on an ESP32 controller and commonly available automotive sensors.
+The project aims to bring professional grade results to the DIYer without the price tag associated with owning a professional bench.
+
+This repository contains the hardware schematics and software code needed to build a volumetric flow bench based on an ESP32 controller and commonly available automotive MAF sensors.
 
 Support is included for the following systems architectures.
 
 - MAF based benches
-- Orifice based benches
-- Pitot style benches
-- Venturi style benches
+- Orifice based benches (In Development for V3 release)
+- Pitot style benches (In Development for V3 release)
+- Venturi style benches (In Development for V3 release)
 
 The DIYFB system can be used on any flow bench and makes an ideal retrofit for older manometer based benches as well as being the perfect choice for new builds. We include DIY hardware plans so you can build a basic MAF based flow bench that uses a shop vac for the vacuum source. This is a great entry level bench and perfect for most shops and hobbyists. We also provide support for larger and more complex bench designs.
 
@@ -50,7 +54,6 @@ The DIYFB system can be used on any flow bench and makes an ideal retrofit for o
 - Generates results comparable with commercial flow bench.
 - Open source software and hardware design.
 - DIY Shield kits available to purchase.
-
 
 
 ## Development Info
@@ -77,8 +80,6 @@ If you get stuck, feel free to create a [discussion](https://github.com/DeeEmm/D
 If you find an issue, or have a feature request, please [raise an issue](https://github.com/DeeEmm/DIY-Flow-Bench/issues)
 
 
-
-
 ## License
 ###
 
@@ -90,7 +91,6 @@ This software is released under the GPLV3 license. For details on usage please r
 You can view an online demo of the Web UI at the followng link
 
 [https://diyflowbench.com/demo/](https://diyflowbench.com/demo/)
-
 
 
 ## Further Information

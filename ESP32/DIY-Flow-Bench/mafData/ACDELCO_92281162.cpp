@@ -9,6 +9,7 @@
  * Status: Validated
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
+ * 160777 mg/s is Approx 263cfm 
  ***/
 #ifndef MAFDATACLASS
 #define MAFDATACLASS
@@ -71,7 +72,6 @@ int Maf::mafUnits() {
  * @brief mafLookupTable
  * @note Global vector of vectors containing MAF>Flow key>value pairs
  ***/
-// std::vector<std::vector<int>> Maf::mafLookupTable = new std::vector<std::vector<int>> {{ // declare on heap using pointer
  std::vector<std::vector<long>> mafLookupTable = {{ 
     {0,0},
     {1,177},

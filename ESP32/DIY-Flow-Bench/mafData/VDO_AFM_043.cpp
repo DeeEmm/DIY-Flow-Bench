@@ -69,7 +69,7 @@ int Maf::mafUnits() {
  * @brief mafLookupTable
  * @note Global vector of vectors containing MAF>Flow key>value pairs
  ***/
- std::vector<std::vector<int>> mafLookupTable = {{ 
+ std::vector<std::vector<long>> mafLookupTable = {{ 
 {0,0},
 {1500,214},
 {1625,259},

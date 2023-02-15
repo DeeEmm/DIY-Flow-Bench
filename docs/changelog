@@ -1,15 +1,9 @@
 ===================================================================
-Current build status
+Project Status
 ===================================================================
 
-Need to validate bench readings with calibrated source
+https://github.com/users/DeeEmm/projects/5/
 
-===================================================================
-Current work in progress
-===================================================================
-
-Code tidy in preparation for release
-Working through unit tests (see below)
 
 ===================================================================
 Known Issues
@@ -17,42 +11,6 @@ Known Issues
 
 ADC Channels PREF swapped with PDIFF (ERROR ON SHIELD PCB)
 
-===================================================================
-TODO
-===================================================================
-
-Calibration
-
-===================================================================
-Info / References I want to save for later
-===================================================================
-
-Poss thread safe library for i2c BME280 + ADS1115 (recommended + official) ?!!
-https://github.com/UncleRus/esp-idf-lib
-https://esp-idf-lib.readthedocs.io/en/latest/groups/i2cdev.html
-https://esp-idf-lib.readthedocs.io/en/latest/
-https://esp-idf-lib.readthedocs.io/en/latest/groups/bmp280.html        
-
-===================================================================
-Items to sort before formal RC release
-===================================================================
-
-- [X]   REMOVE tags
-- [X]   REVIEW tags
-- [X]   TEST tags
-- [X]   BUG tags
-- [X]   KNOWN ISSUES
-- [ ]   Translations
-- [ ]   Rename DIY-Flow-Bench.cpp to DIY-Flow-Bench.ino for Arduino IDE compatibility
-- [ ]   Shield Unit Tests...
-- [X]   BME280
-- [ ]   ADS1115 (MAF / Pref / Pdiff / Pitot)
-- [ ]   3.3V Buck + voltage feedback
-- [ ]   5V Buck + voltage feedback
-- [ ]   ULN2003 outputs
-- [ ]   DRV8825 stepper driver (valve adjust)
-- [ ]   DRV8825 stepper driver (Flow Valve?????)
-- [ ]   High speed input (Turbo speed)
  
 ===================================================================
 !! Don't forget to update the build number in configuration.h !!
@@ -64,7 +22,31 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-31012301        - Fixed MAF unit error
+23021501        - Outline of VFD control
+                - Added adjustment for absolute humidity in flow conversion
+                - Finalised pin mapping for Wemos D1
+23021301        - Added pin outs for Arducam boards (UNTESTED)
+                - Updated README
+                - Fixed sensor type display on info page
+                - Tidied pinouts from Wemos D1 (For shield compatibility)
+23020901        - Display MAC Address
+                - Some improvements to WiFi
+                - Changed default STA Password
+23020801        - Substituted sensors->getMAFvolts for hardware->getADCvolts
+23020701        - Changed conversion from mass flow to volumetric
+                - Fixed syntax errors in MAF Data files
+                - Renamed main tasks for continuity
+                - Added ATM units to pressure conversion 
+                - Added converssaion between mass flow units
+                - Changed MAF datatype to int32
+23020201        - Refactored MAF code and Mass to Volumetric conversion
+23020102        - Fixed include in MH95_3000_100 MAF Data file
+23020101        - Updated ReadMe 
+                - Updated DEV_BRANCH in configuration.h
+                - Updated MAF Data vectors to long datatype
+                - Fixed incorrect build number for RC4 (NOTE prev 31012301)
+23013101        - Release Candidate 4
+                - Fixed MAF unit error
                 - Fix Ref depression unit error
                 - Added bench running check to adjusted flow calc
 23012701        - Renamed TASKgetBenchData to TASKgetSensorData

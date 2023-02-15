@@ -25,10 +25,10 @@ class Hardware {
 
 	protected:
 		uint8_t		_i2cAddress;
-		uint16_t	_gain;
-		uint16_t	_mux;
+		uint32_t	_gain;
+		uint32_t	_mux;
 		uint8_t		_rate;			  
-        uint16_t 	_config;
+        uint32_t 	_config;
 
 	public:
 		Hardware();
@@ -38,12 +38,14 @@ class Hardware {
 		void getI2CList();
 		void getI2CDeviceList();
 		
-		int16_t getADCRawData(int channel);
+		int32_t getADCRawData(int channel);
 		double get3v3SupplyVolts();
 		double get5vSupplyVolts();
 		double getADCVolts(int channel);
 		bool benchIsRunning();	
 		void checkRefPressure();
+		void setVFDRef();
+		void setBleedValveRef();
 		
 		void benchOn();
 		void benchOff();
