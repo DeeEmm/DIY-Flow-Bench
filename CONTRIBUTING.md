@@ -2,31 +2,34 @@
 
 ###
 
-The following guidelines explain how contributions to the project are managed. The reason for having these the guidelines are so that the project is maintained in a well-organised manner and easy to use for both the end user and future developers alike.
+The following guidelines explain how contributions to the project are managed. The reason for having these the guidelines is so that the project is maintained in a well-organised manner and easy to use for both the end user and future developers alike.
 
 The project stretches across a number of platforms and disciplines, and so trying to make a one-size-fits-all set of 'rules' is likely impossible as there are many things do not apply equally to all. So the guidelines seek to set out some basic concepts that can then be implimented in the best manner across each of the platforms.
 
 
 ## Coding standards
 
-As there is no adopted formal coding standard in use, the style and methods employed are largely at the discretion and experience of the individual coder. We beleive that there is no **ONE** _RIGHT_ way of coding (Give a coding job to 10 softies and you will get 10 solutions) and so there is no expectation that the code is written a certain way. 
+As there is no adopted formal coding standard in use, the style and methods employed are largely at the discretion and experience of the individual coder. We beleive that there is no **ONE** _RIGHT_ way of coding (Give a coding job to 10 softies and you will get very different 10 solutions) and so there is no expectation that the code is written a certain way. However with that said, it is expected that all code submissions follow the basic guidelines.
 
 
 ### Basic guidelines
 
 Whilst we do not employ any specific coding standards, we do however have some very basic guidelines that we ask you to follow if possible.
 
-
+- One change per pull request. Do not combine changes unless they are directly related
+- Do not reformat or tidy existing code. Unecessary changes complicate code review
 - Keep your work neat so that it is easy for others to follow
 - Try to adhere to general good coding practice (no spaghetti logic please)
-- Include title blocks for code classes and functions
-- Comment your work so that others can follow what's going on
+- Include Doxygen style title blocks for code classes and functions
+- Comment your work so that others can follow what's going on (this is a public repo)
 - Try to use descriptive variable / function / class names
-- Use camelCase for variable / function / class names if possible
-- If you find it difficult to follow, others will too.
+- Use camelCase for variable / function / class names
+- Prefix class references with underscores
+- Create constants for integer based logic to make code easier to read (e.g. switch case statements)
+- Consider that if you find your code difficult to follow, others will too.
 
 
-Essentially it's all about making the code easy for others to read and follow. Remember that this is an open source project so people of all skill levels will be using it and trying to decypher what's going on. Also, please consider that the more help that is provided within the code, the less real-world help will be required to get people up and running, which will help minimise the real-world resources needed to support the project
+Essentially it's all about making the code easy for others to read and follow. Remember that this is an open source project so people of all skill levels will be using it and trying to decypher what's going on. Also, please consider that the more help that is provided within the code, the less real-world help will be required to get people up and running, which will help minimise the real-world resources needed to support the project.
 
 
 ## Version control
