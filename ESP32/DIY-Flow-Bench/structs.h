@@ -38,7 +38,7 @@ struct ConfigSettings {
   int min_flow_rate = 1;                          // Flow rate at which bench is considered running
   int min_bench_pressure = 1;                     // Min bench pressure where bench is considered running
   double maf_min_volts = 0.1;                     // Filter out results less than this
-  int refresh_rate = 250;                         // Screen refresh rate in milliseconds (>180)
+  int refresh_rate = 500;                         // Screen refresh rate in milliseconds (>180)
   int adj_flow_depression = 28;                   // Adjusted flow depression in inches of water
   double cal_ref_press = 10;                      // Calibration orifice ref pressure
   double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
@@ -55,13 +55,14 @@ struct ConfigSettings {
   int parsecs = 12;
   char pageTitle[32] = "DIY Flow Bench";          // Display name for software
   char wifi_ssid[32] = "WIFI-SSID";               // Your Wifi SSID
-  char wifi_pswd[32] = "PASSWORD";               // Your Wifi Password
+  char wifi_pswd[32] = "PASSWORD";                // Your Wifi Password
   char wifi_ap_pswd[32] = "123456789";            // Default Access Point Password
   char hostname[32] = "diyfb";                    // Default Hostname
   char api_delim[2] = ":";                        // API Serial comms delimiter
   char wifi_ap_ssid[32] = "DIYFB";                // Default Access Point name
   char temp_unit[11] = "Celcius";                 // Defalt display unit of temperature
   bool ap_mode = false;                           // Default WiFi connection mode is accesspoint mode
+  double valveLiftInterval = 1.5;                 // Distance between valve lift data points (can be metric or imperial)
 };
 
 

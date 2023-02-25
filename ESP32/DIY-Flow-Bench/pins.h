@@ -326,6 +326,7 @@
  * Uses Officiel Expressif ESP32 WROVER Development KIT
  * Do not use configuration on other boards as pin mapping is modded for debugging
  * NOTE: GPIO 12,13,14,15 are reserved for JTAG interface and so are unused in this map
+ * NOTE: 
  ***/
 #ifdef ESP32_WROVER_KIT
 

@@ -26,8 +26,8 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "23021501"
-#define RELEASE "V.2.0-RC.5"
+#define BUILD_NUMBER "23022401"
+#define RELEASE "V.2.0-RC.6"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"
 
 
@@ -53,9 +53,10 @@
 * NOTE: If defining new board make sure to add board type definition to Hardware::begin
 ***/
 
-// #define ARDUCAM_ESP32S 
 #define WEMOS_D1_R32 // Using official Shield
 // #define ESP32DUINO // Generic pin mapping for ESP32 UNO style footprint. Copy or modify this for custom board mapping
+// #define ARDUCAM_ESP32S 
+// #define ARDUCAM_LOTAI 
 // #define ESP32_WROVER_KIT // DEBUG BUILD ONLY
 
 
@@ -115,12 +116,16 @@
 #define PRINT_BUFFER_LENGTH 128
 // #define API_CHECKSUM_IS_ENABLED                       
 #define WEBSOCK_CLEAN_FREQ 600000
-#define STATUS_UPDATE_RATE 500                              // time between SSE push in milliseconds
 #define FILESYSTEM SPIFFS
-#define VTASK_DELAY_ADC 100
-#define VTASK_DELAY_BME 100
-#define VTASK_DELAY_SSE 100
+#define VTASK_DELAY_ADC 500
+#define VTASK_DELAY_BME 500
+#define VTASK_DELAY_SSE 500
 
+
+/***********************************************************
+* WEBUI SETTINGS
+***/
+#define STATUS_UPDATE_RATE 500                              // time between SSE push in milliseconds
 
 
 /***********************************************************
@@ -232,7 +237,7 @@ const int ADC_I2C_ADDR = 0x48;
 * If you want to modify the code to include additional reference pressure sensors
 * You will need to add your volts to kPa algorithm in the function sensors->getPRef()
 *
-* Recommended sensor is the MPXV7007DP
+* Recommended sensor is the MPXV7007DP or XGZP6899A007KPDPN 
 ***/
 
 #define PREF_IS_ENABLED                                     // Comment to disable reference pressure related code
@@ -246,12 +251,13 @@ const int ADC_I2C_ADDR = 0x48;
 // Set sensor type (Uncomment One line only)
 // #define PREF_SENSOR_TYPE_LINEAR_ANALOG 
 #define PREF_SENSOR_TYPE_MPXV7007        
+// #define PREF_SENSOR_TYPE_XGZP6899A007KPDPN        
+// #define PREF_SENSOR_TYPE_XGZP6899A010KPDPN        
 
 
 #define PREF_MV_TRIMPOT 0.0                               // Millivolt offset
 #define PREF_ANALOG_SCALE 1.0                             // Scaling factor used for raw analog value
-#define PREF_ADC_CHANNEL 2                                // BUG: TEMP SWAPPED WITH PDIFF (ERROR ON PCB)
-
+#define PREF_ADC_CHANNEL 1                                
 
 
 
@@ -261,7 +267,7 @@ const int ADC_I2C_ADDR = 0x48;
 * If you want to modify the code to include additional reference pressure sensors
 * You will need to add your volts to kPa algorithm in the function sensors->getPDiff()
 * 
-* Recommended sensor is the MPXV7007DP
+* Recommended sensor is the MPXV7007DP or XGZP6899A007KPDPN 
 ***/
 
 #define PDIFF_IS_ENABLED                                  // Comment to disable Differential pressure related code
@@ -275,10 +281,12 @@ const int ADC_I2C_ADDR = 0x48;
 // Set sensor type (Uncomment One line only)   
 // #define PDIFF_SENSOR_TYPE_LINEAR_ANALOG 
 #define PDIFF_SENSOR_TYPE_MPXV7007          
+// #define PDIFF_SENSOR_TYPE_XGZP6899A007KPDPN        
+// #define PDIFF_SENSOR_TYPE_XGZP6899A010KPDPN        
 
 #define PDIFF_MV_TRIMPOT 0.0                              // Millivolt offset
 #define PDIFF_ANALOG_SCALE 1.0                            // Scaling factor used for raw analog value
-#define PDIFF_ADC_CHANNEL 1                               // TODO: TEMP SWAPPED WITH PREF (ERROR ON PCB)
+#define PDIFF_ADC_CHANNEL 2                               
 
 
 
@@ -289,7 +297,7 @@ const int ADC_I2C_ADDR = 0x48;
 * You will need to add your volts to kPa algorithm in the function sensors->getPitot()
 * Note Pitot sensors need to be a differential pressure sensor (DP)
 *
-* Recommended sensor is the MPXV7007DP
+* Recommended sensor is the MPXV7007DP or XGZP6899A007KPDPN 
 ***/
 
 #define PITOT_IS_ENABLED                                  // Comment to disable pitot related code
@@ -302,6 +310,8 @@ const int ADC_I2C_ADDR = 0x48;
 // #define PITOT_SENSOR_NOT_USED
 // #define PITOT_SENSOR_TYPE_LINEAR_ANALOG                // Use analog signal from PITOT_PIN
 #define PITOT_SENSOR_TYPE_MPXV7007
+// #define PITOT_SENSOR_TYPE_XGZP6899A007KPDPN        
+// #define PITOT_SENSOR_TYPE_XGZP6899A010KPDPN        
 
 #define PITOT_MV_TRIMPOT 0.0                              // Millivolt offset
 #define PITOT_ANALOG_SCALE 1.0                            // Scaling factor used for raw analog value

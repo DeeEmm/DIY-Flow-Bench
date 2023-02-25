@@ -18,6 +18,8 @@
  ***/
 #include "Arduino.h"
 #include <rom/rtc.h>
+#include <SPI.h>
+#include <SD.h>
 
 #include "configuration.h"
 #include "constants.h"
@@ -77,10 +79,10 @@ void Webserver::begin()
     _message.serialPrintf("Complete.\n");
   } else {
     _message.serialPrintf("Failed.\n");
-#if defined FORMAT_FILESYSTEM_IF_FAILED
-    SPIFFS.format();
-    _message.serialPrintf("!! File System Formatted !!\n");
-#endif
+    #if defined FORMAT_FILESYSTEM_IF_FAILED
+        SPIFFS.format();
+        _message.serialPrintf("!! File System Formatted !!\n");
+    #endif
   }
 
   // Check if config and calibration json files exist. If not create them.
@@ -94,14 +96,25 @@ void Webserver::begin()
   this->loadConfig();
   _calibration.loadCalibration();
 
-
-  // Filesystem info
+  // Display Filesystem Stats
   status.spiffs_mem_size = SPIFFS.totalBytes();
   status.spiffs_mem_used = SPIFFS.usedBytes();
 
   _message.serialPrintf("===== File system info ===== \n");
   _message.serialPrintf("Total space:      %s \n", byteDecode(status.spiffs_mem_size));
   _message.serialPrintf("Total space used: %s \n", byteDecode(status.spiffs_mem_used));
+
+  // SD Card
+  #ifdef SD_CARD_IS_ENABLED
+    _message.serialPrintf("Initialising SD Card... \n");
+
+      if (!SD.begin(SD_CS)) {
+        _message.serialPrintf("SD Card initialisation failed \n");
+        while (true);
+      } else {
+        _message.serialPrintf("Complete.\n");
+      }
+  #endif
 
   // WiFi
   // if WiFi password is unedited or blank force AP mode
@@ -264,7 +277,6 @@ void Webserver::begin()
       processUpload);
 
   // Download request handler
-  // TODO Need to retest this!!!
   server->on("/api/file/download", HTTP_GET, [](AsyncWebServerRequest *request){              
       Messages _message;
       String downloadFilename = request->url();
@@ -542,6 +554,7 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
   config.adj_flow_depression = configData["ADJ_FLOW_DEPRESSION"].as<int>();
   // config.temp_unit = configData["TEMP_UNIT"].as<int>();
   strcpy(config.temp_unit, configData["TEMP_UNIT"]);
+  config.valveLiftInterval = configData["VALVE_LIFT_INTERVAL"].as<double>();
 
   // save settings to config file
   serializeJsonPretty(configData, jsonString);
@@ -759,15 +772,6 @@ String Webserver::processTemplate(const String &var)
   extern struct ConfigSettings config;
   extern struct CalibrationSettings calibration;
 
-  Webserver _webserver;
-
-  DynamicJsonDocument doc(1024);
-
-  String fileList;
-  String orificeList;
-
-  // Serial.println(var);
-
   // Config Info
   if (var == "RELEASE") return RELEASE;
   if (var == "BUILD_NUMBER") return BUILD_NUMBER;
@@ -792,32 +796,71 @@ String Webserver::processTemplate(const String &var)
 
   // Orifice Settings
   #ifdef ORIFICE_STYLE_BENCH
-  if (var == "ORIFICE_LIST"){ 
-    orificeList =  R"END(
-    <form method="POST" action="/api/setorifice">
-      <div class="switch-field">
-        <input type="radio" id="orifice-one" name="switch-one" value="1" checked/>
-        <label for="orifice-one">1</label>
-        <input type="radio" id="orifice-two" name="switch-one" value="2" />
-        <label for="orifice-two">2</label>
-        <input type="radio" id="orifice-three" name="switch-one" value="3"/>
-        <label for="orifice-three">3</label>
-        <input type="radio" id="orifice-four" name="switch-one" value="4" />
-        <label for="orifice-four">4</label>
-        <input type="radio" id="orifice-five" name="switch-one" value="5" />
-        <label for="orifice-five">5</label>
-        <input type="radio" id="orifice-six" name="switch-one" value="6" />
-        <label for="orifice-six">6</label>
-      </div>
-      <div id="orifice-data">Orifice #%SELECTED_ORIFICE% Flow Max: %ORIFICE_MAX_FLOW%cfm @ %ORIFICE_CALIBRATED_DEPRESSION%"</div>
-    </form>
-    )END" ;
+    String orificeList;
+    if (var == "ORIFICE_LIST"){ 
+      orificeList =  R"END(
+      <form method="POST" action="/api/setorifice">
+        <div class="switch-field">
+          <input type="radio" id="orifice-one" name="switch-one" value="1" checked/>
+          <label for="orifice-one">1</label>
+          <input type="radio" id="orifice-two" name="switch-one" value="2" />
+          <label for="orifice-two">2</label>
+          <input type="radio" id="orifice-three" name="switch-one" value="3"/>
+          <label for="orifice-three">3</label>
+          <input type="radio" id="orifice-four" name="switch-one" value="4" />
+          <label for="orifice-four">4</label>
+          <input type="radio" id="orifice-five" name="switch-one" value="5" />
+          <label for="orifice-five">5</label>
+          <input type="radio" id="orifice-six" name="switch-one" value="6" />
+          <label for="orifice-six">6</label>
+        </div>
+        <div id="orifice-data">Orifice #%SELECTED_ORIFICE% Flow Max: %ORIFICE_MAX_FLOW%cfm @ %ORIFICE_CALIBRATED_DEPRESSION%"</div>
+      </form>
+      )END" ;
 
-    return orificeList;
-  }
+      return orificeList;
+    }
   #endif
   
-  // Wifi Settings
+   // Lift Profile
+
+  if (floor(config.valveLiftInterval) == config.valveLiftInterval) {
+
+    // it's an integer so lets truncate fractional part
+    int liftInterval = config.valveLiftInterval;
+    if (var == "lift1") return String(1 * liftInterval);
+    if (var == "lift2") return String(2 * liftInterval);
+    if (var == "lift3") return String(3 * liftInterval);
+    if (var == "lift4") return String(4 * liftInterval);
+    if (var == "lift5") return String(5 * liftInterval);
+    if (var == "lift6") return String(6 * liftInterval);
+    if (var == "lift7") return String(7 * liftInterval);
+    if (var == "lift8") return String(8 * liftInterval);
+    if (var == "lift9") return String(9 * liftInterval);
+    if (var == "lift10") return String(10 * liftInterval);
+    if (var == "lift11") return String(11 * liftInterval);
+    if (var == "lift12") return String(12 * liftInterval);
+
+  } else {
+    // Display the double
+    if (var == "lift1") return String(1 * config.valveLiftInterval);
+    if (var == "lift2") return String(2 * config.valveLiftInterval);
+    if (var == "lift3") return String(3 * config.valveLiftInterval);
+    if (var == "lift4") return String(4 * config.valveLiftInterval);
+    if (var == "lift5") return String(5 * config.valveLiftInterval);
+    if (var == "lift6") return String(6 * config.valveLiftInterval);
+    if (var == "lift7") return String(7 * config.valveLiftInterval);
+    if (var == "lift8") return String(8 * config.valveLiftInterval);
+    if (var == "lift9") return String(9 * config.valveLiftInterval);
+    if (var == "lift10") return String(10 * config.valveLiftInterval);
+    if (var == "lift11") return String(11 * config.valveLiftInterval);
+    if (var == "lift12") return String(12 * config.valveLiftInterval);
+}
+
+
+
+
+   // Wifi Settings
   if (var == "CONF_WIFI_SSID") return String(config.wifi_ssid);
   if (var == "CONF_WIFI_PSWD") return String(config.wifi_pswd);
   if (var == "CONF_WIFI_AP_SSID") return String(config.wifi_ap_ssid);
@@ -846,6 +889,7 @@ String Webserver::processTemplate(const String &var)
       return String("<select name='TEMP_UNIT' class='config-select' id='TEMP_UNIT'><option value='Celcius'>Celcius </option><option value='Farenheit' selected>Farenheit </option></select>");
     }
   }
+  if (var == "VALVE_LIFT_INTERVAL") return String(config.valveLiftInterval);
 
   // Calibration Settings
   if (var == "CONF_CAL_FLOW_RATE") return String(config.cal_flow_rate);
@@ -876,8 +920,7 @@ String Webserver::processTemplate(const String &var)
     return fileList;
   }
 
-
-  return String();
+  return "";
 }
 
 
@@ -948,5 +991,126 @@ int Webserver::getWifiConnection(){
   }
  
   return wifiConnectionStatus;
+
+}
+
+
+
+
+  // TODO SD File handling / Data recording
+
+  /*
+  Need to work out how to process file list and display in GUI
+  Also need to work out how to load file selected in GUI and display / edit contents
+  Suspect that best method is to handle all data as JSON
+  However this may need some consideration with reference to Key>Value data
+
+  Consider... if we use valve lift as Key then we cannot hard code Key values in code as Valve interval may be changed
+  Currently we take an interval value and scale it across 10 data points...
+
+  1 / 1.5 / 3 / 4.5 / ... / 13.5 / 15
+
+  But this may be changed to imperial or some other more appropriate interval by end user...
+
+  100 / 200 / 300 / etc
+
+  Which means that we cannot hard code the Key values. We can however utilise the current interval value.
+  However there is also the possibility that users may use different intervals on different projects.
+  Suspect easiest solution is to make valve interval editable via GUI config. This way users can change as needed.
+
+  Also need to determine if 10 data points is enough. Need to canvas Facebook group - Performance Trends use 12 points!
+
+  Best solution is to use dynamic number of data points but this adds complexity
+
+  Also need to add notes field to GUI
+
+  */
+
+
+  // Code Examples...
+  // https://wokwi.com/projects/323656763409695316
+  // https://deguez07.medium.com/esp32-with-sd-card-modules-the-master-guide-5d391f6785d7
+  // https://www.electronicwings.com/esp32/microsd-card-interfacing-with-esp32  
+  // https://microcontrollerslab.com/microsd-card-esp32-arduino-ide/
+  // https://www.mischianti.org/2021/03/28/how-to-use-sd-card-with-esp32-2/
+
+
+
+
+/***********************************************************
+ * @brief read JSON file from SD card 
+ * @return JSON data
+ * @NOTE: https://wokwi.com/projects/323656763409695316
+ ***/
+StaticJsonDocument<1024> Webserver::getFileSD(String filename){
+
+  StaticJsonDocument<1024> dataJson;
+
+  // Example of reading file from SD card:
+  File textFile = SD.open("/wokwi.txt");
+  if (textFile) {
+    Serial.print("wokwi.txt: ");
+    while (textFile.available()) {
+      Serial.write(textFile.read());
+    }
+    textFile.close();
+  } else {
+    Serial.println("error opening wokwi.txt!");
+  }
+
+  return dataJson;
+
+}
+
+
+
+
+/***********************************************************
+ * @brief read file list from SD card 
+ * @return JSON formatted list
+ * 
+ ***/
+StaticJsonDocument<1024> Webserver::getFileListSD(String filename){
+
+  //TODO - not coded yet
+
+  StaticJsonDocument<1024> dataJson;
+
+  File root;
+
+  Serial.println("Files in the card:");
+  root = SD.open("/");
+  // printDirectory(root, 0);
+  Serial.println("");
+
+
+
+  File dir;
+  int numTabs = 10;
+
+
+  while (true) {
+
+    File entry =  dir.openNextFile();
+    if (! entry) {
+      // no more files
+      break;
+    }
+    for (uint8_t i = 0; i < numTabs; i++) {
+      Serial.print('\t');
+    }
+    Serial.print(entry.name());
+    if (entry.isDirectory()) {
+      Serial.println("/");
+      // printDirectory(entry, numTabs + 1);
+    } else {
+      // files have sizes, directories do not
+      Serial.print("\t\t");
+      Serial.println(entry.size(), DEC);
+    }
+    entry.close();
+  }
+
+  return dataJson;
 
 }

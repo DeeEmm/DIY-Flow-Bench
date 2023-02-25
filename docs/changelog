@@ -6,12 +6,20 @@ https://github.com/users/DeeEmm/projects/5/
 
 
 ===================================================================
-Known Issues
+Open Issues
 ===================================================================
 
-ADC Channels PREF swapped with PDIFF (ERROR ON SHIELD PCB)
+https://github.com/DeeEmm/DIY-Flow-Bench/issues
 
- 
+
+===================================================================
+Contributing
+===================================================================
+
+https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/CONTRIBUTING.md
+
+
+
 ===================================================================
 !! Don't forget to update the build number in configuration.h !!
 ===================================================================
@@ -22,6 +30,13 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+23022501        - Added support for XGZP6899A007 and XGZP6899A010 pressure sensors
+23022401        - Decreased task update rates to address message queue overload
+                - Updated README
+23022301        - Trunate fractional part of lift interval if interval is intval
+23022201        - Reverted temporary swap of Pdiff / Pref Analog channels
+                - Added Data save and Data view modal dialogs 
+23021601        - Code Tidying
 23021501        - Outline of VFD control
                 - Added adjustment for absolute humidity in flow conversion
                 - Finalised pin mapping for Wemos D1
@@ -37,7 +52,7 @@ Build #         - Description of Change
                 - Fixed syntax errors in MAF Data files
                 - Renamed main tasks for continuity
                 - Added ATM units to pressure conversion 
-                - Added converssaion between mass flow units
+                - Added conversion between mass flow units
                 - Changed MAF datatype to int32
 23020201        - Refactored MAF code and Mass to Volumetric conversion
 23020102        - Fixed include in MH95_3000_100 MAF Data file

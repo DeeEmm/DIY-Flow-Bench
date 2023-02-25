@@ -80,7 +80,8 @@ class Webserver {
 		void createConfigFile ();
 		void resetWifi ( void );
 		void wifiReconnect ( void );
-
+		StaticJsonDocument<1024> getFileSD(String filename);
+		StaticJsonDocument<1024> getFileListSD(String filename);
 		
 
 		

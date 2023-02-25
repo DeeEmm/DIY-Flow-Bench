@@ -135,7 +135,8 @@ void API::ParseMessage(char apiMessage) {
   C : JSON Configuration Data
   D : MAF data max value
   d : MAF data key max value
-  E : Enum
+  E : Enum1
+  e : Enum2
   F : Flow Value in CFM
   f : Flow Value in KG/H
   H : Humidity Value

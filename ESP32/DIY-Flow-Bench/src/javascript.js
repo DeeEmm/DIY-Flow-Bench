@@ -21,8 +21,12 @@ window.addEventListener('load', onLoad);
 
 var fileModal = document.getElementById("fileModal");
 var infoModal = document.getElementById("infoModal");
+var saveDataModal = document.getElementById("saveDataModal");
+var viewDataModal = document.getElementById("viewDataModal");
 var closeFileModalButton = document.getElementsByClassName("closeFileModalButton")[0];
 var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton")[0];
+var closeSaveDataModalButton = document.getElementsByClassName("closeSaveDataModalButton")[0];
+var closeViewDataModalButton = document.getElementsByClassName("closeViewDataModalButton")[0];
 
 // Set up Server Side Events (SSE)
 if (!!window.EventSource) {
@@ -100,6 +104,14 @@ function onLoad(event) {
 function initialiseButtons() {
   
   var xhr = new XMLHttpRequest();
+
+  document.getElementById('saveData-button').addEventListener('click', function(){
+    document.getElementById('saveDataModal').style.display='block';
+  });
+
+  document.getElementById('viewData-button').addEventListener('click', function(){
+    document.getElementById('viewDataModal').style.display='block';
+  });
 
   document.getElementById('file-manager-button').addEventListener('click', function(){
     document.getElementById('fileModal').style.display='block';
@@ -216,12 +228,30 @@ closeInfoModalButton.onclick = function() {
 
 
 /***********************************************************
+* Close Save Data modal dialog
+***/
+closeSaveDataModalButton.onclick = function() {
+  saveDataModal.style.display = "none";
+}
+
+
+/***********************************************************
+* Close View Data modal dialog
+***/
+closeViewDataModalButton.onclick = function() {
+  viewDataModal.style.display = "none";
+}
+
+
+/***********************************************************
 * Close modal dialogs on lose focus
 ***/
 window.onclick = function(event) {
-  if (event.target == fileModal || event.target == infoModal ) {
+  if (event.target == fileModal || event.target == infoModal || event.target == saveDataModal || event.target == viewDataModal ) {
     fileModal.style.display = "none";
     infoModal.style.display = "none";
+    saveDataModal.style.display = "none";
+    viewDataModal.style.display = "none";
   }
 }
 
@@ -232,6 +262,8 @@ document.addEventListener("keydown", ({key}) => {
   if (key === "Escape") {
     fileModal.style.display = "none";
     infoModal.style.display = "none";
+    saveDataModal.style.display = "none";
+    viewDataModal.style.display = "none";
   }
 })
 

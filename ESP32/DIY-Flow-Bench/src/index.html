@@ -7,6 +7,70 @@
 	</HEAD>
 	<BODY>
 
+
+
+    <!-- Save Data Modal -->
+    <div id="saveDataModal" class="modal">
+      <div class="modal-content">
+        <span class="closeSaveDataModalButton">&times;</span>
+        <h3>Save Flow v Lift Data</h3>
+        <hr>
+        <div class="align-center">
+          <form method="POST" action="/api/saveData" enctype="multipart/form-data">
+            <label class="config-label">Filename:</label>&nbsp;<input type="text" value="~FileName~">
+            <br>
+              <div class="switch-field">
+                <input type="radio" id="lift-one" name="switch-two" value="1" checked/>
+                <label for="lift-one">~lift1~</label>
+                <input type="radio" id="lift-two" name="switch-two" value="2" />
+                <label for="lift-two">~lift2~</label>
+                <input type="radio" id="lift-three" name="switch-two" value="3"/>
+                <label for="lift-three">~lift3~</label>
+                <input type="radio" id="lift-four" name="switch-two" value="4" />
+                <label for="lift-four">~lift4~</label>
+                <input type="radio" id="lift-five" name="switch-two" value="5" />
+                <label for="lift-five">~lift5~</label>
+                <input type="radio" id="lift-six" name="switch-two" value="6" />
+                <label for="lift-six">~lift6~</label>
+                <input type="radio" id="lift-seven" name="switch-two" value="7" />
+                <label for="lift-seven">~lift7~</label>
+                <input type="radio" id="lift-eight" name="switch-two" value="8" />
+                <label for="lift-eight">~lift8~</label>
+                <input type="radio" id="lift-nine" name="switch-two" value="9" />
+                <label for="lift-nine">~lift9~</label>
+                <input type="radio" id="lift-ten" name="switch-two" value="10" />
+                <label for="lift-ten">~lift10~</label>
+                <input type="radio" id="lift-eleven" name="switch-two" value="10" />
+                <label for="lift-eleven">~lift11~</label>
+                <input type="radio" id="lift-twelve" name="switch-two" value="10" />
+                <label for="lift-twelve">~lift12~</label>
+              </div>
+            <input id="data" type="file" name="wtf"/>
+            <input class="button submit-button" type="submit" value="Save"/>
+          </form>
+        </div>
+        <div class="clear-both">&nbsp;</div>
+      </div>        
+    </div>
+
+
+    <!-- View Data Modal -->
+    <div id="viewDataModal" class="modal">
+      <div class="modal-content">
+        <span class="closeViewDataModalButton">&times;</span>
+        <h3>Flow v Lift Profile</h3>
+        <hr>
+        <br>
+        <div class="float-right">
+          <form method="POST" action="/api/viewdata" enctype="multipart/form-data">
+            <input class="button file-submit-button" type="submit" value="Load"/>
+          </form>
+        </div>
+        <div class="clear-both">&nbsp;</div>
+      </div>        
+    </div>
+
+
     <!-- File Manager Modal -->
     <div id="fileModal" class="modal">
       <div class="modal-content">
@@ -128,19 +192,21 @@
         </div>   
         
 
-        <!-- TODO Uatomatically submit form when radio button changed [javascript / onclick]-->
+
+
+        <!-- TODO Automatically submit form when radio button changed [javascript / onclick]-->
         <!-- Select Orifice Radio buttons (required for orifice style bench)-->
         ~ORIFICE_LIST~
           
-        <!--
-          <button id="datalog-button" class="button">Datalog</button>
-          <button id="record-button" class="button">Record</button>
-        -->
           <button id="on-button" class="control-button">START BENCH</button>
           <button id="off-button" class="control-button">STOP BENCH</button>
           <button id="clear-message-button" class="control-button">CLEAR ALARM</button>
-        
-        
+<!--
+          <br>
+          <br>
+          <button id="saveData-button" class="control-button">SAVE DATA</button>
+          <button id="viewData-button" class="control-button">LOAD DATA </button>
+-->    
         
         
         
@@ -148,7 +214,7 @@
              
         <!-- lift graph -->
         
-        <!-- TODO: 
+        <!-- TODO: Display lift data in graph in GUI
         
         Set graph scaling based on MAF max flow rate 
         Add user settings for graph scaling
@@ -242,6 +308,39 @@
         <!-- end lift graph -->
 
 
+
+        <!-- TODO Allow download of liftdata directly from browser as JSON file
+
+          This should be fallback method if SD card not enabled / unavailable
+
+          Lift v flow data needs to be stored in local variable (storageObj)
+          
+          Example from https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
+
+            HTML: <a id="downloadAnchorElem" style="display:none"></a>
+
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(storageObj));
+            var dlAnchorElem = document.getElementById('downloadAnchorElem');
+            dlAnchorElem.setAttribute("href",     dataStr     );
+            dlAnchorElem.setAttribute("download", "scene.json");
+            dlAnchorElem.click();
+
+
+            function downloadObjectAsJson(exportObj, exportName){
+              var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+              var downloadAnchorNode = document.createElement('a');
+              downloadAnchorNode.setAttribute("href",     dataStr);
+              downloadAnchorNode.setAttribute("download", exportName + ".json");
+              document.body.appendChild(downloadAnchorNode); // required for firefox
+              downloadAnchorNode.click();
+              downloadAnchorNode.remove();
+            }
+        
+        
+        
+        -->
+
+
       </div>
                 
       <!-- Footer -->
@@ -256,6 +355,7 @@
         <p style="text-align:center"><button id="file-manager-button" class="button">Files</button> <button id="info-button" class="button">Info</button> <button id="support-button" class="button" onclick="window.open('https://github.com/DeeEmm/DIY-Flow-Bench/wiki','_blank')">Support</button> <button id="restart-button" class="button" >Reboot</button></p>       
         <br>
         <form method="POST" action="/api/saveconfig">
+          <h2>System Settings</h2>
           <h3>WiFi Info</h3>        
           <div class="config-row tooltip"><label class="config-label">WiFi SSID:</label>&nbsp;<input type="text" id="CONF_WIFI_SSID"  name="CONF_WIFI_SSID" value="~CONF_WIFI_SSID~" class="config-text" ><span class="tooltiptext">The name of your WiFi network</span></div>
           <div class="config-row tooltip"><label class="config-label">WiFi Password:</label>&nbsp;<input type="text" id="CONF_WIFI_PSWD" name="CONF_WIFI_PSWD" value="~CONF_WIFI_PSWD~" class="config-text"><span class="tooltiptext">Your WiFi Password</span></div>
@@ -278,14 +378,27 @@
           <div class="config-row tooltip"><label class="config-label">Refresh Rate:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="~CONF_REFRESH_RATE~" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
           <div class="config-row tooltip"><label class="config-label">Conversion Depression:</label>&nbsp;<input type="text" id="ADJ_FLOW_DEPRESSION" name="ADJ_FLOW_DEPRESSION" value="~ADJ_FLOW_DEPRESSION~" class="config-text"><span class="tooltiptext">Bench depression used for adjusted flow calcs</span></div>
           <div class="config-row tooltip"><label class="config-label">Temperature Unit:</label><span>~TEMPERATURE_DROPDOWN~</span><span class="tooltiptext">Display unit of temperature</span></div>
+          <div class="config-row tooltip"><label class="config-label">Valve Lift Interval:</label>&nbsp;<input type="text" id="VALVE_LIFT_INTERVAL" name="VALVE_LIFT_INTERVAL" value="~VALVE_LIFT_INTERVAL~" class="config-text"><span class="tooltiptext">Distance between valve lift data points</span></div>
           <br>
-          <h3>Calibration Settings</h3>
+          <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
+          <br>
+          <br>
+          </form>
+          <form method="POST" action="/api/savecalibrationsettings"></form>
+          <hr>
+          <h2>Calibration Settings</h2>
           <div class="config-row tooltip"><label class="config-label">Calibration Orifice Flow Rate:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="~CONF_CAL_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice in cfm</span></div>
           <div class="config-row tooltip"><label class="config-label">Calibration Orifice Test Pressure:</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="~CONF_CAL_REF_PRESS~" class="config-text"><span class="tooltiptext">Reference depression of calibration orifice in in/wg</span></div>
           <div class="config-row tooltip"><label class="config-label">Leak Test Tolerance:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_TOLERANCE" name="CONF_LEAK_TEST_TOLERANCE" value="~CONF_LEAK_TEST_TOLERANCE~" class="config-text"><span class="tooltiptext">Maximum allowable deviation in cfm</span></div>
           <div class="config-row tooltip"><label class="config-label">Leak Test Threshold:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_THRESHOLD" name="CONF_LEAK_TEST_THRESHOLD" value="~CONF_LEAK_TEST_THRESHOLD~" class="config-text"><span class="tooltiptext">Depression value above which leak test activates</span></div>
           <br>
-          <h3>Orifice Data</h3>
+          <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
+          <br>
+          <br>
+          </form>
+          <form method="POST" action="/api/saveorificedata"></form>
+          <hr>
+          <h2>Orifice Data</h2>
           <div class="config-row tooltip"><label class="config-label">Orifice #1 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE1_FLOW_RATE" name="ORIFICE1_FLOW_RATE" value="~ORIFICE1_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #1 in cfm</span></div>
           <div class="config-row tooltip"><label class="config-label">Orifice #1 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE1_TEST_PRESSURE" name="ORIFICE1_TEST_PRESSURE" value="~ORIFICE1_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #1 in in/wg</span></div>
           <div class="config-row tooltip"><label class="config-label">Orifice #2 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE2_FLOW_RATE" name="ORIFICE2_FLOW_RATE" value="~ORIFICE2_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #2 in cfm</span></div>
@@ -300,10 +413,33 @@
           <div class="config-row tooltip"><label class="config-label">Orifice #6 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE6_TEST_PRESSURE" name="ORIFICE6_TEST_PRESSURE" value="~ORIFICE6_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #6 in in/wg</span></div>
           <br>
           <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
+          <br>
+          <br>
+          </form>
+          <form method="POST" action="/api/saveliftpointdata"></form>
+          <hr>
+          <h2>Valve Lift Data</h2>
+          <div class="config-row tooltip"><label class="config-label">Lift Interval:</label>&nbsp;<input type="text" id="LIFT_INTERVAL" name="LIFT_INTERVAL" value="~LIFT_INTERVAL~" class="config-text"><span class="tooltiptext">Valve lift interval</span></div>
+          <!--
+          <div class="config-row tooltip"><label class="config-label">Lift Point #1 Value:</label>&nbsp;<input type="text" id="LIFT1_VALUE" name="LIFT1_VALUE" value="~LIFT1_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #1</span></div>
+          <div class="config-row tooltip"><label class="config-label">Lift Point #2 Value:</label>&nbsp;<input type="text" id="LIFT2_VALUE" name="LIFT1_VALUE" value="~LIFT2_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #2</span></div>
+          <div class="config-row tooltip"><label class="config-label">Lift Point #3 Value:</label>&nbsp;<input type="text" id="LIFT3_VALUE" name="LIFT1_VALUE" value="~LIFT3_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #3</span></div>
+          <div class="config-row tooltip"><label class="config-label">Lift Point #4 Value:</label>&nbsp;<input type="text" id="LIFT4_VALUE" name="LIFT1_VALUE" value="~LIFT4_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #4</span></div>
+          <div class="config-row tooltip"><label class="config-label">Lift Point #5 Value:</label>&nbsp;<input type="text" id="LIFT5_VALUE" name="LIFT1_VALUE" value="~LIFT5_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #5</span></div>
+          <div class="config-row tooltip"><label class="config-label">Lift Point #6 Value:</label>&nbsp;<input type="text" id="LIFT6_VALUE" name="LIFT1_VALUE" value="~LIFT6_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #6</span></div>
+          <div class="config-row tooltip"><label class="config-label">Lift Point #7 Value:</label>&nbsp;<input type="text" id="LIFT7_VALUE" name="LIFT1_VALUE" value="~LIFT7_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #7</span></div>
+          <div class="config-row tooltip"><label class="config-label">Lift Point #8 Value:</label>&nbsp;<input type="text" id="LIFT8_VALUE" name="LIFT1_VALUE" value="~LIFT8_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #8</span></div>
+          <div class="config-row tooltip"><label class="config-label">Lift Point #9 Value:</label>&nbsp;<input type="text" id="LIFT9_VALUE" name="LIFT1_VALUE" value="~LIFT9_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #9</span></div>
+          <div class="config-row tooltip"><label class="config-label">Lift Point #10 Value:</label>&nbsp;<input type="text" id="LIFT10_VALUE" name="LIFT1_VALUE" value="~LIFT10_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #10</span></div>
+          <br>
+          -->
+          <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
+          <br>
+          <br>
         </form>
         <br>
         <br>
-        <h3>Calibration Data</h3>
+        <h2>Calibration Data</h2>
         <div class="config-row tooltip"><label class="config-label">Calibration Offset:</label>&nbsp;<input disabled="disabled" type="text" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
         <div class="config-row tooltip"><label class="config-label">Leak Test Vac Value:</label>&nbsp;<input disabled="disabled" type="text" id="LEAK_CAL_VAC_VAL" name="LEAK_CAL_VAC_VAL" value="~LEAK_CAL_VAC_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
         <div class="config-row tooltip"><label class="config-label">Leak Test Pressure Value:</label>&nbsp;<input disabled="disabled" type="text" id="LEAK_CAL_PRESS_VAL" name="LEAK_CAL_PRESS_VAL" value="~LEAK_CAL_PRESS_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
