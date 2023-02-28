@@ -40,6 +40,7 @@
 #include <Arduino.h>
 #include "freertos/semphr.h"
 #include "esp_task_wdt.h"
+#include <MD_REncoder.h>
 
 #include "constants.h"
 #include "configuration.h"
@@ -82,6 +83,9 @@ TaskHandle_t enviroDataTask = NULL;
 char charDataJSON[256];
 String jsonString;
 
+#ifdef SWIRL_IS_ENABLED
+  MD_REncoder Encoder = MD_REncoder(SWIRL_ENCODER_PIN_A, SWIRL_ENCODER_PIN_B);
+#endif
 /***********************************************************
  * @brief TASK: Get bench sensor data (ADS1115 - MAF/RefP/DiffP/Pitot)
  * @param i2c_task_mutex Semaphore handshake with TASKpushData / TASKgetEnviroData
@@ -123,6 +127,17 @@ void TASKgetSensorData( void * parameter ){
 
         sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
         sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, config.adj_flow_depression, sensorVal.FlowCFM);
+
+        #ifdef SWIRL_IS_ENABLED
+          uint8_t Swirl = Encoder.read();
+
+          if (Swirl == DIR_CW) {
+            sensorVal.Swirl = Encoder.speed();
+          } else {
+            sensorVal.Swirl = Encoder.speed() * -1;
+          }
+
+        #endif
 
 
 
@@ -206,6 +221,10 @@ void setup(void) {
   xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", 1800, NULL, 2, &enviroDataTask, secondaryCore); 
   #endif
 
+  #ifdef SWIRL_IS_ENABLED
+  Encoder.begin();
+  #endif
+
 }
 
 
@@ -251,7 +270,8 @@ void loop () {
       }
   }
   #endif
-  
+
+
   vTaskDelay( 1 );  //mSec delay to prevent Watch Dog Timer (WDT) triggering for empty task
   
 }

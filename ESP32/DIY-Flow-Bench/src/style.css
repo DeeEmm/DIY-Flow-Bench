@@ -70,10 +70,21 @@ html {
 .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover {
   color:white;
   text-decoration: none;
+  font-size: 44px;
+  font-weight: bold;
 }
 
-h1{
-  color: #FFF;
+h1 {
+  font-size: 30px;
+}
+
+h2 {
+	font-size: 26px;
+	margin-bottom: 14px;
+}
+
+h3 {
+  font-size: 20px;
 }
 
 p{
@@ -146,22 +157,31 @@ hr {
 }
 
 
+#tile-pdiff {
+  display: none;
+  cursor: pointer;
+}
+
+#tile-pref {
+  cursor: pointer;
+}
+
 #flow-tile {
   cursor: pointer;
 }
 
 #aflow-tile {
-  display:none;
+  display: none;
   cursor: pointer;
 }
 
-#tile-pdiff {
-  display:none;
-  cursor: pointer;
-}
 
 #tile-pitot {
-  display:block;
+  cursor: pointer;
+}
+
+#tile-swirl {
+  display:none;
   cursor: pointer;
 }
 
@@ -575,10 +595,7 @@ svg.graph .labels.y-labels {
 	padding: 16px;
 }
 
-h2 {
-	font-size: 18px;
-	margin-bottom: 8px;
-}
+
 
 #orifice-data {
   font-size: 22px;

@@ -24,12 +24,12 @@ gulp.task('js', function(done){
 		done(); 
 });
 
-gulp.task('html', function(done) {
-	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
-		.pipe(htmlmin({ collapseWhitespace: true }))
-		.pipe(gulp.dest('esp32/DIY-Flow-Bench/build'))
-		done();
-	});
+// gulp.task('html', function(done) {
+// 	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
+// 		.pipe(htmlmin({ collapseWhitespace: true }))
+// 		.pipe(gulp.dest('esp32/DIY-Flow-Bench/build'))
+// 		done();
+// 	});
 	
 gulp.task('clean', function () {
 	return gulp.src('esp32/DIY-Flow-Bench/build/*', {read: false})

@@ -677,6 +677,9 @@ String Webserver::getDataJSON()
   // Differential pressure
   dataJson["PDIFF"] = sensorVal.PDiffKPA;
 
+  // Swirl (+/- rpm)
+  dataJson["SWIRL"] = sensorVal.Swirl;
+
   if (1!=1) {  // TODO if message handler is active display the active message
     dataJson["STATUS_MESSAGE"] = status.statusMessage;
   } else { // else lets just show the uptime

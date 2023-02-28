@@ -396,6 +396,20 @@ const int ADC_I2C_ADDR = 0x48;
 #define RELH_FINE_ADJUST 0.0                                // Adjust end value
 
 
+
+
+
+
+/***********************************************************
+* CONFIGURE SWIRL ENCODER
+*
+* 2 channel quadrature style encoder
+***/
+
+#define SWIRL_IS_ENABLED                                     // Comment to disable swirl related code
+
+
+
 // REVIEW - Advanced calibration settings
 /***********************************************************
 * ADVANCED CALIBRATION SETTINGS

@@ -121,6 +121,16 @@ function initialiseButtons() {
     document.getElementById('infoModal').style.display='block';
   });
 
+  document.getElementById('tile-pref').addEventListener('click', function(){
+    document.getElementById('tile-pref').style.display='none';
+    document.getElementById('tile-pdiff').style.display='block';
+  });
+
+  document.getElementById('tile-pdiff').addEventListener('click', function(){
+    document.getElementById('tile-pdiff').style.display='none';
+    document.getElementById('tile-pref').style.display='block';
+  });
+
   document.getElementById('flow-tile').addEventListener('click', function(){
     document.getElementById('flow-tile').style.display='none';
     document.getElementById('aflow-tile').style.display='block';
@@ -133,11 +143,11 @@ function initialiseButtons() {
 
   document.getElementById('tile-pitot').addEventListener('click', function(){
     document.getElementById('tile-pitot').style.display='none';
-    document.getElementById('tile-pdiff').style.display='block';
+    document.getElementById('tile-swirl').style.display='block';
   });
 
-  document.getElementById('tile-pdiff').addEventListener('click', function(){
-    document.getElementById('tile-pdiff').style.display='none';
+  document.getElementById('tile-swirl').addEventListener('click', function(){
+    document.getElementById('tile-swirl').style.display='none';
     document.getElementById('tile-pitot').style.display='block';
   });
 

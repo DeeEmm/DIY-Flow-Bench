@@ -151,6 +151,7 @@ struct SensorData {
   double PDiffMv = 0.0;
   double PitotKPA = 0.0;
   double PitotMv = 0.0;
+  double Swirl = 0.0;
 };
 
 

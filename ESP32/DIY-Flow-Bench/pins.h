@@ -61,6 +61,10 @@
     // SENSORS
     #define SPEED_SENSOR_PIN            2                       // turbine / rotor speed for turbo / blower flow bench 
 
+    // SWIRL ENCODER
+    #define SWIRL_ENCODER_PIN_A         2
+    #define SWIRL_ENCODER_PIN_B         4
+
     // ORIFICE DETECTION                                                                                    
     #define ORIFICE_BCD_BIT1_PIN        34                                       
     #define ORIFICE_BCD_BIT2_PIN        36                                           
@@ -137,7 +141,11 @@
     // SENSORS
     #define SPEED_SENSOR_PIN            5                      // NOTE Also used by SD Card  // turbine / rotor speed for turbo / blower flow bench 
 
-    // ORIFICE DETECTION                                                                                    
+     // SWIRL ENCODER
+    #define SWIRL_ENCODER_PIN_A         99
+    #define SWIRL_ENCODER_PIN_B         99
+
+   // ORIFICE DETECTION                                                                                    
     #define ORIFICE_BCD_BIT1_PIN        34                                       
     #define ORIFICE_BCD_BIT2_PIN        36                                           
     #define ORIFICE_BCD_BIT3_PIN        39                         
@@ -205,6 +213,10 @@
     
     // SENSORS
     #define SPEED_SENSOR_PIN            4                       // turbine / rotor speed for turbo / blower flow bench
+
+    // SWIRL ENCODER
+    #define SWIRL_ENCODER_PIN_A         99
+    #define SWIRL_ENCODER_PIN_B         99
 
     // ORIFICE DETECTION                                                                                    
     #define ORIFICE_BCD_BIT1_PIN        33                      
@@ -274,7 +286,11 @@
     // SENSORS
     #define SPEED_SENSOR_PIN            4                       // turbine / rotor speed for turbo / blower flow bench
 
-    // ORIFICE DETECTION                                                                                    
+     // SWIRL ENCODER
+    #define SWIRL_ENCODER_PIN_A         99
+    #define SWIRL_ENCODER_PIN_B         99
+
+   // ORIFICE DETECTION                                                                                    
     #define ORIFICE_BCD_BIT1_PIN        33                      
     #define ORIFICE_BCD_BIT2_PIN        34                      
     #define ORIFICE_BCD_BIT3_PIN        35     
@@ -355,7 +371,11 @@
     // SENSORS
     #define SPEED_SENSOR_PIN            2                       // turbine / rotor speed for turbo / blower flow bench 
 
-    // ORIFICE DETECTION                                                                                    
+     // SWIRL ENCODER
+    #define SWIRL_ENCODER_PIN_A         99
+    #define SWIRL_ENCODER_PIN_B         99
+
+   // ORIFICE DETECTION                                                                                    
     #define ORIFICE_BCD_BIT1_PIN        34                                       
     #define ORIFICE_BCD_BIT2_PIN        36                                           
     #define ORIFICE_BCD_BIT3_PIN        39                         

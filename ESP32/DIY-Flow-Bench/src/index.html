@@ -141,9 +141,14 @@
     <div id="dashboard" class="tabcontent tabcontentMain">        
       <div class="content">
         <div class="tile-grid">
-          <div class="tile tile-pref">
+          <div class="tile tile-pref" id="tile-pref">
             <p class="tile-title">Depression</p>
             <p><span class="tile-value" id="PREF">&nbsp;</span></p>
+            <p class="units">inH2O</p>
+          </div>
+          <div class="tile tile-pdiff" id="tile-pdiff">
+            <p class="tile-title">Diff Pressure</p>
+            <p><span class="tile-value" id="PDIFF">&nbsp;</span></p>
             <p class="units">inH2O</p>
           </div>
           <div class="tile tile-flow" id="flow-tile">
@@ -161,10 +166,10 @@
             <p><span class="tile-value" id="PITOT">&nbsp;</span></p>
             <p class="units">inH2O</p>
           </div>
-          <div class="tile tile-pdiff" id="tile-pdiff">
-            <p class="tile-title">Diff Pressure</p>
-            <p><span class="tile-value" id="PDIFF">&nbsp;</span></p>
-            <p class="units">inH2O</p>
+          <div class="tile tile-swirl" id="tile-swirl">
+            <p class="tile-title">Swirl</p>
+            <p><span class="tile-value" id="SWIRL">&nbsp;</span></p>
+            <p class="units">rpm</p>
           </div>
           <div class="tile tile-temp">
             <p class="tile-title">Temperature</p>
@@ -201,12 +206,11 @@
           <button id="on-button" class="control-button">START BENCH</button>
           <button id="off-button" class="control-button">STOP BENCH</button>
           <button id="clear-message-button" class="control-button">CLEAR ALARM</button>
-<!--
           <br>
           <br>
           <button id="saveData-button" class="control-button">SAVE DATA</button>
           <button id="viewData-button" class="control-button">LOAD DATA </button>
--->    
+   
         
         
         
