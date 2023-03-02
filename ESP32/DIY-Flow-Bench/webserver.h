@@ -73,16 +73,23 @@ class Webserver {
 		void begin();
 		void writeJSONFile(String data, String filename);
 		String getDataJSON();
-		StaticJsonDocument<1024> loadJSONFile(String filename);
+		StaticJsonDocument<CONFIG_JSON_SIZE> loadJSONFile(String filename);
 		void sendWebSocketMessage(String jsonValues);
-		void parseConfigData(StaticJsonDocument<1024> configData);
-		StaticJsonDocument<1024> loadConfig ();
+		void parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configData);
+		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfig ();
 		void createConfigFile ();
 		void resetWifi ( void );
 		void wifiReconnect ( void );
 		StaticJsonDocument<1024> getFileSD(String filename);
 		StaticJsonDocument<1024> getFileListSD(String filename);
-		
+
+
+		// StaticJsonDocument<1024> loadCalibrationSettings ();
+		// StaticJsonDocument<1024> loadCalibrationData ();
+		// void parseCalibrationSettings(StaticJsonDocument<1024> calibrationData);
+		// void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
+		// void createCalibrationFile ();
+
 
 		
 };

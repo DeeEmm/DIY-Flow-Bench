@@ -28,7 +28,7 @@
 #include "sensors.h"
 #include "calculations.h"
 #include "messages.h"
-// #include "calibration.h"
+#include "calibration.h"
 #include "webserver.h"
 // #include LANGUAGE_FILE
 
@@ -98,14 +98,16 @@ String API::getConfigJSON() {
 void API::ParseMessage(char apiMessage) {
 
   extern struct ConfigSettings config;
-  extern struct DeviceStatus status;
+  extern struct CalibrationData calVal;
   extern struct SensorData sensorVal;
+  extern struct DeviceStatus status;
 
   Calculations _calculations;
   Sensors _sensors;
-  Messages _message;
+  Messages _message;    
   Hardware _hardware;
   Webserver _webserver;
+  Calibration _calibration;
   
   extern TaskHandle_t sensorDataTask;
   extern TaskHandle_t enviroDataTask;
@@ -267,9 +269,8 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'O': // Flow Offset Calibration  'O\r\n'        
-          // TODO: setCalibrationOffset();
-          // TODO: calibration.flow_offset
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "O%s%f", config.api_delim , config.cal_offset);
+          _calibration.setFlowOffset();
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "O%s%f", config.api_delim , calVal.flow_offset);
           // TODO: confirm Flow Offset Calibration success in response
       break;      
   

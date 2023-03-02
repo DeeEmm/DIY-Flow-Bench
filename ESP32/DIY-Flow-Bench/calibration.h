@@ -30,12 +30,18 @@ class Calibration {
 		Calibration();
 		bool setFlowOffset();
 		double getFlowOffset();
-		bool setLeakTestPressure();
+		bool setLeakTest();
+		void setLeakTestVacuum();
+		void setLeakTestPressure();
+		double getLeakTestVacuum();
 		double getLeakTestPressure();
-		void createCalibrationFile();
-		void saveCalibration();
-		StaticJsonDocument<1024> loadCalibration();
-		void parseCalibrationData(StaticJsonDocument<1024>  calibrationData);
+		void writeCalibrationFile(String data, String filename);
+		void saveCalibrationData();
+		void createCalibrationFile ();
+		StaticJsonDocument<1024> loadCalibrationFile();		
+		StaticJsonDocument<1024> loadCalibrationData ();
+
+		void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
 
 	
 	private:

@@ -40,12 +40,7 @@ struct ConfigSettings {
   double maf_min_volts = 0.1;                     // Filter out results less than this
   int refresh_rate = 500;                         // Screen refresh rate in milliseconds (>180)
   int adj_flow_depression = 28;                   // Adjusted flow depression in inches of water
-  double cal_ref_press = 10;                      // Calibration orifice ref pressure
-  double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
-  double cal_offset = 0;                          // Calibration offset
   int cyc_av_buffer = 3;                          // [5] Scan # over which to average output (helps smooth results)
-  int leak_test_tolerance = 2;                    // Leak test tolerance
-  int leak_test_threshold = 10;                   // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
   bool show_alarms = true;                        // Display Alarms?
   bool debug_mode = false;                        // Global debug print override
   bool dev_mode = false;                          // Developer mode
@@ -63,17 +58,42 @@ struct ConfigSettings {
   char temp_unit[11] = "Celcius";                 // Defalt display unit of temperature
   bool ap_mode = false;                           // Default WiFi connection mode is accesspoint mode
   double valveLiftInterval = 1.5;                 // Distance between valve lift data points (can be metric or imperial)
+  double cal_ref_press = 10;                      // Calibration orifice ref pressure
+  double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
+  int leak_test_tolerance = 2;                    // Leak test tolerance
+  int leak_test_threshold = 10;                   // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
+  double OrificeOneFlow = 0.0;
+  double OrificeOneDepression = 0.0;
+  double OrificeTwoFlow = 0.0;
+  double OrificeTwoDepression = 0.0;
+  double OrificeThreeFlow = 0.0;
+  double OrificeThreeDepression = 0.0;
+  double OrificeFourFlow = 0.0;
+  double OrificeFourDepression = 0.0;
+  double OrificeFiveFlow = 0.0;
+  double OrificeFiveDepression = 0.0;
+  double OrificeSixFlow = 0.0;
+  double OrificeSixDepression = 0.0;
 };
+
+
+
 
 
 
 /***********************************************************
- * Calibration Settings
+ * Calibration Data
  ***/
-struct CalibrationSettings { 
-  double flow_offset = 0.0;         
+struct CalibrationData { 
+  double leak_cal_press_val = 1000.0;  
+  double leak_cal_vac_val = -1000.0;  
   double leak_cal_val = 0.0;  
+  double flow_offset = 0.0;         
 };
+
+
+
+
 
 
 
@@ -129,7 +149,6 @@ struct FileUploadData {
 
 
 
-
 /***********************************************************
  * Sensor data
  ***/
@@ -154,21 +173,3 @@ struct SensorData {
   double Swirl = 0.0;
 };
 
-
-/***********************************************************
- * Orifice data
- ***/
-struct OrificeData {
-  double OrificeOneFlow;
-  double OrificeOneDepression;
-  double OrificeTwoFlow;
-  double OrificeTwoDepression;
-  double OrificeThreeFlow;
-  double OrificeThreeDepression;
-  double OrificeFourFlow;
-  double OrificeFourDepression;
-  double OrificeFiveFlow;
-  double OrificeFiveDepression;
-  double OrificeSixFlow;
-  double OrificeSixDepression;
-};

@@ -26,7 +26,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "23022501"
+#define BUILD_NUMBER "23030201"
 #define RELEASE "V.2.0-RC.6"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"
 
@@ -55,8 +55,8 @@
 
 #define WEMOS_D1_R32 // Using official Shield
 // #define ESP32DUINO // Generic pin mapping for ESP32 UNO style footprint. Copy or modify this for custom board mapping
-// #define ARDUCAM_ESP32S 
-// #define ARDUCAM_LOTAI 
+// #define ARDUCAM_ESP32S // Untested - Needs validating + refining
+// #define ARDUCAM_LOTAI  // Untested - Needs validating + refining
 // #define ESP32_WROVER_KIT // DEBUG BUILD ONLY
 
 
@@ -117,6 +117,9 @@
 // #define API_CHECKSUM_IS_ENABLED                       
 #define WEBSOCK_CLEAN_FREQ 600000
 #define FILESYSTEM SPIFFS
+#define SENSOR_TASK_MEM_STACK 2200
+#define ENVIRO_TASK_MEM_STACK 1800
+#define CONFIG_JSON_SIZE 2048
 #define VTASK_DELAY_ADC 500
 #define VTASK_DELAY_BME 500
 #define VTASK_DELAY_SSE 500
@@ -403,10 +406,10 @@ const int ADC_I2C_ADDR = 0x48;
 /***********************************************************
 * CONFIGURE SWIRL ENCODER
 *
-* 2 channel quadrature style encoder
+* 2 channel quadrature style encoder to measure speed and direction
 ***/
 
-#define SWIRL_IS_ENABLED                                     // Comment to disable swirl related code
+// #define SWIRL_IS_ENABLED                                     // Uncomment to enable swirl related code
 
 
 
@@ -428,21 +431,4 @@ const int ADC_I2C_ADDR = 0x48;
 #define calibrationPlateMidCFM 50                           // Flow rate for med calibration orifice
 #define calibrationPlateLowCFM 10                           // Flow rate for small calibration orifice
 
-
-
-// REVIEW - Orifice data
-/***********************************************************
- * @brief Orifice data for DP bench
- * @note {diameter_in_mm, cfm_flow@15"}
- * 
- * TODO: Move into configuration data or into stand alone file
- *
- ***/
-// double orificeData [][2] = {
-//     {51.85,209.5},
-//     {42.38,139.5},
-//     {29.98,70.4},
-//     {21.16,35.5},
-//     {9.92,7.8}
-// };
 

@@ -84,8 +84,8 @@
     // COMMS    
     #define SERIAL0_TX_PIN              1                       // API
     #define SERIAL0_RX_PIN              3                       // API
-    #define SERIAL2_TX_PIN              16                      // GAUGE PROTOCOL
-    #define SERIAL2_RX_PIN              17                      // GAUGE PROTOCOL
+    #define SERIAL2_TX_PIN              16                      // GAUGE PROTOCOL CLOCK
+    #define SERIAL2_RX_PIN              17                      // GAUGE PROTOCOL DATA
     #define SDA_PIN                     21                      // BME280 etc
     #define SCL_PIN                     22                      // BME280 etc
 
@@ -164,8 +164,8 @@
     // COMMS    
     #define SERIAL0_TX_PIN              1                       // API
     #define SERIAL0_RX_PIN              3                       // API
-    #define SERIAL2_TX_PIN              16                      // GAUGE PROTOCOL
-    #define SERIAL2_RX_PIN              17                      // GAUGE PROTOCOL
+    #define SERIAL2_TX_PIN              16                      // GAUGE PROTOCOL CLOCK
+    #define SERIAL2_RX_PIN              17                      // GAUGE PROTOCOL DATA
     #define SDA_PIN                     21                      // BME280 etc
     #define SCL_PIN                     22                      // BME280 etc
 
@@ -247,8 +247,8 @@
     // COMMS    
     #define SERIAL0_TX_PIN              1                      // API
     #define SERIAL0_RX_PIN              3                      // API
-    #define SERIAL2_TX_PIN              15                     // GAUGE PROTOCOL
-    #define SERIAL2_RX_PIN              14                     // GAUGE PROTOCOL
+    #define SERIAL2_TX_PIN              15                     // GAUGE PROTOCOL CLOCK
+    #define SERIAL2_RX_PIN              14                     // GAUGE PROTOCOL DATA
     #define SDA_PIN                     21                     // BME280 etc
     #define SCL_PIN                     22                     // BME280 etc
     
@@ -319,8 +319,8 @@
     // COMMS    
     #define SERIAL0_TX_PIN              1                      // API
     #define SERIAL0_RX_PIN              3                      // API
-    #define SERIAL2_TX_PIN              15                     // GAUGE PROTOCOL
-    #define SERIAL2_RX_PIN              14                     // GAUGE PROTOCOL
+    #define SERIAL2_TX_PIN              15                     // GAUGE PROTOCOL CLOCK
+    #define SERIAL2_RX_PIN              14                     // GAUGE PROTOCOL DATA
     #define SDA_PIN                     21                     // BME280 etc
     #define SCL_PIN                     22                     // BME280 etc
     
@@ -394,8 +394,8 @@
     // COMMS    
     #define SERIAL0_TX_PIN              1                       // API
     #define SERIAL0_RX_PIN              3                       // API
-    #define SERIAL2_TX_PIN              16                      // GAUGE PROTOCOL
-    #define SERIAL2_RX_PIN              17                      // GAUGE PROTOCOL
+    #define SERIAL2_TX_PIN              16                      // GAUGE PROTOCOL CLOCK
+    #define SERIAL2_RX_PIN              17                      // GAUGE PROTOCOL DATA
     #define SDA_PIN                     21                      // BME280 etc
     #define SCL_PIN                     22                      // BME280 etc
 

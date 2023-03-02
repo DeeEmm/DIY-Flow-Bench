@@ -33,7 +33,7 @@
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
-#include "Webserver.h"
+#include "webserver.h"
 
 #include "calibration.h"
 #include "sensors.h"
@@ -94,7 +94,7 @@ void Webserver::begin()
   }
 
   this->loadConfig();
-  _calibration.loadCalibration();
+  _calibration.loadCalibrationData();
 
   // Display Filesystem Stats
   status.spiffs_mem_size = SPIFFS.totalBytes();
@@ -243,7 +243,7 @@ void Webserver::begin()
       Messages _message;
       Calibration _calibrate;
       Hardware _hardware;
-      if (_hardware.benchIsRunning()) {
+      if (!_hardware.benchIsRunning()) {
         _message.Handler(translate.LANG_VAL_CALIBRATING);
         _message.debugPrintf("Calibrating Flow...\n");
         request->send(200, "text/html", "{\"calibrate\":\"true\"}");
@@ -258,11 +258,11 @@ void Webserver::begin()
       Messages _message;
       Calibration _calibrate;
       Hardware _hardware;
-      if (_hardware.benchIsRunning()) {
+      if (!_hardware.benchIsRunning()) {
         _message.Handler(translate.LANG_VAL_LEAK_CALIBRATING);
         _message.debugPrintf("Calibrating Leak Test...\n");
         request->send(200, "text/html", "{\"leakcal\":\"true\"}");
-        _calibrate.setLeakTestPressure();
+        _calibrate.setLeakTest();
       } else {
         _message.Handler(translate.LANG_VAL_RUN_BENCH_TO_CALIBRATE);
         request->send(200, "text/html", "{\"leakcal\":\"false\"}");
@@ -412,11 +412,12 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
 
 
+
 /***********************************************************
-* @brief Parse Config Data
+* @brief Parse Config Settings
 * @param configData JSON document containing config data
 ***/
-void Webserver::parseConfigData(StaticJsonDocument<1024> configData) {
+void Webserver::parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configData) {
 
   extern struct ConfigSettings config;
 
@@ -433,12 +434,28 @@ void Webserver::parseConfigData(StaticJsonDocument<1024> configData) {
   config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
   strcpy(config.api_delim, configData["CONF_API_DELIM"]);
   config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
-//  config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
+  config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
+  configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
+  configData["TEMP_UNIT"] = config.temp_unit;
+  configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
+
+  config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
+  config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
   config.leak_test_tolerance = configData["CONF_LEAK_TEST_TOLERANCE"].as<int>();
   config.leak_test_threshold = configData["CONF_LEAK_TEST_THRESHOLD"].as<int>();
-  config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
-  config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
-//  config.cal_offset = configData["CONF_CAL_OFFSET"].as<double>();
+
+  config.OrificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
+  config.OrificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
+  config.OrificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
+  config.OrificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
+  config.OrificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
+  config.OrificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
+  config.OrificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
+  config.OrificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
+  config.OrificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
+  config.OrificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
+  config.OrificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
+  config.OrificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
 
 }
 
@@ -448,22 +465,26 @@ void Webserver::parseConfigData(StaticJsonDocument<1024> configData) {
 * @brief loadConfig
 * @details read configuration data from config.json file
 ***/ 
-StaticJsonDocument<1024> Webserver::loadConfig () {
+StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
 
   Messages _message;
   
   _message.serialPrintf("Loading Configuration... \n");     
-  StaticJsonDocument<1024> configData;
+  StaticJsonDocument<CONFIG_JSON_SIZE> configData;
   configData = loadJSONFile("/config.json");
-  parseConfigData(configData);
+  parseConfigSettings(configData);
+  
   return configData;  
 
 }
 
 
+
+
+
 /***********************************************************
 * @brief createConfig
-* @details Create configuration json file
+* @details Create basic minimum configuration json file
 * @note Called from Webserver::Initialise() if config.json not found
 ***/
 void Webserver::createConfigFile () {
@@ -471,7 +492,7 @@ void Webserver::createConfigFile () {
   extern struct ConfigSettings config;
   Messages _message;
   String jsonString;  
-  StaticJsonDocument<1024> configData;
+  StaticJsonDocument<CONFIG_JSON_SIZE> configData;
 
   _message.serialPrintf("Creating config.json file... \n"); 
  
@@ -489,16 +510,29 @@ void Webserver::createConfigFile () {
   configData["CONF_MAF_MIN_VOLTS"] = config.maf_min_volts;
   configData["CONF_API_DELIM"] = config.api_delim;
   configData["CONF_SERIAL_BAUD_RATE"] = config.serial_baud_rate;
-  configData["CONF_LEAK_TEST_TOLERANCE"] = config.leak_test_tolerance;
-  configData["CONF_LEAK_TEST_THRESHOLD"] = config.leak_test_threshold;
-  configData["CONF_CAL_REF_PRESS"] = config.cal_ref_press;
-  configData["CONF_CAL_FLOW_RATE"] = config.cal_flow_rate;
   configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
   configData["TEMP_UNIT"] = config.temp_unit;
-    
+  configData["CONF_SHOW_ALARMS"] = config.show_alarms;
+
+  configData["CONF_CAL_FLOW_RATE"] = config.cal_flow_rate;
+  configData["CONF_CAL_REF_PRESS"] = config.cal_ref_press;
+  configData["CONF_LEAK_TEST_TOLERANCE"] = config.leak_test_tolerance;
+  configData["CONF_LEAK_TEST_THRESHOLD"] = config.leak_test_threshold;
+
+  configData["ORIFICE1_FLOW_RATE"] = config.OrificeOneFlow;
+  configData["ORIFICE1_TEST_PRESSURE"] = config.OrificeOneDepression;
+  configData["ORIFICE2_FLOW_RATE"] = config.OrificeTwoFlow;
+  configData["ORIFICE2_TEST_PRESSURE"] = config.OrificeThreeDepression;
+  configData["ORIFICE3_FLOW_RATE"] = config.OrificeThreeFlow;
+  configData["ORIFICE4_FLOW_RATE"] = config.OrificeFourFlow;
+  configData["ORIFICE4_TEST_PRESSURE"] = config.OrificeFourDepression;
+  configData["ORIFICE5_FLOW_RATE"] = config.OrificeFiveFlow;
+  configData["ORIFICE5_TEST_PRESSURE"] = config.OrificeFiveDepression;
+  configData["ORIFICE6_FLOW_RATE"] = config.OrificeSixFlow;
+  configData["ORIFICE7_TEST_PRESSURE"] = config.OrificeSixDepression;
+
   serializeJsonPretty(configData, jsonString);
   writeJSONFile(jsonString, "/config.json");
-  
 
 }
 
@@ -517,7 +551,7 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
   Messages _message;
   Webserver _webserver;
 
-  StaticJsonDocument<1024> configData;
+  StaticJsonDocument<CONFIG_JSON_SIZE> configData;
   extern struct ConfigSettings config;
   String jsonString;
   
@@ -545,19 +579,34 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
   config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
   strcpy(config.api_delim, configData["CONF_API_DELIM"]);
   config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
-//  config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
-  config.leak_test_tolerance = configData["CONF_LEAK_TEST_TOLERANCE"].as<int>();
-  config.leak_test_threshold = configData["CONF_LEAK_TEST_THRESHOLD"].as<int>();
-  config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
-  config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
-//  config.cal_offset = configData["CONF_CAL_OFFSET"].as<double>();
+  config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
   config.adj_flow_depression = configData["ADJ_FLOW_DEPRESSION"].as<int>();
-  // config.temp_unit = configData["TEMP_UNIT"].as<int>();
   strcpy(config.temp_unit, configData["TEMP_UNIT"]);
   config.valveLiftInterval = configData["VALVE_LIFT_INTERVAL"].as<double>();
 
+  config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
+  config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
+  config.leak_test_tolerance = configData["CONF_LEAK_TEST_TOLERANCE"].as<int>();
+  config.leak_test_threshold = configData["CONF_LEAK_TEST_THRESHOLD"].as<int>();
+
+  config.OrificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
+  config.OrificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
+  config.OrificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
+  config.OrificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
+  config.OrificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
+  config.OrificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
+  config.OrificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
+  config.OrificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
+  config.OrificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
+  config.OrificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
+  config.OrificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
+  config.OrificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
+
   // save settings to config file
   serializeJsonPretty(configData, jsonString);
+  if (SPIFFS.exists("/config.json"))  {
+    SPIFFS.remove("/config.json");
+  }
   _webserver.writeJSONFile(jsonString, "/config.json");
 
   _message.debugPrintf("Configuration Saved \n");
@@ -570,6 +619,7 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
 /***********************************************************
  * @brief setOrifice
  * @details Sets selected orifice and loads orifice data
+ * @todo //TODO auto orifice decode
  ***/
 void Webserver::setOrifice(AsyncWebServerRequest *request)
 {
@@ -702,7 +752,7 @@ void Webserver::writeJSONFile(String data, String filename)
 
   Messages _message;
 
-  StaticJsonDocument<1024> jsonData;
+  StaticJsonDocument<CONFIG_JSON_SIZE> jsonData;
   DeserializationError error = deserializeJson(jsonData, data);
   if (!error)  {
     _message.debugPrintf("Writing JSON file... \n");
@@ -719,7 +769,7 @@ void Webserver::writeJSONFile(String data, String filename)
  * @brief loadJSONFile
  * @details Loads JSON data from file
  ***/
-StaticJsonDocument<1024> Webserver::loadJSONFile(String filename)
+StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadJSONFile(String filename)
 {
 
   Messages _message;
@@ -728,7 +778,7 @@ StaticJsonDocument<1024> Webserver::loadJSONFile(String filename)
 
   // Allocate the memory pool on the stack.
   // Use arduinojson.org/assistant to compute the capacity.
-  StaticJsonDocument<1024> jsonData;
+  StaticJsonDocument<CONFIG_JSON_SIZE> jsonData;
 
   if (SPIFFS.exists(filename))  {
     File jsonFile = SPIFFS.open(filename, FILE_READ);
@@ -738,7 +788,7 @@ StaticJsonDocument<1024> Webserver::loadJSONFile(String filename)
       _message.statusPrintf("Failed to open file for reading \n");
     }    else    {
       size_t size = jsonFile.size();
-      if (size > 1024)    {
+      if (size > CONFIG_JSON_SIZE)    {
 
 
       }
@@ -773,7 +823,7 @@ String Webserver::processTemplate(const String &var)
 
   extern struct DeviceStatus status;
   extern struct ConfigSettings config;
-  extern struct CalibrationSettings calibration;
+  extern struct CalibrationData calVal;
 
   // Config Info
   if (var == "RELEASE") return RELEASE;
@@ -797,7 +847,7 @@ String Webserver::processTemplate(const String &var)
   if (var == "PDIFF_SENSOR") return String(status.pdiffSensor);
   if (var == "STATUS_MESSAGE") return String(status.statusMessage);
 
-  // Orifice Settings
+  // Orifice Selector
   #ifdef ORIFICE_STYLE_BENCH
     String orificeList;
     if (var == "ORIFICE_LIST"){ 
@@ -824,9 +874,24 @@ String Webserver::processTemplate(const String &var)
       return orificeList;
     }
   #endif
+
+  // Orifice plates
+  if (var == "ORIFICE1_FLOW_RATE") return String(config.OrificeOneFlow);
+  if (var == "ORIFICE1_TEST_PRESSURE") return String(config.OrificeOneDepression);
+  if (var == "ORIFICE2_FLOW_RATE") return String(config.OrificeTwoFlow);
+  if (var == "ORIFICE2_TEST_PRESSURE") return String(config.OrificeTwoDepression);
+  if (var == "ORIFICE3_FLOW_RATE") return String(config.OrificeThreeFlow);
+  if (var == "ORIFICE3_TEST_PRESSURE") return String(config.OrificeThreeDepression);
+  if (var == "ORIFICE4_FLOW_RATE") return String(config.OrificeFourFlow);
+  if (var == "ORIFICE4_TEST_PRESSURE") return String(config.OrificeFourDepression);
+  if (var == "ORIFICE5_FLOW_RATE") return String(config.OrificeFiveFlow);
+  if (var == "ORIFICE5_TEST_PRESSURE") return String(config.OrificeFiveDepression);
+  if (var == "ORIFICE6_FLOW_RATE") return String(config.OrificeSixFlow);
+  if (var == "ORIFICE6_TEST_PRESSURE") return String(config.OrificeSixDepression);
+
+
   
    // Lift Profile
-
   if (floor(config.valveLiftInterval) == config.valveLiftInterval) {
 
     // it's an integer so lets truncate fractional part
@@ -859,7 +924,6 @@ String Webserver::processTemplate(const String &var)
     if (var == "lift11") return String(11 * config.valveLiftInterval);
     if (var == "lift12") return String(12 * config.valveLiftInterval);
 }
-
 
 
 
@@ -901,8 +965,9 @@ String Webserver::processTemplate(const String &var)
   if (var == "CONF_LEAK_TEST_THRESHOLD") return String(config.leak_test_threshold);
 
   // Calibration Data
-  if (var == "FLOW_OFFSET") return String(calibration.flow_offset);
-  if (var == "LEAK_CAL_VAL") return String(calibration.leak_cal_val);
+  if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
+  if (var == "LEAK_CAL_PRESS_VAL") return String(calVal.leak_cal_vac_val);
+  if (var == "LEAK_CAL_VAC_VAL") return String(calVal.leak_cal_vac_val);
 
   // Generate file list HTML code
   if (var == "FILE_LIST"){
