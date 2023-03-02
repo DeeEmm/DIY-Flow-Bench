@@ -243,7 +243,7 @@ void Webserver::begin()
       Messages _message;
       Calibration _calibrate;
       Hardware _hardware;
-      if (!_hardware.benchIsRunning()) {
+      if (_hardware.benchIsRunning()) {
         _message.Handler(translate.LANG_VAL_CALIBRATING);
         _message.debugPrintf("Calibrating Flow...\n");
         request->send(200, "text/html", "{\"calibrate\":\"true\"}");
@@ -258,7 +258,7 @@ void Webserver::begin()
       Messages _message;
       Calibration _calibrate;
       Hardware _hardware;
-      if (!_hardware.benchIsRunning()) {
+      if (_hardware.benchIsRunning()) {
         _message.Handler(translate.LANG_VAL_LEAK_CALIBRATING);
         _message.debugPrintf("Calibrating Leak Test...\n");
         request->send(200, "text/html", "{\"leakcal\":\"true\"}");
