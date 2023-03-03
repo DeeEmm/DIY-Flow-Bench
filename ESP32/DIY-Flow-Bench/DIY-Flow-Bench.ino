@@ -48,10 +48,10 @@
 #include "pins.h"
 
 #include "mafData/maf.h"
-#include "hardware.h"
+#include "hardware.h" // bench type config needed here
 #include "sensors.h"
 #include "calculations.h"
-#include "webserver.h"
+#include "webserver.h" // config loaded here
 #include "messages.h"
 #include "API.h"
 #include "Wire.h"
@@ -118,7 +118,7 @@ void TASKgetSensorData( void * parameter ){
 
         // check pressure / depression to see if we are in leaktest mode
         if (sensorVal.PRefKPA < (calVal.leak_cal_vac_val + config.leak_test_threshold) || sensorVal.PRefKPA > (calVal.leak_cal_press_val - config.leak_test_threshold)) {
-          // We are in the zone, lets chek if we pass or fail
+          // We are in the zone, lets check if we pass or fail
           if (sensorVal.PRefKPA < (calVal.leak_cal_vac_val + config.leak_test_tolerance)) {
             // vac leak test pass 
              status.statusMessage = "Vacuum Leak Test Pass";
@@ -283,7 +283,6 @@ void loop () {
         
         // Push data to client using Server Side Events (SSE)
         jsonString = _webserver.getDataJSON();
-
         _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore

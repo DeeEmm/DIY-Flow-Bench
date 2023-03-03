@@ -44,6 +44,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+23030202        - Added ability to change bench type in GUI
+                - Fixed AP Mode IP address display in GUI
 23030201        - Updated calibration code for flow and leaktest calibration
                 - Added CERN-OSH-W license for Hardware
                 - Updated Hardware BOM

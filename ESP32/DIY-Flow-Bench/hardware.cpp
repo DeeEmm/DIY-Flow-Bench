@@ -122,34 +122,13 @@ void Hardware::configurePins () {
 void Hardware::begin () {
 
   Messages _message;
+  ConfigSettings config;
+
   extern struct DeviceStatus status;
   
   this->beginSerial();                                      // Start of serial comms
   this->initialise();                                       // Initialise hardware
 
-  // Bench definitions for system status pane
-  #if defined MAF_STYLE_BENCH
-    status.benchType = "MAF Style";
-  #elif defined ORIFICE_STYLE_BENCH
-    status.benchType = "Orifice Style";
-  #elif defined PITOT_STYLE_BENCH
-    status.benchType = "Pitot Style";
-  #elif defined VENTURI_STYLE_BENCH
-    status.benchType = "Venturi Style";
-  #endif
-
-  // Board definitions for system status pane
-  #if defined WEMOS_D1_R32                    
-    status.boardType = "WEMOS_D1_R32";
-  #elif defined ARDUCAM_ESP32S
-    status.boardType = "ARDUCAM_ESP32S";
-  #elif defined ESP32DUINO
-    status.boardType = "ESP32DUINO";
-  #elif defined ESP32_WROVER_KIT 
-    status.boardType = "ESP32_WROVER_KIT";
-  #else
-    status.boardType = "CUSTOM_PIN_MAPPING";
-  #endif
   
 }
 

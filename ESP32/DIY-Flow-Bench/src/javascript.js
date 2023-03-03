@@ -47,6 +47,30 @@ if (!!window.EventSource) {
       }
     } 
 
+    // get bench type and set up GUI accoordingly
+    var benchType = myObj["BENCH_TYPE"];
+
+    switch (benchType) {
+  
+      case "MAF":
+        document.getElementById('orificeData').style.display='none';
+      break;
+  
+      case "ORIFICE":
+        document.getElementById('orificeData').style.display='block';
+      break;
+        
+      case "VENTURI":
+        document.getElementById('orificeData').style.display='block';
+      break;
+        
+      case "PITOT":
+        document.getElementById('orificeData').style.display='block';
+      break;
+        
+    }
+
+
   }, false);
 
 }

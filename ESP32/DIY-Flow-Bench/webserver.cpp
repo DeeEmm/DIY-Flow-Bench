@@ -166,6 +166,7 @@ void Webserver::begin()
     _message.serialPrintf("Creating WiFi Access Point:  %s  \n", config.wifi_ap_ssid); // NOTE: Default AP SSID / PW = DIYFB / 123456789
     WiFi.mode(WIFI_AP);
     WiFi.softAP(config.wifi_ap_ssid, config.wifi_ap_pswd);
+    status.local_ip_address = WiFi.softAPIP().toString().c_str();
     _message.serialPrintf("Access Point IP address: %s \n", WiFi.softAPIP().toString().c_str());
     status.apMode = true;
   }
@@ -438,6 +439,7 @@ void Webserver::parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configD
   configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
   configData["TEMP_UNIT"] = config.temp_unit;
   configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
+  strcpy(config.bench_type, configData["BENCH_TYPE"]);
 
   config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
   config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
@@ -467,12 +469,16 @@ void Webserver::parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configD
 ***/ 
 StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
 
-  Messages _message;
-  
-  _message.serialPrintf("Loading Configuration... \n");     
   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
-  configData = loadJSONFile("/config.json");
-  parseConfigSettings(configData);
+
+  Messages _message;
+  _message.serialPrintf("Loading Configuration... \n");     
+  if (SPIFFS.exists("/config.json"))  {
+    configData = loadJSONFile("/config.json");
+    parseConfigSettings(configData);
+  } else {
+    _message.serialPrintf("Configuration file not found \n");
+  }
   
   return configData;  
 
@@ -512,7 +518,9 @@ void Webserver::createConfigFile () {
   configData["CONF_SERIAL_BAUD_RATE"] = config.serial_baud_rate;
   configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
   configData["TEMP_UNIT"] = config.temp_unit;
+  configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
   configData["CONF_SHOW_ALARMS"] = config.show_alarms;
+  configData["BENCH_TYPE"] = config.bench_type;
 
   configData["CONF_CAL_FLOW_RATE"] = config.cal_flow_rate;
   configData["CONF_CAL_REF_PRESS"] = config.cal_ref_press;
@@ -531,8 +539,8 @@ void Webserver::createConfigFile () {
   configData["ORIFICE6_FLOW_RATE"] = config.OrificeSixFlow;
   configData["ORIFICE7_TEST_PRESSURE"] = config.OrificeSixDepression;
 
-  serializeJsonPretty(configData, jsonString);
-  writeJSONFile(jsonString, "/config.json");
+  // serializeJsonPretty(configData, jsonString);
+  // writeJSONFile(jsonString, "/config.json");
 
 }
 
@@ -583,6 +591,7 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
   config.adj_flow_depression = configData["ADJ_FLOW_DEPRESSION"].as<int>();
   strcpy(config.temp_unit, configData["TEMP_UNIT"]);
   config.valveLiftInterval = configData["VALVE_LIFT_INTERVAL"].as<double>();
+  strcpy(config.bench_type, configData["BENCH_TYPE"]);
 
   config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
   config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
@@ -718,6 +727,18 @@ String Webserver::getDataJSON()
   } else {
     dataJson["TEMP"] = sensorVal.TempDegF;
   }
+
+  // Bench Type
+  if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())) {
+    dataJson["BENCH_TYPE"] = "MAF";
+  } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())) {
+    dataJson["BENCH_TYPE"] = "ORIFICE";
+  } else if (strstr(String(config.bench_type).c_str(), String("VENTURI").c_str())) {
+    dataJson["BENCH_TYPE"] = "VENTURI";
+  } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())) {
+    dataJson["BENCH_TYPE"] = "PITOT";
+  }
+
   dataJson["BARO"] = sensorVal.BaroKPA;
   dataJson["RELH"] = sensorVal.RelH;
 
@@ -825,6 +846,32 @@ String Webserver::processTemplate(const String &var)
   extern struct ConfigSettings config;
   extern struct CalibrationData calVal;
 
+  // REVIEW : moved from hardware.begin
+  // Bench definitions for system status pane 
+  if (strstr(config.bench_type, "MAF")!=NULL) {
+    status.benchType = "MAF Style";
+  } else if (strstr(config.bench_type, "ORIFICE")!=NULL) {
+    status.benchType = "Orifice Style";
+  } else if (strstr(config.bench_type, "VENTURI")!=NULL) {
+    status.benchType = "Venturi Style";
+  } else if (strstr(config.bench_type, "PITOT")!=NULL) {
+    status.benchType = "Pitot Style";
+  }
+
+  // REVIEW : moved from hardware.begin
+  // Board definitions for system status pane
+  #if defined WEMOS_D1_R32                    
+    status.boardType = "WEMOS_D1_R32";
+  #elif defined ARDUCAM_ESP32S
+    status.boardType = "ARDUCAM_ESP32S";
+  #elif defined ESP32DUINO
+    status.boardType = "ESP32DUINO";
+  #elif defined ESP32_WROVER_KIT 
+    status.boardType = "ESP32_WROVER_KIT";
+  #else
+    status.boardType = "CUSTOM_PIN_MAPPING";
+  #endif
+
   // Config Info
   if (var == "RELEASE") return RELEASE;
   if (var == "BUILD_NUMBER") return BUILD_NUMBER;
@@ -847,8 +894,9 @@ String Webserver::processTemplate(const String &var)
   if (var == "PDIFF_SENSOR") return String(status.pdiffSensor);
   if (var == "STATUS_MESSAGE") return String(status.statusMessage);
 
+
   // Orifice Selector
-  #ifdef ORIFICE_STYLE_BENCH
+  if (strstr(config.bench_type, "ORIFICE")!=NULL) {
     String orificeList;
     if (var == "ORIFICE_LIST"){ 
       orificeList =  R"END(
@@ -873,7 +921,7 @@ String Webserver::processTemplate(const String &var)
 
       return orificeList;
     }
-  #endif
+  }
 
   // Orifice plates
   if (var == "ORIFICE1_FLOW_RATE") return String(config.OrificeOneFlow);
@@ -949,6 +997,8 @@ String Webserver::processTemplate(const String &var)
   if (var == "CONF_REFRESH_RATE") return String(config.refresh_rate);
   if (var == "ADJ_FLOW_DEPRESSION") return String(config.adj_flow_depression);
   if (var == "TEMP_UNIT") return String(config.temp_unit);
+  
+  // Temperature
   if (var == "TEMPERATURE_DROPDOWN"){
     if (strstr(String(config.temp_unit).c_str(), String("Celcius").c_str())){
       return String( "<select name='TEMP_UNIT' class='config-select' id='TEMP_UNIT'><option value='Celcius' selected>Celcius </option><option value='Farenheit'>Farenheit </option></select>");
@@ -956,8 +1006,23 @@ String Webserver::processTemplate(const String &var)
       return String("<select name='TEMP_UNIT' class='config-select' id='TEMP_UNIT'><option value='Celcius'>Celcius </option><option value='Farenheit' selected>Farenheit </option></select>");
     }
   }
+
+  // Lift
   if (var == "VALVE_LIFT_INTERVAL") return String(config.valveLiftInterval);
 
+  // Bench type
+  if (var == "BENCH_TYPE_DROPDOWN"){
+    if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())){
+      return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF' selected>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
+    } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())) {
+      return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF'>MAF Style</option><option value='ORIFICE' selected>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
+    } else if (strstr(String(config.bench_type).c_str(), String("VENTURI").c_str())){
+      return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF'>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI' selected>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
+    } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())) {
+      return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF'>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT' selected>Pitot Style</option></select>");
+    }
+  }
+ 
   // Calibration Settings
   if (var == "CONF_CAL_FLOW_RATE") return String(config.cal_flow_rate);
   if (var == "CONF_CAL_REF_PRESS") return String(config.cal_ref_press);
@@ -966,7 +1031,7 @@ String Webserver::processTemplate(const String &var)
 
   // Calibration Data
   if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
-  if (var == "LEAK_CAL_PRESS_VAL") return String(calVal.leak_cal_vac_val);
+  if (var == "LEAK_CAL_PRESS_VAL") return String(calVal.leak_cal_press_val);
   if (var == "LEAK_CAL_VAC_VAL") return String(calVal.leak_cal_vac_val);
 
   // Generate file list HTML code

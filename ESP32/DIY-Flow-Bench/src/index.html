@@ -379,6 +379,7 @@
           <div class="config-row tooltip"><label class="config-label">Cyclical Average Buffer:</label>&nbsp;<input type="text" id="CONF_CYCLIC_AVERAGE_BUFFER" name="CONF_CYCLIC_AVERAGE_BUFFER" value="~CONF_CYCLIC_AVERAGE_BUFFER~" class="config-text"><span class="tooltiptext">Mean buffer size - Used for smoothing results.</span></div>
           <br>
           <h3>Bench Settings</h3>
+          <div class="config-row tooltip"><label class="config-label">Bench Type:</label><span>~BENCH_TYPE_DROPDOWN~</span><span class="tooltiptext">Select bench type</span></div>
           <div class="config-row tooltip"><label class="config-label">Refresh Rate:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="~CONF_REFRESH_RATE~" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
           <div class="config-row tooltip"><label class="config-label">Conversion Depression:</label>&nbsp;<input type="text" id="ADJ_FLOW_DEPRESSION" name="ADJ_FLOW_DEPRESSION" value="~ADJ_FLOW_DEPRESSION~" class="config-text"><span class="tooltiptext">Bench depression used for adjusted flow calcs</span></div>
           <div class="config-row tooltip"><label class="config-label">Temperature Unit:</label><span>~TEMPERATURE_DROPDOWN~</span><span class="tooltiptext">Display unit of temperature</span></div>
@@ -390,67 +391,26 @@
           <div class="config-row tooltip"><label class="config-label">Leak Test Tolerance:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_TOLERANCE" name="CONF_LEAK_TEST_TOLERANCE" value="~CONF_LEAK_TEST_TOLERANCE~" class="config-text"><span class="tooltiptext">Maximum allowable deviation in depression</span></div>
           <div class="config-row tooltip"><label class="config-label">Leak Test Threshold:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_THRESHOLD" name="CONF_LEAK_TEST_THRESHOLD" value="~CONF_LEAK_TEST_THRESHOLD~" class="config-text"><span class="tooltiptext">Depression value above which leak test activates</span></div>
           <br>
-          <h3>Orifice Data</h3>
-          <div class="config-row tooltip"><label class="config-label">Orifice #1 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE1_FLOW_RATE" name="ORIFICE1_FLOW_RATE" value="~ORIFICE1_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #1 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #1 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE1_TEST_PRESSURE" name="ORIFICE1_TEST_PRESSURE" value="~ORIFICE1_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #1 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #2 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE2_FLOW_RATE" name="ORIFICE2_FLOW_RATE" value="~ORIFICE2_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #2 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #2 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE2_TEST_PRESSURE" name="ORIFICE2_TEST_PRESSURE" value="~ORIFICE2_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #2 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #3 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE3_FLOW_RATE" name="ORIFICE3_FLOW_RATE" value="~ORIFICE3_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #3 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #3 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE3_TEST_PRESSURE" name="ORIFICE3_TEST_PRESSURE" value="~ORIFICE3_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #3 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #4 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE4_FLOW_RATE" name="ORIFICE4_FLOW_RATE" value="~ORIFICE4_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #4 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #4 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE4_TEST_PRESSURE" name="ORIFICE4_TEST_PRESSURE" value="~ORIFICE4_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #4 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #5 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE5_FLOW_RATE" name="ORIFICE5_FLOW_RATE" value="~ORIFICE5_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #5 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #5 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE5_TEST_PRESSURE" name="ORIFICE5_TEST_PRESSURE" value="~ORIFICE5_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #5 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #6 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE6_FLOW_RATE" name="ORIFICE6_FLOW_RATE" value="~ORIFICE6_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #6 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #6 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE6_TEST_PRESSURE" name="ORIFICE6_TEST_PRESSURE" value="~ORIFICE6_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #6 in in/wg</span></div>
-          <br>
+          <div id="orificeData">
+            <h3>Orifice Data</h3>
+            <div class="config-row tooltip"><label class="config-label">Orifice #1 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE1_FLOW_RATE" name="ORIFICE1_FLOW_RATE" value="~ORIFICE1_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #1 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #1 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE1_TEST_PRESSURE" name="ORIFICE1_TEST_PRESSURE" value="~ORIFICE1_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #1 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #2 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE2_FLOW_RATE" name="ORIFICE2_FLOW_RATE" value="~ORIFICE2_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #2 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #2 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE2_TEST_PRESSURE" name="ORIFICE2_TEST_PRESSURE" value="~ORIFICE2_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #2 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #3 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE3_FLOW_RATE" name="ORIFICE3_FLOW_RATE" value="~ORIFICE3_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #3 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #3 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE3_TEST_PRESSURE" name="ORIFICE3_TEST_PRESSURE" value="~ORIFICE3_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #3 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #4 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE4_FLOW_RATE" name="ORIFICE4_FLOW_RATE" value="~ORIFICE4_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #4 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #4 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE4_TEST_PRESSURE" name="ORIFICE4_TEST_PRESSURE" value="~ORIFICE4_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #4 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #5 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE5_FLOW_RATE" name="ORIFICE5_FLOW_RATE" value="~ORIFICE5_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #5 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #5 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE5_TEST_PRESSURE" name="ORIFICE5_TEST_PRESSURE" value="~ORIFICE5_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #5 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #6 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE6_FLOW_RATE" name="ORIFICE6_FLOW_RATE" value="~ORIFICE6_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #6 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #6 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE6_TEST_PRESSURE" name="ORIFICE6_TEST_PRESSURE" value="~ORIFICE6_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #6 in in/wg</span></div>
+            <br>
+          </div>
           <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
           <br>
           <br>
         </form>
-        <!--
-        <form method="POST" action="/api/saveorificedata"></form>
-          <hr>
-          <h2>Orifice Data</h2>
-          <div class="config-row tooltip"><label class="config-label">Orifice #1 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE1_FLOW_RATE" name="ORIFICE1_FLOW_RATE" value="~ORIFICE1_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #1 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #1 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE1_TEST_PRESSURE" name="ORIFICE1_TEST_PRESSURE" value="~ORIFICE1_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #1 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #2 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE2_FLOW_RATE" name="ORIFICE2_FLOW_RATE" value="~ORIFICE2_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #2 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #2 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE2_TEST_PRESSURE" name="ORIFICE2_TEST_PRESSURE" value="~ORIFICE2_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #2 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #3 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE3_FLOW_RATE" name="ORIFICE3_FLOW_RATE" value="~ORIFICE3_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #3 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #3 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE3_TEST_PRESSURE" name="ORIFICE3_TEST_PRESSURE" value="~ORIFICE3_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #3 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #4 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE4_FLOW_RATE" name="ORIFICE4_FLOW_RATE" value="~ORIFICE4_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #4 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #4 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE4_TEST_PRESSURE" name="ORIFICE4_TEST_PRESSURE" value="~ORIFICE4_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #4 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #5 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE5_FLOW_RATE" name="ORIFICE5_FLOW_RATE" value="~ORIFICE5_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #5 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #5 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE5_TEST_PRESSURE" name="ORIFICE5_TEST_PRESSURE" value="~ORIFICE5_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #5 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #6 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE6_FLOW_RATE" name="ORIFICE6_FLOW_RATE" value="~ORIFICE6_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #6 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #6 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE6_TEST_PRESSURE" name="ORIFICE6_TEST_PRESSURE" value="~ORIFICE6_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #6 in in/wg</span></div>
-          <br>
-          <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
-          <br>
-          <br>
-        </form>
-        -->
-        <!--
-        <form method="POST" action="/api/saveliftpointdata"></form>
-          <hr>
-          <h2>Valve Lift Data</h2>
-          <div class="config-row tooltip"><label class="config-label">Lift Interval:</label>&nbsp;<input type="text" id="LIFT_INTERVAL" name="LIFT_INTERVAL" value="~LIFT_INTERVAL~" class="config-text"><span class="tooltiptext">Valve lift interval</span></div>
-          <div class="config-row tooltip"><label class="config-label">Lift Point #1 Value:</label>&nbsp;<input type="text" id="LIFT1_VALUE" name="LIFT1_VALUE" value="~LIFT1_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #1</span></div>
-          <div class="config-row tooltip"><label class="config-label">Lift Point #2 Value:</label>&nbsp;<input type="text" id="LIFT2_VALUE" name="LIFT1_VALUE" value="~LIFT2_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #2</span></div>
-          <div class="config-row tooltip"><label class="config-label">Lift Point #3 Value:</label>&nbsp;<input type="text" id="LIFT3_VALUE" name="LIFT1_VALUE" value="~LIFT3_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #3</span></div>
-          <div class="config-row tooltip"><label class="config-label">Lift Point #4 Value:</label>&nbsp;<input type="text" id="LIFT4_VALUE" name="LIFT1_VALUE" value="~LIFT4_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #4</span></div>
-          <div class="config-row tooltip"><label class="config-label">Lift Point #5 Value:</label>&nbsp;<input type="text" id="LIFT5_VALUE" name="LIFT1_VALUE" value="~LIFT5_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #5</span></div>
-          <div class="config-row tooltip"><label class="config-label">Lift Point #6 Value:</label>&nbsp;<input type="text" id="LIFT6_VALUE" name="LIFT1_VALUE" value="~LIFT6_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #6</span></div>
-          <div class="config-row tooltip"><label class="config-label">Lift Point #7 Value:</label>&nbsp;<input type="text" id="LIFT7_VALUE" name="LIFT1_VALUE" value="~LIFT7_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #7</span></div>
-          <div class="config-row tooltip"><label class="config-label">Lift Point #8 Value:</label>&nbsp;<input type="text" id="LIFT8_VALUE" name="LIFT1_VALUE" value="~LIFT8_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #8</span></div>
-          <div class="config-row tooltip"><label class="config-label">Lift Point #9 Value:</label>&nbsp;<input type="text" id="LIFT9_VALUE" name="LIFT1_VALUE" value="~LIFT9_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #9</span></div>
-          <div class="config-row tooltip"><label class="config-label">Lift Point #10 Value:</label>&nbsp;<input type="text" id="LIFT10_VALUE" name="LIFT1_VALUE" value="~LIFT10_VALUE~" class="config-text"><span class="tooltiptext">Valve lift value for lift point #10</span></div>
-          <br>
-          <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
-          <br>
-          <br>
-        </form>
-        -->
         <br>
         <br>
         <h2>Calibration Data</h2>
