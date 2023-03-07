@@ -27,7 +27,7 @@ body, html {
   cursor: pointer;
   padding: 18px 16px;
   font-size: 22px;
-  width: 50vw;
+  width: 33.3333%;
 }
 
 .tablink:active {
@@ -38,16 +38,23 @@ body, html {
   background-color: #777;
 }
 
+#tabcontainer {
+  padding: 100px 20px 20px 20px;
+
+}
+
 /* Style the tab content (and add height:100% of viewport height for full page content) */
 .tabcontentMain {
-  padding: 100px 20px;
-  height: 100vh;
+  display:block;
 }
 
 .tabcontentConfig {
   display: none;
-  padding: 100px 20px;
-  height: 100vh;
+  margin-bottom: 60px;
+}
+
+.tabcontentData {
+  display: none;
 }
 
 #Home {background-color: white;}
@@ -478,7 +485,11 @@ input[type="file"] {
 
 svg.graph {
     height: 500px;
-    width: 800px;
+    width: 750px;
+    background-color: #fff;
+    padding-top: 100px;
+    box-shadow: 2px 2px 12px 1px #666;
+    stroke-linejoin: round;
 }
 
 svg.graph .grid {
@@ -488,7 +499,7 @@ svg.graph .grid {
 }
 
 svg.graph .points {
-  stroke: white;
+  /*stroke: white;*/
   stroke-width: 3;
 }
 svg.graph .first_set {
@@ -516,6 +527,35 @@ svg.graph .labels.x-labels {
 svg.graph .labels.y-labels {
   text-anchor: end;
 }
+
+
+
+ .hide {
+  display: none;
+}
+    
+.dataCircle:hover + .hide {
+  display: block;
+  z-index: 999;
+}
+
+svg .dataCircle:hover {
+  r: 6;
+}
+
+.dataCircle {
+  position:relative;
+  opacity: 0.25;
+} 
+
+.dataValue {
+  text-anchor: middle;
+  font-size: 14px;
+  color: black;
+  transition: font-size 0.5s, opacity 0.3s;    
+}
+
+
 
 
 

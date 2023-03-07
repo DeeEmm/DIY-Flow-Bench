@@ -16,6 +16,7 @@ var leakCalVal;
 var flowCalVal;
 var leakCalTolerance;
 var leakTestThreshold;
+var updateSSE = true;
 
 window.addEventListener('load', onLoad);
 
@@ -34,42 +35,46 @@ if (!!window.EventSource) {
 
   source.addEventListener('JSON_DATA', function(e) {
     var myObj = JSON.parse(e.data);
-    for (key in myObj) {
-      try {
-        if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
-          document.getElementById(key).innerHTML = myObj[key];
-        } else {
-          document.getElementById(key).innerHTML = myObj[key].toFixed(2); 
+
+    if (updateSSE === true){
+
+      for (key in myObj) {
+        try {
+          if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
+            document.getElementById(key).innerHTML = myObj[key];
+          } else {
+            document.getElementById(key).innerHTML = myObj[key].toFixed(2); 
+          }
+        } catch (error) {
+          console.log('Missing or incorrect data');
+          console.log(key + ' : ' + myObj[key]);
         }
-      } catch (error) {
-        console.log('Missing or incorrect data');
-        console.log(key + ' : ' + myObj[key]);
+      } 
+
+      // get bench type and set up GUI accoordingly
+      var benchType = myObj["BENCH_TYPE"];
+
+      switch (benchType) {
+    
+        case "MAF":
+          document.getElementById('orificeData').style.display='none';
+        break;
+    
+        case "ORIFICE":
+          document.getElementById('orificeData').style.display='block';
+        break;
+          
+        case "VENTURI":
+          document.getElementById('orificeData').style.display='block';
+        break;
+          
+        case "PITOT":
+          document.getElementById('orificeData').style.display='block';
+        break;
+          
       }
-    } 
 
-    // get bench type and set up GUI accoordingly
-    var benchType = myObj["BENCH_TYPE"];
-
-    switch (benchType) {
-  
-      case "MAF":
-        document.getElementById('orificeData').style.display='none';
-      break;
-  
-      case "ORIFICE":
-        document.getElementById('orificeData').style.display='block';
-      break;
-        
-      case "VENTURI":
-        document.getElementById('orificeData').style.display='block';
-      break;
-        
-      case "PITOT":
-        document.getElementById('orificeData').style.display='block';
-      break;
-        
     }
-
 
   }, false);
 
@@ -243,6 +248,12 @@ function openTab(tabName, elmnt) {
     tabcontent[i].style.display = "none";
   }
   document.getElementById(tabName).style.display = "block";
+  // Pause SSE update when on data tab
+  if (tabName === "datalog") {
+    updateSSE = false;
+  } else {
+    updateSSE = true;
+  }
 }
 
 

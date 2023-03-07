@@ -26,7 +26,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "23030202"
+#define BUILD_NUMBER "23030801"
 #define RELEASE "V.2.0-RC.6"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"
 
@@ -216,12 +216,12 @@ const int ADC_I2C_ADDR = 0x48;
     
 // Uncomment One sensor only
 #define MAF_DATA_FILE "mafData/ACDELCO_92281162.cpp"        //default recommended sensor    
-// #define MAF_DATA_FILE "mafData/ACDELCO_19330122.h" 
-// #define MAF_DATA_FILE "mafData/VDO_AFM_043.h"
-// #define MAF_DATA_FILE  "mafData/MH95_3000_100.h"         // PMAS MH95-3000 in 100mm housing              
-// #define MAF_DATA_FILE  "mafData/SIEMENS_5WK9605.h"       // Data from Tonys tests
-// #define MAF_DATA_FILE  "mafData/DELPHI_AF10118.h"        // kg/hr - Data from efidynotuning.com/maf.htm 
-// #define MAF_DATA_FILE  "mafData/TEST.h"                  // Test Data
+// #define MAF_DATA_FILE "mafData/ACDELCO_19330122.cpp" 
+// #define MAF_DATA_FILE "mafData/VDO_AFM_043.cpp"
+// #define MAF_DATA_FILE  "mafData/MH95_3000_100.cpp"       // PMAS MH95-3000 in 100mm housing              
+// #define MAF_DATA_FILE  "mafData/SIEMENS_5WK9605.cpp"     // Data from Tonys tests
+// #define MAF_DATA_FILE  "mafData/DELPHI_AF10118.cpp"      // kg/hr - Data from efidynotuning.com/maf.htm 
+// #define MAF_DATA_FILE  "mafData/TEST.cpp"                // Test Data
 
 
 // Set signal source (Uncomment One line only)

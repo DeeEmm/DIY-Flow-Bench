@@ -89,10 +89,10 @@
     #define SDA_PIN                     21                      // BME280 etc
     #define SCL_PIN                     22                      // BME280 etc
 
-    #define SD_CS                       5
-    #define SD_MOSI                     23                 
-    #define SD_MISO                     19             
-    #define SD_SCK                      18                   
+    #define SD_CS_PIN                   5
+    #define SD_MOSI_PIN                 23                 
+    #define SD_MISO_PIN                 19             
+    #define SD_SCK_PIN                  18                   
 
 
     #define WEMOS_SPARE_PIN_1           4                       // NOTE cannot be used for analog                 
@@ -170,10 +170,10 @@
     #define SCL_PIN                     22                      // BME280 etc
 
     // SD Card
-    #define SD_CS                       5
-    #define SD_MOSI                     23                 
-    #define SD_MISO                     19             
-    #define SD_SCK                      18                   
+    #define SD_CS_PIN                   5
+    #define SD_MOSI_PIN                 23                 
+    #define SD_MISO_PIN                 19             
+    #define SD_SCK_PIN                  18                   
 
     
     // NOTE: Pins 15/32/33 are only available on Wemos D1 R32
@@ -253,10 +253,10 @@
     #define SCL_PIN                     22                     // BME280 etc
     
     // SD Card
-    #define SD_CS                       5
-    #define SD_MOSI                     23
-    #define SD_MISO                     19
-    #define SD_SCK                      18
+    #define SD_CS_PIN                   5
+    #define SD_MOSI_PIN                 23                 
+    #define SD_MISO_PIN                 19             
+    #define SD_SCK_PIN                  18                   
 
 #endif
 
@@ -324,10 +324,10 @@
     #define SDA_PIN                     21                     // BME280 etc
     #define SCL_PIN                     22                     // BME280 etc
     
-    #define SD_CS                       5
-    #define SD_MOSI                     23
-    #define SD_MISO                     19
-    #define SD_SCK                      18
+    #define SD_CS_PIN                   5
+    #define SD_MOSI_PIN                 23                 
+    #define SD_MISO_PIN                 19             
+    #define SD_SCK_PIN                  18                   
 
 #endif
 
@@ -399,10 +399,10 @@
     #define SDA_PIN                     21                      // BME280 etc
     #define SCL_PIN                     22                      // BME280 etc
 
-    #define SD_CS                       5
-    #define SD_MOSI                     23                 
-    #define SD_MISO                     19             
-    #define SD_SCK                      18                   
+    #define SD_CS_PIN                   5
+    #define SD_MOSI_PIN                 23                 
+    #define SD_MISO_PIN                 19             
+    #define SD_SCK_PIN                  18                   
 
 
     #define WEMOS_SPARE_PIN_1           4                       // NOTE cannot be used for analog      

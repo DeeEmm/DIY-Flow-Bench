@@ -112,8 +112,8 @@
           <!-- <div class="config-row"><label class="config-label">Uptime:  </label><span class="config-value" id="UPTIME">~UPTIME~</span></div> -->
           <h4>Hardware Configuration</h4>
           <hr>
-          <div class="config-row"><label class="config-label">Bench Type:  </label><span class="config-value" id="BENCHTYPE">~BENCHTYPE~</span></div>
-          <div class="config-row"><label class="config-label">Board Type:  </label><span class="config-value" id="BOARDTYPE">~BOARDTYPE~</span></div>
+          <div class="config-row"><label class="config-label">Bench Type:  </label><span class="config-value" id="BENCH_TYPE">~BENCH_TYPE~</span></div>
+          <div class="config-row"><label class="config-label">Board Type:  </label><span class="config-value" id="BOARD_TYPE">~BOARD_TYPE~</span></div>
           <!-- <div class="config-row"><label class="config-label">Boot Time:  </label><span class="config-value" id="BOOT_TIME">~BOOT_TIME~</span></div> -->
           <h4>Sensor Configuration</h4>
           <hr>
@@ -136,8 +136,13 @@
         <h1><a href="/" id="PAGE_TITLE" alt="DIY Flow Bench">DIY Flow Bench</a></h1>
     </div>
 
+    <!-- Navbar-->
     <button class="tablink" onclick="openTab('dashboard', this)" id="load-dashboard-button">Dashboard</button>
+    <button class="tablink" onclick="openTab('datalog', this)" id="load-datalog-button">Data</button>
     <button class="tablink" onclick="openTab('configuration', this)" id="load-config-button">Configuration</button>
+
+    <div id="tabcontainer">
+    <!-- Main Tab-->
     <div id="dashboard" class="tabcontent tabcontentMain">        
       <div class="content">
         <div class="tile-grid">
@@ -213,6 +218,18 @@
    
         
         
+
+      </div>
+                
+
+    </div>
+
+    
+    <!-- Datalog tab -->
+    <div id="datalog" class="tabcontent tabcontentData">
+
+
+
         
         
              
@@ -245,69 +262,162 @@
         Store Data in JSON / SPIFFS file
         
         -->
+
+        
+
         <!--
+          NOTE: SVG graph is drawn from top down as the origin is actually at top left of graph area. 
+          All data points = (graph_height - datapoint_value)
+          Origin is 100,350
+          Top right is ,0
+
+          For 'Ron: 
+
+          Smooth using bezier curves...
+          https://observablehq.com/@ndry/smooth-a-svg-path-with-cubic-bezier-curves
+          based on...
+          https://francoisromain.medium.com/smooth-a-svg-path-with-cubic-bezier-curves-e37b49d46c74
+        -->
         <div class="graph-container">        
           <svg class="graph" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+          
+            <!--Grid-->
             <g class="grid x-grid" id="xGrid">
-              <line x1="113" x2="113" y1="10" y2="380"></line>
-              <line x1="259" x2="259" y1="10" y2="380"></line>
-              <line x1="405" x2="405" y1="10" y2="380"></line>
-              <line x1="551" x2="551" y1="10" y2="380"></line>
-              <line x1="697" x2="697" y1="10" y2="380"></line>
+              <line x1="100" x2="100" y1="0" y2="360"></line>
+              <line x1="150" x2="150" y1="0" y2="360"></line>
+              <line x1="200" x2="200" y1="0" y2="360"></line>
+              <line x1="250" x2="250" y1="0" y2="360"></line>
+              <line x1="300" x2="300" y1="0" y2="360"></line>
+              <line x1="350" x2="350" y1="0" y2="360"></line>
+              <line x1="400" x2="400" y1="0" y2="360"></line>
+              <line x1="450" x2="450" y1="0" y2="360"></line>
+              <line x1="500" x2="500" y1="0" y2="360"></line>
+              <line x1="550" x2="550" y1="0" y2="360"></line>
+              <line x1="600" x2="600" y1="0" y2="360"></line>
+              <line x1="650" x2="650" y1="0" y2="360"></line>
+              <line x1="700" x2="700" y1="0" y2="360"></line>
             </g>
+
             <g class="grid y-grid" id="yGrid">
-              <line x1="86" x2="697" y1="10" y2="10"></line>
-              <line x1="86" x2="697" y1="68" y2="68"></line>
-              <line x1="86" x2="697" y1="126" y2="126"></line>
-              <line x1="86" x2="697" y1="185" y2="185"></line>
-              <line x1="86" x2="697" y1="243" y2="243"></line>
-              <line x1="86" x2="697" y1="301" y2="301"></line>
-              <line x1="86" x2="697" y1="360" y2="360"></line>
+              <line x1="90" x2="700" y1="0" y2="0"></line>
+              <line x1="90" x2="700" y1="50" y2="50"></line>
+              <line x1="90" x2="700" y1="100" y2="100"></line>
+              <line x1="90" x2="700" y1="150" y2="150"></line>
+              <line x1="90" x2="700" y1="200" y2="200"></line>
+              <line x1="90" x2="700" y1="250" y2="250"></line>
+              <line x1="90" x2="700" y1="300" y2="300"></line>
+              <line x1="90" x2="700" y1="350" y2="350"></line>
             </g>
-            
-            
-            <g class="surfaces">
-        
-                <line x1="550" y1="20" x2="620" y2="20"  style="stroke:rgb(0,0,255);stroke-width:2" /> 
-              
-                <line x1="113" y1="360" x2="259" y2="221"  style="stroke:rgb(0,0,255);stroke-width:2" />
-                <line x1="259" y1="221" x2="405" y2="139"  style="stroke:rgb(0,0,255);stroke-width:2" />
-                <line x1="405" y1="139" x2="551" y2="170"  style="stroke:rgb(0,0,255);stroke-width:2" />
-                <line x1="551" y1="170" x2="697" y2="220"  style="stroke:rgb(0,0,255);stroke-width:2" />
-        
-        
-                <line x1="550" y1="35" x2="620" y2="35"  style="stroke:rgb(255,0,0);stroke-width:2" /> 
-        
-                <line x1="113" y1="360" x2="259" y2="231"  style="stroke:rgb(255,0,0);stroke-width:2" />
-                <line x1="259" y1="231" x2="405" y2="179"  style="stroke:rgb(255,0,0);stroke-width:2" />
-                <line x1="405" y1="179" x2="551" y2="200"  style="stroke:rgb(255,0,0);stroke-width:2" />
-                <line x1="551" y1="200" x2="697" y2="230"  style="stroke:rgb(255,0,0);stroke-width:2" />
-        
-            </g>
-            
-            <use class="grid double" xlink:href="#xGrid" style=""></use>
-            <use class="grid double" xlink:href="#yGrid" style=""></use>
-            
+
+            <!--Grid Labels-->
             <g class="labels x-labels">
-                <text x="113" y="400">Lift: mm</text>
-                <text x="259" y="400">2mm</text>
-                <text x="405" y="400">3mm</text>
-                <text x="551" y="400">4mm</text>
-                <text x="697" y="400">5mm</text>
-            </g>
-            <g class="labels y-labels">
-                <text x="80" y="15">200</text>
-                <text x="80" y="131">150</text>
-                <text x="80" y="248">100</text>
-                <text x="80" y="365">Flow: CFM</text>
-            </g>
+              <text x="100" y="400">Lift:</text>
+              <text x="150" y="400">~lift1~</text>
+              <text x="200" y="400">~lift2~</text>
+              <text x="250" y="400">~lift3~</text>
+              <text x="300" y="400">~lift4~</text>
+              <text x="350" y="400">~lift5~</text>
+              <text x="400" y="400">~lift6~</text>
+              <text x="450" y="400">~lift7~</text>
+              <text x="500" y="400">~lift8~</text>
+              <text x="550" y="400">~lift9~</text>
+              <text x="600" y="400">~lift10~</text>
+              <text x="650" y="400">~lift11~</text>
+              <text x="700" y="400">~lift12~</text>
+          </g>
+          
+          <g class="labels y-labels">
+            <text x="80" y="10">400</text>
+            <text x="80" y="60">350</text>
+            <text x="80" y="110">300</text>
+            <text x="80" y="160">250</text>
+            <text x="80" y="210">200</text>
+            <text x="80" y="260">150</text>
+            <text x="80" y="310">100</text>
+            <text x="80" y="360">Flow (cfm)</text>
+          </g>
+
+            <!--Graph Key-->
             <g class="labels key-labels">
+
               <text x="625" y="25">Inlet</text>
+              <line x1="550" y1="20" x2="620" y2="20"  style="stroke:#234568;stroke-width:2;opacity:0.5;" /> 
+
+              <line x1="550" y1="35" x2="620" y2="35"  style="stroke:#f50808;stroke-width:2;opacity:0.5;" /> 
               <text x="625" y="40">Exhaust</text>
             </g>
+
+            <!--Data Points-->
+            <g class="first_set points" data-setname="Our first data set" id="dataPlot">
+              <circle class="dataCircle" cx="150" cy="340" data-value="7.2" r="4"></circle><text class="dataValue hide" x="150" y="310">7.2</text>
+              <circle class="dataCircle" cx="200" cy="315" data-value="8.1" r="4"></circle><text class="dataValue hide" x="200" y="285">4.2</text>
+              <circle class="dataCircle" cx="250" cy="301" data-value="7.7" r="4"></circle><text class="dataValue hide" x="250" y="271">5.2</text> 
+              <circle class="dataCircle" cx="300" cy="280" data-value="6.8" r="4"></circle><text class="dataValue hide" x="300" y="270">23.2</text>
+              <circle class="dataCircle" cx="350" cy="249" data-value="6.7" r="4"></circle><text class="dataValue hide" x="350" y="239">32</text>  
+              <circle class="dataCircle" cx="400" cy="245" data-value="5.7" r="4"></circle><text class="dataValue hide" x="400" y="235">7.2</text> 
+              <circle class="dataCircle" cx="450" cy="242" data-value="6.7" r="4"></circle><text class="dataValue hide" x="450" y="232">8.2</text> 
+              <circle class="dataCircle" cx="500" cy="238" data-value="6.8" r="4"></circle><text class="dataValue hide" x="500" y="228">752</text> 
+              <circle class="dataCircle" cx="550" cy="230" data-value="4.7" r="4"></circle><text class="dataValue hide" x="550" y="220">22</text>  
+              <circle class="dataCircle" cx="600" cy="222" data-value="5.7" r="4"></circle><text class="dataValue hide" x="600" y="212">7</text>   
+              <circle class="dataCircle" cx="650" cy="220" data-value="2.7" r="4"></circle><text class="dataValue hide" x="650" y="210">7542</text>
+              <circle class="dataCircle" cx="700" cy="218" data-value="6.9" r="4"></circle><text class="dataValue hide" x="700" y="208">42</text>  
+            </g>
+
+            <!--Graph Data-->
+            <g class="surfaces">
+                <!--Line data-->
+                <polyline fill="none" stroke="#234568" stroke-width="1" stroke-dasharray="5, 2"
+                points="100,350 150,340 200,315 250,301 300,280 350,249 400,245 450,242 500,238 550,230 600,222 650,220 700,218" />
+
+                <!--Line data-->
+                <polyline fill="none" stroke="#f50808" stroke-width="1" stroke-dasharray="5, 2"
+                points="100,350 150,342 200,333 250,305 300,265 350,241 400,230 450,221 500,201 550,198 600,191 650,185 700,181"/>
+            </g>
+            
+            <use class="grid double" xlink:href="#xGrid" ></use>
+            <use class="grid double" xlink:href="#yGrid" ></use>
+            
           </svg>
+
+
+          <!-- ARRAY TO SVG -->
+
+          <coords-svg stroke="gold" coords="[[100,330],[ 150,332],[ 200,332],[ 250,335],[ 300,275],[ 350,281],[ 400,250],[ 450,241],[ 500,251],[ 550,133],[ 600,199],[ 650,172],[ 700,177]]"></coords-svg>
+          <!-- <coords-svg stroke="green" coords="[[2, 15],[57, 58],[5, 57]]"></coords-svg> -->
+
+          <!-- Converts custom <coord-svg> elements into valid polyline and appends to dataPlot. Next stage is to use JSON -->
+          <script>
+            customElements.define("coords-svg", class extends HTMLElement{
+              connectedCallback(){
+                let arr = JSON.parse(this.getAttribute("coords"));
+                let dPath = arr.flat().join(" ");
+                let stroke = this.getAttribute("stroke");
+                this.style.display = "inline-block";
+                
+                var svgNS = "http://www.w3.org/2000/svg";
+                let polyline = document.createElementNS(svgNS, "polyline");
+                polyline.classList.add("dataLine");
+
+                polyline.setAttribute("points", dPath);
+                polyline.setAttribute("stroke", stroke);
+                polyline.setAttribute("stroke-width", 1);
+                polyline.setAttribute("fill", "none");
+
+                document.getElementById("dataPlot").appendChild(polyline);
+              }
+            });
+          </script>
+         
+          <!-- ARRAY TO SVG -->
+
+ 
+
+
+
+
+
         </div>  
-        -->
+      
         
         <!-- end lift graph -->
 
@@ -345,13 +455,11 @@
         -->
 
 
-      </div>
-                
-      <!-- Footer -->
-      <br><div id="footer"><a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a></div>
+
 
     </div>
-    
+
+
 
     <!-- configuration tab -->
     <div id="configuration" class="tabcontent tabcontentConfig">
@@ -423,6 +531,12 @@
         <br>
       </div>                    
     </div>
+  </div>
+
+
+    <!-- Footer -->
+    <div id="footer"><a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a></div>
+
 
     <script src="/javascript.js"></script>
   </BODY>

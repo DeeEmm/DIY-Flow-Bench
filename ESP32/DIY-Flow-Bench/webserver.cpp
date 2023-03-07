@@ -108,10 +108,26 @@ void Webserver::begin()
   #ifdef SD_CARD_IS_ENABLED
     _message.serialPrintf("Initialising SD Card... \n");
 
-      if (!SD.begin(SD_CS)) {
+      if (!SD.begin(SD_CS_PIN)) {
         _message.serialPrintf("SD Card initialisation failed \n");
         while (true);
       } else {
+        uint64_t cardSize = SD.cardSize() / (1024 * 1024);
+        Serial.printf("SD Card Size: %lluMB\n", cardSize);
+        listDir(SD, "/", 0);
+        createDir(SD, "/mydir");
+        listDir(SD, "/", 0);
+        removeDir(SD, "/mydir");
+        listDir(SD, "/", 2);
+        writeFile(SD, "/hello.txt", "Hello ");
+        appendFile(SD, "/hello.txt", "World!\n");
+        readFile(SD, "/hello.txt");
+        deleteFile(SD, "/foo.txt");
+        renameFile(SD, "/hello.txt", "/foo.txt");
+        readFile(SD, "/foo.txt");
+        testFileIO(SD, "/test.txt");
+        _message.serialprintf("Total space: %lluMB\n", SD.totalBytes() / (1024 * 1024));
+        _message.serialprintf("Used space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
         _message.serialPrintf("Complete.\n");
       }
   #endif
@@ -880,8 +896,8 @@ String Webserver::processTemplate(const String &var)
   if (var == "LOCAL_IP_ADDRESS") return String(status.local_ip_address);
   if (var == "HOSTNAME") return String(status.hostname);
   if (var == "UPTIME") return String(esp_timer_get_time()/1000);
-  if (var == "BENCHTYPE") return String(status.benchType);
-  if (var == "BOARDTYPE") return String(status.boardType);
+  if (var == "BENCH_TYPE") return String(status.benchType);
+  if (var == "BOARD_TYPE") return String(status.boardType);
   if (var == "BOOT_TIME") return String(status.boot_time);
 
   // Sensor Values
@@ -1129,8 +1145,22 @@ int Webserver::getWifiConnection(){
 
 
 
-
+//***********************************************************
+//***********************************************************
+//***********************************************************
+//***********************************************************
+//***********************************************************
+//***********************************************************
+//***********************************************************
+//***********************************************************
   // TODO SD File handling / Data recording
+//***********************************************************
+//***********************************************************
+//***********************************************************
+//***********************************************************
+//***********************************************************
+//***********************************************************
+//***********************************************************
 
   /*
   Need to work out how to process file list and display in GUI
@@ -1167,83 +1197,356 @@ int Webserver::getWifiConnection(){
   // https://microcontrollerslab.com/microsd-card-esp32-arduino-ide/
   // https://www.mischianti.org/2021/03/28/how-to-use-sd-card-with-esp32-2/
 
+/*
+
+
+From https://deguez07.medium.com/esp32-with-sd-card-modules-the-master-guide-5d391f6785d7
+
+// File will be null/false if /parent directory doesn't exist
+File file = SD.open("/parent/hello-sd.txt", FILE_WRITE);
+if (!file) { // the /parent directory doesn't exist, hence the file can't be created}
+// Perform operations on the file
+file.close(); // Never forget to close!
+
+
+bool didCreate = SD.mkdir("/test-dir");
+bool didMove = SD.rename("/test-dir", "/test");
+bool didRemoveDir = SD.rmdir("/test");
+bool didRemoveFile = SD.remove("hello.txt");
 
 
 
-/***********************************************************
- * @brief read JSON file from SD card 
- * @return JSON data
- * @NOTE: https://wokwi.com/projects/323656763409695316
- ***/
-StaticJsonDocument<1024> Webserver::getFileSD(String filename){
+SD.mkdir("/test-dir"); //true
+SD.mkdir("/parent/test-dir"); //false
 
-  StaticJsonDocument<1024> dataJson;
 
-  // Example of reading file from SD card:
-  File textFile = SD.open("/wokwi.txt");
-  if (textFile) {
-    Serial.print("wokwi.txt: ");
-    while (textFile.available()) {
-      Serial.write(textFile.read());
+SD.mkdir("/parent"); // true
+SD.mkdir("/parent/test-dir"); // true, now that /parent exists
+
+
+SD.rename("/hello.txt", "/top/hello.txt"); // false, target path already exists
+SD.rename("/hello-world.txt", "/hw.txt"); // false, /hello-world.txt doesn't exist
+SD.rename("/hello.txt", "/top2/hello.txt"); // false, /top2 doesn't exist
+SD.rename("/hello.txt", "/top/hello-world.txt"); // true, we're moving and renaming /hello.txt
+SD.rename("/top", "/top2/top-mod"); // false, /top2 doesn't exist
+SD.rename("/top", "/top-mod"); // true, we're renaming the /top directory to /top-mod
+
+
+
+SD.rmdir("/parent"); false, /parent directory doesn't exist
+SD.rmdir("/top-dir"); false, /top-dir contains a directory /nested-dir
+SD.rmdir("/top-dir2"); false, /top-dir2 contains a file hello.txt
+SD.rmdir("/top-dir/nested-dir"); true, /nested-dir can be deleted, it doesn't contain files or other directories
+SD.rmdir("/top-dir"); true, /top-dir can NOW be deleted, as it doesn't contain sub-directories
+
+
+
+
+
+
+
+*/
+
+
+
+
+
+
+
+// /***********************************************************
+//  * @brief read JSON file from SD card 
+//  * @return JSON data
+//  * @NOTE: https://wokwi.com/projects/323656763409695316
+//  ***/
+// StaticJsonDocument<1024> Webserver::getSDFile(String filename){
+
+//   StaticJsonDocument<1024> dataJson;
+
+//   // Example of reading file from SD card:
+//   File textFile = SD.open("/wokwi.txt");
+//   if (textFile) {
+//     Serial.print("wokwi.txt: ");
+//     while (textFile.available()) {
+//       Serial.write(textFile.read());
+//     }
+//     textFile.close();
+//   } else {
+//     Serial.println("error opening wokwi.txt!");
+//   }
+
+//   return dataJson;
+
+// }
+
+
+
+
+// /***********************************************************
+//  * @brief read file list from SD card 
+//  * @return JSON formatted list
+//  * 
+//  ***/
+// StaticJsonDocument<1024> Webserver::getSDFileList(String filename){
+
+//   //TODO - not coded yet
+
+//   StaticJsonDocument<1024> dataJson;
+
+//   File root;
+
+//   Serial.println("Files in the card:");
+//   root = SD.open("/");
+//   // printDirectory(root, 0);
+//   Serial.println("");
+
+
+
+//   File dir;
+//   int numTabs = 10;
+
+
+//   while (true) {
+
+//     File entry =  dir.openNextFile();
+//     if (! entry) {
+//       // no more files
+//       break;
+//     }
+//     for (uint8_t i = 0; i < numTabs; i++) {
+//       Serial.print('\t');
+//     }
+//     Serial.print(entry.name());
+//     if (entry.isDirectory()) {
+//       Serial.println("/");
+//       // printDirectory(entry, numTabs + 1);
+//     } else {
+//       // files have sizes, directories do not
+//       Serial.print("\t\t");
+//       Serial.println(entry.size(), DEC);
+//     }
+//     entry.close();
+//   }
+
+//   return dataJson;
+
+// }
+
+
+// /** 
+//  * Writes the given [data] to file at the given [filePath] 
+//  * @return True if the data operation completes without errors
+//  */
+// bool Webserver::writeToSDFile(const char* filePath, const char* data) {
+//     File file = SD.open(filePath, FILE_WRITE);
+
+//     // Check the file could be opened
+//     if (!file) {
+//         return false;
+//     }
+
+//     file.println(data);
+//     file.close();
+
+//     return true;
+// }
+
+// /**
+//  * Appends the given [data] to the file at the given [filePath]
+//  * @return True if data is appended without errors
+//  */
+// bool Webserver::appendToSDFile(const char* filePath, const char* data) {
+//     File file = SD.open(filePath, FILE_APPEND);
+//     if (!file) { return false; }
+
+//     file.println(data);
+//     file.close();
+//     return true;
+// }
+
+// /** Returns the data of the file at the given [filePath] */
+// const char* Webserver::readSDFile(const char* filePath) {
+//     File file = SD.open(filePath, FILE_READ);
+//     if (!file) { return ""; }
+
+//     String data = file.readString();
+//     file.close();
+//     return data.c_str();
+// }
+
+
+
+// void Webserver::deleteFile(fs::FS &fs, const char * path){
+//     Serial.printf("Deleting file: %s\n", path);
+//     if(fs.remove(path)){
+//         Serial.println("File deleted");
+//     } else {
+//         Serial.println("Delete failed");
+//     }
+// }
+
+
+
+
+
+
+/* 
+https://github.com/espressif/arduino-esp32/blob/master/libraries/SD/examples/SD_Test/SD_Test.ino
+*/
+
+
+void Webserver::listSDDir(fs::FS &fs, const char * dirname, uint8_t levels){
+    Serial.printf("Listing directory: %s\n", dirname);
+
+    File root = fs.open(dirname);
+    if(!root){
+        Serial.println("Failed to open directory");
+        return;
     }
-    textFile.close();
-  } else {
-    Serial.println("error opening wokwi.txt!");
-  }
+    if(!root.isDirectory()){
+        Serial.println("Not a directory");
+        return;
+    }
 
-  return dataJson;
-
+    File file = root.openNextFile();
+    while(file){
+        if(file.isDirectory()){
+            Serial.print("  DIR : ");
+            Serial.println(file.name());
+            if(levels){
+                listSDDir(fs, file.path(), levels -1);
+            }
+        } else {
+            Serial.print("  FILE: ");
+            Serial.print(file.name());
+            Serial.print("  SIZE: ");
+            Serial.println(file.size());
+        }
+        file = root.openNextFile();
+    }
 }
 
-
-
-
-/***********************************************************
- * @brief read file list from SD card 
- * @return JSON formatted list
- * 
- ***/
-StaticJsonDocument<1024> Webserver::getFileListSD(String filename){
-
-  //TODO - not coded yet
-
-  StaticJsonDocument<1024> dataJson;
-
-  File root;
-
-  Serial.println("Files in the card:");
-  root = SD.open("/");
-  // printDirectory(root, 0);
-  Serial.println("");
-
-
-
-  File dir;
-  int numTabs = 10;
-
-
-  while (true) {
-
-    File entry =  dir.openNextFile();
-    if (! entry) {
-      // no more files
-      break;
-    }
-    for (uint8_t i = 0; i < numTabs; i++) {
-      Serial.print('\t');
-    }
-    Serial.print(entry.name());
-    if (entry.isDirectory()) {
-      Serial.println("/");
-      // printDirectory(entry, numTabs + 1);
+void Webserver::createSDDir(fs::FS &fs, const char * path){
+    Serial.printf("Creating Dir: %s\n", path);
+    if(fs.mkdir(path)){
+        Serial.println("Dir created");
     } else {
-      // files have sizes, directories do not
-      Serial.print("\t\t");
-      Serial.println(entry.size(), DEC);
+        Serial.println("mkdir failed");
     }
-    entry.close();
-  }
+}
 
-  return dataJson;
+void Webserver::removeSDDir(fs::FS &fs, const char * path){
+    Serial.printf("Removing Dir: %s\n", path);
+    if(fs.rmdir(path)){
+        Serial.println("Dir removed");
+    } else {
+        Serial.println("rmdir failed");
+    }
+}
 
+void Webserver::readSDFile(fs::FS &fs, const char * path){
+    Serial.printf("Reading file: %s\n", path);
+
+    File file = fs.open(path);
+    if(!file){
+        Serial.println("Failed to open file for reading");
+        return;
+    }
+
+    Serial.print("Read from file: ");
+    while(file.available()){
+        Serial.write(file.read());
+    }
+    file.close();
+}
+
+void Webserver::writeSDFile(fs::FS &fs, const char * path, const char * message){
+    Serial.printf("Writing file: %s\n", path);
+
+    File file = fs.open(path, FILE_WRITE);
+    if(!file){
+        Serial.println("Failed to open file for writing");
+        return;
+    }
+    if(file.print(message)){
+        Serial.println("File written");
+    } else {
+        Serial.println("Write failed");
+    }
+    file.close();
+}
+
+void Webserver::appendSDFile(fs::FS &fs, const char * path, const char * message){
+    Serial.printf("Appending to file: %s\n", path);
+
+    File file = fs.open(path, FILE_APPEND);
+    if(!file){
+        Serial.println("Failed to open file for appending");
+        return;
+    }
+    if(file.print(message)){
+        Serial.println("Message appended");
+    } else {
+        Serial.println("Append failed");
+    }
+    file.close();
+}
+
+void Webserver::renameSDFile(fs::FS &fs, const char * path1, const char * path2){
+    Serial.printf("Renaming file %s to %s\n", path1, path2);
+    if (fs.rename(path1, path2)) {
+        Serial.println("File renamed");
+    } else {
+        Serial.println("Rename failed");
+    }
+}
+
+void Webserver::deleteSDFile(fs::FS &fs, const char * path){
+    Serial.printf("Deleting file: %s\n", path);
+    if(fs.remove(path)){
+        Serial.println("File deleted");
+    } else {
+        Serial.println("Delete failed");
+    }
+}
+
+void Webserver::testSDFileIO(fs::FS &fs, const char * path){
+    File file = fs.open(path);
+    static uint8_t buf[512];
+    size_t len = 0;
+    uint32_t start = millis();
+    uint32_t end = start;
+    if(file){
+        len = file.size();
+        size_t flen = len;
+        start = millis();
+        while(len){
+            size_t toRead = len;
+            if(toRead > 512){
+                toRead = 512;
+            }
+            file.read(buf, toRead);
+            len -= toRead;
+        }
+        end = millis() - start;
+        Serial.printf("%u bytes read for %u ms\n", flen, end);
+        file.close();
+    } else {
+        Serial.println("Failed to open file for reading");
+    }
+
+
+    file = fs.open(path, FILE_WRITE);
+    if(!file){
+        Serial.println("Failed to open file for writing");
+        return;
+    }
+
+    size_t i;
+    start = millis();
+    for(i=0; i<2048; i++){
+        file.write(buf, 512);
+    }
+    end = millis() - start;
+    Serial.printf("%u bytes written for %u ms\n", 2048 * 512, end);
+    file.close();
 }

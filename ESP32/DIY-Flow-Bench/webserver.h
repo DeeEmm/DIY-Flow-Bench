@@ -80,8 +80,26 @@ class Webserver {
 		void createConfigFile ();
 		void resetWifi ( void );
 		void wifiReconnect ( void );
-		StaticJsonDocument<1024> getFileSD(String filename);
-		StaticJsonDocument<1024> getFileListSD(String filename);
+		
+		StaticJsonDocument<1024> getSDFile(String filename);
+		StaticJsonDocument<1024> getSDFileList(String filename);
+		bool writeToSDFile(const char* filePath, const char* data);
+		bool appendToSDFile(const char* filePath, const char* data);
+		const char* readSDFile(const char* filePath);
+		void deleteFile(fs::FS &fs, const char * path);
+
+		void listSDDir(fs::FS &fs, const char * dirname, uint8_t levels);
+		void createSDDir(fs::FS &fs, const char * path);
+		void removeSDDir(fs::FS &fs, const char * path);
+		void readSDFile(fs::FS &fs, const char * path);
+		void writeSDFile(fs::FS &fs, const char * path, const char * message);
+		void appendSDFile(fs::FS &fs, const char * path, const char * message);
+		void renameSDFile(fs::FS &fs, const char * path1, const char * path2);
+		void deleteSDFile(fs::FS &fs, const char * path);
+		void testSDFileIO(fs::FS &fs, const char * path);
+
+
+
 
 
 		// StaticJsonDocument<1024> loadCalibrationSettings ();

@@ -44,6 +44,11 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+23030801        - Created code to generate lift plot from custom XML element (data array)
+23030701        - Created basic lift graph
+                - Fixed mafData file extensions in configuration.h
+23030601        - Added Dataview layout
+                - Added basic SD handling
 23030202        - Added ability to change bench type in GUI
                 - Fixed AP Mode IP address display in GUI
 23030201        - Updated calibration code for flow and leaktest calibration
