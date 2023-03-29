@@ -495,6 +495,10 @@ double Sensors::getPRefValue() {
 		// sensorVal (kPa) = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
 		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
 
+	#elif defined PREF_SENSOR_TYPE_MPXV7025
+
+		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+
 	#elif defined PREF_SENSOR_TYPE_XGZP6899A007KPDPN
 
 		// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
@@ -586,6 +590,11 @@ double Sensors::getPDiffValue() {
 		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
 		// sensorVal = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
 		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+
+
+	#elif defined PDIFF_SENSOR_TYPE_MPXV7025
+
+		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
 
 
 	#elif defined PDIFF_SENSOR_TYPE_XGZP6899A007KPDPN
@@ -680,6 +689,11 @@ double Sensors::getPitotValue() {
 		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
 		// sensorVal = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
 		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+
+
+	#elif defined PITOT_SENSOR_TYPE_MPXV7025
+
+		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
 
 
 	#elif defined PITOT_SENSOR_TYPE_XGZP6899A007KPDPN
