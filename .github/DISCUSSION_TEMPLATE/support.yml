@@ -1,5 +1,6 @@
 title: "[Give your discussion a concise and relevant title] "
 - type: markdown
+  id: title_help
   attributes:
     value: Providing a descriptive title will help others who have similar issues in the future.
 body:
