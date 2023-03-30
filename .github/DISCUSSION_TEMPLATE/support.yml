@@ -1,4 +1,5 @@
-title: "Give your discussion a concise and relevant title... "
+title: "Describe your issue "
+label: "Give your discussion a concise and descriptive title"
 body:
 - type: textarea
   id: version
