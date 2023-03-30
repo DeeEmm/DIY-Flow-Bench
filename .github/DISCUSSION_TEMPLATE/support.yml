@@ -1,6 +1,6 @@
 title: "Give your discussion a concise and descriptive title"
 body:
-- type: textarea
+- type: input
   id: version
   attributes:
     label: Version Info
