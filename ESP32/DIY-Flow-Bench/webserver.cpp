@@ -444,6 +444,7 @@ void Webserver::parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configD
   strcpy(config.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
   strcpy(config.hostname, configData["CONF_HOSTNAME"]);
   config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
+  config.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
   config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
   config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
   config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
@@ -525,6 +526,7 @@ void Webserver::createConfigFile () {
   configData["CONF_WIFI_AP_PSWD"] = config.wifi_ap_pswd;
   configData["CONF_HOSTNAME"] = config.hostname;
   configData["CONF_WIFI_TIMEOUT"] = config.wifi_timeout;
+  configData["CONF_MAF_HOUSING_DIAMETER"] = config.maf_housing_diameter;
   configData["CONF_REFRESH_RATE"] = config.refresh_rate;
   configData["CONF_MIN_BENCH_PRESSURE"] = config.min_bench_pressure;
   configData["CONF_MIN_FLOW_RATE"] = config.min_flow_rate;
@@ -596,6 +598,7 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
   strcpy(config.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
   strcpy(config.hostname, configData["CONF_HOSTNAME"]);
   config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
+  config.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
   config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
   config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
   config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
@@ -1010,6 +1013,7 @@ String Webserver::processTemplate(const String &var)
   if (var == "CONF_CYCLIC_AVERAGE_BUFFER") return String(config.cyc_av_buffer);
 
   // Bench Settings
+  if (var == "CONF_MAF_HOUSING_DIAMETER") return String(config.maf_housing_diameter);
   if (var == "CONF_REFRESH_RATE") return String(config.refresh_rate);
   if (var == "ADJ_FLOW_DEPRESSION") return String(config.adj_flow_depression);
   if (var == "TEMP_UNIT") return String(config.temp_unit);
