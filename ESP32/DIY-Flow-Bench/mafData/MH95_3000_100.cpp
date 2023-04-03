@@ -6,9 +6,10 @@
  * MAF file for type: 
  * File units = 1000 * kg/hr
  * Comments:  Sensor mounted in 4" (100mm) housing - Data provided by PMAS
- * Status: Untested 
+ * Status: VALIDATED / UNTESTED 
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
+ * 686 kg/h is Approx 336cfm  
  ***/
 #ifndef MAFDATACLASS
 #define MAFDATACLASS
@@ -63,6 +64,19 @@ int Maf::outputType() {
  ***/
 int Maf::mafUnits() {
     return KG_H;
+}
+
+
+
+/***********************************************************
+ * @brief Original MAF Diameter in mm
+ * 
+ * @note Used to calculate MAF transfer function to transpose 
+ * flow rates for different pipe diameters
+ * @note Diameter confirmed - Source PMAS
+ ***/
+int Maf::mafDiameter() {
+    return 95;
 }
 
 

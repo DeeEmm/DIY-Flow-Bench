@@ -1,8 +1,8 @@
 /***********************************************************
- * ACDELCO_92281162.h
+ * DELPHI_AF10058.h
  *
- * Manufacturer: AC Delco
- * Part#: 92281162
+ * Manufacturer: DELPHI
+ * Part#: AF10058 (GM 92281162 equivilent but in slot style package)
  * MAF file for type: GM / Holden VZ & VE / Corvette / LS2 engines
  * File units = 10 * mg/sec
  * Comments: Original data from Megasquirt website - www.microsquirt.info/maffactor_lsx.inc
@@ -37,11 +37,11 @@ Maf::Maf() {
  *
  ***/
 String Maf::sensorType() {
-    return "ACDELCO_92281162";
+    return "DELPHI_AF10058";
 }
 
-
-
+ 
+ 
 /***********************************************************
  * @brief MAF Output Type
  *
@@ -76,7 +76,7 @@ int Maf::mafUnits() {
  * @note Dimension Verified
  ***/
 int Maf::mafDiameter() {
-    return 94;
+    return 94; 
 }
 
 

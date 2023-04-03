@@ -1,14 +1,15 @@
 /***********************************************************
- * ACDELCO-19330122.h
+ * ACDELCO_19330122.h
  *
  * Manufacturer: AC Delco
  * Part#: 19330122
  * MAF file for type: Corvette Z06  
  * File units = 100 * gm / sec
  * Comments: Basic test data
- * Status:
+ * Status: UNVALIDATED / UNTESTED
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
+ * 
  ***/
 #ifndef MAFDATACLASS
 #define MAFDATACLASS
@@ -62,6 +63,19 @@ int Maf::outputType() {
 int Maf::mafUnits() {
     return MG_S;
 }
+
+
+/***********************************************************
+ * @brief Original MAF Diameter in mm
+ * 
+ * @note Used to calculate MAF transfer function to transpose 
+ * flow rates for different pipe diameters
+ * @note Diameter from - https://www.corvetteforum.com/forums/c5-tech/2951897-upgrading-to-z06-maf.html
+ ***/
+int Maf::mafDiameter() {
+    return 85;
+}
+
 
 
 /***********************************************************

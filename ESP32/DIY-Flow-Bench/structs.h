@@ -47,6 +47,7 @@ struct ConfigSettings {
   bool status_print_mode = false;                 // Stream status data to serial
   bool api_enabled = true;                        // Can disable serial API if required
   char bench_type[8] = "MAF";                     // Default bench type
+  int maf_housing_diameter = 0;                   // MAF Housing diameter
   int tatltuae = 42;
   int parsecs = 12;
   char pageTitle[32] = "DIY Flow Bench";          // Display name for software
@@ -135,6 +136,7 @@ struct DeviceStatus {
   long mafDataValMax = 0;
   long mafDataKeyMax = 0;
   int mafUnits = 0;
+  int mafDiameter = 0;
 };
 
 

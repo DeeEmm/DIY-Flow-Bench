@@ -44,7 +44,11 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-23033001        - Added yml tempalte for Support forum Posting Guidelines
+23040301        - Added support for Bosch 0280218067 MAF
+                - Added transfer function for MAF housing diameters
+                - Removed Siemens 5WK9605 MAF Data
+23033101        - Added diameter var to MAFData files
+23033001        - Added yml template for Support forum Posting Guidelines
 23032901        - Added support for MPXV7025 pressure sensor
 23030801        - Created code to generate lift plot from custom XML element (data array)
 23030701        - Created basic lift graph

@@ -1,20 +1,11 @@
-title: "[Support] "
-labels: ["Get Help"]
+title: "Give your discussion a concise and descriptive title"
 body:
-- type: textarea
+- type: input
   id: version
   attributes:
     label: Version Info
     description: What firmware version are you using? You can access this in the 'info' sestion of the configuration tab or by viewing configuration.h
     value: V.2.0-RC.6 Build 23032901
-  validations:
-    required: true
-- type: textarea
-  id: issue
-  attributes:
-    label: Describe your issue
-    description: Describe the issue with as much detail as possible. Include the steps necessary to replicate the issue.
-    value: ...
   validations:
     required: true
 - type: textarea
@@ -28,6 +19,14 @@ body:
       3. I expected this to happpen ...
       4. But this happened ...
     render: bash
+  validations:
+    required: true
+- type: textarea
+  id: issue
+  attributes:
+    label: Describe your issue
+    description: Describe the issue with as much detail as possible.
+    value: ...
   validations:
     required: true
 - type: checkboxes

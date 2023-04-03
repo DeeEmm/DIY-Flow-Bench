@@ -61,6 +61,19 @@ int Maf::mafUnits() {
 }
 
 
+/***********************************************************
+ * @brief Original MAF Diameter in mm
+ * 
+ * @note Used to calculate MAF transfer function to transpose 
+ * flow rates for different pipe diameters
+ * @note diamter should be stock diameter that flow data relates to
+ ***/
+int Maf::mafDiameter() {
+    return 100;
+}
+
+
+
 
 /***********************************************************
 * @brief MAF Data
@@ -83,6 +96,7 @@ int Maf::mafUnits() {
 * NOTE: that there should be a zero value!!!!
 *
 ***/
+
 
 
 

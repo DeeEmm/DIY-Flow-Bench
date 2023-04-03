@@ -6,7 +6,7 @@
  * MAF file for type: GM GenIII LS1 / VT-VX-VY 5.7 Commodore / Monaro 
  * File units = 100 * gm / sec
  * Comments: Basic test data
- * Status:
+ * Status: UNVALIDATED / UNTESTED
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
  ***/
@@ -61,6 +61,19 @@ int Maf::outputType() {
  ***/
 int Maf::mafUnits() {
     return MG_S;
+}
+
+
+
+/***********************************************************
+ * @brief Original MAF Diameter in mm
+ * 
+ * @note Used to calculate MAF transfer function to transpose 
+ * flow rates for different pipe diameters
+ * @note unavalidated diameter - https://forums.justcommodores.com.au/threads/ve-maf-to-ls1.232264/page-2
+ ***/
+int Maf::mafDiameter() {
+    return 74;
 }
 
 

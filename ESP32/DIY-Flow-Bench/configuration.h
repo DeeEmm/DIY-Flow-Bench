@@ -26,7 +26,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "23033001"
+#define BUILD_NUMBER "23040301"
 #define RELEASE "V.2.0-RC.6"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"
 
@@ -208,20 +208,32 @@ const int ADC_I2C_ADDR = 0x48;
  * If you want to modify the code to include additional MAF sensors
  * You will need to create your own MAF data file. Use exampleMafData.h as an example
  *
- * NOTE: RC level software has only been tested with default recommended sensor (ACDELCO_92281162)
- * NOTE: Currently onbly VOLTAGE based MAF sensors are working
+ * @note RC level software has only been tested with default recommended sensor (ACDELCO_92281162)
+ * @note Currently only VOLTAGE based MAF sensors are working
+ * 
+ * @note Source data for MAF sensors from trusted sources are considered validated data and will be
+ * marked as 'VALIDATED' However if data has not been tested and flow figures checked with a calibrated 
+ * reference orifice then the MAF will be listed as 'UNTESTED'. All other sensors are marked as 'UNTESTED + UNVALIDATED'
+ *  
  ***/
 
 #define MAF_IS_ENABLED                                      // Comment to disable MAF related code
     
-// Uncomment One sensor only
-#define MAF_DATA_FILE "mafData/ACDELCO_92281162.cpp"        //default recommended sensor    
-// #define MAF_DATA_FILE "mafData/ACDELCO_19330122.cpp" 
-// #define MAF_DATA_FILE "mafData/VDO_AFM_043.cpp"
+// Uncomment One sensor only!!!
+
+// Validated + tested data 
+
+// Validated + untested data 
+#define MAF_DATA_FILE "mafData/ACDELCO_92281162.cpp"        // LS2 (283cfm) 
+// #define MAF_DATA_FILE "mafData/BOSCH_0280218067.cpp"     // AUDI RS4 (884cfm)
 // #define MAF_DATA_FILE  "mafData/MH95_3000_100.cpp"       // PMAS MH95-3000 in 100mm housing              
-// #define MAF_DATA_FILE  "mafData/SIEMENS_5WK9605.cpp"     // Data from Tonys tests
+
+// Unvalidated + untested data 
+// #define MAF_DATA_FILE "mafData/ACDELCO_19330122.cpp"     // Corvette Z06 ()
+// #define MAF_DATA_FILE "mafData/VDO_AFM_043.cpp"
 // #define MAF_DATA_FILE  "mafData/DELPHI_AF10118.cpp"      // kg/hr - Data from efidynotuning.com/maf.htm 
-// #define MAF_DATA_FILE  "mafData/TEST.cpp"                // Test Data
+
+
 
 
 // Set signal source (Uncomment One line only)

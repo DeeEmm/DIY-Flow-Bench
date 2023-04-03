@@ -100,6 +100,10 @@ void Sensors::initialise () {
 		
 		// get MAF units
 		status.mafUnits = _maf.mafUnits();
+
+		// get MAF diameter
+		status.mafDiameter = _maf.mafDiameter();
+
 	#endif
 
 
@@ -370,6 +374,7 @@ int32_t Sensors::getMafFlow(int units) {
 
 	extern struct DeviceStatus status;
 	extern struct SensorData sensorVal;
+	extern struct ConfigSettings config;
 
 	Hardware _hardware;
 
@@ -377,6 +382,8 @@ int32_t Sensors::getMafFlow(int units) {
 	double flowRateMGS = 0.0;
 	double flowRateKGH = 0.0;
 	double lookupValue = 0.0;
+	double transposedflowRateKGH = 0.0;
+	double mafVelocity = 0.0;
 
 	// scale sensor reading to data table size using map function (0-5v : 0-keymax)
 	long refValue =  map(this->getMafVolts(), 0, _hardware.get5vSupplyVolts(), 0, status.mafDataKeyMax ); 
@@ -428,7 +435,29 @@ int32_t Sensors::getMafFlow(int units) {
 	}
 
 
-	return flowRateKGH;
+	// Now that we have a converted flow value we can translate it for different housing diameters
+	if (config.maf_housing_diameter != status.mafDiameter && config.maf_housing_diameter > 0 && status.mafDiameter > 0) { 
+		// We are running a custom MAF Housing, lets translate the flow rates to the new diameter
+
+		// NOTE this transfer function is actually for volumetric flow but we can assume that the mass to volumetric conversion is ratiometric at any given instant in time.
+		// This is because any environmental influences apply equally to both parts of the equation and cancel each other out. 
+		// So we can reduce the mass flow conversion to the same simple ratio that we use for volumetric flow. 
+		// In short, the relationship between flow and pipe area applies equally to both mass flow and volumetric flow for a given instant in time.
+
+		// Calculate the 'velocity' for the original pipe area
+		mafVelocity = flowRateKGH / pow(PI * (status.mafDiameter / 2), 2);
+
+		// scale the result with the new pipe area and convert back to mass flow
+		transposedflowRateKGH = mafVelocity * PI * pow((config.maf_housing_diameter / 2), 2);
+
+		return transposedflowRateKGH;
+
+	} else { // lets send the standard MAF data
+
+		return flowRateKGH;
+	}
+
+
 
 
 }
