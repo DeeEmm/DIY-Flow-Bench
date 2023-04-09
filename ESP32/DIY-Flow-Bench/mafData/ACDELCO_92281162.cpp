@@ -69,6 +69,17 @@ int Maf::mafUnits() {
 
 
 /***********************************************************
+ * @brief MAF scaling
+ * 
+ * @note: scaling factor for MAF Data:
+ ***/
+int Maf::mafScaling() {
+    return 10;
+}
+
+
+
+/***********************************************************
  * @brief Original MAF Diameter in mm
  * 
  * @note Used to calculate MAF transfer function to transpose 
