@@ -85,17 +85,25 @@ void Webserver::begin()
     #endif
   }
 
-  // Check if config and calibration json files exist. If not create them.
+  // Check if config / calibration / liftdata json files exist. If not create them.
+  // NOTE Combined filesize cannot exceed SPIFFS partition
   if (!SPIFFS.exists("/config.json"))  {
     createConfigFile();
   }
+
+  if (!SPIFFS.exists("/liftdata.json")) {
+    createLiftDataFile();
+  }
+
   if (!SPIFFS.exists("/cal.json")) {
     _calibration.createCalibrationFile();
   }
 
+  // load json configuration files from SPIFFS memory
   this->loadConfig();
+  this->loadLiftData();
   _calibration.loadCalibrationData();
-
+  
   // Display Filesystem Stats
   status.spiffs_mem_size = SPIFFS.totalBytes();
   status.spiffs_mem_used = SPIFFS.usedBytes();
@@ -329,7 +337,19 @@ void Webserver::begin()
   // Save Orifice Form
   server->on("/api/setorifice", HTTP_POST, setOrifice);
 
+  // Capture Lift Data
+  server->on("/api/captureLiftData", HTTP_POST, captureLiftData);
+
+  // Clear Lift Data
+  server->on("/api/clearLiftData", HTTP_POST, clearLiftDataFile);
+
+
+
+
+
   server->rewrite("/index.html", "/");
+
+
 
   // Style sheet request handler
   server->on("/style.css", HTTP_ANY, [](AsyncWebServerRequest *request){ request->send(SPIFFS, "/style.css", "text/css"); });
@@ -557,8 +577,8 @@ void Webserver::createConfigFile () {
   configData["ORIFICE6_FLOW_RATE"] = config.OrificeSixFlow;
   configData["ORIFICE7_TEST_PRESSURE"] = config.OrificeSixDepression;
 
-  // serializeJsonPretty(configData, jsonString);
-  // writeJSONFile(jsonString, "/config.json");
+  serializeJsonPretty(configData, jsonString);
+  writeJSONFile(jsonString, "/config.json", CONFIG_JSON_SIZE);
 
 }
 
@@ -635,13 +655,276 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
   if (SPIFFS.exists("/config.json"))  {
     SPIFFS.remove("/config.json");
   }
-  _webserver.writeJSONFile(jsonString, "/config.json");
+  _webserver.writeJSONFile(jsonString, "/config.json", CONFIG_JSON_SIZE);
 
   _message.debugPrintf("Configuration Saved \n");
 
   request->redirect("/?view=config");
 
 }
+
+
+
+
+/***********************************************************
+* @brief loadLiftDataFile
+* @details read lift data from liftdata.json file
+***/ 
+StaticJsonDocument<LIFT_DATA_JSON_SIZE> Webserver::loadLiftData () {
+
+  StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
+
+  Messages _message;
+  _message.serialPrintf("Loading Lift Data... \n");     
+  if (SPIFFS.exists("/liftdata.json"))  {
+    liftData = loadJSONFile("/liftdata.json");
+    parseLiftData(liftData);
+  } else {
+    _message.serialPrintf("LiftData file not found \n");
+  }
+  
+  return liftData;  
+
+}
+
+
+
+/***********************************************************
+* @brief createLiftDataFile
+* @details Create blank lift data json file
+* @note Called from Webserver::Initialise() if liftdata.json not found
+***/
+void Webserver::createLiftDataFile () {
+
+  Messages _message;
+  String jsonString;  
+  StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
+
+  _message.serialPrintf("Creating liftdata.json file... \n"); 
+
+  liftData["LIFTDATA1"] = 0.0;
+  liftData["LIFTDATA2"] = 0.0;
+  liftData["LIFTDATA3"] = 0.0;
+  liftData["LIFTDATA4"] = 0.0;
+  liftData["LIFTDATA5"] = 0.0;
+  liftData["LIFTDATA6"] = 0.0;
+  liftData["LIFTDATA7"] = 0.0;
+  liftData["LIFTDATA8"] = 0.0;
+  liftData["LIFTDATA9"] = 0.0;
+  liftData["LIFTDATA10"] = 0.0;
+  liftData["LIFTDATA11"] = 0.0;
+  liftData["LIFTDATA12"] = 0.0;
+
+  serializeJsonPretty(liftData, jsonString);
+  writeJSONFile(jsonString, "/liftdata.json", LIFT_DATA_JSON_SIZE);
+
+}
+
+
+
+/***********************************************************
+* @brief clearLiftDataFile
+* @details Delete and recreate default lift data file
+***/
+void Webserver::clearLiftDataFile(AsyncWebServerRequest *request){
+
+  Webserver _webserver;
+  
+  if (SPIFFS.exists("/liftdata.json"))  {
+    SPIFFS.remove("/liftdata.json");
+  }
+  
+  _webserver.createLiftDataFile();
+
+  _webserver.loadLiftData();
+
+  request->redirect("/?view=graph");
+
+}
+
+
+
+
+/***********************************************************
+* @brief Parse Lift Data Settings
+* @param liftData JSON document containing lift data
+***/
+void Webserver::parseLiftData(StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData) {
+
+  extern struct ValveLiftData valveData;
+
+  valveData.LiftData1 = liftData["LIFTDATA1"].as<double>();
+  valveData.LiftData2 = liftData["LIFTDATA2"].as<double>();
+  valveData.LiftData3 = liftData["LIFTDATA3"].as<double>();
+  valveData.LiftData4 = liftData["LIFTDATA4"].as<double>();
+  valveData.LiftData5 = liftData["LIFTDATA5"].as<double>();
+  valveData.LiftData6 = liftData["LIFTDATA6"].as<double>();
+  valveData.LiftData7 = liftData["LIFTDATA7"].as<double>();
+  valveData.LiftData8 = liftData["LIFTDATA8"].as<double>();
+  valveData.LiftData9 = liftData["LIFTDATA9"].as<double>();
+  valveData.LiftData10 = liftData["LIFTDATA10"].as<double>();
+  valveData.LiftData11 = liftData["LIFTDATA11"].as<double>();
+  valveData.LiftData12 = liftData["LIFTDATA12"].as<double>();
+
+}
+
+
+/***********************************************************
+ * @brief captureLiftData
+ * @details captures lift data to workign memory
+ * 
+ ***/
+void Webserver::captureLiftData(AsyncWebServerRequest *request)
+{
+
+  Messages _message;
+  Webserver _webserver;
+
+  StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
+  extern struct SensorData sensorVal;
+  extern struct ValveLiftData valveData;
+  String jsonString;
+  String liftPoint;
+  int switchval;
+  char *end;
+  int params = request->params();
+  const char* PARAM_INPUT = "lift-data";
+
+  _message.debugPrintf("Saving Lift Data...\n");
+
+  // Convert POST vars to JSON 
+  for(int i=0;i<params;i++){
+    AsyncWebParameter* p = request->getParam(i);
+
+        // get selected radio button and store it (radio button example from https://www.electrorules.com/esp32-web-server-control-stepper-motor-html-form/)
+        if (p->name() == PARAM_INPUT) {
+          liftPoint = p->value();
+        }
+
+  }
+
+
+  // // load the liftdata
+  // if (SPIFFS.exists("/liftdata.json"))  {
+  //   liftData = loadJSONFile("/liftdata.json");
+  //   parseLiftData(liftData);
+  // } else {
+  //   _message.serialPrintf("LiftData file not found \n");
+  // }
+
+
+  switchval = strtol(liftPoint.c_str(), &end, 10); // convert std::str to int
+
+  switch (switchval) {
+
+    case 1:
+      valveData.LiftData1 = sensorVal.FlowCFM;
+      break;
+
+    case 2:
+      valveData.LiftData2 = sensorVal.FlowCFM;
+      break;
+
+    case 3:
+      valveData.LiftData3 = sensorVal.FlowCFM;
+      break;
+
+    case 4:
+      valveData.LiftData4 = sensorVal.FlowCFM;
+      break;
+
+    case 5:
+      valveData.LiftData5 = sensorVal.FlowCFM;
+      break;
+
+    case 6:
+      valveData.LiftData6 = sensorVal.FlowCFM;
+      break;
+
+    case 7:
+      valveData.LiftData7 = sensorVal.FlowCFM;
+      break;
+
+    case 8:
+      valveData.LiftData8 = sensorVal.FlowCFM;
+      break;
+
+    case 9:
+      valveData.LiftData9 = sensorVal.FlowCFM;
+      break;
+
+    case 10:
+      valveData.LiftData10 = sensorVal.FlowCFM;
+      break;
+
+    case 11:
+      valveData.LiftData11 = sensorVal.FlowCFM;
+      break;
+
+    case 12:
+      valveData.LiftData12 = sensorVal.FlowCFM;
+      break;
+  }
+
+  liftData["LIFTDATA1"] = valveData.LiftData1;
+  liftData["LIFTDATA2"] = valveData.LiftData2;
+  liftData["LIFTDATA3"] = valveData.LiftData3;
+  liftData["LIFTDATA4"] = valveData.LiftData4;
+  liftData["LIFTDATA5"] = valveData.LiftData5;
+  liftData["LIFTDATA6"] = valveData.LiftData6;
+  liftData["LIFTDATA7"] = valveData.LiftData7;
+  liftData["LIFTDATA8"] = valveData.LiftData8;
+  liftData["LIFTDATA9"] = valveData.LiftData9;
+  liftData["LIFTDATA10"] = valveData.LiftData10;
+  liftData["LIFTDATA11"] = valveData.LiftData11;
+  liftData["LIFTDATA12"] = valveData.LiftData12;
+    
+  // save settings to liftdata file
+  serializeJsonPretty(liftData, jsonString);
+  if (SPIFFS.exists("/liftdata.json"))  {
+    SPIFFS.remove("/liftdata.json");
+  }
+  _webserver.writeJSONFile(jsonString, "/liftdata.json", LIFT_DATA_JSON_SIZE);
+
+  request->redirect("/");
+
+
+}
+
+
+
+/***********************************************************
+ * @brief getValveDataJSON
+ * @details Package up current bench data into JSON string
+ ***/
+String Webserver::getValveDataJSON()
+{
+  extern struct ValveLiftData valveData;
+
+  String jsonString;
+
+  StaticJsonDocument<DATA_JSON_SIZE> liftData;
+
+  liftData["LIFTDATA1"] = valveData.LiftData1;
+  liftData["LIFTDATA2"] = valveData.LiftData2;
+  liftData["LIFTDATA3"] = valveData.LiftData3;
+  liftData["LIFTDATA4"] = valveData.LiftData4;
+  liftData["LIFTDATA5"] = valveData.LiftData5;
+  liftData["LIFTDATA6"] = valveData.LiftData6;
+  liftData["LIFTDATA7"] = valveData.LiftData7;
+  liftData["LIFTDATA8"] = valveData.LiftData8;
+  liftData["LIFTDATA9"] = valveData.LiftData9;
+  liftData["LIFTDATA10"] = valveData.LiftData10;
+  liftData["LIFTDATA11"] = valveData.LiftData11;
+  liftData["LIFTDATA12"] = valveData.LiftData12;
+
+  serializeJson(liftData, jsonString);
+
+  return jsonString;
+
+}
+
+
 
 
 /***********************************************************
@@ -724,7 +1007,7 @@ String Webserver::getDataJSON()
 
   String jsonString;
 
-  StaticJsonDocument<1500> dataJson;
+  StaticJsonDocument<DATA_JSON_SIZE> dataJson;
 
   // Reference pressure
   dataJson["PREF"] = sensorVal.PRefH2O;
@@ -787,12 +1070,12 @@ String Webserver::getDataJSON()
  * @brief writeJSONFile
  * @details write JSON string to file
  ***/
-void Webserver::writeJSONFile(String data, String filename)
-{
+void Webserver::writeJSONFile(String data, String filename, int dataSize){
 
   Messages _message;
 
-  StaticJsonDocument<CONFIG_JSON_SIZE> jsonData;
+  // StaticJsonDocument<dataSize> jsonData;
+  DynamicJsonDocument jsonData(dataSize);
   DeserializationError error = deserializeJson(jsonData, data);
   if (!error)  {
     _message.debugPrintf("Writing JSON file... \n");
@@ -913,6 +1196,58 @@ String Webserver::processTemplate(const String &var)
   if (var == "PDIFF_SENSOR") return String(status.pdiffSensor);
   if (var == "STATUS_MESSAGE") return String(status.statusMessage);
 
+  // Lift graph
+  // <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1" points="100,350 150,340 200,315 250,301 300,280 350,249 400,245 450,242 500,238 550,230 600,222 650,220 700,218" />
+  // NOTE line data coordinates are flipped 350=0 and 0=350
+
+  extern struct ValveLiftData valveData;
+
+  if (var == "LINE_DATA1") return String(350-valveData.LiftData1);
+  if (var == "LINE_DATA2") return String(350-valveData.LiftData2);
+  if (var == "LINE_DATA3") return String(350-valveData.LiftData3);
+  if (var == "LINE_DATA4") return String(350-valveData.LiftData4);
+  if (var == "LINE_DATA5") return String(350-valveData.LiftData5);
+  if (var == "LINE_DATA6") return String(350-valveData.LiftData6);
+  if (var == "LINE_DATA7") return String(350-valveData.LiftData7);
+  if (var == "LINE_DATA8") return String(350-valveData.LiftData8);
+  if (var == "LINE_DATA9") return String(350-valveData.LiftData9);
+  if (var == "LINE_DATA10") return String(350-valveData.LiftData10);
+  if (var == "LINE_DATA11") return String(350-valveData.LiftData11);
+  if (var == "LINE_DATA12") return String(350-valveData.LiftData12);
+
+  // if (var == "LINE_DATA") {
+
+  //   extern struct ValveLiftData valveData;
+  //   String attribs;
+  //   char* lineData;
+
+  //   attribs =  R"END(
+  //     fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4,1" opacity="0.5"
+  //   )END" ;
+
+  //   int point1 = 350-valveData.LiftData1;
+  //   int point2 = 350-valveData.LiftData2;
+  //   int point3 = 350-valveData.LiftData3;
+  //   int point4 = 350-valveData.LiftData4;
+  //   int point5 = 350-valveData.LiftData5;
+  //   int point6 = 350-valveData.LiftData6;
+  //   int point7 = 350-valveData.LiftData7;
+  //   int point8 = 350-valveData.LiftData8;
+  //   int point9 = 350-valveData.LiftData9;
+  //   int point10 = 350-valveData.LiftData10;
+  //   int point11 = 350-valveData.LiftData11;
+  //   int point12 = 350-valveData.LiftData12;
+
+
+  //   // sprintf (lineData, "<polyline %s points=\"100,0 150, %d 200,%d 250,%d 300,%d 350,%d 400,%d 450,%d 500,%d 550,%d 600,%d 650,%d 700,%d\"  />", attribs, point1,  point2,  point3,  point4,  point5,  point6,  point7,  point8,  point9,  point10,  point11,  point12 );
+  //   sprintf (lineData, "<polyline %s points=\"100,0 150,%d 200,%d \"  />", attribs, point1, point2);
+
+
+  //   return '<polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1" points="100,350 150,340 200,315 250,301 300,280 350,249 400,245 450,242 500,238 550,230 600,222 650,220 700,218" />';
+
+
+  //   // return String(lineData).c_str();
+  // }
 
   // Orifice Selector
   if (strstr(config.bench_type, "ORIFICE")!=NULL) {
