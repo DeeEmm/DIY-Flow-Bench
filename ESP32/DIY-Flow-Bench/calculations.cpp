@@ -223,6 +223,27 @@ double Calculations::convertRelativeHumidity(double relativeHumidity, int units)
 
 
 /***********************************************************
+ * @brief CALCULATE SATURATION VAPOUR PRESSURE
+ * @details Saturation vapor pressure is the vapor pressure at 100% relative humidity
+ * https://www.omnicalculator.com/physics/air-density
+ * 
+ ***/
+double Calculations::calculateSaturationVaporPressure() {
+
+extern struct SensorData sensorVal;
+
+  double vapourPressure;
+
+  vapourPressure = 0.61078 * exp((7.5 * sensorVal.TempDegC) / (sensorVal.TempDegC + 237.3)); 
+
+  return vapourPressure;
+
+}
+
+
+
+
+/***********************************************************
  * @brief CALCULATE VAPOUR PRESSURE (nominally 101.325kPa)
  * 
  * @note Tetans Equation
@@ -239,8 +260,8 @@ double Calculations::calculateVaporPressure(int units) {
   double vapourPressureKpa;
   double vapourPressurePsia;
 
-  // vapourPressureKpa = 0.61078 * exp((17.27 * sensorVal.TempDegC) / (sensorVal.TempDegC + 237.3)); // Tetan 
-  vapourPressureKpa = 0.61094 * exp((17.625 * sensorVal.TempDegC) / (sensorVal.TempDegC + 243.04)); // Magnus
+  vapourPressureKpa = 0.61078 * exp((17.27 * sensorVal.TempDegC) / (sensorVal.TempDegC + 237.3)); // Tetan 
+  // vapourPressureKpa = 0.61094 * exp((17.625 * sensorVal.TempDegC) / (sensorVal.TempDegC + 243.04)); // Magnus
 
   switch (units)
   {
@@ -419,6 +440,7 @@ double Calculations::convertMassFlowUnits(double refFlow, int unitsOut, int unit
  * @NOTE simplified conversion
  * 
  * From Conversation https://github.com/DeeEmm/DIY-Flow-Bench/discussions/138#discussioncomment-5590135
+ * and.. https://www.omnicalculator.com/physics/air-density
  * 
  * ρ = p / (R * T)
  * where
@@ -433,14 +455,24 @@ double Calculations::convertFlow(double massFlowKGH) {
   extern struct SensorData sensorVal;
 
   double airDensity = 0.0; // kg/m3
+  double waterVaporDensity = 0.0; // kg/m3
+  double waterVaporPressure = 0.0; // kg/m3
+  double dryAirPressure = 0.0; // kg/m3
   double flowM3H = 0.0; // m3/hr
   double flowCFM = 0.0;
 
-  double refPressurePascals = this->convertPressure(sensorVal.BaroKPA, PASCALS);
+  // TODO validate reference pressure adjustment - do we add it or subtract it????????
+  double refPressurePascals = this->convertPressure(sensorVal.BaroKPA, PASCALS) - this->convertPressure(sensorVal.PRefKPA, PASCALS) ;
   double tempInKelvin = this->convertTemperature(sensorVal.TempDegC, KELVIN, DEGC);
 
-  // Calculate density of air (kg/m3)
-  airDensity = refPressurePascals / (SPECIFIC_GAS_CONSTANT_DRY_AIR * tempInKelvin); 
+  // Calculate saturation vapor pressure
+  waterVaporPressure = 0.61078 * exp((7.5 * sensorVal.TempDegC) / (sensorVal.TempDegC + 237.3)) * sensorVal.RelH;
+
+  // Calculate Dry air pressure
+  dryAirPressure = refPressurePascals - waterVaporPressure;
+
+  // Calculate air density from ratio of dry to wet air
+  airDensity = (dryAirPressure / (SPECIFIC_GAS_CONSTANT_DRY_AIR * tempInKelvin)) + (waterVaporPressure / (SPECIFIC_GAS_CONSTANT_WATER_VAPOUR * tempInKelvin));
 
   // Multiply mass by density to get volume (m3/hr)
   flowM3H = massFlowKGH / airDensity; 
