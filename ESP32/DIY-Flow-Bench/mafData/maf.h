@@ -38,6 +38,7 @@ class Maf {
         String sensorType();
         int outputType();
         int mafUnits();
+        double mafScaling();
         int mafDiameter();
 
         static std::vector<std::vector<int>> mafLookupTable;

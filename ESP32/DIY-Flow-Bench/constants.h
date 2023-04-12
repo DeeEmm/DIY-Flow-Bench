@@ -30,11 +30,11 @@
 /***********************************************************
  * Physical constants
  ***/
-#define MOLAR_MASS_DRY_AIR 28.96469 // g/mole
+#define MOLAR_MASS_DRY_AIR 28.96469 // g/mole or 0.028964 kg/mol.
+#define MOLAR_MASS_WATER_VAPOUR 18.01528 //g/mol or 0.0180153 kg/mol
 #define SPECIFIC_GAS_CONSTANT_DRY_AIR 287.058  // J/ (kg.K).
 #define SPECIFIC_GRAVITY_DRY_AIR 0.0013 // SG
-#define UNIVERSAL_GAS_FLOW_CONSTANT 8.3144598 // (48) J⋅mol^−1⋅K^−1.
-#define MOLAR_MASS_WATER_VAPOUR 18.01528 //(33) g/mol
+#define UNIVERSAL_GAS_CONSTANT 8.3144598 // (48) J⋅mol^−1⋅K^−1.
 #define SPECIFIC_GAS_CONSTANT_WATER_VAPOUR 461.5 //  J/(kg⋅K).
 
 

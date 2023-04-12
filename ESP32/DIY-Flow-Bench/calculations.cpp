@@ -55,6 +55,10 @@ double Calculations::convertPressure(double inputPressure, int unitsOut, int uni
   // First convert input pressure to kPa
   switch (unitsIn)
   {
+    case PASCALS:
+      inputPressureKpa = inputPressure * 0.001;
+      break;
+
     case HPA:
       inputPressureKpa = inputPressure * 0.1;
       break;
@@ -84,6 +88,11 @@ double Calculations::convertPressure(double inputPressure, int unitsOut, int uni
   // Then convert kPa to required output and return result
   switch (unitsOut)
   {
+    case PASCALS:
+      convertedPressure = inputPressureKpa * 1000;
+      return convertedPressure;
+      break;
+
     case HPA:
       convertedPressure = inputPressureKpa * 10;
       return convertedPressure;
@@ -340,7 +349,7 @@ double Calculations::calculateAirDensity() {
   extern struct SensorData sensorVal;
 
   // original 
-  // double airDensity = ((convertPressure(sensorVal.BaroKPA, PSIA)) * MOLAR_MASS_DRY_AIR + calculateVaporPressure(PSIA) * MOLAR_MASS_WATER_VAPOUR) / UNIVERSAL_GAS_FLOW_CONSTANT * convertTemperature(sensorVal.TempDegC, KELVIN);
+  // double airDensity = ((convertPressure(sensorVal.BaroKPA, PSIA)) * MOLAR_MASS_DRY_AIR + calculateVaporPressure(PSIA) * MOLAR_MASS_WATER_VAPOUR) / UNIVERSAL_GAS_CONSTANT * convertTemperature(sensorVal.TempDegC, KELVIN);
 
   double airDensity = (convertPressure(sensorVal.BaroKPA, PSIA) / (287.058 * convertTemperature(sensorVal.TempDegC, KELVIN))) + (calculateVaporPressure(PSIA) / (461.495 * convertTemperature(sensorVal.TempDegC, KELVIN)));
 
@@ -352,20 +361,42 @@ double Calculations::calculateAirDensity() {
 
 /***********************************************************
  * @brief CONVERT BETWEEN MASS FLOW UNITS
- * @param massflowKgh Mass flow in KG/H
+ * @param unitsOut Default is Mass flow in KG/H
+ * @param unitsIn Default is MassFlow in MG_S
+ * 
+ * 1g/m = 277.778mg/s
+ * 1g/m = 0.06kg/h
  ***/
-double Calculations::convertMassFlowUnits(double massFlowKGH, int units) {
+double Calculations::convertMassFlowUnits(double refFlow, int unitsOut, int unitsIn) {
 
+  double massFlowKGH = 0.0;
   double convertedFlow = 0.0;
 
-  switch (units) {
+  switch (unitsIn) {
 
     case MG_S:
-      convertedFlow = massFlowKGH * 277.8;
+      massFlowKGH = refFlow * 277.778;
       break;
 
     case GM_M:
-      convertedFlow = massFlowKGH * 16.667;
+      massFlowKGH = refFlow * 16.6667;
+      break;
+
+    case KG_H:
+    default:
+      massFlowKGH = refFlow;
+      break;
+  }
+
+
+  switch (unitsOut) {
+
+    case MG_S:
+      convertedFlow = massFlowKGH * 0.0036;
+      break;
+
+    case GM_M:
+      convertedFlow = massFlowKGH * 0.06;
       break;
 
     case KG_H:
@@ -374,9 +405,54 @@ double Calculations::convertMassFlowUnits(double massFlowKGH, int units) {
       break;
   }
 
+
   return convertedFlow;
 
 }
+
+
+
+
+
+/***********************************************************
+ * @brief CONVERT KGH TO CFM
+ * @NOTE simplified conversion
+ * 
+ * From Conversation https://github.com/DeeEmm/DIY-Flow-Bench/discussions/138#discussioncomment-5590135
+ * 
+ * ρ = p / (R * T)
+ * where
+ * ρ = air density (in kg/m³)
+ * p = air pressure (in Pa or N/m²)
+ * R = specific gas constant for dry air (287.058 J/(kg·K)) ( not calculating actual value with humidity from bmp280)
+ * T = air temperature (in K)
+ * 
+ ***/
+double Calculations::convertFlow(double massFlowKGH) {
+
+  extern struct SensorData sensorVal;
+
+  double airDensity = 0.0; // kg/m3
+  double flowM3H = 0.0; // m3/hr
+  double flowCFM = 0.0;
+
+  double refPressurePascals = this->convertPressure(sensorVal.BaroKPA, PASCALS);
+  double tempInKelvin = this->convertTemperature(sensorVal.TempDegC, KELVIN, DEGC);
+
+  // Calculate density of air (kg/m3)
+  airDensity = refPressurePascals / (SPECIFIC_GAS_CONSTANT_DRY_AIR * tempInKelvin); 
+
+  // Multiply mass by density to get volume (m3/hr)
+  flowM3H = massFlowKGH / airDensity; 
+
+  // Convert to CFM
+  flowCFM = flowM3H * 0.58858;
+
+  return flowCFM;
+
+}
+
+
 
 
 
@@ -402,16 +478,16 @@ double Calculations::convertKGHtoCFM(double massFlowKGH) {
 
   double FlowCFM;
   double flowCMM;
-  double massFlowGM_M = convertMassFlowUnits(massFlowKGH, GM_M);
+  double massFlowGM_M = convertMassFlowUnits(massFlowKGH, GM_M, KG_H);
 
-  double tempInKelvin = this->convertTemperature(sensorVal.TempDegC, DEGC, KELVIN);
-  double baroPressureHpa = this->convertPressure(sensorVal.BaroKPA, HPA);
+  double tempInKelvin = this->convertTemperature(sensorVal.TempDegC, KELVIN, DEGC);
+  double refPressureHpa = this->convertPressure(sensorVal.BaroKPA, HPA); // need to add ref pressure in HPA to this
   double absoluteHumidity = calculateAbsoluteHumidity(); // grams / m3 of water vapour in air
 
-  // adjust molar mass based on volume of water vapour in air
+  // adjust molar mass based on volume of water vapour in air (water displaces air and reduces its density)
   double molarMassAir = ((100 - absoluteHumidity) * MOLAR_MASS_DRY_AIR / 100) + (absoluteHumidity * MOLAR_MASS_WATER_VAPOUR / 100);
 
-  flowCMM  = massFlowGM_M * 82.1 * tempInKelvin / molarMassAir * baroPressureHpa;
+  flowCMM  = massFlowGM_M * 82.1 * tempInKelvin / molarMassAir * refPressureHpa;
 
   // convert cm3/min to CFM
   FlowCFM = flowCMM * 0.000035314666721489 * -0.001;
@@ -438,7 +514,6 @@ double Calculations::convertKGHtoCFM(double massFlowKGH) {
  * @ref https://www.pdblowers.com/tech-talk/volume-and-mass-flow-calculations-for-gases/
  * @todo review !!!!!!
  ***/
-// DEPRECATED Replaced by convertKGHtoCFM conversion
 double Calculations::convertMassFlowToVolumetric(double massFlowKgh) {
   
   extern struct SensorData sensorVal;
@@ -446,17 +521,18 @@ double Calculations::convertMassFlowToVolumetric(double massFlowKgh) {
   double mafFlowCFM;
   double gasPressure;
 
-  double tempInRankine = this->convertTemperature(sensorVal.TempDegC, DEGC, RANKINE);
+  double tempInRankine = this->convertTemperature(sensorVal.TempDegC, RANKINE, DEGC);
   double specificGravity = this->calculateSpecificGravity(); //tested ok
   double molecularWeightAir = MOLAR_MASS_DRY_AIR * specificGravity; //tested ok
   double baroPressurePsia = this->convertPressure(sensorVal.BaroKPA, PSIA);
   double refPressurePsia = this->convertPressure(sensorVal.PRefKPA, PSIA);
   double massFlowLbm = massFlowKgh * 0.03674371036415;
-  double universalGasConstant = 1545 / molecularWeightAir;
+  double universalGasConstant = 1545 / molecularWeightAir; //1545 ftlbf/(lbmol)(°R)) divided by M.W.
 
-  // gasPressure = baroPressurePsia + refPressurePsia; // Adjusted value includes reference depression
-  gasPressure = baroPressurePsia;
+  gasPressure = baroPressurePsia + refPressurePsia; // Adjusted value includes reference depression
+  // gasPressure = baroPressurePsia;
 
+  // REVIEW
   // mafFlowCFM = ((massFlowLbm * 1545 * tempInRankine) / (molecularWeightAir * 144 * gasPressure)); // original
   mafFlowCFM = ((massFlowLbm * universalGasConstant * tempInRankine) / (144 * gasPressure)); // this is a test
   mafFlowCFM = mafFlowCFM * -1; // get rid of negative value from test

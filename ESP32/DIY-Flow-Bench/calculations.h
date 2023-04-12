@@ -40,10 +40,11 @@ class Calculations {
 		double calculateAirDensity();
 		double calculateAbsoluteHumidity();
 
+		double convertFlow(double massFlowKgh);
 		double convertMassFlowToVolumetric(double massFlowKgh);
 		double convertVelocityToVolumetric(double velocityFpm, double pipeRadiusFt);
 
-		double convertMassFlowUnits(double massFlowKGH, int units = KG_H);
+		double convertMassFlowUnits(double refFlow, int unitsOut = MG_S, int unitsIn = KG_H);
 		double convertKGHtoCFM(double massFlowKGH);
 
 		double startupBaroPressure;

@@ -26,7 +26,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "23040401"
+#define BUILD_NUMBER "23041201"
 #define RELEASE "V.2.0-RC.6"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"
 
@@ -115,11 +115,14 @@
 #define API_SCAN_DELAY_MS 250
 #define PRINT_BUFFER_LENGTH 128
 // #define API_CHECKSUM_IS_ENABLED                       
-#define WEBSOCK_CLEAN_FREQ 600000
+// #define WEBSOCK_CLEAN_FREQ 600000 // DEPRECATED
 #define FILESYSTEM SPIFFS
 #define SENSOR_TASK_MEM_STACK 2200
 #define ENVIRO_TASK_MEM_STACK 1800
-#define CONFIG_JSON_SIZE 2048
+#define DATA_JSON_SIZE 1500
+#define CONFIG_JSON_SIZE 1536 //1200 
+#define CAL_DATA_JSON_SIZE 128
+#define LIFT_DATA_JSON_SIZE 384
 #define VTASK_DELAY_ADC 500
 #define VTASK_DELAY_BME 500
 #define VTASK_DELAY_SSE 500
@@ -211,28 +214,34 @@ const int ADC_I2C_ADDR = 0x48;
  * @note RC level software has only been tested with default recommended sensor (ACDELCO_92281162)
  * @note Currently only VOLTAGE based MAF sensors are working
  * 
- * @note Source data for MAF sensors from trusted sources are considered validated data and will be
- * marked as 'VALIDATED' However if data has not been tested and flow figures checked with a calibrated 
- * reference orifice then the MAF will be listed as 'UNTESTED'. All other sensors are marked as 'UNTESTED + UNVALIDATED'
  *  
  ***/
 
 #define MAF_IS_ENABLED                                      // Comment to disable MAF related code
     
-// Uncomment One sensor only!!!
+// !!!!!UNCOMMENT ONE SENSOR ONLY!!!!!
 
-// Validated + tested data 
+/**
+ * Validated + Tested
+ ***/  
+#define MAF_DATA_FILE "mafData/BOSCH_0280218067.cpp"     // AUDI RS4 (884cfm)
+// #define MAF_DATA_FILE "mafData/SIEMENS_5WK9605.cpp"      // BMW M54B30 (502cfm)
+// #define MAF_DATA_FILE "mafData/ACDELCO_92281162.cpp"     // LS2 (832cfm) 
 
-// Validated + untested data 
-#define MAF_DATA_FILE "mafData/ACDELCO_92281162.cpp"        // LS2 (283cfm) 
-// #define MAF_DATA_FILE "mafData/BOSCH_0280218067.cpp"     // AUDI RS4 (884cfm)
-// #define MAF_DATA_FILE  "mafData/MH95_3000_100.cpp"       // PMAS MH95-3000 in 100mm housing              
 
-// Unvalidated + untested data 
-// #define MAF_DATA_FILE "mafData/ACDELCO_19330122.cpp"     // Corvette Z06 ()
-// #define MAF_DATA_FILE "mafData/VDO_AFM_043.cpp"
-// #define MAF_DATA_FILE  "mafData/DELPHI_AF10118.cpp"      // kg/hr - Data from efidynotuning.com/maf.htm 
+/**
+ * Working but Unvalidated / Untested
+ ***/  
+// #define MAF_DATA_FILE "mafData/DELPHI_AF10118.cpp"      // kg/hr - Data from efidynotuning.com/maf.htm 
+// #define MAF_DATA_FILE "mafData/DELPHI_AF10058.cpp"      // LS2 in slot style package 
+// #define MAF_DATA_FILE "mafData/MH95_3000_100.cpp"       // PMAS MH95-3000 in 100mm housing ()
 
+
+/**
+ * Not working
+ ***/  
+// #define MAF_DATA_FILE "mafData/ACDELCO_19330122.cpp"     // Corvette Z06 (FREQUENCY BASED)
+// #define MAF_DATA_FILE "mafData/VDO_AFM_043.cpp"          // (FREQUENCY BASED)
 
 
 
@@ -260,13 +269,13 @@ const int ADC_I2C_ADDR = 0x48;
 #define FIXED_REF_PRESS_VALUE 1                             // Fixed pressure value in Pascals
 
 // Set signal source (Uncomment One line only)
-//#define PREF_SRC_PIN
+// #define PREF_SRC_PIN
 #define PREF_SRC_ADC
 
 // Set sensor type (Uncomment One line only)
 // #define PREF_SENSOR_TYPE_LINEAR_ANALOG 
 #define PREF_SENSOR_TYPE_MPXV7007        
-#define PREF_SENSOR_TYPE_MPXV7025
+// #define PREF_SENSOR_TYPE_MPXV7025
 // #define PREF_SENSOR_TYPE_XGZP6899A007KPDPN        
 // #define PREF_SENSOR_TYPE_XGZP6899A010KPDPN        
 
@@ -297,7 +306,7 @@ const int ADC_I2C_ADDR = 0x48;
 // Set sensor type (Uncomment One line only)   
 // #define PDIFF_SENSOR_TYPE_LINEAR_ANALOG 
 #define PDIFF_SENSOR_TYPE_MPXV7007          
-#define PDIFF_SENSOR_TYPE_MPXV7025
+// #define PDIFF_SENSOR_TYPE_MPXV7025
 // #define PDIFF_SENSOR_TYPE_XGZP6899A007KPDPN        
 // #define PDIFF_SENSOR_TYPE_XGZP6899A010KPDPN        
 
@@ -327,7 +336,7 @@ const int ADC_I2C_ADDR = 0x48;
 // #define PITOT_SENSOR_NOT_USED
 // #define PITOT_SENSOR_TYPE_LINEAR_ANALOG                // Use analog signal from PITOT_PIN
 #define PITOT_SENSOR_TYPE_MPXV7007
-#define PITOT_SENSOR_TYPE_MPXV7025
+// #define PITOT_SENSOR_TYPE_MPXV7025
 // #define PITOT_SENSOR_TYPE_XGZP6899A007KPDPN        
 // #define PITOT_SENSOR_TYPE_XGZP6899A010KPDPN        
 

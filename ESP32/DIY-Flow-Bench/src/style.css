@@ -292,12 +292,20 @@ hr {
   background-color: #fa7b04;
 }
 
-#savedata-button {
+#clear-graph-data-button {
   background-color: #fa7b04;
 }
 
-#load-button {
+#export-graph-data-button {
+  background-color: #2ca909;
+}
+
+#load-graph-data-button {
   background-color: #125ab1;
+}
+
+#save-graph-data-button {
+  background-color: #fa7b04;
 }
 
 #calibrate-button{
@@ -406,7 +414,7 @@ input[type="file"] {
   
 
 /* The Close Button */
-.closeInfoModalButton, .closeFileModalButton, .closeSaveDataModalButton, .closeViewDataModalButton {
+.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton {
   color: #aaa;
   float: right;
   font-size: 22px;
@@ -418,10 +426,12 @@ input[type="file"] {
 .closeFileModalButton:focus,
 .closeInfoModalButton:hover,
 .closeInfoModalButton:focus,
-.closeSaveDataModalButton:hover,
-.closeSaveDataModalButton:focus,
-.closeViewDataModalButton:hover,
-.closeViewDataModalButton:focus {
+.closeCaptureLiftDataModalButton:hover,
+.closeCaptureLiftDataModalButton:focus,
+.closeSaveGraphDataModalButton:hover,
+.closeSaveGraphDataModalButton:focus,
+.closeLoadGraphDataModalButton:hover,
+.closeLoadGraphDataModalButton:focus {
   color: black;
   text-decoration: none;
   cursor: pointer;

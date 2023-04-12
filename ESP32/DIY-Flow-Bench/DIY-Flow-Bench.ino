@@ -63,6 +63,7 @@ ConfigSettings config;
 DeviceStatus status;
 FileUploadData fileUploadData;
 SensorData sensorVal;
+ValveLiftData valveData;
 Translator translate;
 CalibrationData calVal;
 
@@ -109,8 +110,9 @@ void TASKgetSensorData( void * parameter ){
         // TODO integration for non maf style benches
         #ifdef MAF_IS_ENABLED
         sensorVal.FlowKGH = _sensors.getMafFlow();
+        sensorVal.FlowCFM = _calculations.convertFlow(sensorVal.FlowKGH);
         // sensorVal.FlowCFM = _calculations.convertMassFlowToVolumetric(sensorVal.FlowKGH);
-        sensorVal.FlowCFM = _calculations.convertKGHtoCFM(sensorVal.FlowKGH) + calVal.flow_offset;
+        // sensorVal.FlowCFM = _calculations.convertKGHtoCFM(sensorVal.FlowKGH) + calVal.flow_offset;
         #endif
         
         #ifdef PREF_IS_ENABLED 
@@ -212,7 +214,6 @@ void TASKgetEnviroData( void * parameter ){
  ***/
 void setup(void) {
   
-
   // We need to call Wire globally so that it is available to both hardware and sensor classes so lets do that here
   Wire.begin (SDA_PIN, SCL_PIN); 
   Wire.setClock(100000);
@@ -262,12 +263,16 @@ void loop () {
 
   // Process API comms
   if (config.api_enabled) {        
-      if (millis() > status.apiPollTimer) {
+    if (millis() > status.apiPollTimer) {
+      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
         status.apiPollTimer = millis() + API_SCAN_DELAY_MS; 
+
         if (Serial.available() > 0) {
           status.serialData = Serial.read();
           _api.ParseMessage(status.serialData);
         }
+        xSemaphoreGive(i2c_task_mutex); // Release semaphore
+      }
     }                            
   }
   

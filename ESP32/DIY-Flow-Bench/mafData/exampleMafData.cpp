@@ -9,6 +9,7 @@
  * Status: Unvalidated
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
+ * Data Source: DIYFB
 ***/
 #ifndef MAFDATACLASS
 #define MAFDATACLASS
@@ -59,6 +60,17 @@ int Maf::outputType() {
 int Maf::mafUnits() {
     return MG_S;
 }
+
+
+/***********************************************************
+ * @brief MAF scaling
+ * 
+ * @note: scaling factor for MAF Data:
+ ***/
+double Maf::mafScaling() {
+    return 0.1;
+}
+
 
 
 /***********************************************************

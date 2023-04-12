@@ -116,13 +116,16 @@ void API::ParseMessage(char apiMessage) {
   char apiResponse[API_RESPONSE_LENGTH];  //64
   char apiResponseBlob[API_BLOB_LENGTH];  //1024
   char charDataJSON[API_JSON_LENGTH];     //1020
+  char fileListBlob[1024];
 
   // Initialise arrays
   apiResponse[0] = 0;
   apiResponseBlob[0] = 0;
   charDataJSON[0] = 0;
+  fileListBlob[0] = 0;
   
   String jsonString;
+  long refValue;
   
   //API Response
   char apiHelpText[] = R"(
@@ -144,19 +147,23 @@ void API::ParseMessage(char apiMessage) {
   H : Humidity Value
   I : IP Address
   J : JSON Status Data
+  K : MAF Data Key Value
+  k : MAF Data Lookup Value
   L : Leak Test Calibration
   l : Leak Test
-  M : MAF RAW Value
+  M : MAF RAW ADC Value
   m : MAF Voltage
   N : Hostname
   O : Flow Offset Calibration
   R : Reference Pressure Value
   r : Reference Pressure Voltage
   S : WiFi SSID
+  s : SPIFFS File List
   T : Temperature in Celcius
   t : Temperature in Fahrenheit
   U : Uptime in hhhh.mm
   V : Version
+  v : Valve lift data in JSON format
   X : xTask memory usage   
   ? : Help
   ~ : Restart ESP
@@ -230,7 +237,8 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'f': // Get measured Mass Flow 'F123.45\r\n'       
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", config.api_delim , sensorVal.FlowKGH);
+          // snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", config.api_delim , sensorVal.FlowKGH);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", config.api_delim , _sensors.getMafFlow());
       break;
 
       case 'H': // Get measured Humidity 'H.123.45\r\n'
@@ -246,6 +254,16 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", config.api_delim, String(jsonString).c_str());
       break;
       
+      case 'K': // MAF Data Key Value 
+          // refValue =  map(_sensors.getMafVolts(), 0, 5, 0, status.mafDataKeyMax); 
+          refValue = (status.mafDataKeyMax / 5) * _sensors.getMafVolts();
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "K%s MAF DATA Key value: %d ", config.api_delim , refValue); 
+      break;
+
+      case 'k': // MAF Data lookup value
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "k%s MAF DATA Lookup value: %d ", config.api_delim , sensorVal.MafLookup); 
+      break;
+
       case 'L': // Perform Leak Test Calibration 'L\r\n'
           // TODO: apiResponse = ("L") + config.api_delim + leakTestCalibration();
           // TODO: confirm Leak Test Calibration success in response
@@ -290,6 +308,24 @@ void API::ParseMessage(char apiMessage) {
           }
       break;
       
+      case 's': // SPIFFS File List
+        {
+          FILESYSTEM.begin();
+          File root = FILESYSTEM.open("/");
+          File file = root.openNextFile();
+          const char* spiffsFileName;
+          String spiffsFileSize;
+          while (file)  {
+            spiffsFileName = file.name();
+            spiffsFileSize = file.size(); // TODO what about file size????!?!?!
+            strcat(fileListBlob, spiffsFileName);
+            strcat(fileListBlob, "\n");
+            file = root.openNextFile();
+          }
+          snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s" , fileListBlob);
+        }
+      break;
+
       case 't': // Get measured Temperature in Fahrenheit 'F.123.45\r\n'
           double TdegF;
           TdegF = _calculations.convertTemperature(sensorVal.TempDegC, DEGF);
@@ -312,10 +348,21 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "V%s%s.%s.%s", config.api_delim , MAJOR_VERSION, MINOR_VERSION, BUILD_NUMBER);
       break;
 
+      case 'v': // Valve lift Data
+          jsonString = _webserver.getValveDataJSON();
+          snprintf(apiResponseBlob, API_BLOB_LENGTH, "v%s%s", config.api_delim, String(jsonString).c_str());
+      break;
+      
       case 'X': // Print xTask memory usage (Stack high water mark) to serial monitor 
           snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack Free Memory EnviroTask=%d / SensorTask=%d ", config.api_delim , uxTaskGetStackHighWaterMark(enviroDataTask), uxTaskGetStackHighWaterMark(sensorDataTask)); 
       break;
 
+      case 'Z': // TEST
+          // snprintf(apiResponse, API_RESPONSE_LENGTH, "Z%s%d", config.api_delim , status.mafScaling);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "Z%s%d", config.api_delim , status.mafUnits);
+
+      break;
+      
       case '@': // Status Print Mode (Stream status messages to serial)
         if (config.status_print_mode == true){
           config.status_print_mode = false;

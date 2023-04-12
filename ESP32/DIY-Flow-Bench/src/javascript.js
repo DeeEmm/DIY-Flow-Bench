@@ -22,12 +22,15 @@ window.addEventListener('load', onLoad);
 
 var fileModal = document.getElementById("fileModal");
 var infoModal = document.getElementById("infoModal");
-var saveDataModal = document.getElementById("saveDataModal");
-var viewDataModal = document.getElementById("viewDataModal");
+var captureLiftDataModal = document.getElementById("captureLiftDataModal");
+var loadGraphDataModal = document.getElementById("loadGraphDataModal");
+var saveGraphDataModal = document.getElementById("saveGraphDataModal");
+
 var closeFileModalButton = document.getElementsByClassName("closeFileModalButton")[0];
 var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton")[0];
-var closeSaveDataModalButton = document.getElementsByClassName("closeSaveDataModalButton")[0];
-var closeViewDataModalButton = document.getElementsByClassName("closeViewDataModalButton")[0];
+var closeCaptureLiftDataModalButton = document.getElementsByClassName("closeCaptureLiftDataModalButton")[0];
+var closeLoadGraphDataModalButton = document.getElementsByClassName("closeLoadGraphDataModalButton")[0];
+var closeSaveGraphDataModalButton = document.getElementsByClassName("closeSaveGraphDataModalButton")[0];
 
 // Set up Server Side Events (SSE)
 if (!!window.EventSource) {
@@ -116,6 +119,11 @@ function onLoad(event) {
       document.getElementById('fileModal').style.display='block';
     break;
 
+    case "graph":
+      document.getElementById("load-datalog-button").click();
+      document.getElementById('datalog').style.display='block';
+    break;
+      
     case "config":
       document.getElementById("load-config-button").click();
     break;
@@ -134,13 +142,51 @@ function initialiseButtons() {
   
   var xhr = new XMLHttpRequest();
 
-  document.getElementById('saveData-button').addEventListener('click', function(){
-    document.getElementById('saveDataModal').style.display='block';
+  document.getElementById('show-capture-modal-button').addEventListener('click', function(){
+    document.getElementById('captureLiftDataModal').style.display='block';
   });
 
-  document.getElementById('viewData-button').addEventListener('click', function(){
-    document.getElementById('viewDataModal').style.display='block';
+  // document.getElementById('capture-lift-data-button').addEventListener('click', function(){
+  //   // save current flow vlue to selected lift data point
+  // });
+
+
+  // document.getElementById('load-graph-data-button').addEventListener('click', function(){
+  //   document.getElementById('loadGraphDataModal').style.display='block';
+  // });
+
+  // document.getElementById('save-graph-data-button').addEventListener('click', function(){
+  //   document.getElementById('saveGraphDataModal').style.display='block';
+  // });
+
+  document.getElementById('clear-graph-data-button').addEventListener('click', function(){
+        
+    // clear data points from graph
+    // var p = document.getElementById('dataPlot');
+    // var child = p.lastElementChild; 
+    // while (child) {
+    //     p.removeChild(child);
+    //     child = p.lastElementChild;
+    // }
+    // clear line data from graph
+    var l = document.getElementById('lineData');
+    var child = l.lastElementChild; 
+    while (child) {
+        l.removeChild(child);
+        child = l.lastElementChild;
+    }
+
+    // clear liftdata.json
+
+
   });
+
+  document.getElementById('export-graph-data-button').addEventListener('click', function(){
+    // initiate JSON Data download from browser
+    // <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
+    document.getElementById('file-data-download').click();
+  });
+
 
   document.getElementById('file-manager-button').addEventListener('click', function(){
     document.getElementById('fileModal').style.display='block';
@@ -273,18 +319,25 @@ closeInfoModalButton.onclick = function() {
 
 
 /***********************************************************
-* Close Save Data modal dialog
+* Close Capture Data modal dialog
 ***/
-closeSaveDataModalButton.onclick = function() {
-  saveDataModal.style.display = "none";
+closeCaptureLiftDataModalButton.onclick = function() {
+  captureLiftDataModal.style.display = "none";
 }
 
 
 /***********************************************************
-* Close View Data modal dialog
+* Close Load Data modal dialog
 ***/
-closeViewDataModalButton.onclick = function() {
-  viewDataModal.style.display = "none";
+closeLoadGraphDataModalButton.onclick = function() {
+  loadGraphDataModal.style.display = "none";
+}
+
+/***********************************************************
+* Close Save Data modal dialog
+***/
+closeSaveGraphDataModalButton.onclick = function() {
+  saveGraphDataModal.style.display = "none";
 }
 
 
@@ -292,11 +345,12 @@ closeViewDataModalButton.onclick = function() {
 * Close modal dialogs on lose focus
 ***/
 window.onclick = function(event) {
-  if (event.target == fileModal || event.target == infoModal || event.target == saveDataModal || event.target == viewDataModal ) {
+  if (event.target == fileModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal ) {
     fileModal.style.display = "none";
     infoModal.style.display = "none";
-    saveDataModal.style.display = "none";
-    viewDataModal.style.display = "none";
+    captureLiftDataModal.style.display = "none";
+    loadGraphDataModal.style.display = "none";
+    saveGraphDataModal.style.display = "none";
   }
 }
 
@@ -307,8 +361,9 @@ document.addEventListener("keydown", ({key}) => {
   if (key === "Escape") {
     fileModal.style.display = "none";
     infoModal.style.display = "none";
-    saveDataModal.style.display = "none";
-    viewDataModal.style.display = "none";
+    captureLiftDataModal.style.display = "none";
+    loadGraphDataModal.style.display = "none";
+    saveGraphDataModal.style.display = "none";
   }
 })
 

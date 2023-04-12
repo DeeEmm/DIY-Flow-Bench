@@ -153,12 +153,13 @@ void Hardware::initialise () {
 
   adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
   adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
+  // adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
   
   if (!adc.testConnection()) {
-      _message.serialPrintf("ADS1115 Connection failed");
-			while(1); //Freeze
-		} else {
-			_message.serialPrintf("ADS1115 Initialised\n");
+    _message.serialPrintf("ADS1115 Connection failed");
+		while(1); //Freeze
+	} else {
+		_message.serialPrintf("ADS1115 Initialised\n");
   }
   #endif
 
@@ -282,7 +283,7 @@ int32_t Hardware::getADCRawData(int channel) {
   
   #if defined ADC_TYPE_ADS1115 && defined ADC_IS_ENABLED 
     
-    volts = rawADCval * ADC_GAIN / 32767.00F; 
+    volts = rawADCval * ADC_GAIN / ADC_RANGE; 
   
   #elif defined ADC_TYPE_ADS1015 && defined ADC_IS_ENABLED 
 

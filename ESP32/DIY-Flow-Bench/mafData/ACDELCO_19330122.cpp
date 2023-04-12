@@ -1,5 +1,5 @@
 /***********************************************************
- * ACDELCO_19330122.h
+ * ACDELCO_19330122.cpp
  *
  * Manufacturer: AC Delco
  * Part#: 19330122
@@ -63,6 +63,18 @@ int Maf::outputType() {
 int Maf::mafUnits() {
     return MG_S;
 }
+
+
+
+/***********************************************************
+ * @brief MAF scaling
+ * 
+ * @note: scaling factor for MAF Data:
+ ***/
+double Maf::mafScaling() {
+    return 0.01;
+}
+
 
 
 /***********************************************************

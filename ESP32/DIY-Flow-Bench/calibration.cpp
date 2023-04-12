@@ -215,7 +215,7 @@ void Calibration::createCalibrationFile () {
   Webserver _webserver;
   Messages _message;
   String jsonString;
-  StaticJsonDocument<1024> calibrationData;
+  StaticJsonDocument<CAL_DATA_JSON_SIZE> calibrationData;
   
   _message.debugPrintf("Creating cal.json file... \n"); 
   

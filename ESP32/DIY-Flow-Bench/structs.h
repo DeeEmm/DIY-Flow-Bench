@@ -136,6 +136,7 @@ struct DeviceStatus {
   long mafDataValMax = 0;
   long mafDataKeyMax = 0;
   int mafUnits = 0;
+  double mafScaling = 1;
   int mafDiameter = 0;
 };
 
@@ -157,6 +158,7 @@ struct FileUploadData {
  ***/
 struct SensorData {
   long MafRAW = 0;
+  long MafLookup = 0;
   double FlowKGH = 0.0;
   double FlowCFM = 0.0;
   double FlowADJ = 0.0;
@@ -176,3 +178,22 @@ struct SensorData {
   double Swirl = 0.0;
 };
 
+
+
+/***********************************************************
+ * Valve Lift data
+ ***/
+struct ValveLiftData {
+  double LiftData1 = 0.0;
+  double LiftData2 = 0.0;
+  double LiftData3 = 0.0;
+  double LiftData4 = 0.0;
+  double LiftData5 = 0.0;
+  double LiftData6 = 0.0;
+  double LiftData7 = 0.0;
+  double LiftData8 = 0.0;
+  double LiftData9 = 0.0;
+  double LiftData10 = 0.0;
+  double LiftData11 = 0.0;
+  double LiftData12 = 0.0;
+};

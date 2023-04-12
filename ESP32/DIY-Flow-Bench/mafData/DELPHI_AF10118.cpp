@@ -1,14 +1,14 @@
 /***********************************************************
- * DELPHI_AF10118.h
+ * DELPHI_AF10118.cpp
  *
  * Manufacturer: DELPHI
  * Part#: AF10118
- * MAF file for type: 5.0l Ford
+ * MAF file for type: 5.0l Ford Explorer
  * File units = 1000 * kg/hr
- * Comments: Data from efidynotuning.com/maf.htm
  * Status: UNVALIDATED / UNTESTED
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
+ * Data Source: efidynotuning.com/maf.htm
  * 
  ***/
 #ifndef MAFDATACLASS
@@ -64,6 +64,17 @@ int Maf::outputType() {
  ***/
 int Maf::mafUnits() {
     return KG_H;
+}
+
+
+
+/***********************************************************
+ * @brief MAF scaling
+ * 
+ * @note: scaling factor for MAF Data:
+ ***/
+double Maf::mafScaling() {
+    return 0.001;
 }
 
 

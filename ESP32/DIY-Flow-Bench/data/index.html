@@ -298,12 +298,20 @@ hr {
   background-color: #fa7b04;
 }
 
-#savedata-button {
+#clear-graph-data-button {
   background-color: #fa7b04;
 }
 
-#load-button {
+#export-graph-data-button {
+  background-color: #2ca909;
+}
+
+#load-graph-data-button {
   background-color: #125ab1;
+}
+
+#save-graph-data-button {
+  background-color: #fa7b04;
 }
 
 #calibrate-button{
@@ -412,7 +420,7 @@ input[type="file"] {
   
 
 /* The Close Button */
-.closeInfoModalButton, .closeFileModalButton, .closeSaveDataModalButton, .closeViewDataModalButton {
+.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton {
   color: #aaa;
   float: right;
   font-size: 22px;
@@ -424,10 +432,12 @@ input[type="file"] {
 .closeFileModalButton:focus,
 .closeInfoModalButton:hover,
 .closeInfoModalButton:focus,
-.closeSaveDataModalButton:hover,
-.closeSaveDataModalButton:focus,
-.closeViewDataModalButton:hover,
-.closeViewDataModalButton:focus {
+.closeCaptureLiftDataModalButton:hover,
+.closeCaptureLiftDataModalButton:focus,
+.closeSaveGraphDataModalButton:hover,
+.closeSaveGraphDataModalButton:focus,
+.closeLoadGraphDataModalButton:hover,
+.closeLoadGraphDataModalButton:focus {
   color: black;
   text-decoration: none;
   cursor: pointer;
@@ -657,43 +667,43 @@ svg .dataCircle:hover {
 
 
     <!-- Save Data Modal -->
-    <div id="saveDataModal" class="modal">
+    <div id="captureLiftDataModal" class="modal">
       <div class="modal-content">
-        <span class="closeSaveDataModalButton">&times;</span>
-        <h3>Save Flow v Lift Data</h3>
+        <span class="closeCaptureLiftDataModalButton">&times;</span>
+        <h3>Select lift value before capture</h3>
         <hr>
         <div class="align-center">
-          <form method="POST" action="/api/saveData" enctype="multipart/form-data">
-            <label class="config-label">Filename:</label>&nbsp;<input type="text" value="~FileName~">
+          <form method="POST" action="/api/captureLiftData" enctype="multipart/form-data">
+            <label>Lift Value</label>
             <br>
               <div class="switch-field">
-                <input type="radio" id="lift-one" name="switch-two" value="1" checked/>
+                <input type="radio" id="lift-one" name="lift-data" value="1" checked/>
                 <label for="lift-one">~lift1~</label>
-                <input type="radio" id="lift-two" name="switch-two" value="2" />
+                <input type="radio" id="lift-two" name="lift-data" value="2" />
                 <label for="lift-two">~lift2~</label>
-                <input type="radio" id="lift-three" name="switch-two" value="3"/>
+                <input type="radio" id="lift-three" name="lift-data" value="3"/>
                 <label for="lift-three">~lift3~</label>
-                <input type="radio" id="lift-four" name="switch-two" value="4" />
+                <input type="radio" id="lift-four" name="lift-data" value="4" />
                 <label for="lift-four">~lift4~</label>
-                <input type="radio" id="lift-five" name="switch-two" value="5" />
+                <input type="radio" id="lift-five" name="lift-data" value="5" />
                 <label for="lift-five">~lift5~</label>
-                <input type="radio" id="lift-six" name="switch-two" value="6" />
+                <input type="radio" id="lift-six" name="lift-data" value="6" />
                 <label for="lift-six">~lift6~</label>
-                <input type="radio" id="lift-seven" name="switch-two" value="7" />
+                <input type="radio" id="lift-seven" name="lift-data" value="7" />
                 <label for="lift-seven">~lift7~</label>
-                <input type="radio" id="lift-eight" name="switch-two" value="8" />
+                <input type="radio" id="lift-eight" name="lift-data" value="8" />
                 <label for="lift-eight">~lift8~</label>
-                <input type="radio" id="lift-nine" name="switch-two" value="9" />
+                <input type="radio" id="lift-nine" name="lift-data" value="9" />
                 <label for="lift-nine">~lift9~</label>
-                <input type="radio" id="lift-ten" name="switch-two" value="10" />
+                <input type="radio" id="lift-ten" name="lift-data" value="10" />
                 <label for="lift-ten">~lift10~</label>
-                <input type="radio" id="lift-eleven" name="switch-two" value="10" />
+                <input type="radio" id="lift-eleven" name="lift-data" value="11" />
                 <label for="lift-eleven">~lift11~</label>
-                <input type="radio" id="lift-twelve" name="switch-two" value="10" />
+                <input type="radio" id="lift-twelve" name="lift-data" value="12" />
                 <label for="lift-twelve">~lift12~</label>
               </div>
             <input id="data" type="file" name="wtf"/>
-            <input class="button submit-button" type="submit" value="Save"/>
+            <input class="button submit-button" type="submit" id="capture-lift-data-button" value="Capture"/>
           </form>
         </div>
         <div class="clear-both">&nbsp;</div>
@@ -701,11 +711,11 @@ svg .dataCircle:hover {
     </div>
 
 
-    <!-- View Data Modal -->
-    <div id="viewDataModal" class="modal">
+    <!-- Load Data Modal -->
+    <div id="loadGraphDataModal" class="modal">
       <div class="modal-content">
-        <span class="closeViewDataModalButton">&times;</span>
-        <h3>Flow v Lift Profile</h3>
+        <span class="closeLoadGraphDataModalButton">&times;</span>
+        <h3>Load Lift Profile</h3>
         <hr>
         <br>
         <div class="float-right">
@@ -716,6 +726,25 @@ svg .dataCircle:hover {
         <div class="clear-both">&nbsp;</div>
       </div>        
     </div>
+
+
+    <!-- Save Data Modal -->
+    <div id="saveGraphDataModal" class="modal">
+      <div class="modal-content">
+        <span class="closeSaveGraphDataModalButton">&times;</span>
+        <h3>Save Lift Data</h3>
+        <hr>
+        <br>
+        <div class="float-right">
+          <form method="POST" action="/api/savedata" enctype="multipart/form-data">
+            <label class="config-label">Filename:</label>&nbsp;<input type="text" value="~FileName~">
+            <input class="button file-submit-button" type="submit" value="Load"/>
+          </form>
+        </div>
+        <div class="clear-both">&nbsp;</div>
+      </div>        
+    </div>
+
 
 
     <!-- File Manager Modal -->
@@ -860,8 +889,8 @@ svg .dataCircle:hover {
           <button id="clear-message-button" class="control-button">CLEAR ALARM</button>
           <br>
           <br>
-          <button id="saveData-button" class="control-button">SAVE DATA</button>
-          <button id="viewData-button" class="control-button">LOAD DATA </button>
+          <button id="show-capture-modal-button" class="control-button">SAVE DATA</button>
+
    
         
         
@@ -974,27 +1003,29 @@ svg .dataCircle:hover {
           </g>
           
           <g class="labels y-labels">
-            <text x="80" y="10">400</text>
-            <text x="80" y="60">350</text>
-            <text x="80" y="110">300</text>
-            <text x="80" y="160">250</text>
-            <text x="80" y="210">200</text>
-            <text x="80" y="260">150</text>
-            <text x="80" y="310">100</text>
+            <text x="80" y="10">350</text>
+            <text x="80" y="60">300</text>
+            <text x="80" y="110">250</text>
+            <text x="80" y="160">200</text>
+            <text x="80" y="210">150</text>
+            <text x="80" y="260">100</text>
+            <text x="80" y="310">50</text>
             <text x="80" y="360">Flow (cfm)</text>
           </g>
 
             <!--Graph Key-->
             <g class="labels key-labels">
 
-              <text x="625" y="25">Inlet</text>
-              <line x1="550" y1="20" x2="620" y2="20"  style="stroke:#234568;stroke-width:2;opacity:0.5;" /> 
-
+              <text x="625" y="25" id="default-key-text">Current Data</text>
+              <line x1="550" y1="20" x2="620" y2="20"  id="default-key" style="stroke:#000;stroke-width:1;stroke-dasharray:4,1;opacity:0.5;" /> 
+              <!--
               <line x1="550" y1="35" x2="620" y2="35"  style="stroke:#f50808;stroke-width:2;opacity:0.5;" /> 
               <text x="625" y="40">Exhaust</text>
+              -->
             </g>
 
-            <!--Data Points-->
+            <!--Data Points - css classes to display value on hover - NOTE text value is displayed above dataPoint-->
+            <!--
             <g class="first_set points" data-setname="Our first data set" id="dataPlot">
               <circle class="dataCircle" cx="150" cy="340" data-value="7.2" r="4"></circle><text class="dataValue hide" x="150" y="310">7.2</text>
               <circle class="dataCircle" cx="200" cy="315" data-value="8.1" r="4"></circle><text class="dataValue hide" x="200" y="285">4.2</text>
@@ -1009,16 +1040,22 @@ svg .dataCircle:hover {
               <circle class="dataCircle" cx="650" cy="220" data-value="2.7" r="4"></circle><text class="dataValue hide" x="650" y="210">7542</text>
               <circle class="dataCircle" cx="700" cy="218" data-value="6.9" r="4"></circle><text class="dataValue hide" x="700" y="208">42</text>  
             </g>
+            -->
 
-            <!--Graph Data-->
-            <g class="surfaces">
+            <!--Hard coded Graph Line Data-->
+            <g class="surfaces" id="lineData">
                 <!--Line data-->
-                <polyline fill="none" stroke="#234568" stroke-width="1" stroke-dasharray="5, 2"
+
+                <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1"
+                points="100,350 150,~LINE_DATA1~ 200,~LINE_DATA2~ 250,~LINE_DATA3~ 300,~LINE_DATA4~ 350,~LINE_DATA5~ 400,~LINE_DATA6~ 450,~LINE_DATA7~ 500,~LINE_DATA8~ 550,~LINE_DATA9~ 600,~LINE_DATA10~ 650,~LINE_DATA11~ 700,~LINE_DATA12~"/>
+
+                <!-- TEST DATA
+                <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1"
                 points="100,350 150,340 200,315 250,301 300,280 350,249 400,245 450,242 500,238 550,230 600,222 650,220 700,218" />
 
-                <!--Line data-->
                 <polyline fill="none" stroke="#f50808" stroke-width="1" stroke-dasharray="5, 2"
-                points="100,350 150,342 200,333 250,305 300,265 350,241 400,230 450,221 500,201 550,198 600,191 650,185 700,181"/>
+                points="100,0 150,~LINE_DATA1~ 200,~LINE_DATA2~ 250,~LINE_DATA3~ 300,~LINE_DATA4~ 350,~LINE_DATA5~ 400,~LINE_DATA6~ 450,~LINE_DATA7~ 500,~LINE_DATA8~ 550,~LINE_DATA9~ 600,~LINE_DATA10~ 650,~LINE_DATA11~ 700,~LINE_DATA12~"/>
+                -->
             </g>
             
             <use class="grid double" xlink:href="#xGrid" ></use>
@@ -1027,9 +1064,9 @@ svg .dataCircle:hover {
           </svg>
 
 
-          <!-- ARRAY TO SVG -->
+          <!-- ARRAY TO SVG - Appends data to graph container -->
 
-          <coords-svg stroke="gold" coords="[[100,330],[ 150,332],[ 200,332],[ 250,335],[ 300,275],[ 350,281],[ 400,250],[ 450,241],[ 500,251],[ 550,133],[ 600,199],[ 650,172],[ 700,177]]"></coords-svg>
+          <coords-svg stroke="gold" stroke-dasharray="4, 1" coords="[[100,330],[ 150,332],[ 200,332],[ 250,335],[ 300,275],[ 350,281],[ 400,250],[ 450,241],[ 500,251],[ 550,133],[ 600,199],[ 650,172],[ 700,177]]"></coords-svg>
           <!-- <coords-svg stroke="green" coords="[[2, 15],[57, 58],[5, 57]]"></coords-svg> -->
 
           <!-- Converts custom <coord-svg> elements into valid polyline and appends to dataPlot. Next stage is to use JSON -->
@@ -1057,50 +1094,26 @@ svg .dataCircle:hover {
          
           <!-- ARRAY TO SVG -->
 
- 
-
-
-
-
-
         </div>  
-      
+    
         
         <!-- end lift graph -->
 
 
 
-        <!-- TODO Allow download of liftdata directly from browser as JSON file
-
-          This should be fallback method if SD card not enabled / unavailable
-
-          Lift v flow data needs to be stored in local variable (storageObj)
-          
-          Example from https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
-
-            HTML: <a id="downloadAnchorElem" style="display:none"></a>
-
-            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(storageObj));
-            var dlAnchorElem = document.getElementById('downloadAnchorElem');
-            dlAnchorElem.setAttribute("href",     dataStr     );
-            dlAnchorElem.setAttribute("download", "scene.json");
-            dlAnchorElem.click();
-
-
-            function downloadObjectAsJson(exportObj, exportName){
-              var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
-              var downloadAnchorNode = document.createElement('a');
-              downloadAnchorNode.setAttribute("href",     dataStr);
-              downloadAnchorNode.setAttribute("download", exportName + ".json");
-              document.body.appendChild(downloadAnchorNode); // required for firefox
-              downloadAnchorNode.click();
-              downloadAnchorNode.remove();
-            }
-        
-        
-        
-        -->
-
+        <div class="align-center">
+          <br>
+          <!--
+          <button id="load-graph-data-button" class="control-button">LOAD</button>
+          <button id="save-graph-data-button" class="control-button">SAVE</button>
+          -->
+          <form method="POST" action="/api/clearLiftData" enctype="multipart/form-data">
+            <input id="clear-graph-data-button" type="submit" class="control-button submit-button"  value="CLEAR"/>
+            <button id="export-graph-data-button" class="control-button">EXPORT</button> 
+          </form>
+          <!-- Export button fires javascript function to click link below forcing the download-->
+          <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
+        </div>
 
 
 
@@ -1135,7 +1148,7 @@ svg .dataCircle:hover {
           <br>
           <h3>Bench Settings</h3>
           <div class="config-row tooltip"><label class="config-label">Bench Type:</label><span>~BENCH_TYPE_DROPDOWN~</span><span class="tooltiptext">Select bench type</span></div>
-          <div class="config-row tooltip"><label class="config-label">MAF Housing Diamter:</label>&nbsp;<input type="text" id="CONF_MAF_HOUSING_DIAMETER" name="CONF_MAF_HOUSING_DIAMETER" value="~CONF_MAF_HOUSING_DIAMETER~" class="config-text"><span class="tooltiptext">Diameter of MAF Housing. (Leave as zero to use standard housing diamter)</span></div>
+          <div class="config-row tooltip"><label class="config-label">MAF Housing Diameter:</label>&nbsp;<input type="text" id="CONF_MAF_HOUSING_DIAMETER" name="CONF_MAF_HOUSING_DIAMETER" value="~CONF_MAF_HOUSING_DIAMETER~" class="config-text"><span class="tooltiptext">Diameter of MAF Housing. (Leave as zero to use standard housing diameter)</span></div>
           <div class="config-row tooltip"><label class="config-label">Refresh Rate:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="~CONF_REFRESH_RATE~" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
           <div class="config-row tooltip"><label class="config-label">Conversion Depression:</label>&nbsp;<input type="text" id="ADJ_FLOW_DEPRESSION" name="ADJ_FLOW_DEPRESSION" value="~ADJ_FLOW_DEPRESSION~" class="config-text"><span class="tooltiptext">Bench depression used for adjusted flow calcs</span></div>
           <div class="config-row tooltip"><label class="config-label">Temperature Unit:</label><span>~TEMPERATURE_DROPDOWN~</span><span class="tooltiptext">Display unit of temperature</span></div>
@@ -1211,12 +1224,15 @@ window.addEventListener('load', onLoad);
 
 var fileModal = document.getElementById("fileModal");
 var infoModal = document.getElementById("infoModal");
-var saveDataModal = document.getElementById("saveDataModal");
-var viewDataModal = document.getElementById("viewDataModal");
+var captureLiftDataModal = document.getElementById("captureLiftDataModal");
+var loadGraphDataModal = document.getElementById("loadGraphDataModal");
+var saveGraphDataModal = document.getElementById("saveGraphDataModal");
+
 var closeFileModalButton = document.getElementsByClassName("closeFileModalButton")[0];
 var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton")[0];
-var closeSaveDataModalButton = document.getElementsByClassName("closeSaveDataModalButton")[0];
-var closeViewDataModalButton = document.getElementsByClassName("closeViewDataModalButton")[0];
+var closeCaptureLiftDataModalButton = document.getElementsByClassName("closeCaptureLiftDataModalButton")[0];
+var closeLoadGraphDataModalButton = document.getElementsByClassName("closeLoadGraphDataModalButton")[0];
+var closeSaveGraphDataModalButton = document.getElementsByClassName("closeSaveGraphDataModalButton")[0];
 
 // Set up Server Side Events (SSE)
 if (!!window.EventSource) {
@@ -1305,6 +1321,11 @@ function onLoad(event) {
       document.getElementById('fileModal').style.display='block';
     break;
 
+    case "graph":
+      document.getElementById("load-datalog-button").click();
+      document.getElementById('datalog').style.display='block';
+    break;
+      
     case "config":
       document.getElementById("load-config-button").click();
     break;
@@ -1323,13 +1344,51 @@ function initialiseButtons() {
   
   var xhr = new XMLHttpRequest();
 
-  document.getElementById('saveData-button').addEventListener('click', function(){
-    document.getElementById('saveDataModal').style.display='block';
+  document.getElementById('show-capture-modal-button').addEventListener('click', function(){
+    document.getElementById('captureLiftDataModal').style.display='block';
   });
 
-  document.getElementById('viewData-button').addEventListener('click', function(){
-    document.getElementById('viewDataModal').style.display='block';
+  // document.getElementById('capture-lift-data-button').addEventListener('click', function(){
+  //   // save current flow vlue to selected lift data point
+  // });
+
+
+  // document.getElementById('load-graph-data-button').addEventListener('click', function(){
+  //   document.getElementById('loadGraphDataModal').style.display='block';
+  // });
+
+  // document.getElementById('save-graph-data-button').addEventListener('click', function(){
+  //   document.getElementById('saveGraphDataModal').style.display='block';
+  // });
+
+  document.getElementById('clear-graph-data-button').addEventListener('click', function(){
+        
+    // clear data points from graph
+    // var p = document.getElementById('dataPlot');
+    // var child = p.lastElementChild; 
+    // while (child) {
+    //     p.removeChild(child);
+    //     child = p.lastElementChild;
+    // }
+    // clear line data from graph
+    var l = document.getElementById('lineData');
+    var child = l.lastElementChild; 
+    while (child) {
+        l.removeChild(child);
+        child = l.lastElementChild;
+    }
+
+    // clear liftdata.json
+
+
   });
+
+  document.getElementById('export-graph-data-button').addEventListener('click', function(){
+    // initiate JSON Data download from browser
+    // <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
+    document.getElementById('file-data-download').click();
+  });
+
 
   document.getElementById('file-manager-button').addEventListener('click', function(){
     document.getElementById('fileModal').style.display='block';
@@ -1462,18 +1521,25 @@ closeInfoModalButton.onclick = function() {
 
 
 /***********************************************************
-* Close Save Data modal dialog
+* Close Capture Data modal dialog
 ***/
-closeSaveDataModalButton.onclick = function() {
-  saveDataModal.style.display = "none";
+closeCaptureLiftDataModalButton.onclick = function() {
+  captureLiftDataModal.style.display = "none";
 }
 
 
 /***********************************************************
-* Close View Data modal dialog
+* Close Load Data modal dialog
 ***/
-closeViewDataModalButton.onclick = function() {
-  viewDataModal.style.display = "none";
+closeLoadGraphDataModalButton.onclick = function() {
+  loadGraphDataModal.style.display = "none";
+}
+
+/***********************************************************
+* Close Save Data modal dialog
+***/
+closeSaveGraphDataModalButton.onclick = function() {
+  saveGraphDataModal.style.display = "none";
 }
 
 
@@ -1481,11 +1547,12 @@ closeViewDataModalButton.onclick = function() {
 * Close modal dialogs on lose focus
 ***/
 window.onclick = function(event) {
-  if (event.target == fileModal || event.target == infoModal || event.target == saveDataModal || event.target == viewDataModal ) {
+  if (event.target == fileModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal ) {
     fileModal.style.display = "none";
     infoModal.style.display = "none";
-    saveDataModal.style.display = "none";
-    viewDataModal.style.display = "none";
+    captureLiftDataModal.style.display = "none";
+    loadGraphDataModal.style.display = "none";
+    saveGraphDataModal.style.display = "none";
   }
 }
 
@@ -1496,8 +1563,9 @@ document.addEventListener("keydown", ({key}) => {
   if (key === "Escape") {
     fileModal.style.display = "none";
     infoModal.style.display = "none";
-    saveDataModal.style.display = "none";
-    viewDataModal.style.display = "none";
+    captureLiftDataModal.style.display = "none";
+    loadGraphDataModal.style.display = "none";
+    saveGraphDataModal.style.display = "none";
   }
 })
 
