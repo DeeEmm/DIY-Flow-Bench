@@ -210,7 +210,7 @@ void Webserver::begin()
       _message.Handler(translate.LANG_VAL_BENCH_RUNNING);
       _message.debugPrintf("Bench On \n");
       _hardware.benchOn(); 
-      // request->send(200, "text/html", "{\"bench\":\"on\"}"); 
+      request->send(200, "text/html", "{\"bench\":\"on\"}"); 
       });
 
   server->on("/api/bench/off", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -219,7 +219,7 @@ void Webserver::begin()
       _message.Handler(translate.LANG_VAL_BENCH_STOPPED);
       _message.debugPrintf("Bench Off \n");
       _hardware.benchOff(); 
-      // request->send(200, "text/html", "{\"bench\":\"off\"}"); 
+      request->send(200, "text/html", "{\"bench\":\"off\"}"); 
       });
 
   server->on("/api/debug/on", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -342,8 +342,6 @@ void Webserver::begin()
 
   // Clear Lift Data
   server->on("/api/clearLiftData", HTTP_POST, clearLiftDataFile);
-
-
 
 
 
@@ -1196,24 +1194,101 @@ String Webserver::processTemplate(const String &var)
   if (var == "PDIFF_SENSOR") return String(status.pdiffSensor);
   if (var == "STATUS_MESSAGE") return String(status.statusMessage);
 
-  // Lift graph
-  // <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1" points="100,350 150,340 200,315 250,301 300,280 350,249 400,245 450,242 500,238 550,230 600,222 650,220 700,218" />
-  // NOTE line data coordinates are flipped 350=0 and 0=350
-
+  // Datagraph Stuff
   extern struct ValveLiftData valveData;
+  int maxval = 0;
+  int maxcfm = 0;
+  double scaleFactor = 0.0;
 
-  if (var == "LINE_DATA1") return String(350-valveData.LiftData1);
-  if (var == "LINE_DATA2") return String(350-valveData.LiftData2);
-  if (var == "LINE_DATA3") return String(350-valveData.LiftData3);
-  if (var == "LINE_DATA4") return String(350-valveData.LiftData4);
-  if (var == "LINE_DATA5") return String(350-valveData.LiftData5);
-  if (var == "LINE_DATA6") return String(350-valveData.LiftData6);
-  if (var == "LINE_DATA7") return String(350-valveData.LiftData7);
-  if (var == "LINE_DATA8") return String(350-valveData.LiftData8);
-  if (var == "LINE_DATA9") return String(350-valveData.LiftData9);
-  if (var == "LINE_DATA10") return String(350-valveData.LiftData10);
-  if (var == "LINE_DATA11") return String(350-valveData.LiftData11);
-  if (var == "LINE_DATA12") return String(350-valveData.LiftData12);
+  // very rough cfm calculation from max mafdata (approx half of KG/h rate)
+  if (status.mafUnits == MG_S) {
+    maxcfm = (0.0036 * status.mafDataValMax) / 2; 
+  } else {
+    maxcfm = status.mafDataValMax / 2;
+  }
+
+  // Determine data graph flow axis scale
+  // NOTE: currently 1000cfm is the largest flow that the graph will display. 
+  // We could change scaling to be realtive to SVG height (surface currently fixed at 500)
+  if (maxcfm < 500) {
+    maxval = 250;
+    scaleFactor = 2;
+  } else if (maxcfm > 250 && maxcfm < 500) {
+    maxval = 500;
+    scaleFactor = 1;
+  } else if (maxcfm > 500){
+    maxval = 1000; 
+    scaleFactor = 0.5;
+  }
+
+  // scale the data graph flow axis
+  if (var == "flow1") return String(maxval / 10);
+  if (var == "flow2") return String(maxval / 10 * 2);
+  if (var == "flow3") return String(maxval / 10 * 3);
+  if (var == "flow4") return String(maxval / 10 * 4);
+  if (var == "flow5") return String(maxval / 10 * 5);
+  if (var == "flow6") return String(maxval / 10 * 6);
+  if (var == "flow7") return String(maxval / 10 * 7);
+  if (var == "flow8") return String(maxval / 10 * 8);
+  if (var == "flow9") return String(maxval / 10 * 9);
+  if (var == "flow10") return String(maxval );
+
+  // scale the datapoint values to fit the flow axis scale
+  // NOTE: surface is 500 units high with zero at the bottom
+  if (var == "LINE_DATA1") return String(500 - (valveData.LiftData1 * scaleFactor));
+  if (var == "LINE_DATA2") return String(500 - (valveData.LiftData2 * scaleFactor));
+  if (var == "LINE_DATA3") return String(500 - (valveData.LiftData3 * scaleFactor));
+  if (var == "LINE_DATA4") return String(500 - (valveData.LiftData4 * scaleFactor));
+  if (var == "LINE_DATA5") return String(500 - (valveData.LiftData5 * scaleFactor));
+  if (var == "LINE_DATA6") return String(500 - (valveData.LiftData6 * scaleFactor));
+  if (var == "LINE_DATA7") return String(500 - (valveData.LiftData7 * scaleFactor));
+  if (var == "LINE_DATA8") return String(500 - (valveData.LiftData8 * scaleFactor));
+  if (var == "LINE_DATA9") return String(500 - (valveData.LiftData9 * scaleFactor));
+  if (var == "LINE_DATA10") return String(500 - (valveData.LiftData10 * scaleFactor));
+  if (var == "LINE_DATA11") return String(500 - (valveData.LiftData11 * scaleFactor));
+  if (var == "LINE_DATA12") return String(500 - (valveData.LiftData12 * scaleFactor));
+
+
+
+
+
+  // Lift Profile
+  if (floor(config.valveLiftInterval) == config.valveLiftInterval) {
+
+    // it's an integer so lets truncate fractional part
+    int liftInterval = config.valveLiftInterval;
+    if (var == "lift1") return String(1 * liftInterval);
+    if (var == "lift2") return String(2 * liftInterval);
+    if (var == "lift3") return String(3 * liftInterval);
+    if (var == "lift4") return String(4 * liftInterval);
+    if (var == "lift5") return String(5 * liftInterval);
+    if (var == "lift6") return String(6 * liftInterval);
+    if (var == "lift7") return String(7 * liftInterval);
+    if (var == "lift8") return String(8 * liftInterval);
+    if (var == "lift9") return String(9 * liftInterval);
+    if (var == "lift10") return String(10 * liftInterval);
+    if (var == "lift11") return String(11 * liftInterval);
+    if (var == "lift12") return String(12 * liftInterval);
+
+  } else {
+    // Display the double
+    if (var == "lift1") return String(1 * config.valveLiftInterval);
+    if (var == "lift2") return String(2 * config.valveLiftInterval);
+    if (var == "lift3") return String(3 * config.valveLiftInterval);
+    if (var == "lift4") return String(4 * config.valveLiftInterval);
+    if (var == "lift5") return String(5 * config.valveLiftInterval);
+    if (var == "lift6") return String(6 * config.valveLiftInterval);
+    if (var == "lift7") return String(7 * config.valveLiftInterval);
+    if (var == "lift8") return String(8 * config.valveLiftInterval);
+    if (var == "lift9") return String(9 * config.valveLiftInterval);
+    if (var == "lift10") return String(10 * config.valveLiftInterval);
+    if (var == "lift11") return String(11 * config.valveLiftInterval);
+    if (var == "lift12") return String(12 * config.valveLiftInterval);
+  }
+
+
+
+
 
   // if (var == "LINE_DATA") {
 
@@ -1293,39 +1368,6 @@ String Webserver::processTemplate(const String &var)
 
 
   
-   // Lift Profile
-  if (floor(config.valveLiftInterval) == config.valveLiftInterval) {
-
-    // it's an integer so lets truncate fractional part
-    int liftInterval = config.valveLiftInterval;
-    if (var == "lift1") return String(1 * liftInterval);
-    if (var == "lift2") return String(2 * liftInterval);
-    if (var == "lift3") return String(3 * liftInterval);
-    if (var == "lift4") return String(4 * liftInterval);
-    if (var == "lift5") return String(5 * liftInterval);
-    if (var == "lift6") return String(6 * liftInterval);
-    if (var == "lift7") return String(7 * liftInterval);
-    if (var == "lift8") return String(8 * liftInterval);
-    if (var == "lift9") return String(9 * liftInterval);
-    if (var == "lift10") return String(10 * liftInterval);
-    if (var == "lift11") return String(11 * liftInterval);
-    if (var == "lift12") return String(12 * liftInterval);
-
-  } else {
-    // Display the double
-    if (var == "lift1") return String(1 * config.valveLiftInterval);
-    if (var == "lift2") return String(2 * config.valveLiftInterval);
-    if (var == "lift3") return String(3 * config.valveLiftInterval);
-    if (var == "lift4") return String(4 * config.valveLiftInterval);
-    if (var == "lift5") return String(5 * config.valveLiftInterval);
-    if (var == "lift6") return String(6 * config.valveLiftInterval);
-    if (var == "lift7") return String(7 * config.valveLiftInterval);
-    if (var == "lift8") return String(8 * config.valveLiftInterval);
-    if (var == "lift9") return String(9 * config.valveLiftInterval);
-    if (var == "lift10") return String(10 * config.valveLiftInterval);
-    if (var == "lift11") return String(11 * config.valveLiftInterval);
-    if (var == "lift12") return String(12 * config.valveLiftInterval);
-}
 
 
 

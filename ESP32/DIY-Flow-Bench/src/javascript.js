@@ -1,14 +1,9 @@
 /***********************************************************
 * javascript.js
 *
-* Browser control code for DIY-Flow-bench project
+* Browser control code for DIY-Flow-bench project: diyflowbench.com
 * Handles data transmission and display update tasks
 * Provides UI control to browser
-*
-* TODO: look at implimenting browser based file downloading for data recording...
-* https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
-*
-* TODO: Pretty graphical data representation
 *
 ***/
 
@@ -103,6 +98,7 @@ function onFileUpload(event) {
 }
 
 
+
 /***********************************************************
 * onLoad event handler
 ***/
@@ -135,6 +131,7 @@ function onLoad(event) {
 }
 
 
+
 /***********************************************************
 * Initialise buttons
 ***/
@@ -145,19 +142,6 @@ function initialiseButtons() {
   document.getElementById('show-capture-modal-button').addEventListener('click', function(){
     document.getElementById('captureLiftDataModal').style.display='block';
   });
-
-  // document.getElementById('capture-lift-data-button').addEventListener('click', function(){
-  //   // save current flow vlue to selected lift data point
-  // });
-
-
-  // document.getElementById('load-graph-data-button').addEventListener('click', function(){
-  //   document.getElementById('loadGraphDataModal').style.display='block';
-  // });
-
-  // document.getElementById('save-graph-data-button').addEventListener('click', function(){
-  //   document.getElementById('saveGraphDataModal').style.display='block';
-  // });
 
   document.getElementById('clear-graph-data-button').addEventListener('click', function(){
         
@@ -176,15 +160,22 @@ function initialiseButtons() {
         child = l.lastElementChild;
     }
 
-    // clear liftdata.json
-
+    xhr.open('POST', '/api/clearLiftData');
+    xhr.onload = function() {
+      if (xhr.status === 200) window.location.href = '/?view=graph';
+    };
+    xhr.send();
 
   });
-
+  
   document.getElementById('export-graph-data-button').addEventListener('click', function(){
     // initiate JSON Data download from browser
-    // <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
     document.getElementById('file-data-download').click();
+  });
+
+  document.getElementById('capture-graph-data-button').addEventListener('click', function(){
+    // initiate datagraph image download from browser
+    exportSVGAsPNG();
   });
 
 
@@ -333,12 +324,14 @@ closeLoadGraphDataModalButton.onclick = function() {
   loadGraphDataModal.style.display = "none";
 }
 
+
 /***********************************************************
 * Close Save Data modal dialog
 ***/
 closeSaveGraphDataModalButton.onclick = function() {
   saveGraphDataModal.style.display = "none";
 }
+
 
 
 /***********************************************************
@@ -354,6 +347,7 @@ window.onclick = function(event) {
   }
 }
 
+
 /***********************************************************
 * Close modal dialogs on esc button
 ***/
@@ -368,3 +362,47 @@ document.addEventListener("keydown", ({key}) => {
 })
 
 
+/***********************************************************
+* Export Data Graph as PNG Image
+* Source: https://takuti.me/note/javascript-save-svg-as-image/
+***/
+function exportSVGAsPNG() {
+
+  const svg = document.querySelector('svg');
+
+  const data = (new XMLSerializer()).serializeToString(svg);
+  const svgBlob = new Blob([data], {
+      type: 'image/svg+xml;charset=utf-8'
+  });
+
+  // convert the blob object to a dedicated URL
+  const url = URL.createObjectURL(svgBlob);
+
+  // load the SVG blob to a flesh image object
+  const img = new Image();
+  img.addEventListener('load', () => {
+    
+    // draw the image on an ad-hoc canvas
+    const bbox = svg.getBBox();
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 750;
+
+    const context = canvas.getContext('2d');
+    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    URL.revokeObjectURL(url);
+
+    // trigger a synthetic download operation with a temporary link
+    const a = document.createElement('a');
+    a.download = 'LiftGraph.png';
+    document.body.appendChild(a);
+    a.href = canvas.toDataURL();
+    a.click();
+    a.remove();
+
+  });
+  img.src = url;
+
+}

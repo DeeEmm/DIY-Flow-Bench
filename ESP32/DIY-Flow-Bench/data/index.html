@@ -500,8 +500,8 @@ input[type="file"] {
 }
 
 svg.graph {
-    height: 500px;
-    width: 750px;
+    height: 600px !important;
+    width: 750px !important;
     background-color: #fff;
     padding-top: 100px;
     box-shadow: 2px 2px 12px 1px #666;
@@ -889,7 +889,7 @@ svg .dataCircle:hover {
           <button id="clear-message-button" class="control-button">CLEAR ALARM</button>
           <br>
           <br>
-          <button id="show-capture-modal-button" class="control-button">SAVE DATA</button>
+          <button id="show-capture-modal-button" class="control-button">CAPTURE</button>
 
    
         
@@ -947,34 +947,29 @@ svg .dataCircle:hover {
           Origin is 100,350
           Top right is ,0
 
-          For 'Ron: 
-
-          Smooth using bezier curves...
-          https://observablehq.com/@ndry/smooth-a-svg-path-with-cubic-bezier-curves
-          based on...
-          https://francoisromain.medium.com/smooth-a-svg-path-with-cubic-bezier-curves-e37b49d46c74
+          Inline styling is required for SVG Download
         -->
         <div class="graph-container">        
-          <svg class="graph" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+          <svg class="graph" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="dataGraph" style="background-color: #fff; padding-top: 100px;">
           
             <!--Grid-->
-            <g class="grid x-grid" id="xGrid">
-              <line x1="100" x2="100" y1="0" y2="360"></line>
-              <line x1="150" x2="150" y1="0" y2="360"></line>
-              <line x1="200" x2="200" y1="0" y2="360"></line>
-              <line x1="250" x2="250" y1="0" y2="360"></line>
-              <line x1="300" x2="300" y1="0" y2="360"></line>
-              <line x1="350" x2="350" y1="0" y2="360"></line>
-              <line x1="400" x2="400" y1="0" y2="360"></line>
-              <line x1="450" x2="450" y1="0" y2="360"></line>
-              <line x1="500" x2="500" y1="0" y2="360"></line>
-              <line x1="550" x2="550" y1="0" y2="360"></line>
-              <line x1="600" x2="600" y1="0" y2="360"></line>
-              <line x1="650" x2="650" y1="0" y2="360"></line>
-              <line x1="700" x2="700" y1="0" y2="360"></line>
+            <g class="grid x-grid" id="xGrid" style="stroke: grey; stroke-dasharray: 1 2; stroke-width: 1;">
+              <line x1="100" x2="100" y1="0" y2="510"></line>
+              <line x1="150" x2="150" y1="0" y2="510"></line>
+              <line x1="200" x2="200" y1="0" y2="510"></line>
+              <line x1="250" x2="250" y1="0" y2="510"></line>
+              <line x1="300" x2="300" y1="0" y2="510"></line>
+              <line x1="350" x2="350" y1="0" y2="510"></line>
+              <line x1="400" x2="400" y1="0" y2="510"></line>
+              <line x1="450" x2="450" y1="0" y2="510"></line>
+              <line x1="500" x2="500" y1="0" y2="510"></line>
+              <line x1="550" x2="550" y1="0" y2="510"></line>
+              <line x1="600" x2="600" y1="0" y2="510"></line>
+              <line x1="650" x2="650" y1="0" y2="510"></line>
+              <line x1="700" x2="700" y1="0" y2="510"></line>
             </g>
 
-            <g class="grid y-grid" id="yGrid">
+            <g class="grid y-grid" id="yGrid" style="stroke: grey; stroke-dasharray: 1 2; stroke-width: 1;">
               <line x1="90" x2="700" y1="0" y2="0"></line>
               <line x1="90" x2="700" y1="50" y2="50"></line>
               <line x1="90" x2="700" y1="100" y2="100"></line>
@@ -983,42 +978,48 @@ svg .dataCircle:hover {
               <line x1="90" x2="700" y1="250" y2="250"></line>
               <line x1="90" x2="700" y1="300" y2="300"></line>
               <line x1="90" x2="700" y1="350" y2="350"></line>
+              <line x1="90" x2="700" y1="400" y2="400"></line>
+              <line x1="90" x2="700" y1="450" y2="450"></line>
+              <line x1="90" x2="700" y1="500" y2="500"></line>
             </g>
 
             <!--Grid Labels-->
             <g class="labels x-labels">
-              <text x="100" y="400">Lift:</text>
-              <text x="150" y="400">~lift1~</text>
-              <text x="200" y="400">~lift2~</text>
-              <text x="250" y="400">~lift3~</text>
-              <text x="300" y="400">~lift4~</text>
-              <text x="350" y="400">~lift5~</text>
-              <text x="400" y="400">~lift6~</text>
-              <text x="450" y="400">~lift7~</text>
-              <text x="500" y="400">~lift8~</text>
-              <text x="550" y="400">~lift9~</text>
-              <text x="600" y="400">~lift10~</text>
-              <text x="650" y="400">~lift11~</text>
-              <text x="700" y="400">~lift12~</text>
+              <text x="100" y="550">Lift:</text>
+              <text x="150" y="550">~lift1~</text>
+              <text x="200" y="550">~lift2~</text>
+              <text x="250" y="550">~lift3~</text>
+              <text x="300" y="550">~lift4~</text>
+              <text x="350" y="550">~lift5~</text>
+              <text x="400" y="550">~lift6~</text>
+              <text x="450" y="550">~lift7~</text>
+              <text x="500" y="550">~lift8~</text>
+              <text x="550" y="550">~lift9~</text>
+              <text x="600" y="550">~lift10~</text>
+              <text x="650" y="550">~lift11~</text>
+              <text x="700" y="550">~lift12~</text>
           </g>
           
           <g class="labels y-labels">
-            <text x="80" y="10">350</text>
-            <text x="80" y="60">300</text>
-            <text x="80" y="110">250</text>
-            <text x="80" y="160">200</text>
-            <text x="80" y="210">150</text>
-            <text x="80" y="260">100</text>
-            <text x="80" y="310">50</text>
-            <text x="80" y="360">Flow (cfm)</text>
+            <text x="80" y="10">~flow10~</text>
+            <text x="80" y="60">~flow9~</text>
+            <text x="80" y="110">~flow8~</text>
+            <text x="80" y="160">~flow7~</text>
+            <text x="80" y="210">~flow6~</text>
+            <text x="80" y="260">~flow5~</text>
+            <text x="80" y="310">~flow4~</text>
+            <text x="80" y="360">~flow3~</text>
+            <text x="80" y="410">~flow2~</text>
+            <text x="80" y="460">~flow1~</text>
+            <text x="80" y="510">Flow (cfm)</text>
           </g>
 
             <!--Graph Key-->
             <g class="labels key-labels">
-
+              <!--
               <text x="625" y="25" id="default-key-text">Current Data</text>
               <line x1="550" y1="20" x2="620" y2="20"  id="default-key" style="stroke:#000;stroke-width:1;stroke-dasharray:4,1;opacity:0.5;" /> 
-              <!--
+              
               <line x1="550" y1="35" x2="620" y2="35"  style="stroke:#f50808;stroke-width:2;opacity:0.5;" /> 
               <text x="625" y="40">Exhaust</text>
               -->
@@ -1047,7 +1048,7 @@ svg .dataCircle:hover {
                 <!--Line data-->
 
                 <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1"
-                points="100,350 150,~LINE_DATA1~ 200,~LINE_DATA2~ 250,~LINE_DATA3~ 300,~LINE_DATA4~ 350,~LINE_DATA5~ 400,~LINE_DATA6~ 450,~LINE_DATA7~ 500,~LINE_DATA8~ 550,~LINE_DATA9~ 600,~LINE_DATA10~ 650,~LINE_DATA11~ 700,~LINE_DATA12~"/>
+                points="100,500 150,~LINE_DATA1~ 200,~LINE_DATA2~ 250,~LINE_DATA3~ 300,~LINE_DATA4~ 350,~LINE_DATA5~ 400,~LINE_DATA6~ 450,~LINE_DATA7~ 500,~LINE_DATA8~ 550,~LINE_DATA9~ 600,~LINE_DATA10~ 650,~LINE_DATA11~ 700,~LINE_DATA12~"/>
 
                 <!-- TEST DATA
                 <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1"
@@ -1066,11 +1067,11 @@ svg .dataCircle:hover {
 
           <!-- ARRAY TO SVG - Appends data to graph container -->
 
-          <coords-svg stroke="gold" stroke-dasharray="4, 1" coords="[[100,330],[ 150,332],[ 200,332],[ 250,335],[ 300,275],[ 350,281],[ 400,250],[ 450,241],[ 500,251],[ 550,133],[ 600,199],[ 650,172],[ 700,177]]"></coords-svg>
+          <!-- <coords-svg stroke="gold" stroke-dasharray="4, 1" coords="[[100,330],[ 150,332],[ 200,332],[ 250,335],[ 300,275],[ 350,281],[ 400,250],[ 450,241],[ 500,251],[ 550,133],[ 600,199],[ 650,172],[ 700,177]]"></coords-svg> -->
           <!-- <coords-svg stroke="green" coords="[[2, 15],[57, 58],[5, 57]]"></coords-svg> -->
 
           <!-- Converts custom <coord-svg> elements into valid polyline and appends to dataPlot. Next stage is to use JSON -->
-          <script>
+          <!-- <script>
             customElements.define("coords-svg", class extends HTMLElement{
               connectedCallback(){
                 let arr = JSON.parse(this.getAttribute("coords"));
@@ -1090,7 +1091,7 @@ svg .dataCircle:hover {
                 document.getElementById("dataPlot").appendChild(polyline);
               }
             });
-          </script>
+          </script> -->
          
           <!-- ARRAY TO SVG -->
 
@@ -1106,11 +1107,14 @@ svg .dataCircle:hover {
           <!--
           <button id="load-graph-data-button" class="control-button">LOAD</button>
           <button id="save-graph-data-button" class="control-button">SAVE</button>
-          -->
+
           <form method="POST" action="/api/clearLiftData" enctype="multipart/form-data">
             <input id="clear-graph-data-button" type="submit" class="control-button submit-button"  value="CLEAR"/>
-            <button id="export-graph-data-button" class="control-button">EXPORT</button> 
           </form>
+          -->
+          <button id="clear-graph-data-button" class="control-button">CLEAR</button> 
+          <button id="export-graph-data-button" class="control-button">EXPORT</button> 
+          <button id="capture-graph-data-button" class="control-button">IMAGE</button> 
           <!-- Export button fires javascript function to click link below forcing the download-->
           <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
         </div>
@@ -1378,15 +1382,22 @@ function initialiseButtons() {
         child = l.lastElementChild;
     }
 
-    // clear liftdata.json
-
+    xhr.open('POST', '/api/clearLiftData');
+    xhr.onload = function() {
+      if (xhr.status === 200) window.location.href = '/?view=graph';
+    };
+    xhr.send();
 
   });
-
+  
   document.getElementById('export-graph-data-button').addEventListener('click', function(){
     // initiate JSON Data download from browser
-    // <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
     document.getElementById('file-data-download').click();
+  });
+
+  document.getElementById('capture-graph-data-button').addEventListener('click', function(){
+    // initiate datagraph image download from browser
+    exportSVGAsPNG();
   });
 
 
@@ -1569,7 +1580,51 @@ document.addEventListener("keydown", ({key}) => {
   }
 })
 
+/***********************************************************
+* Export Data Graph as PNG Image
+* Source: https://takuti.me/note/javascript-save-svg-as-image/
+***/
+function exportSVGAsPNG() {
 
+const svg = document.querySelector('svg');
+
+const data = (new XMLSerializer()).serializeToString(svg);
+const svgBlob = new Blob([data], {
+    type: 'image/svg+xml;charset=utf-8'
+});
+
+// convert the blob object to a dedicated URL
+const url = URL.createObjectURL(svgBlob);
+
+// load the SVG blob to a flesh image object
+const img = new Image();
+img.addEventListener('load', () => {
+  
+  // draw the image on an ad-hoc canvas
+  const bbox = svg.getBBox();
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 800;
+  canvas.height = 750;
+
+  const context = canvas.getContext('2d');
+  context.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  URL.revokeObjectURL(url);
+
+  // trigger a synthetic download operation with a temporary link
+  const a = document.createElement('a');
+  a.download = 'LiftGraph.png';
+  document.body.appendChild(a);
+  a.href = canvas.toDataURL();
+  a.click();
+  a.remove();
+
+});
+img.src = url;
+
+
+}
 
 </script>
   </BODY>
