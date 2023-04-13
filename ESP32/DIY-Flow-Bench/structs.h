@@ -38,41 +38,64 @@ struct ConfigSettings {
   int min_flow_rate = 1;                          // Flow rate at which bench is considered running
   int min_bench_pressure = 1;                     // Min bench pressure where bench is considered running
   double maf_min_volts = 0.1;                     // Filter out results less than this
-  int refresh_rate = 250;                         // Screen refresh rate in milliseconds (>180)
+  int refresh_rate = 500;                         // Screen refresh rate in milliseconds (>180)
   int adj_flow_depression = 28;                   // Adjusted flow depression in inches of water
-  double cal_ref_press = 10;                      // Calibration orifice ref pressure
-  double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
-  double cal_offset = 0;                          // Calibration offset
   int cyc_av_buffer = 3;                          // [5] Scan # over which to average output (helps smooth results)
-  int leak_test_tolerance = 2;                    // Leak test tolerance
-  int leak_test_threshold = 10;                   // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
   bool show_alarms = true;                        // Display Alarms?
   bool debug_mode = false;                        // Global debug print override
   bool dev_mode = false;                          // Developer mode
   bool status_print_mode = false;                 // Stream status data to serial
   bool api_enabled = true;                        // Can disable serial API if required
+  char bench_type[8] = "MAF";                     // Default bench type
+  int maf_housing_diameter = 0;                   // MAF Housing diameter
   int tatltuae = 42;
   int parsecs = 12;
   char pageTitle[32] = "DIY Flow Bench";          // Display name for software
   char wifi_ssid[32] = "WIFI-SSID";               // Your Wifi SSID
-  char wifi_pswd[32] = "PASSWORD";               // Your Wifi Password
+  char wifi_pswd[32] = "PASSWORD";                // Your Wifi Password
   char wifi_ap_pswd[32] = "123456789";            // Default Access Point Password
   char hostname[32] = "diyfb";                    // Default Hostname
   char api_delim[2] = ":";                        // API Serial comms delimiter
   char wifi_ap_ssid[32] = "DIYFB";                // Default Access Point name
   char temp_unit[11] = "Celcius";                 // Defalt display unit of temperature
   bool ap_mode = false;                           // Default WiFi connection mode is accesspoint mode
+  double valveLiftInterval = 1.5;                 // Distance between valve lift data points (can be metric or imperial)
+  double cal_ref_press = 10;                      // Calibration orifice ref pressure
+  double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
+  int leak_test_tolerance = 2;                    // Leak test tolerance
+  int leak_test_threshold = 10;                   // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
+  double OrificeOneFlow = 0.0;
+  double OrificeOneDepression = 0.0;
+  double OrificeTwoFlow = 0.0;
+  double OrificeTwoDepression = 0.0;
+  double OrificeThreeFlow = 0.0;
+  double OrificeThreeDepression = 0.0;
+  double OrificeFourFlow = 0.0;
+  double OrificeFourDepression = 0.0;
+  double OrificeFiveFlow = 0.0;
+  double OrificeFiveDepression = 0.0;
+  double OrificeSixFlow = 0.0;
+  double OrificeSixDepression = 0.0;
 };
+
+
+
 
 
 
 /***********************************************************
- * Calibration Settings
+ * Calibration Data
  ***/
-struct CalibrationSettings { 
-  double flow_offset = 0.0;         
+struct CalibrationData { 
+  double leak_cal_press_val = 1000.0;  
+  double leak_cal_vac_val = -1000.0;  
   double leak_cal_val = 0.0;  
+  double flow_offset = 0.0;         
 };
+
+
+
+
 
 
 
@@ -113,6 +136,8 @@ struct DeviceStatus {
   long mafDataValMax = 0;
   long mafDataKeyMax = 0;
   int mafUnits = 0;
+  double mafScaling = 1;
+  int mafDiameter = 0;
 };
 
 
@@ -128,12 +153,12 @@ struct FileUploadData {
 
 
 
-
 /***********************************************************
  * Sensor data
  ***/
 struct SensorData {
   long MafRAW = 0;
+  long MafLookup = 0;
   double FlowKGH = 0.0;
   double FlowCFM = 0.0;
   double FlowADJ = 0.0;
@@ -150,23 +175,25 @@ struct SensorData {
   double PDiffMv = 0.0;
   double PitotKPA = 0.0;
   double PitotMv = 0.0;
+  double Swirl = 0.0;
 };
 
 
+
 /***********************************************************
- * Orifice data
+ * Valve Lift data
  ***/
-struct OrificeData {
-  double OrificeOneFlow;
-  double OrificeOneDepression;
-  double OrificeTwoFlow;
-  double OrificeTwoDepression;
-  double OrificeThreeFlow;
-  double OrificeThreeDepression;
-  double OrificeFourFlow;
-  double OrificeFourDepression;
-  double OrificeFiveFlow;
-  double OrificeFiveDepression;
-  double OrificeSixFlow;
-  double OrificeSixDepression;
+struct ValveLiftData {
+  double LiftData1 = 0.0;
+  double LiftData2 = 0.0;
+  double LiftData3 = 0.0;
+  double LiftData4 = 0.0;
+  double LiftData5 = 0.0;
+  double LiftData6 = 0.0;
+  double LiftData7 = 0.0;
+  double LiftData8 = 0.0;
+  double LiftData9 = 0.0;
+  double LiftData10 = 0.0;
+  double LiftData11 = 0.0;
+  double LiftData12 = 0.0;
 };

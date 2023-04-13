@@ -44,7 +44,7 @@ class Sensors {
 		double BME280GetTemperature(void);
 		double BME280GetHumidity(void);
 		long getMafRaw();
-		int32_t getMafFlow(int units = KG_H);
+		double getMafFlow(int units = KG_H);
 		double getMafVolts();
 		double getTempValue();
 		double getBaroValue();

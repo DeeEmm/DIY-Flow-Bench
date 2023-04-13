@@ -16,13 +16,21 @@ var leakCalVal;
 var flowCalVal;
 var leakCalTolerance;
 var leakTestThreshold;
+var updateSSE = true;
 
 window.addEventListener('load', onLoad);
 
 var fileModal = document.getElementById("fileModal");
 var infoModal = document.getElementById("infoModal");
+var captureLiftDataModal = document.getElementById("captureLiftDataModal");
+var loadGraphDataModal = document.getElementById("loadGraphDataModal");
+var saveGraphDataModal = document.getElementById("saveGraphDataModal");
+
 var closeFileModalButton = document.getElementsByClassName("closeFileModalButton")[0];
 var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton")[0];
+var closeCaptureLiftDataModalButton = document.getElementsByClassName("closeCaptureLiftDataModalButton")[0];
+var closeLoadGraphDataModalButton = document.getElementsByClassName("closeLoadGraphDataModalButton")[0];
+var closeSaveGraphDataModalButton = document.getElementsByClassName("closeSaveGraphDataModalButton")[0];
 
 // Set up Server Side Events (SSE)
 if (!!window.EventSource) {
@@ -30,18 +38,46 @@ if (!!window.EventSource) {
 
   source.addEventListener('JSON_DATA', function(e) {
     var myObj = JSON.parse(e.data);
-    for (key in myObj) {
-      try {
-        if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
-          document.getElementById(key).innerHTML = myObj[key];
-        } else {
-          document.getElementById(key).innerHTML = myObj[key].toFixed(2); 
+
+    if (updateSSE === true){
+
+      for (key in myObj) {
+        try {
+          if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
+            document.getElementById(key).innerHTML = myObj[key];
+          } else {
+            document.getElementById(key).innerHTML = myObj[key].toFixed(2); 
+          }
+        } catch (error) {
+          console.log('Missing or incorrect data');
+          console.log(key + ' : ' + myObj[key]);
         }
-      } catch (error) {
-        console.log('Missing or incorrect data');
-        console.log(key + ' : ' + myObj[key]);
+      } 
+
+      // get bench type and set up GUI accoordingly
+      var benchType = myObj["BENCH_TYPE"];
+
+      switch (benchType) {
+    
+        case "MAF":
+          document.getElementById('orificeData').style.display='none';
+        break;
+    
+        case "ORIFICE":
+          document.getElementById('orificeData').style.display='block';
+        break;
+          
+        case "VENTURI":
+          document.getElementById('orificeData').style.display='block';
+        break;
+          
+        case "PITOT":
+          document.getElementById('orificeData').style.display='block';
+        break;
+          
       }
-    } 
+
+    }
 
   }, false);
 
@@ -83,6 +119,11 @@ function onLoad(event) {
       document.getElementById('fileModal').style.display='block';
     break;
 
+    case "graph":
+      document.getElementById("load-datalog-button").click();
+      document.getElementById('datalog').style.display='block';
+    break;
+      
     case "config":
       document.getElementById("load-config-button").click();
     break;
@@ -101,12 +142,68 @@ function initialiseButtons() {
   
   var xhr = new XMLHttpRequest();
 
+  document.getElementById('show-capture-modal-button').addEventListener('click', function(){
+    document.getElementById('captureLiftDataModal').style.display='block';
+  });
+
+  // document.getElementById('capture-lift-data-button').addEventListener('click', function(){
+  //   // save current flow vlue to selected lift data point
+  // });
+
+
+  // document.getElementById('load-graph-data-button').addEventListener('click', function(){
+  //   document.getElementById('loadGraphDataModal').style.display='block';
+  // });
+
+  // document.getElementById('save-graph-data-button').addEventListener('click', function(){
+  //   document.getElementById('saveGraphDataModal').style.display='block';
+  // });
+
+  document.getElementById('clear-graph-data-button').addEventListener('click', function(){
+        
+    // clear data points from graph
+    // var p = document.getElementById('dataPlot');
+    // var child = p.lastElementChild; 
+    // while (child) {
+    //     p.removeChild(child);
+    //     child = p.lastElementChild;
+    // }
+    // clear line data from graph
+    var l = document.getElementById('lineData');
+    var child = l.lastElementChild; 
+    while (child) {
+        l.removeChild(child);
+        child = l.lastElementChild;
+    }
+
+    // clear liftdata.json
+
+
+  });
+
+  document.getElementById('export-graph-data-button').addEventListener('click', function(){
+    // initiate JSON Data download from browser
+    // <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
+    document.getElementById('file-data-download').click();
+  });
+
+
   document.getElementById('file-manager-button').addEventListener('click', function(){
     document.getElementById('fileModal').style.display='block';
   });
 
   document.getElementById('info-button').addEventListener('click', function(){
     document.getElementById('infoModal').style.display='block';
+  });
+
+  document.getElementById('tile-pref').addEventListener('click', function(){
+    document.getElementById('tile-pref').style.display='none';
+    document.getElementById('tile-pdiff').style.display='block';
+  });
+
+  document.getElementById('tile-pdiff').addEventListener('click', function(){
+    document.getElementById('tile-pdiff').style.display='none';
+    document.getElementById('tile-pref').style.display='block';
   });
 
   document.getElementById('flow-tile').addEventListener('click', function(){
@@ -121,11 +218,11 @@ function initialiseButtons() {
 
   document.getElementById('tile-pitot').addEventListener('click', function(){
     document.getElementById('tile-pitot').style.display='none';
-    document.getElementById('tile-pdiff').style.display='block';
+    document.getElementById('tile-swirl').style.display='block';
   });
 
-  document.getElementById('tile-pdiff').addEventListener('click', function(){
-    document.getElementById('tile-pdiff').style.display='none';
+  document.getElementById('tile-swirl').addEventListener('click', function(){
+    document.getElementById('tile-swirl').style.display='none';
     document.getElementById('tile-pitot').style.display='block';
   });
 
@@ -197,6 +294,12 @@ function openTab(tabName, elmnt) {
     tabcontent[i].style.display = "none";
   }
   document.getElementById(tabName).style.display = "block";
+  // Pause SSE update when on data tab
+  if (tabName === "datalog") {
+    updateSSE = false;
+  } else {
+    updateSSE = true;
+  }
 }
 
 
@@ -216,12 +319,38 @@ closeInfoModalButton.onclick = function() {
 
 
 /***********************************************************
+* Close Capture Data modal dialog
+***/
+closeCaptureLiftDataModalButton.onclick = function() {
+  captureLiftDataModal.style.display = "none";
+}
+
+
+/***********************************************************
+* Close Load Data modal dialog
+***/
+closeLoadGraphDataModalButton.onclick = function() {
+  loadGraphDataModal.style.display = "none";
+}
+
+/***********************************************************
+* Close Save Data modal dialog
+***/
+closeSaveGraphDataModalButton.onclick = function() {
+  saveGraphDataModal.style.display = "none";
+}
+
+
+/***********************************************************
 * Close modal dialogs on lose focus
 ***/
 window.onclick = function(event) {
-  if (event.target == fileModal || event.target == infoModal ) {
+  if (event.target == fileModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal ) {
     fileModal.style.display = "none";
     infoModal.style.display = "none";
+    captureLiftDataModal.style.display = "none";
+    loadGraphDataModal.style.display = "none";
+    saveGraphDataModal.style.display = "none";
   }
 }
 
@@ -232,6 +361,9 @@ document.addEventListener("keydown", ({key}) => {
   if (key === "Escape") {
     fileModal.style.display = "none";
     infoModal.style.display = "none";
+    captureLiftDataModal.style.display = "none";
+    loadGraphDataModal.style.display = "none";
+    saveGraphDataModal.style.display = "none";
   }
 })
 

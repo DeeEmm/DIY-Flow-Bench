@@ -122,34 +122,13 @@ void Hardware::configurePins () {
 void Hardware::begin () {
 
   Messages _message;
+  ConfigSettings config;
+
   extern struct DeviceStatus status;
   
   this->beginSerial();                                      // Start of serial comms
   this->initialise();                                       // Initialise hardware
 
-  // Bench definitions for system status pane
-  #if defined MAF_STYLE_BENCH
-    status.benchType = "MAF Style";
-  #elif defined ORIFICE_STYLE_BENCH
-    status.benchType = "Orifice Style";
-  #elif defined PITOT_STYLE_BENCH
-    status.benchType = "Pitot Style";
-  #elif defined VENTURI_STYLE_BENCH
-    status.benchType = "Venturi Style";
-  #endif
-
-  // Board definitions for system status pane
-  #if defined WEMOS_D1_R32                    
-    status.boardType = "WEMOS_D1_R32";
-  #elif defined ARDUCAM_ESP32S
-    status.boardType = "ARDUCAM_ESP32S";
-  #elif defined ESP32DUINO
-    status.boardType = "ESP32DUINO";
-  #elif defined ESP32_WROVER_KIT 
-    status.boardType = "ESP32_WROVER_KIT";
-  #else
-    status.boardType = "CUSTOM_PIN_MAPPING";
-  #endif
   
 }
 
@@ -174,12 +153,13 @@ void Hardware::initialise () {
 
   adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
   adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
+  // adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
   
   if (!adc.testConnection()) {
-      _message.serialPrintf("ADS1115 Connection failed");
-			while(1); //Freeze
-		} else {
-			_message.serialPrintf("ADS1115 Initialised\n");
+    _message.serialPrintf("ADS1115 Connection failed");
+		while(1); //Freeze
+	} else {
+		_message.serialPrintf("ADS1115 Initialised\n");
   }
   #endif
 
@@ -303,7 +283,7 @@ int32_t Hardware::getADCRawData(int channel) {
   
   #if defined ADC_TYPE_ADS1115 && defined ADC_IS_ENABLED 
     
-    volts = rawADCval * ADC_GAIN / 32767.00F; 
+    volts = rawADCval * ADC_GAIN / ADC_RANGE; 
   
   #elif defined ADC_TYPE_ADS1015 && defined ADC_IS_ENABLED 
 

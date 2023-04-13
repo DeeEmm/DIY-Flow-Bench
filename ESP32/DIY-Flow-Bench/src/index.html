@@ -7,6 +7,89 @@
 	</HEAD>
 	<BODY>
 
+
+
+    <!-- Save Data Modal -->
+    <div id="captureLiftDataModal" class="modal">
+      <div class="modal-content">
+        <span class="closeCaptureLiftDataModalButton">&times;</span>
+        <h3>Select lift value before capture</h3>
+        <hr>
+        <div class="align-center">
+          <form method="POST" action="/api/captureLiftData" enctype="multipart/form-data">
+            <label>Lift Value</label>
+            <br>
+              <div class="switch-field">
+                <input type="radio" id="lift-one" name="lift-data" value="1" checked/>
+                <label for="lift-one">~lift1~</label>
+                <input type="radio" id="lift-two" name="lift-data" value="2" />
+                <label for="lift-two">~lift2~</label>
+                <input type="radio" id="lift-three" name="lift-data" value="3"/>
+                <label for="lift-three">~lift3~</label>
+                <input type="radio" id="lift-four" name="lift-data" value="4" />
+                <label for="lift-four">~lift4~</label>
+                <input type="radio" id="lift-five" name="lift-data" value="5" />
+                <label for="lift-five">~lift5~</label>
+                <input type="radio" id="lift-six" name="lift-data" value="6" />
+                <label for="lift-six">~lift6~</label>
+                <input type="radio" id="lift-seven" name="lift-data" value="7" />
+                <label for="lift-seven">~lift7~</label>
+                <input type="radio" id="lift-eight" name="lift-data" value="8" />
+                <label for="lift-eight">~lift8~</label>
+                <input type="radio" id="lift-nine" name="lift-data" value="9" />
+                <label for="lift-nine">~lift9~</label>
+                <input type="radio" id="lift-ten" name="lift-data" value="10" />
+                <label for="lift-ten">~lift10~</label>
+                <input type="radio" id="lift-eleven" name="lift-data" value="11" />
+                <label for="lift-eleven">~lift11~</label>
+                <input type="radio" id="lift-twelve" name="lift-data" value="12" />
+                <label for="lift-twelve">~lift12~</label>
+              </div>
+            <input id="data" type="file" name="wtf"/>
+            <input class="button submit-button" type="submit" id="capture-lift-data-button" value="Capture"/>
+          </form>
+        </div>
+        <div class="clear-both">&nbsp;</div>
+      </div>        
+    </div>
+
+
+    <!-- Load Data Modal -->
+    <div id="loadGraphDataModal" class="modal">
+      <div class="modal-content">
+        <span class="closeLoadGraphDataModalButton">&times;</span>
+        <h3>Load Lift Profile</h3>
+        <hr>
+        <br>
+        <div class="float-right">
+          <form method="POST" action="/api/viewdata" enctype="multipart/form-data">
+            <input class="button file-submit-button" type="submit" value="Load"/>
+          </form>
+        </div>
+        <div class="clear-both">&nbsp;</div>
+      </div>        
+    </div>
+
+
+    <!-- Save Data Modal -->
+    <div id="saveGraphDataModal" class="modal">
+      <div class="modal-content">
+        <span class="closeSaveGraphDataModalButton">&times;</span>
+        <h3>Save Lift Data</h3>
+        <hr>
+        <br>
+        <div class="float-right">
+          <form method="POST" action="/api/savedata" enctype="multipart/form-data">
+            <label class="config-label">Filename:</label>&nbsp;<input type="text" value="~FileName~">
+            <input class="button file-submit-button" type="submit" value="Load"/>
+          </form>
+        </div>
+        <div class="clear-both">&nbsp;</div>
+      </div>        
+    </div>
+
+
+
     <!-- File Manager Modal -->
     <div id="fileModal" class="modal">
       <div class="modal-content">
@@ -48,8 +131,8 @@
           <!-- <div class="config-row"><label class="config-label">Uptime:  </label><span class="config-value" id="UPTIME">~UPTIME~</span></div> -->
           <h4>Hardware Configuration</h4>
           <hr>
-          <div class="config-row"><label class="config-label">Bench Type:  </label><span class="config-value" id="BENCHTYPE">~BENCHTYPE~</span></div>
-          <div class="config-row"><label class="config-label">Board Type:  </label><span class="config-value" id="BOARDTYPE">~BOARDTYPE~</span></div>
+          <div class="config-row"><label class="config-label">Bench Type:  </label><span class="config-value" id="BENCH_TYPE">~BENCH_TYPE~</span></div>
+          <div class="config-row"><label class="config-label">Board Type:  </label><span class="config-value" id="BOARD_TYPE">~BOARD_TYPE~</span></div>
           <!-- <div class="config-row"><label class="config-label">Boot Time:  </label><span class="config-value" id="BOOT_TIME">~BOOT_TIME~</span></div> -->
           <h4>Sensor Configuration</h4>
           <hr>
@@ -72,14 +155,24 @@
         <h1><a href="/" id="PAGE_TITLE" alt="DIY Flow Bench">DIY Flow Bench</a></h1>
     </div>
 
+    <!-- Navbar-->
     <button class="tablink" onclick="openTab('dashboard', this)" id="load-dashboard-button">Dashboard</button>
+    <button class="tablink" onclick="openTab('datalog', this)" id="load-datalog-button">Data</button>
     <button class="tablink" onclick="openTab('configuration', this)" id="load-config-button">Configuration</button>
+
+    <div id="tabcontainer">
+    <!-- Main Tab-->
     <div id="dashboard" class="tabcontent tabcontentMain">        
       <div class="content">
         <div class="tile-grid">
-          <div class="tile tile-pref">
+          <div class="tile tile-pref" id="tile-pref">
             <p class="tile-title">Depression</p>
             <p><span class="tile-value" id="PREF">&nbsp;</span></p>
+            <p class="units">inH2O</p>
+          </div>
+          <div class="tile tile-pdiff" id="tile-pdiff">
+            <p class="tile-title">Diff Pressure</p>
+            <p><span class="tile-value" id="PDIFF">&nbsp;</span></p>
             <p class="units">inH2O</p>
           </div>
           <div class="tile tile-flow" id="flow-tile">
@@ -97,10 +190,10 @@
             <p><span class="tile-value" id="PITOT">&nbsp;</span></p>
             <p class="units">inH2O</p>
           </div>
-          <div class="tile tile-pdiff" id="tile-pdiff">
-            <p class="tile-title">Diff Pressure</p>
-            <p><span class="tile-value" id="PDIFF">&nbsp;</span></p>
-            <p class="units">inH2O</p>
+          <div class="tile tile-swirl" id="tile-swirl">
+            <p class="tile-title">Swirl</p>
+            <p><span class="tile-value" id="SWIRL">&nbsp;</span></p>
+            <p class="units">rpm</p>
           </div>
           <div class="tile tile-temp">
             <p class="tile-title">Temperature</p>
@@ -128,27 +221,40 @@
         </div>   
         
 
-        <!-- TODO Uatomatically submit form when radio button changed [javascript / onclick]-->
+
+
+        <!-- TODO Automatically submit form when radio button changed [javascript / onclick]-->
         <!-- Select Orifice Radio buttons (required for orifice style bench)-->
         ~ORIFICE_LIST~
           
-        <!--
-          <button id="datalog-button" class="button">Datalog</button>
-          <button id="record-button" class="button">Record</button>
-        -->
           <button id="on-button" class="control-button">START BENCH</button>
           <button id="off-button" class="control-button">STOP BENCH</button>
           <button id="clear-message-button" class="control-button">CLEAR ALARM</button>
+          <br>
+          <br>
+          <button id="show-capture-modal-button" class="control-button">CAPTURE</button>
+
+   
         
         
-        
-        
+
+      </div>
+                
+
+    </div>
+
+    
+    <!-- Datalog tab -->
+    <div id="datalog" class="tabcontent tabcontentData">
+
+
+
         
         
              
         <!-- lift graph -->
         
-        <!-- TODO: 
+        <!-- TODO: Display lift data in graph in GUI
         
         Set graph scaling based on MAF max flow rate 
         Add user settings for graph scaling
@@ -175,80 +281,188 @@
         Store Data in JSON / SPIFFS file
         
         -->
+
+        
+
         <!--
+          NOTE: SVG graph is drawn from top down as the origin is actually at top left of graph area. 
+          All data points = (graph_height - datapoint_value)
+          Origin is 100,350
+          Top right is ,0
+
+          For 'Ron: 
+
+          Smooth using bezier curves...
+          https://observablehq.com/@ndry/smooth-a-svg-path-with-cubic-bezier-curves
+          based on...
+          https://francoisromain.medium.com/smooth-a-svg-path-with-cubic-bezier-curves-e37b49d46c74
+        -->
         <div class="graph-container">        
           <svg class="graph" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+          
+            <!--Grid-->
             <g class="grid x-grid" id="xGrid">
-              <line x1="113" x2="113" y1="10" y2="380"></line>
-              <line x1="259" x2="259" y1="10" y2="380"></line>
-              <line x1="405" x2="405" y1="10" y2="380"></line>
-              <line x1="551" x2="551" y1="10" y2="380"></line>
-              <line x1="697" x2="697" y1="10" y2="380"></line>
+              <line x1="100" x2="100" y1="0" y2="360"></line>
+              <line x1="150" x2="150" y1="0" y2="360"></line>
+              <line x1="200" x2="200" y1="0" y2="360"></line>
+              <line x1="250" x2="250" y1="0" y2="360"></line>
+              <line x1="300" x2="300" y1="0" y2="360"></line>
+              <line x1="350" x2="350" y1="0" y2="360"></line>
+              <line x1="400" x2="400" y1="0" y2="360"></line>
+              <line x1="450" x2="450" y1="0" y2="360"></line>
+              <line x1="500" x2="500" y1="0" y2="360"></line>
+              <line x1="550" x2="550" y1="0" y2="360"></line>
+              <line x1="600" x2="600" y1="0" y2="360"></line>
+              <line x1="650" x2="650" y1="0" y2="360"></line>
+              <line x1="700" x2="700" y1="0" y2="360"></line>
             </g>
+
             <g class="grid y-grid" id="yGrid">
-              <line x1="86" x2="697" y1="10" y2="10"></line>
-              <line x1="86" x2="697" y1="68" y2="68"></line>
-              <line x1="86" x2="697" y1="126" y2="126"></line>
-              <line x1="86" x2="697" y1="185" y2="185"></line>
-              <line x1="86" x2="697" y1="243" y2="243"></line>
-              <line x1="86" x2="697" y1="301" y2="301"></line>
-              <line x1="86" x2="697" y1="360" y2="360"></line>
+              <line x1="90" x2="700" y1="0" y2="0"></line>
+              <line x1="90" x2="700" y1="50" y2="50"></line>
+              <line x1="90" x2="700" y1="100" y2="100"></line>
+              <line x1="90" x2="700" y1="150" y2="150"></line>
+              <line x1="90" x2="700" y1="200" y2="200"></line>
+              <line x1="90" x2="700" y1="250" y2="250"></line>
+              <line x1="90" x2="700" y1="300" y2="300"></line>
+              <line x1="90" x2="700" y1="350" y2="350"></line>
             </g>
-            
-            
-            <g class="surfaces">
-        
-                <line x1="550" y1="20" x2="620" y2="20"  style="stroke:rgb(0,0,255);stroke-width:2" /> 
-              
-                <line x1="113" y1="360" x2="259" y2="221"  style="stroke:rgb(0,0,255);stroke-width:2" />
-                <line x1="259" y1="221" x2="405" y2="139"  style="stroke:rgb(0,0,255);stroke-width:2" />
-                <line x1="405" y1="139" x2="551" y2="170"  style="stroke:rgb(0,0,255);stroke-width:2" />
-                <line x1="551" y1="170" x2="697" y2="220"  style="stroke:rgb(0,0,255);stroke-width:2" />
-        
-        
-                <line x1="550" y1="35" x2="620" y2="35"  style="stroke:rgb(255,0,0);stroke-width:2" /> 
-        
-                <line x1="113" y1="360" x2="259" y2="231"  style="stroke:rgb(255,0,0);stroke-width:2" />
-                <line x1="259" y1="231" x2="405" y2="179"  style="stroke:rgb(255,0,0);stroke-width:2" />
-                <line x1="405" y1="179" x2="551" y2="200"  style="stroke:rgb(255,0,0);stroke-width:2" />
-                <line x1="551" y1="200" x2="697" y2="230"  style="stroke:rgb(255,0,0);stroke-width:2" />
-        
-            </g>
-            
-            <use class="grid double" xlink:href="#xGrid" style=""></use>
-            <use class="grid double" xlink:href="#yGrid" style=""></use>
-            
+
+            <!--Grid Labels-->
             <g class="labels x-labels">
-                <text x="113" y="400">Lift: mm</text>
-                <text x="259" y="400">2mm</text>
-                <text x="405" y="400">3mm</text>
-                <text x="551" y="400">4mm</text>
-                <text x="697" y="400">5mm</text>
-            </g>
-            <g class="labels y-labels">
-                <text x="80" y="15">200</text>
-                <text x="80" y="131">150</text>
-                <text x="80" y="248">100</text>
-                <text x="80" y="365">Flow: CFM</text>
-            </g>
+              <text x="100" y="400">Lift:</text>
+              <text x="150" y="400">~lift1~</text>
+              <text x="200" y="400">~lift2~</text>
+              <text x="250" y="400">~lift3~</text>
+              <text x="300" y="400">~lift4~</text>
+              <text x="350" y="400">~lift5~</text>
+              <text x="400" y="400">~lift6~</text>
+              <text x="450" y="400">~lift7~</text>
+              <text x="500" y="400">~lift8~</text>
+              <text x="550" y="400">~lift9~</text>
+              <text x="600" y="400">~lift10~</text>
+              <text x="650" y="400">~lift11~</text>
+              <text x="700" y="400">~lift12~</text>
+          </g>
+          
+          <g class="labels y-labels">
+            <text x="80" y="10">350</text>
+            <text x="80" y="60">300</text>
+            <text x="80" y="110">250</text>
+            <text x="80" y="160">200</text>
+            <text x="80" y="210">150</text>
+            <text x="80" y="260">100</text>
+            <text x="80" y="310">50</text>
+            <text x="80" y="360">Flow (cfm)</text>
+          </g>
+
+            <!--Graph Key-->
             <g class="labels key-labels">
-              <text x="625" y="25">Inlet</text>
+
+              <text x="625" y="25" id="default-key-text">Current Data</text>
+              <line x1="550" y1="20" x2="620" y2="20"  id="default-key" style="stroke:#000;stroke-width:1;stroke-dasharray:4,1;opacity:0.5;" /> 
+              <!--
+              <line x1="550" y1="35" x2="620" y2="35"  style="stroke:#f50808;stroke-width:2;opacity:0.5;" /> 
               <text x="625" y="40">Exhaust</text>
+              -->
             </g>
+
+            <!--Data Points - css classes to display value on hover - NOTE text value is displayed above dataPoint-->
+            <!--
+            <g class="first_set points" data-setname="Our first data set" id="dataPlot">
+              <circle class="dataCircle" cx="150" cy="340" data-value="7.2" r="4"></circle><text class="dataValue hide" x="150" y="310">7.2</text>
+              <circle class="dataCircle" cx="200" cy="315" data-value="8.1" r="4"></circle><text class="dataValue hide" x="200" y="285">4.2</text>
+              <circle class="dataCircle" cx="250" cy="301" data-value="7.7" r="4"></circle><text class="dataValue hide" x="250" y="271">5.2</text> 
+              <circle class="dataCircle" cx="300" cy="280" data-value="6.8" r="4"></circle><text class="dataValue hide" x="300" y="270">23.2</text>
+              <circle class="dataCircle" cx="350" cy="249" data-value="6.7" r="4"></circle><text class="dataValue hide" x="350" y="239">32</text>  
+              <circle class="dataCircle" cx="400" cy="245" data-value="5.7" r="4"></circle><text class="dataValue hide" x="400" y="235">7.2</text> 
+              <circle class="dataCircle" cx="450" cy="242" data-value="6.7" r="4"></circle><text class="dataValue hide" x="450" y="232">8.2</text> 
+              <circle class="dataCircle" cx="500" cy="238" data-value="6.8" r="4"></circle><text class="dataValue hide" x="500" y="228">752</text> 
+              <circle class="dataCircle" cx="550" cy="230" data-value="4.7" r="4"></circle><text class="dataValue hide" x="550" y="220">22</text>  
+              <circle class="dataCircle" cx="600" cy="222" data-value="5.7" r="4"></circle><text class="dataValue hide" x="600" y="212">7</text>   
+              <circle class="dataCircle" cx="650" cy="220" data-value="2.7" r="4"></circle><text class="dataValue hide" x="650" y="210">7542</text>
+              <circle class="dataCircle" cx="700" cy="218" data-value="6.9" r="4"></circle><text class="dataValue hide" x="700" y="208">42</text>  
+            </g>
+            -->
+
+            <!--Hard coded Graph Line Data-->
+            <g class="surfaces" id="lineData">
+                <!--Line data-->
+
+                <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1"
+                points="100,350 150,~LINE_DATA1~ 200,~LINE_DATA2~ 250,~LINE_DATA3~ 300,~LINE_DATA4~ 350,~LINE_DATA5~ 400,~LINE_DATA6~ 450,~LINE_DATA7~ 500,~LINE_DATA8~ 550,~LINE_DATA9~ 600,~LINE_DATA10~ 650,~LINE_DATA11~ 700,~LINE_DATA12~"/>
+
+                <!-- TEST DATA
+                <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1"
+                points="100,350 150,340 200,315 250,301 300,280 350,249 400,245 450,242 500,238 550,230 600,222 650,220 700,218" />
+
+                <polyline fill="none" stroke="#f50808" stroke-width="1" stroke-dasharray="5, 2"
+                points="100,0 150,~LINE_DATA1~ 200,~LINE_DATA2~ 250,~LINE_DATA3~ 300,~LINE_DATA4~ 350,~LINE_DATA5~ 400,~LINE_DATA6~ 450,~LINE_DATA7~ 500,~LINE_DATA8~ 550,~LINE_DATA9~ 600,~LINE_DATA10~ 650,~LINE_DATA11~ 700,~LINE_DATA12~"/>
+                -->
+            </g>
+            
+            <use class="grid double" xlink:href="#xGrid" ></use>
+            <use class="grid double" xlink:href="#yGrid" ></use>
+            
           </svg>
+
+
+          <!-- ARRAY TO SVG - Appends data to graph container -->
+
+          <!-- <coords-svg stroke="gold" stroke-dasharray="4, 1" coords="[[100,330],[ 150,332],[ 200,332],[ 250,335],[ 300,275],[ 350,281],[ 400,250],[ 450,241],[ 500,251],[ 550,133],[ 600,199],[ 650,172],[ 700,177]]"></coords-svg> -->
+          <!-- <coords-svg stroke="green" coords="[[2, 15],[57, 58],[5, 57]]"></coords-svg> -->
+
+          <!-- Converts custom <coord-svg> elements into valid polyline and appends to dataPlot. Next stage is to use JSON -->
+          <!-- <script>
+            customElements.define("coords-svg", class extends HTMLElement{
+              connectedCallback(){
+                let arr = JSON.parse(this.getAttribute("coords"));
+                let dPath = arr.flat().join(" ");
+                let stroke = this.getAttribute("stroke");
+                this.style.display = "inline-block";
+                
+                var svgNS = "http://www.w3.org/2000/svg";
+                let polyline = document.createElementNS(svgNS, "polyline");
+                polyline.classList.add("dataLine");
+
+                polyline.setAttribute("points", dPath);
+                polyline.setAttribute("stroke", stroke);
+                polyline.setAttribute("stroke-width", 1);
+                polyline.setAttribute("fill", "none");
+
+                document.getElementById("dataPlot").appendChild(polyline);
+              }
+            });
+          </script> -->
+         
+          <!-- ARRAY TO SVG -->
+
         </div>  
-        -->
+    
         
         <!-- end lift graph -->
 
 
-      </div>
-                
-      <!-- Footer -->
-      <br><div id="footer"><a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a></div>
+
+        <div class="align-center">
+          <br>
+          <!--
+          <button id="load-graph-data-button" class="control-button">LOAD</button>
+          <button id="save-graph-data-button" class="control-button">SAVE</button>
+          -->
+          <form method="POST" action="/api/clearLiftData" enctype="multipart/form-data">
+            <input id="clear-graph-data-button" type="submit" class="control-button submit-button"  value="CLEAR"/>
+            <button id="export-graph-data-button" class="control-button">EXPORT</button> 
+          </form>
+          <!-- Export button fires javascript function to click link below forcing the download-->
+          <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
+        </div>
+
+
 
     </div>
-    
+
+
 
     <!-- configuration tab -->
     <div id="configuration" class="tabcontent tabcontentConfig">
@@ -256,6 +470,7 @@
         <p style="text-align:center"><button id="file-manager-button" class="button">Files</button> <button id="info-button" class="button">Info</button> <button id="support-button" class="button" onclick="window.open('https://github.com/DeeEmm/DIY-Flow-Bench/wiki','_blank')">Support</button> <button id="restart-button" class="button" >Reboot</button></p>       
         <br>
         <form method="POST" action="/api/saveconfig">
+          <h2>System Settings</h2>
           <h3>WiFi Info</h3>        
           <div class="config-row tooltip"><label class="config-label">WiFi SSID:</label>&nbsp;<input type="text" id="CONF_WIFI_SSID"  name="CONF_WIFI_SSID" value="~CONF_WIFI_SSID~" class="config-text" ><span class="tooltiptext">The name of your WiFi network</span></div>
           <div class="config-row tooltip"><label class="config-label">WiFi Password:</label>&nbsp;<input type="text" id="CONF_WIFI_PSWD" name="CONF_WIFI_PSWD" value="~CONF_WIFI_PSWD~" class="config-text"><span class="tooltiptext">Your WiFi Password</span></div>
@@ -275,44 +490,57 @@
           <div class="config-row tooltip"><label class="config-label">Cyclical Average Buffer:</label>&nbsp;<input type="text" id="CONF_CYCLIC_AVERAGE_BUFFER" name="CONF_CYCLIC_AVERAGE_BUFFER" value="~CONF_CYCLIC_AVERAGE_BUFFER~" class="config-text"><span class="tooltiptext">Mean buffer size - Used for smoothing results.</span></div>
           <br>
           <h3>Bench Settings</h3>
+          <div class="config-row tooltip"><label class="config-label">Bench Type:</label><span>~BENCH_TYPE_DROPDOWN~</span><span class="tooltiptext">Select bench type</span></div>
+          <div class="config-row tooltip"><label class="config-label">MAF Housing Diameter:</label>&nbsp;<input type="text" id="CONF_MAF_HOUSING_DIAMETER" name="CONF_MAF_HOUSING_DIAMETER" value="~CONF_MAF_HOUSING_DIAMETER~" class="config-text"><span class="tooltiptext">Diameter of MAF Housing. (Leave as zero to use standard housing diameter)</span></div>
           <div class="config-row tooltip"><label class="config-label">Refresh Rate:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="~CONF_REFRESH_RATE~" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
           <div class="config-row tooltip"><label class="config-label">Conversion Depression:</label>&nbsp;<input type="text" id="ADJ_FLOW_DEPRESSION" name="ADJ_FLOW_DEPRESSION" value="~ADJ_FLOW_DEPRESSION~" class="config-text"><span class="tooltiptext">Bench depression used for adjusted flow calcs</span></div>
           <div class="config-row tooltip"><label class="config-label">Temperature Unit:</label><span>~TEMPERATURE_DROPDOWN~</span><span class="tooltiptext">Display unit of temperature</span></div>
+          <div class="config-row tooltip"><label class="config-label">Valve Lift Interval:</label>&nbsp;<input type="text" id="VALVE_LIFT_INTERVAL" name="VALVE_LIFT_INTERVAL" value="~VALVE_LIFT_INTERVAL~" class="config-text"><span class="tooltiptext">Distance between valve lift data points</span></div>
           <br>
           <h3>Calibration Settings</h3>
           <div class="config-row tooltip"><label class="config-label">Calibration Orifice Flow Rate:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="~CONF_CAL_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice in cfm</span></div>
           <div class="config-row tooltip"><label class="config-label">Calibration Orifice Test Pressure:</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="~CONF_CAL_REF_PRESS~" class="config-text"><span class="tooltiptext">Reference depression of calibration orifice in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Leak Test Tolerance:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_TOLERANCE" name="CONF_LEAK_TEST_TOLERANCE" value="~CONF_LEAK_TEST_TOLERANCE~" class="config-text"><span class="tooltiptext">Maximum allowable deviation in cfm</span></div>
+          <div class="config-row tooltip"><label class="config-label">Leak Test Tolerance:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_TOLERANCE" name="CONF_LEAK_TEST_TOLERANCE" value="~CONF_LEAK_TEST_TOLERANCE~" class="config-text"><span class="tooltiptext">Maximum allowable deviation in depression</span></div>
           <div class="config-row tooltip"><label class="config-label">Leak Test Threshold:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_THRESHOLD" name="CONF_LEAK_TEST_THRESHOLD" value="~CONF_LEAK_TEST_THRESHOLD~" class="config-text"><span class="tooltiptext">Depression value above which leak test activates</span></div>
           <br>
-          <h3>Orifice Data</h3>
-          <div class="config-row tooltip"><label class="config-label">Orifice #1 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE1_FLOW_RATE" name="ORIFICE1_FLOW_RATE" value="~ORIFICE1_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #1 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #1 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE1_TEST_PRESSURE" name="ORIFICE1_TEST_PRESSURE" value="~ORIFICE1_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #1 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #2 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE2_FLOW_RATE" name="ORIFICE2_FLOW_RATE" value="~ORIFICE2_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #2 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #2 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE2_TEST_PRESSURE" name="ORIFICE2_TEST_PRESSURE" value="~ORIFICE2_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #2 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #3 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE3_FLOW_RATE" name="ORIFICE3_FLOW_RATE" value="~ORIFICE3_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #3 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #3 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE3_TEST_PRESSURE" name="ORIFICE3_TEST_PRESSURE" value="~ORIFICE3_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #3 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #4 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE4_FLOW_RATE" name="ORIFICE4_FLOW_RATE" value="~ORIFICE4_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #4 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #4 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE4_TEST_PRESSURE" name="ORIFICE4_TEST_PRESSURE" value="~ORIFICE4_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #4 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #5 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE5_FLOW_RATE" name="ORIFICE5_FLOW_RATE" value="~ORIFICE5_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #5 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #5 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE5_TEST_PRESSURE" name="ORIFICE5_TEST_PRESSURE" value="~ORIFICE5_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #5 in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #6 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE6_FLOW_RATE" name="ORIFICE6_FLOW_RATE" value="~ORIFICE6_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #6 in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Orifice #6 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE6_TEST_PRESSURE" name="ORIFICE6_TEST_PRESSURE" value="~ORIFICE6_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #6 in in/wg</span></div>
-          <br>
+          <div id="orificeData">
+            <h3>Orifice Data</h3>
+            <div class="config-row tooltip"><label class="config-label">Orifice #1 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE1_FLOW_RATE" name="ORIFICE1_FLOW_RATE" value="~ORIFICE1_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #1 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #1 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE1_TEST_PRESSURE" name="ORIFICE1_TEST_PRESSURE" value="~ORIFICE1_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #1 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #2 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE2_FLOW_RATE" name="ORIFICE2_FLOW_RATE" value="~ORIFICE2_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #2 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #2 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE2_TEST_PRESSURE" name="ORIFICE2_TEST_PRESSURE" value="~ORIFICE2_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #2 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #3 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE3_FLOW_RATE" name="ORIFICE3_FLOW_RATE" value="~ORIFICE3_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #3 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #3 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE3_TEST_PRESSURE" name="ORIFICE3_TEST_PRESSURE" value="~ORIFICE3_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #3 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #4 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE4_FLOW_RATE" name="ORIFICE4_FLOW_RATE" value="~ORIFICE4_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #4 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #4 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE4_TEST_PRESSURE" name="ORIFICE4_TEST_PRESSURE" value="~ORIFICE4_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #4 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #5 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE5_FLOW_RATE" name="ORIFICE5_FLOW_RATE" value="~ORIFICE5_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #5 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #5 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE5_TEST_PRESSURE" name="ORIFICE5_TEST_PRESSURE" value="~ORIFICE5_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #5 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #6 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE6_FLOW_RATE" name="ORIFICE6_FLOW_RATE" value="~ORIFICE6_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #6 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #6 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE6_TEST_PRESSURE" name="ORIFICE6_TEST_PRESSURE" value="~ORIFICE6_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #6 in in/wg</span></div>
+            <br>
+          </div>
           <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
+          <br>
+          <br>
         </form>
         <br>
         <br>
-        <h3>Calibration Data</h3>
+        <h2>Calibration Data</h2>
         <div class="config-row tooltip"><label class="config-label">Calibration Offset:</label>&nbsp;<input disabled="disabled" type="text" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
-        <div class="config-row tooltip"><label class="config-label">Leak Test Vac Value:</label>&nbsp;<input disabled="disabled" type="text" id="LEAK_CAL_VAC_VAL" name="LEAK_CAL_VAC_VAL" value="~LEAK_CAL_VAC_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
-        <div class="config-row tooltip"><label class="config-label">Leak Test Pressure Value:</label>&nbsp;<input disabled="disabled" type="text" id="LEAK_CAL_PRESS_VAL" name="LEAK_CAL_PRESS_VAL" value="~LEAK_CAL_PRESS_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
+        <div class="config-row tooltip"><label class="config-label">Vac Leak Test Value:</label>&nbsp;<input disabled="disabled" type="text" id="LEAK_CAL_VAC_VAL" name="LEAK_CAL_VAC_VAL" value="~LEAK_CAL_VAC_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
+        <div class="config-row tooltip"><label class="config-label">Pressure Leak Test Value:</label>&nbsp;<input disabled="disabled" type="text" id="LEAK_CAL_PRESS_VAL" name="LEAK_CAL_PRESS_VAL" value="~LEAK_CAL_PRESS_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
 
         <br>
         <div class="float-right"><button id="calibrate-button" class="button">Calibrate Flow Offset</button><button id="leak-cal-button" class="button">Calibrate Leak Test</button></div>
         <br>
       </div>                    
     </div>
+  </div>
+
+
+    <!-- Footer -->
+    <div id="footer"><a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a></div>
+
 
     <script src="/javascript.js"></script>
   </BODY>

@@ -1,8 +1,8 @@
 /***********************************************************
 * DIY-Flow-Bench style.css
-* 
-* TODO: Look at implimenting flex / flex-wrap - https://polypane.app/blog/4-css-layouts-without-using-media-queries/
+* CSS code for DIY-Flow-bench project: diyflowbench.com
 ***/
+
 
 /* Set height of body and the document to 100 percent of viewport height to enable "full page tabs" */
 body, html {
@@ -15,8 +15,6 @@ body, html {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='562' height='468.3' viewBox='0 0 1080 900'%3E%3Cg fill-opacity='0.03'%3E%3Cpolygon fill='%23444' points='90 150 0 300 180 300'/%3E%3Cpolygon points='90 150 180 0 0 0'/%3E%3Cpolygon fill='%23AAA' points='270 150 360 0 180 0'/%3E%3Cpolygon fill='%23DDD' points='450 150 360 300 540 300'/%3E%3Cpolygon fill='%23999' points='450 150 540 0 360 0'/%3E%3Cpolygon points='630 150 540 300 720 300'/%3E%3Cpolygon fill='%23DDD' points='630 150 720 0 540 0'/%3E%3Cpolygon fill='%23444' points='810 150 720 300 900 300'/%3E%3Cpolygon fill='%23FFF' points='810 150 900 0 720 0'/%3E%3Cpolygon fill='%23DDD' points='990 150 900 300 1080 300'/%3E%3Cpolygon fill='%23444' points='990 150 1080 0 900 0'/%3E%3Cpolygon fill='%23DDD' points='90 450 0 600 180 600'/%3E%3Cpolygon points='90 450 180 300 0 300'/%3E%3Cpolygon fill='%23666' points='270 450 180 600 360 600'/%3E%3Cpolygon fill='%23AAA' points='270 450 360 300 180 300'/%3E%3Cpolygon fill='%23DDD' points='450 450 360 600 540 600'/%3E%3Cpolygon fill='%23999' points='450 450 540 300 360 300'/%3E%3Cpolygon fill='%23999' points='630 450 540 600 720 600'/%3E%3Cpolygon fill='%23FFF' points='630 450 720 300 540 300'/%3E%3Cpolygon points='810 450 720 600 900 600'/%3E%3Cpolygon fill='%23DDD' points='810 450 900 300 720 300'/%3E%3Cpolygon fill='%23AAA' points='990 450 900 600 1080 600'/%3E%3Cpolygon fill='%23444' points='990 450 1080 300 900 300'/%3E%3Cpolygon fill='%23222' points='90 750 0 900 180 900'/%3E%3Cpolygon points='270 750 180 900 360 900'/%3E%3Cpolygon fill='%23DDD' points='270 750 360 600 180 600'/%3E%3Cpolygon points='450 750 540 600 360 600'/%3E%3Cpolygon points='630 750 540 900 720 900'/%3E%3Cpolygon fill='%23444' points='630 750 720 600 540 600'/%3E%3Cpolygon fill='%23AAA' points='810 750 720 900 900 900'/%3E%3Cpolygon fill='%23666' points='810 750 900 600 720 600'/%3E%3Cpolygon fill='%23999' points='990 750 900 900 1080 900'/%3E%3Cpolygon fill='%23999' points='180 0 90 150 270 150'/%3E%3Cpolygon fill='%23444' points='360 0 270 150 450 150'/%3E%3Cpolygon fill='%23FFF' points='540 0 450 150 630 150'/%3E%3Cpolygon points='900 0 810 150 990 150'/%3E%3Cpolygon fill='%23222' points='0 300 -90 450 90 450'/%3E%3Cpolygon fill='%23FFF' points='0 300 90 150 -90 150'/%3E%3Cpolygon fill='%23FFF' points='180 300 90 450 270 450'/%3E%3Cpolygon fill='%23666' points='180 300 270 150 90 150'/%3E%3Cpolygon fill='%23222' points='360 300 270 450 450 450'/%3E%3Cpolygon fill='%23FFF' points='360 300 450 150 270 150'/%3E%3Cpolygon fill='%23444' points='540 300 450 450 630 450'/%3E%3Cpolygon fill='%23222' points='540 300 630 150 450 150'/%3E%3Cpolygon fill='%23AAA' points='720 300 630 450 810 450'/%3E%3Cpolygon fill='%23666' points='720 300 810 150 630 150'/%3E%3Cpolygon fill='%23FFF' points='900 300 810 450 990 450'/%3E%3Cpolygon fill='%23999' points='900 300 990 150 810 150'/%3E%3Cpolygon points='0 600 -90 750 90 750'/%3E%3Cpolygon fill='%23666' points='0 600 90 450 -90 450'/%3E%3Cpolygon fill='%23AAA' points='180 600 90 750 270 750'/%3E%3Cpolygon fill='%23444' points='180 600 270 450 90 450'/%3E%3Cpolygon fill='%23444' points='360 600 270 750 450 750'/%3E%3Cpolygon fill='%23999' points='360 600 450 450 270 450'/%3E%3Cpolygon fill='%23666' points='540 600 630 450 450 450'/%3E%3Cpolygon fill='%23222' points='720 600 630 750 810 750'/%3E%3Cpolygon fill='%23FFF' points='900 600 810 750 990 750'/%3E%3Cpolygon fill='%23222' points='900 600 990 450 810 450'/%3E%3Cpolygon fill='%23DDD' points='0 900 90 750 -90 750'/%3E%3Cpolygon fill='%23444' points='180 900 270 750 90 750'/%3E%3Cpolygon fill='%23FFF' points='360 900 450 750 270 750'/%3E%3Cpolygon fill='%23AAA' points='540 900 630 750 450 750'/%3E%3Cpolygon fill='%23FFF' points='720 900 810 750 630 750'/%3E%3Cpolygon fill='%23222' points='900 900 990 750 810 750'/%3E%3Cpolygon fill='%23222' points='1080 300 990 450 1170 450'/%3E%3Cpolygon fill='%23FFF' points='1080 300 1170 150 990 150'/%3E%3Cpolygon points='1080 600 990 750 1170 750'/%3E%3Cpolygon fill='%23666' points='1080 600 1170 450 990 450'/%3E%3Cpolygon fill='%23DDD' points='1080 900 1170 750 990 750'/%3E%3C/g%3E%3C/svg%3E");  
 }
 
-
-
 /* Set tabs to 50 percent of viewport width */
 .tablink {
   background-color: #555;
@@ -27,7 +25,7 @@ body, html {
   cursor: pointer;
   padding: 18px 16px;
   font-size: 22px;
-  width: 50vw;
+  width: 33.3333%;
 }
 
 .tablink:active {
@@ -38,16 +36,23 @@ body, html {
   background-color: #777;
 }
 
+#tabcontainer {
+  padding: 100px 20px 20px 20px;
+
+}
+
 /* Style the tab content (and add height:100% of viewport height for full page content) */
 .tabcontentMain {
-  padding: 100px 20px;
-  height: 100vh;
+  display:block;
 }
 
 .tabcontentConfig {
   display: none;
-  padding: 100px 20px;
-  height: 100vh;
+  margin-bottom: 60px;
+}
+
+.tabcontentData {
+  display: none;
 }
 
 #Home {background-color: white;}
@@ -70,10 +75,21 @@ html {
 .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover {
   color:white;
   text-decoration: none;
+  font-size: 44px;
+  font-weight: bold;
 }
 
-h1{
-  color: #FFF;
+h1 {
+  font-size: 30px;
+}
+
+h2 {
+	font-size: 26px;
+	margin-bottom: 14px;
+}
+
+h3 {
+  font-size: 20px;
 }
 
 p{
@@ -146,22 +162,31 @@ hr {
 }
 
 
+#tile-pdiff {
+  display: none;
+  cursor: pointer;
+}
+
+#tile-pref {
+  cursor: pointer;
+}
+
 #flow-tile {
   cursor: pointer;
 }
 
 #aflow-tile {
-  display:none;
+  display: none;
   cursor: pointer;
 }
 
-#tile-pdiff {
-  display:none;
-  cursor: pointer;
-}
 
 #tile-pitot {
-  display:block;
+  cursor: pointer;
+}
+
+#tile-swirl {
+  display:none;
   cursor: pointer;
 }
 
@@ -262,18 +287,32 @@ hr {
 }
 
 #record-button {
-  background-color: #fa2e04;
+  background-color: #fa7b04;
 }
 
-#save-button {
-  background-color: #44b112;
+#clear-graph-data-button {
+  background-color: #fa7b04;
+}
+
+#export-graph-data-button {
+  background-color: #2ca909;
+}
+
+#load-graph-data-button {
+  background-color: #125ab1;
+}
+
+#save-graph-data-button {
+  background-color: #fa7b04;
 }
 
 #calibrate-button{
   background-color: #fa2e04;
 }
 
-
+#clear-message-button {
+  background-color: #999;
+}
 
 #info-button, #support-button,  #file-manager-button, #restart-button {
   width:120px;
@@ -373,7 +412,7 @@ input[type="file"] {
   
 
 /* The Close Button */
-.closeInfoModalButton, .closeFileModalButton {
+.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton {
   color: #aaa;
   float: right;
   font-size: 22px;
@@ -384,7 +423,13 @@ input[type="file"] {
 .closeFileModalButton:hover, 
 .closeFileModalButton:focus,
 .closeInfoModalButton:hover,
-.closeInfoModalButton:focus {
+.closeInfoModalButton:focus,
+.closeCaptureLiftDataModalButton:hover,
+.closeCaptureLiftDataModalButton:focus,
+.closeSaveGraphDataModalButton:hover,
+.closeSaveGraphDataModalButton:focus,
+.closeLoadGraphDataModalButton:hover,
+.closeLoadGraphDataModalButton:focus {
   color: black;
   text-decoration: none;
   cursor: pointer;
@@ -447,8 +492,12 @@ input[type="file"] {
 }
 
 svg.graph {
-    height: 500px;
-    width: 800px;
+    height: 600px !important;
+    width: 750px !important;
+    background-color: #fff;
+    padding-top: 100px;
+    box-shadow: 2px 2px 12px 1px #666;
+    stroke-linejoin: round;
 }
 
 svg.graph .grid {
@@ -458,7 +507,7 @@ svg.graph .grid {
 }
 
 svg.graph .points {
-  stroke: white;
+  /*stroke: white;*/
   stroke-width: 3;
 }
 svg.graph .first_set {
@@ -486,6 +535,35 @@ svg.graph .labels.x-labels {
 svg.graph .labels.y-labels {
   text-anchor: end;
 }
+
+
+
+ .hide {
+  display: none;
+}
+    
+.dataCircle:hover + .hide {
+  display: block;
+  z-index: 999;
+}
+
+svg .dataCircle:hover {
+  r: 6;
+}
+
+.dataCircle {
+  position:relative;
+  opacity: 0.25;
+} 
+
+.dataValue {
+  text-anchor: middle;
+  font-size: 14px;
+  color: black;
+  transition: font-size 0.5s, opacity 0.3s;    
+}
+
+
 
 
 
@@ -528,10 +606,10 @@ svg.graph .labels.y-labels {
 .switch-field label {
 	background-color: #989898;
 	color: #FFF;
-	font-size: 22px;
+	font-size: 20px;
 	line-height: 1;
 	text-align: center;
-	padding: 8px 16px;
+	padding: 8px 8px;
 	margin-right: -1px;
 	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
 	transition: all 0.1s ease-in-out;
@@ -565,10 +643,7 @@ svg.graph .labels.y-labels {
 	padding: 16px;
 }
 
-h2 {
-	font-size: 18px;
-	margin-bottom: 8px;
-}
+
 
 #orifice-data {
   font-size: 22px;

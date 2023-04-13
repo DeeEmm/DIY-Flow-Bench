@@ -61,6 +61,10 @@
     // SENSORS
     #define SPEED_SENSOR_PIN            2                       // turbine / rotor speed for turbo / blower flow bench 
 
+    // SWIRL ENCODER
+    #define SWIRL_ENCODER_PIN_A         2
+    #define SWIRL_ENCODER_PIN_B         4
+
     // ORIFICE DETECTION                                                                                    
     #define ORIFICE_BCD_BIT1_PIN        34                                       
     #define ORIFICE_BCD_BIT2_PIN        36                                           
@@ -80,15 +84,15 @@
     // COMMS    
     #define SERIAL0_TX_PIN              1                       // API
     #define SERIAL0_RX_PIN              3                       // API
-    #define SERIAL2_TX_PIN              16                      // GAUGE PROTOCOL
-    #define SERIAL2_RX_PIN              17                      // GAUGE PROTOCOL
+    #define SERIAL2_TX_PIN              16                      // GAUGE PROTOCOL CLOCK
+    #define SERIAL2_RX_PIN              17                      // GAUGE PROTOCOL DATA
     #define SDA_PIN                     21                      // BME280 etc
     #define SCL_PIN                     22                      // BME280 etc
 
-    #define SD_CS                       5
-    #define SD_MOSI                     23                 
-    #define SD_MISO                     19             
-    #define SD_SCK                      18                   
+    #define SD_CS_PIN                   5
+    #define SD_MOSI_PIN                 23                 
+    #define SD_MISO_PIN                 19             
+    #define SD_SCK_PIN                  18                   
 
 
     #define WEMOS_SPARE_PIN_1           4                       // NOTE cannot be used for analog                 
@@ -137,7 +141,11 @@
     // SENSORS
     #define SPEED_SENSOR_PIN            5                      // NOTE Also used by SD Card  // turbine / rotor speed for turbo / blower flow bench 
 
-    // ORIFICE DETECTION                                                                                    
+     // SWIRL ENCODER
+    #define SWIRL_ENCODER_PIN_A         99
+    #define SWIRL_ENCODER_PIN_B         99
+
+   // ORIFICE DETECTION                                                                                    
     #define ORIFICE_BCD_BIT1_PIN        34                                       
     #define ORIFICE_BCD_BIT2_PIN        36                                           
     #define ORIFICE_BCD_BIT3_PIN        39                         
@@ -156,16 +164,16 @@
     // COMMS    
     #define SERIAL0_TX_PIN              1                       // API
     #define SERIAL0_RX_PIN              3                       // API
-    #define SERIAL2_TX_PIN              16                      // GAUGE PROTOCOL
-    #define SERIAL2_RX_PIN              17                      // GAUGE PROTOCOL
+    #define SERIAL2_TX_PIN              16                      // GAUGE PROTOCOL CLOCK
+    #define SERIAL2_RX_PIN              17                      // GAUGE PROTOCOL DATA
     #define SDA_PIN                     21                      // BME280 etc
     #define SCL_PIN                     22                      // BME280 etc
 
     // SD Card
-    #define SD_CS                       5
-    #define SD_MOSI                     23                 
-    #define SD_MISO                     19             
-    #define SD_SCK                      18                   
+    #define SD_CS_PIN                   5
+    #define SD_MOSI_PIN                 23                 
+    #define SD_MISO_PIN                 19             
+    #define SD_SCK_PIN                  18                   
 
     
     // NOTE: Pins 15/32/33 are only available on Wemos D1 R32
@@ -206,6 +214,10 @@
     // SENSORS
     #define SPEED_SENSOR_PIN            4                       // turbine / rotor speed for turbo / blower flow bench
 
+    // SWIRL ENCODER
+    #define SWIRL_ENCODER_PIN_A         99
+    #define SWIRL_ENCODER_PIN_B         99
+
     // ORIFICE DETECTION                                                                                    
     #define ORIFICE_BCD_BIT1_PIN        33                      
     #define ORIFICE_BCD_BIT2_PIN        34                      
@@ -235,16 +247,16 @@
     // COMMS    
     #define SERIAL0_TX_PIN              1                      // API
     #define SERIAL0_RX_PIN              3                      // API
-    #define SERIAL2_TX_PIN              15                     // GAUGE PROTOCOL
-    #define SERIAL2_RX_PIN              14                     // GAUGE PROTOCOL
+    #define SERIAL2_TX_PIN              15                     // GAUGE PROTOCOL CLOCK
+    #define SERIAL2_RX_PIN              14                     // GAUGE PROTOCOL DATA
     #define SDA_PIN                     21                     // BME280 etc
     #define SCL_PIN                     22                     // BME280 etc
     
     // SD Card
-    #define SD_CS                       5
-    #define SD_MOSI                     23
-    #define SD_MISO                     19
-    #define SD_SCK                      18
+    #define SD_CS_PIN                   5
+    #define SD_MOSI_PIN                 23                 
+    #define SD_MISO_PIN                 19             
+    #define SD_SCK_PIN                  18                   
 
 #endif
 
@@ -274,7 +286,11 @@
     // SENSORS
     #define SPEED_SENSOR_PIN            4                       // turbine / rotor speed for turbo / blower flow bench
 
-    // ORIFICE DETECTION                                                                                    
+     // SWIRL ENCODER
+    #define SWIRL_ENCODER_PIN_A         99
+    #define SWIRL_ENCODER_PIN_B         99
+
+   // ORIFICE DETECTION                                                                                    
     #define ORIFICE_BCD_BIT1_PIN        33                      
     #define ORIFICE_BCD_BIT2_PIN        34                      
     #define ORIFICE_BCD_BIT3_PIN        35     
@@ -303,15 +319,15 @@
     // COMMS    
     #define SERIAL0_TX_PIN              1                      // API
     #define SERIAL0_RX_PIN              3                      // API
-    #define SERIAL2_TX_PIN              15                     // GAUGE PROTOCOL
-    #define SERIAL2_RX_PIN              14                     // GAUGE PROTOCOL
+    #define SERIAL2_TX_PIN              15                     // GAUGE PROTOCOL CLOCK
+    #define SERIAL2_RX_PIN              14                     // GAUGE PROTOCOL DATA
     #define SDA_PIN                     21                     // BME280 etc
     #define SCL_PIN                     22                     // BME280 etc
     
-    #define SD_CS                       5
-    #define SD_MOSI                     23
-    #define SD_MISO                     19
-    #define SD_SCK                      18
+    #define SD_CS_PIN                   5
+    #define SD_MOSI_PIN                 23                 
+    #define SD_MISO_PIN                 19             
+    #define SD_SCK_PIN                  18                   
 
 #endif
 
@@ -326,6 +342,7 @@
  * Uses Officiel Expressif ESP32 WROVER Development KIT
  * Do not use configuration on other boards as pin mapping is modded for debugging
  * NOTE: GPIO 12,13,14,15 are reserved for JTAG interface and so are unused in this map
+ * NOTE: 
  ***/
 #ifdef ESP32_WROVER_KIT
 
@@ -354,7 +371,11 @@
     // SENSORS
     #define SPEED_SENSOR_PIN            2                       // turbine / rotor speed for turbo / blower flow bench 
 
-    // ORIFICE DETECTION                                                                                    
+     // SWIRL ENCODER
+    #define SWIRL_ENCODER_PIN_A         99
+    #define SWIRL_ENCODER_PIN_B         99
+
+   // ORIFICE DETECTION                                                                                    
     #define ORIFICE_BCD_BIT1_PIN        34                                       
     #define ORIFICE_BCD_BIT2_PIN        36                                           
     #define ORIFICE_BCD_BIT3_PIN        39                         
@@ -373,15 +394,15 @@
     // COMMS    
     #define SERIAL0_TX_PIN              1                       // API
     #define SERIAL0_RX_PIN              3                       // API
-    #define SERIAL2_TX_PIN              16                      // GAUGE PROTOCOL
-    #define SERIAL2_RX_PIN              17                      // GAUGE PROTOCOL
+    #define SERIAL2_TX_PIN              16                      // GAUGE PROTOCOL CLOCK
+    #define SERIAL2_RX_PIN              17                      // GAUGE PROTOCOL DATA
     #define SDA_PIN                     21                      // BME280 etc
     #define SCL_PIN                     22                      // BME280 etc
 
-    #define SD_CS                       5
-    #define SD_MOSI                     23                 
-    #define SD_MISO                     19             
-    #define SD_SCK                      18                   
+    #define SD_CS_PIN                   5
+    #define SD_MOSI_PIN                 23                 
+    #define SD_MISO_PIN                 19             
+    #define SD_SCK_PIN                  18                   
 
 
     #define WEMOS_SPARE_PIN_1           4                       // NOTE cannot be used for analog      

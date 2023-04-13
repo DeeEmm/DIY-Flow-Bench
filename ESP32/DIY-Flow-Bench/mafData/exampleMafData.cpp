@@ -9,6 +9,7 @@
  * Status: Unvalidated
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
+ * Data Source: DIYFB
 ***/
 #ifndef MAFDATACLASS
 #define MAFDATACLASS
@@ -61,6 +62,30 @@ int Maf::mafUnits() {
 }
 
 
+/***********************************************************
+ * @brief MAF scaling
+ * 
+ * @note: scaling factor for MAF Data:
+ ***/
+double Maf::mafScaling() {
+    return 0.1;
+}
+
+
+
+/***********************************************************
+ * @brief Original MAF Diameter in mm
+ * 
+ * @note Used to calculate MAF transfer function to transpose 
+ * flow rates for different pipe diameters
+ * @note diamter should be stock diameter that flow data relates to
+ ***/
+int Maf::mafDiameter() {
+    return 100;
+}
+
+
+
 
 /***********************************************************
 * @brief MAF Data
@@ -83,6 +108,7 @@ int Maf::mafUnits() {
 * NOTE: that there should be a zero value!!!!
 *
 ***/
+
 
 
 

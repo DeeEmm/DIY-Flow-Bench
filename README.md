@@ -13,7 +13,9 @@ General Version V2.0-RC.X
 [Download the latest official release](https://github.com/DeeEmm/DIY-Flow-Bench/releases)
 
 
-NOTE: This project is still in active development and is currently at Release Candidate stage. We are working towards a stable software and hardware release. If you are interested in contributing with testing please head over to our [Discord](https://discord.gg/eAbktJj) channel or [discussion forums](https://github.com/DeeEmm/DIY-Flow-Bench/discussions). 
+NOTE: This project is still in active development and is currently at Release Candidate stage. We are working towards a stable software and hardware release. 
+
+If you are interested in contributing with testing please head over to our [discussion forums](https://github.com/DeeEmm/DIY-Flow-Bench/discussions) or [Discord](https://discord.gg/eAbktJj) channel.
 
 
 ## What is a Flow Bench?
@@ -30,7 +32,19 @@ Modern flow benches use sensors to measure flow and reference pressures and then
 ## What is the DIY Flow Bench Project?
 ###
 
-The DIY Flow Bench project (DIYFB) is a professional quality flow bench controller that produces results comparable with, and in some cases exceeding commercial grade systems. It uses high grade sensors and a WiFi enabled ESP32 microprocessor to display flow data and control bench operation via a web browser on any web enabled device. 
+The DIY Flow Bench project (DIYFB) is a professional quality flow bench controller that produces results comparable with, and in some cases exceeding commercial grade systems.
+
+The project comprises of two distinct aspects.
+
+
+**Software**
+
+The software code is developed in C++ and runs on an ESP32 microprocessor. The ESP processes sensor data and uses the results to calculate volumetric flow data, which is then displayed via web browser on any web enabled device.
+
+**Hardware**
+
+The hardware aspect of the project comprises of a PCB (commonly known as a 'shield') which connects to the ESP processor, The PCB includes environmental sensors to measure temperature, humidity and barometric pressure along with pressure sensors to measure the reference depression from the vacuum source. It also interfaces to a MAF sensor or additional differential pressure sensors. This sensor data allows the software to accurately measure and calculate volumetric flow.
+
 
 The project aims to bring professional grade results to the DIYer without the price tag associated with owning a professional bench.
 
@@ -77,7 +91,7 @@ Documentation is provided for installation, configuration and use in the [WIKI](
 
 If you get stuck, feel free to create a [discussion](https://github.com/DeeEmm/DIY-Flow-Bench/discussions/) in the support forum, or see if anyone is available over on the [Discord](https://discord.gg/eAbktJj) channel.
 
-If you find an issue, or have a feature request, please [raise an issue](https://github.com/DeeEmm/DIY-Flow-Bench/issues)
+If you find a bug, or have a feature request, please [raise an issue](https://github.com/DeeEmm/DIY-Flow-Bench/issues)
 
 
 ## License
