@@ -228,6 +228,7 @@ double Calculations::convertRelativeHumidity(double relativeHumidity, int units)
  * https://www.omnicalculator.com/physics/air-density
  * 
  ***/
+// DEPRECATED
 double Calculations::calculateSaturationVaporPressure() {
 
 extern struct SensorData sensorVal;
@@ -253,6 +254,7 @@ extern struct SensorData sensorVal;
  * @example P(kPa) = 0.61094 * EXP((17.625 * Temp(C) / Temp(C) + 243.04)
  * 
  ***/
+// DEPRECATED
 double Calculations::calculateVaporPressure(int units) {
 
   extern struct SensorData sensorVal;
@@ -300,6 +302,7 @@ double Calculations::calculateVaporPressure(int units) {
  * T = Temperature 
  * 
  ***/
+// DEPRECATED
 double Calculations::calculateAbsoluteHumidity() {
 
   extern struct SensorData sensorVal;
@@ -328,6 +331,7 @@ double Calculations::calculateAbsoluteHumidity() {
  * SG = 1-(0.378 * RH(%) * vaporPressure(psia)) / baroPressure(psia)
  * 
  ***/
+// DEPRECATED
 double Calculations::calculateSpecificGravity() {
 
   extern struct SensorData sensorVal;
@@ -365,6 +369,7 @@ double Calculations::calculateSpecificGravity() {
  * 
  * 
  ***/
+// DEPRECATED
 double Calculations::calculateAirDensity() {
 
   extern struct SensorData sensorVal;
@@ -436,18 +441,12 @@ double Calculations::convertMassFlowUnits(double refFlow, int unitsOut, int unit
 
 
 /***********************************************************
- * @brief CONVERT KGH TO CFM
- * @NOTE simplified conversion
+ * @brief CONVERT FLOW
+ * @details Simplified conversion from KG/H to CFM
  * 
- * From Conversation https://github.com/DeeEmm/DIY-Flow-Bench/discussions/138#discussioncomment-5590135
- * and.. https://www.omnicalculator.com/physics/air-density
- * 
- * ρ = p / (R * T)
- * where
- * ρ = air density (in kg/m³)
- * p = air pressure (in Pa or N/m²)
- * R = specific gas constant for dry air (287.058 J/(kg·K)) ( not calculating actual value with humidity from bmp280)
- * T = air temperature (in K)
+ * From Conversation #138 https://github.com/DeeEmm/DIY-Flow-Bench/discussions/138#discussioncomment-5590135
+ * https://www.engineeringtoolbox.com/density-air-d_680.html
+ * https://www.omnicalculator.com/physics/air-density
  * 
  ***/
 double Calculations::convertFlow(double massFlowKGH) {
@@ -461,7 +460,7 @@ double Calculations::convertFlow(double massFlowKGH) {
   double flowM3H = 0.0; // m3/hr
   double flowCFM = 0.0;
 
-  // TODO validate reference pressure adjustment - do we add it or subtract it????????
+  // TODO validate reference pressure adjustment - do we add it or subtract it? Should be baro pressure less vac amount
   double refPressurePascals = this->convertPressure(sensorVal.BaroKPA, PASCALS) - this->convertPressure(sensorVal.PRefKPA, PASCALS) ;
   double tempInKelvin = this->convertTemperature(sensorVal.TempDegC, KELVIN, DEGC);
 
@@ -504,6 +503,7 @@ double Calculations::convertFlow(double massFlowKGH) {
  * 
  * 
  ***/
+// DEPRECATED
 double Calculations::convertKGHtoCFM(double massFlowKGH) {
 
   extern struct SensorData sensorVal;
@@ -546,6 +546,7 @@ double Calculations::convertKGHtoCFM(double massFlowKGH) {
  * @ref https://www.pdblowers.com/tech-talk/volume-and-mass-flow-calculations-for-gases/
  * @todo review !!!!!!
  ***/
+// DEPRECATED
 double Calculations::convertMassFlowToVolumetric(double massFlowKgh) {
   
   extern struct SensorData sensorVal;
