@@ -6,9 +6,9 @@
       <style>
 /***********************************************************
 * DIY-Flow-Bench style.css
-* 
-* TODO: Look at implimenting flex / flex-wrap - https://polypane.app/blog/4-css-layouts-without-using-media-queries/
+* CSS code for DIY-Flow-bench project: diyflowbench.com
 ***/
+
 
 /* Set height of body and the document to 100 percent of viewport height to enable "full page tabs" */
 body, html {
@@ -20,8 +20,6 @@ body, html {
   background-color: #FFFFFF;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='562' height='468.3' viewBox='0 0 1080 900'%3E%3Cg fill-opacity='0.03'%3E%3Cpolygon fill='%23444' points='90 150 0 300 180 300'/%3E%3Cpolygon points='90 150 180 0 0 0'/%3E%3Cpolygon fill='%23AAA' points='270 150 360 0 180 0'/%3E%3Cpolygon fill='%23DDD' points='450 150 360 300 540 300'/%3E%3Cpolygon fill='%23999' points='450 150 540 0 360 0'/%3E%3Cpolygon points='630 150 540 300 720 300'/%3E%3Cpolygon fill='%23DDD' points='630 150 720 0 540 0'/%3E%3Cpolygon fill='%23444' points='810 150 720 300 900 300'/%3E%3Cpolygon fill='%23FFF' points='810 150 900 0 720 0'/%3E%3Cpolygon fill='%23DDD' points='990 150 900 300 1080 300'/%3E%3Cpolygon fill='%23444' points='990 150 1080 0 900 0'/%3E%3Cpolygon fill='%23DDD' points='90 450 0 600 180 600'/%3E%3Cpolygon points='90 450 180 300 0 300'/%3E%3Cpolygon fill='%23666' points='270 450 180 600 360 600'/%3E%3Cpolygon fill='%23AAA' points='270 450 360 300 180 300'/%3E%3Cpolygon fill='%23DDD' points='450 450 360 600 540 600'/%3E%3Cpolygon fill='%23999' points='450 450 540 300 360 300'/%3E%3Cpolygon fill='%23999' points='630 450 540 600 720 600'/%3E%3Cpolygon fill='%23FFF' points='630 450 720 300 540 300'/%3E%3Cpolygon points='810 450 720 600 900 600'/%3E%3Cpolygon fill='%23DDD' points='810 450 900 300 720 300'/%3E%3Cpolygon fill='%23AAA' points='990 450 900 600 1080 600'/%3E%3Cpolygon fill='%23444' points='990 450 1080 300 900 300'/%3E%3Cpolygon fill='%23222' points='90 750 0 900 180 900'/%3E%3Cpolygon points='270 750 180 900 360 900'/%3E%3Cpolygon fill='%23DDD' points='270 750 360 600 180 600'/%3E%3Cpolygon points='450 750 540 600 360 600'/%3E%3Cpolygon points='630 750 540 900 720 900'/%3E%3Cpolygon fill='%23444' points='630 750 720 600 540 600'/%3E%3Cpolygon fill='%23AAA' points='810 750 720 900 900 900'/%3E%3Cpolygon fill='%23666' points='810 750 900 600 720 600'/%3E%3Cpolygon fill='%23999' points='990 750 900 900 1080 900'/%3E%3Cpolygon fill='%23999' points='180 0 90 150 270 150'/%3E%3Cpolygon fill='%23444' points='360 0 270 150 450 150'/%3E%3Cpolygon fill='%23FFF' points='540 0 450 150 630 150'/%3E%3Cpolygon points='900 0 810 150 990 150'/%3E%3Cpolygon fill='%23222' points='0 300 -90 450 90 450'/%3E%3Cpolygon fill='%23FFF' points='0 300 90 150 -90 150'/%3E%3Cpolygon fill='%23FFF' points='180 300 90 450 270 450'/%3E%3Cpolygon fill='%23666' points='180 300 270 150 90 150'/%3E%3Cpolygon fill='%23222' points='360 300 270 450 450 450'/%3E%3Cpolygon fill='%23FFF' points='360 300 450 150 270 150'/%3E%3Cpolygon fill='%23444' points='540 300 450 450 630 450'/%3E%3Cpolygon fill='%23222' points='540 300 630 150 450 150'/%3E%3Cpolygon fill='%23AAA' points='720 300 630 450 810 450'/%3E%3Cpolygon fill='%23666' points='720 300 810 150 630 150'/%3E%3Cpolygon fill='%23FFF' points='900 300 810 450 990 450'/%3E%3Cpolygon fill='%23999' points='900 300 990 150 810 150'/%3E%3Cpolygon points='0 600 -90 750 90 750'/%3E%3Cpolygon fill='%23666' points='0 600 90 450 -90 450'/%3E%3Cpolygon fill='%23AAA' points='180 600 90 750 270 750'/%3E%3Cpolygon fill='%23444' points='180 600 270 450 90 450'/%3E%3Cpolygon fill='%23444' points='360 600 270 750 450 750'/%3E%3Cpolygon fill='%23999' points='360 600 450 450 270 450'/%3E%3Cpolygon fill='%23666' points='540 600 630 450 450 450'/%3E%3Cpolygon fill='%23222' points='720 600 630 750 810 750'/%3E%3Cpolygon fill='%23FFF' points='900 600 810 750 990 750'/%3E%3Cpolygon fill='%23222' points='900 600 990 450 810 450'/%3E%3Cpolygon fill='%23DDD' points='0 900 90 750 -90 750'/%3E%3Cpolygon fill='%23444' points='180 900 270 750 90 750'/%3E%3Cpolygon fill='%23FFF' points='360 900 450 750 270 750'/%3E%3Cpolygon fill='%23AAA' points='540 900 630 750 450 750'/%3E%3Cpolygon fill='%23FFF' points='720 900 810 750 630 750'/%3E%3Cpolygon fill='%23222' points='900 900 990 750 810 750'/%3E%3Cpolygon fill='%23222' points='1080 300 990 450 1170 450'/%3E%3Cpolygon fill='%23FFF' points='1080 300 1170 150 990 150'/%3E%3Cpolygon points='1080 600 990 750 1170 750'/%3E%3Cpolygon fill='%23666' points='1080 600 1170 450 990 450'/%3E%3Cpolygon fill='%23DDD' points='1080 900 1170 750 990 750'/%3E%3C/g%3E%3C/svg%3E");  
 }
-
-
 
 /* Set tabs to 50 percent of viewport width */
 .tablink {
@@ -664,8 +662,6 @@ svg .dataCircle:hover {
 	</HEAD>
 	<BODY>
 
-
-
     <!-- Save Data Modal -->
     <div id="captureLiftDataModal" class="modal">
       <div class="modal-content">
@@ -805,9 +801,7 @@ svg .dataCircle:hover {
       
 
 
-
     <!-- main page code -->
-
     <div class="headerbar">
         <h1><a href="/" id="PAGE_TITLE" alt="DIY Flow Bench">DIY Flow Bench</a></h1>
     </div>
@@ -835,12 +829,12 @@ svg .dataCircle:hover {
           <div class="tile tile-flow" id="flow-tile">
             <p class="tile-title">Flow Rate</p>
             <p><span class="tile-value" id="FLOW">&nbsp;</span></p>
-            <p class="units">CFM</p>
+            <p class="units">ACFM</p>
           </div>
           <div class="tile tile-aflow" id="aflow-tile">
             <p class="tile-title">Adjusted Flow</p>
             <p><span class="tile-value" id="AFLOW">&nbsp;</span></p>
-            <p class="units">cfm&nbsp;&commat;&nbsp;<span id="PADJUST">28</span>&nbsp;inH2O</p>
+            <p class="units">ACFM&nbsp;&commat;&nbsp;<span id="PADJUST">28</span>&nbsp;inH2O</p>
           </div>
           <div class="tile tile-pitot" id="tile-pitot">
             <p class="tile-title">Pitot</p>
@@ -877,11 +871,6 @@ svg .dataCircle:hover {
           <br>Pitot mV: <span id="PITOT_MV">&nbsp;</span>
         </div>   
         
-
-
-
-        <!-- TODO Automatically submit form when radio button changed [javascript / onclick]-->
-        <!-- Select Orifice Radio buttons (required for orifice style bench)-->
         ~ORIFICE_LIST~
           
           <button id="on-button" class="control-button">START BENCH</button>
@@ -891,64 +880,16 @@ svg .dataCircle:hover {
           <br>
           <button id="show-capture-modal-button" class="control-button">CAPTURE</button>
 
-   
-        
-        
-
       </div>
                 
-
     </div>
 
     
     <!-- Datalog tab -->
     <div id="datalog" class="tabcontent tabcontentData">
 
-
-
-        
-        
-             
         <!-- lift graph -->
-        
-        <!-- TODO: Display lift data in graph in GUI
-        
-        Set graph scaling based on MAF max flow rate 
-        Add user settings for graph scaling
-        lift in 0.025" increments up to 1"
-        
-        Add ability to load multiple trend overlays to same graph - each trend has different colour - this gives ability to compare results
-        
-        Ability to chart additional data (From David Vizards IOP - Induction optimisation program)
-        Some of this may be possible with additional manually inputted data. This data could be in the form of header data in the JSON file
-        i.e. valve size / port area / port length
-        Additional graphs can then be displayed using simple button navigation
-        Might be worth splitting charting onto dedicated data logging page at this point to prevent UI Bloat
-        
-        Flow per square inch (valve area x lift)
-        Coefficient of discharge (max theoretical flow versus actual flow)
-        Port velocity (cfm x port area)
-        Port energy
-        Port energy density
-        Effective velocity
-        Swirl
-        Effective coefficient of discharge
-        
-        Load graph from JSON / SPIFFS File
-        Store Data in JSON / SPIFFS file
-        
-        -->
-
-        
-
-        <!--
-          NOTE: SVG graph is drawn from top down as the origin is actually at top left of graph area. 
-          All data points = (graph_height - datapoint_value)
-          Origin is 100,350
-          Top right is ,0
-
-          Inline styling is required for SVG Download
-        -->
+        <!-- NOTE: Inline styling is required for SVG Download-->
         <div class="graph-container">        
           <svg class="graph" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="dataGraph" style="background-color: #fff; padding-top: 100px;">
           
@@ -1046,17 +987,9 @@ svg .dataCircle:hover {
             <!--Hard coded Graph Line Data-->
             <g class="surfaces" id="lineData">
                 <!--Line data-->
-
                 <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1"
                 points="100,500 150,~LINE_DATA1~ 200,~LINE_DATA2~ 250,~LINE_DATA3~ 300,~LINE_DATA4~ 350,~LINE_DATA5~ 400,~LINE_DATA6~ 450,~LINE_DATA7~ 500,~LINE_DATA8~ 550,~LINE_DATA9~ 600,~LINE_DATA10~ 650,~LINE_DATA11~ 700,~LINE_DATA12~"/>
 
-                <!-- TEST DATA
-                <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1"
-                points="100,350 150,340 200,315 250,301 300,280 350,249 400,245 450,242 500,238 550,230 600,222 650,220 700,218" />
-
-                <polyline fill="none" stroke="#f50808" stroke-width="1" stroke-dasharray="5, 2"
-                points="100,0 150,~LINE_DATA1~ 200,~LINE_DATA2~ 250,~LINE_DATA3~ 300,~LINE_DATA4~ 350,~LINE_DATA5~ 400,~LINE_DATA6~ 450,~LINE_DATA7~ 500,~LINE_DATA8~ 550,~LINE_DATA9~ 600,~LINE_DATA10~ 650,~LINE_DATA11~ 700,~LINE_DATA12~"/>
-                -->
             </g>
             
             <use class="grid double" xlink:href="#xGrid" ></use>
@@ -1097,21 +1030,11 @@ svg .dataCircle:hover {
 
         </div>  
     
-        
         <!-- end lift graph -->
-
 
 
         <div class="align-center">
           <br>
-          <!--
-          <button id="load-graph-data-button" class="control-button">LOAD</button>
-          <button id="save-graph-data-button" class="control-button">SAVE</button>
-
-          <form method="POST" action="/api/clearLiftData" enctype="multipart/form-data">
-            <input id="clear-graph-data-button" type="submit" class="control-button submit-button"  value="CLEAR"/>
-          </form>
-          -->
           <button id="clear-graph-data-button" class="control-button">CLEAR</button> 
           <button id="export-graph-data-button" class="control-button">EXPORT</button> 
           <button id="capture-graph-data-button" class="control-button">IMAGE</button> 
@@ -1119,11 +1042,7 @@ svg .dataCircle:hover {
           <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
         </div>
 
-
-
     </div>
-
-
 
     <!-- configuration tab -->
     <div id="configuration" class="tabcontent tabcontentConfig">
@@ -1198,23 +1117,17 @@ svg .dataCircle:hover {
     </div>
   </div>
 
+  <!-- Footer -->
+  <div id="footer"><a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a></div>
 
-    <!-- Footer -->
-    <div id="footer"><a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a></div>
 
-
-    <script>
+  <script>
 /***********************************************************
 * javascript.js
 *
-* Browser control code for DIY-Flow-bench project
+* Browser control code for DIY-Flow-bench project: diyflowbench.com
 * Handles data transmission and display update tasks
 * Provides UI control to browser
-*
-* TODO: look at implimenting browser based file downloading for data recording...
-* https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
-*
-* TODO: Pretty graphical data representation
 *
 ***/
 
@@ -1309,6 +1222,7 @@ function onFileUpload(event) {
 }
 
 
+
 /***********************************************************
 * onLoad event handler
 ***/
@@ -1341,6 +1255,7 @@ function onLoad(event) {
 }
 
 
+
 /***********************************************************
 * Initialise buttons
 ***/
@@ -1351,19 +1266,6 @@ function initialiseButtons() {
   document.getElementById('show-capture-modal-button').addEventListener('click', function(){
     document.getElementById('captureLiftDataModal').style.display='block';
   });
-
-  // document.getElementById('capture-lift-data-button').addEventListener('click', function(){
-  //   // save current flow vlue to selected lift data point
-  // });
-
-
-  // document.getElementById('load-graph-data-button').addEventListener('click', function(){
-  //   document.getElementById('loadGraphDataModal').style.display='block';
-  // });
-
-  // document.getElementById('save-graph-data-button').addEventListener('click', function(){
-  //   document.getElementById('saveGraphDataModal').style.display='block';
-  // });
 
   document.getElementById('clear-graph-data-button').addEventListener('click', function(){
         
@@ -1546,12 +1448,14 @@ closeLoadGraphDataModalButton.onclick = function() {
   loadGraphDataModal.style.display = "none";
 }
 
+
 /***********************************************************
 * Close Save Data modal dialog
 ***/
 closeSaveGraphDataModalButton.onclick = function() {
   saveGraphDataModal.style.display = "none";
 }
+
 
 
 /***********************************************************
@@ -1567,6 +1471,7 @@ window.onclick = function(event) {
   }
 }
 
+
 /***********************************************************
 * Close modal dialogs on esc button
 ***/
@@ -1580,49 +1485,49 @@ document.addEventListener("keydown", ({key}) => {
   }
 })
 
+
 /***********************************************************
 * Export Data Graph as PNG Image
 * Source: https://takuti.me/note/javascript-save-svg-as-image/
 ***/
 function exportSVGAsPNG() {
 
-const svg = document.querySelector('svg');
+  const svg = document.querySelector('svg');
 
-const data = (new XMLSerializer()).serializeToString(svg);
-const svgBlob = new Blob([data], {
-    type: 'image/svg+xml;charset=utf-8'
-});
+  const data = (new XMLSerializer()).serializeToString(svg);
+  const svgBlob = new Blob([data], {
+      type: 'image/svg+xml;charset=utf-8'
+  });
 
-// convert the blob object to a dedicated URL
-const url = URL.createObjectURL(svgBlob);
+  // convert the blob object to a dedicated URL
+  const url = URL.createObjectURL(svgBlob);
 
-// load the SVG blob to a flesh image object
-const img = new Image();
-img.addEventListener('load', () => {
-  
-  // draw the image on an ad-hoc canvas
-  const bbox = svg.getBBox();
+  // load the SVG blob to a flesh image object
+  const img = new Image();
+  img.addEventListener('load', () => {
+    
+    // draw the image on an ad-hoc canvas
+    const bbox = svg.getBBox();
 
-  const canvas = document.createElement('canvas');
-  canvas.width = 800;
-  canvas.height = 750;
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 750;
 
-  const context = canvas.getContext('2d');
-  context.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const context = canvas.getContext('2d');
+    context.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-  URL.revokeObjectURL(url);
+    URL.revokeObjectURL(url);
 
-  // trigger a synthetic download operation with a temporary link
-  const a = document.createElement('a');
-  a.download = 'LiftGraph.png';
-  document.body.appendChild(a);
-  a.href = canvas.toDataURL();
-  a.click();
-  a.remove();
+    // trigger a synthetic download operation with a temporary link
+    const a = document.createElement('a');
+    a.download = 'LiftGraph.png';
+    document.body.appendChild(a);
+    a.href = canvas.toDataURL();
+    a.click();
+    a.remove();
 
-});
-img.src = url;
-
+  });
+  img.src = url;
 
 }
 

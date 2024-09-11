@@ -1011,10 +1011,10 @@ String Webserver::getDataJSON()
   dataJson["PREF"] = sensorVal.PRefH2O;
 
   // Flow Rate
-  if (sensorVal.FlowCFM > config.min_flow_rate)  {
+  if ((sensorVal.FlowCFM > config.min_flow_rate) && (sensorVal.PRefH2O > config.min_bench_pressure))  {
     dataJson["FLOW"] = sensorVal.FlowCFM;
   }  else  {
-    dataJson["FLOW"] = 0;
+    dataJson["FLOW"] = 0.0;
   }
 
   // Adjusted Flow Rate
@@ -1039,7 +1039,7 @@ String Webserver::getDataJSON()
     dataJson["BENCH_TYPE"] = "PITOT";
   }
 
-  dataJson["BARO"] = sensorVal.BaroKPA;
+  dataJson["BARO"] = sensorVal.BaroHPA; // GUI  displays mbar (hPa)
   dataJson["RELH"] = sensorVal.RelH;
 
   // Pitot

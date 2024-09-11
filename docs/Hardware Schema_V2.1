@@ -1,5 +1,5 @@
 /***********************************************************
- * Hardware schema for V2
+ * Hardware schema for V2 PCBs
  *
  * NOTE: This code was developed to work on the DIYFB shield but can be adapted for use with other hardware.
  * 
@@ -81,9 +81,10 @@ SCL - PIN 21 (Dedicated SCL pin for Mega2560)
 /***********************************************************
 * Pressure sensors 
 *
-* NOTE Preferred choice is NXP MPXV7007DP due to ideal scale / range. (+/- 28" AQ)
+* NOTE Preferred choice is NXP MPXV7007DP or XGZP6899A due to ideal scale / range. (+/- 28" AQ)
 * All other NXP sensors have much larger range and so offer poor resolution
 * MPXV7007DP is expensive but offers the best performance.
+* XGZP6899A is same range but more cost effective
 ***/
 
 
@@ -111,6 +112,16 @@ Pin 4 -  V1
 Pin 5 -  V2
 Pin 6 -  Vex
 
+## XGZP6899A DIL Surface mount sensors
+Datasheet - https://cfsensor.com/wp-content/uploads/2022/11/XGZP6899A-Pressure-Sensor-V2.6.pdf 
+Pin 1 -  N/C
+Pin 2 -  Ground
+Pin 3 -  N/C
+Pin 4 -  N/C
+Pin 5 -  Out
+Pin 6 -  Vdd
+Pin 7 -  N/C
+Pin 8 -  N/C
 
 
 /***********************************************************

@@ -198,32 +198,3 @@ size_t Messages::debugPrintf(const std::string format, ...) {
 	#endif
 }
 
-
-
-
-
-
-
-
-// DEPRECATED
-/***********************************************************
-* serialPrintf
-* 
-* Threadsafe print
-*/
-// extern int  ets_putc(int);
-// void * ICACHE_FLASH_ATTR Messages::serialPrintf(const char *s, ...) {
-//    int i=0;
-//    for (i=0; i<(sizeof(user_printfHook)/4); i++)   {
-// 	  if (user_printfHook[i] != NULL)  {
-// 		 ((void (*)(const char *))user_printfHook[i])(s);
-// 	  }
-//    }
-//    va_list args;
-//    va_start(args, s);
-//    ets_vprintf(ets_putc, s, args);
-//    va_end(args);
-// }
-
-
-

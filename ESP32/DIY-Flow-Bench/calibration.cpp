@@ -63,7 +63,7 @@ bool Calibration::setFlowOffset() {
   
   // Get the current flow value
   // TODO: need to determine what flow sensors are active (MAF / Orifice / Pitot)
-  double MafFlowCFM = _calculations.convertKGHtoCFM(_sensors.getMafFlow());
+  double MafFlowCFM = _calculations.convertFlow(_sensors.getMafFlow());
   // Get the current reference pressure
   double RefPressure = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);
   
