@@ -1,4 +1,4 @@
-<img width="2032" alt="Screenshot 2023-02-22 at 1 37 35 pm" src="https://user-images.githubusercontent.com/3038710/231706881-e8f968e5-44ca-4bdc-a4ba-b6cb024abd6a.png">
+<img width="2032" alt="PCB 3D View" src="https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/PCB/PCB%203D.png?raw=true">
 
 ## The DIY Flow Bench project
 
@@ -27,19 +27,22 @@ This project and all associated files are provided for use under the CERNâ€“OHLâ
 
 ## Schematic
 
-![Schematic_DIY-FLOW-BENCH-V2](https://user-images.githubusercontent.com/3038710/231708453-fe83ac02-28ee-4325-a34d-cd31aa10870b.png)
+![Schematic_DIY-FLOW-BENCH-V2](https://github.com/DeeEmm/DIY-Flow-Bench/files/11220199/Schematic_DIY-FLOW-BENCH-V2-3.jpg)
 [Schematic_DIY-FLOW-BENCH-V2.pdf](https://github.com/DeeEmm/DIY-Flow-Bench/files/11220199/Schematic_DIY-FLOW-BENCH-V2-3.pdf)
 
 
 ## BOM
 
-You can view the BOM at the following link - https://htmlpreview.github.io/?https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/docs/iBom-DIY-FLOW-BENCH-V2-3.html
-This open up an interactive BOM and schematic layout which allows you to view component locations on the PCB
+You can view the BOM at the following link 
+
+https://htmlpreview.github.io/?https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/docs/iBom-DIY-FLOW-BENCH-V2-3.html
+
+This will open up an interactive BOM and schematic layout which allows you to view component locations on the PCB
 
 
 ## Official DIYFB Shield
 
-The V2.3 shield PCB is available for purchase for AU$10 + Shipping.
+The V2.3 shield PCB is available for purchase for AU$10 + Shipping. DM me for more details.
 
 
 ## Changelog
