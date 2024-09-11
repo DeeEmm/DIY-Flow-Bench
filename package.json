@@ -1,9 +1,8 @@
 {
   "name": "diy-flow-bench",
-  "version": "2.0.0",
-  "description": "npm packages required to run Gulp tasks for minification of HTML, JS and CSS files used in DIYFB project. This is not required the DIYFB project to function but is provided to help you set up your development environment",
+  "version": "1.0.0",
+  "description": "## Version Information ###",
   "main": "index.js",
-  "private": true,
   "directories": {
     "doc": "docs"
   },
@@ -20,17 +19,19 @@
     "url": "https://github.com/DeeEmm/DIY-Flow-Bench/issues"
   },
   "homepage": "https://github.com/DeeEmm/DIY-Flow-Bench#readme",
+  "dependencies": {
+    "array-initial": "^1.1.0",
+    "gulp-clean": "^0.4.0",
+    "gulp-cli": "^3.0.0",
+    "gulp-cssnano": "^1.1.0",
+    "gulp-gzip": "^1.4.2",
+    "gulp-htmlmin": "^5.0.1",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-remove-html-comments": "^1.0.1",
+    "gulp-replace": "^1.1.3",
+    "gulp-terser": "^2.0.1"
+  },
   "devDependencies": {
-    "array-initial": "*",
-    "gulp": "*",
-    "gulp-clean": "*",
-    "gulp-cli": "*",
-    "gulp-cssnano": "*",
-    "gulp-gzip": "*",
-    "gulp-htmlmin": "*",
-    "gulp-minify-css": "*",
-    "gulp-remove-html-comments": "*",
-    "gulp-replace": "*",
-    "gulp-terser": "*"
+    "gulp": "^5.0.0"
   }
 }
