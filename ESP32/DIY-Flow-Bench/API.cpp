@@ -214,12 +214,13 @@ void API::ParseMessage(char apiMessage) {
       break;      
 
       case 'e': // Enum - Vapour Pressure:Absolute Humidity:Specific Gravity:Air Density
-          
+          /*
           snprintf(apiResponse, API_RESPONSE_LENGTH, "e%s%f%s%f%s%f%s%f", 
           config.api_delim, _calculations.calculateVaporPressure(KPA), 
           config.api_delim, _calculations.calculateAbsoluteHumidity(), 
           config.api_delim, _calculations.calculateSpecificGravity(), 
           config.api_delim, _calculations.calculateAirDensity());
+          */
       break;     
 
       case 'E': // Enum - Flow:Ref:Temp:Humidity:Baro
@@ -229,7 +230,7 @@ void API::ParseMessage(char apiMessage) {
           config.api_delim, _calculations.convertPressure(sensorVal.PRefKPA, KPA), 
           config.api_delim, _calculations.convertTemperature(sensorVal.TempDegC, DEGC), 
           config.api_delim, _calculations.convertRelativeHumidity(sensorVal.RelH, PERCENT), 
-          config.api_delim, _calculations.convertPressure(sensorVal.BaroKPA, KPA));
+          config.api_delim, sensorVal.BaroKPA);
       break;      
       
       case 'F': // Get measured Flow in CFM 'F123.45\r\n'       

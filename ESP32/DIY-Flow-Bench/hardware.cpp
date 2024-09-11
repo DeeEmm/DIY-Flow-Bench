@@ -364,7 +364,7 @@ bool Hardware::benchIsRunning() {
   
   // TODO: Check scope of these...
   double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
-  double mafFlowRateCFM = _calculations.convertKGHtoCFM(_sensors.getMafFlow());
+  double mafFlowRateCFM = _calculations.convertFlow(_sensors.getMafFlow());
 
   if ((refPressure > config.min_bench_pressure))
   {

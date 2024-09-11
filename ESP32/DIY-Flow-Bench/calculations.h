@@ -35,12 +35,6 @@ class Calculations {
 		double convertTemperature(double refTempDegC, int unitsOut, int unitsIn = DEGC);
 		double convertRelativeHumidity(double relativeHumidity, int units = DECI);
 
-		double calculateSaturationVaporPressure();
-		double calculateVaporPressure(int units = PSIA);
-		double calculateSpecificGravity();
-		double calculateAirDensity();
-		double calculateAbsoluteHumidity();
-
 		double convertFlow(double massFlowKgh);
 		double convertMassFlowToVolumetric(double massFlowKgh);
 		double convertVelocityToVolumetric(double velocityFpm, double pipeRadiusFt);

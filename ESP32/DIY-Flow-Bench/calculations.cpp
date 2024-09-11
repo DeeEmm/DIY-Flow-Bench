@@ -222,167 +222,6 @@ double Calculations::convertRelativeHumidity(double relativeHumidity, int units)
 
 
 
-/***********************************************************
- * @brief CALCULATE SATURATION VAPOUR PRESSURE
- * @details Saturation vapor pressure is the vapor pressure at 100% relative humidity
- * https://www.omnicalculator.com/physics/air-density
- * 
- ***/
-// DEPRECATED
-double Calculations::calculateSaturationVaporPressure() {
-
-extern struct SensorData sensorVal;
-
-  double vapourPressure;
-
-  vapourPressure = 0.61078 * exp((7.5 * sensorVal.TempDegC) / (sensorVal.TempDegC + 237.3)); 
-
-  return vapourPressure;
-
-}
-
-
-
-
-/***********************************************************
- * @brief CALCULATE VAPOUR PRESSURE (nominally 101.325kPa)
- * 
- * @note Tetans Equation
- * @example P(kPa) = 0.61078 * EXP((17.27 * Temp(C) / Temp(C) + 237.3)
- * 
- * @note Magnus-Tetan Equation
- * @example P(kPa) = 0.61094 * EXP((17.625 * Temp(C) / Temp(C) + 243.04)
- * 
- ***/
-// DEPRECATED
-double Calculations::calculateVaporPressure(int units) {
-
-  extern struct SensorData sensorVal;
-
-  double vapourPressureKpa;
-  double vapourPressurePsia;
-
-  vapourPressureKpa = 0.61078 * exp((17.27 * sensorVal.TempDegC) / (sensorVal.TempDegC + 237.3)); // Tetan 
-  // vapourPressureKpa = 0.61094 * exp((17.625 * sensorVal.TempDegC) / (sensorVal.TempDegC + 243.04)); // Magnus
-
-  switch (units)
-  {
-    case PASCALS:
-      return vapourPressureKpa * 1000;
-      break;
-
-    case KPA:
-      return vapourPressureKpa;
-      break;
-
-    case PSIA:
-      vapourPressurePsia = vapourPressureKpa * 0.145038;
-      return vapourPressurePsia;
-      break;
-  }
-
-  return vapourPressureKpa;
-
-}
-
-
-
-
-
-/***********************************************************
- * @brief CALCULATE ABSOLUTE HUMIDITY 
- * 
- * AH = (RH × P)/(Rw × T × 100)
- * 
- * Where:
- * AH = Absolute Humdity g/m³  
- * RH = Relative Humidity
- * Rw = specific gas constant for water
- * P = Saturation Vapour Pressure in Pascals
- * T = Temperature 
- * 
- ***/
-// DEPRECATED
-double Calculations::calculateAbsoluteHumidity() {
-
-  extern struct SensorData sensorVal;
-  
-  double vapourPressure = this->calculateVaporPressure(KPA);
-
-  double absoluteHumidity = (convertRelativeHumidity(sensorVal.RelH, PERCENT) * vapourPressure) / SPECIFIC_GAS_CONSTANT_WATER_VAPOUR * sensorVal.TempDegC;
-
-  return absoluteHumidity;
-
-}
-
-
-
-
-/***********************************************************
- * @brief CALCULATE SPECIFIC GRAVITY (ratio of densities of air to water)
- * 
- * SG = 1 - 0.378 RHa PVa / Pb
- * Where:
- * SG = specific gravity 
- * RHa = relative humidity in % (e.g. 0.36)
- * PVa = Vapor pressure of water at actual temperature in psia
- * Pb = barometric pressure in psia
- * 
- * SG = 1-(0.378 * RH(%) * vaporPressure(psia)) / baroPressure(psia)
- * 
- ***/
-// DEPRECATED
-double Calculations::calculateSpecificGravity() {
-
-  extern struct SensorData sensorVal;
-  double specificGravity;
-
-  double vaporPressurePsia = this->calculateVaporPressure(PSIA);
-  double relativeHumidity = this->convertRelativeHumidity(sensorVal.RelH, DECI);
-  double baroPressurePsia = this->convertPressure(sensorVal.BaroKPA, PSIA);
-
-  specificGravity = 1 - (0.378 * relativeHumidity * vaporPressurePsia) / baroPressurePsia;
-
-  return specificGravity;
-
-}
-
-
-
-
-/***********************************************************
- * @brief CALCULATE DENSITY OF AIR
- * 
- * @todo needs review - https://en.wikipedia.org/wiki/Density_of_air
- * 
- * @note Ideal gas law
- * @example airDensity(kg/m3) = absPressurePa / (SPECIFIC_GAS_CONSTANT_DRY_AIR * absTempKelvin)
- * 
- * 
- * ρ = [(Pd / (Rd * T)) + (Pv / (Rv * T))]
- * where:
- * Pd = Pressure of dry air
- * Pv = Water vapor pressure 
- * T = Temperature in Kelvins
- * Rd = Specific gas constant for dry air [287.058 J/(kg·K)]
- * Rv = Specific gas constant for water [461.495 J/(kg·K)]
- * 
- * 
- ***/
-// DEPRECATED
-double Calculations::calculateAirDensity() {
-
-  extern struct SensorData sensorVal;
-
-  // original 
-  // double airDensity = ((convertPressure(sensorVal.BaroKPA, PSIA)) * MOLAR_MASS_DRY_AIR + calculateVaporPressure(PSIA) * MOLAR_MASS_WATER_VAPOUR) / UNIVERSAL_GAS_CONSTANT * convertTemperature(sensorVal.TempDegC, KELVIN);
-
-  double airDensity = (convertPressure(sensorVal.BaroKPA, PSIA) / (287.058 * convertTemperature(sensorVal.TempDegC, KELVIN))) + (calculateVaporPressure(PSIA) / (461.495 * convertTemperature(sensorVal.TempDegC, KELVIN)));
-
-  return airDensity;
-
-}
-
 
 
 /***********************************************************
@@ -461,7 +300,7 @@ double Calculations::convertFlow(double massFlowKGH) {
   double flowCFM = 0.0;
 
   // TODO validate reference pressure adjustment - do we add it or subtract it? Should be baro pressure less vac amount
-  double refPressurePascals = this->convertPressure(sensorVal.BaroKPA, PASCALS) - this->convertPressure(sensorVal.PRefKPA, PASCALS) ;
+  double refPressurePascals = sensorVal.BaroPA - this->convertPressure(sensorVal.PRefKPA, PASCALS) ;
   double tempInKelvin = this->convertTemperature(sensorVal.TempDegC, KELVIN, DEGC);
 
   // Calculate saturation vapor pressure
@@ -479,98 +318,12 @@ double Calculations::convertFlow(double massFlowKGH) {
   // Convert to CFM
   flowCFM = flowM3H * 0.58858;
 
-  return flowCFM;
-
-}
-
-
-
-
-
-/***********************************************************
- * @brief CONVERT KGH TO CFM
- * @note Convert mass flow to volumetric using ideal gas law
- * 
- * Q = nRT/mP * ṁ
- * Where:
- * Q = Volumetric flow (SCCM)
- * n = number of moles of gas
- * R = Gas constant (litres . atm . mole . oK or cm3 . atm/mole . oK) | R = 82.1 (cm3 x atm) / (mole x K) | (m3 x Pa) / (mole x K)
- * T = absolute temperature in Kelvin
- * m = mass in grams
- * P = Pressure
- * ṁ = Mass flow (grams / min)
- * 
- * 
- ***/
-// DEPRECATED
-double Calculations::convertKGHtoCFM(double massFlowKGH) {
-
-  extern struct SensorData sensorVal;
-
-  double FlowCFM;
-  double flowCMM;
-  double massFlowGM_M = convertMassFlowUnits(massFlowKGH, GM_M, KG_H);
-
-  double tempInKelvin = this->convertTemperature(sensorVal.TempDegC, KELVIN, DEGC);
-  double refPressureHpa = this->convertPressure(sensorVal.BaroKPA, HPA); // need to add ref pressure in HPA to this
-  double absoluteHumidity = calculateAbsoluteHumidity(); // grams / m3 of water vapour in air
-
-  // adjust molar mass based on volume of water vapour in air (water displaces air and reduces its density)
-  double molarMassAir = ((100 - absoluteHumidity) * MOLAR_MASS_DRY_AIR / 100) + (absoluteHumidity * MOLAR_MASS_WATER_VAPOUR / 100);
-
-  flowCMM  = massFlowGM_M * 82.1 * tempInKelvin / molarMassAir * refPressureHpa;
-
-  // convert cm3/min to CFM
-  FlowCFM = flowCMM * 0.000035314666721489 * -0.001;
-
-  return FlowCFM;
-
-}
-
-
-/***********************************************************
- * @brief CONVERT MASS FLOW TO VOLUMETRIC FLOW
- * @param massflowKgh Mass flow in KG/h
- * @note Calculate flow using ideal gas law:
- * V̇  = ṁ nRT / mP
- * Q = mRTZ/144P
- * where:
- * Q = flow in CFM
- * P = pressure in PSIA
- * m = mass flow in lb/min
- * R = universal gas constant Ru/MW
- * T = temperature in Rankine
- * Z = compressibility 
- * flowCFM = (massFlow * UniversalGasFlowConstant * GasTempInRankine * CompressibilityFactor(1))/ 144 * PressurePSIA
- * @ref https://www.pdblowers.com/tech-talk/volume-and-mass-flow-calculations-for-gases/
- * @todo review !!!!!!
- ***/
-// DEPRECATED
-double Calculations::convertMassFlowToVolumetric(double massFlowKgh) {
-  
-  extern struct SensorData sensorVal;
-
-  double mafFlowCFM;
-  double gasPressure;
-
-  double tempInRankine = this->convertTemperature(sensorVal.TempDegC, RANKINE, DEGC);
-  double specificGravity = this->calculateSpecificGravity(); //tested ok
-  double molecularWeightAir = MOLAR_MASS_DRY_AIR * specificGravity; //tested ok
-  double baroPressurePsia = this->convertPressure(sensorVal.BaroKPA, PSIA);
-  double refPressurePsia = this->convertPressure(sensorVal.PRefKPA, PSIA);
-  double massFlowLbm = massFlowKgh * 0.03674371036415;
-  double universalGasConstant = 1545 / molecularWeightAir; //1545 ftlbf/(lbmol)(°R)) divided by M.W.
-
-  gasPressure = baroPressurePsia + refPressurePsia; // Adjusted value includes reference depression
-  // gasPressure = baroPressurePsia;
-
-  // REVIEW
-  // mafFlowCFM = ((massFlowLbm * 1545 * tempInRankine) / (molecularWeightAir * 144 * gasPressure)); // original
-  mafFlowCFM = ((massFlowLbm * universalGasConstant * tempInRankine) / (144 * gasPressure)); // this is a test
-  mafFlowCFM = mafFlowCFM * -1; // get rid of negative value from test
-
-  return mafFlowCFM;
+  // only return value if valid posotive value received
+  if ( massFlowKGH > 0 ) {
+    return flowCFM;
+  } else {
+    return 0.0;
+  }
 
 }
 
@@ -595,11 +348,20 @@ double Calculations::convertFlowDepression(double oldPressure, double newPressur
 
   Calculations _calculations;
   Hardware _hardware;
+  double outputFlow;
+  double pressureRatio;
+  double scaleFactor;
 
   if (_hardware.benchIsRunning()) {
-    double outputFlow;
-    double pressureRatio = (newPressure / oldPressure);
-    outputFlow = sqrt(pressureRatio) * inputFlowCFM;
+    if (newPressure == oldPressure) {
+      return inputFlowCFM;
+    } else if (newPressure > oldPressure) {
+      pressureRatio = (newPressure / oldPressure);
+    } else {
+      pressureRatio = (oldPressure / newPressure);
+    }
+    scaleFactor = sqrt(pressureRatio);
+    outputFlow =  inputFlowCFM * scaleFactor;
     return outputFlow;
   } else {
     return 0.0;

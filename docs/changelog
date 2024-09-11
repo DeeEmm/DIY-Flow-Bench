@@ -33,6 +33,11 @@ https://www.calctool.org/atmospheric-thermodynamics/air-density
 https://www.engineeringtoolbox.com/ideal-gas-law-d_157.html
 https://www.engineeringtoolbox.com/density-air-d_680.html
 
+1 kg/h ~= 0.4803099 ft³/m
+1 mg/s ~= 0.00172911 ft³/m
+
+
+
 ===================================================================
 Contributing
 ===================================================================
@@ -51,6 +56,17 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+
+24091101        - Updated project PCB files and documentation
+24090301        - #164 Baro value display
+                - Removed deprecated methods
+                - Masked zero flow values
+23060501        - Added pin map for ESP32_WROOM_32
+23052201        - Added xQueueCreate definition to try and address message queue errors
+23042401        - Changed CFM to ACFM in GUI 
+23042301        - Updated convertFlowDepression() method 
+23041401        - Updated package.json...
+                - Moved dependencies into devDependencies section and made private
 23041301        - Added graph image capture
                 - General code tidy
 23041202        - Added adjustment for humidity and ref pressure to CFM Calc
@@ -476,10 +492,10 @@ Build #         - Description of Change
                 - Display Calibration results on screen 
 19120803        - #7  Update calibration functions 
 19120802        - Added partial support for additional languages
-	       - Created function for popover display dialog
-	       - Added max-flow error check
+	        - Created function for popover display dialog
+	        - Added max-flow error check
 19120801        - Added support for MAF lookup tables via external files
-	       - Including support for alternate MAF sensors
+	        - Including support for alternate MAF sensors
 19120701        - Changed directory structure to resolve dependency issue 
                 - Moved libraries into src subfolder folder
                 - Created this changelog file

@@ -194,7 +194,8 @@ void TASKgetEnviroData( void * parameter ){
         sensorVal.TempDegC = _sensors.getTempValue();
         sensorVal.TempDegF = _calculations.convertTemperature(_sensors.getTempValue(), DEGF);
         sensorVal.BaroHPA = _sensors.getBaroValue();
-        sensorVal.BaroKPA = sensorVal.BaroHPA / 10;
+        sensorVal.BaroPA = sensorVal.BaroHPA * 100.00F;
+        sensorVal.BaroKPA = sensorVal.BaroPA * 0.001F;
         sensorVal.RelH = _sensors.getRelHValue();
         xSemaphoreGive(i2c_task_mutex); // Release semaphore
       }
@@ -213,6 +214,10 @@ void TASKgetEnviroData( void * parameter ){
  * @note We can assign tasks to specific cores if required (currently disabled)
  ***/
 void setup(void) {
+
+  // REVIEW
+  // set message queue length
+  xQueueCreate( 256, 2048);
   
   // We need to call Wire globally so that it is available to both hardware and sensor classes so lets do that here
   Wire.begin (SDA_PIN, SCL_PIN); 
