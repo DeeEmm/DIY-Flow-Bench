@@ -28,13 +28,13 @@ This project and all associated files are provided for use under the CERNâ€“OHLâ
 ## Schematic
 
 ![Schematic_DIY-FLOW-BENCH-V2](https://user-images.githubusercontent.com/3038710/231708453-fe83ac02-28ee-4325-a34d-cd31aa10870b.png)
-[Schematic_DIY-FLOW-BENCH-V2.pdf](https://github.com/DeeEmm/DIY-Flow-Bench/files/11220199/Schematic_DIY-FLOW-BENCH-V2.pdf)
+[Schematic_DIY-FLOW-BENCH-V2.pdf](https://github.com/DeeEmm/DIY-Flow-Bench/files/11220199/Schematic_DIY-FLOW-BENCH-V2-3.pdf)
 
 
 ## BOM
 
-![BOM_DIY-FLOW-BENCH-V2](https://user-images.githubusercontent.com/3038710/231706321-c94b84f1-5c3f-42c6-91a3-65d81e70514c.png)
-[BOM_DIY-FLOW-BENCH-V2.pdf](https://github.com/DeeEmm/DIY-Flow-Bench/files/11220123/BOM_DIY-FLOW-BENCH-V2.pdf)
+You can view the BOM at the following link - https://htmlpreview.github.io/?https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/docs/iBom-DIY-FLOW-BENCH-V2-3.html
+This open up an interactive BOM and schematic layout which allows you to view component locations on the PCB
 
 
 ## Official DIYFB Shield
