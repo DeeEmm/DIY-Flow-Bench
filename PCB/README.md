@@ -27,8 +27,8 @@ This project and all associated files are provided for use under the CERNâ€“OHLâ
 
 ## Schematic
 
-![Schematic_DIY-FLOW-BENCH-V2](https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/PCB/Schematic_DIY-FLOW-BENCH-V2-3.jpg?raw=true)
-[Schematic_DIY-FLOW-BENCH-V2.pdf](https://github.com/DeeEmm/DIY-Flow-Bench/files/11220199/Schematic_DIY-FLOW-BENCH-V2-3.pdf)
+![Schematic_DIY-FLOW-BENCH-V2-3](https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/PCB/Schematic_DIY-FLOW-BENCH-V2-3.jpg?raw=true)
+[Schematic_DIY-FLOW-BENCH-V2-3.pdf](https://github.com/DeeEmm/DIY-Flow-Bench/files/11220199/Schematic_DIY-FLOW-BENCH-V2-3.pdf)
 
 
 ## BOM
