@@ -31,9 +31,15 @@
 #include "driver/pcnt.h"
 #include LANGUAGE_FILE
 
+// #ifdef MAF_IS_ENABLED
+// #include "mafData/maf.h"
+// #endif
+
 #ifdef MAF_IS_ENABLED
-#include "mafData/maf.h"
+#include MAF_DATA_FILE
 #endif
+
+
 
 #ifdef BME_IS_ENABLED
 #define TINY_BME280_I2C
@@ -77,13 +83,33 @@ void Sensors::initialise () {
 
 	Messages _message;
 
-	#ifdef MAF_IS_ENABLED
-	Maf _mafdata;
-	#endif
-
 	extern struct DeviceStatus status;
     extern struct Translator translate;
 	extern int mafOutputType;
+
+	// Initialise  MAF data
+	#ifdef MAF_IS_ENABLED
+		Maf _maf;
+		
+		// get size of the MAF datatable
+  		status.mafDataTableRows = mafLookupTable.size() -1;
+
+		// get highest MAF input value from data table
+		status.mafDataValMax = mafLookupTable[status.mafDataTableRows][1];
+		status.mafDataKeyMax = mafLookupTable[status.mafDataTableRows][0];
+		
+		// get MAF units
+		status.mafUnits = _maf.mafUnits();
+
+		// get MAF data scaling
+		status.mafScaling = _maf.mafScaling();
+
+		// get MAF diameter
+		status.mafDiameter = _maf.mafDiameter();
+
+	#endif
+
+
 	
 	//initialise BME
 	#ifdef BME_IS_ENABLED
@@ -110,12 +136,22 @@ void Sensors::initialise () {
 	#endif
 
 
-	// REVIEW temp disabled - need to reenable
+
+
+	// REVIEW FREQUENCY BASED MAF - temporarily disabled - need to fix & reenable
 	// Set up the MAF ISR if required
 	// Note Frequency based MAFs are required to be attached direct to MAF pin for pulse counter to work
-	// This means 5v > 3.3v signal conditioning is required on MAF pin
+	// This means 5v > 3.3v signal conditioning is required on MAF pin (possible simple voltage divider + filter)
+	// Need to check out use of ESP PCNT function - https://docs.espressif.com/projects/esp-idf/en/v4.4/esp32/api-reference/peripherals/pcnt.html
+	// ESP32 has max PCNT frequency of 40MHz (half clock speed - 80MHz)
+	// Typical MAF is 30Hz -  150Hz
+	// Example - https://github.com/espressif/esp-idf/blob/v4.4/examples/peripherals/pcnt/pulse_count_event/main/pcnt_event_example_main.c
+	// also this... https://blog.adafruit.com/2018/12/27/frequency-measurement-on-an-esp32-in-micropython-esp32-micropython-python/
+	// and this... https://forum.micropython.org/viewtopic.php?f=18&t=5724&p=32921
+	// (which has example without interrupts)
+
 /* temp disabled - need to reenable	
-	if (_mafdata.outputType == FREQUENCY) {	
+	if (_maf.outputType == FREQUENCY) {	
 		__mafVoodoo.mafSetupISR(MAF_PIN, []{__mafVoodoo.mafFreqCountISR();}, FALLING);
 		timer = timerBegin(0, 2, true);                                  
 		timerStart(timer);	
@@ -126,9 +162,9 @@ void Sensors::initialise () {
 	// Sensor definitions for system status pane
 	// MAF Sensor
 	#if defined MAF_IS_ENABLED && defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
-		this->_mafSensorType = _mafdata.sensorType();
+		this->_mafSensorType = _maf.sensorType();
 	#elif defined MAF_IS_ENABLED && defined MAF_SRC_IS_PIN
-		this->_mafSensorType = _mafdata.sensorType() + " on GPIO:" + MAF_PIN;
+		this->_mafSensorType = _maf.sensorType() + " on GPIO:" + MAF_PIN;
 	#else
 		this->_mafSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#endif
@@ -169,7 +205,7 @@ void Sensors::initialise () {
 	#endif
 	
 	// Rel Humidity Sensor
-	#ifdef RELH_SENSOR_NOT_USED
+	#ifndef RELH_IS_ENABLED
 		this->startupBaroPressure = this->getPRefValue();
 		this->_relhSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#elif defined RELH_SENSOR_TYPE_FIXED_VALUE
@@ -186,12 +222,14 @@ void Sensors::initialise () {
 	#endif
 
 	// reference pressure
-	#ifdef PREF_SENSOR_NOT_USED
+	#ifndef PREF_IS_ENABLED
 		this->_prefSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#elif defined PREF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_prefSensorType = "SMPXV7007";
 	#elif defined PREF_SENSOR_TYPE_MPX4250 && defined ADC_IS_ENABLED
 		this->_prefSensorType = "MPX4250";
+	#elif defined PREF_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
+		this->_prefSensorType = "MPXV7025";
 	#elif defined PREF_SENSOR_TYPE_LINEAR_ANALOG
 		this->_prefSensorType = "ANALOG PIN: " + REF_PRESSURE_PIN;
 	#else 
@@ -199,21 +237,25 @@ void Sensors::initialise () {
 	#endif
 	
 	// differential pressure
-	#ifdef PDIFF_SENSOR_NOT_USED
+	#ifndef PDIFF_IS_ENABLED
 		this->_pdiffSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#elif defined PDIFF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_pdiffSensorType = "SMPXV7007";
 	#elif defined PDIFF_SENSOR_TYPE_LINEAR_ANALOG
 		this->_pdiffSensorType = "ANALOG PIN: " + DIFF_PRESSURE_PIN;
+	#elif defined PDIFF_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
+		this->_prefSensorType = "MPXV7025";
 	#else 
 		this->_pdiffSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#endif
 	
 	// pitot pressure differential
-    #ifdef PITOT_SENSOR_NOT_USED
+    #ifndef PITOT_IS_ENABLED
 		this->_pitotSensorType = translate.LANG_VAL_NOT_ENABLED;
 	#elif defined PITOT_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_pitotSensorType = "SMPXV7007";
+	#elif defined PITOT_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
+		this->_prefSensorType = "MPXV7025";
 	#elif defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
 		this->_pitotSensorType = "ANALOG PIN: " + PITOT_PIN;
 	#else 
@@ -264,6 +306,40 @@ void IRAM_ATTR Sensors::mafFreqCountISR() {
 
 
 
+
+/***********************************************************
+ * @brief Returns RAW MAF Sensor value (ADC Value)
+ *
+ ***/
+long Sensors::getMafRaw() {
+	
+	Hardware _hardware;
+	extern struct SensorData sensorVal;
+
+	#ifdef MAF_IS_ENABLED
+	Maf _maf;
+
+	#if defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
+		sensorVal.MafRAW = _hardware.getADCRawData(MAF_ADC_CHANNEL);
+		
+	#elif defined MAF_SRC_IS_PIN	
+		long mafFlowRaw = analogRead(MAF_PIN);
+	#else
+		mafFlowRaw = 1;
+	#endif
+
+	return sensorVal.MafRAW;
+
+	#else
+
+	return 0; // MAF is disabled so lets return 1
+
+	#endif
+}
+
+
+
+
 /***********************************************************
  * @brief getMafVolts: Returns MAF signal in Volts
  ***/
@@ -296,54 +372,112 @@ double Sensors::getMafVolts() {
 
 
 
+
+
 /***********************************************************
- * @brief Returns RAW MAF Sensor value (mass flow)
+ * @brief Returns MAF mass flow value in KG/H 
+ * @note Interpolates lookupvalue from datatable key>value pairs
  *
- * @note MAF decode is done in Calculations.cpp
  ***/
-long Sensors::getMafRaw() {
-	
+double Sensors::getMafFlow(int units) {
+
+	extern struct DeviceStatus status;
+	extern struct SensorData sensorVal;
+	extern struct ConfigSettings config;
+
 	Hardware _hardware;
-	#ifdef MAF_IS_ENABLED
-	Maf _mafdata;
 
-	switch (_mafdata.outputType()) {
-		
-		case VOLTAGE:
-		{
-			#if defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
-				mafFlowRaw = _hardware.getADCRawData(MAF_ADC_CHANNEL);
-				
-			#elif defined MAF_SRC_IS_PIN	
-				long mafFlowRaw = analogRead(MAF_PIN);
-			#else
-				mafFlowRaw = 1;
-			#endif
+	double flowRateCFM = 0.0;
+	double flowRateMGS = 0.0;
+	double flowRateKGH = 0.0;
+	double lookupValue = 0.0;
+	double transposedflowRateKGH = 0.0;
+	double mafVelocity = 0.0;
+
+	// scale sensor reading to data table size using map function (0-5v : 0-keymax)
+	// NOTE Discrepency with MAP calculated value
+	// long refValue =  map(this->getMafVolts(), 0, _hardware.get5vSupplyVolts(), 0, status.mafDataKeyMax ); 
+	// long refValue =  map(this->getMafVolts(), 0, 5, 0, status.mafDataKeyMax); 
+	long refValue = (status.mafDataKeyMax / 5) * this->getMafVolts();
+
+	for (int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { // iterate the data table comparing the Lookup Value to the refValue for each row
+
+		long Key = mafLookupTable[rowNum][0]; // Key Value for this row (x2)
+		long Val = mafLookupTable[rowNum][1]; // Flow Value for this row (y2)
+
+		// Did we get a match??
+		if (refValue == Key) { // Great!!! we've got the exact key value
+
+			lookupValue = Val; // lets use the associated lookup value
+			sensorVal.MafLookup = Val;
+			break;
+			
+		// } else if ( Key > refValue && rowNum == 0) { // we were only on the first row so there is no previous value to interpolate with, so lets set the flow value to zero and consider it no flow
+
+		// 	sensorVal.MafLookup = 0;
+		// 	return 0; 
+		// 	break;
+
+		} else if (Key > refValue && rowNum > 0) { // The value is somewhere between this and the previous key value so let's use linear interpolation to calculate the actual value: 
+
+			long KeyPrev = mafLookupTable[rowNum - 1][0]; // Key value for the previous row (x1)
+			long ValPrev = mafLookupTable[rowNum - 1][1]; // Flow value for the previous row (y1)
+
+			// Linear interpolation y = y1 + (x-x1)((y2-y1)/(x2-x1)) where x1+y1 are coord1 and x2_y2 are coord2
+			lookupValue = ValPrev + (refValue - KeyPrev)*((Val-ValPrev)/(Key-KeyPrev));
+			sensorVal.MafLookup = lookupValue;
+			break;   
+
+		} else if (rowNum == status.mafDataTableRows && refValue > Key) { //we're at the largest value, this must be it
+			lookupValue = Val; // lets use the associated lookup value
+			sensorVal.MafLookup = Val;
+			// TODO status message MAX FLOW
+			break;
 		}
-		break;
-		
-		case FREQUENCY:
-		{  
-			// TODO
-			mafFlowRaw = 40000000.00 / PeriodCount;
-			//mafFlowRaw = 40000000.00 / __mafVoodoo.PeriodCount; // NOTE: Do we need Voodoo?
-		}
-		break;
-		
-	}	
-	
-	return mafFlowRaw;
 
-	#else
+	} 
 
-	return 0; // MAF is disabled so lets return 1
+	// Scale lookup value
+	lookupValue *= status.mafScaling; 
 
-	#endif
+	if (status.mafUnits == MG_S) {
+		flowRateKGH = lookupValue * 0.0036F;
+
+	} else { // mafUnits is KG/H
+		flowRateKGH = lookupValue;
+	}
+
+	// Now that we have a converted flow value we can translate it for different housing diameters
+	if (config.maf_housing_diameter > 0 && status.mafDiameter > 0 && config.maf_housing_diameter != status.mafDiameter) { 
+		// We are running a custom MAF Housing, lets translate the flow rates to the new diameter
+
+		// NOTE this transfer function is actually for volumetric flow but we can assume that the mass to volumetric conversion is ratiometric at any given instant in time.
+		// This is because any environmental influences apply equally to both parts of the equation and cancel each other out. 
+		// So we can reduce the mass flow conversion to the same simple ratio that we use for volumetric flow. 
+		// In short, the relationship between flow and pipe area applies equally to both mass flow and volumetric flow for a given instant in time.
+
+		// Q = A*V
+		// V = Q/A
+		// A = PI*r^2
+		// where Q = flow | A = area | V = velocity
+
+		// Calculate the 'velocity' for the original pipe area
+		mafVelocity = flowRateKGH / pow(PI * (status.mafDiameter / 2), 2);
+
+		// scale the result with the new pipe area and convert back to mass flow
+		transposedflowRateKGH = mafVelocity * PI * pow((config.maf_housing_diameter / 2), 2);
+
+		return transposedflowRateKGH;
+
+	} else { // lets send the standard MAF data
+
+		return flowRateKGH;
+	}
+
+
+
+
 }
-
-
-
-
 
 /***********************************************************
  * @brief get Reference Pressure sensor voltage
@@ -404,8 +538,23 @@ double Sensors::getPRefValue() {
 	#elif defined PREF_SENSOR_TYPE_MPXV7007
 
 		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
-		// sensorVal (kPa) = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
 		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+
+	#elif defined PREF_SENSOR_TYPE_MPXV7025
+
+		// Vout = Vcc x (0.018 x P + 0.5)
+		// P = ((Vout / Vcc) - 0.5 ) / 0.018 )
+		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+
+	#elif defined PREF_SENSOR_TYPE_XGZP6899A007KPDPN
+
+		// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
+		sensorVal = sensorVolts * 3.5 - 8.75
+
+	#elif defined PREF_SENSOR_TYPE_XGZP6899A010KPDPN
+
+		// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
+		sensorVal = sensorVolts * 5 - 12.5
 
 	#else
 
@@ -489,6 +638,23 @@ double Sensors::getPDiffValue() {
 		// sensorVal = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
 		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
 
+
+	#elif defined PDIFF_SENSOR_TYPE_MPXV7025
+
+		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+
+
+	#elif defined PDIFF_SENSOR_TYPE_XGZP6899A007KPDPN
+
+		// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
+		sensorVal = sensorVolts * 3.5 - 8.75
+
+	#elif defined PDIFF_SENSOR_TYPE_XGZP6899A010KPDPN
+
+		// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
+		sensorVal = sensorVolts * 5 - 12.5
+
+
 	#else // use fixed value
 
 		sensorVal = FIXED_PDIFF_PRESS;
@@ -565,16 +731,33 @@ double Sensors::getPitotValue() {
 
 		sensorVal = getPitotVolts() * PITOT_ANALOG_SCALE;
 	
-	#elif defined PITOT_SENSOR_TYPE_MPXV7007DP
+	#elif defined PITOT_SENSOR_TYPE_MPXV7007
 		
 		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
 		// sensorVal = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
 		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
 
 
+	#elif defined PITOT_SENSOR_TYPE_MPXV7025
+
+		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+
+
+	#elif defined PITOT_SENSOR_TYPE_XGZP6899A007KPDPN
+
+		// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
+		sensorVal = sensorVolts * 3.5 - 8.75
+
+	#elif defined PITOT_SENSOR_TYPE_XGZP6899A010KPDPN
+
+		// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
+		sensorVal = sensorVolts * 5 - 12.5
+
+
+
 	#else // use fixed value
 
-		sensorVal = FIXED_PITOT_VALUE;
+		sensorVal = 0.0001;
 
 	#endif
 

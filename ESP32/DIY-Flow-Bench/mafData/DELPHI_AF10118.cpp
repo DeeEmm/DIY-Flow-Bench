@@ -1,14 +1,15 @@
 /***********************************************************
- * DELPHI_AF10118.h
+ * DELPHI_AF10118.cpp
  *
  * Manufacturer: DELPHI
  * Part#: AF10118
- * MAF file for type: 
+ * MAF file for type: 5.0l Ford Explorer
  * File units = 1000 * kg/hr
- * Comments: Example Data
- * Status: Unvalidated
+ * Status: UNVALIDATED / UNTESTED
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
+ * Data Source: efidynotuning.com/maf.htm
+ * 
  ***/
 #ifndef MAFDATACLASS
 #define MAFDATACLASS
@@ -68,10 +69,34 @@ int Maf::mafUnits() {
 
 
 /***********************************************************
+ * @brief MAF scaling
+ * 
+ * @note: scaling factor for MAF Data:
+ ***/
+double Maf::mafScaling() {
+    return 0.001;
+}
+
+
+
+/***********************************************************
+ * @brief Original MAF Diameter in mm
+ * 
+ * @note Used to calculate MAF transfer function to transpose 
+ * flow rates for different pipe diameters
+ * @note unavalidated diameter - https://www.corral.net/threads/explorer-maf-size.792608/
+ ***/
+int Maf::mafDiameter() {
+    return 70;
+}
+
+
+
+/***********************************************************
  * @brief mafLookupTable
  * @note Global vector of vectors containing MAF>Flow key>value pairs
  ***/
- std::vector<std::vector<int>> mafLookupTable = {{ 
+ std::vector<std::vector<long>> mafLookupTable = {{ 
 {0,0},
 {600,5620},
 {800,8982},
@@ -100,7 +125,7 @@ int Maf::mafUnits() {
 {4500,421040},
 {4750,490925},
 {5000,490925}
-};
+}};
 
 //#endif
 #endif

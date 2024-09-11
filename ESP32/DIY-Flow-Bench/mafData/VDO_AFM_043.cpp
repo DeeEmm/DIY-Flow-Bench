@@ -1,14 +1,15 @@
 /***********************************************************
- * VDO-AFM-043.h
+ * VDO-AFM-043.cpp
  *
  * Manufacturer: VDO | Siemens
  * Part#: AFM-043 | 25008302 | A2C59506198
  * MAF file for type: GM GenIII LS1 / VT-VX-VY 5.7 Commodore / Monaro 
  * File units = 100 * gm / sec
  * Comments: Basic test data
- * Status:
+ * Status: UNVALIDATED / UNTESTED
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
+ * Data Source: 
  ***/
 #ifndef MAFDATACLASS
 #define MAFDATACLASS
@@ -66,10 +67,34 @@ int Maf::mafUnits() {
 
 
 /***********************************************************
+ * @brief MAF scaling
+ * 
+ * @note: scaling factor for MAF Data:
+ ***/
+double Maf::mafScaling() {
+    return 0.01;
+}
+
+
+
+/***********************************************************
+ * @brief Original MAF Diameter in mm
+ * 
+ * @note Used to calculate MAF transfer function to transpose 
+ * flow rates for different pipe diameters
+ * @note unavalidated diameter - https://forums.justcommodores.com.au/threads/ve-maf-to-ls1.232264/page-2
+ ***/
+int Maf::mafDiameter() {
+    return 74;
+}
+
+
+
+/***********************************************************
  * @brief mafLookupTable
  * @note Global vector of vectors containing MAF>Flow key>value pairs
  ***/
- std::vector<std::vector<int>> mafLookupTable = {{ 
+ std::vector<std::vector<long>> mafLookupTable = {{ 
 {0,0},
 {1500,214},
 {1625,259},

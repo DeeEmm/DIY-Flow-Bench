@@ -1,0 +1,39 @@
+title: "Give your discussion a concise and descriptive title"
+body:
+- type: input
+  id: version
+  attributes:
+    label: Version Info
+    description: What firmware version are you using? You can access this in the 'info' sestion of the configuration tab or by viewing configuration.h
+    value: V.2.0-RC.6 Build 23032901
+  validations:
+    required: true
+- type: textarea
+  id: steps
+  attributes:
+    label: Steps to replicate issue
+    description: "If possible outline the steps needed to replicate the issue along with the expected behaviour and the actual behaviour"
+    value: |
+      1. Do this
+      2. Then do this
+      3. I expected this to happpen ...
+      4. But this happened ...
+    render: bash
+  validations:
+    required: true
+- type: textarea
+  id: issue
+  attributes:
+    label: Describe your issue
+    description: Describe the issue with as much detail as possible.
+    value: ...
+  validations:
+    required: true
+- type: checkboxes
+  attributes:
+    label: Posting Guidelines
+    description: The posting guidelines outline how to use the forums. Please familiarise yourself with them.
+    options:
+      - label: I have read the [Posting Guidelines](https://github.com/DeeEmm/DIY-Flow-Bench/discussions/133)
+        required: true
+    

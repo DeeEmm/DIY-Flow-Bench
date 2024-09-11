@@ -1,59 +1,46 @@
 ===================================================================
-Current build status
+Project Status
 ===================================================================
 
-Need to validate bench readings with calibrated source
+https://github.com/users/DeeEmm/projects/5/
+
 
 ===================================================================
-Current work in progress
+Open Issues
 ===================================================================
 
-Code tidy in preparation for release
-Working through unit tests (see below)
+https://github.com/DeeEmm/DIY-Flow-Bench/issues
+
 
 ===================================================================
-Known Issues
+For 'Ron...
 ===================================================================
 
-ADC Channels PREF swapped with PDIFF (ERROR ON SHIELD PCB)
+http://www.shumatech.com/support/chinese_scales.htm
+https://www.yuriystoys.com/2013/07/chinese-caliper-data-format.html
+https://hackaday.io/project/511-digital-dial-indicator-cnc-surface-probe/log/814-the-digital-dial-indicator-and-how-to-read-from-it
+https://hackaday.io/project/511-digital-dial-indicator-cnc-surface-probe/log/1470-interfacing-dial-indicator-to-computer-using-pic-chip
+https://robotroom.com/Caliper-Digital-Data-Port.html
+https://robotroom.com/Caliper-Digital-Data-Port-2.html
+https://robotroom.com/Caliper-Digital-Data-Port-3.html
+
+https://arduino.stackexchange.com/questions/69261/arduino-10bit-adc-is-not-accurate/69266
+
+https://www.sciencedirect.com/topics/engineering/dry-air-mass-flow
+https://www.conservationphysics.org/atmcalc/atmoclc1.html
+https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Physical_Properties_of_Matter/States_of_Matter/Properties_of_Gases/Gases_(Waterloo)/The_Ideal_Gas_Law
+https://www.calctool.org/atmospheric-thermodynamics/air-density
+https://www.engineeringtoolbox.com/ideal-gas-law-d_157.html
+https://www.engineeringtoolbox.com/density-air-d_680.html
 
 ===================================================================
-TODO
+Contributing
 ===================================================================
 
-Calibration
+https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/CONTRIBUTING.md
 
-===================================================================
-Info / References I want to save for later
-===================================================================
 
-Poss thread safe library for i2c BME280 + ADS1115 (recommended + official) ?!!
-https://github.com/UncleRus/esp-idf-lib
-https://esp-idf-lib.readthedocs.io/en/latest/groups/i2cdev.html
-https://esp-idf-lib.readthedocs.io/en/latest/
-https://esp-idf-lib.readthedocs.io/en/latest/groups/bmp280.html        
 
-===================================================================
-Items to sort before formal RC release
-===================================================================
-
-- [X]   REMOVE tags
-- [X]   REVIEW tags
-- [X]   TEST tags
-- [X]   BUG tags
-- [X]   KNOWN ISSUES
-- [ ]   Translations
-- [ ]   Rename DIY-Flow-Bench.cpp to DIY-Flow-Bench.ino for Arduino IDE compatibility
-- [ ]   Shield Unit Tests...
-- [X]   BME280
-- [ ]   ADS1115 (MAF / Pref / Pdiff / Pitot)
-- [ ]   3.3V Buck + voltage feedback
-- [ ]   5V Buck + voltage feedback
-- [ ]   ULN2003 outputs
-- [ ]   DRV8825 stepper driver (valve adjust)
-- [ ]   DRV8825 stepper driver (Flow Valve?????)
-- [ ]   High speed input (Turbo speed)
- 
 ===================================================================
 !! Don't forget to update the build number in configuration.h !!
 ===================================================================
@@ -64,7 +51,74 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-31012301        - Fixed MAF unit error
+23041301        - Added graph image capture
+                - General code tidy
+23041202        - Added adjustment for humidity and ref pressure to CFM Calc
+23041201        - Updated MAf conversion code
+                - Implimented simplified Mass flow to CFM conversion
+                - Updated ACDELCO_92281162 MAF Data
+23041102        - Changed 'Save Data' button test to 'Capture'
+23041101        - Basic lift data handling finalised
+23041001        - Increased loop task size in platformio
+23040901        - Fixed error with MPXV7025 info display
+                - Fixed error with MPXV7025 transfer function
+                - Fixed error with MAF Data scaling
+23040601        - Added lift data handling
+                - liftdata.json file management in spiffs
+                - liftdata.json export via WebGUI
+23040402        - Updated GUI Graph data handling
+23040401        - Added updated SIEMENS_5WK9605 MAF Data file
+23040302        - Added GUI handling for MAF diameter
+23040301        - Added support for Bosch 0280218067 MAF
+                - Added transfer function for MAF housing diameters
+                - Removed Siemens 5WK9605 MAF Data
+23033101        - Added diameter var to MAFData files
+23033001        - Added yml template for Support forum Posting Guidelines
+23032901        - Added support for MPXV7025 pressure sensor
+23030801        - Created code to generate lift plot from custom XML element (data array)
+23030701        - Created basic lift graph
+                - Fixed mafData file extensions in configuration.h
+23030601        - Added Dataview layout
+                - Added basic SD handling
+23030202        - Added ability to change bench type in GUI
+                - Fixed AP Mode IP address display in GUI
+23030201        - Updated calibration code for flow and leaktest calibration
+                - Added CERN-OSH-W license for Hardware
+                - Updated Hardware BOM
+23022801        - Reformatted data tiles to include swirl
+                - Added swirl function
+23022501        - Added support for XGZP6899A007 and XGZP6899A010 pressure sensors
+23022401        - Decreased task update rates to address message queue overload
+                - Updated README
+23022301        - Trunate fractional part of lift interval if interval is intval
+23022201        - Reverted temporary swap of Pdiff / Pref Analog channels
+                - Added Data save and Data view modal dialogs 
+23021601        - Code Tidying
+23021501        - Outline of VFD control
+                - Added adjustment for absolute humidity in flow conversion
+                - Finalised pin mapping for Wemos D1
+23021301        - Added pin outs for Arducam boards (UNTESTED)
+                - Updated README
+                - Fixed sensor type display on info page
+                - Tidied pinouts from Wemos D1 (For shield compatibility)
+23020901        - Display MAC Address
+                - Some improvements to WiFi
+                - Changed default STA Password
+23020801        - Substituted sensors->getMAFvolts for hardware->getADCvolts
+23020701        - Changed conversion from mass flow to volumetric
+                - Fixed syntax errors in MAF Data files
+                - Renamed main tasks for continuity
+                - Added ATM units to pressure conversion 
+                - Added conversion between mass flow units
+                - Changed MAF datatype to int32
+23020201        - Refactored MAF code and Mass to Volumetric conversion
+23020102        - Fixed include in MH95_3000_100 MAF Data file
+23020101        - Updated ReadMe 
+                - Updated DEV_BRANCH in configuration.h
+                - Updated MAF Data vectors to long datatype
+                - Fixed incorrect build number for RC4 (NOTE prev 31012301)
+23013101        - Release Candidate 4
+                - Fixed MAF unit error
                 - Fix Ref depression unit error
                 - Added bench running check to adjusted flow calc
 23012701        - Renamed TASKgetBenchData to TASKgetSensorData

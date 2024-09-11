@@ -1,21 +1,24 @@
 /***********************************************************
- * MH95-3000-100.h
+ * MH95-3000-100.cpp
  *
  * Manufacturer: PMAS
  * Part#: MH95-3000
  * MAF file for type: 
  * File units = 1000 * kg/hr
  * Comments:  Sensor mounted in 4" (100mm) housing - Data provided by PMAS
- * Status: Untested 
+ * Status: VALIDATED / UNTESTED 
+ * Source: 
  * Support: https://github.com/DeeEmm/DIY-Flow-Bench/wiki/MAF-Data-Files
  * Discussion: https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51
+ * Data Source: PMAS
+ * 686 kg/h is Approx 336cfm  
  ***/
 #ifndef MAFDATACLASS
 #define MAFDATACLASS
 
 #include <Arduino.h>
 #include "../constants.h"
-#include "mafData/m
+#include "mafData/maf.h"
 
 
 
@@ -68,10 +71,34 @@ int Maf::mafUnits() {
 
 
 /***********************************************************
+ * @brief MAF scaling
+ * 
+ * @note: scaling factor for MAF Data:
+ ***/
+double Maf::mafScaling() {
+    return 0.001;
+}
+
+
+
+/***********************************************************
+ * @brief Original MAF Diameter in mm
+ * 
+ * @note Used to calculate MAF transfer function to transpose 
+ * flow rates for different pipe diameters
+ * @note Diameter confirmed - Source PMAS
+ ***/
+int Maf::mafDiameter() {
+    return 95;
+}
+
+
+
+/***********************************************************
  * @brief mafLookupTable
  * @note Global vector of vectors containing MAF>Flow key>value pairs
  ***/
- std::vector<std::vector<int>> mafLookupTable = {{ 
+ std::vector<std::vector<long>> mafLookupTable = {{ 
 {0,0},
 {880,1156},
 {896,1271},
@@ -211,7 +238,7 @@ int Maf::mafUnits() {
 {3061,122412},
 {3077,124715},
 {3093,127048},
-{3110,3839880},
+{3110,129880},
 {3126,131806},
 {3142,134232},
 {3158,136689},
@@ -328,7 +355,7 @@ int Maf::mafUnits() {
 {4952,663528},
 {4968,671159},
 {4984,678854},
-{5000,686611}
+{5000,686611},
 }};
 
 #endif

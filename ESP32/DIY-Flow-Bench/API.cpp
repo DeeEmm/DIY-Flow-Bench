@@ -28,7 +28,7 @@
 #include "sensors.h"
 #include "calculations.h"
 #include "messages.h"
-// #include "calibration.h"
+#include "calibration.h"
 #include "webserver.h"
 // #include LANGUAGE_FILE
 
@@ -98,30 +98,34 @@ String API::getConfigJSON() {
 void API::ParseMessage(char apiMessage) {
 
   extern struct ConfigSettings config;
-  extern struct DeviceStatus status;
+  extern struct CalibrationData calVal;
   extern struct SensorData sensorVal;
+  extern struct DeviceStatus status;
 
   Calculations _calculations;
   Sensors _sensors;
-  Messages _message;
+  Messages _message;    
   Hardware _hardware;
   Webserver _webserver;
+  Calibration _calibration;
   
-  extern TaskHandle_t bmeTaskHandle;
-  extern TaskHandle_t adcTaskHandle;
-  extern TaskHandle_t sseTaskHandle;
+  extern TaskHandle_t sensorDataTask;
+  extern TaskHandle_t enviroDataTask;
   
   // define char arrays for response strings
   char apiResponse[API_RESPONSE_LENGTH];  //64
   char apiResponseBlob[API_BLOB_LENGTH];  //1024
   char charDataJSON[API_JSON_LENGTH];     //1020
+  char fileListBlob[1024];
 
   // Initialise arrays
   apiResponse[0] = 0;
   apiResponseBlob[0] = 0;
   charDataJSON[0] = 0;
+  fileListBlob[0] = 0;
   
   String jsonString;
+  long refValue;
   
   //API Response
   char apiHelpText[] = R"(
@@ -134,26 +138,32 @@ void API::ParseMessage(char apiMessage) {
   5 : 5V Voltage Value
   B : Barometric Pressure
   C : JSON Configuration Data
-  d : Debug On / Off
-  E : Enum
+  D : MAF data max value
+  d : MAF data key max value
+  E : Enum1
+  e : Enum2
   F : Flow Value in CFM
-  F : Flow Value in KG/H
+  f : Flow Value in KG/H
   H : Humidity Value
   I : IP Address
   J : JSON Status Data
+  K : MAF Data Key Value
+  k : MAF Data Lookup Value
   L : Leak Test Calibration
   l : Leak Test
-  M : MAF RAW Value
+  M : MAF RAW ADC Value
   m : MAF Voltage
   N : Hostname
   O : Flow Offset Calibration
   R : Reference Pressure Value
   r : Reference Pressure Voltage
   S : WiFi SSID
+  s : SPIFFS File List
   T : Temperature in Celcius
   t : Temperature in Fahrenheit
   U : Uptime in hhhh.mm
   V : Version
+  v : Valve lift data in JSON format
   X : xTask memory usage   
   ? : Help
   ~ : Restart ESP
@@ -195,30 +205,24 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponseBlob, API_BLOB_LENGTH, "C%s%s", config.api_delim, charDataJSON);
       break;
       
-      case 'd': // DEBUG ON/OFF'
-        if (streamMafData == false) {
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%s", config.api_delim, "Debug Mode On" );
-          streamMafData = true;
-        } else {
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%s", config.api_delim, "Debug Mode Off" );
-          streamMafData = false;
-        }
+      case 'D': // mafdata max value
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%u", config.api_delim , status.mafDataValMax);
       break;      
 
+      case 'd': // mafdata max key value
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%u", config.api_delim , status.mafDataKeyMax);
+      break;      
+
+      case 'e': // Enum - Vapour Pressure:Absolute Humidity:Specific Gravity:Air Density
+          
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "e%s%f%s%f%s%f%s%f", 
+          config.api_delim, _calculations.calculateVaporPressure(KPA), 
+          config.api_delim, _calculations.calculateAbsoluteHumidity(), 
+          config.api_delim, _calculations.calculateSpecificGravity(), 
+          config.api_delim, _calculations.calculateAirDensity());
+      break;     
+
       case 'E': // Enum - Flow:Ref:Temp:Humidity:Baro
-          // // Flow
-          // apiResponse = ("E") + config.api_delim ;        
-          // // Truncate to 2 decimal places
-          // flowCFM = _calculations.calculateFlowCFM(_sensors.getMafRaw()) * 100;
-          // apiResponse += (flowCFM / 100) + (config.api_delim);
-          // // Reference Pressure
-          // apiResponse += _calculations.convertPressure(_sensors.getPRefValue(), KPA) + (config.api_delim);
-          // // Temperature
-          // apiResponse += _calculations.convertTemperature(_sensors.getTempValue(), DEGC) + (config.api_delim);
-          // // Humidity
-          // apiResponse += _calculations.convertRelativeHumidity(_sensors.getRelHValue(), PERCENT) + (config.api_delim);
-          // // Barometric Pressure
-          // apiResponse += _calculations.convertPressure(_sensors.getBaroValue(), KPA);
           
           snprintf(apiResponse, API_RESPONSE_LENGTH, "E%s%f%s%f%s%f%s%f%s%f", 
           config.api_delim, sensorVal.FlowCFM, 
@@ -233,7 +237,8 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'f': // Get measured Mass Flow 'F123.45\r\n'       
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", config.api_delim , sensorVal.FlowMASS);
+          // snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", config.api_delim , sensorVal.FlowKGH);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", config.api_delim , _sensors.getMafFlow());
       break;
 
       case 'H': // Get measured Humidity 'H.123.45\r\n'
@@ -249,6 +254,16 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", config.api_delim, String(jsonString).c_str());
       break;
       
+      case 'K': // MAF Data Key Value 
+          // refValue =  map(_sensors.getMafVolts(), 0, 5, 0, status.mafDataKeyMax); 
+          refValue = (status.mafDataKeyMax / 5) * _sensors.getMafVolts();
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "K%s MAF DATA Key value: %d ", config.api_delim , refValue); 
+      break;
+
+      case 'k': // MAF Data lookup value
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "k%s MAF DATA Lookup value: %d ", config.api_delim , sensorVal.MafLookup); 
+      break;
+
       case 'L': // Perform Leak Test Calibration 'L\r\n'
           // TODO: apiResponse = ("L") + config.api_delim + leakTestCalibration();
           // TODO: confirm Leak Test Calibration success in response
@@ -260,7 +275,7 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'M': // Get MAF raw sensor data'  
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "M%s%f", config.api_delim, sensorVal.MafRAW);   
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "M%s%u", config.api_delim, _hardware.getADCRawData(MAF_ADC_CHANNEL));   
       break;
       
       case 'm': // Get MAF output voltage'
@@ -272,9 +287,8 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'O': // Flow Offset Calibration  'O\r\n'        
-          // TODO: setCalibrationOffset();
-          // TODO: calibration.flow_offset
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "O%s%f", config.api_delim , config.cal_offset);
+          _calibration.setFlowOffset();
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "O%s%f", config.api_delim , calVal.flow_offset);
           // TODO: confirm Flow Offset Calibration success in response
       break;      
   
@@ -294,6 +308,24 @@ void API::ParseMessage(char apiMessage) {
           }
       break;
       
+      case 's': // SPIFFS File List
+        {
+          FILESYSTEM.begin();
+          File root = FILESYSTEM.open("/");
+          File file = root.openNextFile();
+          const char* spiffsFileName;
+          String spiffsFileSize;
+          while (file)  {
+            spiffsFileName = file.name();
+            spiffsFileSize = file.size(); // TODO what about file size????!?!?!
+            strcat(fileListBlob, spiffsFileName);
+            strcat(fileListBlob, "\n");
+            file = root.openNextFile();
+          }
+          snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s" , fileListBlob);
+        }
+      break;
+
       case 't': // Get measured Temperature in Fahrenheit 'F.123.45\r\n'
           double TdegF;
           TdegF = _calculations.convertTemperature(sensorVal.TempDegC, DEGF);
@@ -316,10 +348,21 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "V%s%s.%s.%s", config.api_delim , MAJOR_VERSION, MINOR_VERSION, BUILD_NUMBER);
       break;
 
+      case 'v': // Valve lift Data
+          jsonString = _webserver.getValveDataJSON();
+          snprintf(apiResponseBlob, API_BLOB_LENGTH, "v%s%s", config.api_delim, String(jsonString).c_str());
+      break;
+      
       case 'X': // Print xTask memory usage (Stack high water mark) to serial monitor 
-          snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack HWM BMETask=%d / ADCTask=%d ", config.api_delim , uxTaskGetStackHighWaterMark(bmeTaskHandle), uxTaskGetStackHighWaterMark(adcTaskHandle)); 
+          snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack Free Memory EnviroTask=%d / SensorTask=%d ", config.api_delim , uxTaskGetStackHighWaterMark(enviroDataTask), uxTaskGetStackHighWaterMark(sensorDataTask)); 
       break;
 
+      case 'Z': // TEST
+          // snprintf(apiResponse, API_RESPONSE_LENGTH, "Z%s%d", config.api_delim , status.mafScaling);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "Z%s%d", config.api_delim , status.mafUnits);
+
+      break;
+      
       case '@': // Status Print Mode (Stream status messages to serial)
         if (config.status_print_mode == true){
           config.status_print_mode = false;

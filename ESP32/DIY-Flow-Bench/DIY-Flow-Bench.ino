@@ -40,6 +40,7 @@
 #include <Arduino.h>
 #include "freertos/semphr.h"
 #include "esp_task_wdt.h"
+#include <MD_REncoder.h>
 
 #include "constants.h"
 #include "configuration.h"
@@ -47,10 +48,10 @@
 #include "pins.h"
 
 #include "mafData/maf.h"
-#include "hardware.h"
+#include "hardware.h" // bench type config needed here
 #include "sensors.h"
 #include "calculations.h"
-#include "webserver.h"
+#include "webserver.h" // config loaded here
 #include "messages.h"
 #include "API.h"
 #include "Wire.h"
@@ -59,11 +60,12 @@
 
 // Initiate Structs
 ConfigSettings config;
-CalibrationSettings calibration;
 DeviceStatus status;
 FileUploadData fileUploadData;
 SensorData sensorVal;
+ValveLiftData valveData;
 Translator translate;
+CalibrationData calVal;
 
 // Initiate Classes
 API _api;
@@ -75,14 +77,16 @@ Webserver _webserver;
 
 // Set up semaphore signalling between tasks
 SemaphoreHandle_t i2c_task_mutex;
-TaskHandle_t bmeTaskHandle = NULL;
-TaskHandle_t adcTaskHandle = NULL;
-TaskHandle_t sseTaskHandle = NULL;
+TaskHandle_t sensorDataTask = NULL;
+TaskHandle_t enviroDataTask = NULL;
 // portMUX_TYPE mmux = portMUX_INITIALIZER_UNLOCKED;
 
 char charDataJSON[256];
 String jsonString;
 
+#ifdef SWIRL_IS_ENABLED
+  MD_REncoder Encoder = MD_REncoder(SWIRL_ENCODER_PIN_A, SWIRL_ENCODER_PIN_B);
+#endif
 /***********************************************************
  * @brief TASK: Get bench sensor data (ADS1115 - MAF/RefP/DiffP/Pitot)
  * @param i2c_task_mutex Semaphore handshake with TASKpushData / TASKgetEnviroData
@@ -103,13 +107,35 @@ void TASKgetSensorData( void * parameter ){
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
         status.adcPollTimer = millis() + ADC_SCAN_DELAY_MS; // Only reset timer when task executes
 
+        // TODO integration for non maf style benches
         #ifdef MAF_IS_ENABLED
-        sensorVal.MafRAW = _sensors.getMafRaw();
-        sensorVal.FlowCFM = _calculations.calculateFlowCFM(sensorVal.MafRAW);
+        sensorVal.FlowKGH = _sensors.getMafFlow();
+        sensorVal.FlowCFM = _calculations.convertFlow(sensorVal.FlowKGH);
+        // sensorVal.FlowCFM = _calculations.convertMassFlowToVolumetric(sensorVal.FlowKGH);
+        // sensorVal.FlowCFM = _calculations.convertKGHtoCFM(sensorVal.FlowKGH) + calVal.flow_offset;
         #endif
         
         #ifdef PREF_IS_ENABLED 
         sensorVal.PRefKPA = _sensors.getPRefValue();
+
+        // check pressure / depression to see if we are in leaktest mode
+        if (sensorVal.PRefKPA < (calVal.leak_cal_vac_val + config.leak_test_threshold) || sensorVal.PRefKPA > (calVal.leak_cal_press_val - config.leak_test_threshold)) {
+          // We are in the zone, lets check if we pass or fail
+          if (sensorVal.PRefKPA < (calVal.leak_cal_vac_val + config.leak_test_tolerance)) {
+            // vac leak test pass 
+             status.statusMessage = "Vacuum Leak Test Pass";
+          } else {
+            // vac leak test fail
+             status.statusMessage = "Vacuum Leak Test Fail";
+          }
+          if (sensorVal.PRefKPA > (calVal.leak_cal_press_val - config.leak_test_tolerance)) {
+            // pressure leak test pass 
+             status.statusMessage = "Pressure Leak Test Pass";
+          } else {
+            // pressure leak test fail
+             status.statusMessage = "Pressure Leak Test Fail";
+          }
+        }
         #endif
 
         #ifdef PDIFF_IS_ENABLED
@@ -122,6 +148,18 @@ void TASKgetSensorData( void * parameter ){
 
         sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
         sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, config.adj_flow_depression, sensorVal.FlowCFM);
+
+        
+        #ifdef SWIRL_IS_ENABLED
+          uint8_t Swirl = Encoder.read();
+
+          if (Swirl == DIR_CW) {
+            sensorVal.Swirl = Encoder.speed();
+          } else {
+            sensorVal.Swirl = Encoder.speed() * -1;
+          }
+
+        #endif
 
 
 
@@ -177,8 +215,9 @@ void TASKgetEnviroData( void * parameter ){
 void setup(void) {
   
   // We need to call Wire globally so that it is available to both hardware and sensor classes so lets do that here
-  Wire.begin (SCA_PIN, SCL_PIN); 
-  Wire.setClock(300000);
+  Wire.begin (SDA_PIN, SCL_PIN); 
+  Wire.setClock(100000);
+  // Wire.setClock(300000); // ok for wemos D1
   // Wire.setClock(400000);
     
   _hardware.begin();
@@ -196,13 +235,15 @@ void setup(void) {
   #endif
 
   #ifdef ADC_IS_ENABLED // Compile time directive used for testing
-  // xTaskCreate(TASKgetSensorData, "GET_BENCH_DATA", 2800, NULL, 2, &adcTaskHandle); 
-  xTaskCreatePinnedToCore(TASKgetSensorData, "GET_BENCH_DATA", 1700, NULL, 2, &adcTaskHandle, secondaryCore);  
+  xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENSOR_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
   #endif
 
   #ifdef BME_IS_ENABLED // Compile time directive used for testing
-  // xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle); 
-  xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", 2400, NULL, 2, &bmeTaskHandle, secondaryCore); 
+  xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
+  #endif
+
+  #ifdef SWIRL_IS_ENABLED
+  Encoder.begin();
   #endif
 
 }
@@ -222,16 +263,22 @@ void loop () {
 
   // Process API comms
   if (config.api_enabled) {        
-      if (millis() > status.apiPollTimer) {
+    if (millis() > status.apiPollTimer) {
+      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
         status.apiPollTimer = millis() + API_SCAN_DELAY_MS; 
+
         if (Serial.available() > 0) {
           status.serialData = Serial.read();
           _api.ParseMessage(status.serialData);
         }
+        xSemaphoreGive(i2c_task_mutex); // Release semaphore
+      }
     }                            
   }
   
   // TODO: PID Vac source Analog VFD control [if PREF not within limits]
+  // _hardware.setVFDRef();
+  // _hardware.setBleedValveRef();
   
   #ifdef WEBSERVER_ENABLED
   if (millis() > status.browserUpdateTimer) {        
@@ -241,14 +288,14 @@ void loop () {
         
         // Push data to client using Server Side Events (SSE)
         jsonString = _webserver.getDataJSON();
-
         _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore
       }
   }
   #endif
-  
+
+
   vTaskDelay( 1 );  //mSec delay to prevent Watch Dog Timer (WDT) triggering for empty task
   
 }

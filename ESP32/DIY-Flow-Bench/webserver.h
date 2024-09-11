@@ -42,6 +42,7 @@ class Webserver {
 
     	AsyncWebServer *server;
 		StaticJsonDocument<1024> dataJson; 
+		StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftDataJson; 
 
 		String getFileListJSON ();
 		String getSystemStatusJSON();		
@@ -60,6 +61,8 @@ class Webserver {
 		void uploadFile();
 		String index_html;
 		int getWifiConnection();
+		StaticJsonDocument<LIFT_DATA_JSON_SIZE> loadLiftData ();
+		void parseLiftData(StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData);
 		
 	public:
 	
@@ -71,17 +74,47 @@ class Webserver {
 		AsyncEventSource *events;
 		
 		void begin();
-		void writeJSONFile(String data, String filename);
+		void writeJSONFile(String data, String filename, int dataSize);
 		String getDataJSON();
-		StaticJsonDocument<1024> loadJSONFile(String filename);
+		StaticJsonDocument<CONFIG_JSON_SIZE> loadJSONFile(String filename);
 		void sendWebSocketMessage(String jsonValues);
-		void parseConfigData(StaticJsonDocument<1024> configData);
-		StaticJsonDocument<1024> loadConfig ();
+		void parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configData);
+		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfig ();
 		void createConfigFile ();
 		void resetWifi ( void );
 		void wifiReconnect ( void );
-
+		String getValveDataJSON();
 		
+		StaticJsonDocument<1024> getSDFile(String filename);
+		StaticJsonDocument<1024> getSDFileList(String filename);
+		bool writeToSDFile(const char* filePath, const char* data);
+		bool appendToSDFile(const char* filePath, const char* data);
+		const char* readSDFile(const char* filePath);
+		void deleteFile(fs::FS &fs, const char * path);
+
+		void listSDDir(fs::FS &fs, const char * dirname, uint8_t levels);
+		void createSDDir(fs::FS &fs, const char * path);
+		void removeSDDir(fs::FS &fs, const char * path);
+		void readSDFile(fs::FS &fs, const char * path);
+		void writeSDFile(fs::FS &fs, const char * path, const char * message);
+		void appendSDFile(fs::FS &fs, const char * path, const char * message);
+		void renameSDFile(fs::FS &fs, const char * path1, const char * path2);
+		void deleteSDFile(fs::FS &fs, const char * path);
+		void testSDFileIO(fs::FS &fs, const char * path);
+
+		void createLiftDataFile();
+		static void clearLiftDataFile(AsyncWebServerRequest *request);
+		static void captureLiftData(AsyncWebServerRequest *request);
+
+
+
+
+		// StaticJsonDocument<1024> loadCalibrationSettings ();
+		// StaticJsonDocument<1024> loadCalibrationData ();
+		// void parseCalibrationSettings(StaticJsonDocument<1024> calibrationData);
+		// void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
+		// void createCalibrationFile ();
+
 
 		
 };

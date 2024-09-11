@@ -19,17 +19,31 @@ gulp.task('css', function(done){
 
 gulp.task('js', function(done){    
 	return gulp.src('esp32/DIY-Flow-Bench/src/javascript.js')          
-		.pipe(terser())       
+		// .pipe(terser())       
 		.pipe(gulp.dest('esp32/DIY-Flow-Bench/build'))
 		done(); 
 });
 
-gulp.task('html', function(done) {
-	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
-		.pipe(htmlmin({ collapseWhitespace: true }))
+gulp.task('cssmax', function(done){    
+	return gulp.src('esp32/DIY-Flow-Bench/src/style.css')       
+		// .pipe(cssnano())       
+		// .pipe(minifyCSS())
 		.pipe(gulp.dest('esp32/DIY-Flow-Bench/build'))
-		done();
-	});
+		done(); 
+});	
+
+gulp.task('jsmax', function(done){    
+	return gulp.src('esp32/DIY-Flow-Bench/src/javascript.js')             
+		.pipe(gulp.dest('esp32/DIY-Flow-Bench/build'))
+		done(); 
+});
+
+// gulp.task('html', function(done) {
+// 	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
+// 		.pipe(htmlmin({ collapseWhitespace: true }))
+// 		.pipe(gulp.dest('esp32/DIY-Flow-Bench/build'))
+// 		done();
+// 	});
 	
 gulp.task('clean', function () {
 	return gulp.src('esp32/DIY-Flow-Bench/build/*', {read: false})
@@ -49,6 +63,7 @@ gulp.task('compress', function(done) {
 	.pipe(gulp.dest('esp32/DIY-Flow-Bench/data'))
 	done();
 });
+
 	
 
 gulp.task('html', function() {
@@ -64,7 +79,21 @@ gulp.task('html', function() {
 		   }))
 		.pipe(htmlmin({ collapseWhitespace: true }))
 	   .pipe(gulp.dest('esp32/DIY-Flow-Bench/build'));
+	});	
+
+gulp.task('htmlmax', function() {
+	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
+		.pipe(replace(/<link rel="stylesheet" type="text\/css" href="\/style.css"[^>]*>/, function(s) {
+				var style = fs.readFileSync('esp32/DIY-Flow-Bench/build/style.css', 'utf8');
+				return '<style>\n' + style + '\n</style>';
+			}))
+		.pipe(replace(/<script src="\/javascript.js"\><\/script\>/, function(s) {
+				var script = fs.readFileSync('esp32/DIY-Flow-Bench/build/javascript.js', 'utf8');
+				return '<script>\n' + script + '\n</script>';
+			}))
+		.pipe(gulp.dest('esp32/DIY-Flow-Bench/build'));
 	});
 	
-gulp.task('minify+gzip', gulp.series('css', 'js', 'html', 'compress+gzip', 'clean'));
-gulp.task('minify', gulp.series('css', 'js', 'html', 'compress', 'clean'));
+gulp.task('combine', gulp.series('cssmax', 'jsmax', 'htmlmax', 'compress', 'clean'));
+gulp.task('combine+minify', gulp.series('css', 'js', 'html', 'compress', 'clean'));
+gulp.task('combine+minify+gzip', gulp.series('css', 'js', 'html', 'compress+gzip', 'clean'));

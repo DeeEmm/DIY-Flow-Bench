@@ -26,15 +26,16 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "31012301"
-#define RELEASE "V.2.0-RC.4"
-#define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/ESP32"
+#define BUILD_NUMBER "23041301"
+#define RELEASE "V.2.0-RC.6"
+#define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"
 
 
 
 /***********************************************************
-* SELECT BENCH TYPE
+* SELECT DEFAULT BENCH TYPE
 * NOTE: Only MAF style bench working at this stage
+* Other bench types planned for V3 release
 ***/
 
 #define MAF_STYLE_BENCH
@@ -53,8 +54,9 @@
 ***/
 
 #define WEMOS_D1_R32 // Using official Shield
-// #define ARDUCAM_ESP32S // Using official Shield // TODO Finalise pin mapping (copied from WEMOS_D1_R32 but pins are not correctly mapped yet)
-// #define ESP32DUINO // Generic pin mapping for ESP32 UNO style footprint. 
+// #define ESP32DUINO // Generic pin mapping for ESP32 UNO style footprint. Copy or modify this for custom board mapping
+// #define ARDUCAM_ESP32S // Untested - Needs validating + refining
+// #define ARDUCAM_LOTAI  // Untested - Needs validating + refining
 // #define ESP32_WROVER_KIT // DEBUG BUILD ONLY
 
 
@@ -66,6 +68,12 @@
 
 #define FORMAT_FILESYSTEM_IF_FAILED true
 
+
+/***********************************************************
+* CONFIGURE SD Card
+***/
+
+// #define SD_CARD_IS_ENABLED
 
 
 /***********************************************************
@@ -81,8 +89,11 @@
 
 #define SERIAL0_BAUD 115200
 #define SERIAL2_BAUD 9600
-
-#define WEBSERVER_ENABLED                                   // Disable if running headless
+// #define MAC_ADDRESS {0x32, 0xAE, 0xA4, 0x07, 0x0D, 0x00}    // MAC Address (uncomment to enable)
+// #define STATIC_IP {192,168,1,222}                           // Static IP address (uncomment to enable)
+#define SUBNET {192,168,1,1}                                // Subnet (For static IP)
+#define GATEWAY {255,255,0,0}                               // Default gateway (For static IP)
+#define WEBSERVER_ENABLED                                   // Disable to run headless
 
 
 
@@ -104,13 +115,23 @@
 #define API_SCAN_DELAY_MS 250
 #define PRINT_BUFFER_LENGTH 128
 // #define API_CHECKSUM_IS_ENABLED                       
-#define WEBSOCK_CLEAN_FREQ 600000
-#define STATUS_UPDATE_RATE 500                              // time between SSE push in milliseconds
+// #define WEBSOCK_CLEAN_FREQ 600000 // DEPRECATED
 #define FILESYSTEM SPIFFS
-#define VTASK_DELAY_ADC 100
-#define VTASK_DELAY_BME 100
-#define VTASK_DELAY_SSE 100
+#define SENSOR_TASK_MEM_STACK 2200
+#define ENVIRO_TASK_MEM_STACK 1800
+#define DATA_JSON_SIZE 1500
+#define CONFIG_JSON_SIZE 1536 //1200 
+#define CAL_DATA_JSON_SIZE 128
+#define LIFT_DATA_JSON_SIZE 384
+#define VTASK_DELAY_ADC 500
+#define VTASK_DELAY_BME 500
+#define VTASK_DELAY_SSE 500
 
+
+/***********************************************************
+* WEBUI SETTINGS
+***/
+#define STATUS_UPDATE_RATE 500                              // time between SSE push in milliseconds
 
 
 /***********************************************************
@@ -176,9 +197,11 @@ const int BME280_I2C_ADDR = 0x76;
 const int ADC_I2C_ADDR = 0x48; 
 #define ADC_SCAN_DELAY_MS 250                               // Need to allow enough time for ADC read (min 10ms)
 #define ADC_MAX_RETRIES 10
+#define ADC_RANGE 32767    
+#define ADC_GAIN 6.144                                      // 16bit range for 1115
 
 #define ADC_TYPE_ADS1115 // 16 bit (188uV/bit)
-// #define ADC_TYPE_ADS1015 // 12 bit (3 mV/bit)            // UNTESTED (Not supported in ADS1115_lite library but might work)
+// #define ADC_TYPE_ADS1015 // 12 bit (3 mV/bit)            // UNTESTED (Not supported in ADS1115_lite library but can possibly be made work)
 
 
 
@@ -188,20 +211,38 @@ const int ADC_I2C_ADDR = 0x48;
  * If you want to modify the code to include additional MAF sensors
  * You will need to create your own MAF data file. Use exampleMafData.h as an example
  *
- * NOTE: RC level software has only been tested with default recommended sensor (ACDELCO_92281162)
- * NOTE: Currently onbly VOLTAGE based MAF sensors are working
+ * @note RC level software has only been tested with default recommended sensor (ACDELCO_92281162)
+ * @note Currently only VOLTAGE based MAF sensors are working
+ * 
+ *  
  ***/
 
 #define MAF_IS_ENABLED                                      // Comment to disable MAF related code
     
-// Uncomment One sensor only
-#define MAF_DATA_FILE "mafData/ACDELCO_92281162.cpp"        //default recommended sensor    
-// #define MAF_DATA_FILE "mafData/ACDELCO_19330122.h" 
-// #define MAF_DATA_FILE "mafData/VDO_AFM_043.h"
-// #define MAF_DATA_FILE  "mafData/MH95_3000_100.h"         // PMAS MH95-3000 in 100mm housing              
-// #define MAF_DATA_FILE  "mafData/SIEMENS_5WK9605.h"       // Data from Tonys tests
-// #define MAF_DATA_FILE  "mafData/DELPHI_AF10118.h"        // kg/hr - Data from efidynotuning.com/maf.htm 
-// #define MAF_DATA_FILE  "mafData/TEST.h"                  // Test Data
+// !!!!!UNCOMMENT ONE SENSOR ONLY!!!!!
+
+/**
+ * Validated + Tested
+ ***/  
+#define MAF_DATA_FILE "mafData/BOSCH_0280218067.cpp"     // AUDI RS4 (884cfm)
+// #define MAF_DATA_FILE "mafData/SIEMENS_5WK9605.cpp"      // BMW M54B30 (502cfm)
+// #define MAF_DATA_FILE "mafData/ACDELCO_92281162.cpp"     // LS2 (832cfm) 
+
+
+/**
+ * Working but Unvalidated / Untested
+ ***/  
+// #define MAF_DATA_FILE "mafData/DELPHI_AF10118.cpp"      // kg/hr - Data from efidynotuning.com/maf.htm 
+// #define MAF_DATA_FILE "mafData/DELPHI_AF10058.cpp"      // LS2 in slot style package 
+// #define MAF_DATA_FILE "mafData/MH95_3000_100.cpp"       // PMAS MH95-3000 in 100mm housing ()
+
+
+/**
+ * Not working
+ ***/  
+// #define MAF_DATA_FILE "mafData/ACDELCO_19330122.cpp"     // Corvette Z06 (FREQUENCY BASED)
+// #define MAF_DATA_FILE "mafData/VDO_AFM_043.cpp"          // (FREQUENCY BASED)
+
 
 
 // Set signal source (Uncomment One line only)
@@ -220,7 +261,7 @@ const int ADC_I2C_ADDR = 0x48;
 * If you want to modify the code to include additional reference pressure sensors
 * You will need to add your volts to kPa algorithm in the function sensors->getPRef()
 *
-* Recommended sensor is the MPXV7007DP
+* Recommended sensor is the MPXV7007DP or XGZP6899A007KPDPN 
 ***/
 
 #define PREF_IS_ENABLED                                     // Comment to disable reference pressure related code
@@ -228,19 +269,20 @@ const int ADC_I2C_ADDR = 0x48;
 #define FIXED_REF_PRESS_VALUE 1                             // Fixed pressure value in Pascals
 
 // Set signal source (Uncomment One line only)
-//#define PREF_SRC_PIN
+// #define PREF_SRC_PIN
 #define PREF_SRC_ADC
 
 // Set sensor type (Uncomment One line only)
-// #define PREF_SENSOR_NOT_USED
 // #define PREF_SENSOR_TYPE_LINEAR_ANALOG 
 #define PREF_SENSOR_TYPE_MPXV7007        
+// #define PREF_SENSOR_TYPE_MPXV7025
+// #define PREF_SENSOR_TYPE_XGZP6899A007KPDPN        
+// #define PREF_SENSOR_TYPE_XGZP6899A010KPDPN        
 
 
 #define PREF_MV_TRIMPOT 0.0                               // Millivolt offset
 #define PREF_ANALOG_SCALE 1.0                             // Scaling factor used for raw analog value
-#define PREF_ADC_CHANNEL 2                                // BUG: TEMP SWAPPED WITH PDIFF (ERROR ON PCB)
-
+#define PREF_ADC_CHANNEL 1                                
 
 
 
@@ -250,7 +292,7 @@ const int ADC_I2C_ADDR = 0x48;
 * If you want to modify the code to include additional reference pressure sensors
 * You will need to add your volts to kPa algorithm in the function sensors->getPDiff()
 * 
-* Recommended sensor is the MPXV7007DP
+* Recommended sensor is the MPXV7007DP or XGZP6899A007KPDPN 
 ***/
 
 #define PDIFF_IS_ENABLED                                  // Comment to disable Differential pressure related code
@@ -261,14 +303,16 @@ const int ADC_I2C_ADDR = 0x48;
 // #define PDIFF_SRC_IS_PIN
 #define PDIFF_SRC_IS_ADC
 
-// Set sensor type (Uncomment One line only)
-// #define PDIFF_SENSOR_NOT_USED            
+// Set sensor type (Uncomment One line only)   
 // #define PDIFF_SENSOR_TYPE_LINEAR_ANALOG 
 #define PDIFF_SENSOR_TYPE_MPXV7007          
+// #define PDIFF_SENSOR_TYPE_MPXV7025
+// #define PDIFF_SENSOR_TYPE_XGZP6899A007KPDPN        
+// #define PDIFF_SENSOR_TYPE_XGZP6899A010KPDPN        
 
 #define PDIFF_MV_TRIMPOT 0.0                              // Millivolt offset
 #define PDIFF_ANALOG_SCALE 1.0                            // Scaling factor used for raw analog value
-#define PDIFF_ADC_CHANNEL 1                               // TODO: TEMP SWAPPED WITH PREF (ERROR ON PCB)
+#define PDIFF_ADC_CHANNEL 2                               
 
 
 
@@ -279,7 +323,7 @@ const int ADC_I2C_ADDR = 0x48;
 * You will need to add your volts to kPa algorithm in the function sensors->getPitot()
 * Note Pitot sensors need to be a differential pressure sensor (DP)
 *
-* Recommended sensor is the MPXV7007DP
+* Recommended sensor is the MPXV7007DP or XGZP6899A007KPDPN 
 ***/
 
 #define PITOT_IS_ENABLED                                  // Comment to disable pitot related code
@@ -291,7 +335,10 @@ const int ADC_I2C_ADDR = 0x48;
 // Set sensor type (Uncomment One line only)
 // #define PITOT_SENSOR_NOT_USED
 // #define PITOT_SENSOR_TYPE_LINEAR_ANALOG                // Use analog signal from PITOT_PIN
-#define PITOT_SENSOR_TYPE_MPXV7007DP
+#define PITOT_SENSOR_TYPE_MPXV7007
+// #define PITOT_SENSOR_TYPE_MPXV7025
+// #define PITOT_SENSOR_TYPE_XGZP6899A007KPDPN        
+// #define PITOT_SENSOR_TYPE_XGZP6899A010KPDPN        
 
 #define PITOT_MV_TRIMPOT 0.0                              // Millivolt offset
 #define PITOT_ANALOG_SCALE 1.0                            // Scaling factor used for raw analog value
@@ -367,7 +414,6 @@ const int ADC_I2C_ADDR = 0x48;
 #define RELH_ANALOG_SCALE 1.0                               // Scaling factor for raw analog value
 
 // Uncomment ONE of the following
-// #define RELH_SENSOR_NOT_USED
 // #define RELH_SENSOR_TYPE_FIXED_VALUE
 // #define RELH_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from HUMIDITY_PIN
 #define RELH_SENSOR_TYPE_BME280
@@ -375,6 +421,20 @@ const int ADC_I2C_ADDR = 0x48;
 
 #define RELH_MV_TRIMPOT 0.0                                 // Millivolt offset
 #define RELH_FINE_ADJUST 0.0                                // Adjust end value
+
+
+
+
+
+
+/***********************************************************
+* CONFIGURE SWIRL ENCODER
+*
+* 2 channel quadrature style encoder to measure speed and direction
+***/
+
+// #define SWIRL_IS_ENABLED                                     // Uncomment to enable swirl related code
+
 
 
 // REVIEW - Advanced calibration settings
@@ -395,21 +455,4 @@ const int ADC_I2C_ADDR = 0x48;
 #define calibrationPlateMidCFM 50                           // Flow rate for med calibration orifice
 #define calibrationPlateLowCFM 10                           // Flow rate for small calibration orifice
 
-
-
-// REVIEW - Orifice data
-/***********************************************************
- * @brief Orifice data for DP bench
- * @note {diameter_in_mm, cfm_flow@15"}
- * 
- * TODO: Move into configuration data or into stand alone file
- *
- ***/
-// double orificeData [][2] = {
-//     {51.85,209.5},
-//     {42.38,139.5},
-//     {29.98,70.4},
-//     {21.16,35.5},
-//     {9.92,7.8}
-// };
 
