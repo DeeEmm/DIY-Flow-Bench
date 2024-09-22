@@ -26,8 +26,8 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "24091101"
-#define RELEASE "V.2.0-RC.7"
+#define BUILD_NUMBER "24092301"
+#define RELEASE "V.2.0-RC.8"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"
 
 
