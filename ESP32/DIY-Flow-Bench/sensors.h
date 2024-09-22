@@ -45,6 +45,7 @@ class Sensors {
 		double BME280GetHumidity(void);
 		long getMafRaw();
 		double getMafFlow(int units = KG_H);
+		double getDifferentialFlow();
 		double getMafVolts();
 		double getTempValue();
 		double getBaroValue();
@@ -57,7 +58,8 @@ class Sensors {
 		double getPitotValue();
 		void mafFreqCountISR();
 		void mafSetupISR(uint8_t irq_pin, void (*ISR_callback)(void), int value);
-		
+
+	
 		double startupBaroPressure;
 		volatile uint64_t StartValue;                 
 		volatile uint64_t PeriodCount; 

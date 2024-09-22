@@ -31,6 +31,7 @@
 #include "driver/pcnt.h"
 #include LANGUAGE_FILE
 
+
 // #ifdef MAF_IS_ENABLED
 // #include "mafData/maf.h"
 // #endif
@@ -478,6 +479,101 @@ double Sensors::getMafFlow(int units) {
 
 
 }
+
+
+
+
+/***********************************************************
+ * @brief Returns flow value in CFM from differential pressure using ratiometric principle
+ * @note uses calibrated orifice flow rate and assumes reference pressure is matched to orifice calibration
+ * @note pRef tapped below orifice plate | pDiff tapped above orifice plate
+ *
+ ***/
+double Sensors::getDifferentialFlow() {
+
+	extern struct DeviceStatus status;
+	extern struct SensorData sensorVal;
+	extern struct ConfigSettings config;
+	extern struct Translator translate;
+
+	Hardware _hardware;
+    Messages _message;  
+
+	double flowRateCFM = 0.0;
+    double orificeOneFlow = 0.0;
+    double orificeOneDepression = 0.0;
+	double orificeFlowRate = 0.0;
+	double orificeDepression = 0.0;
+	double flowRatio = 0.0;
+
+	// convert orifice querystring to char 
+	char activeOrifice[status.activeOrifice.length() + 1];
+	strcpy(activeOrifice, status.activeOrifice.c_str()); 
+
+	//  switchval = strtol(liftPoint.c_str(), &end, 10); // convert std::str to int
+
+	char orifice = activeOrifice[0];
+
+	// get orifice flow data from active orifice
+	switch (orifice)   {
+
+		case '1': 
+			orificeFlowRate = config.orificeOneFlow;
+			orificeDepression = config.orificeOneDepression;
+		break;
+
+		case '2': 
+			orificeFlowRate = config.orificeTwoFlow;
+			orificeDepression = config.orificeTwoDepression;
+		break;
+
+		case '3': 
+			orificeFlowRate = config.orificeThreeFlow;
+			orificeDepression = config.orificeThreeDepression;
+		break;
+
+		case '4': 
+			orificeFlowRate = config.orificeFourFlow;
+			orificeDepression = config.orificeFourDepression;
+		break;
+
+		case '5': 
+			orificeFlowRate = config.orificeFiveFlow;
+			orificeDepression = config.orificeFiveDepression;
+		break;
+
+		case '6': 
+			orificeFlowRate = config.orificeSixFlow;
+			orificeDepression = config.orificeSixDepression;
+		break;
+
+		// We've got here without a valid active orifice so lets set something and send an error message
+        default:
+			orificeFlowRate = config.orificeOneFlow;
+			orificeDepression = config.orificeOneDepression;
+			_message.serialPrintf("%s\n", "Invalid Orifice Data");
+			String statusMessage = translate.LANG_VAL_INVALID_ORIFICE_SELECTED;
+        break;
+
+	}
+
+	status.activeOrificeFlowRate = orificeFlowRate;
+	status.activeOrificeTestPressure = orificeDepression;
+
+	// Calculate flow rate based on calibrated orifice data, ref pressure and current pressure drop
+	flowRatio = sensorVal.PDiffKPA / sensorVal.PRefKPA;
+	flowRateCFM = flowRatio * orificeFlowRate;
+
+	return flowRateCFM;
+
+}
+
+
+
+
+
+
+
 
 /***********************************************************
  * @brief get Reference Pressure sensor voltage

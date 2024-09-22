@@ -107,13 +107,33 @@ void TASKgetSensorData( void * parameter ){
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
         status.adcPollTimer = millis() + ADC_SCAN_DELAY_MS; // Only reset timer when task executes
 
-        // TODO integration for non maf style benches
-        #ifdef MAF_IS_ENABLED
-        sensorVal.FlowKGH = _sensors.getMafFlow();
-        sensorVal.FlowCFM = _calculations.convertFlow(sensorVal.FlowKGH);
-        // sensorVal.FlowCFM = _calculations.convertMassFlowToVolumetric(sensorVal.FlowKGH);
-        // sensorVal.FlowCFM = _calculations.convertKGHtoCFM(sensorVal.FlowKGH) + calVal.flow_offset;
-        #endif
+        // Get flow data
+        // Bench is MAF type...
+        if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())){
+          #ifdef MAF_IS_ENABLED
+          sensorVal.FlowKGH = _sensors.getMafFlow();
+          sensorVal.FlowCFM = _calculations.convertFlow(sensorVal.FlowKGH);
+          // sensorVal.FlowCFM = _calculations.convertMassFlowToVolumetric(sensorVal.FlowKGH);
+          // sensorVal.FlowCFM = _calculations.convertKGHtoCFM(sensorVal.FlowKGH) + calVal.flow_offset;
+          #endif
+
+        // Bench is ORIFICE type...
+        } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())){
+          sensorVal.FlowCFM = _sensors.getDifferentialFlow();
+
+
+        // Bench is VENTURI type...
+        } else if (strstr(String(config.bench_type).c_str(), String("VENTURI").c_str())){
+
+
+        // Bench is PITOT type...
+        } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())){
+
+        // Error bench type unknown
+        } else {
+
+
+        }
         
         #ifdef PREF_IS_ENABLED 
         sensorVal.PRefKPA = _sensors.getPRefValue();

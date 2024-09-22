@@ -64,18 +64,18 @@ struct ConfigSettings {
   double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
   int leak_test_tolerance = 2;                    // Leak test tolerance
   int leak_test_threshold = 10;                   // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
-  double OrificeOneFlow = 0.0;
-  double OrificeOneDepression = 0.0;
-  double OrificeTwoFlow = 0.0;
-  double OrificeTwoDepression = 0.0;
-  double OrificeThreeFlow = 0.0;
-  double OrificeThreeDepression = 0.0;
-  double OrificeFourFlow = 0.0;
-  double OrificeFourDepression = 0.0;
-  double OrificeFiveFlow = 0.0;
-  double OrificeFiveDepression = 0.0;
-  double OrificeSixFlow = 0.0;
-  double OrificeSixDepression = 0.0;
+  double orificeOneFlow = 0.0;
+  double orificeOneDepression = 0.0;
+  double orificeTwoFlow = 0.0;
+  double orificeTwoDepression = 0.0;
+  double orificeThreeFlow = 0.0;
+  double orificeThreeDepression = 0.0;
+  double orificeFourFlow = 0.0;
+  double orificeFourDepression = 0.0;
+  double orificeFiveFlow = 0.0;
+  double orificeFiveDepression = 0.0;
+  double orificeSixFlow = 0.0;
+  double orificeSixDepression = 0.0;
 };
 
 
@@ -138,6 +138,9 @@ struct DeviceStatus {
   int mafUnits = 0;
   double mafScaling = 1;
   int mafDiameter = 0;
+  String activeOrifice = "1";
+  double activeOrificeFlowRate;
+  double activeOrificeTestPressure;
 };
 
 

@@ -12,6 +12,8 @@ var flowCalVal;
 var leakCalTolerance;
 var leakTestThreshold;
 var updateSSE = true;
+var active_orifice;
+var runOnce = false;
 
 window.addEventListener('load', onLoad);
 
@@ -52,14 +54,23 @@ if (!!window.EventSource) {
       // get bench type and set up GUI accoordingly
       var benchType = myObj["BENCH_TYPE"];
 
+      // get active orifice and set up GUI accoordingly
+      active_orifice = myObj["ACTIVE_ORIFICE"];
+      if (runOnce == false ){
+        radioButton = document.getElementById("orifice" + active_orifice);
+        radioButton.checked = true;
+      }
+
       switch (benchType) {
     
         case "MAF":
           document.getElementById('orificeData').style.display='none';
+          document.getElementById('orificeRadio').style.display='none';
         break;
     
         case "ORIFICE":
           document.getElementById('orificeData').style.display='block';
+          document.getElementById('orificeRadio').style.display='block';
         break;
           
         case "VENTURI":
@@ -75,6 +86,8 @@ if (!!window.EventSource) {
     }
 
   }, false);
+
+
 
 }
 
@@ -126,6 +139,7 @@ function onLoad(event) {
       
     
   }
+ 
   console.log('Page Loaded');
   
 }
@@ -262,7 +276,6 @@ function initialiseButtons() {
     xhr.send();
   });
 
-
   document.getElementById('restart-button').addEventListener('click', function(){
     console.log('System Reboot');
     xhr.open('GET', '/api/bench/reboot');
@@ -272,7 +285,27 @@ function initialiseButtons() {
     xhr.send();
   });
 
+
 }
+
+
+/***********************************************************
+* Update selected orifice when orifice-radio button change
+***/
+function orificeChange(src) {
+  
+  var xhr = new XMLHttpRequest();
+
+  console.log('Orifice ' + src.value + ' Selected');
+
+  xhr.open('GET', '/api/orifice-change?orifice=' + src.value);
+  xhr.onload = function() {
+//    if (xhr.status === 200) window.location.href = '/';
+  };
+  xhr.send();
+  }
+
+
 
 
 /***********************************************************
@@ -360,6 +393,7 @@ document.addEventListener("keydown", ({key}) => {
     saveGraphDataModal.style.display = "none";
   }
 })
+
 
 
 /***********************************************************

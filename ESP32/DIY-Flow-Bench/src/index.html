@@ -216,14 +216,30 @@
           <br>Pitot mV: <span id="PITOT_MV">&nbsp;</span>
         </div>   
         
-        ~ORIFICE_LIST~
+        <form method="POST" id="orificeRadio" style="display: none;">
+          <div class="switch-field">
+            <input type="radio" id="orifice1" name="radioOrifice" value="1" ~ORIFICE1_CHECKED~ onchange="orificeChange(this);"/>
+            <label for="orifice1">1</label>
+            <input type="radio" id="orifice2" name="radioOrifice" value="2" ~ORIFICE2_CHECKED~ onchange="orificeChange(this);"/>
+            <label for="orifice2">2</label>
+            <input type="radio" id="orifice3" name="radioOrifice" value="3" ~ORIFICE3_CHECKED~ onchange="orificeChange(this);"/>
+            <label for="orifice3">3</label>
+            <input type="radio" id="orifice4" name="radioOrifice" value="4" ~ORIFICE4_CHECKED~ onchange="orificeChange(this);"/>
+            <label for="orifice4">4</label>
+            <input type="radio" id="orifice5" name="radioOrifice" value="5" ~ORIFICE5_CHECKED~ onchange="orificeChange(this);"/>
+            <label for="orifice5">5</label>
+            <input type="radio" id="orifice6" name="radioOrifice" value="6" ~ORIFICE6_CHECKED~ onchange="orificeChange(this);"/>
+            <label for="orifice6">6</label>
+          </div>
+          <div id="orifice-data">Calibrated Flow Rate: <span id="ORIFICE_MAX_FLOW">~ORIFICE_MAX_FLOW~</span>cfm @ <span id="ORIFICE_CALIBRATED_DEPRESSION">~ORIFICE_CALIBRATED_DEPRESSION~</span> inH2O"</div>
+        </form>
           
-          <button id="on-button" class="control-button">START BENCH</button>
-          <button id="off-button" class="control-button">STOP BENCH</button>
-          <button id="clear-message-button" class="control-button">CLEAR ALARM</button>
-          <br>
-          <br>
-          <button id="show-capture-modal-button" class="control-button">CAPTURE</button>
+        <button id="on-button" class="control-button">START BENCH</button>
+        <button id="off-button" class="control-button">STOP BENCH</button>
+        <button id="clear-message-button" class="control-button">CLEAR ALARM</button>
+        <br>
+        <br>
+        <button id="show-capture-modal-button" class="control-button">CAPTURE</button>
 
       </div>
                 

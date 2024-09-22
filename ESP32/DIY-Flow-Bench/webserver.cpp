@@ -43,6 +43,10 @@
 #include "calculations.h"
 #include LANGUAGE_FILE
 
+#include <sstream>
+using namespace std;
+
+
 // RTC_DATA_ATTR int bootCount; // flash mem
 
 /***********************************************************
@@ -256,6 +260,14 @@ void Webserver::begin()
       _message.Handler(translate.LANG_VAL_NO_ERROR);
       _message.debugPrintf("Clearing messages...\n");
        });
+
+    server->on("/api/orifice-change", HTTP_GET, [](AsyncWebServerRequest *request){
+      Messages _message;
+      _message.Handler(translate.LANG_VAL_ORIFICE_CHANGE);
+      _message.debugPrintf("Active Orifice Changed\n");
+      status.activeOrifice = request->arg("orifice");
+      request->send(200, "text/html", "{\"orifice\":changed\"\"}"); });
+
 
   server->on("/api/bench/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
@@ -481,18 +493,18 @@ void Webserver::parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configD
   config.leak_test_tolerance = configData["CONF_LEAK_TEST_TOLERANCE"].as<int>();
   config.leak_test_threshold = configData["CONF_LEAK_TEST_THRESHOLD"].as<int>();
 
-  config.OrificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
-  config.OrificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
-  config.OrificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
-  config.OrificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
-  config.OrificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
-  config.OrificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
-  config.OrificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
-  config.OrificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
-  config.OrificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
-  config.OrificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
-  config.OrificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
-  config.OrificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
+  config.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
+  config.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
+  config.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
+  config.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
+  config.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
+  config.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
+  config.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
+  config.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
+  config.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
+  config.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
+  config.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
+  config.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
 
 }
 
@@ -563,17 +575,17 @@ void Webserver::createConfigFile () {
   configData["CONF_LEAK_TEST_TOLERANCE"] = config.leak_test_tolerance;
   configData["CONF_LEAK_TEST_THRESHOLD"] = config.leak_test_threshold;
 
-  configData["ORIFICE1_FLOW_RATE"] = config.OrificeOneFlow;
-  configData["ORIFICE1_TEST_PRESSURE"] = config.OrificeOneDepression;
-  configData["ORIFICE2_FLOW_RATE"] = config.OrificeTwoFlow;
-  configData["ORIFICE2_TEST_PRESSURE"] = config.OrificeThreeDepression;
-  configData["ORIFICE3_FLOW_RATE"] = config.OrificeThreeFlow;
-  configData["ORIFICE4_FLOW_RATE"] = config.OrificeFourFlow;
-  configData["ORIFICE4_TEST_PRESSURE"] = config.OrificeFourDepression;
-  configData["ORIFICE5_FLOW_RATE"] = config.OrificeFiveFlow;
-  configData["ORIFICE5_TEST_PRESSURE"] = config.OrificeFiveDepression;
-  configData["ORIFICE6_FLOW_RATE"] = config.OrificeSixFlow;
-  configData["ORIFICE7_TEST_PRESSURE"] = config.OrificeSixDepression;
+  configData["ORIFICE1_FLOW_RATE"] = config.orificeOneFlow;
+  configData["ORIFICE1_TEST_PRESSURE"] = config.orificeOneDepression;
+  configData["ORIFICE2_FLOW_RATE"] = config.orificeTwoFlow;
+  configData["ORIFICE2_TEST_PRESSURE"] = config.orificeThreeDepression;
+  configData["ORIFICE3_FLOW_RATE"] = config.orificeThreeFlow;
+  configData["ORIFICE4_FLOW_RATE"] = config.orificeFourFlow;
+  configData["ORIFICE4_TEST_PRESSURE"] = config.orificeFourDepression;
+  configData["ORIFICE5_FLOW_RATE"] = config.orificeFiveFlow;
+  configData["ORIFICE5_TEST_PRESSURE"] = config.orificeFiveDepression;
+  configData["ORIFICE6_FLOW_RATE"] = config.orificeSixFlow;
+  configData["ORIFICE7_TEST_PRESSURE"] = config.orificeSixDepression;
 
   serializeJsonPretty(configData, jsonString);
   writeJSONFile(jsonString, "/config.json", CONFIG_JSON_SIZE);
@@ -635,18 +647,18 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
   config.leak_test_tolerance = configData["CONF_LEAK_TEST_TOLERANCE"].as<int>();
   config.leak_test_threshold = configData["CONF_LEAK_TEST_THRESHOLD"].as<int>();
 
-  config.OrificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
-  config.OrificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
-  config.OrificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
-  config.OrificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
-  config.OrificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
-  config.OrificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
-  config.OrificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
-  config.OrificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
-  config.OrificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
-  config.OrificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
-  config.OrificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
-  config.OrificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
+  config.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
+  config.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
+  config.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
+  config.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
+  config.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
+  config.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
+  config.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
+  config.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
+  config.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
+  config.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
+  config.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
+  config.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
 
   // save settings to config file
   serializeJsonPretty(configData, jsonString);
@@ -1057,6 +1069,13 @@ String Webserver::getDataJSON()
     dataJson["STATUS_MESSAGE"] = "Uptime: " + String(_hardware.uptime()) + " (hh.mm)";      
   }
 
+  // Active Orifice
+  dataJson["ACTIVE_ORIFICE"] = status.activeOrifice;
+  // Orifice Max Flow
+  dataJson["ORIFICE_MAX_FLOW"] = status.activeOrificeFlowRate;
+  // Orifice Calibration Depression
+  dataJson["ORIFICE_CALIBRATED_DEPRESSION"] = status.activeOrificeTestPressure;
+
   serializeJson(dataJson, jsonString);
 
   return jsonString;
@@ -1324,48 +1343,27 @@ String Webserver::processTemplate(const String &var)
   //   // return String(lineData).c_str();
   // }
 
-  // Orifice Selector
-  if (strstr(config.bench_type, "ORIFICE")!=NULL) {
-    String orificeList;
-    if (var == "ORIFICE_LIST"){ 
-      orificeList =  R"END(
-      <form method="POST" action="/api/setorifice">
-        <div class="switch-field">
-          <input type="radio" id="orifice-one" name="switch-one" value="1" checked/>
-          <label for="orifice-one">1</label>
-          <input type="radio" id="orifice-two" name="switch-one" value="2" />
-          <label for="orifice-two">2</label>
-          <input type="radio" id="orifice-three" name="switch-one" value="3"/>
-          <label for="orifice-three">3</label>
-          <input type="radio" id="orifice-four" name="switch-one" value="4" />
-          <label for="orifice-four">4</label>
-          <input type="radio" id="orifice-five" name="switch-one" value="5" />
-          <label for="orifice-five">5</label>
-          <input type="radio" id="orifice-six" name="switch-one" value="6" />
-          <label for="orifice-six">6</label>
-        </div>
-        <div id="orifice-data">Orifice #%SELECTED_ORIFICE% Flow Max: %ORIFICE_MAX_FLOW%cfm @ %ORIFICE_CALIBRATED_DEPRESSION%"</div>
-      </form>
-      )END" ;
 
-      return orificeList;
-    }
-  }
+
 
   // Orifice plates
-  if (var == "ORIFICE1_FLOW_RATE") return String(config.OrificeOneFlow);
-  if (var == "ORIFICE1_TEST_PRESSURE") return String(config.OrificeOneDepression);
-  if (var == "ORIFICE2_FLOW_RATE") return String(config.OrificeTwoFlow);
-  if (var == "ORIFICE2_TEST_PRESSURE") return String(config.OrificeTwoDepression);
-  if (var == "ORIFICE3_FLOW_RATE") return String(config.OrificeThreeFlow);
-  if (var == "ORIFICE3_TEST_PRESSURE") return String(config.OrificeThreeDepression);
-  if (var == "ORIFICE4_FLOW_RATE") return String(config.OrificeFourFlow);
-  if (var == "ORIFICE4_TEST_PRESSURE") return String(config.OrificeFourDepression);
-  if (var == "ORIFICE5_FLOW_RATE") return String(config.OrificeFiveFlow);
-  if (var == "ORIFICE5_TEST_PRESSURE") return String(config.OrificeFiveDepression);
-  if (var == "ORIFICE6_FLOW_RATE") return String(config.OrificeSixFlow);
-  if (var == "ORIFICE6_TEST_PRESSURE") return String(config.OrificeSixDepression);
+  if (var == "ORIFICE1_FLOW_RATE") return String(config.orificeOneFlow);
+  if (var == "ORIFICE1_TEST_PRESSURE") return String(config.orificeOneDepression);
+  if (var == "ORIFICE2_FLOW_RATE") return String(config.orificeTwoFlow);
+  if (var == "ORIFICE2_TEST_PRESSURE") return String(config.orificeTwoDepression);
+  if (var == "ORIFICE3_FLOW_RATE") return String(config.orificeThreeFlow);
+  if (var == "ORIFICE3_TEST_PRESSURE") return String(config.orificeThreeDepression);
+  if (var == "ORIFICE4_FLOW_RATE") return String(config.orificeFourFlow);
+  if (var == "ORIFICE4_TEST_PRESSURE") return String(config.orificeFourDepression);
+  if (var == "ORIFICE5_FLOW_RATE") return String(config.orificeFiveFlow);
+  if (var == "ORIFICE5_TEST_PRESSURE") return String(config.orificeFiveDepression);
+  if (var == "ORIFICE6_FLOW_RATE") return String(config.orificeSixFlow);
+  if (var == "ORIFICE6_TEST_PRESSURE") return String(config.orificeSixDepression);
 
+  // Current orifice data
+  if (var == "ACTIVE_ORIFICE") return String(status.activeOrifice);
+  if (var == "ORIFICE_MAX_FLOW") return String(status.activeOrificeFlowRate);
+  if (var == "ORIFICE_CALIBRATED_DEPRESSION") return String(status.activeOrificeTestPressure);
 
   
 

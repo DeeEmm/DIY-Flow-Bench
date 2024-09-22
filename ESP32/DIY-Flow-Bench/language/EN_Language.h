@@ -43,6 +43,8 @@ struct Translator {
     String LANG_VAL_SYSTEM_REBOOTING = "System Rebooting";
     String LANG_VAL_CANNOT_DELETE_INDEX = "Cannot delete index.html (overwrite it instead!)";
     String LANG_VAL_DELETE_FAILED = "File Delete Failed";
+    String LANG_VAL_INVALID_ORIFICE_SELECTED = "Invalid Orifice selected";
+    String LANG_VAL_ORIFICE_CHANGE = "Orifice Plate Changed";
     
 };
 
