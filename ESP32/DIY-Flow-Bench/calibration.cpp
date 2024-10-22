@@ -67,12 +67,12 @@ bool Calibration::setFlowOffset() {
   // Get the current reference pressure
   double RefPressure = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);
   
-  // convert the calibration orifice flow value  to our current ref pressure  
+  // convert the calibration orifice flow value to the calibration orifice test pressure  
   double convertedOrificeFlowCFM = _calculations.convertFlowDepression(config.cal_ref_press, RefPressure,  config.cal_flow_rate);
  
-  // compare it to the measured flow to generate our flow offset
-  double flowCalibrationOffset = convertedOrificeFlowCFM - MafFlowCFM;
-  
+  // compare it to the calibrated orifice to generate our flow offset
+  double flowCalibrationOffset = convertedOrificeFlowCFM - config.cal_flow_rate;
+    
   // update config var
   calVal.flow_offset = flowCalibrationOffset;
   
@@ -298,11 +298,11 @@ StaticJsonDocument<1024> Calibration::loadCalibrationData () {
 ***/
 void Calibration::parseCalibrationData(StaticJsonDocument<1024> calibrationData) {
 
-  // extern struct CalibrationData calVal;
+  extern struct CalibrationData calVal;
 
-  // calData.flow_offset = calibrationData["FLOW_OFFSET"];
-  // calData.leak_cal_vac_val = calibrationData["LEAK_CAL_VAC_VAL"];
-  // calData.leak_cal_press_val = calibrationData["LEAK_CAL_PRESS_VAL"];
+  calVal.flow_offset = calibrationData["FLOW_OFFSET"];
+  calVal.leak_cal_vac_val = calibrationData["LEAK_CAL_VAC_VAL"];
+  calVal.leak_cal_press_val = calibrationData["LEAK_CAL_PRESS_VAL"];
 
 
 }

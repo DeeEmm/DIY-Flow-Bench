@@ -87,8 +87,8 @@ struct ConfigSettings {
  * Calibration Data
  ***/
 struct CalibrationData { 
-  double leak_cal_press_val = 1000.0;  
-  double leak_cal_vac_val = -1000.0;  
+  double leak_cal_press_val = 1.0;  
+  double leak_cal_vac_val = -1.0;  
   double leak_cal_val = 0.0;  
   double flow_offset = 0.0;         
 };
