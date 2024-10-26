@@ -253,7 +253,7 @@ function initialiseButtons() {
     console.log('Calibrate FLow Offset');
     xhr.open('GET', '/api/bench/calibrate');
     xhr.onload = function() {
-      if (xhr.status === 200) window.location.href = '/';
+      if (xhr.status === 200) window.location.href = '/?view=config';
     };
     xhr.send();
   });
@@ -262,7 +262,7 @@ function initialiseButtons() {
     console.log('Leak Test Calibration');
     xhr.open('GET', '/api/bench/leakcal');
     xhr.onload = function() {
-      if (xhr.status === 200) window.location.href = '/';
+      if (xhr.status === 200) window.location.href = '/?view=config';
     };
     xhr.send();
   });

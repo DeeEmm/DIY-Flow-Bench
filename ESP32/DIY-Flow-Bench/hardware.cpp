@@ -361,10 +361,16 @@ bool Hardware::benchIsRunning() {
   extern struct ConfigSettings config;
   extern struct Translator translate;
   extern struct SensorData sensorVal;
-  
+
+  double refPressure;
+  double mafFlowRateCFM; 
+ 
   // TODO: Check scope of these...
-  double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
-  double mafFlowRateCFM = _calculations.convertFlow(_sensors.getMafFlow());
+  refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
+  mafFlowRateCFM = _calculations.convertFlow(_sensors.getMafFlow());
+
+  // comvert negative value into posotive
+  refPressure = fabs(refPressure); 
 
   if ((refPressure > config.min_bench_pressure))
   {
