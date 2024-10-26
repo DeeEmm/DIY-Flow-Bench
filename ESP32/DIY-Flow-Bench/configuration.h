@@ -26,7 +26,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "24102301"
+#define BUILD_NUMBER "24102601"
 #define RELEASE "V.2.0-RC.8"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"
 
@@ -50,7 +50,7 @@
 *
 * Default DIYFB_SHIELD 
 * NOTE: ESP32_WROVER_KIT can be used for debug workflows in VSCode / PlatformIO
-* NOTE: If defining new board make sure to add board type definition to Hardware::begin
+* NOTE: If defining new board make sure to add board type definition to pins.h
 ***/
 
 #define WEMOS_D1_R32 // Using official Shield

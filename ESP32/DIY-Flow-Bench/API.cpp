@@ -173,6 +173,7 @@ void API::ParseMessage(char apiMessage) {
   ! : Debug Mode
   < : Last Error
   ==============================
+
   )";
 
 
@@ -202,7 +203,7 @@ void API::ParseMessage(char apiMessage) {
 
       case 'C': // Flow Offset Calibration  'O\r\n'        
           _calibration.setFlowOffset();
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "O%s%f", config.api_delim , calVal.flow_offset);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "C%s%f", config.api_delim , calVal.flow_offset);
           // TODO: confirm Flow Offset Calibration success in response
       break;      
 
@@ -273,7 +274,8 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'L': // Perform Leak Test Calibration 'L\r\n'
-          // TODO: apiResponse = ("L") + config.api_delim + leakTestCalibration();
+          _calibration.setLeakTest();
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "L%s%F", config.api_delim , calVal.leak_cal_vac_val );
           // TODO: confirm Leak Test Calibration success in response
       break;
       
