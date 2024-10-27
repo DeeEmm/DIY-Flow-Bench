@@ -662,6 +662,9 @@ svg .dataCircle:hover {
 	</HEAD>
 	<BODY>
 
+    <input type="hidden" id="ACTIVE_ORIFICE" value=""></input>
+    <input type="hidden" id="BENCH_TYPE" value=""></input>
+
     <!-- Save Data Modal -->
     <div id="captureLiftDataModal" class="modal">
       <div class="modal-content">
@@ -892,9 +895,11 @@ svg .dataCircle:hover {
         <button id="on-button" class="control-button">START BENCH</button>
         <button id="off-button" class="control-button">STOP BENCH</button>
         <button id="clear-message-button" class="control-button">CLEAR ALARM</button>
-        <br>
-        <br>
         <button id="show-capture-modal-button" class="control-button">CAPTURE</button>
+        <br>
+        <button id="calibrate-button" class="button">Calibrate Flow Offset</button>
+        <button id="leak-cal-button" class="button">Calibrate Leak Test</button>
+
 
       </div>
                 
@@ -1125,10 +1130,6 @@ svg .dataCircle:hover {
         <div class="config-row tooltip"><label class="config-label">Calibration Offset:</label>&nbsp;<input disabled="disabled" type="text" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
         <div class="config-row tooltip"><label class="config-label">Vac Leak Test Value:</label>&nbsp;<input disabled="disabled" type="text" id="LEAK_CAL_VAC_VAL" name="LEAK_CAL_VAC_VAL" value="~LEAK_CAL_VAC_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
         <div class="config-row tooltip"><label class="config-label">Pressure Leak Test Value:</label>&nbsp;<input disabled="disabled" type="text" id="LEAK_CAL_PRESS_VAL" name="LEAK_CAL_PRESS_VAL" value="~LEAK_CAL_PRESS_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
-
-        <br>
-        <div class="float-right"><button id="calibrate-button" class="button">Calibrate Flow Offset</button><button id="leak-cal-button" class="button">Calibrate Leak Test</button></div>
-        <br>
       </div>                    
     </div>
   </div>
@@ -1186,8 +1187,8 @@ if (!!window.EventSource) {
             document.getElementById(key).innerHTML = myObj[key].toFixed(2); 
           }
         } catch (error) {
-          console.log('Missing or incorrect data');
-          console.log(key + ' : ' + myObj[key]);
+          console.log('Missing or incorrect JSON data');
+          console.log(error);
         }
       } 
 

@@ -46,8 +46,8 @@ if (!!window.EventSource) {
             document.getElementById(key).innerHTML = myObj[key].toFixed(2); 
           }
         } catch (error) {
-          console.log('Missing or incorrect data');
-          console.log(key + ' : ' + myObj[key]);
+          console.log('Missing or incorrect JSON data');
+          console.log(error);
         }
       } 
 
