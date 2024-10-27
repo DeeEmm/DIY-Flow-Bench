@@ -23,6 +23,8 @@ var captureLiftDataModal = document.getElementById("captureLiftDataModal");
 var loadGraphDataModal = document.getElementById("loadGraphDataModal");
 var saveGraphDataModal = document.getElementById("saveGraphDataModal");
 
+
+var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
 var closeFileModalButton = document.getElementsByClassName("closeFileModalButton")[0];
 var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton")[0];
 var closeCaptureLiftDataModalButton = document.getElementsByClassName("closeCaptureLiftDataModalButton")[0];
@@ -192,6 +194,9 @@ function initialiseButtons() {
     exportSVGAsPNG();
   });
 
+  document.getElementById('STATUS_MESSAGE').addEventListener('dblclick', function(){
+    document.getElementById('calibrationModal').style.display='block';
+  });
 
   document.getElementById('file-manager-button').addEventListener('click', function(){
     document.getElementById('fileModal').style.display='block';
@@ -230,6 +235,9 @@ function initialiseButtons() {
     document.getElementById('tile-swirl').style.display='none';
     document.getElementById('tile-pitot').style.display='block';
   });
+
+
+
 
   document.getElementById('on-button').addEventListener('click', function(){
     console.log('Bench On');
@@ -286,6 +294,12 @@ function initialiseButtons() {
   });
 
 
+  
+
+
+
+
+
 }
 
 
@@ -326,6 +340,12 @@ function openTab(tabName, elmnt) {
   }
 }
 
+/***********************************************************
+* Close file modal dialog
+***/
+closeCalibrationModalButton.onclick = function() {
+  calibrationModal.style.display = "none";
+}
 
 /***********************************************************
 * Close file modal dialog

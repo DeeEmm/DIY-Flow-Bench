@@ -401,6 +401,10 @@ hr {
   border-radius: 5px;
 }
 
+.calibrationModal {
+  width:400px;
+}
+
 @media screen and (max-width: 800px) {
   .modal-content {
       width: 100vw;
@@ -418,7 +422,7 @@ input[type="file"] {
   
 
 /* The Close Button */
-.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton {
+.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton {
   color: #aaa;
   float: right;
   font-size: 22px;
@@ -435,7 +439,9 @@ input[type="file"] {
 .closeSaveGraphDataModalButton:hover,
 .closeSaveGraphDataModalButton:focus,
 .closeLoadGraphDataModalButton:hover,
-.closeLoadGraphDataModalButton:focus {
+.closeLoadGraphDataModalButton:focus,
+.closeCalibrationModalButton:hover,
+.closeCalibrationModalButton:focus {
   color: black;
   text-decoration: none;
   cursor: pointer;
@@ -709,6 +715,16 @@ svg .dataCircle:hover {
       </div>        
     </div>
 
+    <!--Calibration modal-->
+    <div id="calibrationModal" class="modal">
+      <div class="modal-content calibrationModal">
+        <span class="closeCalibrationModalButton">&times;</span>
+        <div class="align-center">
+          <button id="calibrate-button" class="button">Calibrate Flow Offset</button>
+          <button id="leak-cal-button" class="button">Calibrate Leak Test</button>
+        </div>
+      </div>        
+    </div>
 
     <!-- Load Data Modal -->
     <div id="loadGraphDataModal" class="modal">
@@ -895,10 +911,8 @@ svg .dataCircle:hover {
         <button id="on-button" class="control-button">START BENCH</button>
         <button id="off-button" class="control-button">STOP BENCH</button>
         <button id="clear-message-button" class="control-button">CLEAR ALARM</button>
-        <button id="show-capture-modal-button" class="control-button">CAPTURE</button>
         <br>
-        <button id="calibrate-button" class="button">Calibrate Flow Offset</button>
-        <button id="leak-cal-button" class="button">Calibrate Leak Test</button>
+        <button id="show-capture-modal-button" class="control-button">CAPTURE</button>
 
 
       </div>
@@ -1164,6 +1178,8 @@ var captureLiftDataModal = document.getElementById("captureLiftDataModal");
 var loadGraphDataModal = document.getElementById("loadGraphDataModal");
 var saveGraphDataModal = document.getElementById("saveGraphDataModal");
 
+
+var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
 var closeFileModalButton = document.getElementsByClassName("closeFileModalButton")[0];
 var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton")[0];
 var closeCaptureLiftDataModalButton = document.getElementsByClassName("closeCaptureLiftDataModalButton")[0];
@@ -1333,6 +1349,9 @@ function initialiseButtons() {
     exportSVGAsPNG();
   });
 
+  document.getElementById('STATUS_MESSAGE').addEventListener('dblclick', function(){
+    document.getElementById('calibrationModal').style.display='block';
+  });
 
   document.getElementById('file-manager-button').addEventListener('click', function(){
     document.getElementById('fileModal').style.display='block';
@@ -1371,6 +1390,9 @@ function initialiseButtons() {
     document.getElementById('tile-swirl').style.display='none';
     document.getElementById('tile-pitot').style.display='block';
   });
+
+
+
 
   document.getElementById('on-button').addEventListener('click', function(){
     console.log('Bench On');
@@ -1427,6 +1449,12 @@ function initialiseButtons() {
   });
 
 
+  
+
+
+
+
+
 }
 
 
@@ -1467,6 +1495,12 @@ function openTab(tabName, elmnt) {
   }
 }
 
+/***********************************************************
+* Close file modal dialog
+***/
+closeCalibrationModalButton.onclick = function() {
+  calibrationModal.style.display = "none";
+}
 
 /***********************************************************
 * Close file modal dialog

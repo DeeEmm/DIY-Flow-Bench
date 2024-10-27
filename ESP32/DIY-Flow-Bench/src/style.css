@@ -395,6 +395,10 @@ hr {
   border-radius: 5px;
 }
 
+.calibrationModal {
+  width:400px;
+}
+
 @media screen and (max-width: 800px) {
   .modal-content {
       width: 100vw;
@@ -412,7 +416,7 @@ input[type="file"] {
   
 
 /* The Close Button */
-.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton {
+.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton {
   color: #aaa;
   float: right;
   font-size: 22px;
@@ -429,7 +433,9 @@ input[type="file"] {
 .closeSaveGraphDataModalButton:hover,
 .closeSaveGraphDataModalButton:focus,
 .closeLoadGraphDataModalButton:hover,
-.closeLoadGraphDataModalButton:focus {
+.closeLoadGraphDataModalButton:focus,
+.closeCalibrationModalButton:hover,
+.closeCalibrationModalButton:focus {
   color: black;
   text-decoration: none;
   cursor: pointer;
