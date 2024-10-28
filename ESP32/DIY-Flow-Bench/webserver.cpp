@@ -211,7 +211,7 @@ void Webserver::begin()
   server->on("/api/bench/on", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Hardware _hardware;
-      _message.Handler(translate.LANG_VAL_BENCH_RUNNING);
+      _message.Handler(translate.LANG_BENCH_RUNNING);
       _message.debugPrintf("Bench On \n");
       _hardware.benchOn(); 
       request->send(200, "text/html", "{\"bench\":\"on\"}"); 
@@ -220,7 +220,7 @@ void Webserver::begin()
   server->on("/api/bench/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Hardware _hardware;
-      _message.Handler(translate.LANG_VAL_BENCH_STOPPED);
+      _message.Handler(translate.LANG_BENCH_STOPPED);
       _message.debugPrintf("Bench Off \n");
       _hardware.benchOff(); 
       request->send(200, "text/html", "{\"bench\":\"off\"}"); 
@@ -228,28 +228,28 @@ void Webserver::begin()
 
   server->on("/api/debug/on", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      _message.Handler(translate.LANG_VAL_DEBUG_MODE);
+      _message.Handler(translate.LANG_DEBUG_MODE);
       _message.debugPrintf("Debug Mode On\n");
       config.debug_mode = true;
       request->send(200, "text/html", "{\"debug\":\"on\"}"); });
 
   server->on("/api/debug/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      _message.Handler(translate.LANG_VAL_BLANK);
+      _message.Handler(translate.LANG_BLANK);
       _message.debugPrintf("Debug Mode Off\n");
       config.debug_mode = false;
       request->send(200, "text/html", "{\"debug\":\"off\"}"); });
 
   server->on("/api/dev/on", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
-      _message.Handler(translate.LANG_VAL_DEV_MODE);
+      _message.Handler(translate.LANG_DEV_MODE);
       _message.debugPrintf("Developer Mode On\n");
       config.dev_mode = true;
       request->send(200, "text/html", "{\"dev\":\"on\"}"); });
 
   server->on("/api/dev/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      _message.Handler(translate.LANG_VAL_BLANK);
+      _message.Handler(translate.LANG_BLANK);
       _message.debugPrintf("Developer Mode Off\n");
       config.dev_mode = false;
       request->send(200, "text/html", "{\"dev\":\"off\"}"); });
@@ -257,13 +257,13 @@ void Webserver::begin()
   server->on("/api/clear-message", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
       status.statusMessage = "";
-      _message.Handler(translate.LANG_VAL_NO_ERROR);
+      _message.Handler(translate.LANG_NO_ERROR);
       _message.debugPrintf("Clearing messages...\n");
        });
 
     server->on("/api/orifice-change", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      _message.Handler(translate.LANG_VAL_ORIFICE_CHANGE);
+      _message.Handler(translate.LANG_ORIFICE_CHANGE);
       _message.debugPrintf("Active Orifice Changed\n");
       status.activeOrifice = request->arg("orifice");
       request->send(200, "text/html", "{\"orifice\":changed\"\"}"); });
@@ -271,7 +271,7 @@ void Webserver::begin()
 
   server->on("/api/bench/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
-      _message.Handler(translate.LANG_VAL_SYSTEM_REBOOTING);
+      _message.Handler(translate.LANG_SYSTEM_REBOOTING);
       request->send(200, "text/html", "{\"reboot\":\"true\"}");
       ESP.restart(); 
       request->redirect("/"); });
@@ -281,12 +281,12 @@ void Webserver::begin()
       Calibration _calibrate;
       Hardware _hardware;
       if (_hardware.benchIsRunning()) {
-        _message.Handler(translate.LANG_VAL_CALIBRATING);
+        _message.Handler(translate.LANG_CALIBRATING);
         _message.debugPrintf("Calibrating Flow...\n");
         request->send(200, "text/html", "{\"calibrate\":\"true\"}");
         _calibrate.setFlowOffset();         
       } else {
-        _message.Handler(translate.LANG_VAL_RUN_BENCH_TO_CALIBRATE);
+        _message.Handler(translate.LANG_RUN_BENCH_TO_CALIBRATE);
         request->send(200, "text/html", "{\"calibrate\":\"false\"}");
       }  
       request->redirect("/");});
@@ -296,12 +296,12 @@ void Webserver::begin()
       Calibration _calibrate;
       Hardware _hardware;
       if (_hardware.benchIsRunning()) {
-        _message.Handler(translate.LANG_VAL_LEAK_CALIBRATING);
+        _message.Handler(translate.LANG_LEAK_CALIBRATING);
         _message.debugPrintf("Calibrating Leak Test...\n");
         request->send(200, "text/html", "{\"leakcal\":\"true\"}");
         _calibrate.setLeakTest();
       } else {
-        _message.Handler(translate.LANG_VAL_RUN_BENCH_TO_CALIBRATE);
+        _message.Handler(translate.LANG_RUN_BENCH_TO_CALIBRATE);
         request->send(200, "text/html", "{\"leakcal\":\"false\"}");
       } 
       request->redirect("/"); });
@@ -309,8 +309,10 @@ void Webserver::begin()
   // Upload request handler
   server->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
       Messages _message;
-      _message.serialPrintf("Upload Request Called \n");
-      request->redirect("/?view=upload"); },
+      _message.debugPrintf("/api/file/upload \n");
+      request->send(200);
+      // request->redirect("/?view=upload"); 
+      },
       processUpload);
 
   // Download request handler
@@ -333,7 +335,7 @@ void Webserver::begin()
           SPIFFS.remove(fileToDelete);
         }  else {
           _message.debugPrintf("Delete Failed: %s", fileToDelete);  
-          _message.Handler(translate.LANG_VAL_DELETE_FAILED);    
+          _message.Handler(translate.LANG_DELETE_FAILED);    
         } 
         if (fileToDelete == "/index.html"){
           request->redirect("/");
@@ -379,14 +381,14 @@ void Webserver::begin()
       if (SPIFFS.exists("/index.html")) {
         request->send(SPIFFS, "/index.html", "text/html", false, processTemplate);
        } else {
-        request->send(200, "text/html", LANG_VAL_INDEX_HTML); 
+        request->send(200, "text/html", LANG_INDEX_HTML); 
       }});
 
   server->onFileUpload(processUpload);
   server->addHandler(events);
   server->begin();
 
-  _message.Handler(translate.LANG_VAL_SERVER_RUNNING);
+  _message.Handler(translate.LANG_SERVER_RUNNING);
   _message.serialPrintf("Server Running \n");
 }
 
@@ -418,19 +420,35 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
   Messages _message;
   extern struct FileUploadData fileUploadData;
+  extern struct Translator translate;
   String redirectURL;
 
-  if (SPIFFS.exists(filename))  {
-    SPIFFS.remove(filename);
+  if (!filename.startsWith("/")){
+    filename = "/" + filename;
   }
+
   uint32_t freespace = SPIFFS.totalBytes() - SPIFFS.usedBytes();
 
-  if (!filename.startsWith("/"))
-    filename = "/" + filename;
-  if (!index && !fileUploadData.upload_error)  {
+//  if (!index && !fileUploadData.upload_error)  {
+  if (!index)  {
     _message.debugPrintf("UploadStart: %s \n", filename);
+    // open the file on first call and store the file handle in the request object
     request->_tempFile = SPIFFS.open(filename, "w");
   }
+
+  if (len)  {
+    fileUploadData.file_size += len;
+    if (fileUploadData.file_size > freespace)    {
+      _message.Handler(translate.LANG_UPLOAD_FAILED_NO_SPACE);
+      _message.debugPrintf("Upload failed, no Space: %s \n", freespace);
+      fileUploadData.upload_error = true;
+    }    else    {
+      _message.Handler(translate.LANG_FILE_UPLOADED);
+      _message.debugPrintf("Writing file: '%s' index=%u len=%u \n", filename, index, len);
+      // stream the incoming chunk to the opened file
+      request->_tempFile.write(data, len);
+    }
+  } 
 
   // Set redirect to file Upload modal unless uploading the index file
   if (filename == String("/index.html.gz") || filename == String("/index.html"))  {
@@ -439,19 +457,8 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
     redirectURL = "/?view=upload";
   }
 
-  if (len)  {
-    fileUploadData.file_size += len;
-    if (fileUploadData.file_size > freespace)    {
-      // TODO: _message.statusPrintf("Upload rejected, not enough space \n");
-      fileUploadData.upload_error = true;
-    }    else    {
-      // TODO: _message.statusPrintf("Writing file: '%s' index=%s len=%s \n", filename, index, len);
-      request->_tempFile.write(data, len);
-    }
-  } 
-
   if (final)  {
-    _message.statusPrintf("UploadEnd: %s,%s \n", filename, fileUploadData.file_size);
+    _message.debugPrintf("Upload Complete: %s,%u \n", filename, fileUploadData.file_size);
     request->_tempFile.close();
     request->redirect(redirectURL);
   }
@@ -1124,7 +1131,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadJSONFile(String filename)
     File jsonFile = SPIFFS.open(filename, FILE_READ);
 
     if (!jsonFile)    {
-      _message.Handler(translate.LANG_VAL_ERROR_LOADING_FILE);
+      _message.Handler(translate.LANG_ERROR_LOADING_FILE);
       _message.statusPrintf("Failed to open file for reading \n");
     }    else    {
       size_t size = jsonFile.size();

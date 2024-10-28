@@ -57,7 +57,12 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 Build #         - Description of Change
 
 
-24102702        - Added calibration modal to main tab
+
+24102801        - Updated flow calibration routine
+                - Changed partition regime to allow for OTA
+                - General code tidy
+                - Updated language constants
+                - Fixed issue with index.html upload
 24102701        - Moved calibration buttons to main tab
 24102601        - #178 - Leak Test Calibration data 
                 - #179 - Flow test Calibration

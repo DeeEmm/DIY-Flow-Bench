@@ -51,34 +51,20 @@ bool Calibration::setFlowOffset() {
   extern struct ConfigSettings config;
   extern struct CalibrationData calVal;
   extern struct Translator translate;
+  extern struct SensorData sensorVal;
   
   Sensors _sensors; 
   Calculations _calculations;
   Messages _message;
-
-  // load current calibration data
-  loadCalibrationData();
-
-  _message.debugPrintf("Calibration::setFlowOffset \n");
-  
-  // Get the current flow value
-  // TODO: need to determine what flow sensors are active (MAF / Orifice / Pitot)
-  double MafFlowCFM = _calculations.convertFlow(_sensors.getMafFlow());
-  // Get the current reference pressure
-  double RefPressure = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);
-  
-  // convert the calibration orifice flow value to the calibration orifice test pressure  
-  double convertedOrificeFlowCFM = _calculations.convertFlowDepression(config.cal_ref_press, RefPressure,  config.cal_flow_rate);
  
-  // compare it to the calibrated orifice to generate our flow offset
-  double flowCalibrationOffset = convertedOrificeFlowCFM - config.cal_flow_rate;
-    
   // update config var
-  calVal.flow_offset = flowCalibrationOffset;
+  calVal.flow_offset = sensorVal.FlowCFM - config.cal_flow_rate;
   
+  _message.debugPrintf("Calibration::setFlowOffset $ \n", calVal.flow_offset);
+
   saveCalibrationData();    
 
-  _message.Handler(translate.LANG_VAL_CAL_OFFET_VALUE + flowCalibrationOffset);
+  _message.Handler(translate.LANG_CAL_OFFET_VALUE + calVal.flow_offset);
   
   return true;
   
@@ -145,7 +131,7 @@ void Calibration::setLeakTestVacuum() {
   
   calVal.leak_cal_vac_val = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
 
-  _message.Handler(translate.LANG_VAL_LEAK_CAL_VALUE + calVal.leak_cal_vac_val);
+  _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_vac_val);
 
 }
 
@@ -166,7 +152,7 @@ void Calibration::setLeakTestPressure() {
   
   calVal.leak_cal_press_val = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
 
-  _message.Handler(translate.LANG_VAL_LEAK_CAL_VALUE + calVal.leak_cal_press_val);
+  _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_press_val);
 
 }
 
@@ -244,8 +230,8 @@ void Calibration::saveCalibrationData() {
   extern struct CalibrationData calVal;
   extern struct Translator translate;
   Messages _message;
-  Webserver _webserver;
-  String jsonString;
+  // Webserver _webserver;
+  // String jsonString;
   StaticJsonDocument<1024> calibrationData;
 
   _message.debugPrintf("Writing to cal.json file... \n");
@@ -254,10 +240,9 @@ void Calibration::saveCalibrationData() {
   calibrationData["LEAK_CAL_VAC_VAL"] = calVal.leak_cal_vac_val;
   calibrationData["LEAK_CAL_PRESS_VAL"] = calVal.leak_cal_press_val;
 
-
-  _message.Handler(translate.LANG_VAL_SAVING_CALIBRATION);
+  _message.Handler(translate.LANG_SAVING_CALIBRATION);
   
-  serializeJsonPretty(calibrationData, jsonString);
+  // serializeJsonPretty(calibrationData, jsonString);
 
   if (SPIFFS.exists("/cal.json"))  {
     SPIFFS.remove("/cal.json");

@@ -64,7 +64,7 @@ Messages::Messages() {
  * @brief Message Handler
  *
  * @details Translates status messages and stores in global struct
- * @example _message.Handler(translate.LANG_VAL_SAVING_CONFIG);
+ * @example _message.Handler(translate.LANG_SAVING_CONFIG);
  * @note - Language strings are defined in the current language file i.e. /language/XX_Language.h
  * @note - statusMessage is pushed to client as part of JSON data created in webserver::getJsonData()
  * 

@@ -374,10 +374,10 @@ bool Hardware::benchIsRunning() {
 
   if ((refPressure > config.min_bench_pressure))
   {
-	  _message.Handler(translate.LANG_VAL_BENCH_RUNNING);
+	  _message.Handler(translate.LANG_BENCH_RUNNING);
 	  return true;
   } else {
-    _message.Handler(translate.LANG_VAL_NO_ERROR);
+    _message.Handler(translate.LANG_NO_ERROR);
 	  return false;
   }
 }
@@ -404,7 +404,7 @@ void Hardware::checkRefPressure() {
   // Is this a redundant check? Maybe a different alert would be more appropriate
   if ((refPressure < (config.cal_ref_press * (MIN_TEST_PRESSURE_PERCENTAGE / 100))) && (Hardware::benchIsRunning()))
   {
-    _message.Handler(translate.LANG_VAL_REF_PRESS_LOW);
+    _message.Handler(translate.LANG_REF_PRESS_LOW);
   }
 }
 

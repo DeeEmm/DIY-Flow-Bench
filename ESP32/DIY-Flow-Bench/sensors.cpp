@@ -167,16 +167,16 @@ void Sensors::initialise () {
 	#elif defined MAF_IS_ENABLED && defined MAF_SRC_IS_PIN
 		this->_mafSensorType = _maf.sensorType() + " on GPIO:" + MAF_PIN;
 	#else
-		this->_mafSensorType = translate.LANG_VAL_NOT_ENABLED;
+		this->_mafSensorType = translate.LANG_NOT_ENABLED;
 	#endif
 
 	// Baro Sensor
 	#if defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
 		this->startupBaroPressure = this->getPRefValue();
-		this->_baroSensorType = translate.LANG_VAL_START_REF_PRESSURE;
+		this->_baroSensorType = translate.LANG_START_REF_PRESSURE;
 	#elif defined BARO_SENSOR_TYPE_FIXED_VALUE
 		this->startupBaroPressure = FIXED_BARO_VALUE;
-		this->_baroSensorType = translate.LANG_VAL_FIXED_VALUE;
+		this->_baroSensorType = translate.LANG_FIXED_VALUE;
 		this->_baroSensorType += FIXED_BARO_VALUE;
 	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 		this->_baroSensorType = "BME280";
@@ -185,15 +185,15 @@ void Sensors::initialise () {
 	#elif defined BARO_SENSOR_TYPE_LINEAR_ANALOG
 		this->_baroSensorType = "ANALOG PIN: " + REF_BARO_PIN;
 	#else 
-		this->_baroSensorType = translate.LANG_VAL_FIXED_VALUE + FIXED_BARO_VALUE;
+		this->_baroSensorType = translate.LANG_FIXED_VALUE + FIXED_BARO_VALUE;
 	#endif
 	
 	//Temp Sensor
 	#ifdef TEMP_SENSOR_NOT_USED
 		this->startupBaroPressure = this->getPRefValue();
-		this->_tempSensorType = translate.LANG_VAL_NOT_ENABLED;
+		this->_tempSensorType = translate.LANG_NOT_ENABLED;
 	#elif defined TEMP_SENSOR_TYPE_FIXED_VALUE
-		this->_tempSensorType = translate.LANG_VAL_FIXED_VALUE;
+		this->_tempSensorType = translate.LANG_FIXED_VALUE;
 		this->_tempSensorType += FIXED_TEMP_VALUE;
 	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 		this->_tempSensorType = "BME280";
@@ -202,15 +202,15 @@ void Sensors::initialise () {
 	#elif defined TEMP_SENSOR_TYPE_LINEAR_ANALOG
 		this->_tempSensorType = "ANALOG PIN: " + TEMPERATURE_PIN;
 	#else 
-		this->_tempSensorType = translate.LANG_VAL_FIXED_VALUE + FIXED_TEMP_VALUE;
+		this->_tempSensorType = translate.LANG_FIXED_VALUE + FIXED_TEMP_VALUE;
 	#endif
 	
 	// Rel Humidity Sensor
 	#ifndef RELH_IS_ENABLED
 		this->startupBaroPressure = this->getPRefValue();
-		this->_relhSensorType = translate.LANG_VAL_NOT_ENABLED;
+		this->_relhSensorType = translate.LANG_NOT_ENABLED;
 	#elif defined RELH_SENSOR_TYPE_FIXED_VALUE
-		this->_relhSensorType = translate.LANG_VAL_FIXED_VALUE;
+		this->_relhSensorType = translate.LANG_FIXED_VALUE;
 		this->_relhSensorType += FIXED_RELH_VALUE;
 	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 		this->_relhSensorType = "BME280";
@@ -219,12 +219,12 @@ void Sensors::initialise () {
 	#elif defined RELH_SENSOR_TYPE_LINEAR_ANALOG
 		this->_relhSensorType = "ANALOG PIN: " + HUMIDITY_PIN;
 	#else 
-		this->_relhSensorType = translate.LANG_VAL_FIXED_VALUE + FIXED_RELH_VALUE;
+		this->_relhSensorType = translate.LANG_FIXED_VALUE + FIXED_RELH_VALUE;
 	#endif
 
 	// reference pressure
 	#ifndef PREF_IS_ENABLED
-		this->_prefSensorType = translate.LANG_VAL_NOT_ENABLED;
+		this->_prefSensorType = translate.LANG_NOT_ENABLED;
 	#elif defined PREF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_prefSensorType = "SMPXV7007";
 	#elif defined PREF_SENSOR_TYPE_MPX4250 && defined ADC_IS_ENABLED
@@ -234,12 +234,12 @@ void Sensors::initialise () {
 	#elif defined PREF_SENSOR_TYPE_LINEAR_ANALOG
 		this->_prefSensorType = "ANALOG PIN: " + REF_PRESSURE_PIN;
 	#else 
-		this->_prefSensorType = translate.LANG_VAL_NOT_ENABLED;
+		this->_prefSensorType = translate.LANG_NOT_ENABLED;
 	#endif
 	
 	// differential pressure
 	#ifndef PDIFF_IS_ENABLED
-		this->_pdiffSensorType = translate.LANG_VAL_NOT_ENABLED;
+		this->_pdiffSensorType = translate.LANG_NOT_ENABLED;
 	#elif defined PDIFF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_pdiffSensorType = "SMPXV7007";
 	#elif defined PDIFF_SENSOR_TYPE_LINEAR_ANALOG
@@ -247,12 +247,12 @@ void Sensors::initialise () {
 	#elif defined PDIFF_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
 		this->_prefSensorType = "MPXV7025";
 	#else 
-		this->_pdiffSensorType = translate.LANG_VAL_NOT_ENABLED;
+		this->_pdiffSensorType = translate.LANG_NOT_ENABLED;
 	#endif
 	
 	// pitot pressure differential
     #ifndef PITOT_IS_ENABLED
-		this->_pitotSensorType = translate.LANG_VAL_NOT_ENABLED;
+		this->_pitotSensorType = translate.LANG_NOT_ENABLED;
 	#elif defined PITOT_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_pitotSensorType = "SMPXV7007";
 	#elif defined PITOT_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
@@ -260,7 +260,7 @@ void Sensors::initialise () {
 	#elif defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
 		this->_pitotSensorType = "ANALOG PIN: " + PITOT_PIN;
 	#else 
-		this->_pitotSensorType = translate.LANG_VAL_NOT_ENABLED;
+		this->_pitotSensorType = translate.LANG_NOT_ENABLED;
 	#endif
 	
 	// Set status values for GUI
@@ -552,7 +552,7 @@ double Sensors::getDifferentialFlow() {
 			orificeFlowRate = config.orificeOneFlow;
 			orificeDepression = config.orificeOneDepression;
 			_message.serialPrintf("%s\n", "Invalid Orifice Data");
-			String statusMessage = translate.LANG_VAL_INVALID_ORIFICE_SELECTED;
+			String statusMessage = translate.LANG_INVALID_ORIFICE_SELECTED;
         break;
 
 	}
@@ -898,7 +898,7 @@ double Sensors::getTempValue() {
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
 		int err = SimpleDHTErrSuccess;
 		if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
-		  _message.Handler(translate.LANG_VAL_DHT11_READ_FAIL); // Set error to display on screen
+		  _message.Handler(translate.LANG_DHT11_READ_FAIL); // Set error to display on screen
 		  refTempDegC = 0;        
 		} else {
 		  refTempDegC = refTemp;
@@ -990,7 +990,7 @@ double Sensors::getRelHValue() {
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
 		int err = SimpleDHTErrSuccess;
 		if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
-		  _message.Handler(translate.LANG_VAL_DHT11_READ_FAIL); // Set error to display on screen
+		  _message.Handler(translate.LANG_DHT11_READ_FAIL); // Set error to display on screen
 		  relativeHumidity = 0;        
 		} else {
 		  relativeHumidity = refRelh;

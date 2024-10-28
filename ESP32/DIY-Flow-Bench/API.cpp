@@ -141,7 +141,6 @@ void API::ParseMessage(char apiMessage) {
   D : MAF data max value
   d : MAF data key max value
   E : Enum1
-  e : Enum2
   F : Flow Value in CFM
   f : Flow Value in KG/H
   H : Humidity Value
@@ -172,8 +171,7 @@ void API::ParseMessage(char apiMessage) {
   @ : Stream Status
   ! : Debug Mode
   < : Last Error
-  ==============================
-
+  ============================== 
   )";
 
 
@@ -214,16 +212,6 @@ void API::ParseMessage(char apiMessage) {
       case 'd': // mafdata max key value
           snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%u", config.api_delim , status.mafDataKeyMax);
       break;      
-
-      case 'e': // Enum - Vapour Pressure:Absolute Humidity:Specific Gravity:Air Density
-          /*
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "e%s%f%s%f%s%f%s%f", 
-          config.api_delim, _calculations.calculateVaporPressure(KPA), 
-          config.api_delim, _calculations.calculateAbsoluteHumidity(), 
-          config.api_delim, _calculations.calculateSpecificGravity(), 
-          config.api_delim, _calculations.calculateAirDensity());
-          */
-      break;     
 
       case 'E': // Enum - Flow:Ref:Temp:Humidity:Baro
           
@@ -406,7 +394,7 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case '?': // Help      
-        snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s\n", apiHelpText);
+        snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s", apiHelpText);
       break;
       
       case '<': // Display last error
@@ -451,6 +439,7 @@ void API::ParseMessage(char apiMessage) {
   #else
       if (*apiResponseBlob != 0) {
         _message.blobPrintf("%s\n", apiResponseBlob);     
+        _message.serialPrintf("\n\n", "");    
       } else if (*apiResponse != 0) {
         _message.serialPrintf("%s\n", apiResponse);    
       }else {
