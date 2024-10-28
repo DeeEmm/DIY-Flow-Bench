@@ -567,6 +567,7 @@ void Webserver::createConfigFile () {
   configData["CONF_REFRESH_RATE"] = config.refresh_rate;
   configData["CONF_MIN_BENCH_PRESSURE"] = config.min_bench_pressure;
   configData["CONF_MIN_FLOW_RATE"] = config.min_flow_rate;
+  configData["DATA_FILTER_TYPE"] = config.data_filter_type;
   configData["CONF_CYCLIC_AVERAGE_BUFFER"] = config.cyc_av_buffer;
   configData["CONF_MAF_MIN_VOLTS"] = config.maf_min_volts;
   configData["CONF_API_DELIM"] = config.api_delim;
@@ -639,6 +640,7 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
   config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
   config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
   config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
+  strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
   config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
   config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
   strcpy(config.api_delim, configData["CONF_API_DELIM"]);
@@ -1032,8 +1034,10 @@ String Webserver::getDataJSON()
   // Flow Rate
   if ((sensorVal.FlowCFM > config.min_flow_rate) && (sensorVal.PRefH2O > config.min_bench_pressure))  {
     dataJson["FLOW"] = sensorVal.FlowCFM;
+    dataJson["MFLOW"] = sensorVal.FlowKGH;
   }  else  {
     dataJson["FLOW"] = 0.0;
+    dataJson["MFLOW"] = 0.0;
   }
 
   // Adjusted Flow Rate
@@ -1047,6 +1051,17 @@ String Webserver::getDataJSON()
     dataJson["TEMP"] = sensorVal.TempDegF;
   }
 
+  // Data Filter Type
+  if (strstr(String(config.data_filter_type).c_str(), String("NONE").c_str())) {
+    dataJson["DATA_FILTER_TYPE"] = "NONE";
+  } else if (strstr(String(config.data_filter_type).c_str(), String("MEDIAN").c_str())) {
+    dataJson["DATA_FILTER_TYPE"] = "MEDIAN";
+  } else if (strstr(String(config.data_filter_type).c_str(), String("AVERAGE").c_str())) {
+    dataJson["DATA_FILTER_TYPE"] = "AVERAGE";
+  } else if (strstr(String(config.data_filter_type).c_str(), String("MODE").c_str())) {
+    dataJson["DATA_FILTER_TYPE"] = "NODE";
+  }
+
   // Bench Type
   if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())) {
     dataJson["BENCH_TYPE"] = "MAF";
@@ -1057,6 +1072,7 @@ String Webserver::getDataJSON()
   } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())) {
     dataJson["BENCH_TYPE"] = "PITOT";
   }
+
 
   dataJson["BARO"] = sensorVal.BaroHPA; // GUI  displays mbar (hPa)
   dataJson["RELH"] = sensorVal.RelH;
@@ -1137,7 +1153,6 @@ StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadJSONFile(String filename)
       size_t size = jsonFile.size();
       if (size > CONFIG_JSON_SIZE)    {
 
-
       }
 
       DeserializationError error = deserializeJson(jsonData, jsonFile);
@@ -1172,7 +1187,7 @@ String Webserver::processTemplate(const String &var)
   extern struct ConfigSettings config;
   extern struct CalibrationData calVal;
 
-  // REVIEW : moved from hardware.begin
+
   // Bench definitions for system status pane 
   if (strstr(config.bench_type, "MAF")!=NULL) {
     status.benchType = "MAF Style";
@@ -1184,7 +1199,6 @@ String Webserver::processTemplate(const String &var)
     status.benchType = "Pitot Style";
   }
 
-  // REVIEW : moved from hardware.begin
   // Board definitions for system status pane
   #if defined WEMOS_D1_R32                    
     status.boardType = "WEMOS_D1_R32";
@@ -1387,6 +1401,19 @@ String Webserver::processTemplate(const String &var)
   // API Settings
   if (var == "CONF_API_DELIM") return String(config.api_delim);
   if (var == "CONF_SERIAL_BAUD_RATE") return String(config.serial_baud_rate);
+
+  // Data Filter type
+  if (var == "DATA_FILTER_TYPE_DROPDOWN"){
+    if (strstr(String(config.data_filter_type).c_str(), String("NONE").c_str())){
+      return String( "<select name='DATA_FILTER_TYPE' class='config-select'><option value='NONE' selected>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE'>Mode</option></select>");
+    } else if (strstr(String(config.data_filter_type).c_str(), String("MEDIAN").c_str())) {
+      return String( "<select name='DATA_FILTER_TYPE' class='config-select'><option value='NONE' >None</option><option value='MEDIAN' selected>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE'>Mode</option></select>");
+    } else if (strstr(String(config.data_filter_type).c_str(), String("AVERAGE").c_str())){
+      return String( "<select name='DATA_FILTER_TYPE' class='config-select'><option value='NONE'>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE' selected>Cyclic Average </option><option value='MODE'>Mode</option></select>");
+    } else if (strstr(String(config.data_filter_type).c_str(), String("MODE").c_str())) {
+      return String( "<select name='DATA_FILTER_TYPE' class='config-select'><option value='NONE'>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE' selected>Mode</option></select>");
+    }
+  }
 
   // Data Filters
   if (var == "CONF_MIN_FLOW_RATE") return String(config.min_flow_rate);

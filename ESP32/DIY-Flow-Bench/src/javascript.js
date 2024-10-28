@@ -85,6 +85,10 @@ if (!!window.EventSource) {
           
       }
 
+      // Get data filter type
+      var dataFilterType = myObj["DATA_FILTER_TYPE"];
+
+
     }
 
   }, false);
@@ -223,9 +227,13 @@ function initialiseButtons() {
 
   document.getElementById('aflow-tile').addEventListener('click', function(){
     document.getElementById('aflow-tile').style.display='none';
-    document.getElementById('flow-tile').style.display='block';
+    document.getElementById('maf-tile').style.display='block';
   });
 
+  document.getElementById('maf-tile').addEventListener('click', function(){
+    document.getElementById('maf-tile').style.display='none';
+    document.getElementById('flow-tile').style.display='block';
+  });
   document.getElementById('tile-pitot').addEventListener('click', function(){
     document.getElementById('tile-pitot').style.display='none';
     document.getElementById('tile-swirl').style.display='block';
@@ -235,9 +243,6 @@ function initialiseButtons() {
     document.getElementById('tile-swirl').style.display='none';
     document.getElementById('tile-pitot').style.display='block';
   });
-
-
-
 
   document.getElementById('on-button').addEventListener('click', function(){
     console.log('Bench On');
@@ -292,11 +297,6 @@ function initialiseButtons() {
     };
     xhr.send();
   });
-
-
-  
-
-
 
 
 
@@ -397,6 +397,7 @@ window.onclick = function(event) {
     captureLiftDataModal.style.display = "none";
     loadGraphDataModal.style.display = "none";
     saveGraphDataModal.style.display = "none";
+    calibrationModal.style.display = "none";
   }
 }
 
@@ -411,6 +412,7 @@ document.addEventListener("keydown", ({key}) => {
     captureLiftDataModal.style.display = "none";
     loadGraphDataModal.style.display = "none";
     saveGraphDataModal.style.display = "none";
+    calibrationModal.style.display = "none";
   }
 })
 

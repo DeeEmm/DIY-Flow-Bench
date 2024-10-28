@@ -180,6 +180,11 @@ hr {
   cursor: pointer;
 }
 
+#maf-tile {
+  display: none;
+  cursor: pointer;
+}
+
 
 #tile-pitot {
   cursor: pointer;

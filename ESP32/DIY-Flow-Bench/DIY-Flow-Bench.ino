@@ -41,6 +41,7 @@
 #include "freertos/semphr.h"
 #include "esp_task_wdt.h"
 #include <MD_REncoder.h>
+#include <math.h>
 
 #include "constants.h"
 #include "configuration.h"
@@ -109,8 +110,7 @@ void TASKgetSensorData( void * parameter ){
 
         // Get flow data
         // Bench is MAF type...
-        #ifdef MAF_STYLE_BENCH
-        // if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())){
+        if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())){
           #ifdef MAF_IS_ENABLED
           sensorVal.FlowKGH = _sensors.getMafFlow();
           sensorVal.FlowCFM = _calculations.convertFlow(sensorVal.FlowKGH);
@@ -119,26 +119,56 @@ void TASKgetSensorData( void * parameter ){
           #endif
 
         // Bench is ORIFICE type...
-        // } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())){
-        #elif defined ORIFICE_STYLE_BENCH
-          
+        } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())){
           sensorVal.FlowCFM = _sensors.getDifferentialFlow();
 
 
         // Bench is VENTURI type...
-        // } else if (strstr(String(config.bench_type).c_str(), String("VENTURI").c_str())){
-        #elif defined VENTURI_STYLE_BENCH
+        } else if (strstr(String(config.bench_type).c_str(), String("VENTURI").c_str())){
 
 
         // Bench is PITOT type...
-        // } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())){
-        #elif defined PITOT_STYLE_BENCH
+        } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())){
 
         // Error bench type unknown
-        #elif
+        } else {
 
 
-        #endif
+        }
+
+        //Rolling Median
+        if (strstr(String(config.data_filter_type).c_str(), String("MEDIAN").c_str())){
+ 
+          
+          sensorVal.AverageCFM += ( sensorVal.FlowCFM - sensorVal.AverageCFM ) * 0.1f; // rough running average.
+          sensorVal.MedianCFM += copysign( sensorVal.AverageCFM * 0.01, sensorVal.FlowCFM - sensorVal.MedianCFM );
+          sensorVal.FlowCFM = sensorVal.MedianCFM;
+
+        //TODO - Cyclic average
+        } else if (strstr(String(config.data_filter_type).c_str(), String("AVERAGE").c_str())){
+
+          // create array / stack of 'Cyclical Average Buffer' length
+          // push value to stack - repeat this for size of stack 
+          
+          // calculate average of values on stack
+          // average results with current value - this is our displayed value
+          // push current (raw) value on to stack, remove oldest value
+          // repeat
+
+
+          
+        //TODO - Mode
+        } else if (strstr(String(config.data_filter_type).c_str(), String("MODE").c_str())){
+
+          // return most common value over x number of cycles (requested by @black-top)
+
+        }
+
+
+
+
+
+
         
         #ifdef PREF_IS_ENABLED 
         sensorVal.PRefKPA = _sensors.getPRefValue();

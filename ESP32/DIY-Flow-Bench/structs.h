@@ -40,6 +40,7 @@ struct ConfigSettings {
   double maf_min_volts = 0.1;                     // Filter out results less than this
   int refresh_rate = 500;                         // Screen refresh rate in milliseconds (>180)
   int adj_flow_depression = 28;                   // Adjusted flow depression in inches of water
+  char data_filter_type[12] = "NONE";             // Data filter type 
   int cyc_av_buffer = 5;                          // [5] Scan # over which to average output (helps smooth results)
   bool show_alarms = true;                        // Display Alarms?
   bool debug_mode = false;                        // Global debug print override
@@ -87,8 +88,8 @@ struct ConfigSettings {
  * Calibration Data
  ***/
 struct CalibrationData { 
-  double leak_cal_press_val = 1.0;  
-  double leak_cal_vac_val = -1.0;  
+  double leak_cal_press_val = 0.0;  
+  double leak_cal_vac_val = -0.0;  
   double leak_cal_val = 0.0;  
   double flow_offset = 0.0;         
 };
@@ -162,6 +163,8 @@ struct FileUploadData {
 struct SensorData {
   long MafRAW = 0;
   long MafLookup = 0;
+  double MedianCFM = 0.0;
+  double AverageCFM = 0.0;
   double FlowKGH = 0.0;
   double FlowCFM = 0.0;
   double FlowADJ = 0.0;

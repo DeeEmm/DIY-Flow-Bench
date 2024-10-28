@@ -56,8 +56,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-
-
+24102803        - Added data filter for Rolling Median and base code for Cyclic Average and Mode
+24102802        - Added MAF Flow tile to dashboard
 24102801        - Updated flow calibration routine
                 - Changed partition regime to allow for OTA
                 - General code tidy
