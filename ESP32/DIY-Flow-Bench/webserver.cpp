@@ -485,6 +485,7 @@ void Webserver::parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configD
   config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
   config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
   config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
+  strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
   config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
   config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
   strcpy(config.api_delim, configData["CONF_API_DELIM"]);
@@ -1289,9 +1290,6 @@ String Webserver::processTemplate(const String &var)
   if (var == "LINE_DATA12") return String(500 - (valveData.LiftData12 * scaleFactor));
 
 
-
-
-
   // Lift Profile
   if (floor(config.valveLiftInterval) == config.valveLiftInterval) {
 
@@ -1385,9 +1383,6 @@ String Webserver::processTemplate(const String &var)
   if (var == "ACTIVE_ORIFICE") return String(status.activeOrifice);
   if (var == "ORIFICE_MAX_FLOW") return String(status.activeOrificeFlowRate);
   if (var == "ORIFICE_CALIBRATED_DEPRESSION") return String(status.activeOrificeTestPressure);
-
-  
-
 
 
    // Wifi Settings
