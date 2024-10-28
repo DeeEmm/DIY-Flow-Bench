@@ -476,8 +476,6 @@ double Sensors::getMafFlow(int units) {
 	}
 
 
-
-
 }
 
 

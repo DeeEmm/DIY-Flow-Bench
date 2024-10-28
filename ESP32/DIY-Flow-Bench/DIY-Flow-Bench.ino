@@ -113,9 +113,7 @@ void TASKgetSensorData( void * parameter ){
         if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())){
           #ifdef MAF_IS_ENABLED
           sensorVal.FlowKGH = _sensors.getMafFlow();
-          sensorVal.FlowCFM = _calculations.convertFlow(sensorVal.FlowKGH);
-          // sensorVal.FlowCFM = _calculations.convertMassFlowToVolumetric(sensorVal.FlowKGH);
-          // sensorVal.FlowCFM = _calculations.convertKGHtoCFM(sensorVal.FlowKGH) + calVal.flow_offset;
+          sensorVal.FlowCFM = _calculations.convertFlow(sensorVal.FlowKGH) + calVal.flow_offset;
           #endif
 
         // Bench is ORIFICE type...
