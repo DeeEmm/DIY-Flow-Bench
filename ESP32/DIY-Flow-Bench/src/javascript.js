@@ -22,6 +22,10 @@ var infoModal = document.getElementById("infoModal");
 var captureLiftDataModal = document.getElementById("captureLiftDataModal");
 var loadGraphDataModal = document.getElementById("loadGraphDataModal");
 var saveGraphDataModal = document.getElementById("saveGraphDataModal");
+var calibrationModal = document.getElementById("calibrationModal");
+var updateModal = document.getElementById("updateModal");
+
+
 
 
 var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
@@ -30,6 +34,8 @@ var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton
 var closeCaptureLiftDataModalButton = document.getElementsByClassName("closeCaptureLiftDataModalButton")[0];
 var closeLoadGraphDataModalButton = document.getElementsByClassName("closeLoadGraphDataModalButton")[0];
 var closeSaveGraphDataModalButton = document.getElementsByClassName("closeSaveGraphDataModalButton")[0];
+var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
+var closeUpdateModalButton = document.getElementsByClassName("closeUpdateModalButton")[0];
 
 // Set up Server Side Events (SSE)
 if (!!window.EventSource) {
@@ -210,6 +216,10 @@ function initialiseButtons() {
     document.getElementById('infoModal').style.display='block';
   });
 
+  document.getElementById('update-button').addEventListener('click', function(){
+    document.getElementById('updateModal').style.display='block';
+  });
+
   document.getElementById('tile-pref').addEventListener('click', function(){
     document.getElementById('tile-pref').style.display='none';
     document.getElementById('tile-pdiff').style.display='block';
@@ -341,7 +351,14 @@ function openTab(tabName, elmnt) {
 }
 
 /***********************************************************
-* Close file modal dialog
+* Close update modal dialog
+***/
+closeUpdateModalButton.onclick = function() {
+  updateModal.style.display = "none";
+}
+
+/***********************************************************
+* Close calibration modal dialog
 ***/
 closeCalibrationModalButton.onclick = function() {
   calibrationModal.style.display = "none";
@@ -391,13 +408,14 @@ closeSaveGraphDataModalButton.onclick = function() {
 * Close modal dialogs on lose focus
 ***/
 window.onclick = function(event) {
-  if (event.target == fileModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal ) {
+  if (event.target == fileModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal || event.target == calibrationModal || event.target == updateModal) {
     fileModal.style.display = "none";
     infoModal.style.display = "none";
     captureLiftDataModal.style.display = "none";
     loadGraphDataModal.style.display = "none";
     saveGraphDataModal.style.display = "none";
     calibrationModal.style.display = "none";
+    updateModal.style.display = "none";
   }
 }
 
@@ -413,6 +431,7 @@ document.addEventListener("keydown", ({key}) => {
     loadGraphDataModal.style.display = "none";
     saveGraphDataModal.style.display = "none";
     calibrationModal.style.display = "none";
+    updateModal.style.display = "none";
   }
 })
 

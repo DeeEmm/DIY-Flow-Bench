@@ -49,6 +49,7 @@ class Webserver {
 		String byteDecode(size_t bytes);
 		void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
+		static void processUpdate(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final);
 		static void saveConfig(AsyncWebServerRequest *request);
 		static void setOrifice(AsyncWebServerRequest *request);
 		int decodeMessageHeader (char *data);

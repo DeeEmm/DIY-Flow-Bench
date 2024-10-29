@@ -142,6 +142,7 @@ struct DeviceStatus {
   String activeOrifice = "1";
   double activeOrificeFlowRate;
   double activeOrificeTestPressure;
+  bool shouldReboot = false;
 };
 
 

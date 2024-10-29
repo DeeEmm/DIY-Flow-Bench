@@ -319,10 +319,11 @@ hr {
   background-color: #999;
 }
 
-#info-button, #support-button,  #file-manager-button, #restart-button {
-  width:120px;
+#info-button, #support-button,  #file-manager-button, #restart-button, #update-button {
+  width:110px;
   height: 50px;
 }
+
 
 #on-button {
   background-color: #44b112;
@@ -414,14 +415,36 @@ hr {
   padding: 12px 0px;
   text-align: center;
 }
+ 
+.file-submit-button {
+  padding: 12px 0px;
+  text-align: center;
+  font-size: 15px;
+  padding: 6px 6px;
+}
 
-input[type="file"] {
-  display: none;
-}  
-  
+.input_container {
+  border: 1px solid #e5e5e5;
+}
+
+input[type=file]::file-selector-button {
+  background-color: #fff;
+  color: #000;
+  border: 0px;
+  border-right: 1px solid #e5e5e5;
+  padding: 10px 15px;
+  margin-right: 20px;
+  transition: .5s;
+}
+
+input[type=file]::file-selector-button:hover {
+  background-color: #eee;
+  border: 0px;
+  border-right: 1px solid #e5e5e5;
+}
 
 /* The Close Button */
-.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton {
+.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton, closeUpdateModalButton {
   color: #aaa;
   float: right;
   font-size: 22px;
@@ -429,6 +452,8 @@ input[type="file"] {
   cursor: pointer;
 }
 
+.closeUpdateModalButton:hover, 
+.closeUpdateModalButton:focus,
 .closeFileModalButton:hover, 
 .closeFileModalButton:focus,
 .closeInfoModalButton:hover,

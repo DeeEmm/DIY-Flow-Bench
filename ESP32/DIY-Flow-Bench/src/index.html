@@ -54,6 +54,24 @@
       </div>        
     </div>
 
+    <!--Update modal-->
+    <div id="updateModal" class="modal">
+      <div class="modal-content updateModal">
+        <span class="closeUpdateModalButton">&times;</span>
+        <div class="align-center">
+          <h3>Upload Firmware Binary (firmware.bin)</h3>
+          <hr>
+          <br>
+          <form method='POST' action='/api/update' enctype='multipart/form-data'>
+            <div class="input_container">
+              <input type="file" name="update" id="fileUpload">
+              <input type='submit' value='Update' class="button file-submit-button">
+            </div>
+          </form>
+        </div>
+      </div>        
+    </div>
+
     <!--Calibration modal-->
     <div id="calibrationModal" class="modal">
       <div class="modal-content calibrationModal">
@@ -112,9 +130,10 @@
         <br>
         <div class="float-right">
           <form method="POST" action="/api/file/upload" enctype="multipart/form-data">
-            <label for="data" class="file-upload-button button">Select File</label>
-            <input id="data" type="file" name="wtf"/>
-            <input class="button file-submit-button" type="submit" value="Upload"/>
+            <div class="input_container">
+              <input type="file" name="upload" id="fileUpload">
+              <input type='submit' value='Upload' class="button file-submit-button">
+            </div>
           </form>
         </div>
         <div class="clear-both">&nbsp;</div>
@@ -426,7 +445,7 @@
     <!-- configuration tab -->
     <div id="configuration" class="tabcontent tabcontentConfig">
       <div class="config-panel">
-        <p style="text-align:center"><button id="file-manager-button" class="button">Files</button> <button id="info-button" class="button">Info</button> <button id="support-button" class="button" onclick="window.open('https://github.com/DeeEmm/DIY-Flow-Bench/wiki','_blank')">Support</button> <button id="restart-button" class="button" >Reboot</button></p>       
+        <p style="text-align:center"><button id="file-manager-button" class="button">Files</button> <button id="info-button" class="button">Info</button> <button id="support-button" class="button" onclick="window.open('https://github.com/DeeEmm/DIY-Flow-Bench/wiki','_blank')">Support</button> <button id="restart-button" class="button" >Reboot</button> <button id="update-button" class="button">Update</button></p>       
         <br>
         <form method="POST" action="/api/saveconfig">
           <h2>System Settings</h2>
