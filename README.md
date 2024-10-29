@@ -23,7 +23,7 @@ If you are interested in contributing with testing please head over to our [disc
 
 A Flow Bench is a basic system to measure and display volumetric air flow.
 
-It is used as a tool for measuring and quantifying modifications and improvements made to items suxh as automotive cylinder heads and carburettors by measuring the volume of air that they can flow within a set time period. By measuring the volume of air that can be passed through the item the user can determine if modifications made to the item help improve air flow characteristics.
+It is used as a tool for measuring and quantifying modifications and improvements made to items such as automotive cylinder heads and carburettors by measuring the volume of air that they can flow within a set time period. By measuring the volume of air that can be passed through the item the user can determine if modifications made to the item help improve air flow characteristics.
 
 Traditional flow benches utilise a manometer and regulate the reference pressure using calibrated flow orifices. Volumetric flow is then calculated using mathematical methods to convert the pressure drop across the testpiece into flow. 
 
@@ -53,7 +53,7 @@ This repository contains the hardware schematics and software code needed to bui
 Support is included for the following systems architectures.
 
 - MAF based benches
-- Orifice based benches (In Development for V3 release)
+- Orifice based benches 
 - Pitot style benches (In Development for V3 release)
 - Venturi style benches (In Development for V3 release)
 
