@@ -325,10 +325,11 @@ hr {
   background-color: #999;
 }
 
-#info-button, #support-button,  #file-manager-button, #restart-button {
-  width:120px;
+#info-button, #support-button,  #file-manager-button, #restart-button, #update-button {
+  width:110px;
   height: 50px;
 }
+
 
 #on-button {
   background-color: #44b112;
@@ -420,14 +421,36 @@ hr {
   padding: 12px 0px;
   text-align: center;
 }
+ 
+.file-submit-button {
+  padding: 12px 0px;
+  text-align: center;
+  font-size: 15px;
+  padding: 6px 6px;
+}
 
-input[type="file"] {
-  display: none;
-}  
-  
+.input_container {
+  border: 1px solid #e5e5e5;
+}
+
+input[type=file]::file-selector-button {
+  background-color: #fff;
+  color: #000;
+  border: 0px;
+  border-right: 1px solid #e5e5e5;
+  padding: 10px 15px;
+  margin-right: 20px;
+  transition: .5s;
+}
+
+input[type=file]::file-selector-button:hover {
+  background-color: #eee;
+  border: 0px;
+  border-right: 1px solid #e5e5e5;
+}
 
 /* The Close Button */
-.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton {
+.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton, closeUpdateModalButton {
   color: #aaa;
   float: right;
   font-size: 22px;
@@ -435,6 +458,8 @@ input[type="file"] {
   cursor: pointer;
 }
 
+.closeUpdateModalButton:hover, 
+.closeUpdateModalButton:focus,
 .closeFileModalButton:hover, 
 .closeFileModalButton:focus,
 .closeInfoModalButton:hover,
@@ -720,6 +745,24 @@ svg .dataCircle:hover {
       </div>        
     </div>
 
+    <!--Update modal-->
+    <div id="updateModal" class="modal">
+      <div class="modal-content updateModal">
+        <span class="closeUpdateModalButton">&times;</span>
+        <div class="align-center">
+          <h3>Upload Firmware Binary (*.bin)</h3>
+          <hr>
+          <br>
+          <form method='POST' action='/api/update' enctype='multipart/form-data'>
+            <div class="input_container">
+              <input type="file" name="update" id="fileUpload">
+              <input type='submit' value='Update' class="button file-submit-button">
+            </div>
+          </form>
+        </div>
+      </div>        
+    </div>
+
     <!--Calibration modal-->
     <div id="calibrationModal" class="modal">
       <div class="modal-content calibrationModal">
@@ -778,9 +821,10 @@ svg .dataCircle:hover {
         <br>
         <div class="float-right">
           <form method="POST" action="/api/file/upload" enctype="multipart/form-data">
-            <label for="data" class="file-upload-button button">Select File</label>
-            <input id="data" type="file" name="wtf"/>
-            <input class="button file-submit-button" type="submit" value="Upload"/>
+            <div class="input_container">
+              <input type="file" name="upload" id="fileUpload">
+              <input type='submit' value='Upload' class="button file-submit-button">
+            </div>
           </form>
         </div>
         <div class="clear-both">&nbsp;</div>
@@ -1092,7 +1136,7 @@ svg .dataCircle:hover {
     <!-- configuration tab -->
     <div id="configuration" class="tabcontent tabcontentConfig">
       <div class="config-panel">
-        <p style="text-align:center"><button id="file-manager-button" class="button">Files</button> <button id="info-button" class="button">Info</button> <button id="support-button" class="button" onclick="window.open('https://github.com/DeeEmm/DIY-Flow-Bench/wiki','_blank')">Support</button> <button id="restart-button" class="button" >Reboot</button></p>       
+        <p style="text-align:center"><button id="file-manager-button" class="button">Files</button> <button id="info-button" class="button">Info</button> <button id="support-button" class="button" onclick="window.open('https://github.com/DeeEmm/DIY-Flow-Bench/wiki','_blank')">Support</button> <button id="restart-button" class="button" >Reboot</button> <button id="update-button" class="button">Update</button></p>       
         <br>
         <form method="POST" action="/api/saveconfig">
           <h2>System Settings</h2>
@@ -1188,6 +1232,10 @@ var infoModal = document.getElementById("infoModal");
 var captureLiftDataModal = document.getElementById("captureLiftDataModal");
 var loadGraphDataModal = document.getElementById("loadGraphDataModal");
 var saveGraphDataModal = document.getElementById("saveGraphDataModal");
+var calibrationModal = document.getElementById("calibrationModal");
+var updateModal = document.getElementById("updateModal");
+
+
 
 
 var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
@@ -1196,6 +1244,8 @@ var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton
 var closeCaptureLiftDataModalButton = document.getElementsByClassName("closeCaptureLiftDataModalButton")[0];
 var closeLoadGraphDataModalButton = document.getElementsByClassName("closeLoadGraphDataModalButton")[0];
 var closeSaveGraphDataModalButton = document.getElementsByClassName("closeSaveGraphDataModalButton")[0];
+var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
+var closeUpdateModalButton = document.getElementsByClassName("closeUpdateModalButton")[0];
 
 // Set up Server Side Events (SSE)
 if (!!window.EventSource) {
@@ -1376,6 +1426,10 @@ function initialiseButtons() {
     document.getElementById('infoModal').style.display='block';
   });
 
+  document.getElementById('update-button').addEventListener('click', function(){
+    document.getElementById('updateModal').style.display='block';
+  });
+
   document.getElementById('tile-pref').addEventListener('click', function(){
     document.getElementById('tile-pref').style.display='none';
     document.getElementById('tile-pdiff').style.display='block';
@@ -1507,7 +1561,14 @@ function openTab(tabName, elmnt) {
 }
 
 /***********************************************************
-* Close file modal dialog
+* Close update modal dialog
+***/
+closeUpdateModalButton.onclick = function() {
+  updateModal.style.display = "none";
+}
+
+/***********************************************************
+* Close calibration modal dialog
 ***/
 closeCalibrationModalButton.onclick = function() {
   calibrationModal.style.display = "none";
@@ -1557,13 +1618,14 @@ closeSaveGraphDataModalButton.onclick = function() {
 * Close modal dialogs on lose focus
 ***/
 window.onclick = function(event) {
-  if (event.target == fileModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal ) {
+  if (event.target == fileModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal || event.target == calibrationModal || event.target == updateModal) {
     fileModal.style.display = "none";
     infoModal.style.display = "none";
     captureLiftDataModal.style.display = "none";
     loadGraphDataModal.style.display = "none";
     saveGraphDataModal.style.display = "none";
     calibrationModal.style.display = "none";
+    updateModal.style.display = "none";
   }
 }
 
@@ -1579,6 +1641,7 @@ document.addEventListener("keydown", ({key}) => {
     loadGraphDataModal.style.display = "none";
     saveGraphDataModal.style.display = "none";
     calibrationModal.style.display = "none";
+    updateModal.style.display = "none";
   }
 })
 

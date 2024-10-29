@@ -353,6 +353,12 @@ void loop () {
   }
   #endif
 
+  if(status.shouldReboot){
+    _message.serialPrintf("Rebooting...");
+    delay(100);
+    ESP.restart();
+  }
+
 
   vTaskDelay( 1 );  //mSec delay to prevent Watch Dog Timer (WDT) triggering for empty task
   

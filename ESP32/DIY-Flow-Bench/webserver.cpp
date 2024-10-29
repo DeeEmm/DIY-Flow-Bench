@@ -20,6 +20,7 @@
 #include <rom/rtc.h>
 #include <SPI.h>
 #include <SD.h>
+#include <Update.h>
 
 #include "configuration.h"
 #include "constants.h"
@@ -46,6 +47,7 @@
 #include <sstream>
 using namespace std;
 
+#define U_PART U_SPIFFS
 
 // RTC_DATA_ATTR int bootCount; // flash mem
 
@@ -323,6 +325,42 @@ void Webserver::begin()
       _message.debugPrintf("Request Download File: %s \n", downloadFilename);
       request->send(SPIFFS, downloadFilename, String(), true); });
 
+  // Simple Firmware Update Form
+  server->on("/api/update", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(200, "text/html", "<form method='POST' action='/api/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>");
+  });
+
+  // Firmware update handler
+  server->on("/api/update", HTTP_POST, [](AsyncWebServerRequest *request){
+    status.shouldReboot = !Update.hasError();
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/html", status.shouldReboot?"<meta http-equiv=\"refresh\" content=\"3; url=/\" />Rebooting... If the page does not automatically refresh, pleae click <a href=\"/\">HERE</a>":"FIRMWARE UPDATE FAILED!");
+    response->addHeader("Connection", "close");
+    request->send(response);
+  },[](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final){
+    Messages _message;
+    if(!index){
+      _message.debugPrintf("Update Start: %s\n", filename.c_str());
+      // Update.runAsync(true);
+      if(!Update.begin((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000)){
+        _message.debugPrintf("Not Rnough Room: \n");
+        Update.printError(Serial);
+      }
+    }
+    if(!Update.hasError()){
+      if(Update.write(data, len) != len){
+        _message.debugPrintf("Write error: \n");
+        Update.printError(Serial);
+      }
+    }
+    if(final){
+      if(Update.end(true)){
+        Serial.printf("Update Success: %uB\n", index+len);
+      } else {
+        Update.printError(Serial);
+      }
+    }
+  });
+
   // Delete request handler
   server->on("/api/file/delete", HTTP_POST, [](AsyncWebServerRequest *request){              
       Messages _message;
@@ -463,6 +501,7 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
     request->redirect(redirectURL);
   }
 }
+
 
 
 
