@@ -750,7 +750,7 @@ svg .dataCircle:hover {
       <div class="modal-content updateModal">
         <span class="closeUpdateModalButton">&times;</span>
         <div class="align-center">
-          <h3>Upload Firmware Binary (*.bin)</h3>
+          <h3>Upload Firmware Binary (firmware.bin)</h3>
           <hr>
           <br>
           <form method='POST' action='/api/update' enctype='multipart/form-data'>
@@ -1195,10 +1195,14 @@ svg .dataCircle:hover {
         </form>
         <br>
         <br>
-        <h2>Calibration Data</h2>
-        <div class="config-row tooltip"><label class="config-label">Calibration Offset:</label>&nbsp;<input disabled="disabled" type="text" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
-        <div class="config-row tooltip"><label class="config-label">Vac Leak Test Value:</label>&nbsp;<input disabled="disabled" type="text" id="LEAK_CAL_VAC_VAL" name="LEAK_CAL_VAC_VAL" value="~LEAK_CAL_VAC_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
-        <div class="config-row tooltip"><label class="config-label">Pressure Leak Test Value:</label>&nbsp;<input disabled="disabled" type="text" id="LEAK_CAL_PRESS_VAL" name="LEAK_CAL_PRESS_VAL" value="~LEAK_CAL_PRESS_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
+        <form method="POST" action="/api/savecalibration">
+          <h2>Calibration Data</h2>
+          <div class="config-row tooltip"><label class="config-label">Calibration Offset:</label>&nbsp;<input type="text" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
+          <div class="config-row tooltip"><label class="config-label">Vac Leak Test Value:</label>&nbsp;<input  type="text" id="LEAK_CAL_VAC_VAL" name="LEAK_CAL_VAC_VAL" value="~LEAK_CAL_VAC_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
+          <div class="config-row tooltip"><label class="config-label">Pressure Leak Test Value:</label>&nbsp;<input type="text" id="LEAK_CAL_PRESS_VAL" name="LEAK_CAL_PRESS_VAL" value="~LEAK_CAL_PRESS_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
+          <br>
+          <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
+        </form>
       </div>                    
     </div>
   </div>

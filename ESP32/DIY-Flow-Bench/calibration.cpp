@@ -227,28 +227,32 @@ void Calibration::createCalibrationFile () {
 ***/
 void Calibration::saveCalibrationData() {
   
-  extern struct CalibrationData calVal;
-  extern struct Translator translate;
+ 
+
   Messages _message;
+
   // Webserver _webserver;
   // String jsonString;
-  StaticJsonDocument<1024> calibrationData;
+  StaticJsonDocument<1024> calData;
+
+  extern struct CalibrationData calVal;
+  extern struct Translator translate;
 
   _message.debugPrintf("Writing to cal.json file... \n");
     
-  calibrationData["FLOW_OFFSET"] = calVal.flow_offset;
-  calibrationData["LEAK_CAL_VAC_VAL"] = calVal.leak_cal_vac_val;
-  calibrationData["LEAK_CAL_PRESS_VAL"] = calVal.leak_cal_press_val;
+  calData["FLOW_OFFSET"] = calVal.flow_offset;
+  calData["LEAK_CAL_VAC_VAL"] = calVal.leak_cal_vac_val;
+  calData["LEAK_CAL_PRESS_VAL"] = calVal.leak_cal_press_val;
 
   _message.Handler(translate.LANG_SAVING_CALIBRATION);
   
-  // serializeJsonPretty(calibrationData, jsonString);
+  // serializeJsonPretty(calData, jsonString);
 
   if (SPIFFS.exists("/cal.json"))  {
     SPIFFS.remove("/cal.json");
   }
   File outputFile = SPIFFS.open("/cal.json", FILE_WRITE);
-  serializeJsonPretty(calibrationData, outputFile);
+  serializeJsonPretty(calData, outputFile);
   outputFile.close();
   
 

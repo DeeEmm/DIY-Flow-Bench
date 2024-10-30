@@ -583,6 +583,29 @@ StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
 
 
 
+// /***********************************************************
+// * @brief loadCalibration
+// * @details read configuration data from cal.json file
+// ***/ 
+// StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
+
+//   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
+
+//   Messages _message;
+//   _message.serialPrintf("Loading Configuration... \n");     
+//   if (SPIFFS.exists("/config.json"))  {
+//     configData = loadJSONFile("/config.json");
+//     parseConfigSettings(configData);
+//   } else {
+//     _message.serialPrintf("Configuration file not found \n");
+//   }
+  
+//   return configData;  
+
+// }
+
+
+
 
 
 /***********************************************************
@@ -734,6 +757,7 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
  * @details Saves calibration data to cal.json file
  * @note Creates file if it does not exist
  * @note Redirects browser to configuration tab
+ * @note duplicates _calibration.saveCalibrationData whjich is unable to be called from server->on directive
  * 
  ***/
 void Webserver::saveCalibration(AsyncWebServerRequest *request)
@@ -743,7 +767,6 @@ void Webserver::saveCalibration(AsyncWebServerRequest *request)
   Webserver _webserver;
 
   StaticJsonDocument<CAL_DATA_JSON_SIZE> calibrationData;
-  extern struct ConfigSettings config;
   extern struct CalibrationData calVal;
   String jsonString;
 
@@ -758,9 +781,9 @@ void Webserver::saveCalibration(AsyncWebServerRequest *request)
   }
 
   // Update Config Vars
-  calVal.flow_offset, calibrationData["FLOW_OFFSET"].as<double>();
-  calVal.leak_cal_vac_val, calibrationData["LEAK_CAL_VAC_VAL"].as<double>();
-  calVal.leak_cal_press_val, calibrationData["LEAK_CAL_PRESS_VAL"].as<double>();
+  calVal.flow_offset = calibrationData["FLOW_OFFSET"].as<double>();
+  calVal.leak_cal_vac_val = calibrationData["LEAK_CAL_VAC_VAL"].as<double>();
+  calVal.leak_cal_press_val = calibrationData["LEAK_CAL_PRESS_VAL"].as<double>();
 
   // save settings to calibration file
   serializeJsonPretty(calibrationData, jsonString);
