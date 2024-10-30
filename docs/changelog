@@ -56,6 +56,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24103001        - Added manual save function for calibration data
 24103001        - Added firmware update via GUI
 24102902        - Updated README
 24102901        - Fixed bug where filter value was not retained

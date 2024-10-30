@@ -386,6 +386,9 @@ void Webserver::begin()
   // Save Configuration Form
   server->on("/api/saveconfig", HTTP_POST, saveConfig);
 
+  // Save Calibration Form
+  server->on("/api/savecalibration", HTTP_POST, saveCalibration);
+
   // Save Orifice Form
   server->on("/api/setorifice", HTTP_POST, setOrifice);
 
@@ -723,6 +726,54 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
 }
 
 
+
+
+
+/***********************************************************
+ * @brief saveCalibration
+ * @details Saves calibration data to cal.json file
+ * @note Creates file if it does not exist
+ * @note Redirects browser to configuration tab
+ * 
+ ***/
+void Webserver::saveCalibration(AsyncWebServerRequest *request)
+{
+
+  Messages _message;
+  Webserver _webserver;
+
+  StaticJsonDocument<CAL_DATA_JSON_SIZE> calibrationData;
+  extern struct ConfigSettings config;
+  extern struct CalibrationData calVal;
+  String jsonString;
+
+  int params = request->params();
+
+  _message.debugPrintf("Saving Configuration... \n");
+
+  // Convert POST vars to JSON 
+  for(int i=0;i<params;i++){
+    AsyncWebParameter* p = request->getParam(i);
+      calibrationData[p->name().c_str()] = p->value().c_str();
+  }
+
+  // Update Config Vars
+  calVal.flow_offset, calibrationData["FLOW_OFFSET"].as<double>();
+  calVal.leak_cal_vac_val, calibrationData["LEAK_CAL_VAC_VAL"].as<double>();
+  calVal.leak_cal_press_val, calibrationData["LEAK_CAL_PRESS_VAL"].as<double>();
+
+  // save settings to calibration file
+  serializeJsonPretty(calibrationData, jsonString);
+  if (SPIFFS.exists("/cal.json"))  {
+    SPIFFS.remove("/cal.json");
+  }
+  _webserver.writeJSONFile(jsonString, "/cal.json", CAL_DATA_JSON_SIZE);
+
+  _message.debugPrintf("Calibration Saved \n");
+
+  request->redirect("/?view=config");
+
+}
 
 
 /***********************************************************
