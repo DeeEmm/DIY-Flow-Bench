@@ -63,8 +63,6 @@ struct ConfigSettings {
   double valveLiftInterval = 1.5;                 // Distance between valve lift data points (can be metric or imperial)
   double cal_ref_press = 10;                      // Calibration orifice ref pressure
   double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
-  int leak_test_tolerance = 2;                    // Leak test tolerance
-  int leak_test_threshold = 10;                   // Value above which leak test activates (max pref - 2 x leak_test_tolerance is a good starting point)
   double orificeOneFlow = 0.0;
   double orificeOneDepression = 0.0;
   double orificeTwoFlow = 0.0;
@@ -88,10 +86,11 @@ struct ConfigSettings {
  * Calibration Data
  ***/
 struct CalibrationData { 
-  double leak_cal_press_val = 0.0;  
-  double leak_cal_vac_val = -0.0;  
-  double leak_cal_val = 0.0;  
   double flow_offset = 0.0;         
+  double leak_cal_baseline = 0.0;  
+  double leak_cal_offset = 0.0;  
+  double leak_cal_baseline_rev = 0.0;  
+  double leak_cal_offset_rev = 0.0;  
 };
 
 

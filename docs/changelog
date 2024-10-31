@@ -56,7 +56,9 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-
+24103101        - Updated leak cal fucntionality as per discssion #178
+                - Refactored webserver class to reduce spaghetti
+                - General code tidying
 24103002        - Reformatted BOM CSV for Git rendering
 24103001        - Added manual save function for calibration data
 24103001        - Added firmware update via GUI

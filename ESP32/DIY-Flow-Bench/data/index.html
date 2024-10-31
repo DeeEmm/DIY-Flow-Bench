@@ -1167,11 +1167,9 @@ svg .dataCircle:hover {
           <div class="config-row tooltip"><label class="config-label">Temperature Unit:</label><span>~TEMPERATURE_DROPDOWN~</span><span class="tooltiptext">Display unit of temperature</span></div>
           <div class="config-row tooltip"><label class="config-label">Valve Lift Interval:</label>&nbsp;<input type="text" id="VALVE_LIFT_INTERVAL" name="VALVE_LIFT_INTERVAL" value="~VALVE_LIFT_INTERVAL~" class="config-text"><span class="tooltiptext">Distance between valve lift data points</span></div>
           <br>
-          <h3>Calibration Settings</h3>
+          <h3>Calibration Orifice Settings</h3>
           <div class="config-row tooltip"><label class="config-label">Calibration Orifice Flow Rate:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="~CONF_CAL_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice in cfm</span></div>
           <div class="config-row tooltip"><label class="config-label">Calibration Orifice Test Pressure:</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="~CONF_CAL_REF_PRESS~" class="config-text"><span class="tooltiptext">Reference depression of calibration orifice in in/wg</span></div>
-          <div class="config-row tooltip"><label class="config-label">Leak Test Tolerance:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_TOLERANCE" name="CONF_LEAK_TEST_TOLERANCE" value="~CONF_LEAK_TEST_TOLERANCE~" class="config-text"><span class="tooltiptext">Maximum allowable deviation in depression</span></div>
-          <div class="config-row tooltip"><label class="config-label">Leak Test Threshold:</label>&nbsp;<input type="text" id="CONF_LEAK_TEST_THRESHOLD" name="CONF_LEAK_TEST_THRESHOLD" value="~CONF_LEAK_TEST_THRESHOLD~" class="config-text"><span class="tooltiptext">Depression value above which leak test activates</span></div>
           <br>
           <div id="orificeData">
             <h3>Orifice Data</h3>
@@ -1198,10 +1196,12 @@ svg .dataCircle:hover {
         <form method="POST" action="/api/savecalibration">
           <h2>Calibration Data</h2>
           <div class="config-row tooltip"><label class="config-label">Calibration Offset:</label>&nbsp;<input type="text" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
-          <div class="config-row tooltip"><label class="config-label">Vac Leak Test Value:</label>&nbsp;<input  type="text" id="LEAK_CAL_VAC_VAL" name="LEAK_CAL_VAC_VAL" value="~LEAK_CAL_VAC_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
-          <div class="config-row tooltip"><label class="config-label">Pressure Leak Test Value:</label>&nbsp;<input type="text" id="LEAK_CAL_PRESS_VAL" name="LEAK_CAL_PRESS_VAL" value="~LEAK_CAL_PRESS_VAL~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
+          <div class="config-row tooltip"><label class="config-label">Leak Test Baseline:</label>&nbsp;<input  type="text" id="LEAK_CAL_BASELINE" name="LEAK_CAL_BASELINE" value="~LEAK_CAL_BASELINE~" class="config-text"><span class="tooltiptext">Baseline Offset</span></div>
+          <div class="config-row tooltip"><label class="config-label">Leak Test Offset:</label>&nbsp;<input  type="text" id="LEAK_CAL_OFFSET" name="LEAK_CAL_OFFSET" value="~LEAK_CAL_OFFSET~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
+          <div class="config-row tooltip"><label class="config-label">Leak Test Baseline (Reverse):</label>&nbsp;<input  type="text" id="LEAK_CAL_BASELINE_REV" name="LEAK_CAL_BASELINE_REV" value="~LEAK_CAL_BASELINE_REV~" class="config-text"><span class="tooltiptext">Baseline Offset (Reverse Flow)</span></div>
+          <div class="config-row tooltip"><label class="config-label">Leak Test Offset (Reverse):</label>&nbsp;<input type="text" id="LEAK_CAL_OFFSET_REV" name="LEAK_CAL_OFFSET_REV" value="~LEAK_CAL_OFFSET_REV~" class="config-text"><span class="tooltiptext">Measured leak test value (Reverse Flow)</span></div>
           <br>
-          <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
+          <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Overwrite"></div>
         </form>
       </div>                    
     </div>

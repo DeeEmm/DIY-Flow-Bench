@@ -67,8 +67,7 @@ String API::getConfigJSON() {
   dataJson["MIN_FLOW_RATE"] = config.min_flow_rate;
   dataJson["MIN_BENCH_PRESSURE"] = config.min_bench_pressure;
   dataJson["REFRESH_RATE"] = config.refresh_rate;
-  dataJson["LEAK_TEST_TOLERANCE"] = config.leak_test_tolerance;
-  dataJson["LEAK_TEST_THRESHOLD"] = config.leak_test_threshold;
+
   
   serializeJson(dataJson, jsonString);  
   return jsonString;
@@ -200,7 +199,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'C': // Flow Offset Calibration  'O\r\n'        
-          _calibration.setFlowOffset();
+          // _calibration.setFlowOffset();
           snprintf(apiResponse, API_RESPONSE_LENGTH, "C%s%f", config.api_delim , calVal.flow_offset);
           // TODO: confirm Flow Offset Calibration success in response
       break;      
@@ -262,8 +261,8 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'L': // Perform Leak Test Calibration 'L\r\n'
-          _calibration.setLeakTest();
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "L%s%F", config.api_delim , calVal.leak_cal_vac_val );
+          _calibration.setLeakOffset();
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "L%s%F", config.api_delim , calVal.leak_cal_offset );
           // TODO: confirm Leak Test Calibration success in response
       break;
       

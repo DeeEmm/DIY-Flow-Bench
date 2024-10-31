@@ -89,26 +89,34 @@ double Calibration::getFlowOffset() {
 
 
 /***********************************************************
-* Perform leakTestCalibration
+* Perform Leak Offset Calibration
 ***/
-bool Calibration::setLeakTest() {
+bool Calibration::setLeakOffset() {
   
   Calculations _calculations;
   Sensors _sensors;
   Messages _message;
+  extern struct CalibrationData calVal;
+  extern struct Translator translate;
 
   // load current calibration data
   loadCalibrationData();
 
   _message.debugPrintf("Calibration::setLeakTest \n");
 
-  // Pressure or Vacuum?
-  if (_calculations.convertPressure(_sensors.getPRefValue(), INH2O) > 0) {
-    this->setLeakTestPressure();
-  } else {
-    this->setLeakTestVacuum();
-  }
-  
+  //TODO - Reverse flow calibration. Need to understand reverse flow characetitics of sensor
+  // Assumed negative flow = -ve value BUT suspect that sensor -> ADC may need to be wired as differential
+  // Possibility that pressure sensor circuits on PCB may need to be redesigned?!?!?!
+
+  // De we have Pressure or Vacuum | Forwards or Reverse Flow?
+  // if (_calculations.convertPressure(_sensors.getPRefValue(), INH2O) > 0) {
+  //   calVal.leak_cal_offset_rev = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
+  //   _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset_rev);
+  // } else {
+    calVal.leak_cal_offset = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
+    _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
+  // }
+
   saveCalibrationData();    
   
   return true;
@@ -117,72 +125,32 @@ bool Calibration::setLeakTest() {
 
 
 
+
 /***********************************************************
-* Perform setLeakTestVacuum
+* Get leakTest
 ***/
-void Calibration::setLeakTestVacuum() {
-  
+double Calibration::getLeakOffset() {
+
   extern struct CalibrationData calVal;
-  extern struct Translator translate;
-
-  Calculations _calculations;
-  Sensors _sensors;
-  Messages _message;
+  loadCalibrationFile();
   
-  calVal.leak_cal_vac_val = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
-
-  _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_vac_val);
+  return calVal.leak_cal_offset;
 
 }
 
-
-
-
-/***********************************************************
-* Perform setLeakTestPressure
-***/
-void Calibration::setLeakTestPressure() {
-  
-  extern struct CalibrationData calVal;
-  extern struct Translator translate;
-
-  Calculations _calculations;
-  Sensors _sensors;
-  Messages _message;
-  
-  calVal.leak_cal_press_val = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
-
-  _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_press_val);
-
-}
 
 
 
 /***********************************************************
 * Get leakTest
 ***/
-double Calibration::getLeakTestPressure() {
+double Calibration::getLeakOffsetReverse() {
 
   extern struct CalibrationData calVal;
   
   loadCalibrationFile();
   
-  return calVal.leak_cal_press_val;
-
-}
-
-
-
-/***********************************************************
-* Get leakTest
-***/
-double Calibration::getLeakTestVacuum() {
-
-  extern struct CalibrationData calVal;
-  
-  loadCalibrationFile();
-  
-  return calVal.leak_cal_vac_val;
+  return calVal.leak_cal_offset_rev;
 
 }
 
@@ -201,18 +169,20 @@ void Calibration::createCalibrationFile () {
   Webserver _webserver;
   Messages _message;
   String jsonString;
-  StaticJsonDocument<CAL_DATA_JSON_SIZE> calibrationData;
+  StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
   
   _message.debugPrintf("Creating cal.json file... \n"); 
   
-  calibrationData["FLOW_OFFSET"] = calVal.flow_offset;
-  calibrationData["LEAK_CAL_VAC_VAL"] = calVal.leak_cal_vac_val;
-  calibrationData["LEAK_CAL_PRESS_VAL"] = calVal.leak_cal_press_val;
+  calData["FLOW_OFFSET"] = calVal.flow_offset;
+  calData["LEAK_CAL_BASELINE"] = calVal.leak_cal_baseline;
+  calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
+  calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
+  calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
 
-  serializeJsonPretty(calibrationData, jsonString);
+  serializeJsonPretty(calData, jsonString);
 
   File outputFile = SPIFFS.open("/cal.json", FILE_WRITE);
-  serializeJsonPretty(calibrationData, outputFile);
+  serializeJsonPretty(calData, outputFile);
   outputFile.close();
   
 }
@@ -227,26 +197,27 @@ void Calibration::createCalibrationFile () {
 ***/
 void Calibration::saveCalibrationData() {
   
- 
-
   Messages _message;
 
-  // Webserver _webserver;
-  // String jsonString;
-  StaticJsonDocument<1024> calData;
+  Webserver _webserver;
+  String jsonString;
+  StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
 
   extern struct CalibrationData calVal;
   extern struct Translator translate;
 
   _message.debugPrintf("Writing to cal.json file... \n");
     
+  // Populate JSON
   calData["FLOW_OFFSET"] = calVal.flow_offset;
-  calData["LEAK_CAL_VAC_VAL"] = calVal.leak_cal_vac_val;
-  calData["LEAK_CAL_PRESS_VAL"] = calVal.leak_cal_press_val;
+  calData["LEAK_CAL_BASELINE"] = calVal.leak_cal_baseline;
+  calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
+  calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
+  calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
 
   _message.Handler(translate.LANG_SAVING_CALIBRATION);
   
-  // serializeJsonPretty(calData, jsonString);
+  serializeJsonPretty(calData, jsonString);
 
   if (SPIFFS.exists("/cal.json"))  {
     SPIFFS.remove("/cal.json");
@@ -255,6 +226,10 @@ void Calibration::saveCalibrationData() {
   serializeJsonPretty(calData, outputFile);
   outputFile.close();
   
+  _webserver.writeJSONFile(jsonString, "/cal.json", CAL_DATA_JSON_SIZE);
+
+  _message.debugPrintf("Calibration Saved \n");
+
 
 }
 
@@ -285,22 +260,22 @@ StaticJsonDocument<1024> Calibration::loadCalibrationData () {
 * @brief Parse Calibration Data
 * @param calibrationData JSON document containing calibration data
 ***/
-void Calibration::parseCalibrationData(StaticJsonDocument<1024> calibrationData) {
+void Calibration::parseCalibrationData(StaticJsonDocument<1024> calData) {
 
   extern struct CalibrationData calVal;
 
-  calVal.flow_offset = calibrationData["FLOW_OFFSET"];
-  calVal.leak_cal_vac_val = calibrationData["LEAK_CAL_VAC_VAL"];
-  calVal.leak_cal_press_val = calibrationData["LEAK_CAL_PRESS_VAL"];
-
-
+  calVal.flow_offset = calData["FLOW_OFFSET"];
+  calVal.leak_cal_baseline = calData["LEAK_CAL_BASELINE"];
+  calVal.leak_cal_baseline_rev = calData["LEAK_CAL_BASELINE_REV"];
+  calVal.leak_cal_offset = calData["LEAK_CAL_OFFSET"];
+  calVal.leak_cal_offset_rev = calData["LEAK_CAL_OFFSET_REV"];
 }
 
 
 
 
 // TODO if calibration flow is substantially less than calibrated orifice flow then vac source not enough do we need to test for this?????????
-// REVIEW Ideally the test pressure of bench needs to be same as calibrated orifice test pressure.
+
 
 
 

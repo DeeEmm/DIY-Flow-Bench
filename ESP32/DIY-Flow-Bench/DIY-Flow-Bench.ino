@@ -170,25 +170,6 @@ void TASKgetSensorData( void * parameter ){
         
         #ifdef PREF_IS_ENABLED 
         sensorVal.PRefKPA = _sensors.getPRefValue();
-
-        // check pressure / depression to see if we are in leaktest mode
-        if (sensorVal.PRefKPA < (calVal.leak_cal_vac_val + config.leak_test_threshold) || sensorVal.PRefKPA > (calVal.leak_cal_press_val - config.leak_test_threshold)) {
-          // We are in the zone, lets check if we pass or fail
-          if (sensorVal.PRefKPA < (calVal.leak_cal_vac_val + config.leak_test_tolerance)) {
-            // vac leak test pass 
-             status.statusMessage = "Vacuum Leak Test Pass";
-          } else {
-            // vac leak test fail
-             status.statusMessage = "Vacuum Leak Test Fail";
-          }
-          if (sensorVal.PRefKPA > (calVal.leak_cal_press_val - config.leak_test_tolerance)) {
-            // pressure leak test pass 
-             status.statusMessage = "Pressure Leak Test Pass";
-          } else {
-            // pressure leak test fail
-             status.statusMessage = "Pressure Leak Test Fail";
-          }
-        }
         #endif
 
         #ifdef PDIFF_IS_ENABLED

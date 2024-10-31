@@ -30,11 +30,9 @@ class Calibration {
 		Calibration();
 		bool setFlowOffset();
 		double getFlowOffset();
-		bool setLeakTest();
-		void setLeakTestVacuum();
-		void setLeakTestPressure();
-		double getLeakTestVacuum();
-		double getLeakTestPressure();
+		bool setLeakOffset();
+		double getLeakOffset();
+		double getLeakOffsetReverse();
 		void writeCalibrationFile(String data, String filename);
 		void saveCalibrationData();
 		void createCalibrationFile ();

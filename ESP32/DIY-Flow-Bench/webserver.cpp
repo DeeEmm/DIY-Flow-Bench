@@ -270,7 +270,6 @@ void Webserver::begin()
       status.activeOrifice = request->arg("orifice");
       request->send(200, "text/html", "{\"orifice\":changed\"\"}"); });
 
-
   server->on("/api/bench/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
       _message.Handler(translate.LANG_SYSTEM_REBOOTING);
@@ -291,7 +290,8 @@ void Webserver::begin()
         _message.Handler(translate.LANG_RUN_BENCH_TO_CALIBRATE);
         request->send(200, "text/html", "{\"calibrate\":\"false\"}");
       }  
-      request->redirect("/");});
+      request->redirect("/");
+      });
 
   server->on("/api/bench/leakcal", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
@@ -301,7 +301,7 @@ void Webserver::begin()
         _message.Handler(translate.LANG_LEAK_CALIBRATING);
         _message.debugPrintf("Calibrating Leak Test...\n");
         request->send(200, "text/html", "{\"leakcal\":\"true\"}");
-        _calibrate.setLeakTest();
+        _calibrate.setLeakOffset();
       } else {
         _message.Handler(translate.LANG_RUN_BENCH_TO_CALIBRATE);
         request->send(200, "text/html", "{\"leakcal\":\"false\"}");
@@ -383,26 +383,23 @@ void Webserver::begin()
       
        });
 
-  // Save Configuration Form
-  server->on("/api/saveconfig", HTTP_POST, saveConfig);
+  // Parse Configuration Form
+  server->on("/api/saveconfig", HTTP_POST, parseConfigurationForm);
 
-  // Save Calibration Form
-  server->on("/api/savecalibration", HTTP_POST, saveCalibration);
+  // Parse Calibration Form
+  server->on("/api/savecalibration", HTTP_POST, parseCalibrationForm);
 
-  // Save Orifice Form
-  server->on("/api/setorifice", HTTP_POST, setOrifice);
+  // Parse Lift Data Form
+  server->on("/api/saveliftdata", HTTP_POST, parseLiftDataForm);
 
-  // Capture Lift Data
-  server->on("/api/captureLiftData", HTTP_POST, captureLiftData);
+  // Parse Orifice Form
+  server->on("/api/saveorifice", HTTP_POST, parseOrificeForm);
 
   // Clear Lift Data
   server->on("/api/clearLiftData", HTTP_POST, clearLiftDataFile);
 
-
-
+  // index.html
   server->rewrite("/index.html", "/");
-
-
 
   // Style sheet request handler
   server->on("/style.css", HTTP_ANY, [](AsyncWebServerRequest *request){ request->send(SPIFFS, "/style.css", "text/css"); });
@@ -509,70 +506,59 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
 
 
-/***********************************************************
-* @brief Parse Config Settings
-* @param configData JSON document containing config data
-***/
-void Webserver::parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configData) {
-
-  extern struct ConfigSettings config;
-
-  strcpy(config.wifi_ssid, configData["CONF_WIFI_SSID"]);
-  strcpy(config.wifi_pswd, configData["CONF_WIFI_PSWD"]);
-  strcpy(config.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
-  strcpy(config.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
-  strcpy(config.hostname, configData["CONF_HOSTNAME"]);
-  config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
-  config.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
-  config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
-  config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
-  config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
-  strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
-  config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
-  config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
-  strcpy(config.api_delim, configData["CONF_API_DELIM"]);
-  config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
-  config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
-  configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
-  configData["TEMP_UNIT"] = config.temp_unit;
-  configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
-  strcpy(config.bench_type, configData["BENCH_TYPE"]);
-
-  config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
-  config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
-  config.leak_test_tolerance = configData["CONF_LEAK_TEST_TOLERANCE"].as<int>();
-  config.leak_test_threshold = configData["CONF_LEAK_TEST_THRESHOLD"].as<int>();
-
-  config.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
-  config.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
-  config.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
-  config.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
-  config.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
-  config.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
-  config.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
-  config.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
-  config.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
-  config.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
-  config.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
-  config.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
-
-}
-
-
 
 /***********************************************************
 * @brief loadConfig
-* @details read configuration data from config.json file
+* @details read configuration data from config.json file and loads into global struct
 ***/ 
 StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
 
-  StaticJsonDocument<CONFIG_JSON_SIZE> configData;
+  extern struct ConfigSettings config;
 
+  StaticJsonDocument<CONFIG_JSON_SIZE> configData;
   Messages _message;
+
   _message.serialPrintf("Loading Configuration... \n");     
+
   if (SPIFFS.exists("/config.json"))  {
+
     configData = loadJSONFile("/config.json");
-    parseConfigSettings(configData);
+
+    strcpy(config.wifi_ssid, configData["CONF_WIFI_SSID"]);
+    strcpy(config.wifi_pswd, configData["CONF_WIFI_PSWD"]);
+    strcpy(config.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
+    strcpy(config.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
+    strcpy(config.hostname, configData["CONF_HOSTNAME"]);
+    config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
+    config.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
+    config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
+    config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
+    config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
+    strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
+    config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
+    config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
+    strcpy(config.api_delim, configData["CONF_API_DELIM"]);
+    config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
+    config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
+    configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
+    configData["TEMP_UNIT"] = config.temp_unit;
+    configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
+    strcpy(config.bench_type, configData["BENCH_TYPE"]);
+    config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
+    config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
+    config.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
+    config.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
+    config.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
+    config.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
+    config.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
+    config.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
+    config.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
+    config.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
+    config.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
+    config.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
+    config.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
+    config.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
+
   } else {
     _message.serialPrintf("Configuration file not found \n");
   }
@@ -643,12 +629,8 @@ void Webserver::createConfigFile () {
   configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
   configData["CONF_SHOW_ALARMS"] = config.show_alarms;
   configData["BENCH_TYPE"] = config.bench_type;
-
   configData["CONF_CAL_FLOW_RATE"] = config.cal_flow_rate;
   configData["CONF_CAL_REF_PRESS"] = config.cal_ref_press;
-  configData["CONF_LEAK_TEST_TOLERANCE"] = config.leak_test_tolerance;
-  configData["CONF_LEAK_TEST_THRESHOLD"] = config.leak_test_threshold;
-
   configData["ORIFICE1_FLOW_RATE"] = config.orificeOneFlow;
   configData["ORIFICE1_TEST_PRESSURE"] = config.orificeOneDepression;
   configData["ORIFICE2_FLOW_RATE"] = config.orificeTwoFlow;
@@ -669,13 +651,14 @@ void Webserver::createConfigFile () {
 
 
 /***********************************************************
- * @brief saveConfig
+ * @brief parseConfigurationForm
+ * @details Parses calibration form post vars and stores into global struct
  * @details Saves configuration data to config.json file
  * @note Creates file if it does not exist
  * @note Redirects browser to file list
  * 
  ***/
-void Webserver::saveConfig(AsyncWebServerRequest *request)
+void Webserver::parseConfigurationForm(AsyncWebServerRequest *request)
 {
 
   Messages _message;
@@ -716,12 +699,8 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
   strcpy(config.temp_unit, configData["TEMP_UNIT"]);
   config.valveLiftInterval = configData["VALVE_LIFT_INTERVAL"].as<double>();
   strcpy(config.bench_type, configData["BENCH_TYPE"]);
-
   config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
   config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
-  config.leak_test_tolerance = configData["CONF_LEAK_TEST_TOLERANCE"].as<int>();
-  config.leak_test_threshold = configData["CONF_LEAK_TEST_THRESHOLD"].as<int>();
-
   config.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
   config.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
   config.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
@@ -760,39 +739,37 @@ void Webserver::saveConfig(AsyncWebServerRequest *request)
  * @note duplicates _calibration.saveCalibrationData whjich is unable to be called from server->on directive
  * 
  ***/
-void Webserver::saveCalibration(AsyncWebServerRequest *request)
+void Webserver::parseCalibrationForm(AsyncWebServerRequest *request)
 {
 
+  Calibration _calibrate;
   Messages _message;
-  Webserver _webserver;
+  // Webserver _webserver;
 
-  StaticJsonDocument<CAL_DATA_JSON_SIZE> calibrationData;
+  StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
   extern struct CalibrationData calVal;
-  String jsonString;
+  // String jsonString;
 
   int params = request->params();
 
-  _message.debugPrintf("Saving Configuration... \n");
+  _message.debugPrintf("Parsing Calibration Form Data... \n");
 
   // Convert POST vars to JSON 
   for(int i=0;i<params;i++){
     AsyncWebParameter* p = request->getParam(i);
-      calibrationData[p->name().c_str()] = p->value().c_str();
+      calData[p->name().c_str()] = p->value().c_str();
   }
 
-  // Update Config Vars
-  calVal.flow_offset = calibrationData["FLOW_OFFSET"].as<double>();
-  calVal.leak_cal_vac_val = calibrationData["LEAK_CAL_VAC_VAL"].as<double>();
-  calVal.leak_cal_press_val = calibrationData["LEAK_CAL_PRESS_VAL"].as<double>();
+  // Update global Config Vars
+  calVal.flow_offset = calData["FLOW_OFFSET"].as<double>();
+  calVal.leak_cal_offset = calData["LEAK_CAL_OFFSET"].as<double>();
+  calVal.leak_cal_offset_rev = calData["LEAK_CAL_OFFSET_REV"].as<double>();
+  calVal.leak_cal_baseline= calData["LEAK_CAL_BASELINE"].as<double>();
+  calVal.leak_cal_baseline_rev = calData["LEAK_CAL_BASELINE_REV"].as<double>();
 
-  // save settings to calibration file
-  serializeJsonPretty(calibrationData, jsonString);
-  if (SPIFFS.exists("/cal.json"))  {
-    SPIFFS.remove("/cal.json");
-  }
-  _webserver.writeJSONFile(jsonString, "/cal.json", CAL_DATA_JSON_SIZE);
+  _message.debugPrintf("Calibration form post vars parsed \n");
 
-  _message.debugPrintf("Calibration Saved \n");
+  _calibrate.saveCalibrationData();
 
   request->redirect("/?view=config");
 
@@ -805,13 +782,29 @@ void Webserver::saveCalibration(AsyncWebServerRequest *request)
 ***/ 
 StaticJsonDocument<LIFT_DATA_JSON_SIZE> Webserver::loadLiftData () {
 
+  extern struct ValveLiftData valveData;
   StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
-
   Messages _message;
+
   _message.serialPrintf("Loading Lift Data... \n");     
+
   if (SPIFFS.exists("/liftdata.json"))  {
+    
     liftData = loadJSONFile("/liftdata.json");
-    parseLiftData(liftData);
+    
+    valveData.LiftData1 = liftData["LIFTDATA1"].as<double>();
+    valveData.LiftData2 = liftData["LIFTDATA2"].as<double>();
+    valveData.LiftData3 = liftData["LIFTDATA3"].as<double>();
+    valveData.LiftData4 = liftData["LIFTDATA4"].as<double>();
+    valveData.LiftData5 = liftData["LIFTDATA5"].as<double>();
+    valveData.LiftData6 = liftData["LIFTDATA6"].as<double>();
+    valveData.LiftData7 = liftData["LIFTDATA7"].as<double>();
+    valveData.LiftData8 = liftData["LIFTDATA8"].as<double>();
+    valveData.LiftData9 = liftData["LIFTDATA9"].as<double>();
+    valveData.LiftData10 = liftData["LIFTDATA10"].as<double>();
+    valveData.LiftData11 = liftData["LIFTDATA11"].as<double>();
+    valveData.LiftData12 = liftData["LIFTDATA12"].as<double>();
+
   } else {
     _message.serialPrintf("LiftData file not found \n");
   }
@@ -878,36 +871,14 @@ void Webserver::clearLiftDataFile(AsyncWebServerRequest *request){
 
 
 
-/***********************************************************
-* @brief Parse Lift Data Settings
-* @param liftData JSON document containing lift data
-***/
-void Webserver::parseLiftData(StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData) {
-
-  extern struct ValveLiftData valveData;
-
-  valveData.LiftData1 = liftData["LIFTDATA1"].as<double>();
-  valveData.LiftData2 = liftData["LIFTDATA2"].as<double>();
-  valveData.LiftData3 = liftData["LIFTDATA3"].as<double>();
-  valveData.LiftData4 = liftData["LIFTDATA4"].as<double>();
-  valveData.LiftData5 = liftData["LIFTDATA5"].as<double>();
-  valveData.LiftData6 = liftData["LIFTDATA6"].as<double>();
-  valveData.LiftData7 = liftData["LIFTDATA7"].as<double>();
-  valveData.LiftData8 = liftData["LIFTDATA8"].as<double>();
-  valveData.LiftData9 = liftData["LIFTDATA9"].as<double>();
-  valveData.LiftData10 = liftData["LIFTDATA10"].as<double>();
-  valveData.LiftData11 = liftData["LIFTDATA11"].as<double>();
-  valveData.LiftData12 = liftData["LIFTDATA12"].as<double>();
-
-}
 
 
 /***********************************************************
  * @brief captureLiftData
- * @details captures lift data to workign memory
+ * @details captures lift data to working memory
  * 
  ***/
-void Webserver::captureLiftData(AsyncWebServerRequest *request)
+void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
 {
 
   Messages _message;
@@ -935,15 +906,6 @@ void Webserver::captureLiftData(AsyncWebServerRequest *request)
         }
 
   }
-
-
-  // // load the liftdata
-  // if (SPIFFS.exists("/liftdata.json"))  {
-  //   liftData = loadJSONFile("/liftdata.json");
-  //   parseLiftData(liftData);
-  // } else {
-  //   _message.serialPrintf("LiftData file not found \n");
-  // }
 
 
   switchval = strtol(liftPoint.c_str(), &end, 10); // convert std::str to int
@@ -1061,11 +1023,11 @@ String Webserver::getValveDataJSON()
 
 
 /***********************************************************
- * @brief setOrifice
+ * @brief parseOrificeForm
  * @details Sets selected orifice and loads orifice data
  * @todo //TODO auto orifice decode
  ***/
-void Webserver::setOrifice(AsyncWebServerRequest *request)
+void Webserver::parseOrificeForm(AsyncWebServerRequest *request)
 {
 
   Messages _message;
@@ -1563,13 +1525,13 @@ String Webserver::processTemplate(const String &var)
   // Calibration Settings
   if (var == "CONF_CAL_FLOW_RATE") return String(config.cal_flow_rate);
   if (var == "CONF_CAL_REF_PRESS") return String(config.cal_ref_press);
-  if (var == "CONF_LEAK_TEST_TOLERANCE") return String(config.leak_test_tolerance);
-  if (var == "CONF_LEAK_TEST_THRESHOLD") return String(config.leak_test_threshold);
 
   // Calibration Data
   if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
-  if (var == "LEAK_CAL_PRESS_VAL") return String(calVal.leak_cal_press_val);
-  if (var == "LEAK_CAL_VAC_VAL") return String(calVal.leak_cal_vac_val);
+  if (var == "LEAK_CAL_BASELINE") return String(calVal.leak_cal_baseline);
+  if (var == "LEAK_CAL_OFFSET") return String(calVal.leak_cal_offset);
+  if (var == "LEAK_CAL_BASELINE_REV") return String(calVal.leak_cal_baseline_rev);
+  if (var == "LEAK_CAL_OFFSET_REV") return String(calVal.leak_cal_offset_rev);
 
   // Generate file list HTML code
   if (var == "FILE_LIST"){

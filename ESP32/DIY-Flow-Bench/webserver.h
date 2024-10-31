@@ -50,9 +50,9 @@ class Webserver {
 		void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 		static void processUpdate(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final);
-		static void saveConfig(AsyncWebServerRequest *request);
-		static void saveCalibration(AsyncWebServerRequest *request);
-		static void setOrifice(AsyncWebServerRequest *request);
+		static void parseConfigurationForm(AsyncWebServerRequest *request);
+		static void parseCalibrationForm(AsyncWebServerRequest *request);
+		static void parseOrificeForm(AsyncWebServerRequest *request);
 		int decodeMessageHeader (char *data);
 		static String processTemplate(const String& var);
 		
@@ -106,7 +106,7 @@ class Webserver {
 
 		void createLiftDataFile();
 		static void clearLiftDataFile(AsyncWebServerRequest *request);
-		static void captureLiftData(AsyncWebServerRequest *request);
+		static void parseLiftDataForm(AsyncWebServerRequest *request);
 
 
 
