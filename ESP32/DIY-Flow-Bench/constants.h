@@ -96,6 +96,12 @@
 #define MPX4115 9
 #define SIMPLE_TEMP_DHT11 10
 
+/***********************************************************
+ * Flow Differential types
+ ***/
+#define USERTARGET 1
+#define BASELINE 2
+#define BASELINE_LEAK 3
 
 
 /***********************************************************

@@ -16,6 +16,8 @@ https://github.com/DeeEmm/DIY-Flow-Bench/issues
 For 'Ron...
 ===================================================================
 
+https://codepen.io/makhtar/pen/YzPJRpX
+https://github.com/gridstack/gridstack.js
 http://www.shumatech.com/support/chinese_scales.htm
 https://www.yuriystoys.com/2013/07/chinese-caliper-data-format.html
 https://hackaday.io/project/511-digital-dial-indicator-cnc-surface-probe/log/814-the-digital-dial-indicator-and-how-to-read-from-it
@@ -56,6 +58,10 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24100101        - Missing line terminator #187 
+                - Added user definable flow differential target
+                - Finalised flow differential code
+24103002        - Added additional 'Flow Differential' tile
 24103101        - Updated leak cal fucntionality as per discssion #178
                 - Refactored webserver class to reduce spaghetti
                 - General code tidying

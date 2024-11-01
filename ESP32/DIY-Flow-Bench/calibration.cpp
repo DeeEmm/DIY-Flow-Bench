@@ -96,8 +96,10 @@ bool Calibration::setLeakOffset() {
   Calculations _calculations;
   Sensors _sensors;
   Messages _message;
+
   extern struct CalibrationData calVal;
   extern struct Translator translate;
+  extern struct SensorData sensorVal;
 
   // load current calibration data
   loadCalibrationData();
@@ -113,9 +115,12 @@ bool Calibration::setLeakOffset() {
   //   calVal.leak_cal_offset_rev = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
   //   _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset_rev);
   // } else {
-    calVal.leak_cal_offset = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
-    _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
+    // calVal.leak_cal_offset = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
+    // _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
   // }
+
+    calVal.leak_cal_offset = sensorVal.FlowCFM;
+    _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
 
   saveCalibrationData();    
   
@@ -174,6 +179,7 @@ void Calibration::createCalibrationFile () {
   _message.debugPrintf("Creating cal.json file... \n"); 
   
   calData["FLOW_OFFSET"] = calVal.flow_offset;
+  calData["USER_OFFSET"] = calVal.user_offset;
   calData["LEAK_CAL_BASELINE"] = calVal.leak_cal_baseline;
   calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
   calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
@@ -210,6 +216,7 @@ void Calibration::saveCalibrationData() {
     
   // Populate JSON
   calData["FLOW_OFFSET"] = calVal.flow_offset;
+  calData["USER_OFFSET"] = calVal.user_offset;
   calData["LEAK_CAL_BASELINE"] = calVal.leak_cal_baseline;
   calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
   calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
@@ -265,6 +272,7 @@ void Calibration::parseCalibrationData(StaticJsonDocument<1024> calData) {
   extern struct CalibrationData calVal;
 
   calVal.flow_offset = calData["FLOW_OFFSET"];
+  calVal.user_offset = calData["USER_OFFSET"];
   calVal.leak_cal_baseline = calData["LEAK_CAL_BASELINE"];
   calVal.leak_cal_baseline_rev = calData["LEAK_CAL_BASELINE_REV"];
   calVal.leak_cal_offset = calData["LEAK_CAL_OFFSET"];

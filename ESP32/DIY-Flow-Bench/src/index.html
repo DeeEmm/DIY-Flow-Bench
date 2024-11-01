@@ -9,7 +9,7 @@
 
     <input type="hidden" id="ACTIVE_ORIFICE" value=""></input>
     <input type="hidden" id="BENCH_TYPE" value=""></input>
-
+    
     <!-- Save Data Modal -->
     <div id="captureLiftDataModal" class="modal">
       <div class="modal-content">
@@ -68,6 +68,20 @@
               <input type='submit' value='Update' class="button file-submit-button">
             </div>
           </form>
+        </div>
+      </div>        
+    </div>
+
+    <!--Flow Target modal-->
+    <div id="flowTargetModal" class="modal">
+      <div class="modal-content flowTargetModal">
+        <span class="closeFlowTargetModalButton">&times;</span>
+        <div class="align-center">
+          <form method="POST" action="/api/saveflowtarget" enctype="multipart/form-data">
+            <label>User Flow Target Value</label>
+              <input id="flowTargetValInput" type="text" name="USER_OFFSET" value="~USER_OFFSET~"/>
+              <input class="button submit-button" type="submit" value="Save"/>
+            </form>
         </div>
       </div>        
     </div>
@@ -194,52 +208,57 @@
       <div class="content">
         <div class="tile-grid">
           <div class="tile tile-pref" id="tile-pref">
-            <p class="tile-title">Depression</p>
+            <p class="tile-title" id="tile-pref-title">Depression</p>
             <p><span class="tile-value" id="PREF">&nbsp;</span></p>
             <p class="units">inH2O</p>
           </div>
           <div class="tile tile-pdiff" id="tile-pdiff">
-            <p class="tile-title">Diff Pressure</p>
+            <p class="tile-title" id="tile-pdiff-title">Diff Pressure</p>
             <p><span class="tile-value" id="PDIFF">&nbsp;</span></p>
             <p class="units">inH2O</p>
           </div>
           <div class="tile tile-flow" id="flow-tile">
-            <p class="tile-title">Flow Rate</p>
+            <p class="tile-title" id="flow-tile-title">Flow Rate</p>
             <p><span class="tile-value" id="FLOW">&nbsp;</span></p>
             <p class="units">ACFM</p>
           </div>
           <div class="tile tile-aflow" id="aflow-tile">
-            <p class="tile-title">Adjusted Flow</p>
+            <p class="tile-title" id="aflow-tile-title">Adjusted Flow</p>
             <p><span class="tile-value" id="AFLOW">&nbsp;</span></p>
             <p class="units">ACFM&nbsp;&commat;&nbsp;<span id="PADJUST">28</span>&nbsp;inH2O</p>
           </div>
           <div class="tile tile-flow" id="maf-tile">
-            <p class="tile-title">MAF Flow</p>
+            <p class="tile-title" id="maf-tile-title">MAF Flow</p>
             <p><span class="tile-value" id="MFLOW">&nbsp;</span></p>
             <p class="units">KGH</p>
           </div>
           <div class="tile tile-pitot" id="tile-pitot">
-            <p class="tile-title">Pitot</p>
+            <p class="tile-title" id="tile-pitot-title">Pitot</p>
             <p><span class="tile-value" id="PITOT">&nbsp;</span></p>
             <p class="units">inH2O</p>
           </div>
           <div class="tile tile-swirl" id="tile-swirl">
-            <p class="tile-title">Swirl</p>
+            <p class="tile-title" id="tile-swirl-title">Swirl</p>
             <p><span class="tile-value" id="SWIRL">&nbsp;</span></p>
             <p class="units">rpm</p>
           </div>
-          <div class="tile tile-temp">
-            <p class="tile-title">Temperature</p>
+          <div class="tile tile-fdiff" id="tile-fdiff">
+            <p class="tile-title"  id="tile-fdiff-title">Flow Diff</p>
+            <p><span class="tile-value flowTargetVal" id="FDIFF">&nbsp;</span></p>
+            <p class="units"><span id="FDIFFTYPEDESC">~FDIFFTYPEDESC~</span></p>
+          </div>
+          <div class="tile tile-temp" id="tile-temp">
+            <p class="tile-title" id="tile-temp-title">Temperature</p>
             <p><span class="tile-value" id="TEMP">&nbsp;</span></p>
             <p class="units">~TEMP_UNIT~</p>
           </div>
-          <div class="tile tile-baro">
-            <p class="tile-title">Baro Pressure</p>
+          <div class="tile tile-baro" id="tile-baro">
+            <p class="tile-title" id="tile-baro-title">Baro Pressure</p>
             <p><span class="tile-value" id="BARO">&nbsp;</span></p>
             <p class="units">millibar (hPa)</p>
           </div>
-          <div class="tile tile-relh">
-            <p class="tile-title">Humidity</p>
+          <div class="tile tile-relh" id="tile-relh">
+            <p class="tile-title"id="tile-relh-title">Humidity</p>
             <p><span class="tile-value" id="RELH">&nbsp;</span></p>
             <p class="units">&percnt;RelH</p>
           </div>

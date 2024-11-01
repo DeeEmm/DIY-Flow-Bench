@@ -24,10 +24,10 @@ var loadGraphDataModal = document.getElementById("loadGraphDataModal");
 var saveGraphDataModal = document.getElementById("saveGraphDataModal");
 var calibrationModal = document.getElementById("calibrationModal");
 var updateModal = document.getElementById("updateModal");
+var flowTargetModal = document.getElementById("flowTargetModal");
 
 
-
-
+var closeFlowTargetModalButton = document.getElementsByClassName("closeFlowTargetModalButton")[0];
 var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
 var closeFileModalButton = document.getElementsByClassName("closeFileModalButton")[0];
 var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton")[0];
@@ -56,6 +56,7 @@ if (!!window.EventSource) {
         } catch (error) {
           console.log('Missing or incorrect JSON data');
           console.log(error);
+          console.log(key);
         }
       } 
 
@@ -169,6 +170,10 @@ function initialiseButtons() {
     document.getElementById('captureLiftDataModal').style.display='block';
   });
 
+  document.getElementById('FDIFF').addEventListener('click', function(){
+    document.getElementById('flowTargetModal').style.display='block';
+  });
+
   document.getElementById('clear-graph-data-button').addEventListener('click', function(){
         
     // clear data points from graph
@@ -220,38 +225,53 @@ function initialiseButtons() {
     document.getElementById('updateModal').style.display='block';
   });
 
-  document.getElementById('tile-pref').addEventListener('click', function(){
+  document.getElementById('tile-pref-title').addEventListener('click', function(){
     document.getElementById('tile-pref').style.display='none';
     document.getElementById('tile-pdiff').style.display='block';
   });
 
-  document.getElementById('tile-pdiff').addEventListener('click', function(){
+  document.getElementById('tile-pdiff-title').addEventListener('click', function(){
     document.getElementById('tile-pdiff').style.display='none';
     document.getElementById('tile-pref').style.display='block';
   });
 
-  document.getElementById('flow-tile').addEventListener('click', function(){
+  document.getElementById('flow-tile-title').addEventListener('click', function(){
     document.getElementById('flow-tile').style.display='none';
     document.getElementById('aflow-tile').style.display='block';
   });
 
-  document.getElementById('aflow-tile').addEventListener('click', function(){
+  document.getElementById('aflow-tile-title').addEventListener('click', function(){
     document.getElementById('aflow-tile').style.display='none';
     document.getElementById('maf-tile').style.display='block';
   });
 
-  document.getElementById('maf-tile').addEventListener('click', function(){
+  document.getElementById('maf-tile-title').addEventListener('click', function(){
     document.getElementById('maf-tile').style.display='none';
     document.getElementById('flow-tile').style.display='block';
   });
-  document.getElementById('tile-pitot').addEventListener('click', function(){
+  document.getElementById('tile-pitot-title').addEventListener('click', function(){
     document.getElementById('tile-pitot').style.display='none';
     document.getElementById('tile-swirl').style.display='block';
+
   });
 
-  document.getElementById('tile-swirl').addEventListener('click', function(){
+  document.getElementById('tile-swirl-title').addEventListener('click', function(){
     document.getElementById('tile-swirl').style.display='none';
+    document.getElementById('tile-fdiff').style.display='block';
+  });
+
+  document.getElementById('tile-fdiff-title').addEventListener('click', function(){
+    document.getElementById('tile-fdiff').style.display='none';
     document.getElementById('tile-pitot').style.display='block';
+  });
+
+  document.getElementById('FDIFFTYPEDESC').addEventListener('click', function(){
+    console.log('Toggle Flow Diff');
+    xhr.open('GET', '/api/fdiff');
+    // xhr.onload = function() {
+    //   if (xhr.status === 200) window.location.href = '/';
+    // };
+    xhr.send();
   });
 
   document.getElementById('on-button').addEventListener('click', function(){
@@ -402,13 +422,20 @@ closeSaveGraphDataModalButton.onclick = function() {
   saveGraphDataModal.style.display = "none";
 }
 
+/***********************************************************
+* Close Flow Target Data modal dialog
+***/
+closeFlowTargetModalButton.onclick = function() {
+  flowTargetModal.style.display = "none";
+}
+
 
 
 /***********************************************************
 * Close modal dialogs on lose focus
 ***/
 window.onclick = function(event) {
-  if (event.target == fileModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal || event.target == calibrationModal || event.target == updateModal) {
+  if (event.target == fileModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal || event.target == calibrationModal || event.target == updateModal || event.target == flowTargetModal  ){
     fileModal.style.display = "none";
     infoModal.style.display = "none";
     captureLiftDataModal.style.display = "none";
@@ -416,6 +443,7 @@ window.onclick = function(event) {
     saveGraphDataModal.style.display = "none";
     calibrationModal.style.display = "none";
     updateModal.style.display = "none";
+    flowTargetModal.style.display = "none";
   }
 }
 
@@ -432,6 +460,7 @@ document.addEventListener("keydown", ({key}) => {
     saveGraphDataModal.style.display = "none";
     calibrationModal.style.display = "none";
     updateModal.style.display = "none";
+    flowTargetModal.style.display = "none";
   }
 })
 

@@ -152,48 +152,35 @@ hr {
 .tile-title {
 	font-size: 1rem;
 	font-weight: bold;
-	color: #034078
+	color: #034078;
+  cursor: pointer;
 }
 
 .tile-value {
 	font-size: 2.1rem;
 	font-weight: bold;
-	color: #333
+	color: #333;
 }
 
+#FDIFFTYPEDESC {
+  cursor: pointer;
+}
 
-#tile-pdiff {
+.flowTargetVal {
+	font-weight: bold;
+	font-size: 2.1rem;
+	color: #333;
+  cursor: pointer;
+}
+
+flowTargetValInput {
+  font-size: 22px;
+}
+
+#tile-pdiff, #aflow-tile, #maf-tile, #tile-swirl, #tile-fdiff  {
   display: none;
-  cursor: pointer;
 }
 
-#tile-pref {
-  cursor: pointer;
-}
-
-#flow-tile {
-  cursor: pointer;
-}
-
-#aflow-tile {
-  display: none;
-  cursor: pointer;
-}
-
-#maf-tile {
-  display: none;
-  cursor: pointer;
-}
-
-
-#tile-pitot {
-  cursor: pointer;
-}
-
-#tile-swirl {
-  display:none;
-  cursor: pointer;
-}
 
 .config-panel {
   max-width: 650px;
@@ -444,7 +431,7 @@ input[type=file]::file-selector-button:hover {
 }
 
 /* The Close Button */
-.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton, closeUpdateModalButton {
+.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton, closeUpdateModalButton, closeFlowTargetModalButton {
   color: #aaa;
   float: right;
   font-size: 22px;
@@ -452,6 +439,8 @@ input[type=file]::file-selector-button:hover {
   cursor: pointer;
 }
 
+.closeFlowTargetModalButton:hover,
+.closeFlowTargetModalButton:focus,
 .closeUpdateModalButton:hover, 
 .closeUpdateModalButton:focus,
 .closeFileModalButton:hover, 

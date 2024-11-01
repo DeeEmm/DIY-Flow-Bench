@@ -383,6 +383,20 @@ void Webserver::begin()
       
        });
 
+
+  // Toggle Flow Dif Tile
+  server->on("/api/fdiff", HTTP_GET, [](AsyncWebServerRequest *request){
+      Messages _message;
+      // _message.Handler(translate.LANG_BENCH_RUNNING);
+      _message.debugPrintf("/api/fdiff \n");
+      toggleFlowDiffTile();
+      request->send(200);
+      // request->send(200, "text/html", "{\"fdiff\":\"changed\"}"); 
+      });
+
+  // Save user Flow Diff target
+  server->on("/api/saveflowtarget", HTTP_POST, parseUserFlowTargetForm);
+  
   // Parse Configuration Form
   server->on("/api/saveconfig", HTTP_POST, parseConfigurationForm);
 
@@ -762,6 +776,7 @@ void Webserver::parseCalibrationForm(AsyncWebServerRequest *request)
 
   // Update global Config Vars
   calVal.flow_offset = calData["FLOW_OFFSET"].as<double>();
+  calVal.user_offset = calData["USER_OFFSET"].as<double>();
   calVal.leak_cal_offset = calData["LEAK_CAL_OFFSET"].as<double>();
   calVal.leak_cal_offset_rev = calData["LEAK_CAL_OFFSET_REV"].as<double>();
   calVal.leak_cal_baseline= calData["LEAK_CAL_BASELINE"].as<double>();
@@ -774,6 +789,97 @@ void Webserver::parseCalibrationForm(AsyncWebServerRequest *request)
   request->redirect("/?view=config");
 
 }
+
+
+
+
+
+
+/***********************************************************
+ * @brief saveCalibration
+ * @details Saves calibration data to cal.json file
+ * @note Creates file if it does not exist
+ * @note Redirects browser to configuration tab
+ * @note duplicates _calibration.saveCalibrationData whjich is unable to be called from server->on directive
+ * 
+ ***/
+void Webserver::parseUserFlowTargetForm(AsyncWebServerRequest *request)
+{
+
+  Calibration _calibrate;
+  Messages _message;
+  // Webserver _webserver;
+
+  StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
+  extern struct CalibrationData calVal;
+  // String jsonString;
+
+  int params = request->params();
+
+  _message.debugPrintf("Parsing User Flow Target Form Data... \n");
+
+  // Convert POST vars to JSON 
+  for(int i=0;i<params;i++){
+    AsyncWebParameter* p = request->getParam(i);
+      calData[p->name().c_str()] = p->value().c_str();
+  }
+
+  // Update global Config Vars
+  calVal.user_offset = calData["USER_OFFSET"].as<double>();
+  // calVal.flow_offset = calData["FLOW_OFFSET"].as<double>();
+  // calVal.leak_cal_offset = calData["LEAK_CAL_OFFSET"].as<double>();
+  // calVal.leak_cal_offset_rev = calData["LEAK_CAL_OFFSET_REV"].as<double>();
+  // calVal.leak_cal_baseline= calData["LEAK_CAL_BASELINE"].as<double>();
+  // calVal.leak_cal_baseline_rev = calData["LEAK_CAL_BASELINE_REV"].as<double>();
+
+  _message.debugPrintf("sUer Flow Target Form Data parsed \n");
+
+  _calibrate.saveCalibrationData();
+
+  request->redirect("/");
+
+}
+
+
+
+
+
+/***********************************************************
+* @brief toggleFlowDiffTile
+* @details advances data assinged to Flow Differential tile
+***/
+void Webserver::toggleFlowDiffTile () {
+
+  Messages _message;
+
+  extern struct SensorData sensorVal;
+  extern struct CalibrationData calVal;
+
+  _message.debugPrintf("Flow Differential: %u \n", sensorVal.FDiffType);
+
+    // Flow differential type
+  switch (sensorVal.FDiffType) {
+
+  case USERTARGET:
+    sensorVal.FDiffType = 2;
+    break;
+
+  case BASELINE:
+    sensorVal.FDiffType = 3;
+    break;
+
+  case BASELINE_LEAK :
+    sensorVal.FDiffType = 1;
+    break;
+
+
+  default:
+    break;
+  }
+
+}
+
+
 
 
 /***********************************************************
@@ -1127,18 +1233,8 @@ String Webserver::getDataJSON()
     dataJson["TEMP"] = sensorVal.TempDegF;
   }
 
-  // Data Filter Type
-  if (strstr(String(config.data_filter_type).c_str(), String("NONE").c_str())) {
-    dataJson["DATA_FILTER_TYPE"] = "NONE";
-  } else if (strstr(String(config.data_filter_type).c_str(), String("MEDIAN").c_str())) {
-    dataJson["DATA_FILTER_TYPE"] = "MEDIAN";
-  } else if (strstr(String(config.data_filter_type).c_str(), String("AVERAGE").c_str())) {
-    dataJson["DATA_FILTER_TYPE"] = "AVERAGE";
-  } else if (strstr(String(config.data_filter_type).c_str(), String("MODE").c_str())) {
-    dataJson["DATA_FILTER_TYPE"] = "NODE";
-  }
 
-  // Bench Type
+  // Bench Type for status pane
   if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())) {
     dataJson["BENCH_TYPE"] = "MAF";
   } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())) {
@@ -1161,6 +1257,10 @@ String Webserver::getDataJSON()
 
   // Swirl (+/- rpm)
   dataJson["SWIRL"] = sensorVal.Swirl;
+
+  // Flow Differential
+  dataJson["FDIFF"] = sensorVal.FDiff;
+  dataJson["FDIFFTYPEDESC"] = sensorVal.FDiffTypeDesc;
 
   if (1!=1) {  // TODO if message handler is active display the active message
     dataJson["STATUS_MESSAGE"] = status.statusMessage;
@@ -1528,6 +1628,7 @@ String Webserver::processTemplate(const String &var)
 
   // Calibration Data
   if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
+  if (var == "USER_OFFSET") return String(calVal.user_offset);
   if (var == "LEAK_CAL_BASELINE") return String(calVal.leak_cal_baseline);
   if (var == "LEAK_CAL_OFFSET") return String(calVal.leak_cal_offset);
   if (var == "LEAK_CAL_BASELINE_REV") return String(calVal.leak_cal_baseline_rev);

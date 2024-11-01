@@ -87,6 +87,7 @@ struct ConfigSettings {
  ***/
 struct CalibrationData { 
   double flow_offset = 0.0;         
+  double user_offset = 0.0;         
   double leak_cal_baseline = 0.0;  
   double leak_cal_offset = 0.0;  
   double leak_cal_baseline_rev = 0.0;  
@@ -166,6 +167,8 @@ struct SensorData {
   double MedianCFM = 0.0;
   double AverageCFM = 0.0;
   double FlowKGH = 0.0;
+  double FlowCFMraw = 0.0;
+  double FlowCFMunc = 0.0;
   double FlowCFM = 0.0;
   double FlowADJ = 0.0;
   double MafMv = 0.0;
@@ -183,6 +186,9 @@ struct SensorData {
   double PitotKPA = 0.0;
   double PitotMv = 0.0;
   double Swirl = 0.0;
+  double FDiff = 0.0;
+  int FDiffType = 1;
+  char FDiffTypeDesc[32] = "BASELINE";
 };
 
 

@@ -53,6 +53,7 @@ class Webserver {
 		static void parseConfigurationForm(AsyncWebServerRequest *request);
 		static void parseCalibrationForm(AsyncWebServerRequest *request);
 		static void parseOrificeForm(AsyncWebServerRequest *request);
+
 		int decodeMessageHeader (char *data);
 		static String processTemplate(const String& var);
 		
@@ -107,7 +108,9 @@ class Webserver {
 		void createLiftDataFile();
 		static void clearLiftDataFile(AsyncWebServerRequest *request);
 		static void parseLiftDataForm(AsyncWebServerRequest *request);
+		static void parseUserFlowTargetForm(AsyncWebServerRequest *request);
 
+		static void toggleFlowDiffTile (); 
 
 
 

@@ -26,7 +26,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "24103002"
+#define BUILD_NUMBER "24100101"
 #define RELEASE "V.2.0-RC.8"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"
 
@@ -274,10 +274,10 @@ const int ADC_I2C_ADDR = 0x48;
 
 // Set sensor type (Uncomment One line only)
 // #define PREF_SENSOR_TYPE_LINEAR_ANALOG 
-#define PREF_SENSOR_TYPE_MPXV7007        
+// #define PREF_SENSOR_TYPE_MPXV7007        
 // #define PREF_SENSOR_TYPE_MPXV7025
 // #define PREF_SENSOR_TYPE_XGZP6899A007KPDPN        
-// #define PREF_SENSOR_TYPE_XGZP6899A010KPDPN        
+#define PREF_SENSOR_TYPE_XGZP6899A010KPDPN        
 
 
 #define PREF_MV_TRIMPOT 0.0                               // Millivolt offset

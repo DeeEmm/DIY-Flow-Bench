@@ -158,48 +158,35 @@ hr {
 .tile-title {
 	font-size: 1rem;
 	font-weight: bold;
-	color: #034078
+	color: #034078;
+  cursor: pointer;
 }
 
 .tile-value {
 	font-size: 2.1rem;
 	font-weight: bold;
-	color: #333
+	color: #333;
 }
 
+#FDIFFTYPEDESC {
+  cursor: pointer;
+}
 
-#tile-pdiff {
+.flowTargetVal {
+	font-weight: bold;
+	font-size: 2.1rem;
+	color: #333;
+  cursor: pointer;
+}
+
+flowTargetValInput {
+  font-size: 22px;
+}
+
+#tile-pdiff, #aflow-tile, #maf-tile, #tile-swirl, #tile-fdiff  {
   display: none;
-  cursor: pointer;
 }
 
-#tile-pref {
-  cursor: pointer;
-}
-
-#flow-tile {
-  cursor: pointer;
-}
-
-#aflow-tile {
-  display: none;
-  cursor: pointer;
-}
-
-#maf-tile {
-  display: none;
-  cursor: pointer;
-}
-
-
-#tile-pitot {
-  cursor: pointer;
-}
-
-#tile-swirl {
-  display:none;
-  cursor: pointer;
-}
 
 .config-panel {
   max-width: 650px;
@@ -450,7 +437,7 @@ input[type=file]::file-selector-button:hover {
 }
 
 /* The Close Button */
-.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton, closeUpdateModalButton {
+.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton, closeUpdateModalButton, closeFlowTargetModalButton {
   color: #aaa;
   float: right;
   font-size: 22px;
@@ -458,6 +445,8 @@ input[type=file]::file-selector-button:hover {
   cursor: pointer;
 }
 
+.closeFlowTargetModalButton:hover,
+.closeFlowTargetModalButton:focus,
 .closeUpdateModalButton:hover, 
 .closeUpdateModalButton:focus,
 .closeFileModalButton:hover, 
@@ -700,7 +689,7 @@ svg .dataCircle:hover {
 
     <input type="hidden" id="ACTIVE_ORIFICE" value=""></input>
     <input type="hidden" id="BENCH_TYPE" value=""></input>
-
+    
     <!-- Save Data Modal -->
     <div id="captureLiftDataModal" class="modal">
       <div class="modal-content">
@@ -708,7 +697,7 @@ svg .dataCircle:hover {
         <h3>Select lift value before capture</h3>
         <hr>
         <div class="align-center">
-          <form method="POST" action="/api/captureLiftData" enctype="multipart/form-data">
+          <form method="POST" action="/api/saveliftdata" enctype="multipart/form-data">
             <label>Lift Value</label>
             <br>
               <div class="switch-field">
@@ -759,6 +748,20 @@ svg .dataCircle:hover {
               <input type='submit' value='Update' class="button file-submit-button">
             </div>
           </form>
+        </div>
+      </div>        
+    </div>
+
+    <!--Flow Target modal-->
+    <div id="flowTargetModal" class="modal">
+      <div class="modal-content flowTargetModal">
+        <span class="closeFlowTargetModalButton">&times;</span>
+        <div class="align-center">
+          <form method="POST" action="/api/saveflowtarget" enctype="multipart/form-data">
+            <label>User Flow Target Value</label>
+              <input id="flowTargetValInput" type="text" name="USER_OFFSET" value="~USER_OFFSET~"/>
+              <input class="button submit-button" type="submit" value="Save"/>
+            </form>
         </div>
       </div>        
     </div>
@@ -885,52 +888,57 @@ svg .dataCircle:hover {
       <div class="content">
         <div class="tile-grid">
           <div class="tile tile-pref" id="tile-pref">
-            <p class="tile-title">Depression</p>
+            <p class="tile-title" id="tile-pref-title">Depression</p>
             <p><span class="tile-value" id="PREF">&nbsp;</span></p>
             <p class="units">inH2O</p>
           </div>
           <div class="tile tile-pdiff" id="tile-pdiff">
-            <p class="tile-title">Diff Pressure</p>
+            <p class="tile-title" id="tile-pdiff-title">Diff Pressure</p>
             <p><span class="tile-value" id="PDIFF">&nbsp;</span></p>
             <p class="units">inH2O</p>
           </div>
           <div class="tile tile-flow" id="flow-tile">
-            <p class="tile-title">Flow Rate</p>
+            <p class="tile-title" id="flow-tile-title">Flow Rate</p>
             <p><span class="tile-value" id="FLOW">&nbsp;</span></p>
             <p class="units">ACFM</p>
           </div>
           <div class="tile tile-aflow" id="aflow-tile">
-            <p class="tile-title">Adjusted Flow</p>
+            <p class="tile-title" id="aflow-tile-title">Adjusted Flow</p>
             <p><span class="tile-value" id="AFLOW">&nbsp;</span></p>
             <p class="units">ACFM&nbsp;&commat;&nbsp;<span id="PADJUST">28</span>&nbsp;inH2O</p>
           </div>
           <div class="tile tile-flow" id="maf-tile">
-            <p class="tile-title">MAF Flow</p>
+            <p class="tile-title" id="maf-tile-title">MAF Flow</p>
             <p><span class="tile-value" id="MFLOW">&nbsp;</span></p>
             <p class="units">KGH</p>
           </div>
           <div class="tile tile-pitot" id="tile-pitot">
-            <p class="tile-title">Pitot</p>
+            <p class="tile-title" id="tile-pitot-title">Pitot</p>
             <p><span class="tile-value" id="PITOT">&nbsp;</span></p>
             <p class="units">inH2O</p>
           </div>
           <div class="tile tile-swirl" id="tile-swirl">
-            <p class="tile-title">Swirl</p>
+            <p class="tile-title" id="tile-swirl-title">Swirl</p>
             <p><span class="tile-value" id="SWIRL">&nbsp;</span></p>
             <p class="units">rpm</p>
           </div>
-          <div class="tile tile-temp">
-            <p class="tile-title">Temperature</p>
+          <div class="tile tile-fdiff" id="tile-fdiff">
+            <p class="tile-title"  id="tile-fdiff-title">Flow Diff</p>
+            <p><span class="tile-value flowTargetVal" id="FDIFF">&nbsp;</span></p>
+            <p class="units"><span id="FDIFFTYPEDESC">~FDIFFTYPEDESC~</span></p>
+          </div>
+          <div class="tile tile-temp" id="tile-temp">
+            <p class="tile-title" id="tile-temp-title">Temperature</p>
             <p><span class="tile-value" id="TEMP">&nbsp;</span></p>
             <p class="units">~TEMP_UNIT~</p>
           </div>
-          <div class="tile tile-baro">
-            <p class="tile-title">Baro Pressure</p>
+          <div class="tile tile-baro" id="tile-baro">
+            <p class="tile-title" id="tile-baro-title">Baro Pressure</p>
             <p><span class="tile-value" id="BARO">&nbsp;</span></p>
             <p class="units">millibar (hPa)</p>
           </div>
-          <div class="tile tile-relh">
-            <p class="tile-title">Humidity</p>
+          <div class="tile tile-relh" id="tile-relh">
+            <p class="tile-title"id="tile-relh-title">Humidity</p>
             <p><span class="tile-value" id="RELH">&nbsp;</span></p>
             <p class="units">&percnt;RelH</p>
           </div>
@@ -1238,10 +1246,10 @@ var loadGraphDataModal = document.getElementById("loadGraphDataModal");
 var saveGraphDataModal = document.getElementById("saveGraphDataModal");
 var calibrationModal = document.getElementById("calibrationModal");
 var updateModal = document.getElementById("updateModal");
+var flowTargetModal = document.getElementById("flowTargetModal");
 
 
-
-
+var closeFlowTargetModalButton = document.getElementsByClassName("closeFlowTargetModalButton")[0];
 var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
 var closeFileModalButton = document.getElementsByClassName("closeFileModalButton")[0];
 var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton")[0];
@@ -1270,6 +1278,7 @@ if (!!window.EventSource) {
         } catch (error) {
           console.log('Missing or incorrect JSON data');
           console.log(error);
+          console.log(key);
         }
       } 
 
@@ -1383,6 +1392,10 @@ function initialiseButtons() {
     document.getElementById('captureLiftDataModal').style.display='block';
   });
 
+  document.getElementById('FDIFF').addEventListener('click', function(){
+    document.getElementById('flowTargetModal').style.display='block';
+  });
+
   document.getElementById('clear-graph-data-button').addEventListener('click', function(){
         
     // clear data points from graph
@@ -1434,38 +1447,53 @@ function initialiseButtons() {
     document.getElementById('updateModal').style.display='block';
   });
 
-  document.getElementById('tile-pref').addEventListener('click', function(){
+  document.getElementById('tile-pref-title').addEventListener('click', function(){
     document.getElementById('tile-pref').style.display='none';
     document.getElementById('tile-pdiff').style.display='block';
   });
 
-  document.getElementById('tile-pdiff').addEventListener('click', function(){
+  document.getElementById('tile-pdiff-title').addEventListener('click', function(){
     document.getElementById('tile-pdiff').style.display='none';
     document.getElementById('tile-pref').style.display='block';
   });
 
-  document.getElementById('flow-tile').addEventListener('click', function(){
+  document.getElementById('flow-tile-title').addEventListener('click', function(){
     document.getElementById('flow-tile').style.display='none';
     document.getElementById('aflow-tile').style.display='block';
   });
 
-  document.getElementById('aflow-tile').addEventListener('click', function(){
+  document.getElementById('aflow-tile-title').addEventListener('click', function(){
     document.getElementById('aflow-tile').style.display='none';
     document.getElementById('maf-tile').style.display='block';
   });
 
-  document.getElementById('maf-tile').addEventListener('click', function(){
+  document.getElementById('maf-tile-title').addEventListener('click', function(){
     document.getElementById('maf-tile').style.display='none';
     document.getElementById('flow-tile').style.display='block';
   });
-  document.getElementById('tile-pitot').addEventListener('click', function(){
+  document.getElementById('tile-pitot-title').addEventListener('click', function(){
     document.getElementById('tile-pitot').style.display='none';
     document.getElementById('tile-swirl').style.display='block';
+
   });
 
-  document.getElementById('tile-swirl').addEventListener('click', function(){
+  document.getElementById('tile-swirl-title').addEventListener('click', function(){
     document.getElementById('tile-swirl').style.display='none';
+    document.getElementById('tile-fdiff').style.display='block';
+  });
+
+  document.getElementById('tile-fdiff-title').addEventListener('click', function(){
+    document.getElementById('tile-fdiff').style.display='none';
     document.getElementById('tile-pitot').style.display='block';
+  });
+
+  document.getElementById('FDIFFTYPEDESC').addEventListener('click', function(){
+    console.log('Toggle Flow Diff');
+    xhr.open('GET', '/api/fdiff');
+    // xhr.onload = function() {
+    //   if (xhr.status === 200) window.location.href = '/';
+    // };
+    xhr.send();
   });
 
   document.getElementById('on-button').addEventListener('click', function(){
@@ -1616,13 +1644,20 @@ closeSaveGraphDataModalButton.onclick = function() {
   saveGraphDataModal.style.display = "none";
 }
 
+/***********************************************************
+* Close Flow Target Data modal dialog
+***/
+closeFlowTargetModalButton.onclick = function() {
+  flowTargetModal.style.display = "none";
+}
+
 
 
 /***********************************************************
 * Close modal dialogs on lose focus
 ***/
 window.onclick = function(event) {
-  if (event.target == fileModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal || event.target == calibrationModal || event.target == updateModal) {
+  if (event.target == fileModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal || event.target == calibrationModal || event.target == updateModal || event.target == flowTargetModal  ){
     fileModal.style.display = "none";
     infoModal.style.display = "none";
     captureLiftDataModal.style.display = "none";
@@ -1630,6 +1665,7 @@ window.onclick = function(event) {
     saveGraphDataModal.style.display = "none";
     calibrationModal.style.display = "none";
     updateModal.style.display = "none";
+    flowTargetModal.style.display = "none";
   }
 }
 
@@ -1646,6 +1682,7 @@ document.addEventListener("keydown", ({key}) => {
     saveGraphDataModal.style.display = "none";
     calibrationModal.style.display = "none";
     updateModal.style.display = "none";
+    flowTargetModal.style.display = "none";
   }
 })
 

@@ -113,31 +113,40 @@ void TASKgetSensorData( void * parameter ){
         if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())){
           #ifdef MAF_IS_ENABLED
           sensorVal.FlowKGH = _sensors.getMafFlow();
-          sensorVal.FlowCFM = _calculations.convertFlow(sensorVal.FlowKGH) + calVal.flow_offset - calVal.leak_cal_baseline - calVal.leak_cal_offset;
+          sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
           #endif
 
         // Bench is ORIFICE type...
         } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())){
-          sensorVal.FlowCFM = _sensors.getDifferentialFlow();
+          sensorVal.FlowCFMraw = _sensors.getDifferentialFlow();
 
 
         // Bench is VENTURI type...
         } else if (strstr(String(config.bench_type).c_str(), String("VENTURI").c_str())){
 
+          //TODO
 
         // Bench is PITOT type...
         } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())){
 
+          //TODO
+
         // Error bench type unknown
         } else {
 
+          //Do nothing?
 
         }
 
-        //Rolling Median
+        // Apply Flow calibration and leak offsets
+        sensorVal.FlowCFM = sensorVal.FlowCFMraw  - calVal.leak_cal_baseline - calVal.leak_cal_offset  - calVal.flow_offset;
+
+ 
+        // Apply Data filters...
+
+        // Rolling Median
         if (strstr(String(config.data_filter_type).c_str(), String("MEDIAN").c_str())){
  
-          
           sensorVal.AverageCFM += ( sensorVal.FlowCFM - sensorVal.AverageCFM ) * 0.1f; // rough running average.
           sensorVal.MedianCFM += copysign( sensorVal.AverageCFM * 0.01, sensorVal.FlowCFM - sensorVal.MedianCFM );
           sensorVal.FlowCFM = sensorVal.MedianCFM;
@@ -164,7 +173,28 @@ void TASKgetSensorData( void * parameter ){
 
 
 
+        // Create Flow differential values
+        switch (sensorVal.FDiffType) {
 
+        case USERTARGET:
+          sensorVal.FDiff = sensorVal.FlowCFM - calVal.user_offset;
+          strcpy(sensorVal.FDiffTypeDesc, "User Target (cfm)");
+          break;
+
+        case BASELINE:
+          sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline;
+          strcpy(sensorVal.FDiffTypeDesc, "Baseline (cfm)");
+          break;
+        
+        case BASELINE_LEAK :
+          sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline - calVal.leak_cal_offset;
+          strcpy(sensorVal.FDiffTypeDesc, "Leak Cal (cfm)");
+          break;
+                
+        default:
+          break;
+        }
+        
 
 
         
@@ -339,7 +369,6 @@ void loop () {
     delay(100);
     ESP.restart();
   }
-
 
   vTaskDelay( 1 );  //mSec delay to prevent Watch Dog Timer (WDT) triggering for empty task
   

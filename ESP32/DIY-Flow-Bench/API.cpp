@@ -411,7 +411,8 @@ void API::ParseMessage(char apiMessage) {
           _webserver.wifiReconnect();
           // config.api_enabled = true;
       break;
-      
+
+
       // We've got here without a valid API request so lets get outta here before we send garbage to the serial comms
       default:
           return;
