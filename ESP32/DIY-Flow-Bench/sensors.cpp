@@ -643,7 +643,7 @@ double Sensors::getPRefValue() {
 	#elif defined PREF_SENSOR_TYPE_XGZP6899A007KPDPN
 
 		// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
-		sensorVal = sensorVolts * 3.5 - 8.75
+		sensorVal = sensorVolts * 3.5 - 8.75;
 
 	#elif defined PREF_SENSOR_TYPE_XGZP6899A010KPDPN
 

@@ -93,17 +93,16 @@ class Webserver {
 		bool writeToSDFile(const char* filePath, const char* data);
 		bool appendToSDFile(const char* filePath, const char* data);
 		const char* readSDFile(const char* filePath);
-		void deleteFile(fs::FS &fs, const char * path);
 
-		void listSDDir(fs::FS &fs, const char * dirname, uint8_t levels);
-		void createSDDir(fs::FS &fs, const char * path);
-		void removeSDDir(fs::FS &fs, const char * path);
-		void readSDFile(fs::FS &fs, const char * path);
-		void writeSDFile(fs::FS &fs, const char * path, const char * message);
-		void appendSDFile(fs::FS &fs, const char * path, const char * message);
-		void renameSDFile(fs::FS &fs, const char * path1, const char * path2);
-		void deleteSDFile(fs::FS &fs, const char * path);
-		void testSDFileIO(fs::FS &fs, const char * path);
+		void listDir(fs::FS &fs, const char * dirname, uint8_t levels);
+		void createDir(fs::FS &fs, const char * path);
+		void removeDir(fs::FS &fs, const char * path);
+		void readFile(fs::FS &fs, const char * path);
+		void writeFile(fs::FS &fs, const char * path, const char * message);
+		void appendFile(fs::FS &fs, const char * path, const char * message);
+		void renameFile(fs::FS &fs, const char * path1, const char * path2);
+		void deleteFile(fs::FS &fs, const char *path);
+		void testFileIO(fs::FS &fs, const char * path);
 
 		void createLiftDataFile();
 		static void clearLiftDataFile(AsyncWebServerRequest *request);
