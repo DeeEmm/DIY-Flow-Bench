@@ -58,7 +58,10 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-24100101        - Missing line terminator #187 
+24110201        - SD Card methods validated 
+                - Missing line terminator #187 
+                - Changed unused pins to '-1' in pins.h
+24110101        - Missing line terminator #187 
                 - Added user definable flow differential target
                 - Finalised flow differential code
 24103002        - Added additional 'Flow Differential' tile

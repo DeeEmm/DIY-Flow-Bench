@@ -55,7 +55,7 @@
     #define FLOW_VALVE_STEP_PIN         32
     #define FLOW_VALVE_DIR_PIN          33
 
-    #define VCC_3V3_PIN                 99                      // Not required
+    #define VCC_3V3_PIN                 -1                      // Not required
     #define VCC_5V_PIN                  35                      // 10k-10k divider across 5v supply
     
     // SENSORS
@@ -71,15 +71,15 @@
     #define ORIFICE_BCD_BIT3_PIN        39                         
 
     // NOTE: these inputs are handled by ADC
-    #define MAF_PIN                     99                     // NOTE: I2C ADC is used instead
-    #define REF_PRESSURE_PIN            99                     // NOTE: I2C ADC is used instead
-    #define DIFF_PRESSURE_PIN           99                     // NOTE: I2C ADC is used instead
-    #define PITOT_PIN                   99                     // NOTE: I2C ADC is used instead
+    #define MAF_PIN                     -1                     // NOTE: I2C ADC is used instead
+    #define REF_PRESSURE_PIN            -1                     // NOTE: I2C ADC is used instead
+    #define DIFF_PRESSURE_PIN           -1                     // NOTE: I2C ADC is used instead
+    #define PITOT_PIN                   -1                     // NOTE: I2C ADC is used instead
     
     // NOTE: These inputs are handled by BME280
-    #define TEMPERATURE_PIN             99                     // NOTE: I2C BME280 used
-    #define REF_BARO_PIN                99                     // NOTE: I2C BME280 used
-    #define HUMIDITY_PIN                99                     // NOTE: I2C BME280 used                     
+    #define TEMPERATURE_PIN             -1                     // NOTE: I2C BME280 used
+    #define REF_BARO_PIN                -1                     // NOTE: I2C BME280 used
+    #define HUMIDITY_PIN                -1                     // NOTE: I2C BME280 used                     
     
     // COMMS    
     #define SERIAL0_TX_PIN              1                       // API
@@ -135,15 +135,15 @@
     #define FLOW_VALVE_STEP_PIN         27
     #define FLOW_VALVE_DIR_PIN          35
 
-    #define VCC_3V3_PIN                 99                      
+    #define VCC_3V3_PIN                 -1                      
     #define VCC_5V_PIN                  2                      // 10k-10k divider across 5v supply
     
     // SENSORS
     #define SPEED_SENSOR_PIN            5                      // NOTE Also used by SD Card  // turbine / rotor speed for turbo / blower flow bench 
 
      // SWIRL ENCODER
-    #define SWIRL_ENCODER_PIN_A         99
-    #define SWIRL_ENCODER_PIN_B         99
+    #define SWIRL_ENCODER_PIN_A         -1
+    #define SWIRL_ENCODER_PIN_B         -1
 
    // ORIFICE DETECTION                                                                                    
     #define ORIFICE_BCD_BIT1_PIN        34                                       
@@ -151,15 +151,15 @@
     #define ORIFICE_BCD_BIT3_PIN        39                         
 
     // NOTE: these inputs are handled by ADC
-    #define MAF_PIN                     99                     // NOTE: I2C ADC is used instead
-    #define REF_PRESSURE_PIN            99                     // NOTE: I2C ADC is used instead
-    #define DIFF_PRESSURE_PIN           99                     // NOTE: I2C ADC is used instead
-    #define PITOT_PIN                   99                     // NOTE: I2C ADC is used instead
+    #define MAF_PIN                     -1                     // NOTE: I2C ADC is used instead
+    #define REF_PRESSURE_PIN            -1                     // NOTE: I2C ADC is used instead
+    #define DIFF_PRESSURE_PIN           -1                     // NOTE: I2C ADC is used instead
+    #define PITOT_PIN                   -1                     // NOTE: I2C ADC is used instead
     
     // NOTE: These inputs are handled by BME280
-    #define TEMPERATURE_PIN             99                     // NOTE: I2C BME280 used
-    #define REF_BARO_PIN                99                     // NOTE: I2C BME280 used
-    #define HUMIDITY_PIN                99                     // NOTE: I2C BME280 used                     
+    #define TEMPERATURE_PIN             -1                     // NOTE: I2C BME280 used
+    #define REF_BARO_PIN                -1                     // NOTE: I2C BME280 used
+    #define HUMIDITY_PIN                -1                     // NOTE: I2C BME280 used                     
     
     // COMMS    
     #define SERIAL0_TX_PIN              1                       // API
@@ -215,8 +215,8 @@
     #define SPEED_SENSOR_PIN            4                       // turbine / rotor speed for turbo / blower flow bench
 
     // SWIRL ENCODER
-    #define SWIRL_ENCODER_PIN_A         99
-    #define SWIRL_ENCODER_PIN_B         99
+    #define SWIRL_ENCODER_PIN_A         -1
+    #define SWIRL_ENCODER_PIN_B         -1
 
     // ORIFICE DETECTION                                                                                    
     #define ORIFICE_BCD_BIT1_PIN        33                      
@@ -230,19 +230,19 @@
     #define AVO_STEP_PIN                26
     #define AVO_DIR_PIN                 27
 
-    #define VCC_3V3_PIN                 99                      // Unused
+    #define VCC_3V3_PIN                 -1                      // Unused
     #define VCC_5V_PIN                  36                      // 10k-10k divider across 5v supply
     
     // NOTE: these inputs are handled by ADC
-    #define MAF_PIN                     99                     // NOTE: I2C ADC is used instead
-    #define REF_PRESSURE_PIN            99                     // NOTE: I2C ADC is used instead
-    #define DIFF_PRESSURE_PIN           99                     // NOTE: I2C ADC is used instead
-    #define PITOT_PIN                   99                     // NOTE: I2C ADC is used instead
+    #define MAF_PIN                     -1                     // NOTE: I2C ADC is used instead
+    #define REF_PRESSURE_PIN            -1                     // NOTE: I2C ADC is used instead
+    #define DIFF_PRESSURE_PIN           -1                     // NOTE: I2C ADC is used instead
+    #define PITOT_PIN                   -1                     // NOTE: I2C ADC is used instead
     
     // NOTE: These inputs are handled by BME280
-    #define TEMPERATURE_PIN             99                     // NOTE: I2C BME280 used
-    #define REF_BARO_PIN                99                     // NOTE: I2C BME280 used
-    #define HUMIDITY_PIN                99                     // NOTE: I2C BME280 used                     
+    #define TEMPERATURE_PIN             -1                     // NOTE: I2C BME280 used
+    #define REF_BARO_PIN                -1                     // NOTE: I2C BME280 used
+    #define HUMIDITY_PIN                -1                     // NOTE: I2C BME280 used                     
     
     // COMMS    
     #define SERIAL0_TX_PIN              1                      // API
@@ -287,8 +287,8 @@
     #define SPEED_SENSOR_PIN            4                       // turbine / rotor speed for turbo / blower flow bench
 
      // SWIRL ENCODER
-    #define SWIRL_ENCODER_PIN_A         99
-    #define SWIRL_ENCODER_PIN_B         99
+    #define SWIRL_ENCODER_PIN_A         -1
+    #define SWIRL_ENCODER_PIN_B         -1
 
    // ORIFICE DETECTION                                                                                    
     #define ORIFICE_BCD_BIT1_PIN        33                      
@@ -302,19 +302,19 @@
     #define AVO_STEP_PIN                26
     #define AVO_DIR_PIN                 27
 
-    #define VCC_3V3_PIN                 99                      // Unused
+    #define VCC_3V3_PIN                 -1                      // Unused
     #define VCC_5V_PIN                  36                      // 10k-10k divider across 5v supply
     
     // NOTE: these inputs are handled by ADC
-    #define MAF_PIN                     99                     // NOTE: I2C ADC is used instead
-    #define REF_PRESSURE_PIN            99                     // NOTE: I2C ADC is used instead
-    #define DIFF_PRESSURE_PIN           99                     // NOTE: I2C ADC is used instead
-    #define PITOT_PIN                   99                     // NOTE: I2C ADC is used instead
+    #define MAF_PIN                     -1                     // NOTE: I2C ADC is used instead
+    #define REF_PRESSURE_PIN            -1                     // NOTE: I2C ADC is used instead
+    #define DIFF_PRESSURE_PIN           -1                     // NOTE: I2C ADC is used instead
+    #define PITOT_PIN                   -1                     // NOTE: I2C ADC is used instead
     
     // NOTE: These inputs are handled by BME280
-    #define TEMPERATURE_PIN             99                     // NOTE: I2C BME280 used
-    #define REF_BARO_PIN                99                     // NOTE: I2C BME280 used
-    #define HUMIDITY_PIN                99                     // NOTE: I2C BME280 used                     
+    #define TEMPERATURE_PIN             -1                     // NOTE: I2C BME280 used
+    #define REF_BARO_PIN                -1                     // NOTE: I2C BME280 used
+    #define HUMIDITY_PIN                -1                     // NOTE: I2C BME280 used                     
     
     // COMMS    
     #define SERIAL0_TX_PIN              1                      // API
@@ -362,30 +362,30 @@
 #define FLOW_VALVE_STEP_PIN         27
 #define FLOW_VALVE_DIR_PIN          32
 
-#define VCC_3V3_PIN                 99                      
+#define VCC_3V3_PIN                 -1                      
 #define VCC_5V_PIN                  2                      // 10k-10k divider across 5v supply
 
 // SENSORS
 #define SPEED_SENSOR_PIN            5                      // NOTE Also used by SD Card  // turbine / rotor speed for turbo / blower flow bench 
 
  // SWIRL ENCODER
-#define SWIRL_ENCODER_PIN_A         99
-#define SWIRL_ENCODER_PIN_B         99
+#define SWIRL_ENCODER_PIN_A         -1
+#define SWIRL_ENCODER_PIN_B         -1
 // ORIFICE DETECTION
 #define ORIFICE_BCD_BIT1_PIN 34
 #define ORIFICE_BCD_BIT2_PIN 36
 #define ORIFICE_BCD_BIT3_PIN 39
 
 // NOTE: these inputs are handled by ADC
-#define MAF_PIN                     99                     // NOTE: I2C ADC is used instead
-#define REF_PRESSURE_PIN            99                     // NOTE: I2C ADC is used instead
-#define DIFF_PRESSURE_PIN           99                     // NOTE: I2C ADC is used instead
-#define PITOT_PIN                   99                     // NOTE: I2C ADC is used instead
+#define MAF_PIN                     -1                     // NOTE: I2C ADC is used instead
+#define REF_PRESSURE_PIN            -1                     // NOTE: I2C ADC is used instead
+#define DIFF_PRESSURE_PIN           -1                     // NOTE: I2C ADC is used instead
+#define PITOT_PIN                   -1                     // NOTE: I2C ADC is used instead
 
 // NOTE: These inputs are handled by BME280
-#define TEMPERATURE_PIN             99                     // NOTE: I2C BME280 used
-#define REF_BARO_PIN                99                     // NOTE: I2C BME280 used
-#define HUMIDITY_PIN                99                     // NOTE: I2C BME280 used                     
+#define TEMPERATURE_PIN             -1                     // NOTE: I2C BME280 used
+#define REF_BARO_PIN                -1                     // NOTE: I2C BME280 used
+#define HUMIDITY_PIN                -1                     // NOTE: I2C BME280 used                     
 
 // COMMS    
 #define SERIAL0_TX_PIN              1                       // API
