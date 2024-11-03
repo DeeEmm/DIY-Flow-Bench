@@ -1244,8 +1244,11 @@ String Webserver::getDataJSON()
   // Reference pressure
   dataJson["PREF"] = sensorVal.PRefH2O;
 
+  double flowComp = fabs(sensorVal.FlowCFM);
+  double pRefComp = fabs(sensorVal.PRefH2O);
+
   // Flow Rate
-  if ((sensorVal.FlowCFM > config.min_flow_rate) && (sensorVal.PRefH2O > config.min_bench_pressure))  {
+  if ((flowComp > config.min_flow_rate) && (pRefComp > config.min_bench_pressure))  {
     dataJson["FLOW"] = sensorVal.FlowCFM;
     dataJson["MFLOW"] = sensorVal.FlowKGH;
   }  else  {
