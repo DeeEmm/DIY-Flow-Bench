@@ -26,7 +26,7 @@
 
 #define MAJOR_VERSION "V2"
 #define MINOR_VERSION "0"
-#define BUILD_NUMBER "24110201"
+#define BUILD_NUMBER "24110301"
 #define RELEASE "V.2.0-RC.8"
 #define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"
 
@@ -58,7 +58,7 @@
 // #define ARDUCAM_ESP32S // Untested - Needs validating + refining
 // #define ARDUCAM_LOTAI  // Untested - Needs validating + refining
 // #define ESP32_WROVER_KIT // DEBUG BUILD ONLY
-
+// #define ARDUINO_M5STACK_CORE2 // DEBUG BUILD ONLY 
 
 
 
@@ -274,13 +274,13 @@ const int ADC_I2C_ADDR = 0x48;
 
 // Set sensor type (Uncomment One line only)
 // #define PREF_SENSOR_TYPE_LINEAR_ANALOG 
-// #define PREF_SENSOR_TYPE_MPXV7007        
+#define PREF_SENSOR_TYPE_MPXV7007        
 // #define PREF_SENSOR_TYPE_MPXV7025
 // #define PREF_SENSOR_TYPE_XGZP6899A007KPDPN        
-#define PREF_SENSOR_TYPE_XGZP6899A010KPDPN        
+// #define PREF_SENSOR_TYPE_XGZP6899A010KPDPN        
+// #define PREF_SENSOR_TYPE_M5STACK_TubePressure        
 
-
-#define PREF_MV_TRIMPOT 0.0                               // Millivolt offset
+#define PREF_MV_TRIMPOT -0.010999                         // Millivolt offset
 #define PREF_ANALOG_SCALE 1.0                             // Scaling factor used for raw analog value
 #define PREF_ADC_CHANNEL 1                                
 
@@ -309,8 +309,9 @@ const int ADC_I2C_ADDR = 0x48;
 // #define PDIFF_SENSOR_TYPE_MPXV7025
 // #define PDIFF_SENSOR_TYPE_XGZP6899A007KPDPN        
 // #define PDIFF_SENSOR_TYPE_XGZP6899A010KPDPN        
+// #define PDIFF_SENSOR_TYPE_M5STACK_TubePressure       
 
-#define PDIFF_MV_TRIMPOT 0.0                              // Millivolt offset
+#define PDIFF_MV_TRIMPOT -0.007                           // Millivolt offset
 #define PDIFF_ANALOG_SCALE 1.0                            // Scaling factor used for raw analog value
 #define PDIFF_ADC_CHANNEL 2                               
 
@@ -339,8 +340,9 @@ const int ADC_I2C_ADDR = 0x48;
 // #define PITOT_SENSOR_TYPE_MPXV7025
 // #define PITOT_SENSOR_TYPE_XGZP6899A007KPDPN        
 // #define PITOT_SENSOR_TYPE_XGZP6899A010KPDPN        
+// #define PITOT_SENSOR_TYPE_M5STACK_TubePressure        
 
-#define PITOT_MV_TRIMPOT 0.0                              // Millivolt offset
+#define PITOT_MV_TRIMPOT -0.0120249                       // Millivolt offset
 #define PITOT_ANALOG_SCALE 1.0                            // Scaling factor used for raw analog value
 #define PITOT_ADC_CHANNEL 3
 

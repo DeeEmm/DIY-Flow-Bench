@@ -650,6 +650,13 @@ double Sensors::getPRefValue() {
 		// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
 		sensorVal = sensorVolts * 5 - 12.5;
 
+	#elif defined PREF_SENSOR_TYPE_M5STACK_TubePressure
+
+		//P: Actual test pressure value, unit (Kpa)
+		//Vout: sensor voltage output value
+		//P = (Vout-0.1)/3.0*300.0-100.0
+		sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;	
+
 	#else
 
 		sensorVal = FIXED_REF_PRESS_VALUE;
@@ -741,14 +748,20 @@ double Sensors::getPDiffValue() {
 	#elif defined PDIFF_SENSOR_TYPE_XGZP6899A007KPDPN
 
 		// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
-		sensorVal = sensorVolts * 3.5 - 8.75
+		sensorVal = sensorVolts * 3.5 - 8.75;
 
 	#elif defined PDIFF_SENSOR_TYPE_XGZP6899A010KPDPN
 
 		// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
-		sensorVal = sensorVolts * 5 - 12.5
+		sensorVal = sensorVolts * 5 - 12.5;
 
+	#elif defined PDIFF_SENSOR_TYPE_M5STACK_TubePressure
 
+		//P: Actual test pressure value, unit (Kpa)
+		//Vout: sensor voltage output value
+		//P = (Vout-0.1)/3.0*300.0-100.0
+		sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;
+	
 	#else // use fixed value
 
 		sensorVal = FIXED_PDIFF_PRESS;
@@ -840,14 +853,19 @@ double Sensors::getPitotValue() {
 	#elif defined PITOT_SENSOR_TYPE_XGZP6899A007KPDPN
 
 		// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
-		sensorVal = sensorVolts * 3.5 - 8.75
+		sensorVal = sensorVolts * 3.5 - 8.75;
 
 	#elif defined PITOT_SENSOR_TYPE_XGZP6899A010KPDPN
 
 		// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
-		sensorVal = sensorVolts * 5 - 12.5
+		sensorVal = sensorVolts * 5 - 12.5;
 
+	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure
 
+		//P: Actual test pressure value, unit (Kpa)
+		//Vout: sensor voltage output value
+		//P = (Vout-0.1)/3.0*300.0-100.0
+		sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;
 
 	#else // use fixed value
 

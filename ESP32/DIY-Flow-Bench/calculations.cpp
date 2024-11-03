@@ -381,7 +381,7 @@ double Calculations::convertVelocityToVolumetric(double velocityFpm, double pipe
 
   double CFM;
   
-  CFM = velocityFpm * pow(PI * pipeRadiusFt, 2) ;
+  CFM = velocityFpm * (PI * pow(pipeRadiusFt, 2));
 
   return CFM;
   
