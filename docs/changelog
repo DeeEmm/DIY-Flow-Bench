@@ -58,6 +58,11 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24110302        - Fixed flow thresholds to allow negative flow values in GUI
+24110301        - Added M5Stack Core2 Support
+                - Added M5Stack Tube Pressure sensor
+                - Fixed line endings in sensors.cpp
+                - Fixed bug in VelocityToVolumetric method
 24110201        - SD Card methods validated 
                 - Missing line terminator #187 
                 - Changed unused pins to '-1' in pins.h
