@@ -58,7 +58,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-
+24110701        - M5Stack Tube pressure sensors initialisation
+                - Correction to MAF rescaling function
 24110403        - Added HTTP API Call for JSON Data
 24110402        - #180 Added ability to truncate / round flow values in GUI
 24110401        - #179 - Incorrect convertFlowDepression method
