@@ -280,7 +280,7 @@ const int ADC_I2C_ADDR = 0x48;
 // #define PREF_SENSOR_TYPE_XGZP6899A010KPDPN        
 // #define PREF_SENSOR_TYPE_M5STACK_TubePressure        
 
-#define PREF_MV_TRIMPOT -0.010999                         // Millivolt offset
+#define PREF_MV_TRIMPOT  0.0                         // Millivolt offset
 #define PREF_ANALOG_SCALE 1.0                             // Scaling factor used for raw analog value
 #define PREF_ADC_CHANNEL 1                                
 
@@ -311,7 +311,7 @@ const int ADC_I2C_ADDR = 0x48;
 // #define PDIFF_SENSOR_TYPE_XGZP6899A010KPDPN        
 // #define PDIFF_SENSOR_TYPE_M5STACK_TubePressure       
 
-#define PDIFF_MV_TRIMPOT -0.007                           // Millivolt offset
+#define PDIFF_MV_TRIMPOT 0.0                           // Millivolt offset
 #define PDIFF_ANALOG_SCALE 1.0                            // Scaling factor used for raw analog value
 #define PDIFF_ADC_CHANNEL 2                               
 
@@ -342,7 +342,7 @@ const int ADC_I2C_ADDR = 0x48;
 // #define PITOT_SENSOR_TYPE_XGZP6899A010KPDPN        
 // #define PITOT_SENSOR_TYPE_M5STACK_TubePressure        
 
-#define PITOT_MV_TRIMPOT -0.0120249                       // Millivolt offset
+#define PITOT_MV_TRIMPOT 0.0                       // Millivolt offset
 #define PITOT_ANALOG_SCALE 1.0                            // Scaling factor used for raw analog value
 #define PITOT_ADC_CHANNEL 3
 
