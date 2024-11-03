@@ -355,10 +355,8 @@ double Calculations::convertFlowDepression(double oldPressure, double newPressur
   if (_hardware.benchIsRunning()) {
     if (newPressure == oldPressure) {
       return inputFlowCFM;
-    } else if (newPressure > oldPressure) {
-      pressureRatio = (newPressure / oldPressure);
     } else {
-      pressureRatio = (oldPressure / newPressure);
+      pressureRatio = (newPressure / oldPressure);
     }
     scaleFactor = sqrt(pressureRatio);
     outputFlow =  inputFlowCFM * scaleFactor;
