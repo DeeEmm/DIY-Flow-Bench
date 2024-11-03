@@ -408,4 +408,70 @@
 // #define WEMOS_SPARE_PIN_3           33                    
 #endif
 
+/***********************************************************
+ * M5STACK CORE2
+ * UNTESTED
+ * NOTE M5STACK CORE2 has SD card on GPIOs 4/23/38/18
+ *
+  ***/
+#ifdef ARDUINO_M5STACK_CORE2
 
+    #define BOARD_TYPE              "m5stack-core2"
+
+    // Define Physical Pins
+    
+    // VAC CONTROL
+    //#define VAC_SPEED_PIN               -1                      // Built in DAC1 - used for speed reference for VFD (0-3v)
+    //#define VAC_BLEED_VALVE_PIN         -1                      // Built in DAC2 - used for bleed valve control
+    
+    #define VAC_BANK_1_PIN                19                      // vac motor(s) on/off
+    //#define VAC_BANK_2_PIN              -1                      // Provision for 2 stage Vac motor control
+    //#define VAC_BANK_3_PIN              -1                      // Provision for 3 stage Vac motor control
+    
+    // SENSORS
+    //#define SPEED_SENSOR_PIN            -1                      // turbine / rotor speed for turbo / blower flow bench
+
+    // SWIRL ENCODER
+    //#define SWIRL_ENCODER_PIN_A         -1
+    //#define SWIRL_ENCODER_PIN_B        -1
+
+    // ORIFICE DETECTION                                                                                    
+    //#define ORIFICE_BCD_BIT1_PIN        -1                     
+    //#define ORIFICE_BCD_BIT2_PIN        -1                    
+    //#define ORIFICE_BCD_BIT3_PIN        -1     
+
+    //STEPPER MOTOR CONTROLLER                  
+    //#define FLOW_VALVE_STEP_PIN        -1
+    //#define FLOW_VALVE_DIR_PIN         -1
+                  
+    //#define AVO_STEP_PIN               -1
+    //#define AVO_DIR_PIN                -1
+
+    //#define VCC_3V3_PIN                 27                    // Unused
+    #define VCC_5V_PIN                  35                    // 10k-10k divider across 5v supply, This is required as it is used to get the supply voltage for the MPVX7007 pressure calc.
+    
+    // NOTE: these inputs are handled by ADC
+    #define MAF_PIN                     -1                     // NOTE: I2C ADC is used instead
+    #define REF_PRESSURE_PIN            -1                     // NOTE: I2C ADC is used instead, recommened but not essential for a MAF bench, essential for Differential type bench
+    #define DIFF_PRESSURE_PIN           -1                     // NOTE: I2C ADC is used instead, only required for Differential 
+    #define PITOT_PIN                   -1                     // NOTE: I2C ADC is used instead, only required if using a pitot probe
+    
+    // NOTE: These inputs are handled by BME280/BME68X
+    #define TEMPERATURE_PIN             -1                     // NOTE: I2C BME280 used
+    #define REF_BARO_PIN                -1                     // NOTE: I2C BME280 used
+    #define HUMIDITY_PIN                -1                     // NOTE: I2C BME280 used                     
+    
+    // COMMS    
+    #define SERIAL0_TX_PIN              1                      // API
+    #define SERIAL0_RX_PIN              3                      // API
+    //#define SERIAL2_TX_PIN              -1                     // GAUGE PROTOCOL CLOCK
+    //#define SERIAL2_RX_PIN              -1                     // GAUGE PROTOCOL DATA
+    #define SDA_PIN                     32                     // BME280 etc
+    #define SCL_PIN                     33                     // BME280 etc
+    
+    #define SD_CS_PIN                   4
+    #define SD_MOSI_PIN                 23                 
+    #define SD_MISO_PIN                 38             
+    #define SD_SCK_PIN                  18                   
+
+#endif

@@ -56,14 +56,27 @@ Hardware::Hardware() {
 void Hardware::configurePins () {
  
   // Inputs
+  #ifdef VCC_3V3_PIN
   pinMode(VCC_3V3_PIN, INPUT); 
-  pinMode(VCC_5V_PIN, INPUT); 
+  #endif
 
-  pinMode(SPEED_SENSOR_PIN, INPUT); 
+  pinMode(VCC_5V_PIN, INPUT);    //This is required as it is used to get the supply voltage for the MPVX7007 pressure calc.
+
+  #ifdef SPEED_SENSOR_PIN
+  pinMode(SPEED_SENSOR_PIN, INPUT);
+  #endif
+
+  #ifdef ORIFICE_BCD_BIT1_PIN
   pinMode(ORIFICE_BCD_BIT1_PIN, INPUT); 
-  pinMode(ORIFICE_BCD_BIT2_PIN, INPUT); 
-  pinMode(ORIFICE_BCD_BIT3_PIN, INPUT); 
+  #endif
 
+  #ifdef ORIFICE_BCD_BIT2_PIN
+  pinMode(ORIFICE_BCD_BIT2_PIN, INPUT); 
+  #endif
+
+  #ifdef ORIFICE_BCD_BIT3_PIN
+  pinMode(ORIFICE_BCD_BIT3_PIN, INPUT); 
+  #endif
 
   #ifdef MAF_SRC_IS_PIN
   pinMode(MAF_PIN, INPUT); 
@@ -93,26 +106,43 @@ void Hardware::configurePins () {
   
 
   // Outputs
+  #ifdef VAC_BANK_1_PIN
   pinMode(VAC_BANK_1_PIN, OUTPUT);
+  #endif
+
+  #ifdef VAC_BANK_2_PIN
   pinMode(VAC_BANK_2_PIN, OUTPUT);
+  #endif
+
+  #ifdef VAC_BANK_3_PIN
   pinMode(VAC_BANK_3_PIN, OUTPUT);
-  
+  #endif
+
+  #ifdef VAC_SPEED_PIN
   pinMode(VAC_SPEED_PIN, OUTPUT);
+  #endif
+
+  #ifdef VAC_BLEED_VALVE_PIN
   pinMode(VAC_BLEED_VALVE_PIN, OUTPUT);
+  #endif
 
+  #ifdef AVO_STEP_PIN
   pinMode(AVO_STEP_PIN, OUTPUT);
+  #endif
+
+  #ifdef AVO_DIR_PIN
   pinMode(AVO_DIR_PIN, OUTPUT);
+  #endif
 
+  #ifdef FLOW_VALVE_STEP_PIN
   pinMode(FLOW_VALVE_STEP_PIN, OUTPUT);
+  #endif
+
+  #ifdef FLOW_VALVE_DIR_PIN
   pinMode(FLOW_VALVE_DIR_PIN, OUTPUT);
-
-
-
+  #endif
 
 }
-
-
-
 
 /***********************************************************
  * @brief begin function
@@ -333,8 +363,10 @@ double Hardware::get5vSupplyVolts() {
  ***/
 double Hardware::get3v3SupplyVolts() {   
 
+  #ifdef VCC_3V3_PIN  
   long rawVoltageValue = analogRead(VCC_3V3_PIN);  
   double vcc3v3SupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
+  #endif
 
   #ifdef USE_FIXED_3_3V_VALUE
     return 3.3; 
