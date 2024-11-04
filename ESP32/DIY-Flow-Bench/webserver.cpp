@@ -734,6 +734,9 @@ void Webserver::parseConfigurationForm(AsyncWebServerRequest *request)
   config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
   config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
   config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
+  strcpy(config.rounding_type, configData["ROUNDING_TYPE"]);
+  config.flow_decimal_length = configData["FLOW_DECIMAL_LENGTH"].as<int>();
+  config.gen_decimal_length = configData["GEN_DECIMAL_LENGTH"].as<int>();
   strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
   config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
   config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
@@ -1249,15 +1252,30 @@ String Webserver::getDataJSON()
 
   // Flow Rate
   if ((flowComp > config.min_flow_rate) && (pRefComp > config.min_bench_pressure))  {
-    dataJson["FLOW"] = sensorVal.FlowCFM;
-    dataJson["MFLOW"] = sensorVal.FlowKGH;
+
+    // Check if we need to round values
+     if (strstr(String(config.rounding_type).c_str(), String("NONE").c_str())) {
+        dataJson["FLOW"] = sensorVal.FlowCFM;
+        dataJson["MFLOW"] = sensorVal.FlowKGH;
+        dataJson["AFLOW"] = sensorVal.FlowADJ;
+    // Round to whole value    
+    } else if (strstr(String(config.rounding_type).c_str(), String("INTEGER").c_str())) {
+        dataJson["FLOW"] = round(sensorVal.FlowCFM);
+        dataJson["MFLOW"] = round(sensorVal.FlowKGH);
+        dataJson["AFLOW"] = round(sensorVal.FlowADJ);
+    // Round to half (nearest 0.5)
+    } else if (strstr(String(config.rounding_type).c_str(), String("HALF").c_str())) {
+        dataJson["FLOW"] = round(sensorVal.FlowCFM * 2.0 ) / 2.0;
+        dataJson["MFLOW"] = round(sensorVal.FlowKGH * 2.0) / 2.0;
+        dataJson["AFLOW"] = round(sensorVal.FlowADJ * 2.0) / 2.0;
+    }
+
   }  else  {
     dataJson["FLOW"] = 0.0;
     dataJson["MFLOW"] = 0.0;
   }
 
-  // Adjusted Flow Rate
-  dataJson["AFLOW"] = sensorVal.FlowADJ;
+  // Flow depression value for AFLOW units
   dataJson["PADJUST"] = config.adj_flow_depression;
 
   // Temperature deg C or F
@@ -1396,7 +1414,6 @@ String Webserver::processTemplate(const String &var)
   extern struct DeviceStatus status;
   extern struct ConfigSettings config;
   extern struct CalibrationData calVal;
-
 
   // Bench definitions for system status pane 
   if (strstr(config.bench_type, "MAF")!=NULL) {
@@ -1606,6 +1623,43 @@ String Webserver::processTemplate(const String &var)
   if (var == "CONF_API_DELIM") return String(config.api_delim);
   if (var == "CONF_SERIAL_BAUD_RATE") return String(config.serial_baud_rate);
 
+  // Update javascript template vars
+  if (var == "FLOW_DECIMAL_LENGTH") return String(config.flow_decimal_length);
+  if (var == "GEN_DECIMAL_LENGTH") return String(config.gen_decimal_length);
+
+  // Rounding type
+  if (var == "ROUNDING_TYPE_DROPDOWN"){
+    if (strstr(String(config.rounding_type).c_str(), String("NONE").c_str())){
+      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE' selected>None</option><option value='INTEGER'>Whole number</option><option value='HALF'>Half value </option></select>");
+    } else if (strstr(String(config.rounding_type).c_str(), String("INTEGER").c_str())) {
+      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>None</option><option value='INTEGER' selected>Whole number</option><option value='HALF'>Half value </option></select>");
+    } else if (strstr(String(config.rounding_type).c_str(), String("HALF").c_str())){
+      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>None</option><option value='INTEGER'>Whole number</option><option value='HALF' selected>Half value </option></select>");
+    }
+  }
+
+  // Flow Decimal type
+  if (var == "FLOW_DECIMAL_LENGTH_DROPDOWN"){
+    if (strstr(String(config.flow_decimal_length).c_str(), String("0").c_str())){
+      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0' selected>None</option><option value='1'>Tenths</option><option value='2'>Hundredths </option></select>");
+    } else if (strstr(String(config.flow_decimal_length).c_str(), String("1").c_str())) {
+      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0>None</option><option value='1' selected>Tenths</option><option value='2'>Hundredths </option></select>");
+    } else if (strstr(String(config.flow_decimal_length).c_str(), String("2").c_str())){
+      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0'>None</option><option value='1'>Tenths</option><option value='2' selected>Hundredths </option></select>");
+    }
+  }
+
+  // General Decimal type
+  if (var == "GEN_DECIMAL_LENGTH_DROPDOWN"){
+    if (strstr(String(config.gen_decimal_length).c_str(), String("0").c_str())){
+      return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0' selected>None</option><option value='1'>Tenths</option><option value='2'>Hundredths </option></select>");
+    } else if (strstr(String(config.gen_decimal_length).c_str(), String("1").c_str())) {
+      return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0>None</option><option value='1' selected>Tenths</option><option value='2'>Hundredths </option></select>");
+    } else if (strstr(String(config.gen_decimal_length).c_str(), String("2").c_str())){
+      return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0'>None</option><option value='1'>Tenths</option><option value='2' selected>Hundredths </option></select>");
+    }
+  }
+
   // Data Filter type
   if (var == "DATA_FILTER_TYPE_DROPDOWN"){
     if (strstr(String(config.data_filter_type).c_str(), String("NONE").c_str())){
@@ -1619,7 +1673,7 @@ String Webserver::processTemplate(const String &var)
     }
   }
 
-  // Data Filters
+  // Data Filter Settings
   if (var == "CONF_MIN_FLOW_RATE") return String(config.min_flow_rate);
   if (var == "CONF_MIN_BENCH_PRESSURE") return String(config.min_bench_pressure);
   if (var == "CONF_MAF_MIN_VOLTS") return String(config.maf_min_volts);

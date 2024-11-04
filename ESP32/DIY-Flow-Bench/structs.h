@@ -40,6 +40,9 @@ struct ConfigSettings {
   double maf_min_volts = 0.1;                     // Filter out results less than this
   int refresh_rate = 500;                         // Screen refresh rate in milliseconds (>180)
   int adj_flow_depression = 28;                   // Adjusted flow depression in inches of water
+  char rounding_type[12] = "NONE";                // Rounding type 
+  int flow_decimal_length = 1;                    // Flow decimal number of places 
+  int gen_decimal_length = 2;                     // General decimal number of places 
   char data_filter_type[12] = "NONE";             // Data filter type 
   int cyc_av_buffer = 5;                          // [5] Scan # over which to average output (helps smooth results)
   bool show_alarms = true;                        // Display Alarms?

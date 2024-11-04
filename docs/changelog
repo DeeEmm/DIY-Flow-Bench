@@ -58,6 +58,10 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+
+24110402        - Added ability to truncate GUI values
+                - Added rounding function to flow values in GUI
+24110401        - #179 - Incorrect convertFlowDepression method
 24110302        - Fixed flow thresholds to allow negative flow values in GUI
 24110301        - Added M5Stack Core2 Support
                 - Added M5Stack Tube Pressure sensor
