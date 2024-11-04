@@ -51,7 +51,12 @@ if (!!window.EventSource) {
           if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
             document.getElementById(key).innerHTML = myObj[key];
           } else {
-            document.getElementById(key).innerHTML = myObj[key].toFixed(2); 
+            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'FDIFF'){
+              //HACK: template vars - replaced before page load
+              document.getElementById(key).innerHTML = myObj[key].toFixed(~FLOW_DECIMAL_LENGTH~);  
+            } else {
+              document.getElementById(key).innerHTML = myObj[key].toFixed(~GEN_DECIMAL_LENGTH~); 
+            }
           }
         } catch (error) {
           console.log('Missing or incorrect JSON data');
