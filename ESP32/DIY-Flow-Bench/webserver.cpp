@@ -425,6 +425,14 @@ void Webserver::begin()
       // request->send(200, "text/html", "{\"fdiff\":\"changed\"}"); 
       });
 
+  
+  // Send JSON Data
+  server->on("/api/json", HTTP_GET, [](AsyncWebServerRequest *request){
+    Webserver _webserver;
+    request->send(200, "text/html", String(_webserver.getDataJSON()).c_str());
+  });
+
+
   // Save user Flow Diff target
   server->on("/api/saveflowtarget", HTTP_POST, parseUserFlowTargetForm);
   
@@ -441,7 +449,7 @@ void Webserver::begin()
   server->on("/api/saveorifice", HTTP_POST, parseOrificeForm);
 
   // Clear Lift Data
-  server->on("/api/clearLiftData", HTTP_POST, clearLiftDataFile);
+  server->on("/api/clearLiftData", HTTP_POST, clearLiftDataFile);  
 
   // index.html
   server->rewrite("/index.html", "/");

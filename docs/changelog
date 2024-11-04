@@ -59,6 +59,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 Build #         - Description of Change
 
 
+24110403        - Added HTTP API Call for JSON Data
 24110402        - #180 Added ability to truncate / round flow values in GUI
 24110401        - #179 - Incorrect convertFlowDepression method
 24110302        - Fixed flow thresholds to allow negative flow values in GUI
