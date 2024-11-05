@@ -56,6 +56,7 @@ class Webserver {
 
 		int decodeMessageHeader (char *data);
 		static String processTemplate(const String& var);
+		static String processLandingPageTemplate(const String& var);
 		
 	
 	private:

@@ -46,7 +46,7 @@
 #include "constants.h"
 #include "configuration.h"
 #include "structs.h"
-#include "pins.h"
+// #include "pins.h"
 
 #include "mafData/maf.h"
 #include "hardware.h" // bench type config needed here
@@ -67,6 +67,7 @@ SensorData sensorVal;
 ValveLiftData valveData;
 Translator translate;
 CalibrationData calVal;
+Pins PINS;
 
 // Initiate Classes
 API _api;
@@ -279,18 +280,24 @@ void TASKgetEnviroData( void * parameter ){
  ***/
 void setup(void) {
 
+    extern struct Pins PINS;
+  
+
   // REVIEW
   // set message queue length
   xQueueCreate( 256, 2048);
   
+  // if (_hardware.begin()) _sensors.begin(); // check pins loaded
+  _hardware.begin();
+  _sensors.begin();
+
   // We need to call Wire globally so that it is available to both hardware and sensor classes so lets do that here
-  Wire.begin (SDA_PIN, SCL_PIN); 
+  Wire.begin (PINS.SDA_PIN, PINS.SCL_PIN); 
   Wire.setClock(100000);
   // Wire.setClock(300000); // ok for wemos D1
   // Wire.setClock(400000);
     
-  _hardware.begin();
-  _sensors.begin();
+
 
   // Confirm default core - NOTE: setup() and loop() are automatically created on default core 
   uint8_t defaultCore = xPortGetCoreID();                   // This core (1)

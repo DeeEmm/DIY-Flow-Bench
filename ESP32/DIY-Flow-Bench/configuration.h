@@ -21,30 +21,6 @@
 #include "constants.h"
 
 
-// Don't forget to update the changelog & README Versions!!
-// TODO: Automate build numbering with git tasks
-
-#define MAJOR_VERSION "V2"
-#define MINOR_VERSION "0"
-#define BUILD_NUMBER "24110403"
-#define RELEASE "V.2.0-RC.8"
-#define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"
-
-
-
-/***********************************************************
-* SELECT DEFAULT BENCH TYPE
-* NOTE: Only MAF style bench working at this stage
-* Other bench types planned for V3 release
-***/
-
-#define MAF_STYLE_BENCH
-//#define ORIFICE_STYLE_BENCH
-//#define PITOT_STYLE_BENCH
-//#define VENTURI_STYLE_BENCH
-
-
-
 /***********************************************************
 * SELECT BOARD TYPE 
 *
@@ -53,7 +29,7 @@
 * NOTE: If defining new board make sure to add board type definition to pins.h
 ***/
 
-#define WEMOS_D1_R32 // Using official Shield
+// #define WEMOS_D1_R32 // Using official Shield
 // #define ESP32DUINO // Generic pin mapping for ESP32 UNO style footprint. Copy or modify this for custom board mapping
 // #define ARDUCAM_ESP32S // Untested - Needs validating + refining
 // #define ARDUCAM_LOTAI  // Untested - Needs validating + refining
@@ -117,8 +93,8 @@
 // #define API_CHECKSUM_IS_ENABLED                       
 // #define WEBSOCK_CLEAN_FREQ 600000 // DEPRECATED
 #define FILESYSTEM SPIFFS
-#define SENSOR_TASK_MEM_STACK 2200
-#define ENVIRO_TASK_MEM_STACK 1800
+#define SENSOR_TASK_MEM_STACK 2400 // 2200
+#define ENVIRO_TASK_MEM_STACK 2000 // 1800
 #define DATA_JSON_SIZE 1500
 #define CONFIG_JSON_SIZE 1536 //1200 
 #define CAL_DATA_JSON_SIZE 128

@@ -4,9 +4,9 @@
  * @link https://diyflowbench.com
  * @author DeeEmm aka Mick Percy deeemm@deeemm.com
  * 
- * @file hardware.h
+ * @file version.h
  * 
- * @brief Hardware class header file
+ * @brief defines version information
  * 
  * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
  * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
@@ -18,43 +18,11 @@
  ***/
 #pragma once
 
-class Hardware {
-	
-	friend class Messages;
-	friend class Maths;
+// Don't forget to update the changelog & README Versions!!
+// TODO: Automate build numbering with git tasks
 
-	protected:
-		uint8_t		_i2cAddress;
-		uint32_t	_gain;
-		uint32_t	_mux;
-		uint8_t		_rate;			  
-        uint32_t 	_config;
-
-	public:
-		Hardware();
-		bool begin ();
-		void initialise ();
-		void beginSerial(void);
-		void getI2CList();
-		void getI2CDeviceList();
-		
-		int32_t getADCRawData(int channel);
-		double get3v3SupplyVolts();
-		double get5vSupplyVolts();
-		double getADCVolts(int channel);
-		bool benchIsRunning();	
-		void checkRefPressure();
-		void setVFDRef();
-		void setBleedValveRef();
-		
-		void benchOn();
-		void benchOff();
-		float uptime();
-		
-		bool configurePins ();
-
-	private:
-
-
-
-};
+#define MAJOR_VERSION "V2"
+#define MINOR_VERSION "0"
+#define BUILD_NUMBER "24110501"
+#define RELEASE "V.2.0-RC.8"
+#define DEV_BRANCH "https://github.com/DeeEmm/DIY-Flow-Bench/tree/WIP"

@@ -49,7 +49,7 @@ https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/CONTRIBUTING.md
 
 
 ===================================================================
-!! Don't forget to update the build number in configuration.h !!
+!! Don't forget to update the build number in main file !!
 ===================================================================
 
 Build numbers follow format YY MM DD VV Where VV is the incremental daily version
@@ -59,6 +59,11 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 Build #         - Description of Change
 
 
+24110501        - Moved pin handling into runtime
+                - Pin definition now in pins.json
+                - Created WEMOS_D1_R32.json
+                - Moved version info into DIY-Flow-Bench.ino
+                - Created cofiguration.json
 24110403        - Added HTTP API Call for JSON Data
 24110402        - #180 Added ability to truncate / round flow values in GUI
 24110401        - #179 - Incorrect convertFlowDepression method

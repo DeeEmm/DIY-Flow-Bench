@@ -19,11 +19,12 @@
 
 #include "constants.h"
 #include "structs.h"
+#include "version.h"
 #include "configuration.h"
 
 #include "API.h"
 #include <esp32/rom/crc.h> 
-#include "pins.h"
+// #include "pins.h"
 #include "hardware.h"
 #include "sensors.h"
 #include "calculations.h"
@@ -246,8 +247,7 @@ void API::ParseMessage(char apiMessage) {
       
       case 'j': // Current configuration in JSON
           jsonString = this->getConfigJSON();
-          jsonString.toCharArray(charDataJSON, API_JSON_LENGTH);
-          snprintf(apiResponseBlob, API_BLOB_LENGTH, "C%s%s", config.api_delim, charDataJSON);
+          snprintf(apiResponseBlob, API_BLOB_LENGTH, "j%s%s", config.api_delim, String(jsonString).c_str());
       break;
       
       case 'K': // MAF Data Key Value 

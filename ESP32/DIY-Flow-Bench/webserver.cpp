@@ -26,6 +26,8 @@
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
+#include "version.h"
+
 
 #include <WiFi.h>
 #include <ESPmDNS.h>
@@ -39,7 +41,7 @@
 
 #include "calibration.h"
 #include "sensors.h"
-#include "pins.h"
+// #include "pins.h"
 #include "hardware.h"
 #include "messages.h"
 #include "calculations.h"
@@ -70,7 +72,7 @@ void Webserver::begin()
 
   extern struct ConfigSettings config;
   extern struct Translator translate;
-  extern DeviceStatus status;
+  extern struct DeviceStatus status;
 
   int wifiStatusCode;
 
@@ -466,14 +468,17 @@ void Webserver::begin()
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   });
-  
+
+ 
   // Index page request handler
   server->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
-      if (SPIFFS.exists("/index.html")) {
+      extern struct DeviceStatus status;
+      if ((SPIFFS.exists("/index.html")) && (SPIFFS.exists("/pins.json"))) {
         request->send(SPIFFS, "/index.html", "text/html", false, processTemplate);
        } else {
-        request->send(200, "text/html", LANG_INDEX_HTML); 
-      }});
+        request->send_P(200, "text/html", LANDING_PAGE, processLandingPageTemplate); 
+       }
+      });
 
   server->onFileUpload(processUpload);
   server->addHandler(events);
@@ -550,6 +555,13 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
   if (final)  {
     _message.debugPrintf("Upload Complete: %s,%u \n", filename, fileUploadData.file_size);
+
+    // if pins configuration uploaded, lets restart the ESP
+    if (strstr(String(filename).c_str(), String("/pins.json").c_str())){
+      _message.debugPrintf("ESP Restarting...");
+      ESP.restart();
+    } 
+
     request->_tempFile.close();
     request->redirect(redirectURL);
   }
@@ -1413,7 +1425,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadJSONFile(String filename)
  * @brief processTemplate
  * @details Replaces template placeholders with variable values
  * @param &var HTML payload 
- * @note %PLACEHOLDER_FORMAT%
+ * @note ~PLACEHOLDER_FORMAT~
  * @note using IF statements for this sucks but C++ switch statement cannot handle text operators
  ***/
 String Webserver::processTemplate(const String &var)
@@ -1434,18 +1446,21 @@ String Webserver::processTemplate(const String &var)
     status.benchType = "Pitot Style";
   }
 
-  // Board definitions for system status pane
-  #if defined WEMOS_D1_R32                    
-    status.boardType = "WEMOS_D1_R32";
-  #elif defined ARDUCAM_ESP32S
-    status.boardType = "ARDUCAM_ESP32S";
-  #elif defined ESP32DUINO
-    status.boardType = "ESP32DUINO";
-  #elif defined ESP32_WROVER_KIT 
-    status.boardType = "ESP32_WROVER_KIT";
-  #else
-    status.boardType = "CUSTOM_PIN_MAPPING";
-  #endif
+  // Board definition for system status pane
+  status.boardType = status.boardType;
+
+  // #if defined WEMOS_D1_R32                    
+  //   status.boardType = "WEMOS_D1_R32";
+  // #elif defined ARDUCAM_ESP32S
+  //   status.boardType = "ARDUCAM_ESP32S";
+  // #elif defined ESP32DUINO
+  //   status.boardType = "ESP32DUINO";
+  // #elif defined ESP32_WROVER_KIT 
+  //   status.boardType = "ESP32_WROVER_KIT";
+  // #else
+  //   status.boardType = "CUSTOM_PIN_MAPPING";
+  // #endif
+
 
   // Config Info
   if (var == "RELEASE") return RELEASE;
@@ -1752,6 +1767,33 @@ String Webserver::processTemplate(const String &var)
   return "";
 }
 
+
+/***********************************************************
+ * @brief processLandingPage
+ * @details Replaces template placeholders with variable values
+ * @param &var HTML payload 
+ * @note ~PLACEHOLDER_FORMAT~
+ * @note using IF statements for this sucks but C++ switch statement cannot handle text operators
+ ***/
+String Webserver::processLandingPageTemplate(const String &var) {
+
+  extern struct DeviceStatus status;
+
+  if (var == "INDEX_STATUS") {
+    if (!SPIFFS.exists("/index.html")) return String("index.html");
+  }  
+  
+  if (var == "PINS_STATUS" ) {
+    if (!SPIFFS.exists("/pins.json")) return String("pins.json");    
+  }
+
+  if (var == "CONFIG_STATUS") {
+    if (!SPIFFS.exists("/config.json")) return String("config.json");
+  }
+
+  return "";
+
+}
 
 
 /***********************************************************

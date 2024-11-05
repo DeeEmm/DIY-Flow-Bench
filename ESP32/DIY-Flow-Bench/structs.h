@@ -146,6 +146,9 @@ struct DeviceStatus {
   double activeOrificeFlowRate;
   double activeOrificeTestPressure;
   bool shouldReboot = false;
+  bool pinsLoaded = false;
+  bool indexLoaded = false;
+  bool configLoaded = false;
 };
 
 
@@ -212,4 +215,46 @@ struct ValveLiftData {
   double LiftData10 = 0.0;
   double LiftData11 = 0.0;
   double LiftData12 = 0.0;
+};
+
+
+/***********************************************************
+ * Valve Lift data
+ ***/
+struct Pins {
+  int VAC_SPEED_PIN = 25;
+  int VAC_BLEED_VALVE_PIN = 26;
+  int VAC_BANK_1_PIN = 13;
+  int VAC_BANK_2_PIN =12; 
+  int VAC_BANK_3_PIN =14;
+  int AVO_STEP_PIN =  15;
+  int AVO_DIR_PIN = 27;
+  int FLOW_VALVE_STEP_PIN = 32;
+  int FLOW_VALVE_DIR_PIN = 33;
+  int VCC_3V3_PIN = -1;
+  int VCC_5V_PIN = 35;
+  int SPEED_SENSOR_PIN = 2;
+  int SWIRL_ENCODER_PIN_A = 2;
+  int SWIRL_ENCODER_PIN_B = 4;
+  int ORIFICE_BCD_BIT1_PIN = 34;
+  int ORIFICE_BCD_BIT2_PIN = 36;
+  int ORIFICE_BCD_BIT3_PIN = 39;
+  int MAF_PIN = -1;
+  int REF_PRESSURE_PIN = -1;
+  int DIFF_PRESSURE_PIN = -1;
+  int PITOT_PIN = -1;
+  int TEMPERATURE_PIN = -1;
+  int REF_BARO_PIN = -1;
+  int HUMIDITY_PIN = -1;
+  int SERIAL0_TX_PIN =1;
+  int SERIAL0_RX_PIN =3;
+  int SERIAL2_TX_PIN =16;
+  int SERIAL2_RX_PIN =17;
+  int SDA_PIN = 21;
+  int SCL_PIN = 22;
+  int SD_CS_PIN = 5;
+  int SD_MOSI_PIN = 23;
+  int SD_MISO_PIN = 19;             
+  int SD_SCK_PIN = 18;
+  int WEMOS_SPARE_PIN_1 = 4;
 };
