@@ -612,7 +612,6 @@ double Sensors::getPRefVolts() {
 		return 0.0;
 	}
 
-
 }
 
 
@@ -627,7 +626,9 @@ double Sensors::getPRefVolts() {
 double Sensors::getPRefValue() {
 
 	Hardware _hardware;
-	
+	extern struct ConfigSettings config;
+
+
 	double sensorVal = 0.0;
 	double sensorVolts = this->getPRefVolts();
 	
@@ -670,12 +671,12 @@ double Sensors::getPRefValue() {
 	#endif
 
 	// Lets make sure we have a valid value to return
-	if (sensorVal > 0) { 
+	double pRefComp = fabs(sensorVal);
+	if (pRefComp > config.min_bench_pressure) { 
 		return sensorVal;
 	} else { 
 		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in display)
 	}
-
 
 }
 
@@ -729,6 +730,8 @@ double Sensors::getPDiffVolts() {
  ***/
 double Sensors::getPDiffValue() {
 
+	extern struct ConfigSettings config; 
+
 	Hardware _hardware;
 
 	double sensorVal = 0.0;
@@ -774,12 +777,13 @@ double Sensors::getPDiffValue() {
 
 	#endif
 
-	// Lets make sure we have a valid value to return
-	if (sensorVal > 0) {
+	// Lets make sure we have a valid value to return - check it is above minimum threshold
+	double pDiffComp = fabs(sensorVal);
+	if (pDiffComp > config.min_bench_pressure) { 
 		return sensorVal;
-	} else {
-		return 0.0001;
-	}
+	} else { 
+		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in display)
+	}	
 
 }
 
@@ -834,6 +838,8 @@ double Sensors::getPitotVolts() {
  ***/
 double Sensors::getPitotValue() {
 	
+	extern struct ConfigSettings config;
+
 	Hardware _hardware;
 
 	double sensorVal = 0.0;
@@ -879,12 +885,13 @@ double Sensors::getPitotValue() {
 
 	#endif
 
-	// Lets make sure we have a valid value to return
-	if (sensorVal > 0) {
+	// Lets make sure we have a valid value to return - check it is above minimum threshold
+	double pitotComp = fabs(sensorVal);
+	if (pitotComp > config.min_bench_pressure) { 
 		return sensorVal;
-	} else {
-		return 0.0001;
-	}
+	} else { 
+		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in display)
+	}	
 
 }
 
