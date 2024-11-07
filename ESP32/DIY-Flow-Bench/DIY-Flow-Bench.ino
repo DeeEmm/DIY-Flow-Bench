@@ -43,6 +43,7 @@
 #include <MD_REncoder.h>
 #include <math.h>
 
+#include "version.h"
 #include "constants.h"
 #include "configuration.h"
 #include "structs.h"
@@ -200,18 +201,20 @@ void TASKgetSensorData( void * parameter ){
         
         #ifdef PREF_IS_ENABLED 
         sensorVal.PRefKPA = _sensors.getPRefValue();
+        sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
+        sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, config.adj_flow_depression, sensorVal.FlowCFM);
         #endif
 
         #ifdef PDIFF_IS_ENABLED
         sensorVal.PDiffKPA = _sensors.getPDiffValue();
+        sensorVal.PDiffH2O = _calculations.convertPressure(sensorVal.PDiffKPA, INH2O);
         #endif
 
         #ifdef PITOT_IS_ENABLED
         sensorVal.PitotKPA = _sensors.getPitotValue();
+        sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O);
         #endif
 
-        sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
-        sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, config.adj_flow_depression, sensorVal.FlowCFM);
 
         
         #ifdef SWIRL_IS_ENABLED

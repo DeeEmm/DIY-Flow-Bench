@@ -20,6 +20,7 @@
 #include "constants.h"
 #include "structs.h"
 #include "configuration.h"
+#include "version.h"
 
 #include "API.h"
 #include <esp32/rom/crc.h> 

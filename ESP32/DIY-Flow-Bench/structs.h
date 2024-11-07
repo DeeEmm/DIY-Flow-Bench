@@ -185,8 +185,10 @@ struct SensorData {
   double PRefMv = 0.0;
   double PRefH2O = 0.0;
   double PDiffKPA = 0.0;
+  double PDiffH2O = 0.0;
   double PDiffMv = 0.0;
   double PitotKPA = 0.0;
+  double PitotH2O = 0.0;
   double PitotMv = 0.0;
   double Swirl = 0.0;
   double FDiff = 0.0;
