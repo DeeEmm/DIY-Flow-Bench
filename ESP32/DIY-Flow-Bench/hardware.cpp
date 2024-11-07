@@ -68,7 +68,7 @@ bool Hardware::configurePins () {
 
   if (SPIFFS.exists("/pins.json"))  {
 
-    pinData = _webserver.loadJSONFile("/pins.json");
+    pinData = _webserver.loadJSONFile("/pinss.json");
 
     if (!pinData.containsKey("BOARD_TYPE")) return false;
 

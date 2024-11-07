@@ -108,131 +108,135 @@ void TASKgetSensorData( void * parameter ){
   Calculations _calculations;
   int sensorINT;
 
-  for( ;; ) {
-    // Check if semaphore available
-    if (millis() > status.adcPollTimer){
-      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
-      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
-        status.adcPollTimer = millis() + config.ADC_SCAN_DELAY_MS; // Only reset timer when task executes
+  if (status.pinsLoaded == true) {
+    for( ;; ) {
+      // Check if semaphore available
+      if (millis() > status.adcPollTimer){
+        // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
+        if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
+          status.adcPollTimer = millis() + config.ADC_SCAN_DELAY_MS; // Only reset timer when task executes
 
-        // Get flow data
-        // Bench is MAF type...
-        // TODO change to switch statement using HTML dropdown val + named constants
-        if (strstr(String(settings.bench_type).c_str(), String("MAF").c_str())){
-          if (config.MAF_IS_ENABLED == true) {
-            sensorVal.FlowKGH = _sensors.getMafFlow();
-            sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
-          }
+          // Get flow data
+          // Bench is MAF type...
+          // TODO change to switch statement using HTML dropdown val + named constants
+          if (strstr(String(settings.bench_type).c_str(), String("MAF").c_str())){
+            if (config.MAF_IS_ENABLED == true) {
+              sensorVal.FlowKGH = _sensors.getMafFlow();
+              sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
+            }
 
-        // Bench is ORIFICE type...
-        } else if (strstr(String(settings.bench_type).c_str(), String("ORIFICE").c_str())){
-          sensorVal.FlowCFMraw = _sensors.getDifferentialFlow();
-
-
-        // Bench is VENTURI type...
-        } else if (strstr(String(settings.bench_type).c_str(), String("VENTURI").c_str())){
-
-          //TODO
-
-        // Bench is PITOT type...
-        } else if (strstr(String(settings.bench_type).c_str(), String("PITOT").c_str())){
-
-          //TODO
-
-        // Error bench type unknown
-        } else {
-
-          //Do nothing?
-
-        }
-
-        // Apply Flow calibration and leak offsets
-        sensorVal.FlowCFM = sensorVal.FlowCFMraw  - calVal.leak_cal_baseline - calVal.leak_cal_offset  - calVal.flow_offset;
-
- 
-        // Apply Data filters...
-
-        // Rolling Median
-        if (strstr(String(settings.data_filter_type).c_str(), String("MEDIAN").c_str())){
- 
-          sensorVal.AverageCFM += ( sensorVal.FlowCFM - sensorVal.AverageCFM ) * 0.1f; // rough running average.
-          sensorVal.MedianCFM += copysign( sensorVal.AverageCFM * 0.01, sensorVal.FlowCFM - sensorVal.MedianCFM );
-          sensorVal.FlowCFM = sensorVal.MedianCFM;
-
-        //TODO - Cyclic average
-        } else if (strstr(String(settings.data_filter_type).c_str(), String("AVERAGE").c_str())){
-
-          // create array / stack of 'Cyclical Average Buffer' length
-          // push value to stack - repeat this for size of stack 
-          
-          // calculate average of values on stack
-          // average results with current value - this is our displayed value
-          // push current (raw) value on to stack, remove oldest value
-          // repeat
+          // Bench is ORIFICE type...
+          } else if (strstr(String(settings.bench_type).c_str(), String("ORIFICE").c_str())){
+            sensorVal.FlowCFMraw = _sensors.getDifferentialFlow();
 
 
-        //TODO - Mode
-        } else if (strstr(String(settings.data_filter_type).c_str(), String("MODE").c_str())){
+          // Bench is VENTURI type...
+          } else if (strstr(String(settings.bench_type).c_str(), String("VENTURI").c_str())){
 
-          // return most common value over x number of cycles (requested by @black-top)
+            //TODO
 
-        }
+          // Bench is PITOT type...
+          } else if (strstr(String(settings.bench_type).c_str(), String("PITOT").c_str())){
 
-        // Create Flow differential values
-        switch (sensorVal.FDiffType) {
+            //TODO
 
-        case USERTARGET:
-          sensorVal.FDiff = sensorVal.FlowCFM - calVal.user_offset;
-          strcpy(sensorVal.FDiffTypeDesc, "User Target (cfm)");
-          break;
-
-        case BASELINE:
-          sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline;
-          strcpy(sensorVal.FDiffTypeDesc, "Baseline (cfm)");
-          break;
-        
-        case BASELINE_LEAK :
-          sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline - calVal.leak_cal_offset;
-          strcpy(sensorVal.FDiffTypeDesc, "Offset (cfm)");
-          break;
-                
-        default:
-          break;
-        }
-        
-      
-        if (config.PREF_IS_ENABLED) {
-          sensorVal.PRefKPA = _sensors.getPRefValue();
-        }
-        
-        if (config.PDIFF_IS_ENABLED) {
-          sensorVal.PDiffKPA = _sensors.getPDiffValue();
-        }
-
-        if (config.PITOT_IS_ENABLED) {
-          sensorVal.PitotKPA = _sensors.getPitotValue();
-        }
-
-        sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
-        sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, settings.adj_flow_depression, sensorVal.FlowCFM);
-
-        
-        if (config.SWIRL_IS_ENABLED) {
-          uint8_t Swirl = Encoder.read();
-
-          if (Swirl == DIR_CW) {
-            sensorVal.Swirl = Encoder.speed();
+          // Error bench type unknown
           } else {
-            sensorVal.Swirl = Encoder.speed() * -1;
+
+            //Do nothing?
+
           }
 
-        }
+          // Apply Flow calibration and leak offsets
+          sensorVal.FlowCFM = sensorVal.FlowCFMraw  - calVal.leak_cal_baseline - calVal.leak_cal_offset  - calVal.flow_offset;
 
-        xSemaphoreGive(i2c_task_mutex); // Release semaphore        
-      }   
+  
+          // Apply Data filters...
+
+          // Rolling Median
+          if (strstr(String(settings.data_filter_type).c_str(), String("MEDIAN").c_str())){
+  
+            sensorVal.AverageCFM += ( sensorVal.FlowCFM - sensorVal.AverageCFM ) * 0.1f; // rough running average.
+            sensorVal.MedianCFM += copysign( sensorVal.AverageCFM * 0.01, sensorVal.FlowCFM - sensorVal.MedianCFM );
+            sensorVal.FlowCFM = sensorVal.MedianCFM;
+
+          //TODO - Cyclic average
+          } else if (strstr(String(settings.data_filter_type).c_str(), String("AVERAGE").c_str())){
+
+            // create array / stack of 'Cyclical Average Buffer' length
+            // push value to stack - repeat this for size of stack 
+            
+            // calculate average of values on stack
+            // average results with current value - this is our displayed value
+            // push current (raw) value on to stack, remove oldest value
+            // repeat
+
+
+          //TODO - Mode
+          } else if (strstr(String(settings.data_filter_type).c_str(), String("MODE").c_str())){
+
+            // return most common value over x number of cycles (requested by @black-top)
+
+          }
+
+          // Create Flow differential values
+          switch (sensorVal.FDiffType) {
+
+          case USERTARGET:
+            sensorVal.FDiff = sensorVal.FlowCFM - calVal.user_offset;
+            strcpy(sensorVal.FDiffTypeDesc, "User Target (cfm)");
+            break;
+
+          case BASELINE:
+            sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline;
+            strcpy(sensorVal.FDiffTypeDesc, "Baseline (cfm)");
+            break;
+          
+          case BASELINE_LEAK :
+            sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline - calVal.leak_cal_offset;
+            strcpy(sensorVal.FDiffTypeDesc, "Offset (cfm)");
+            break;
+                  
+          default:
+            break;
+          }
+          
+        
+          if (config.PREF_IS_ENABLED) {
+            sensorVal.PRefKPA = _sensors.getPRefValue();
+          }
+          
+          if (config.PDIFF_IS_ENABLED) {
+            sensorVal.PDiffKPA = _sensors.getPDiffValue();
+          }
+
+          if (config.PITOT_IS_ENABLED) {
+            sensorVal.PitotKPA = _sensors.getPitotValue();
+          }
+
+          sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
+          sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, settings.adj_flow_depression, sensorVal.FlowCFM);
+
+          
+          if (config.SWIRL_IS_ENABLED) {
+            uint8_t Swirl = Encoder.read();
+
+            if (Swirl == DIR_CW) {
+              sensorVal.Swirl = Encoder.speed();
+            } else {
+              sensorVal.Swirl = Encoder.speed() * -1;
+            }
+
+          }
+
+          xSemaphoreGive(i2c_task_mutex); // Release semaphore        
+        }   
+      }
     }
-  }
     vTaskDelay( VTASK_DELAY_ADC );  // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
+  } else {
+    vTaskDelay(100); // longer delay as we are skipping over everything 
+  }
 }
 
 
@@ -254,23 +258,27 @@ void TASKgetEnviroData( void * parameter ){
 
   Calculations _calculations;
 
-  for( ;; ) {
-    if (millis() > status.bmePollTimer){
-      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
-      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
-        status.bmePollTimer = millis() + config.BME_SCAN_DELAY_MS; // Only reset timer when task executes
-        
-        sensorVal.TempDegC = _sensors.getTempValue();
-        sensorVal.TempDegF = _calculations.convertTemperature(_sensors.getTempValue(), DEGF);
-        sensorVal.BaroHPA = _sensors.getBaroValue();
-        sensorVal.BaroPA = sensorVal.BaroHPA * 100.00F;
-        sensorVal.BaroKPA = sensorVal.BaroPA * 0.001F;
-        sensorVal.RelH = _sensors.getRelHValue();
-        xSemaphoreGive(i2c_task_mutex); // Release semaphore
+  if (status.pinsLoaded == true) {
+    for( ;; ) {
+      if (millis() > status.bmePollTimer){
+        // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
+        if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
+          status.bmePollTimer = millis() + config.BME_SCAN_DELAY_MS; // Only reset timer when task executes
+          
+          sensorVal.TempDegC = _sensors.getTempValue();
+          sensorVal.TempDegF = _calculations.convertTemperature(_sensors.getTempValue(), DEGF);
+          sensorVal.BaroHPA = _sensors.getBaroValue();
+          sensorVal.BaroPA = sensorVal.BaroHPA * 100.00F;
+          sensorVal.BaroKPA = sensorVal.BaroPA * 0.001F;
+          sensorVal.RelH = _sensors.getRelHValue();
+          xSemaphoreGive(i2c_task_mutex); // Release semaphore
+        }
       }
+      vTaskDelay( VTASK_DELAY_BME ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
     }
-    vTaskDelay( VTASK_DELAY_BME ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
-	}
+  } else {
+    vTaskDelay(100); // longer delay as we are skipping over everything
+  }
 }
 
 
@@ -297,6 +305,7 @@ void setup(void) {
   
   bool hardwareInitialised = _hardware.begin();
 
+  // Hardware needs to be properly initialised to run (pins + configuration)
   if (hardwareInitialised == true) {
     
     _sensors.begin();
@@ -373,8 +382,8 @@ void loop () {
       } else {
           // Push data to client using Server Side Events (SSE)
           jsonString = _webserver.getDataJSON();
-          // _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
-        
+          // _webserver.ev~ents->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
+          vTaskDelay(100);
       }
   }
   #endif

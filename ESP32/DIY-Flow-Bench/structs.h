@@ -221,41 +221,41 @@ struct ValveLiftData {
  * Pin Data
  ***/
 struct Pins {
-  int VAC_SPEED_PIN = 99;
-  int VAC_BLEED_VALVE_PIN = 99;
-  int VAC_BANK_1_PIN = 99;
-  int VAC_BANK_2_PIN = 99; 
-  int VAC_BANK_3_PIN = 99;
-  int AVO_STEP_PIN =  99;
-  int AVO_DIR_PIN = 99;
-  int FLOW_VALVE_STEP_PIN = 99;
-  int FLOW_VALVE_DIR_PIN = 99;
-  int VCC_3V3_PIN = 99;
-  int VCC_5V_PIN = 99;
-  int SPEED_SENSOR_PIN = 99;
-  int SWIRL_ENCODER_PIN_A = 99;
-  int SWIRL_ENCODER_PIN_B = 99;
-  int ORIFICE_BCD_BIT1_PIN = 99;
-  int ORIFICE_BCD_BIT2_PIN = 99;
-  int ORIFICE_BCD_BIT3_PIN = 99;
-  int MAF_PIN = 99;
-  int REF_PRESSURE_PIN = 99;
-  int DIFF_PRESSURE_PIN = 99;
-  int PITOT_PIN = 99;
-  int TEMPERATURE_PIN = 99;
-  int REF_BARO_PIN = 99;
-  int HUMIDITY_PIN = 99;
-  int SERIAL0_TX_PIN = 99;
-  int SERIAL0_RX_PIN = 99;
-  int SERIAL2_TX_PIN = 99;
-  int SERIAL2_RX_PIN = 99;
-  int SDA_PIN = 99;
-  int SCL_PIN = 99;
-  int SD_CS_PIN = 99;
-  int SD_MOSI_PIN = 99;
-  int SD_MISO_PIN = 99;             
-  int SD_SCK_PIN = 99;
-  int WEMOS_SPARE_PIN_1 = 99;
+  int VAC_SPEED_PIN = -1;
+  int VAC_BLEED_VALVE_PIN = -1;
+  int VAC_BANK_1_PIN = -1;
+  int VAC_BANK_2_PIN = -1; 
+  int VAC_BANK_3_PIN = -1;
+  int AVO_STEP_PIN =  -1;
+  int AVO_DIR_PIN = -1;
+  int FLOW_VALVE_STEP_PIN = -1;
+  int FLOW_VALVE_DIR_PIN = -1;
+  int VCC_3V3_PIN = -1;
+  int VCC_5V_PIN = -1;
+  int SPEED_SENSOR_PIN = -1;
+  int SWIRL_ENCODER_PIN_A = -1;
+  int SWIRL_ENCODER_PIN_B = -1;
+  int ORIFICE_BCD_BIT1_PIN = -1;
+  int ORIFICE_BCD_BIT2_PIN = -1;
+  int ORIFICE_BCD_BIT3_PIN = -1;
+  int MAF_PIN = -1;
+  int REF_PRESSURE_PIN = -1;
+  int DIFF_PRESSURE_PIN = -1;
+  int PITOT_PIN = -1;
+  int TEMPERATURE_PIN = -1;
+  int REF_BARO_PIN = -1;
+  int HUMIDITY_PIN = -1;
+  int SERIAL0_TX_PIN = 1; // Default for most ESP32
+  int SERIAL0_RX_PIN = 3; // Default for most ESP32
+  int SERIAL2_TX_PIN = -1;
+  int SERIAL2_RX_PIN = -1;
+  int SDA_PIN = 21; // Default for most ESP32
+  int SCL_PIN = 22; // Default for most ESP32
+  int SD_CS_PIN = -1;
+  int SD_MOSI_PIN = -1;
+  int SD_MISO_PIN = -1;             
+  int SD_SCK_PIN = -1;
+  int WEMOS_SPARE_PIN_1 = -1;
 };
 
 
