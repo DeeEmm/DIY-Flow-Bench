@@ -469,7 +469,7 @@ double Sensors::getMafFlow(int units) {
 		// where Q = flow | A = area | V = velocity
 
 		// Calculate the 'velocity' for the original pipe area
-		mafVelocity = flowRateKGH / PI * pow((status.mafDiameter / 2), 2)
+		mafVelocity = flowRateKGH / PI * pow((status.mafDiameter / 2), 2);
 
 		// scale the result with the new pipe area and convert back to mass flow
 		transposedflowRateKGH = mafVelocity * PI * pow((config.maf_housing_diameter / 2), 2);

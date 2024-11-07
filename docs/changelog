@@ -58,7 +58,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-24110704        - Changed Pdiff and Pitot GUI vals from kPa to H2O
+
+24110704        - Updated calls to #include "version.h"
 24110703        - Added call to version.h in webserver.h
 24110702        - Changed min pressure threshold to allow -ve values
                 - Moved version vars into dedicated file
