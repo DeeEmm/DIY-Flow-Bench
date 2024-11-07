@@ -23,6 +23,7 @@
 #include "constants.h"
 #include "structs.h"
 #include "pins.h"
+#include "version.h"
 
 #include <Wire.h>
 #include "hardware.h"
