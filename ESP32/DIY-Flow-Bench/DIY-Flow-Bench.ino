@@ -43,6 +43,7 @@
 #include <MD_REncoder.h>
 #include <math.h>
 
+#include "version.h"
 #include "constants.h"
 #include "configuration.h"
 #include "structs.h"
