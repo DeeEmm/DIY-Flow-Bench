@@ -22,8 +22,9 @@
 #include <SPI.h>
 #include <SD.h>
 #include <Update.h>
+#include <string>
 
-#include "configuration.h"
+// #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
 #include "version.h"
@@ -41,16 +42,19 @@
 
 #include "calibration.h"
 #include "sensors.h"
-// #include "pins.h"
+
 #include "hardware.h"
 #include "messages.h"
 #include "calculations.h"
-#include LANGUAGE_FILE
+
 
 #include <sstream>
 using namespace std;
 
 #define U_PART U_SPIFFS
+
+const char LANDING_PAGE[] PROGMEM = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/api/file/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~pins_STATUS~</p> <!--<p>~SETTINGS_STATUS~</p>--> <br> <form method='POST' action='/api/file/upload' enctype='multipart/form-data'> <div class=\"input_container\"> <input type=\"file\" name=\"upload\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
+
 
 // RTC_DATA_ATTR int bootCount; // flash mem
 
@@ -70,8 +74,8 @@ using namespace std;
 void Webserver::begin()
 {
 
-  extern struct ConfigSettings config;
-  extern struct Translator translate;
+  extern struct BenchSettings settings;
+  extern struct Language language;
   extern struct DeviceStatus status;
 
   int wifiStatusCode;
@@ -94,10 +98,10 @@ void Webserver::begin()
     #endif
   }
 
-  // Check if config / calibration / liftdata json files exist. If not create them.
+  // Check if settings / calibration / liftdata json files exist. If not create them.
   // NOTE Combined filesize cannot exceed SPIFFS partition
-  if (!SPIFFS.exists("/config.json"))  {
-    createConfigFile();
+  if (!SPIFFS.exists("/settings.json"))  {
+    createSettingsFile();
   }
 
   if (!SPIFFS.exists("/liftdata.json")) {
@@ -109,7 +113,7 @@ void Webserver::begin()
   }
 
   // load json configuration files from SPIFFS memory
-  this->loadConfig();
+  this->loadSettings();
   this->loadLiftData();
   _calibration.loadCalibrationData();
   
@@ -181,12 +185,12 @@ void Webserver::begin()
 
   // WiFi
   // if WiFi password is unedited or blank force AP mode
-  if ((strstr(String(config.wifi_pswd).c_str(), String("PASSWORD").c_str())) || (String(config.wifi_pswd).c_str() == "")) {
-    config.ap_mode = true;
+  if ((strstr(String(settings.wifi_pswd).c_str(), String("PASSWORD").c_str())) || (String(settings.wifi_pswd).c_str() == "")) {
+    settings.ap_mode = true;
   } 
   
   // Connect to WiFi
-  if (config.ap_mode == false)  {
+  if (settings.ap_mode == false)  {
     // WiFi.useStaticBuffers(true);   
     this->resetWifi();
     WiFi.mode(WIFI_STA);
@@ -200,7 +204,7 @@ void Webserver::begin()
     _message.serialPrintf("Connecting to WiFi \n");
     #ifdef STATIC_IP
       // Configures static IP address
-      if (!WiFi.config(STATIC_IP, GATEWAY, SUBNET)) {
+      if (!WiFi.settings(STATIC_IP, GATEWAY, SUBNET)) {
         Serial.println("STA Failed to configure");
       }
     #endif
@@ -208,16 +212,16 @@ void Webserver::begin()
   }
 
   // Test for connection success else create an accesspoint
-  if (wifiStatusCode == 3 && config.ap_mode == false) { 
+  if (wifiStatusCode == 3 && settings.ap_mode == false) { 
     // STA Connection success
-    _message.serialPrintf("\nConnected to %s \n", config.wifi_ssid);
+    _message.serialPrintf("\nConnected to %s \n", settings.wifi_ssid);
     status.local_ip_address = WiFi.localIP().toString().c_str();
     _message.serialPrintf("IP address: %s \n", WiFi.localIP().toString().c_str());
     WiFi.setAutoReconnect(true);
     WiFi.persistent(true);
     
   }  else  { // Go into AP Mode
-    if (config.ap_mode == true) { // AP mode is Default
+    if (settings.ap_mode == true) { // AP mode is Default
       _message.serialPrintf("\nDefaulting to AP Mode \n");
     } else { // AP mode is Fallback
       _message.serialPrintf("\nFailed to connect to Wifi \n");
@@ -226,19 +230,19 @@ void Webserver::begin()
       _message.serialPrintf("\n");
     }
 
-    _message.serialPrintf("Creating WiFi Access Point:  %s  \n", config.wifi_ap_ssid); // NOTE: Default AP SSID / PW = DIYFB / 123456789
+    _message.serialPrintf("Creating WiFi Access Point:  %s  \n", settings.wifi_ap_ssid); // NOTE: Default AP SSID / PW = DIYFB / 123456789
     WiFi.mode(WIFI_AP);
-    WiFi.softAP(config.wifi_ap_ssid, config.wifi_ap_pswd);
+    WiFi.softAP(settings.wifi_ap_ssid, settings.wifi_ap_pswd);
     status.local_ip_address = WiFi.softAPIP().toString().c_str();
     _message.serialPrintf("Access Point IP address: %s \n", WiFi.softAPIP().toString().c_str());
     status.apMode = true;
   }
 
   // Set up Multicast DNS
-  if (!MDNS.begin(config.hostname))  {
+  if (!MDNS.begin(settings.hostname))  {
     _message.serialPrintf("Error starting mDNS \n");
   }  else  {
-    status.hostname = config.hostname;
+    status.hostname = settings.hostname;
     _message.serialPrintf("Multicast: http://%s.local \n", status.hostname);
   }
 
@@ -246,7 +250,7 @@ void Webserver::begin()
   server->on("/api/bench/on", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Hardware _hardware;
-      _message.Handler(translate.LANG_BENCH_RUNNING);
+      _message.Handler(language.LANG_BENCH_RUNNING);
       _message.debugPrintf("Bench On \n");
       _hardware.benchOn(); 
       request->send(200, "text/html", "{\"bench\":\"on\"}"); 
@@ -255,7 +259,7 @@ void Webserver::begin()
   server->on("/api/bench/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Hardware _hardware;
-      _message.Handler(translate.LANG_BENCH_STOPPED);
+      _message.Handler(language.LANG_BENCH_STOPPED);
       _message.debugPrintf("Bench Off \n");
       _hardware.benchOff(); 
       request->send(200, "text/html", "{\"bench\":\"off\"}"); 
@@ -263,49 +267,49 @@ void Webserver::begin()
 
   server->on("/api/debug/on", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      _message.Handler(translate.LANG_DEBUG_MODE);
+      _message.Handler(language.LANG_DEBUG_MODE);
       _message.debugPrintf("Debug Mode On\n");
-      config.debug_mode = true;
+      settings.debug_mode = true;
       request->send(200, "text/html", "{\"debug\":\"on\"}"); });
 
   server->on("/api/debug/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      _message.Handler(translate.LANG_BLANK);
+      _message.Handler(language.LANG_BLANK);
       _message.debugPrintf("Debug Mode Off\n");
-      config.debug_mode = false;
+      settings.debug_mode = false;
       request->send(200, "text/html", "{\"debug\":\"off\"}"); });
 
   server->on("/api/dev/on", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
-      _message.Handler(translate.LANG_DEV_MODE);
+      _message.Handler(language.LANG_DEV_MODE);
       _message.debugPrintf("Developer Mode On\n");
-      config.dev_mode = true;
+      settings.dev_mode = true;
       request->send(200, "text/html", "{\"dev\":\"on\"}"); });
 
   server->on("/api/dev/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      _message.Handler(translate.LANG_BLANK);
+      _message.Handler(language.LANG_BLANK);
       _message.debugPrintf("Developer Mode Off\n");
-      config.dev_mode = false;
+      settings.dev_mode = false;
       request->send(200, "text/html", "{\"dev\":\"off\"}"); });
 
   server->on("/api/clear-message", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
       status.statusMessage = "";
-      _message.Handler(translate.LANG_NO_ERROR);
+      _message.Handler(language.LANG_NO_ERROR);
       _message.debugPrintf("Clearing messages...\n");
        });
 
     server->on("/api/orifice-change", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      _message.Handler(translate.LANG_ORIFICE_CHANGE);
+      _message.Handler(language.LANG_ORIFICE_CHANGE);
       _message.debugPrintf("Active Orifice Changed\n");
       status.activeOrifice = request->arg("orifice");
       request->send(200, "text/html", "{\"orifice\":changed\"\"}"); });
 
   server->on("/api/bench/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
-      _message.Handler(translate.LANG_SYSTEM_REBOOTING);
+      _message.Handler(language.LANG_SYSTEM_REBOOTING);
       request->send(200, "text/html", "{\"reboot\":\"true\"}");
       ESP.restart(); 
       request->redirect("/"); });
@@ -315,12 +319,12 @@ void Webserver::begin()
       Calibration _calibrate;
       Hardware _hardware;
       if (_hardware.benchIsRunning()) {
-        _message.Handler(translate.LANG_CALIBRATING);
+        _message.Handler(language.LANG_CALIBRATING);
         _message.debugPrintf("Calibrating Flow...\n");
         request->send(200, "text/html", "{\"calibrate\":\"true\"}");
         _calibrate.setFlowOffset();         
       } else {
-        _message.Handler(translate.LANG_RUN_BENCH_TO_CALIBRATE);
+        _message.Handler(language.LANG_RUN_BENCH_TO_CALIBRATE);
         request->send(200, "text/html", "{\"calibrate\":\"false\"}");
       }  
       request->redirect("/");
@@ -331,12 +335,12 @@ void Webserver::begin()
       Calibration _calibrate;
       Hardware _hardware;
       if (_hardware.benchIsRunning()) {
-        _message.Handler(translate.LANG_LEAK_CALIBRATING);
+        _message.Handler(language.LANG_LEAK_CALIBRATING);
         _message.debugPrintf("Calibrating Leak Test...\n");
         request->send(200, "text/html", "{\"leakcal\":\"true\"}");
         _calibrate.setLeakOffset();
       } else {
-        _message.Handler(translate.LANG_RUN_BENCH_TO_CALIBRATE);
+        _message.Handler(language.LANG_RUN_BENCH_TO_CALIBRATE);
         request->send(200, "text/html", "{\"leakcal\":\"false\"}");
       } 
       request->redirect("/"); });
@@ -406,7 +410,7 @@ void Webserver::begin()
           SPIFFS.remove(fileToDelete);
         }  else {
           _message.debugPrintf("Delete Failed: %s", fileToDelete);  
-          _message.Handler(translate.LANG_DELETE_FAILED);    
+          _message.Handler(language.LANG_DELETE_FAILED);    
         } 
         if (fileToDelete == "/index.html"){
           request->redirect("/");
@@ -420,7 +424,7 @@ void Webserver::begin()
   // Toggle Flow Dif Tile
   server->on("/api/fdiff", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      // _message.Handler(translate.LANG_BENCH_RUNNING);
+      // _message.Handler(language.LANG_BENCH_RUNNING);
       _message.debugPrintf("/api/fdiff \n");
       toggleFlowDiffTile();
       request->send(200);
@@ -438,8 +442,8 @@ void Webserver::begin()
   // Save user Flow Diff target
   server->on("/api/saveflowtarget", HTTP_POST, parseUserFlowTargetForm);
   
-  // Parse Configuration Form
-  server->on("/api/saveconfig", HTTP_POST, parseConfigurationForm);
+  // Parse Settings Form
+  server->on("/api/savesettings", HTTP_POST, parseSettingsForm);
 
   // Parse Calibration Form
   server->on("/api/savecalibration", HTTP_POST, parseCalibrationForm);
@@ -484,7 +488,7 @@ void Webserver::begin()
   server->addHandler(events);
   server->begin();
 
-  _message.Handler(translate.LANG_SERVER_RUNNING);
+  _message.Handler(language.LANG_SERVER_RUNNING);
   _message.serialPrintf("Server Running \n");
 }
 
@@ -516,7 +520,7 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
   Messages _message;
   extern struct FileUploadData fileUploadData;
-  extern struct Translator translate;
+  extern struct Language language;
   String redirectURL;
 
   if (!filename.startsWith("/")){
@@ -535,11 +539,11 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
   if (len)  {
     fileUploadData.file_size += len;
     if (fileUploadData.file_size > freespace)    {
-      _message.Handler(translate.LANG_UPLOAD_FAILED_NO_SPACE);
+      _message.Handler(language.LANG_UPLOAD_FAILED_NO_SPACE);
       _message.debugPrintf("Upload failed, no Space: %s \n", freespace);
       fileUploadData.upload_error = true;
     }    else    {
-      _message.Handler(translate.LANG_FILE_UPLOADED);
+      _message.Handler(language.LANG_FILE_UPLOADED);
       _message.debugPrintf("Writing file: '%s' index=%u len=%u \n", filename, index, len);
       // stream the incoming chunk to the opened file
       request->_tempFile.write(data, len);
@@ -556,7 +560,7 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
   if (final)  {
     _message.debugPrintf("Upload Complete: %s,%u \n", filename, fileUploadData.file_size);
 
-    // if pins configuration uploaded, lets restart the ESP
+    // if pins file uploaded, lets restart the ESP
     if (strstr(String(filename).c_str(), String("/pins.json").c_str())){
       _message.debugPrintf("ESP Restarting...");
       ESP.restart();
@@ -573,62 +577,208 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
 
 /***********************************************************
-* @brief loadConfig
-* @details read configuration data from config.json file and loads into global struct
+* @brief loadLanguage - acts as language override
+* @details read language strings from language.json file (if exists) and loads into global struct
+* @note Replaces original language.h file
 ***/ 
-StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
+void Webserver::loadLanguage () {
 
-  extern struct ConfigSettings config;
+  extern struct Language lang;
 
-  StaticJsonDocument<CONFIG_JSON_SIZE> configData;
+  Messages _message;
+
+  StaticJsonDocument<LANGUAGE_JSON_SIZE> languageJSON;
+  
+  _message.serialPrintf("Loading Configuration... \n");     
+
+  if (SPIFFS.exists("/language.json"))  {
+
+    languageJSON = loadJSONFile("/language.json");
+
+    strcpy(lang.LANG_BLANK, languageJSON["LANG_BLANK"].as<const char*>());
+    strcpy(lang.LANG_NULL , languageJSON["LANG_NULL"].as<const char*>());
+    strcpy(lang.LANG_NO_ERROR , languageJSON["LANG_NO_ERROR"].as<const char*>());
+    strcpy(lang.LANG_SERVER_RUNNING , languageJSON["LANG_SERVER_RUNNING"].as<const char*>());
+    strcpy(lang.LANG_WARNING , languageJSON["LANG_WARNING"].as<const char*>());
+    strcpy(lang.LANG_FLOW_LIMIT_EXCEEDED , languageJSON["LANG_FLOW_LIMIT_EXCEEDED"].as<const char*>());
+    strcpy(lang.LANG_REF_PRESS_LOW , languageJSON["LANG_REF_PRESS_LOW"].as<const char*>());
+    strcpy(lang.LANG_LEAK_TEST_PASS , languageJSON["LANG_LEAK_TEST_PASS"].as<const char*>());
+    strcpy(lang.LANG_LEAK_TEST_FAILED , languageJSON["LANG_LEAK_TEST_FAILED"].as<const char*>());
+    strcpy(lang.LANG_ERROR_LOADING_CONFIG , languageJSON["LANG_ERROR_LOADING_CONFIG"].as<const char*>());
+    strcpy(lang.LANG_ERROR_SAVING_CONFIG , languageJSON["LANG_ERROR_SAVING_CONFIG"].as<const char*>());
+    strcpy(lang.LANG_SAVING_CONFIG , languageJSON["LANG_SAVING_CONFIG"].as<const char*>());
+    strcpy(lang.LANG_SAVING_CALIBRATION , languageJSON["LANG_SAVING_CALIBRATION"].as<const char*>());
+    strcpy(lang.LANG_ERROR_LOADING_FILE , languageJSON["LANG_ERROR_LOADING_FILE"].as<const char*>());
+    strcpy(lang.LANG_DHT11_READ_FAIL , languageJSON["LANG_DHT11_READ_FAIL"].as<const char*>());
+    strcpy(lang.LANG_BME280_READ_FAIL , languageJSON["LANG_BME280_READ_FAIL"].as<const char*>());
+    strcpy(lang.LANG_LOW_FLOW_CAL_VAL , languageJSON["LANG_LOW_FLOW_CAL_VAL"].as<const char*>());
+    strcpy(lang.LANG_HIGH_FLOW_CAL_VAL , languageJSON["LANG_HIGH_FLOW_CAL_VAL"].as<const char*>());
+    strcpy(lang.LANG_REF_PRESS_VALUE , languageJSON["LANG_REF_PRESS_VALUE"].as<const char*>());
+    strcpy(lang.LANG_NOT_ENABLED , languageJSON["LANG_NOT_ENABLED"].as<const char*>());
+    strcpy(lang.LANG_START_REF_PRESSURE , languageJSON["LANG_START_REF_PRESSURE"].as<const char*>());
+    strcpy(lang.LANG_FIXED_VALUE , languageJSON["LANG_FIXED_VALUE"].as<const char*>());
+    strcpy(lang.LANG_CALIBRATING , languageJSON["LANG_CALIBRATING"].as<const char*>());
+    strcpy(lang.LANG_LEAK_CALIBRATING , languageJSON["LANG_LEAK_CALIBRATING"].as<const char*>());
+    strcpy(lang.LANG_CAL_OFFET_VALUE , languageJSON["LANG_CAL_OFFET_VALUE"].as<const char*>());
+    strcpy(lang.LANG_LEAK_CAL_VALUE , languageJSON["LANG_LEAK_CAL_VALUE"].as<const char*>());
+    strcpy(lang.LANG_RUN_BENCH_TO_CALIBRATE , languageJSON["LANG_RUN_BENCH_TO_CALIBRATE"].as<const char*>());
+    strcpy(lang.LANG_BENCH_RUNNING , languageJSON["LANG_BENCH_RUNNING"].as<const char*>());
+    strcpy(lang.LANG_BENCH_STOPPED , languageJSON["LANG_BENCH_STOPPED"].as<const char*>());
+    strcpy(lang.LANG_DEBUG_MODE , languageJSON["LANG_DEBUG_MODE"].as<const char*>());
+    strcpy(lang.LANG_DEV_MODE , languageJSON["LANG_DEV_MODE"].as<const char*>());
+    strcpy(lang.LANG_SYSTEM_REBOOTING , languageJSON["LANG_SYSTEM_REBOOTING"].as<const char*>());
+    strcpy(lang.LANG_CANNOT_DELETE_INDEX , languageJSON["LANG_CANNOT_DELETE_INDEX"].as<const char*>());
+    strcpy(lang.LANG_DELETE_FAILED , languageJSON["LANG_DELETE_FAILED"].as<const char*>());
+    strcpy(lang.LANG_INVALID_ORIFICE_SELECTED , languageJSON["LANG_INVALID_ORIFICE_SELECTED"].as<const char*>());
+    strcpy(lang.LANG_ORIFICE_CHANGE , languageJSON["LANG_ORIFICE_CHANGE"].as<const char*>());
+    strcpy(lang.LANG_UPLOAD_FAILED_NO_SPACE , languageJSON["LANG_UPLOAD_FAILED_NO_SPACE"].as<const char*>());
+    strcpy(lang.LANG_FILE_UPLOADED , languageJSON["LANG_FILE_UPLOADED"].as<const char*>());
+    strcpy(lang.LANG_NO_BOARD_LOADED , languageJSON["LANG_NO_BOARD_LOADED"].as<const char*>());
+
+
+    // // Iterate through key > value pairs
+    // JsonObject root = languageJSON.as<JsonObject>();
+    // for (JsonPair kv : root) {
+    //     Serial.println(kv.key().c_str());
+    //     Serial.println(kv.value().as<const char*>());
+    // }
+
+
+
+  } else {
+    _message.serialPrintf("Language file not found, using default\n");
+  }
+  
+
+}
+
+
+/***********************************************************
+* @brief loadMAF
+* @details read Maf data from maf.json file and loads into global struct
+* @note Repalces original maf.cpp file
+***/ 
+void Webserver::loadMaf () {
+
+  // extern struct Langauge langauge;
+
+  StaticJsonDocument<MAF_JSON_SIZE> mafJSON;
+  Messages _message;
+
+  _message.serialPrintf("Loading MAF... \n");     
+
+  if (SPIFFS.exists("/maf.json"))  {
+
+    mafJSON = loadJSONFile("/maf.json");
+
+    // need to iterate through key > value pairs
+
+    // strcpy(langauge.wifi_ssid, languageJSON["CONF_WIFI_SSID"]);
+    // strcpy(langauge.wifi_pswd, languageJSON["CONF_WIFI_PSWD"]);
+    // langauge.orificeSixDepression = configurationJSON["ORIFICE6_TEST_PRESSURE"].as<double>();
+
+  } else {
+    _message.serialPrintf("Cinfiguration file not found \n");
+  }
+  
+  // return configurationJSON;  
+
+}
+
+
+
+/***********************************************************
+* @brief loadConfiguration
+* @details read settings from configuration.json file and loads into global struct
+* @note Repalces original configuration.h file
+***/ 
+StaticJsonDocument<SETTINGS_JSON_SIZE> Webserver::loadConfiguration () {
+
+  extern struct Configuration configuration;
+
+  StaticJsonDocument<SETTINGS_JSON_SIZE> configurationJSON;
   Messages _message;
 
   _message.serialPrintf("Loading Configuration... \n");     
 
-  if (SPIFFS.exists("/config.json"))  {
+  if (SPIFFS.exists("/configuration.json"))  {
 
-    configData = loadJSONFile("/config.json");
+    configurationJSON = loadJSONFile("/configuration.json");
 
-    strcpy(config.wifi_ssid, configData["CONF_WIFI_SSID"]);
-    strcpy(config.wifi_pswd, configData["CONF_WIFI_PSWD"]);
-    strcpy(config.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
-    strcpy(config.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
-    strcpy(config.hostname, configData["CONF_HOSTNAME"]);
-    config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
-    config.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
-    config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
-    config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
-    config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
-    strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
-    config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
-    config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
-    strcpy(config.api_delim, configData["CONF_API_DELIM"]);
-    config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
-    config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
-    configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
-    configData["TEMP_UNIT"] = config.temp_unit;
-    configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
-    strcpy(config.bench_type, configData["BENCH_TYPE"]);
-    config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
-    config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
-    config.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
-    config.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
-    config.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
-    config.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
-    config.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
-    config.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
-    config.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
-    config.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
-    config.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
-    config.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
-    config.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
-    config.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
+    // strcpy(configuration.wifi_ssid, configurationJSON["CONF_WIFI_SSID"]);
+    // strcpy(configuration.wifi_pswd, configurationJSON["CONF_WIFI_PSWD"]);
+    // configuration.orificeSixDepression = configurationJSON["ORIFICE6_TEST_PRESSURE"].as<double>();
 
   } else {
-    _message.serialPrintf("Configuration file not found \n");
+    _message.serialPrintf("Cinfiguration file not found \n");
   }
   
-  return configData;  
+  return configurationJSON;  
+
+}
+
+
+
+
+
+
+/***********************************************************
+* @brief loadSettings
+* @details read settings from settings.json file and loads into global struct
+***/ 
+StaticJsonDocument<SETTINGS_JSON_SIZE> Webserver::loadSettings () {
+
+  extern struct BenchSettings settings;
+
+  StaticJsonDocument<SETTINGS_JSON_SIZE> settingsJSON;
+  Messages _message;
+
+  _message.serialPrintf("Loading Settings... \n");     
+
+  if (SPIFFS.exists("/settings.json"))  {
+
+    settingsJSON = loadJSONFile("/settings.json");
+
+    strcpy(settings.wifi_ssid, settingsJSON["CONF_WIFI_SSID"]);
+    strcpy(settings.wifi_pswd, settingsJSON["CONF_WIFI_PSWD"]);
+    strcpy(settings.wifi_ap_ssid, settingsJSON["CONF_WIFI_AP_SSID"]);
+    strcpy(settings.wifi_ap_pswd,settingsJSON["CONF_WIFI_AP_PSWD"]);
+    strcpy(settings.hostname, settingsJSON["CONF_HOSTNAME"]);
+    settings.wifi_timeout = settingsJSON["CONF_WIFI_TIMEOUT"].as<int>();
+    settings.maf_housing_diameter = settingsJSON["CONF_MAF_HOUSING_DIAMETER"].as<int>();
+    settings.refresh_rate = settingsJSON["CONF_REFRESH_RATE"].as<int>();
+    settings.min_bench_pressure  = settingsJSON["CONF_MIN_BENCH_PRESSURE"].as<int>();
+    settings.min_flow_rate = settingsJSON["CONF_MIN_FLOW_RATE"].as<int>();
+    strcpy(settings.data_filter_type, settingsJSON["DATA_FILTER_TYPE"]);
+    settings.cyc_av_buffer  = settingsJSON["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
+    settings.maf_min_volts  = settingsJSON["CONF_MAF_MIN_VOLTS"].as<int>();
+    strcpy(settings.api_delim, settingsJSON["CONF_API_DELIM"]);
+    settings.serial_baud_rate = settingsJSON["CONF_SERIAL_BAUD_RATE"].as<long>();
+    settings.show_alarms = settingsJSON["CONF_SHOW_ALARMS"].as<bool>();
+    settingsJSON["ADJ_FLOW_DEPRESSION"] = settings.adj_flow_depression;
+    settingsJSON["TEMP_UNIT"] = settings.temp_unit;
+    settingsJSON["VALVE_LIFT_INTERVAL"] = settings.valveLiftInterval;
+    strcpy(settings.bench_type, settingsJSON["BENCH_TYPE"]);
+    settings.cal_flow_rate = settingsJSON["CONF_CAL_FLOW_RATE"].as<double>();
+    settings.cal_ref_press = settingsJSON["CONF_CAL_REF_PRESS"].as<double>();
+    settings.orificeOneFlow = settingsJSON["ORIFICE1_FLOW_RATE"].as<double>();
+    settings.orificeOneDepression = settingsJSON["ORIFICE1_TEST_PRESSURE"].as<double>();
+    settings.orificeTwoFlow = settingsJSON["ORIFICE2_FLOW_RATE"].as<double>();
+    settings.orificeTwoDepression = settingsJSON["ORIFICE2_TEST_PRESSURE"].as<double>();
+    settings.orificeThreeFlow = settingsJSON["ORIFICE3_FLOW_RATE"].as<double>();
+    settings.orificeThreeDepression = settingsJSON["ORIFICE3_TEST_PRESSURE"].as<double>();
+    settings.orificeFourFlow = settingsJSON["ORIFICE4_FLOW_RATE"].as<double>();
+    settings.orificeFourDepression = settingsJSON["ORIFICE4_TEST_PRESSURE"].as<double>();
+    settings.orificeFiveFlow = settingsJSON["ORIFICE5_FLOW_RATE"].as<double>();
+    settings.orificeFiveDepression = settingsJSON["ORIFICE5_TEST_PRESSURE"].as<double>();
+    settings.orificeSixFlow = settingsJSON["ORIFICE6_FLOW_RATE"].as<double>();
+    settings.orificeSixDepression = settingsJSON["ORIFICE6_TEST_PRESSURE"].as<double>();
+
+  } else {
+    _message.serialPrintf("Settings file not found \n");
+  }
+  
+  return settingsJSON;  
 
 }
 
@@ -636,22 +786,22 @@ StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
 
 // /***********************************************************
 // * @brief loadCalibration
-// * @details read configuration data from cal.json file
+// * @details read calibration data from cal.json file
 // ***/ 
-// StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
+// StaticJsonDocument<SETTINGS_JSON_SIZE> Webserver::loadSettings () {
 
-//   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
+//   StaticJsonDocument<SETTINGS_JSON_SIZE> settingsJSON;
 
 //   Messages _message;
-//   _message.serialPrintf("Loading Configuration... \n");     
-//   if (SPIFFS.exists("/config.json"))  {
-//     configData = loadJSONFile("/config.json");
-//     parseConfigSettings(configData);
+//   _message.serialPrintf("Loading Settings... \n");     
+//   if (SPIFFS.exists("/settings.json"))  {
+//     settingsJSON = loadJSONFile("/settings.json");
+//     parseBenchSettings(settingsJSON);
 //   } else {
-//     _message.serialPrintf("Configuration file not found \n");
+//     _message.serialPrintf("Settings file not found \n");
 //   }
   
-//   return configData;  
+//   return settingsJSON;  
 
 // }
 
@@ -660,138 +810,138 @@ StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
 
 
 /***********************************************************
-* @brief createConfig
-* @details Create basic minimum configuration json file
-* @note Called from Webserver::Initialise() if config.json not found
+* @brief createSettings
+* @details Create basic minimum settings json file
+* @note Called from Webserver::Initialise() if settings.json not found
 ***/
-void Webserver::createConfigFile () {
+void Webserver::createSettingsFile () {
 
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   Messages _message;
   String jsonString;  
-  StaticJsonDocument<CONFIG_JSON_SIZE> configData;
+  StaticJsonDocument<SETTINGS_JSON_SIZE> settingsJSON;
 
-  _message.serialPrintf("Creating config.json file... \n"); 
+  _message.serialPrintf("Creating settings.json file... \n"); 
  
-  configData["PAGE_TITLE"] = config.pageTitle;
-  configData["CONF_WIFI_SSID"] = config.wifi_ssid;
-  configData["CONF_WIFI_PSWD"] = config.wifi_pswd;
-  configData["CONF_WIFI_AP_SSID"] = config.wifi_ap_ssid;
-  configData["CONF_WIFI_AP_PSWD"] = config.wifi_ap_pswd;
-  configData["CONF_HOSTNAME"] = config.hostname;
-  configData["CONF_WIFI_TIMEOUT"] = config.wifi_timeout;
-  configData["CONF_MAF_HOUSING_DIAMETER"] = config.maf_housing_diameter;
-  configData["CONF_REFRESH_RATE"] = config.refresh_rate;
-  configData["CONF_MIN_BENCH_PRESSURE"] = config.min_bench_pressure;
-  configData["CONF_MIN_FLOW_RATE"] = config.min_flow_rate;
-  configData["DATA_FILTER_TYPE"] = config.data_filter_type;
-  configData["CONF_CYCLIC_AVERAGE_BUFFER"] = config.cyc_av_buffer;
-  configData["CONF_MAF_MIN_VOLTS"] = config.maf_min_volts;
-  configData["CONF_API_DELIM"] = config.api_delim;
-  configData["CONF_SERIAL_BAUD_RATE"] = config.serial_baud_rate;
-  configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
-  configData["TEMP_UNIT"] = config.temp_unit;
-  configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
-  configData["CONF_SHOW_ALARMS"] = config.show_alarms;
-  configData["BENCH_TYPE"] = config.bench_type;
-  configData["CONF_CAL_FLOW_RATE"] = config.cal_flow_rate;
-  configData["CONF_CAL_REF_PRESS"] = config.cal_ref_press;
-  configData["ORIFICE1_FLOW_RATE"] = config.orificeOneFlow;
-  configData["ORIFICE1_TEST_PRESSURE"] = config.orificeOneDepression;
-  configData["ORIFICE2_FLOW_RATE"] = config.orificeTwoFlow;
-  configData["ORIFICE2_TEST_PRESSURE"] = config.orificeThreeDepression;
-  configData["ORIFICE3_FLOW_RATE"] = config.orificeThreeFlow;
-  configData["ORIFICE4_FLOW_RATE"] = config.orificeFourFlow;
-  configData["ORIFICE4_TEST_PRESSURE"] = config.orificeFourDepression;
-  configData["ORIFICE5_FLOW_RATE"] = config.orificeFiveFlow;
-  configData["ORIFICE5_TEST_PRESSURE"] = config.orificeFiveDepression;
-  configData["ORIFICE6_FLOW_RATE"] = config.orificeSixFlow;
-  configData["ORIFICE7_TEST_PRESSURE"] = config.orificeSixDepression;
+  settingsJSON["PAGE_TITLE"] = settings.pageTitle;
+  settingsJSON["CONF_WIFI_SSID"] = settings.wifi_ssid;
+  settingsJSON["CONF_WIFI_PSWD"] = settings.wifi_pswd;
+  settingsJSON["CONF_WIFI_AP_SSID"] = settings.wifi_ap_ssid;
+  settingsJSON["CONF_WIFI_AP_PSWD"] = settings.wifi_ap_pswd;
+  settingsJSON["CONF_HOSTNAME"] = settings.hostname;
+  settingsJSON["CONF_WIFI_TIMEOUT"] = settings.wifi_timeout;
+  settingsJSON["CONF_MAF_HOUSING_DIAMETER"] = settings.maf_housing_diameter;
+  settingsJSON["CONF_REFRESH_RATE"] = settings.refresh_rate;
+  settingsJSON["CONF_MIN_BENCH_PRESSURE"] = settings.min_bench_pressure;
+  settingsJSON["CONF_MIN_FLOW_RATE"] = settings.min_flow_rate;
+  settingsJSON["DATA_FILTER_TYPE"] = settings.data_filter_type;
+  settingsJSON["CONF_CYCLIC_AVERAGE_BUFFER"] = settings.cyc_av_buffer;
+  settingsJSON["CONF_MAF_MIN_VOLTS"] = settings.maf_min_volts;
+  settingsJSON["CONF_API_DELIM"] = settings.api_delim;
+  settingsJSON["CONF_SERIAL_BAUD_RATE"] = settings.serial_baud_rate;
+  settingsJSON["ADJ_FLOW_DEPRESSION"] = settings.adj_flow_depression;
+  settingsJSON["TEMP_UNIT"] = settings.temp_unit;
+  settingsJSON["VALVE_LIFT_INTERVAL"] = settings.valveLiftInterval;
+  settingsJSON["CONF_SHOW_ALARMS"] = settings.show_alarms;
+  settingsJSON["BENCH_TYPE"] = settings.bench_type;
+  settingsJSON["CONF_CAL_FLOW_RATE"] = settings.cal_flow_rate;
+  settingsJSON["CONF_CAL_REF_PRESS"] = settings.cal_ref_press;
+  settingsJSON["ORIFICE1_FLOW_RATE"] = settings.orificeOneFlow;
+  settingsJSON["ORIFICE1_TEST_PRESSURE"] = settings.orificeOneDepression;
+  settingsJSON["ORIFICE2_FLOW_RATE"] = settings.orificeTwoFlow;
+  settingsJSON["ORIFICE2_TEST_PRESSURE"] = settings.orificeThreeDepression;
+  settingsJSON["ORIFICE3_FLOW_RATE"] = settings.orificeThreeFlow;
+  settingsJSON["ORIFICE4_FLOW_RATE"] = settings.orificeFourFlow;
+  settingsJSON["ORIFICE4_TEST_PRESSURE"] = settings.orificeFourDepression;
+  settingsJSON["ORIFICE5_FLOW_RATE"] = settings.orificeFiveFlow;
+  settingsJSON["ORIFICE5_TEST_PRESSURE"] = settings.orificeFiveDepression;
+  settingsJSON["ORIFICE6_FLOW_RATE"] = settings.orificeSixFlow;
+  settingsJSON["ORIFICE7_TEST_PRESSURE"] = settings.orificeSixDepression;
 
-  serializeJsonPretty(configData, jsonString);
-  writeJSONFile(jsonString, "/config.json", CONFIG_JSON_SIZE);
+  serializeJsonPretty(settingsJSON, jsonString);
+  writeJSONFile(jsonString, "/settings.json", SETTINGS_JSON_SIZE);
 
 }
 
 
 
 /***********************************************************
- * @brief parseConfigurationForm
+ * @brief parseSettingsForm
  * @details Parses calibration form post vars and stores into global struct
- * @details Saves configuration data to config.json file
+ * @details Saves data to settings.json file
  * @note Creates file if it does not exist
  * @note Redirects browser to file list
  * 
  ***/
-void Webserver::parseConfigurationForm(AsyncWebServerRequest *request)
+void Webserver::parseSettingsForm(AsyncWebServerRequest *request)
 {
 
   Messages _message;
   Webserver _webserver;
 
-  StaticJsonDocument<CONFIG_JSON_SIZE> configData;
-  extern struct ConfigSettings config;
+  StaticJsonDocument<SETTINGS_JSON_SIZE> settingsJSON;
+  extern struct BenchSettings settings;
   String jsonString;
   
   int params = request->params();
 
-  _message.debugPrintf("Saving Configuration... \n");
+  _message.debugPrintf("Saving Settings... \n");
 
   // Convert POST vars to JSON 
   for(int i=0;i<params;i++){
     AsyncWebParameter* p = request->getParam(i);
-      configData[p->name().c_str()] = p->value().c_str();
+      settingsJSON[p->name().c_str()] = p->value().c_str();
   }
 
-  // Update Config Vars
-  strcpy(config.wifi_ssid, configData["CONF_WIFI_SSID"]);
-  strcpy(config.wifi_pswd, configData["CONF_WIFI_PSWD"]);
-  strcpy(config.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
-  strcpy(config.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
-  strcpy(config.hostname, configData["CONF_HOSTNAME"]);
-  config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
-  config.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
-  config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
-  config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
-  config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
-  strcpy(config.rounding_type, configData["ROUNDING_TYPE"]);
-  config.flow_decimal_length = configData["FLOW_DECIMAL_LENGTH"].as<int>();
-  config.gen_decimal_length = configData["GEN_DECIMAL_LENGTH"].as<int>();
-  strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
-  config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
-  config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
-  strcpy(config.api_delim, configData["CONF_API_DELIM"]);
-  config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
-  config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
-  config.adj_flow_depression = configData["ADJ_FLOW_DEPRESSION"].as<int>();
-  strcpy(config.temp_unit, configData["TEMP_UNIT"]);
-  config.valveLiftInterval = configData["VALVE_LIFT_INTERVAL"].as<double>();
-  strcpy(config.bench_type, configData["BENCH_TYPE"]);
-  config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
-  config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
-  config.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
-  config.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
-  config.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
-  config.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
-  config.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
-  config.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
-  config.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
-  config.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
-  config.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
-  config.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
-  config.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
-  config.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
+  // Update settings Vars
+  strcpy(settings.wifi_ssid, settingsJSON["CONF_WIFI_SSID"]);
+  strcpy(settings.wifi_pswd, settingsJSON["CONF_WIFI_PSWD"]);
+  strcpy(settings.wifi_ap_ssid, settingsJSON["CONF_WIFI_AP_SSID"]);
+  strcpy(settings.wifi_ap_pswd,settingsJSON["CONF_WIFI_AP_PSWD"]);
+  strcpy(settings.hostname, settingsJSON["CONF_HOSTNAME"]);
+  settings.wifi_timeout = settingsJSON["CONF_WIFI_TIMEOUT"].as<int>();
+  settings.maf_housing_diameter = settingsJSON["CONF_MAF_HOUSING_DIAMETER"].as<int>();
+  settings.refresh_rate = settingsJSON["CONF_REFRESH_RATE"].as<int>();
+  settings.min_bench_pressure  = settingsJSON["CONF_MIN_BENCH_PRESSURE"].as<int>();
+  settings.min_flow_rate = settingsJSON["CONF_MIN_FLOW_RATE"].as<int>();
+  strcpy(settings.rounding_type, settingsJSON["ROUNDING_TYPE"]);
+  settings.flow_decimal_length = settingsJSON["FLOW_DECIMAL_LENGTH"].as<int>();
+  settings.gen_decimal_length = settingsJSON["GEN_DECIMAL_LENGTH"].as<int>();
+  strcpy(settings.data_filter_type, settingsJSON["DATA_FILTER_TYPE"]);
+  settings.cyc_av_buffer  = settingsJSON["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
+  settings.maf_min_volts  = settingsJSON["CONF_MAF_MIN_VOLTS"].as<int>();
+  strcpy(settings.api_delim, settingsJSON["CONF_API_DELIM"]);
+  settings.serial_baud_rate = settingsJSON["CONF_SERIAL_BAUD_RATE"].as<long>();
+  settings.show_alarms = settingsJSON["CONF_SHOW_ALARMS"].as<bool>();
+  settings.adj_flow_depression = settingsJSON["ADJ_FLOW_DEPRESSION"].as<int>();
+  strcpy(settings.temp_unit, settingsJSON["TEMP_UNIT"]);
+  settings.valveLiftInterval = settingsJSON["VALVE_LIFT_INTERVAL"].as<double>();
+  strcpy(settings.bench_type, settingsJSON["BENCH_TYPE"]);
+  settings.cal_flow_rate = settingsJSON["CONF_CAL_FLOW_RATE"].as<double>();
+  settings.cal_ref_press = settingsJSON["CONF_CAL_REF_PRESS"].as<double>();
+  settings.orificeOneFlow = settingsJSON["ORIFICE1_FLOW_RATE"].as<double>();
+  settings.orificeOneDepression = settingsJSON["ORIFICE1_TEST_PRESSURE"].as<double>();
+  settings.orificeTwoFlow = settingsJSON["ORIFICE2_FLOW_RATE"].as<double>();
+  settings.orificeTwoDepression = settingsJSON["ORIFICE2_TEST_PRESSURE"].as<double>();
+  settings.orificeThreeFlow = settingsJSON["ORIFICE3_FLOW_RATE"].as<double>();
+  settings.orificeThreeDepression = settingsJSON["ORIFICE3_TEST_PRESSURE"].as<double>();
+  settings.orificeFourFlow = settingsJSON["ORIFICE4_FLOW_RATE"].as<double>();
+  settings.orificeFourDepression = settingsJSON["ORIFICE4_TEST_PRESSURE"].as<double>();
+  settings.orificeFiveFlow = settingsJSON["ORIFICE5_FLOW_RATE"].as<double>();
+  settings.orificeFiveDepression = settingsJSON["ORIFICE5_TEST_PRESSURE"].as<double>();
+  settings.orificeSixFlow = settingsJSON["ORIFICE6_FLOW_RATE"].as<double>();
+  settings.orificeSixDepression = settingsJSON["ORIFICE6_TEST_PRESSURE"].as<double>();
 
-  // save settings to config file
-  serializeJsonPretty(configData, jsonString);
-  if (SPIFFS.exists("/config.json"))  {
-    SPIFFS.remove("/config.json");
+  // save settings to settings file
+  serializeJsonPretty(settingsJSON, jsonString);
+  if (SPIFFS.exists("/settings.json"))  {
+    SPIFFS.remove("/settings.json");
   }
-  _webserver.writeJSONFile(jsonString, "/config.json", CONFIG_JSON_SIZE);
+  _webserver.writeJSONFile(jsonString, "/settings.json", SETTINGS_JSON_SIZE);
 
-  _message.debugPrintf("Configuration Saved \n");
+  _message.debugPrintf("Settings Saved \n");
 
-  request->redirect("/?view=config");
+  request->redirect("/?view=settings");
 
 }
 
@@ -803,7 +953,7 @@ void Webserver::parseConfigurationForm(AsyncWebServerRequest *request)
  * @brief saveCalibration
  * @details Saves calibration data to cal.json file
  * @note Creates file if it does not exist
- * @note Redirects browser to configuration tab
+ * @note Redirects browser to settings tab
  * @note duplicates _calibration.saveCalibrationData whjich is unable to be called from server->on directive
  * 
  ***/
@@ -840,7 +990,7 @@ void Webserver::parseCalibrationForm(AsyncWebServerRequest *request)
 
   _calibrate.saveCalibrationData();
 
-  request->redirect("/?view=config");
+  request->redirect("/?view=settings");
 
 }
 
@@ -853,7 +1003,7 @@ void Webserver::parseCalibrationForm(AsyncWebServerRequest *request)
  * @brief saveCalibration
  * @details Saves calibration data to cal.json file
  * @note Creates file if it does not exist
- * @note Redirects browser to configuration tab
+ * @note Redirects browser to settings tab
  * @note duplicates _calibration.saveCalibrationData whjich is unable to be called from server->on directive
  * 
  ***/
@@ -1201,7 +1351,7 @@ void Webserver::parseOrificeForm(AsyncWebServerRequest *request)
     // Test to see which radio is selected
     
     AsyncWebParameter* p = request->getParam(i);
-      // configData[p->name().c_str()] = p->value().c_str();
+      // settingsJSON[p->name().c_str()] = p->value().c_str();
 
     // Then load orifice data into memory 
   }
@@ -1254,7 +1404,7 @@ String Webserver::getDataJSON()
 {
 
   extern struct DeviceStatus status;
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   extern struct SensorData sensorVal;
 
   Hardware _hardware;
@@ -1271,20 +1421,20 @@ String Webserver::getDataJSON()
   double pRefComp = fabs(sensorVal.PRefH2O);
 
   // Flow Rate
-  if ((flowComp > config.min_flow_rate) && (pRefComp > config.min_bench_pressure))  {
+  if ((flowComp > settings.min_flow_rate) && (pRefComp > settings.min_bench_pressure))  {
 
     // Check if we need to round values
-     if (strstr(String(config.rounding_type).c_str(), String("NONE").c_str())) {
+     if (strstr(String(settings.rounding_type).c_str(), String("NONE").c_str())) {
         dataJson["FLOW"] = sensorVal.FlowCFM;
         dataJson["MFLOW"] = sensorVal.FlowKGH;
         dataJson["AFLOW"] = sensorVal.FlowADJ;
     // Round to whole value    
-    } else if (strstr(String(config.rounding_type).c_str(), String("INTEGER").c_str())) {
+    } else if (strstr(String(settings.rounding_type).c_str(), String("INTEGER").c_str())) {
         dataJson["FLOW"] = round(sensorVal.FlowCFM);
         dataJson["MFLOW"] = round(sensorVal.FlowKGH);
         dataJson["AFLOW"] = round(sensorVal.FlowADJ);
     // Round to half (nearest 0.5)
-    } else if (strstr(String(config.rounding_type).c_str(), String("HALF").c_str())) {
+    } else if (strstr(String(settings.rounding_type).c_str(), String("HALF").c_str())) {
         dataJson["FLOW"] = round(sensorVal.FlowCFM * 2.0 ) / 2.0;
         dataJson["MFLOW"] = round(sensorVal.FlowKGH * 2.0) / 2.0;
         dataJson["AFLOW"] = round(sensorVal.FlowADJ * 2.0) / 2.0;
@@ -1296,10 +1446,10 @@ String Webserver::getDataJSON()
   }
 
   // Flow depression value for AFLOW units
-  dataJson["PADJUST"] = config.adj_flow_depression;
+  dataJson["PADJUST"] = settings.adj_flow_depression;
 
   // Temperature deg C or F
-  if (strstr(String(config.temp_unit).c_str(), String("Celcius").c_str())){
+  if (strstr(String(settings.temp_unit).c_str(), String("Celcius").c_str())){
     dataJson["TEMP"] = sensorVal.TempDegC;
   } else {
     dataJson["TEMP"] = sensorVal.TempDegF;
@@ -1307,13 +1457,13 @@ String Webserver::getDataJSON()
 
 
   // Bench Type for status pane
-  if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())) {
+  if (strstr(String(settings.bench_type).c_str(), String("MAF").c_str())) {
     dataJson["BENCH_TYPE"] = "MAF";
-  } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())) {
+  } else if (strstr(String(settings.bench_type).c_str(), String("ORIFICE").c_str())) {
     dataJson["BENCH_TYPE"] = "ORIFICE";
-  } else if (strstr(String(config.bench_type).c_str(), String("VENTURI").c_str())) {
+  } else if (strstr(String(settings.bench_type).c_str(), String("VENTURI").c_str())) {
     dataJson["BENCH_TYPE"] = "VENTURI";
-  } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())) {
+  } else if (strstr(String(settings.bench_type).c_str(), String("PITOT").c_str())) {
     dataJson["BENCH_TYPE"] = "PITOT";
   }
 
@@ -1380,26 +1530,26 @@ void Webserver::writeJSONFile(String data, String filename, int dataSize){
  * @brief loadJSONFile
  * @details Loads JSON data from file
  ***/
-StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadJSONFile(String filename)
+StaticJsonDocument<SETTINGS_JSON_SIZE> Webserver::loadJSONFile(String filename)
 {
 
   Messages _message;
 
-  extern struct Translator translate;
+  extern struct Language language;
 
   // Allocate the memory pool on the stack.
   // Use arduinojson.org/assistant to compute the capacity.
-  StaticJsonDocument<CONFIG_JSON_SIZE> jsonData;
+  StaticJsonDocument<SETTINGS_JSON_SIZE> jsonData;
 
   if (SPIFFS.exists(filename))  {
     File jsonFile = SPIFFS.open(filename, FILE_READ);
 
     if (!jsonFile)    {
-      _message.Handler(translate.LANG_ERROR_LOADING_FILE);
+      _message.Handler(language.LANG_ERROR_LOADING_FILE);
       _message.statusPrintf("Failed to open file for reading \n");
     }    else    {
       size_t size = jsonFile.size();
-      if (size > CONFIG_JSON_SIZE)    {
+      if (size > SETTINGS_JSON_SIZE)    {
 
       }
 
@@ -1422,6 +1572,32 @@ StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadJSONFile(String filename)
 
 
 /***********************************************************
+ * @brief parseJsonDataObject
+ * @details returns value from key
+ ***/
+// StaticJsonDocument<SETTINGS_JSON_SIZE> Webserver::parseJsonDataObject(String filename)
+// {
+
+//   Messages _message;
+
+//   extern struct Language language;
+
+
+
+//     // // Iterate through key > value pairs
+//     // JsonObject root = languageJSON.as<JsonObject>();
+//     // for (JsonPair kv : root) {
+//     //     Serial.println(kv.key().c_str());
+//     //     Serial.println(kv.value().as<const char*>());
+//     // }
+
+
+
+
+// }
+
+
+/***********************************************************
  * @brief processTemplate
  * @details Replaces template placeholders with variable values
  * @param &var HTML payload 
@@ -1432,17 +1608,17 @@ String Webserver::processTemplate(const String &var)
 {
 
   extern struct DeviceStatus status;
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   extern struct CalibrationData calVal;
 
   // Bench definitions for system status pane 
-  if (strstr(config.bench_type, "MAF")!=NULL) {
+  if (strstr(settings.bench_type, "MAF")!=NULL) {
     status.benchType = "MAF Style";
-  } else if (strstr(config.bench_type, "ORIFICE")!=NULL) {
+  } else if (strstr(settings.bench_type, "ORIFICE")!=NULL) {
     status.benchType = "Orifice Style";
-  } else if (strstr(config.bench_type, "VENTURI")!=NULL) {
+  } else if (strstr(settings.bench_type, "VENTURI")!=NULL) {
     status.benchType = "Venturi Style";
-  } else if (strstr(config.bench_type, "PITOT")!=NULL) {
+  } else if (strstr(settings.bench_type, "PITOT")!=NULL) {
     status.benchType = "Pitot Style";
   }
 
@@ -1462,7 +1638,7 @@ String Webserver::processTemplate(const String &var)
   // #endif
 
 
-  // Config Info
+  // settings Info
   if (var == "RELEASE") return RELEASE;
   if (var == "BUILD_NUMBER") return BUILD_NUMBER;
   if (var == "SPIFFS_MEM_SIZE") return String(status.spiffs_mem_size);
@@ -1540,10 +1716,10 @@ String Webserver::processTemplate(const String &var)
 
 
   // Lift Profile
-  if (floor(config.valveLiftInterval) == config.valveLiftInterval) {
+  if (floor(settings.valveLiftInterval) == settings.valveLiftInterval) {
 
     // it's an integer so lets truncate fractional part
-    int liftInterval = config.valveLiftInterval;
+    int liftInterval = settings.valveLiftInterval;
     if (var == "lift1") return String(1 * liftInterval);
     if (var == "lift2") return String(2 * liftInterval);
     if (var == "lift3") return String(3 * liftInterval);
@@ -1559,18 +1735,18 @@ String Webserver::processTemplate(const String &var)
 
   } else {
     // Display the double
-    if (var == "lift1") return String(1 * config.valveLiftInterval);
-    if (var == "lift2") return String(2 * config.valveLiftInterval);
-    if (var == "lift3") return String(3 * config.valveLiftInterval);
-    if (var == "lift4") return String(4 * config.valveLiftInterval);
-    if (var == "lift5") return String(5 * config.valveLiftInterval);
-    if (var == "lift6") return String(6 * config.valveLiftInterval);
-    if (var == "lift7") return String(7 * config.valveLiftInterval);
-    if (var == "lift8") return String(8 * config.valveLiftInterval);
-    if (var == "lift9") return String(9 * config.valveLiftInterval);
-    if (var == "lift10") return String(10 * config.valveLiftInterval);
-    if (var == "lift11") return String(11 * config.valveLiftInterval);
-    if (var == "lift12") return String(12 * config.valveLiftInterval);
+    if (var == "lift1") return String(1 * settings.valveLiftInterval);
+    if (var == "lift2") return String(2 * settings.valveLiftInterval);
+    if (var == "lift3") return String(3 * settings.valveLiftInterval);
+    if (var == "lift4") return String(4 * settings.valveLiftInterval);
+    if (var == "lift5") return String(5 * settings.valveLiftInterval);
+    if (var == "lift6") return String(6 * settings.valveLiftInterval);
+    if (var == "lift7") return String(7 * settings.valveLiftInterval);
+    if (var == "lift8") return String(8 * settings.valveLiftInterval);
+    if (var == "lift9") return String(9 * settings.valveLiftInterval);
+    if (var == "lift10") return String(10 * settings.valveLiftInterval);
+    if (var == "lift11") return String(11 * settings.valveLiftInterval);
+    if (var == "lift12") return String(12 * settings.valveLiftInterval);
   }
 
 
@@ -1615,18 +1791,18 @@ String Webserver::processTemplate(const String &var)
 
 
   // Orifice plates
-  if (var == "ORIFICE1_FLOW_RATE") return String(config.orificeOneFlow);
-  if (var == "ORIFICE1_TEST_PRESSURE") return String(config.orificeOneDepression);
-  if (var == "ORIFICE2_FLOW_RATE") return String(config.orificeTwoFlow);
-  if (var == "ORIFICE2_TEST_PRESSURE") return String(config.orificeTwoDepression);
-  if (var == "ORIFICE3_FLOW_RATE") return String(config.orificeThreeFlow);
-  if (var == "ORIFICE3_TEST_PRESSURE") return String(config.orificeThreeDepression);
-  if (var == "ORIFICE4_FLOW_RATE") return String(config.orificeFourFlow);
-  if (var == "ORIFICE4_TEST_PRESSURE") return String(config.orificeFourDepression);
-  if (var == "ORIFICE5_FLOW_RATE") return String(config.orificeFiveFlow);
-  if (var == "ORIFICE5_TEST_PRESSURE") return String(config.orificeFiveDepression);
-  if (var == "ORIFICE6_FLOW_RATE") return String(config.orificeSixFlow);
-  if (var == "ORIFICE6_TEST_PRESSURE") return String(config.orificeSixDepression);
+  if (var == "ORIFICE1_FLOW_RATE") return String(settings.orificeOneFlow);
+  if (var == "ORIFICE1_TEST_PRESSURE") return String(settings.orificeOneDepression);
+  if (var == "ORIFICE2_FLOW_RATE") return String(settings.orificeTwoFlow);
+  if (var == "ORIFICE2_TEST_PRESSURE") return String(settings.orificeTwoDepression);
+  if (var == "ORIFICE3_FLOW_RATE") return String(settings.orificeThreeFlow);
+  if (var == "ORIFICE3_TEST_PRESSURE") return String(settings.orificeThreeDepression);
+  if (var == "ORIFICE4_FLOW_RATE") return String(settings.orificeFourFlow);
+  if (var == "ORIFICE4_TEST_PRESSURE") return String(settings.orificeFourDepression);
+  if (var == "ORIFICE5_FLOW_RATE") return String(settings.orificeFiveFlow);
+  if (var == "ORIFICE5_TEST_PRESSURE") return String(settings.orificeFiveDepression);
+  if (var == "ORIFICE6_FLOW_RATE") return String(settings.orificeSixFlow);
+  if (var == "ORIFICE6_TEST_PRESSURE") return String(settings.orificeSixDepression);
 
   // Current orifice data
   if (var == "ACTIVE_ORIFICE") return String(status.activeOrifice);
@@ -1635,107 +1811,107 @@ String Webserver::processTemplate(const String &var)
 
 
    // Wifi Settings
-  if (var == "CONF_WIFI_SSID") return String(config.wifi_ssid);
-  if (var == "CONF_WIFI_PSWD") return String(config.wifi_pswd);
-  if (var == "CONF_WIFI_AP_SSID") return String(config.wifi_ap_ssid);
-  if (var == "CONF_WIFI_AP_PSWD") return String(config.wifi_ap_pswd);
-  if (var == "CONF_HOSTNAME") return String(config.hostname);
-  if (var == "CONF_WIFI_TIMEOUT") return String(config.wifi_timeout);
+  if (var == "CONF_WIFI_SSID") return String(settings.wifi_ssid);
+  if (var == "CONF_WIFI_PSWD") return String(settings.wifi_pswd);
+  if (var == "CONF_WIFI_AP_SSID") return String(settings.wifi_ap_ssid);
+  if (var == "CONF_WIFI_AP_PSWD") return String(settings.wifi_ap_pswd);
+  if (var == "CONF_HOSTNAME") return String(settings.hostname);
+  if (var == "CONF_WIFI_TIMEOUT") return String(settings.wifi_timeout);
 
   // API Settings
-  if (var == "CONF_API_DELIM") return String(config.api_delim);
-  if (var == "CONF_SERIAL_BAUD_RATE") return String(config.serial_baud_rate);
+  if (var == "CONF_API_DELIM") return String(settings.api_delim);
+  if (var == "CONF_SERIAL_BAUD_RATE") return String(settings.serial_baud_rate);
 
   // Update javascript template vars
-  if (var == "FLOW_DECIMAL_LENGTH") return String(config.flow_decimal_length);
-  if (var == "GEN_DECIMAL_LENGTH") return String(config.gen_decimal_length);
+  if (var == "FLOW_DECIMAL_LENGTH") return String(settings.flow_decimal_length);
+  if (var == "GEN_DECIMAL_LENGTH") return String(settings.gen_decimal_length);
 
   // Rounding type
   if (var == "ROUNDING_TYPE_DROPDOWN"){
-    if (strstr(String(config.rounding_type).c_str(), String("NONE").c_str())){
-      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE' selected>None</option><option value='INTEGER'>Whole number</option><option value='HALF'>Half value </option></select>");
-    } else if (strstr(String(config.rounding_type).c_str(), String("INTEGER").c_str())) {
-      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>None</option><option value='INTEGER' selected>Whole number</option><option value='HALF'>Half value </option></select>");
-    } else if (strstr(String(config.rounding_type).c_str(), String("HALF").c_str())){
-      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>None</option><option value='INTEGER'>Whole number</option><option value='HALF' selected>Half value </option></select>");
+    if (strstr(String(settings.rounding_type).c_str(), String("NONE").c_str())){
+      return String( "<select name='ROUNDING_TYPE' class='settings-select'><option value='NONE' selected>None</option><option value='INTEGER'>Whole number</option><option value='HALF'>Half value </option></select>");
+    } else if (strstr(String(settings.rounding_type).c_str(), String("INTEGER").c_str())) {
+      return String( "<select name='ROUNDING_TYPE' class='settings-select'><option value='NONE'>None</option><option value='INTEGER' selected>Whole number</option><option value='HALF'>Half value </option></select>");
+    } else if (strstr(String(settings.rounding_type).c_str(), String("HALF").c_str())){
+      return String( "<select name='ROUNDING_TYPE' class='settings-select'><option value='NONE'>None</option><option value='INTEGER'>Whole number</option><option value='HALF' selected>Half value </option></select>");
     }
   }
 
   // Flow Decimal type
   if (var == "FLOW_DECIMAL_LENGTH_DROPDOWN"){
-    if (strstr(String(config.flow_decimal_length).c_str(), String("0").c_str())){
-      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0' selected>None</option><option value='1'>Tenths</option><option value='2'>Hundredths </option></select>");
-    } else if (strstr(String(config.flow_decimal_length).c_str(), String("1").c_str())) {
-      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0>None</option><option value='1' selected>Tenths</option><option value='2'>Hundredths </option></select>");
-    } else if (strstr(String(config.flow_decimal_length).c_str(), String("2").c_str())){
-      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0'>None</option><option value='1'>Tenths</option><option value='2' selected>Hundredths </option></select>");
+    if (strstr(String(settings.flow_decimal_length).c_str(), String("0").c_str())){
+      return String( "<select name='FLOW_DECIMAL_LENGTH' class='settings-select'><option value='0' selected>None</option><option value='1'>Tenths</option><option value='2'>Hundredths </option></select>");
+    } else if (strstr(String(settings.flow_decimal_length).c_str(), String("1").c_str())) {
+      return String( "<select name='FLOW_DECIMAL_LENGTH' class='settings-select'><option value='0>None</option><option value='1' selected>Tenths</option><option value='2'>Hundredths </option></select>");
+    } else if (strstr(String(settings.flow_decimal_length).c_str(), String("2").c_str())){
+      return String( "<select name='FLOW_DECIMAL_LENGTH' class='settings-select'><option value='0'>None</option><option value='1'>Tenths</option><option value='2' selected>Hundredths </option></select>");
     }
   }
 
   // General Decimal type
   if (var == "GEN_DECIMAL_LENGTH_DROPDOWN"){
-    if (strstr(String(config.gen_decimal_length).c_str(), String("0").c_str())){
-      return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0' selected>None</option><option value='1'>Tenths</option><option value='2'>Hundredths </option></select>");
-    } else if (strstr(String(config.gen_decimal_length).c_str(), String("1").c_str())) {
-      return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0>None</option><option value='1' selected>Tenths</option><option value='2'>Hundredths </option></select>");
-    } else if (strstr(String(config.gen_decimal_length).c_str(), String("2").c_str())){
-      return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0'>None</option><option value='1'>Tenths</option><option value='2' selected>Hundredths </option></select>");
+    if (strstr(String(settings.gen_decimal_length).c_str(), String("0").c_str())){
+      return String( "<select name='GEN_DECIMAL_LENGTH' class='settings-select'><option value='0' selected>None</option><option value='1'>Tenths</option><option value='2'>Hundredths </option></select>");
+    } else if (strstr(String(settings.gen_decimal_length).c_str(), String("1").c_str())) {
+      return String( "<select name='GEN_DECIMAL_LENGTH' class='settings-select'><option value='0>None</option><option value='1' selected>Tenths</option><option value='2'>Hundredths </option></select>");
+    } else if (strstr(String(settings.gen_decimal_length).c_str(), String("2").c_str())){
+      return String( "<select name='GEN_DECIMAL_LENGTH' class='settings-select'><option value='0'>None</option><option value='1'>Tenths</option><option value='2' selected>Hundredths </option></select>");
     }
   }
 
   // Data Filter type
   if (var == "DATA_FILTER_TYPE_DROPDOWN"){
-    if (strstr(String(config.data_filter_type).c_str(), String("NONE").c_str())){
-      return String( "<select name='DATA_FILTER_TYPE' class='config-select'><option value='NONE' selected>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE'>Mode</option></select>");
-    } else if (strstr(String(config.data_filter_type).c_str(), String("MEDIAN").c_str())) {
-      return String( "<select name='DATA_FILTER_TYPE' class='config-select'><option value='NONE' >None</option><option value='MEDIAN' selected>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE'>Mode</option></select>");
-    } else if (strstr(String(config.data_filter_type).c_str(), String("AVERAGE").c_str())){
-      return String( "<select name='DATA_FILTER_TYPE' class='config-select'><option value='NONE'>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE' selected>Cyclic Average </option><option value='MODE'>Mode</option></select>");
-    } else if (strstr(String(config.data_filter_type).c_str(), String("MODE").c_str())) {
-      return String( "<select name='DATA_FILTER_TYPE' class='config-select'><option value='NONE'>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE' selected>Mode</option></select>");
+    if (strstr(String(settings.data_filter_type).c_str(), String("NONE").c_str())){
+      return String( "<select name='DATA_FILTER_TYPE' class='settings-select'><option value='NONE' selected>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE'>Mode</option></select>");
+    } else if (strstr(String(settings.data_filter_type).c_str(), String("MEDIAN").c_str())) {
+      return String( "<select name='DATA_FILTER_TYPE' class='settings-select'><option value='NONE' >None</option><option value='MEDIAN' selected>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE'>Mode</option></select>");
+    } else if (strstr(String(settings.data_filter_type).c_str(), String("AVERAGE").c_str())){
+      return String( "<select name='DATA_FILTER_TYPE' class='settings-select'><option value='NONE'>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE' selected>Cyclic Average </option><option value='MODE'>Mode</option></select>");
+    } else if (strstr(String(settings.data_filter_type).c_str(), String("MODE").c_str())) {
+      return String( "<select name='DATA_FILTER_TYPE' class='settings-select'><option value='NONE'>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE' selected>Mode</option></select>");
     }
   }
 
   // Data Filter Settings
-  if (var == "CONF_MIN_FLOW_RATE") return String(config.min_flow_rate);
-  if (var == "CONF_MIN_BENCH_PRESSURE") return String(config.min_bench_pressure);
-  if (var == "CONF_MAF_MIN_VOLTS") return String(config.maf_min_volts);
-  if (var == "CONF_CYCLIC_AVERAGE_BUFFER") return String(config.cyc_av_buffer);
+  if (var == "CONF_MIN_FLOW_RATE") return String(settings.min_flow_rate);
+  if (var == "CONF_MIN_BENCH_PRESSURE") return String(settings.min_bench_pressure);
+  if (var == "CONF_MAF_MIN_VOLTS") return String(settings.maf_min_volts);
+  if (var == "CONF_CYCLIC_AVERAGE_BUFFER") return String(settings.cyc_av_buffer);
 
   // Bench Settings
-  if (var == "CONF_MAF_HOUSING_DIAMETER") return String(config.maf_housing_diameter);
-  if (var == "CONF_REFRESH_RATE") return String(config.refresh_rate);
-  if (var == "ADJ_FLOW_DEPRESSION") return String(config.adj_flow_depression);
-  if (var == "TEMP_UNIT") return String(config.temp_unit);
+  if (var == "CONF_MAF_HOUSING_DIAMETER") return String(settings.maf_housing_diameter);
+  if (var == "CONF_REFRESH_RATE") return String(settings.refresh_rate);
+  if (var == "ADJ_FLOW_DEPRESSION") return String(settings.adj_flow_depression);
+  if (var == "TEMP_UNIT") return String(settings.temp_unit);
   
   // Temperature
   if (var == "TEMPERATURE_DROPDOWN"){
-    if (strstr(String(config.temp_unit).c_str(), String("Celcius").c_str())){
-      return String( "<select name='TEMP_UNIT' class='config-select' id='TEMP_UNIT'><option value='Celcius' selected>Celcius </option><option value='Farenheit'>Farenheit </option></select>");
+    if (strstr(String(settings.temp_unit).c_str(), String("Celcius").c_str())){
+      return String( "<select name='TEMP_UNIT' class='settings-select' id='TEMP_UNIT'><option value='Celcius' selected>Celcius </option><option value='Farenheit'>Farenheit </option></select>");
     } else {
-      return String("<select name='TEMP_UNIT' class='config-select' id='TEMP_UNIT'><option value='Celcius'>Celcius </option><option value='Farenheit' selected>Farenheit </option></select>");
+      return String("<select name='TEMP_UNIT' class='settings-select' id='TEMP_UNIT'><option value='Celcius'>Celcius </option><option value='Farenheit' selected>Farenheit </option></select>");
     }
   }
 
   // Lift
-  if (var == "VALVE_LIFT_INTERVAL") return String(config.valveLiftInterval);
+  if (var == "VALVE_LIFT_INTERVAL") return String(settings.valveLiftInterval);
 
   // Bench type
   if (var == "BENCH_TYPE_DROPDOWN"){
-    if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())){
-      return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF' selected>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
-    } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())) {
-      return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF'>MAF Style</option><option value='ORIFICE' selected>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
-    } else if (strstr(String(config.bench_type).c_str(), String("VENTURI").c_str())){
-      return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF'>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI' selected>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
-    } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())) {
-      return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF'>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT' selected>Pitot Style</option></select>");
+    if (strstr(String(settings.bench_type).c_str(), String("MAF").c_str())){
+      return String( "<select name='BENCH_TYPE' class='settings-select'><option value='MAF' selected>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
+    } else if (strstr(String(settings.bench_type).c_str(), String("ORIFICE").c_str())) {
+      return String( "<select name='BENCH_TYPE' class='settings-select'><option value='MAF'>MAF Style</option><option value='ORIFICE' selected>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
+    } else if (strstr(String(settings.bench_type).c_str(), String("VENTURI").c_str())){
+      return String( "<select name='BENCH_TYPE' class='settings-select'><option value='MAF'>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI' selected>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
+    } else if (strstr(String(settings.bench_type).c_str(), String("PITOT").c_str())) {
+      return String( "<select name='BENCH_TYPE' class='settings-select'><option value='MAF'>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT' selected>Pitot Style</option></select>");
     }
   }
  
   // Calibration Settings
-  if (var == "CONF_CAL_FLOW_RATE") return String(config.cal_flow_rate);
-  if (var == "CONF_CAL_REF_PRESS") return String(config.cal_ref_press);
+  if (var == "CONF_CAL_FLOW_RATE") return String(settings.cal_flow_rate);
+  if (var == "CONF_CAL_REF_PRESS") return String(settings.cal_ref_press);
 
   // Calibration Data
   if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
@@ -1783,12 +1959,12 @@ String Webserver::processLandingPageTemplate(const String &var) {
     if (!SPIFFS.exists("/index.html")) return String("index.html");
   }  
   
-  if (var == "PINS_STATUS" ) {
+  if (var == "pins_STATUS" ) {
     if (!SPIFFS.exists("/pins.json")) return String("pins.json");    
   }
 
-  if (var == "CONFIG_STATUS") {
-    if (!SPIFFS.exists("/config.json")) return String("config.json");
+  if (var == "SETTINGS_STATUS") {
+    if (!SPIFFS.exists("/settings.json")) return String("settings.json");
   }
 
   return "";
@@ -1839,16 +2015,16 @@ void Webserver::wifiReconnect ( void ) {
 int Webserver::getWifiConnection(){
 
   Messages _message;
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   
   uint8_t wifiConnectionAttempt = 1;
   uint8_t wifiConnectionStatus;
 
   for(;;) {
           
-          WiFi.begin(config.wifi_ssid, config.wifi_pswd); 
-          wifiConnectionStatus = WiFi.waitForConnectResult(config.wifi_timeout);
-          if (wifiConnectionStatus == WL_CONNECTED || wifiConnectionAttempt > config.wifi_retries){
+          WiFi.begin(settings.wifi_ssid, settings.wifi_pswd); 
+          wifiConnectionStatus = WiFi.waitForConnectResult(settings.wifi_timeout);
+          if (wifiConnectionStatus == WL_CONNECTED || wifiConnectionAttempt > settings.wifi_retries){
             break;
           } else if (wifiConnectionStatus != WL_DISCONNECTED) {
             resetWifi();

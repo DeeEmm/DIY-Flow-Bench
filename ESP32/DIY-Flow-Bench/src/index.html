@@ -173,12 +173,12 @@
           <div class="config-row"><label class="config-label">IP Address:  </label><span class="config-value" id="LOCAL_IP_ADDRESS">~LOCAL_IP_ADDRESS~</span></div>
           <div class="config-row"><label class="config-label">Hostname:  </label><span class="config-value" id="HOSTNAME">http://~HOSTNAME~.local</span></div>
           <!-- <div class="config-row"><label class="config-label">Uptime:  </label><span class="config-value" id="UPTIME">~UPTIME~</span></div> -->
-          <h4>Hardware Configuration</h4>
+          <h4>Hardware Settings</h4>
           <hr>
           <div class="config-row"><label class="config-label">Bench Type:  </label><span class="config-value" id="BENCH_TYPE">~BENCH_TYPE~</span></div>
           <div class="config-row"><label class="config-label">Board Type:  </label><span class="config-value" id="BOARD_TYPE">~BOARD_TYPE~</span></div>
           <!-- <div class="config-row"><label class="config-label">Boot Time:  </label><span class="config-value" id="BOOT_TIME">~BOOT_TIME~</span></div> -->
-          <h4>Sensor Configuration</h4>
+          <h4>Sensor Settings</h4>
           <hr>
           <div class="config-row"><label class="config-label">MAF Data File:  </label><span class="config-value" id="MAF_SENSOR">~MAF_SENSOR~</span></div>
           <div class="config-row"><label class="config-label">Ref Press Sensor:  </label><span class="config-value" id="PREF_SENSOR">~PREF_SENSOR~</span></div>
@@ -200,7 +200,7 @@
     <!-- Navbar-->
     <button class="tablink" onclick="openTab('dashboard', this)" id="load-dashboard-button">Dashboard</button>
     <button class="tablink" onclick="openTab('datalog', this)" id="load-datalog-button">Data</button>
-    <button class="tablink" onclick="openTab('configuration', this)" id="load-config-button">Configuration</button>
+    <button class="tablink" onclick="openTab('configuration', this)" id="load-config-button">Settings</button>
 
     <div id="tabcontainer">
     <!-- Main Tab-->
@@ -466,7 +466,7 @@
       <div class="config-panel">
         <p style="text-align:center"><button id="file-manager-button" class="button">Files</button> <button id="info-button" class="button">Info</button> <button id="support-button" class="button" onclick="window.open('https://github.com/DeeEmm/DIY-Flow-Bench/wiki','_blank')">Support</button> <button id="restart-button" class="button" >Reboot</button> <button id="update-button" class="button">Update</button></p>       
         <br>
-        <form method="POST" action="/api/saveconfig">
+        <form method="POST" action="/api/savesettings">
           <h2>System Settings</h2>
           <h3>WiFi Info</h3>        
           <div class="config-row tooltip"><label class="config-label">WiFi SSID:</label>&nbsp;<input type="text" id="CONF_WIFI_SSID"  name="CONF_WIFI_SSID" value="~CONF_WIFI_SSID~" class="config-text" ><span class="tooltiptext">The name of your WiFi network</span></div>

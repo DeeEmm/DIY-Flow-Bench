@@ -19,9 +19,8 @@
 
 #include "Arduino.h"
 
-#include "configuration.h"
+
 #include "constants.h"
-// #include "pins.h"
 #include "structs.h"
 
 #include <Wire.h>
@@ -29,25 +28,20 @@
 #include "sensors.h"
 #include "messages.h"
 #include "driver/pcnt.h"
-#include LANGUAGE_FILE
 
 
-// #ifdef MAF_IS_ENABLED
-// #include "mafData/maf.h"
-// #endif
-
-#ifdef MAF_IS_ENABLED
+// HACK THIS IS JUST A TEMP MEASURE AS configuration.h file now being moved into cinfiguration.json
+// need to add conditional load - only load for MAF style benches
+#define MAF_DATA_FILE "mafData/BOSCH_0280218067.cpp" 
 #include MAF_DATA_FILE
-#endif
 
 
 
-#ifdef BME_IS_ENABLED
+// We are going to include the BME library, even if it is not used as there is no way to exclude it using pre-compile directives if we want to enable it at run time using json configurations
 #define TINY_BME280_I2C
 #include "TinyBME280.h"
 tiny::BME280 _BMESensor;
 TwoWire I2CBME = TwoWire(0);
-#endif
 
 
 /***********************************************************
@@ -85,12 +79,15 @@ void Sensors::initialise () {
 	Messages _message;
 
 	extern struct DeviceStatus status;
-    extern struct Translator translate;
+    extern struct Language language;
+	extern struct Configuration config;
+	extern struct Pins pins;
 	extern int mafOutputType;
 
+	Maf _maf;
+
 	// Initialise  MAF data
-	#ifdef MAF_IS_ENABLED
-		Maf _maf;
+	if (config.MAF_IS_ENABLED) {
 		
 		// get size of the MAF datatable
   		status.mafDataTableRows = mafLookupTable.size() -1;
@@ -108,20 +105,20 @@ void Sensors::initialise () {
 		// get MAF diameter
 		status.mafDiameter = _maf.mafDiameter();
 
-	#endif
+	}
 
 
 	
 	//initialise BME
-	#ifdef BME_IS_ENABLED
+	if (config.BME_IS_ENABLED) {
 	
 		_message.serialPrintf("Initialising BME280 \n");	
-		
-		if (_BMESensor.beginI2C(BME280_I2C_ADDR) == false)
+	
+		if (_BMESensor.beginI2C(config.BME280_I2C_ADDR) == false)
 		{
 			_message.serialPrintf("BME sensor did not respond. \n");
 			_message.serialPrintf("Please check wiring and I2C address\n");
-			_message.serialPrintf("BME I2C address %s set in configuration.h. \n", BME280_I2C_ADDR);
+			_message.serialPrintf("BME I2C address %s set in configuration.h. \n", config.BME280_I2C_ADDR);
 			while(1); //Freeze
 		} else {
 			_message.serialPrintf("BME280 Initialised\n");
@@ -134,7 +131,7 @@ void Sensors::initialise () {
 		_BMESensor.setFilter(0);
 		_BMESensor.setMode(tiny::Mode::NORMAL); // NORMAL / FORCED / SLEEP
 
-	#endif
+	}
 
 
 
@@ -162,21 +159,21 @@ void Sensors::initialise () {
 
 	// Sensor definitions for system status pane
 	// MAF Sensor
-	#if defined MAF_IS_ENABLED && defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
+	if (config.MAF_IS_ENABLED && config.MAF_SRC_IS_ADC && config.ADC_IS_ENABLED) {
 		this->_mafSensorType = _maf.sensorType();
-	#elif defined MAF_IS_ENABLED && defined MAF_SRC_IS_PIN
-		this->_mafSensorType = _maf.sensorType() + " on GPIO:" + MAF_PIN;
-	#else
-		this->_mafSensorType = translate.LANG_NOT_ENABLED;
-	#endif
+	} else if (config.MAF_IS_ENABLED && config.MAF_SRC_IS_PIN) {
+		this->_mafSensorType = _maf.sensorType() + " on GPIO:" + pins.MAF_PIN;
+	} else {
+		this->_mafSensorType = language.LANG_NOT_ENABLED;
+	}
 
 	// Baro Sensor
 	#if defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
 		this->startupBaroPressure = this->getPRefValue();
-		this->_baroSensorType = translate.LANG_START_REF_PRESSURE;
+		this->_baroSensorType = language.LANG_START_REF_PRESSURE;
 	#elif defined BARO_SENSOR_TYPE_FIXED_VALUE
 		this->startupBaroPressure = FIXED_BARO_VALUE;
-		this->_baroSensorType = translate.LANG_FIXED_VALUE;
+		this->_baroSensorType = language.LANG_FIXED_VALUE;
 		this->_baroSensorType += FIXED_BARO_VALUE;
 	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 		this->_baroSensorType = "BME280";
@@ -185,15 +182,15 @@ void Sensors::initialise () {
 	#elif defined BARO_SENSOR_TYPE_LINEAR_ANALOG
 		this->_baroSensorType = "ANALOG PIN: " + REF_BARO_PIN;
 	#else 
-		this->_baroSensorType = translate.LANG_FIXED_VALUE + FIXED_BARO_VALUE;
+		this->_baroSensorType = String(language.LANG_FIXED_VALUE) + String(config.FIXED_BARO_VALUE);
 	#endif
 	
 	//Temp Sensor
 	#ifdef TEMP_SENSOR_NOT_USED
 		this->startupBaroPressure = this->getPRefValue();
-		this->_tempSensorType = translate.LANG_NOT_ENABLED;
+		this->_tempSensorType = language.LANG_NOT_ENABLED;
 	#elif defined TEMP_SENSOR_TYPE_FIXED_VALUE
-		this->_tempSensorType = translate.LANG_FIXED_VALUE;
+		this->_tempSensorType = language.LANG_FIXED_VALUE;
 		this->_tempSensorType += FIXED_TEMP_VALUE;
 	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 		this->_tempSensorType = "BME280";
@@ -202,15 +199,15 @@ void Sensors::initialise () {
 	#elif defined TEMP_SENSOR_TYPE_LINEAR_ANALOG
 		this->_tempSensorType = "ANALOG PIN: " + TEMPERATURE_PIN;
 	#else 
-		this->_tempSensorType = translate.LANG_FIXED_VALUE + FIXED_TEMP_VALUE;
+		this->_tempSensorType = String(language.LANG_FIXED_VALUE) + String(config.FIXED_TEMP_VALUE);
 	#endif
 	
 	// Rel Humidity Sensor
 	#ifndef RELH_IS_ENABLED
 		this->startupBaroPressure = this->getPRefValue();
-		this->_relhSensorType = translate.LANG_NOT_ENABLED;
+		this->_relhSensorType = language.LANG_NOT_ENABLED;
 	#elif defined RELH_SENSOR_TYPE_FIXED_VALUE
-		this->_relhSensorType = translate.LANG_FIXED_VALUE;
+		this->_relhSensorType = language.LANG_FIXED_VALUE;
 		this->_relhSensorType += FIXED_RELH_VALUE;
 	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
 		this->_relhSensorType = "BME280";
@@ -219,12 +216,12 @@ void Sensors::initialise () {
 	#elif defined RELH_SENSOR_TYPE_LINEAR_ANALOG
 		this->_relhSensorType = "ANALOG PIN: " + HUMIDITY_PIN;
 	#else 
-		this->_relhSensorType = translate.LANG_FIXED_VALUE + FIXED_RELH_VALUE;
+		this->_relhSensorType = language.LANG_FIXED_VALUE + FIXED_RELH_VALUE;
 	#endif
 
 	// reference pressure
 	#ifndef PREF_IS_ENABLED
-		this->_prefSensorType = translate.LANG_NOT_ENABLED;
+		this->_prefSensorType = language.LANG_NOT_ENABLED;
 	#elif defined PREF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_prefSensorType = "SMPXV7007";
 	#elif defined PREF_SENSOR_TYPE_MPX4250 && defined ADC_IS_ENABLED
@@ -233,34 +230,40 @@ void Sensors::initialise () {
 		this->_prefSensorType = "MPXV7025";
 	#elif defined PREF_SENSOR_TYPE_LINEAR_ANALOG
 		this->_prefSensorType = "ANALOG PIN: " + REF_PRESSURE_PIN;
+	#elif defined PREF_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
+		this->_pitotSensorType = "TubePressure";
 	#else 
-		this->_prefSensorType = translate.LANG_NOT_ENABLED;
+		this->_prefSensorType = language.LANG_NOT_ENABLED;
 	#endif
 	
 	// differential pressure
 	#ifndef PDIFF_IS_ENABLED
-		this->_pdiffSensorType = translate.LANG_NOT_ENABLED;
+		this->_pdiffSensorType = language.LANG_NOT_ENABLED;
 	#elif defined PDIFF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_pdiffSensorType = "SMPXV7007";
 	#elif defined PDIFF_SENSOR_TYPE_LINEAR_ANALOG
 		this->_pdiffSensorType = "ANALOG PIN: " + DIFF_PRESSURE_PIN;
 	#elif defined PDIFF_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
 		this->_prefSensorType = "MPXV7025";
+	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
+		this->_pitotSensorType = "TubePressure";
 	#else 
-		this->_pdiffSensorType = translate.LANG_NOT_ENABLED;
+		this->_pdiffSensorType = language.LANG_NOT_ENABLED;
 	#endif
 	
 	// pitot pressure differential
     #ifndef PITOT_IS_ENABLED
-		this->_pitotSensorType = translate.LANG_NOT_ENABLED;
+		this->_pitotSensorType = language.LANG_NOT_ENABLED;
 	#elif defined PITOT_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_pitotSensorType = "SMPXV7007";
 	#elif defined PITOT_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
 		this->_prefSensorType = "MPXV7025";
 	#elif defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
 		this->_pitotSensorType = "ANALOG PIN: " + PITOT_PIN;
+	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
+		this->_pitotSensorType = "TubePressure";
 	#else 
-		this->_pitotSensorType = translate.LANG_NOT_ENABLED;
+		this->_pitotSensorType = language.LANG_NOT_ENABLED;
 	#endif
 	
 	// Set status values for GUI
@@ -348,6 +351,8 @@ double Sensors::getMafVolts() {
 	
 	Hardware _hardware;
 
+	extern struct Configuration config;
+
 	double sensorVolts = 0.00F;
 	
 	#if defined MAF_SRC_IS_ADC && defined MAF_IS_ENABLED && defined ADC_IS_ENABLED
@@ -363,7 +368,7 @@ double Sensors::getMafVolts() {
 	
 	// Lets make sure we have a valid value to return
 	if (sensorVolts > 0) {
-		sensorVolts += MAF_MV_TRIMPOT;
+		sensorVolts += config.MAF_MV_TRIMPOT;
 		return sensorVolts;
 	} else {
 		return 0.0;
@@ -384,7 +389,8 @@ double Sensors::getMafFlow(int units) {
 
 	extern struct DeviceStatus status;
 	extern struct SensorData sensorVal;
-	extern struct ConfigSettings config;
+	extern struct BenchSettings settings;
+	extern struct Configuration config;
 
 	Hardware _hardware;
 
@@ -394,6 +400,30 @@ double Sensors::getMafFlow(int units) {
 	double lookupValue = 0.0;
 	double transposedflowRateKGH = 0.0;
 	double mafVelocity = 0.0;
+
+	// #include config.MAF_DATA_FILE.str.c_str();
+	// #include (String(config.MAF_DATA_FILE).c_str());
+
+
+//https://stackoverflow.com/questions/76273155/variable-in-include-file-c
+// #define FILENAME config.MAF_DATA_FILE
+
+// #define QUOTE(x) _QUOTE(x)
+// #define _QUOTE(x) #x
+
+// #define _CONCAT(x, y) x##y.h
+// #define CONCAT(x, y) _CONCAT(x, y)
+
+// #define _INCLUDE_FILE(x, y) QUOTE(CONCAT(x, y))
+// #define INCLUDE_FILE(x, y) _INCLUDE_FILE(x, y)
+
+// #define MAF_FILE config.MAF_DATA_FILE
+// #define STRINGIFY(MAF_FILE)
+
+// read maf.json
+
+
+
 
 	// scale sensor reading to data table size using map function (0-5v : 0-keymax)
 	// NOTE Discrepency with MAP calculated value
@@ -449,7 +479,7 @@ double Sensors::getMafFlow(int units) {
 	}
 
 	// Now that we have a converted flow value we can translate it for different housing diameters
-	if (config.maf_housing_diameter > 0 && status.mafDiameter > 0 && config.maf_housing_diameter != status.mafDiameter) { 
+	if (settings.maf_housing_diameter > 0 && status.mafDiameter > 0 && settings.maf_housing_diameter != status.mafDiameter) { 
 		// We are running a custom MAF Housing, lets translate the flow rates to the new diameter
 
 		// NOTE this transfer function is actually for volumetric flow but we can assume that the mass to volumetric conversion is ratiometric at any given instant in time.
@@ -466,7 +496,7 @@ double Sensors::getMafFlow(int units) {
 		mafVelocity = flowRateKGH / pow(PI * (status.mafDiameter / 2), 2);
 
 		// scale the result with the new pipe area and convert back to mass flow
-		transposedflowRateKGH = mafVelocity * PI * pow((config.maf_housing_diameter / 2), 2);
+		transposedflowRateKGH = mafVelocity * PI * pow((settings.maf_housing_diameter / 2), 2);
 
 		return transposedflowRateKGH;
 
@@ -491,8 +521,8 @@ double Sensors::getDifferentialFlow() {
 
 	extern struct DeviceStatus status;
 	extern struct SensorData sensorVal;
-	extern struct ConfigSettings config;
-	extern struct Translator translate;
+	extern struct BenchSettings settings;
+	extern struct Language language;
 
 	Hardware _hardware;
     Messages _message;  
@@ -516,41 +546,41 @@ double Sensors::getDifferentialFlow() {
 	switch (orifice)   {
 
 		case '1': 
-			orificeFlowRate = config.orificeOneFlow;
-			orificeDepression = config.orificeOneDepression;
+			orificeFlowRate = settings.orificeOneFlow;
+			orificeDepression = settings.orificeOneDepression;
 		break;
 
 		case '2': 
-			orificeFlowRate = config.orificeTwoFlow;
-			orificeDepression = config.orificeTwoDepression;
+			orificeFlowRate = settings.orificeTwoFlow;
+			orificeDepression = settings.orificeTwoDepression;
 		break;
 
 		case '3': 
-			orificeFlowRate = config.orificeThreeFlow;
-			orificeDepression = config.orificeThreeDepression;
+			orificeFlowRate = settings.orificeThreeFlow;
+			orificeDepression = settings.orificeThreeDepression;
 		break;
 
 		case '4': 
-			orificeFlowRate = config.orificeFourFlow;
-			orificeDepression = config.orificeFourDepression;
+			orificeFlowRate = settings.orificeFourFlow;
+			orificeDepression = settings.orificeFourDepression;
 		break;
 
 		case '5': 
-			orificeFlowRate = config.orificeFiveFlow;
-			orificeDepression = config.orificeFiveDepression;
+			orificeFlowRate = settings.orificeFiveFlow;
+			orificeDepression = settings.orificeFiveDepression;
 		break;
 
 		case '6': 
-			orificeFlowRate = config.orificeSixFlow;
-			orificeDepression = config.orificeSixDepression;
+			orificeFlowRate = settings.orificeSixFlow;
+			orificeDepression = settings.orificeSixDepression;
 		break;
 
 		// We've got here without a valid active orifice so lets set something and send an error message
         default:
-			orificeFlowRate = config.orificeOneFlow;
-			orificeDepression = config.orificeOneDepression;
+			orificeFlowRate = settings.orificeOneFlow;
+			orificeDepression = settings.orificeOneDepression;
 			_message.serialPrintf("%s\n", "Invalid Orifice Data");
-			String statusMessage = translate.LANG_INVALID_ORIFICE_SELECTED;
+			String statusMessage = language.LANG_INVALID_ORIFICE_SELECTED;
         break;
 
 	}
@@ -581,6 +611,8 @@ double Sensors::getPRefVolts() {
 
 	Hardware _hardware;
 
+	extern struct Configuration config;
+
 	double sensorVolts = 0.0;
 
 	#if defined PREF_SRC_ADC && defined PREF_IS_ENABLED && defined ADC_IS_ENABLED // use ADC value
@@ -600,7 +632,7 @@ double Sensors::getPRefVolts() {
 
 	// Lets make sure we have a valid value to return
 	if (sensorVolts > 0.0) { 
-		sensorVolts += PREF_MV_TRIMPOT;
+		sensorVolts += config.PREF_MV_TRIMPOT;
 		return sensorVolts;
 	} else { 
 		return 0.0;
@@ -621,50 +653,61 @@ double Sensors::getPRefVolts() {
 double Sensors::getPRefValue() {
 
 	Hardware _hardware;
+
+	extern struct BenchSettings settings;
+	extern struct Configuration config;
 	
 	double sensorVal = 0.0;
 	double sensorVolts = this->getPRefVolts();
 	
 	// Convert value to kPa according to sensor type
-	#if defined PREF_SENSOR_TYPE_LINEAR_ANALOG
-		sensorVal = this->getPRefVolts() * PREF_ANALOG_SCALE;
-	
-	#elif defined PREF_SENSOR_TYPE_MPXV7007
+	switch (config.PREF_SENSOR_TYPE) {
 
-		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
-		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+		case LINEAR_ANALOG:
+			sensorVal = this->getPRefVolts() * config.PREF_ANALOG_SCALE;
+		break;
 
-	#elif defined PREF_SENSOR_TYPE_MPXV7025
+		case MPXV7007:
+			// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
+			sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+		break;
 
-		// Vout = Vcc x (0.018 x P + 0.5)
-		// P = ((Vout / Vcc) - 0.5 ) / 0.018 )
-		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+		case MPXV7025:
+			// Vout = Vcc x (0.018 x P + 0.5)
+			// P = ((Vout / Vcc) - 0.5 ) / 0.018 )
+			sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+		break;
 
-	#elif defined PREF_SENSOR_TYPE_XGZP6899A007KPDPN
+		case XGZP6899A007KPDPN:
+			// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
+			sensorVal = sensorVolts * 3.5 - 8.75;
+		break;
 
-		// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
-		sensorVal = sensorVolts * 3.5 - 8.75;
+		case XGZP6899A010KPDPN:
+			// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
+			sensorVal = sensorVolts * 5 - 12.5;
+		break;
 
-	#elif defined PREF_SENSOR_TYPE_XGZP6899A010KPDPN
+		case M5STACK_TubePressure:
+			//P: Actual test pressure value, unit (Kpa)
+			//Vout: sensor voltage output value
+			//P = (Vout-0.1)/3.0*300.0-100.0
+			sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;	
+		break;
 
-		// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
-		sensorVal = sensorVolts * 5 - 12.5;
+		case NOT_USED:
+			sensorVal = 0.0;
+		break;
 
-	#elif defined PREF_SENSOR_TYPE_M5STACK_TubePressure
+		default:
+			sensorVal = config.FIXED_REF_PRESS_VALUE;
+		break;
 
-		//P: Actual test pressure value, unit (Kpa)
-		//Vout: sensor voltage output value
-		//P = (Vout-0.1)/3.0*300.0-100.0
-		sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;	
+	}
 
-	#else
-
-		sensorVal = FIXED_REF_PRESS_VALUE;
-
-	#endif
-
-	// Lets make sure we have a valid value to return
-	if (sensorVal > 0) { 
+	// Lets make sure we have a valid value to return - cehck itis above minimum threshold
+	double pRefComp = fabs(sensorVal);
+	if (pRefComp > settings.min_bench_pressure) { 
 		return sensorVal;
 	} else { 
 		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in display)
@@ -684,6 +727,8 @@ double Sensors::getPRefValue() {
 double Sensors::getPDiffVolts() {
 	
 	Hardware _hardware;
+
+	extern struct Configuration config;
 
 	double sensorVolts = 0.0;
 	
@@ -705,7 +750,7 @@ double Sensors::getPDiffVolts() {
 	
 	// Lets make sure we have a valid value to return
 	if (sensorVolts > 0) {
-		sensorVolts += PDIFF_MV_TRIMPOT;
+		sensorVolts += config.PDIFF_MV_TRIMPOT;
 		return sensorVolts;
 	} else {
 		return 0;
@@ -725,54 +770,63 @@ double Sensors::getPDiffValue() {
 
 	Hardware _hardware;
 
+	extern struct BenchSettings settings;
+	extern struct Configuration config;
+
 	double sensorVal = 0.0;
 	double sensorVolts = this->getPDiffVolts();
 
 	// Convert value to kPa according to sensor type
-	#if defined PDIFF_SENSOR_TYPE_LINEAR_ANALOG
+	switch (config.PDIFF_SENSOR_TYPE) {
 
-		diffPressureKpa = getPDiffVolts() * PDIFF_ANALOG_SCALE;
-	
-	#elif defined PDIFF_SENSOR_TYPE_MPXV7007 // Recommended sensor
+		case NOT_USED:
+			sensorVal = 0.0;
+		break;
 
-		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
-		// sensorVal = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
-		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+		case LINEAR_ANALOG:
+			sensorVal = this->getPDiffVolts() * config.PDIFF_ANALOG_SCALE;
+		break;
 
+		case MPXV7007:
+			// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
+			sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+		break;
 
-	#elif defined PDIFF_SENSOR_TYPE_MPXV7025
+		case MPXV7025:
+			// Vout = Vcc x (0.018 x P + 0.5)
+			// P = ((Vout / Vcc) - 0.5 ) / 0.018 )
+			sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+		break;
 
-		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+		case XGZP6899A007KPDPN:
+			// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
+			sensorVal = sensorVolts * 3.5 - 8.75;
+		break;
 
+		case XGZP6899A010KPDPN:
+			// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
+			sensorVal = sensorVolts * 5 - 12.5;
+		break;
 
-	#elif defined PDIFF_SENSOR_TYPE_XGZP6899A007KPDPN
+		case M5STACK_TubePressure:
+			//P: Actual test pressure value, unit (Kpa)
+			//Vout: sensor voltage output value
+			//P = (Vout-0.1)/3.0*300.0-100.0
+			sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;	
+		break;
 
-		// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
-		sensorVal = sensorVolts * 3.5 - 8.75;
+		default:
+			sensorVal = config.FIXED_DIFF_PRESS_VALUE;
+		break;
 
-	#elif defined PDIFF_SENSOR_TYPE_XGZP6899A010KPDPN
+	}
 
-		// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
-		sensorVal = sensorVolts * 5 - 12.5;
-
-	#elif defined PDIFF_SENSOR_TYPE_M5STACK_TubePressure
-
-		//P: Actual test pressure value, unit (Kpa)
-		//Vout: sensor voltage output value
-		//P = (Vout-0.1)/3.0*300.0-100.0
-		sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;
-	
-	#else // use fixed value
-
-		sensorVal = FIXED_PDIFF_PRESS;
-
-	#endif
-
-	// Lets make sure we have a valid value to return
-	if (sensorVal > 0) {
+	// Lets make sure we have a valid value to return - cehck itis above minimum threshold
+	double pDiffComp = fabs(sensorVal);
+	if (pDiffComp > settings.min_bench_pressure) { 
 		return sensorVal;
-	} else {
-		return 0.0001;
+	} else { 
+		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in display)
 	}
 
 }
@@ -787,6 +841,8 @@ double Sensors::getPDiffValue() {
 double Sensors::getPitotVolts() {
 
 	Hardware _hardware;
+
+	extern struct Configuration config;
 
 	double sensorVolts = 0.0;
 	
@@ -808,7 +864,7 @@ double Sensors::getPitotVolts() {
 	
 	// Lets make sure we have a valid value to return
 	if (sensorVolts > 0) {
-		sensorVolts += PITOT_MV_TRIMPOT;
+		sensorVolts += config.PITOT_MV_TRIMPOT;
 		return sensorVolts;
 	} else {
 		return 0.0;
@@ -830,54 +886,66 @@ double Sensors::getPitotValue() {
 	
 	Hardware _hardware;
 
+	extern struct BenchSettings settings;
+	extern struct Configuration config;
+
 	double sensorVal = 0.0;
 	double sensorVolts = this->getPitotVolts();
 	
+
+
 	// Convert value to kPa according to sensor type
-	#if defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
+	switch (config.PITOT_SENSOR_TYPE) {
 
-		sensorVal = getPitotVolts() * PITOT_ANALOG_SCALE;
-	
-	#elif defined PITOT_SENSOR_TYPE_MPXV7007
-		
-		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
-		// sensorVal = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
-		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+		case LINEAR_ANALOG:
+			sensorVal = this->getPDiffVolts() * config.PITOT_ANALOG_SCALE;
+		break;
 
+		case MPXV7007:
+			// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
+			sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+		break;
 
-	#elif defined PITOT_SENSOR_TYPE_MPXV7025
+		case MPXV7025:
+			// Vout = Vcc x (0.018 x P + 0.5)
+			// P = ((Vout / Vcc) - 0.5 ) / 0.018 )
+			sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+		break;
 
-		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+		case XGZP6899A007KPDPN:
+			// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
+			sensorVal = sensorVolts * 3.5 - 8.75;
+		break;
 
+		case XGZP6899A010KPDPN:
+			// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
+			sensorVal = sensorVolts * 5 - 12.5;
+		break;
 
-	#elif defined PITOT_SENSOR_TYPE_XGZP6899A007KPDPN
+		case M5STACK_TubePressure:
+			//P: Actual test pressure value, unit (Kpa)
+			//Vout: sensor voltage output value
+			//P = (Vout-0.1)/3.0*300.0-100.0
+			sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;	
+		break;
 
-		// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
-		sensorVal = sensorVolts * 3.5 - 8.75;
+		case NOT_USED:
+			sensorVal = 0.0;
+		break;
 
-	#elif defined PITOT_SENSOR_TYPE_XGZP6899A010KPDPN
+		default:
+			// Invalid Sensor selected
+			sensorVal = 0.0;
+		break;
 
-		// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
-		sensorVal = sensorVolts * 5 - 12.5;
+	}
 
-	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure
-
-		//P: Actual test pressure value, unit (Kpa)
-		//Vout: sensor voltage output value
-		//P = (Vout-0.1)/3.0*300.0-100.0
-		sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;
-
-	#else // use fixed value
-
-		sensorVal = 0.0001;
-
-	#endif
-
-	// Lets make sure we have a valid value to return
-	if (sensorVal > 0) {
+	// Lets make sure we have a valid value to return - cehck itis above minimum threshold
+	double pDiffComp = fabs(sensorVal);
+	if (pDiffComp > settings.min_bench_pressure) { 
 		return sensorVal;
-	} else {
-		return 0.0001;
+	} else { 
+		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in GUI)
 	}
 
 }
@@ -892,6 +960,8 @@ double Sensors::getPitotValue() {
  ***/
 double Sensors::getTempValue() {
 	
+	extern struct Configuration config;
+
 	Hardware _hardware;
 	Messages _message;
 
@@ -914,7 +984,7 @@ double Sensors::getTempValue() {
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
 		int err = SimpleDHTErrSuccess;
 		if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
-		  _message.Handler(translate.LANG_DHT11_READ_FAIL); // Set error to display on screen
+		  _message.Handler(language.LANG_DHT11_READ_FAIL); // Set error to display on screen
 		  refTempDegC = 0;        
 		} else {
 		  refTempDegC = refTemp;
@@ -923,10 +993,10 @@ double Sensors::getTempValue() {
 
 	#else
 		// We don't have any temperature input so we will assume default
-		refTempDegC = FIXED_TEMP_VALUE;
+		refTempDegC = config.FIXED_TEMP_VALUE;
 	#endif
 	
-	if (TEMP_FINE_ADJUST != 0) refTempDegC += TEMP_FINE_ADJUST;
+	if (config.TEMP_FINE_ADJUST != 0) refTempDegC += config.TEMP_FINE_ADJUST;
 	return refTempDegC;
 }
 
@@ -940,6 +1010,8 @@ double Sensors::getTempValue() {
  ***/
 double Sensors::getBaroValue() {
 	
+	extern struct Configuration config;
+
 	Hardware _hardware;
 	double baroPressureHpa;
 		
@@ -968,14 +1040,14 @@ double Sensors::getBaroValue() {
 		baroPressureKpa += BARO_FINE_ADJUST;
 	#else
 		// we don't have any sensor so use default - // NOTE: standard sea level baro pressure is 14.7 psi
-		baroPressureKpa = FIXED_BARO_VALUE;
+		baroPressureKpa = config.FIXED_BARO_VALUE;
 	#endif
 
 	// Truncate to 2 decimal places
 	// int value = baroPressureKpa * 100 + .5;
     // return (double)value / 100;
 
-	if (BARO_FINE_ADJUST != 0) baroPressureKpa += BARO_FINE_ADJUST;
+	if (config.BARO_FINE_ADJUST != 0) baroPressureKpa += config.BARO_FINE_ADJUST;
 	return baroPressureHpa;
 
 }
@@ -989,6 +1061,8 @@ double Sensors::getBaroValue() {
  ***/
 double Sensors::getRelHValue() {
 	
+	extern struct Configuration config;
+
 	Hardware _hardware;
 
 	double relativeHumidity;
@@ -1006,7 +1080,7 @@ double Sensors::getRelHValue() {
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
 		int err = SimpleDHTErrSuccess;
 		if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
-		  _message.Handler(translate.LANG_DHT11_READ_FAIL); // Set error to display on screen
+		  _message.Handler(language.LANG_DHT11_READ_FAIL); // Set error to display on screen
 		  relativeHumidity = 0;        
 		} else {
 		  relativeHumidity = refRelh;
@@ -1019,11 +1093,11 @@ double Sensors::getRelHValue() {
 		
 	#else
 		// we don't have a sensor so use nominal fixed value 
-		relativeHumidity = FIXED_RELH_VALUE; // (36%)
+		relativeHumidity = config.FIXED_RELH_VALUE; // (36%)
 	
 	#endif
 
-	if (RELH_FINE_ADJUST != 0) relativeHumidity += RELH_FINE_ADJUST;
+	if (config.RELH_FINE_ADJUST != 0) relativeHumidity += config.RELH_FINE_ADJUST;
 	return relativeHumidity;
 	
 }

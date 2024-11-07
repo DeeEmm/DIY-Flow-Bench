@@ -26,7 +26,6 @@
  ***/
 #define ARDUINOJSON_ENABLE_STD_STRING 1 // allow support for std::string
 
-
 /***********************************************************
  * Physical constants
  ***/
@@ -36,7 +35,6 @@
 #define SPECIFIC_GRAVITY_DRY_AIR 0.0013 // SG
 #define UNIVERSAL_GAS_CONSTANT 8.3144598 // (48) J⋅mol^−1⋅K^−1.
 #define SPECIFIC_GAS_CONSTANT_WATER_VAPOUR 461.5 //  J/(kg⋅K).
-
 
 /***********************************************************
  * Standard Units
@@ -56,7 +54,6 @@
 #define  ATM 11
 #define  PASCALS 12
 
-
 /***********************************************************
  * Error handler codes
  ***/
@@ -67,7 +64,6 @@
 #define  DHT11_READ_FAIL 4
 #define  BME280_READ_FAIL 5
 #define  BENCH_RUNNING 6
-
 
 /***********************************************************
  * MAF Data File constants
@@ -81,21 +77,6 @@
 #define  MG_S 2
 #define  GM_M 3
 
-
-/***********************************************************
- * Sensor types
- ***/
-#define NOT_USED 1
-#define REF_PRESS_AS_BARO 2
-#define FIXED_VALUE 3
-#define MPXV7007 4
-#define MPX4250 5
-#define MPXV7007DP 6
-#define _BME280 7
-#define SPARKFUN_BME280 8
-#define MPX4115 9
-#define SIMPLE_TEMP_DHT11 10
-
 /***********************************************************
  * Flow Differential types
  ***/
@@ -103,6 +84,25 @@
 #define BASELINE 2
 #define BASELINE_LEAK 3
 
+/***********************************************************
+ * Bench types
+ ***/
+#define MAF 1
+#define ORIFICE 2
+#define VENTURI 3
+#define PITOT 4
+
+/***********************************************************
+ * Sensor types 
+ * PDIFF_SENSOR_TYPE / PREF_SENSOR_TYPE / PITOT_SENSOR_TYPE
+ ***/
+#define NOT_USED 0
+#define LINEAR_ANALOG 1
+#define MPXV7007 2
+#define MPXV7025 3
+#define XGZP6899A007KPDPN 4
+#define XGZP6899A010KPDPN 5
+#define M5STACK_TubePressure 6
 
 /***********************************************************
  * BME Registers

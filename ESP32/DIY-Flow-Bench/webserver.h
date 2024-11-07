@@ -21,6 +21,7 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include "system.h"
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 
@@ -50,7 +51,7 @@ class Webserver {
 		void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 		static void processUpdate(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final);
-		static void parseConfigurationForm(AsyncWebServerRequest *request);
+		static void parseSettingsForm(AsyncWebServerRequest *request);
 		static void parseCalibrationForm(AsyncWebServerRequest *request);
 		static void parseOrificeForm(AsyncWebServerRequest *request);
 
@@ -80,11 +81,15 @@ class Webserver {
 		void begin();
 		void writeJSONFile(String data, String filename, int dataSize);
 		String getDataJSON();
-		StaticJsonDocument<CONFIG_JSON_SIZE> loadJSONFile(String filename);
+		StaticJsonDocument<SETTINGS_JSON_SIZE> loadJSONFile(String filename);
+		StaticJsonDocument<SETTINGS_JSON_SIZE> parseJsonDataObject(String filename);
 		void sendWebSocketMessage(String jsonValues);
-		void parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configData);
-		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfig ();
-		void createConfigFile ();
+		void parseBenchSettings(StaticJsonDocument<SETTINGS_JSON_SIZE> configData);
+		StaticJsonDocument<SETTINGS_JSON_SIZE> loadSettings ();
+		void loadMaf ();
+		void loadLanguage ();
+		StaticJsonDocument<SETTINGS_JSON_SIZE> loadConfiguration ();
+		void createSettingsFile ();
 		void resetWifi ( void );
 		void wifiReconnect ( void );
 		String getValveDataJSON();

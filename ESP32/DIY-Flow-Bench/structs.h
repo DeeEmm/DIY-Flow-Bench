@@ -19,18 +19,17 @@
 #pragma once
 
 #include "Arduino.h"
-#include "configuration.h"
 
 
 /***********************************************************
- * Default / Fallback Configuration Settings
+ * Default / Fallback Settings Settings
  *
  * NOTE: Do not edit these! Please leave the default values.
  * These are used to generate the default config settings in the event of a system crash.
- * If you edit these, you may get locked out of your system or brick your device.
+ * If you edit these; you may get locked out of your system or brick your device.
  * You can easily edit the config settings via the browser after you connect!
  ***/
-struct ConfigSettings {
+struct BenchSettings {
   int api_response_length = 64;                   // API Serial comms message length
   long serial_baud_rate = 115200;                 // Default baud rate 
   unsigned long wifi_timeout = 4000;              // Duration of Wifi connection attempt in millisec's
@@ -131,7 +130,7 @@ struct DeviceStatus {
   long wsCLeanPollTimer = 0;
   int pollTimer = 0;
   int serialData = 0;
-  String statusMessage = BOOT_MESSAGE;
+  String statusMessage = "DIY Flow Bench";
   bool apMode = false;
   double HWMBME = 0.0;
   double HWMADC = 0.0;
@@ -222,39 +221,180 @@ struct ValveLiftData {
  * Pin Data
  ***/
 struct Pins {
-  int VAC_SPEED_PIN = -1;
-  int VAC_BLEED_VALVE_PIN = -1;
-  int VAC_BANK_1_PIN = -1;
-  int VAC_BANK_2_PIN = -1; 
-  int VAC_BANK_3_PIN = -1;
-  int AVO_STEP_PIN =  -1;
-  int AVO_DIR_PIN = -1;
-  int FLOW_VALVE_STEP_PIN = -1;
-  int FLOW_VALVE_DIR_PIN = -1;
-  int VCC_3V3_PIN = -1;
-  int VCC_5V_PIN = -1;
-  int SPEED_SENSOR_PIN = -1;
-  int SWIRL_ENCODER_PIN_A = -1;
-  int SWIRL_ENCODER_PIN_B = -1;
-  int ORIFICE_BCD_BIT1_PIN = -1;
-  int ORIFICE_BCD_BIT2_PIN = -1;
-  int ORIFICE_BCD_BIT3_PIN = -1;
-  int MAF_PIN = -1;
-  int REF_PRESSURE_PIN = -1;
-  int DIFF_PRESSURE_PIN = -1;
-  int PITOT_PIN = -1;
-  int TEMPERATURE_PIN = -1;
-  int REF_BARO_PIN = -1;
-  int HUMIDITY_PIN = -1;
-  int SERIAL0_TX_PIN = -1;
-  int SERIAL0_RX_PIN = -1;
-  int SERIAL2_TX_PIN = -1;
-  int SERIAL2_RX_PIN = -1;
-  int SDA_PIN = -1;
-  int SCL_PIN = -1;
-  int SD_CS_PIN = -1;
-  int SD_MOSI_PIN = -1;
-  int SD_MISO_PIN = -1;             
-  int SD_SCK_PIN = -1;
-  int WEMOS_SPARE_PIN_1 = -1;
+  int VAC_SPEED_PIN = 99;
+  int VAC_BLEED_VALVE_PIN = 99;
+  int VAC_BANK_1_PIN = 99;
+  int VAC_BANK_2_PIN = 99; 
+  int VAC_BANK_3_PIN = 99;
+  int AVO_STEP_PIN =  99;
+  int AVO_DIR_PIN = 99;
+  int FLOW_VALVE_STEP_PIN = 99;
+  int FLOW_VALVE_DIR_PIN = 99;
+  int VCC_3V3_PIN = 99;
+  int VCC_5V_PIN = 99;
+  int SPEED_SENSOR_PIN = 99;
+  int SWIRL_ENCODER_PIN_A = 99;
+  int SWIRL_ENCODER_PIN_B = 99;
+  int ORIFICE_BCD_BIT1_PIN = 99;
+  int ORIFICE_BCD_BIT2_PIN = 99;
+  int ORIFICE_BCD_BIT3_PIN = 99;
+  int MAF_PIN = 99;
+  int REF_PRESSURE_PIN = 99;
+  int DIFF_PRESSURE_PIN = 99;
+  int PITOT_PIN = 99;
+  int TEMPERATURE_PIN = 99;
+  int REF_BARO_PIN = 99;
+  int HUMIDITY_PIN = 99;
+  int SERIAL0_TX_PIN = 99;
+  int SERIAL0_RX_PIN = 99;
+  int SERIAL2_TX_PIN = 99;
+  int SERIAL2_RX_PIN = 99;
+  int SDA_PIN = 99;
+  int SCL_PIN = 99;
+  int SD_CS_PIN = 99;
+  int SD_MOSI_PIN = 99;
+  int SD_MISO_PIN = 99;             
+  int SD_SCK_PIN = 99;
+  int WEMOS_SPARE_PIN_1 = 99;
 };
+
+
+/***********************************************************
+ * @brief Language Data
+ * @note default language is english but can beoverwritten by language.json 
+ ***/
+struct Language {
+    char LANG_BLANK[50] = " "; 
+    char LANG_NULL[50] = "NULL";
+    char LANG_NO_ERROR[50] = "Status OK";
+    char LANG_SERVER_RUNNING[50] = "Server Running";
+    char LANG_WARNING[50] = "Warning!";
+    char LANG_FLOW_LIMIT_EXCEEDED[50] = "Warning! Flow Limit Error";
+    char LANG_REF_PRESS_LOW[50] = "Warning! Low Reference Pressure";
+    char LANG_LEAK_TEST_PASS[50] = "Leak test OK";
+    char LANG_LEAK_TEST_FAILED[50] = "Leak test fail";
+    char LANG_ERROR_LOADING_CONFIG[50] = "Error loading config file";
+    char LANG_ERROR_SAVING_CONFIG[50] = "Error saving config file";
+    char LANG_SAVING_CONFIG[50] = "Saving config file";
+    char LANG_SAVING_CALIBRATION[50] = "Error saving calibration file";
+    char LANG_ERROR_LOADING_FILE[50] = "Error loading file";
+    char LANG_DHT11_READ_FAIL[50] = "DHT11 Read fail";
+    char LANG_BME280_READ_FAIL[50] = "BME280 Read fail";
+    char LANG_LOW_FLOW_CAL_VAL[50] = "Low Cal Value: ";
+    char LANG_HIGH_FLOW_CAL_VAL[50] = "High Cal Value: ";
+    char LANG_REF_PRESS_VALUE[50] = "Ref Press Val: ";
+    char LANG_NOT_ENABLED[50] = "Not Enabled";
+    char LANG_START_REF_PRESSURE[50] = "Using Startup Ref Pressure";
+    char LANG_FIXED_VALUE[50] = "Fixed value: ";
+    char LANG_CALIBRATING[50] = "Calibrating FLow Offset...";
+    char LANG_LEAK_CALIBRATING[50] = "Calibrating Leak Test...";
+    char LANG_CAL_OFFET_VALUE[50] = "Cal Value: ";
+    char LANG_LEAK_CAL_VALUE[50] = "Leak Cal Value: ";
+    char LANG_RUN_BENCH_TO_CALIBRATE[50] = "Bench must be running to calibrate";
+    char LANG_BENCH_RUNNING[50] = "Bench running";
+    char LANG_BENCH_STOPPED[50] = "Bench stopped";
+    char LANG_DEBUG_MODE[50] = "Debug Mode";
+    char LANG_DEV_MODE[50] = "Developer Mode";
+    char LANG_SYSTEM_REBOOTING[50] = "System Rebooting";
+    char LANG_CANNOT_DELETE_INDEX[50] = "Cannot delete index.html (overwrite it instead!)";
+    char LANG_DELETE_FAILED[50] = "File Delete Failed";
+    char LANG_INVALID_ORIFICE_SELECTED[50] = "Invalid Orifice selected";
+    char LANG_ORIFICE_CHANGE[50] = "Orifice Plate Changed";
+    char LANG_UPLOAD_FAILED_NO_SPACE[50] = "Upload rejected, not enough space";
+    char LANG_FILE_UPLOADED[50] = "File uploaded";
+    char LANG_NO_BOARD_LOADED[50] = "No board loaded";  
+};
+
+
+
+
+/***********************************************************
+ * Configuration Data
+ ***/
+struct Configuration {
+  bool SD_CARD_IS_ENABLED = false;
+  int MIN_TEST_PRESSURE_PERCENTAGE = 80;
+  double PIPE_RADIUS_IN_FEET = 0.328084;
+  double VCC_3V3_TRIMPOT = 0.0;
+  double VCC_5V_TRIMPOT = 0.0;
+  bool USE_FIXED_3_3V_VALUE = false;
+  bool USE_FIXED_5V_VALUE = false;
+  bool BME_IS_ENABLED = true;
+  int BME280_I2C_ADDR = 0x76;
+  int BME_SCAN_DELAY_MS =  1000;
+  bool ADC_IS_ENABLED = true;
+  int ADC_I2C_ADDR = 0x48; 
+  int ADC_SCAN_DELAY_MS = 250;
+  int ADC_MAX_RETRIES = 10;
+  int ADC_RANGE = 32767;
+  double ADC_GAIN = 6.144;
+  bool ADC_TYPE_ADS1115 = true;
+  bool MAF_IS_ENABLED = true;
+  const char MAF_DATA_FILE[32] = "mafData/BOSCH_0280218067.cpp";
+  bool MAF_SRC_IS_PIN = false;
+  bool MAF_SRC_IS_ADC = true;
+  double MAF_MV_TRIMPOT = 0.0;
+  int MAF_ADC_CHANNEL = 0;
+  bool PREF_IS_ENABLED = true;
+  int FIXED_REF_PRESS_VALUE = 1;
+  bool PREF_SRC_PIN = false;
+  bool PREF_SRC_ADC = true;
+  int PREF_SENSOR_TYPE = 2;
+  double PREF_MV_TRIMPOT =  0.0;
+  double PREF_ANALOG_SCALE =  1.0;
+  int PREF_ADC_CHANNEL = 1;
+  bool PDIFF_IS_ENABLED = true;
+  int FIXED_DIFF_PRESS_VALUE = 1;
+  bool PDIFF_SRC_IS_PIN = false;
+  bool PDIFF_SRC_IS_ADC = true;
+  int PDIFF_SENSOR_TYPE = 2; 
+  double PDIFF_MV_TRIMPOT = 0.0;
+  double PDIFF_ANALOG_SCALE = 1.0;
+  int PDIFF_ADC_CHANNEL = 2;
+  bool PITOT_IS_ENABLED = true;
+  bool PITOT_SRC_IS_PIN = false;
+  bool PITOT_SRC_IS_ADC = true;
+  int PITOT_SENSOR_TYPE = 2;
+  double PITOT_MV_TRIMPOT = 0.0;
+  double PITOT_ANALOG_SCALE = 1.0;
+  int PITOT_ADC_CHANNEL = 3;
+  bool BARO_IS_ENABLED = true;
+
+  bool BARO_SENSOR_TYPE_FIXED_VALUE = false;
+  bool BARO_SENSOR_TYPE_LINEAR_ANALOG = false;
+  bool BARO_SENSOR_TYPE_BME280 = false;
+  bool BARO_SENSOR_TYPE_MPX4115 = false;
+
+  double FIXED_BARO_VALUE = 101.3529;
+  double BARO_ANALOG_SCALE = 1.0;
+  double startupBaroScalingFactor = 1.0;
+  double startupBaroScalingOffset = 100;
+  double BARO_MV_TRIMPOT = 0.0;
+  double BARO_FINE_ADJUST = 0.0;
+  double SEALEVELPRESSURE_HPA = 1016.90;
+  bool TEMP_IS_ENABLED = true;
+  double FIXED_TEMP_VALUE = 21.0;
+  double TEMP_ANALOG_SCALE = 1.0;
+
+  bool TEMP_SENSOR_NOT_USED = false;
+  bool TEMP_SENSOR_TYPE_FIXED_VALUE = false;
+  bool TEMP_SENSOR_TYPE_LINEAR_ANALOG = false;
+  bool TEMP_SENSOR_TYPE_BME280 = true;
+  bool TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11 = false;
+
+  double TEMP_MV_TRIMPOT = 0.0;
+  double TEMP_FINE_ADJUST = 0.0;
+  bool RELH_IS_ENABLED = true;
+  double FIXED_RELH_VALUE = 36.0;
+  double RELH_ANALOG_SCALE = 1.0;
+
+  bool RELH_SENSOR_TYPE_FIXED_VALUE = false;
+  bool RELH_SENSOR_TYPE_LINEAR_ANALOG = false;
+  bool RELH_SENSOR_TYPE_BME280 = true;
+  bool RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11 = false;
+
+  double RELH_MV_TRIMPOT = 0.0;
+  double RELH_FINE_ADJUST = 0.0;
+  bool SWIRL_IS_ENABLED = false;
+};
+

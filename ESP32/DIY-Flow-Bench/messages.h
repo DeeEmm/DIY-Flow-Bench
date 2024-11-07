@@ -19,11 +19,12 @@
 #pragma once
 
 #include <Arduino.h>
-// #include "configuration.h"
+#include "system.h"
 
 class Messages {
 
 	private:
+
 		
 		char printBuffer[PRINT_BUFFER_LENGTH];
 		
