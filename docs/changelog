@@ -58,6 +58,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24110701        - Changed min pressure threshold to allow -ve values
+                - Moved version vars into dedicated file
 24110701        - M5Stack Tube pressure sensors initialisation
                 - Correction to MAF rescaling function
 24110403        - Added HTTP API Call for JSON Data
