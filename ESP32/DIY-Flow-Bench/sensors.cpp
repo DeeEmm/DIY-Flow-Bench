@@ -233,6 +233,8 @@ void Sensors::initialise () {
 		this->_prefSensorType = "MPXV7025";
 	#elif defined PREF_SENSOR_TYPE_LINEAR_ANALOG
 		this->_prefSensorType = "ANALOG PIN: " + REF_PRESSURE_PIN;
+	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
+		this->_pitotSensorType = "TubePressure";	
 	#else 
 		this->_prefSensorType = translate.LANG_NOT_ENABLED;
 	#endif
@@ -246,6 +248,8 @@ void Sensors::initialise () {
 		this->_pdiffSensorType = "ANALOG PIN: " + DIFF_PRESSURE_PIN;
 	#elif defined PDIFF_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
 		this->_prefSensorType = "MPXV7025";
+	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
+		this->_pitotSensorType = "TubePressure";	
 	#else 
 		this->_pdiffSensorType = translate.LANG_NOT_ENABLED;
 	#endif
@@ -259,6 +263,8 @@ void Sensors::initialise () {
 		this->_prefSensorType = "MPXV7025";
 	#elif defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
 		this->_pitotSensorType = "ANALOG PIN: " + PITOT_PIN;
+	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
+		this->_pitotSensorType = "TubePressure";	
 	#else 
 		this->_pitotSensorType = translate.LANG_NOT_ENABLED;
 	#endif
@@ -463,7 +469,7 @@ double Sensors::getMafFlow(int units) {
 		// where Q = flow | A = area | V = velocity
 
 		// Calculate the 'velocity' for the original pipe area
-		mafVelocity = flowRateKGH / pow(PI * (status.mafDiameter / 2), 2);
+		mafVelocity = flowRateKGH / PI * pow((status.mafDiameter / 2), 2);
 
 		// scale the result with the new pipe area and convert back to mass flow
 		transposedflowRateKGH = mafVelocity * PI * pow((config.maf_housing_diameter / 2), 2);
