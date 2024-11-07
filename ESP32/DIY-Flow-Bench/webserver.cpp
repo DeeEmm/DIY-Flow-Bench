@@ -23,6 +23,7 @@
 #include <SD.h>
 #include <Update.h>
 
+#include "version.h"
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
@@ -1310,10 +1311,10 @@ String Webserver::getDataJSON()
   dataJson["RELH"] = sensorVal.RelH;
 
   // Pitot
-  dataJson["PITOT"] = sensorVal.PitotKPA;
+  dataJson["PITOT"] = sensorVal.PitotH2O;
 
   // Differential pressure
-  dataJson["PDIFF"] = sensorVal.PDiffKPA;
+  dataJson["PDIFF"] = sensorVal.PDiffH2O;
 
   // Swirl (+/- rpm)
   dataJson["SWIRL"] = sensorVal.Swirl;

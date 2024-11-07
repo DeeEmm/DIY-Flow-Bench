@@ -49,7 +49,7 @@ https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/CONTRIBUTING.md
 
 
 ===================================================================
-!! Don't forget to update the build number in configuration.h !!
+!! Don't forget to update the build number in version.h !!
 ===================================================================
 
 Build numbers follow format YY MM DD VV Where VV is the incremental daily version
@@ -58,7 +58,9 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-24110701        - Changed min pressure threshold to allow -ve values
+24110704        - Changed Pdiff and Pitot GUI vals from kPa to H2O
+24110703        - Added call to version.h in webserver.h
+24110702        - Changed min pressure threshold to allow -ve values
                 - Moved version vars into dedicated file
 24110701        - M5Stack Tube pressure sensors initialisation
                 - Correction to MAF rescaling function
