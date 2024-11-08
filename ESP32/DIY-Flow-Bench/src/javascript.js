@@ -249,6 +249,11 @@ function initialiseButtons() {
 
   document.getElementById('aflow-tile-title').addEventListener('click', function(){
     document.getElementById('aflow-tile').style.display='none';
+    document.getElementById('sflow-tile').style.display='block';
+  });
+
+  document.getElementById('sflow-tile-title').addEventListener('click', function(){
+    document.getElementById('sflow-tile').style.display='none';
     document.getElementById('maf-tile').style.display='block';
   });
 

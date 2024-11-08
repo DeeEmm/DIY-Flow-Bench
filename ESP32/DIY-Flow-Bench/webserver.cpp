@@ -1273,16 +1273,19 @@ String Webserver::getDataJSON()
         dataJson["FLOW"] = sensorVal.FlowCFM;
         dataJson["MFLOW"] = sensorVal.FlowKGH;
         dataJson["AFLOW"] = sensorVal.FlowADJ;
+        dataJson["SFLOW"] = sensorVal.FlowSCFM;
     // Round to whole value    
     } else if (strstr(String(config.rounding_type).c_str(), String("INTEGER").c_str())) {
         dataJson["FLOW"] = round(sensorVal.FlowCFM);
         dataJson["MFLOW"] = round(sensorVal.FlowKGH);
         dataJson["AFLOW"] = round(sensorVal.FlowADJ);
+        dataJson["SFLOW"] = round(sensorVal.FlowSCFM);
     // Round to half (nearest 0.5)
     } else if (strstr(String(config.rounding_type).c_str(), String("HALF").c_str())) {
         dataJson["FLOW"] = round(sensorVal.FlowCFM * 2.0 ) / 2.0;
         dataJson["MFLOW"] = round(sensorVal.FlowKGH * 2.0) / 2.0;
         dataJson["AFLOW"] = round(sensorVal.FlowADJ * 2.0) / 2.0;
+        dataJson["SFLOW"] = round(sensorVal.FlowSCFM * 2.0) / 2.0;
     }
 
   }  else  {

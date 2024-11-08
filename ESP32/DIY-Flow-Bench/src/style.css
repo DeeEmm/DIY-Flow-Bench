@@ -177,7 +177,7 @@ flowTargetValInput {
   font-size: 22px;
 }
 
-#tile-pdiff, #aflow-tile, #maf-tile, #tile-swirl, #tile-fdiff  {
+#tile-pdiff, #aflow-tile, #maf-tile, #tile-swirl, #tile-fdiff, #sflow-tile  {
   display: none;
 }
 

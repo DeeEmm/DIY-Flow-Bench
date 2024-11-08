@@ -173,6 +173,7 @@ struct SensorData {
   double FlowCFMraw = 0.0;
   double FlowCFMunc = 0.0;
   double FlowCFM = 0.0;
+  double FlowSCFM = 0.0;
   double FlowADJ = 0.0;
   double MafMv = 0.0;
   double TempDegC = 0.0;

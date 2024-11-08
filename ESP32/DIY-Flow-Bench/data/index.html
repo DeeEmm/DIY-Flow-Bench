@@ -183,7 +183,7 @@ flowTargetValInput {
   font-size: 22px;
 }
 
-#tile-pdiff, #aflow-tile, #maf-tile, #tile-swirl, #tile-fdiff  {
+#tile-pdiff, #aflow-tile, #maf-tile, #tile-swirl, #tile-fdiff, #sflow-tile  {
   display: none;
 }
 
@@ -907,6 +907,11 @@ svg .dataCircle:hover {
             <p><span class="tile-value" id="AFLOW">&nbsp;</span></p>
             <p class="units">ACFM&nbsp;&commat;&nbsp;<span id="PADJUST">28</span>&nbsp;inH2O</p>
           </div>
+          <div class="tile tile-sflow" id="sflow-tile">
+            <p class="tile-title" id="sflow-tile-title">Standard Flow</p>
+            <p><span class="tile-value" id="SFLOW">&nbsp;</span></p>
+            <p class="units">SCFM</p>
+          </div>
           <div class="tile tile-flow" id="maf-tile">
             <p class="tile-title" id="maf-tile-title">MAF Flow</p>
             <p><span class="tile-value" id="MFLOW">&nbsp;</span></p>
@@ -1476,6 +1481,11 @@ function initialiseButtons() {
 
   document.getElementById('aflow-tile-title').addEventListener('click', function(){
     document.getElementById('aflow-tile').style.display='none';
+    document.getElementById('sflow-tile').style.display='block';
+  });
+
+  document.getElementById('sflow-tile-title').addEventListener('click', function(){
+    document.getElementById('sflow-tile').style.display='none';
     document.getElementById('maf-tile').style.display='block';
   });
 
