@@ -589,6 +589,9 @@ StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
     config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
     config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
     strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
+    strcpy(config.rounding_type, configData["ROUNDING_TYPE"]);
+    config.flow_decimal_length, configData["FLOW_DECIMAL_LENGTH"];
+    config.gen_decimal_length, configData["GEN_DECIMAL_LENGTH"];
     config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
     config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
     strcpy(config.api_delim, configData["CONF_API_DELIM"]);
@@ -674,6 +677,9 @@ void Webserver::createConfigFile () {
   configData["CONF_MIN_BENCH_PRESSURE"] = config.min_bench_pressure;
   configData["CONF_MIN_FLOW_RATE"] = config.min_flow_rate;
   configData["DATA_FILTER_TYPE"] = config.data_filter_type;
+  configData["ROUNDING_TYPE"] = config.rounding_type;
+  configData["FLOW_DECIMAL_LENGTH"] = config.flow_decimal_length;
+  configData["GEN_DECIMAL_LENGTH"] = config.gen_decimal_length;
   configData["CONF_CYCLIC_AVERAGE_BUFFER"] = config.cyc_av_buffer;
   configData["CONF_MAF_MIN_VOLTS"] = config.maf_min_volts;
   configData["CONF_API_DELIM"] = config.api_delim;
@@ -743,10 +749,10 @@ void Webserver::parseConfigurationForm(AsyncWebServerRequest *request)
   config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
   config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
   config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
+  strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
   strcpy(config.rounding_type, configData["ROUNDING_TYPE"]);
   config.flow_decimal_length = configData["FLOW_DECIMAL_LENGTH"].as<int>();
   config.gen_decimal_length = configData["GEN_DECIMAL_LENGTH"].as<int>();
-  strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
   config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
   config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
   strcpy(config.api_delim, configData["CONF_API_DELIM"]);
@@ -1282,6 +1288,7 @@ String Webserver::getDataJSON()
   }  else  {
     dataJson["FLOW"] = 0.0;
     dataJson["MFLOW"] = 0.0;
+    dataJson["AFLOW"] = 0.0;
   }
 
   // Flow depression value for AFLOW units
@@ -1652,7 +1659,7 @@ String Webserver::processTemplate(const String &var)
     if (strstr(String(config.flow_decimal_length).c_str(), String("0").c_str())){
       return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0' selected>None</option><option value='1'>Tenths</option><option value='2'>Hundredths </option></select>");
     } else if (strstr(String(config.flow_decimal_length).c_str(), String("1").c_str())) {
-      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0>None</option><option value='1' selected>Tenths</option><option value='2'>Hundredths </option></select>");
+      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0'>None</option><option value='1' selected>Tenths</option><option value='2'>Hundredths </option></select>");
     } else if (strstr(String(config.flow_decimal_length).c_str(), String("2").c_str())){
       return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0'>None</option><option value='1'>Tenths</option><option value='2' selected>Hundredths </option></select>");
     }
