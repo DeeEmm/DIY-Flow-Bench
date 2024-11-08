@@ -356,7 +356,7 @@ double Calculations::convertFlowDepression(double oldPressure, double newPressur
     if (newPressure == oldPressure) {
       return inputFlowCFM;
     } else {
-      pressureRatio = (newPressure / oldPressure);
+      pressureRatio = (abs(newPressure) / abs(oldPressure));
     }
     scaleFactor = sqrt(pressureRatio);
     outputFlow =  inputFlowCFM * scaleFactor;
