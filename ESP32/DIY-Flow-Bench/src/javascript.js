@@ -50,12 +50,14 @@ if (!!window.EventSource) {
         try {
           if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
             document.getElementById(key).innerHTML = myObj[key];
-          } else {
-            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'FDIFF'){
+           } else {
+            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'FDIFF') {
               //HACK: template vars - replaced before page load
               document.getElementById(key).innerHTML = myObj[key].toFixed(~FLOW_DECIMAL_LENGTH~);  
-            } else {
+            } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
               document.getElementById(key).innerHTML = myObj[key].toFixed(~GEN_DECIMAL_LENGTH~); 
+            } else {
+              document.getElementById(key).innerHTML = myObj[key];
             }
           }
         } catch (error) {
