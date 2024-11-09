@@ -789,7 +789,8 @@ void Webserver::parseConfigurationForm(AsyncWebServerRequest *request)
 
   _message.debugPrintf("Configuration Saved \n");
 
-  request->redirect("/?view=config");
+  // request->redirect("/?view=config");
+  request->redirect("/");
 
 }
 
@@ -838,7 +839,8 @@ void Webserver::parseCalibrationForm(AsyncWebServerRequest *request)
 
   _calibrate.saveCalibrationData();
 
-  request->redirect("/?view=config");
+  // request->redirect("/?view=config");
+  request->redirect("/");
 
 }
 
