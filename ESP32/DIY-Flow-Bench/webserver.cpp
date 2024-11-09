@@ -598,6 +598,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
     config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
     config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
     configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
+    configData["STANDARD_REFERENCE"] = config.standardReference;
     configData["TEMP_UNIT"] = config.temp_unit;
     configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
     strcpy(config.bench_type, configData["BENCH_TYPE"]);
@@ -685,6 +686,7 @@ void Webserver::createConfigFile () {
   configData["CONF_API_DELIM"] = config.api_delim;
   configData["CONF_SERIAL_BAUD_RATE"] = config.serial_baud_rate;
   configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
+  configData["STANDARD_REFERENCE"] = config.standardReference;
   configData["TEMP_UNIT"] = config.temp_unit;
   configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
   configData["CONF_SHOW_ALARMS"] = config.show_alarms;
@@ -759,6 +761,7 @@ void Webserver::parseConfigurationForm(AsyncWebServerRequest *request)
   config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
   config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
   config.adj_flow_depression = configData["ADJ_FLOW_DEPRESSION"].as<int>();
+  config.standardReference = configData["STANDARD_REFERENCE"].as<int>();
   strcpy(config.temp_unit, configData["TEMP_UNIT"]);
   config.valveLiftInterval = configData["VALVE_LIFT_INTERVAL"].as<double>();
   strcpy(config.bench_type, configData["BENCH_TYPE"]);
