@@ -103,6 +103,16 @@
 #define BASELINE 2
 #define BASELINE_LEAK 3
 
+/***********************************************************
+ * International Standards
+ ***/
+#define ISO1585 1
+#define ISA 2
+#define ISO13443 3
+#define ISO5011 4
+#define ISO2533 5
+
+
 
 /***********************************************************
  * BME Registers
