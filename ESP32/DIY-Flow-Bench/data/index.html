@@ -1161,9 +1161,12 @@ svg .dataCircle:hover {
           <div class="config-row tooltip"><label class="config-label">Hostname:</label>&nbsp;<input type="text" id="CONF_HOSTNAME" name="CONF_HOSTNAME" value="~CONF_HOSTNAME~" class="config-text"><span class="tooltiptext">DNS Hostname (used for connecting via URL e.g. http://diyfb.local)</span></div>
           <div class="config-row tooltip"><label class="config-label">WiFi Timeout:</label>&nbsp;<input type="text" id="CONF_WIFI_TIMEOUT" name="CONF_WIFI_TIMEOUT" value="~CONF_WIFI_TIMEOUT~" class="config-text"><span class="tooltiptext">Number of milliseconds before WiFi retries connection</span></div>
           <br>
-          <h3>API Settings</h3>
-          <div class="config-row tooltip"><label class="config-label">API Delimiter:</label>&nbsp;<input type="text" id="CONF_API_DELIM" name="CONF_API_DELIM" value="~CONF_API_DELIM~" class="config-text"><span class="tooltiptext">Character used to delimit API / Serial data </span></div>
-          <div class="config-row tooltip"><label class="config-label">Serial Baud Rate:</label>&nbsp;<input type="text" id="CONF_SERIAL_BAUD_RATE" name="CONF_SERIAL_BAUD_RATE" value="~CONF_SERIAL_BAUD_RATE~" class="config-text"><span class="tooltiptext">Baud rate for serial communication</span></div>
+          <h3>Bench Settings</h3>
+          <div class="config-row tooltip"><label class="config-label">Bench Type:</label><span>~BENCH_TYPE_DROPDOWN~</span><span class="tooltiptext">Select bench type</span></div>
+          <div class="config-row tooltip"><label class="config-label">MAF Housing Diameter (mm):</label>&nbsp;<input type="text" id="CONF_MAF_HOUSING_DIAMETER" name="CONF_MAF_HOUSING_DIAMETER" value="~CONF_MAF_HOUSING_DIAMETER~" class="config-text"><span class="tooltiptext">Diameter of MAF Housing. (Leave as zero to use standard housing diameter)</span></div>
+          <div class="config-row tooltip"><label class="config-label">GUI Refresh Rate (ms):</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="~CONF_REFRESH_RATE~" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
+          <div class="config-row tooltip"><label class="config-label">Temperature Unit (&degC / &degF):</label><span>~TEMPERATURE_DROPDOWN~</span><span class="tooltiptext">Display unit of temperature</span></div>
+          <div class="config-row tooltip"><label class="config-label">Valve Lift Interval (mm / inch):</label>&nbsp;<input type="text" id="VALVE_LIFT_INTERVAL" name="VALVE_LIFT_INTERVAL" value="~VALVE_LIFT_INTERVAL~" class="config-text"><span class="tooltiptext">Distance between valve lift data points</span></div>
           <br>
           <h3>Resolution and Accuracy</h3>
           <div class="config-row tooltip"><label class="config-label">Flow Value Rounding:</label><span>~ROUNDING_TYPE_DROPDOWN~</span><span class="tooltiptext">Rounding used in flow calculations</span></div>
@@ -1172,39 +1175,49 @@ svg .dataCircle:hover {
           <br>
           <h3>Data Filters</h3>
           <div class="config-row tooltip"><label class="config-label">Data Filter Type:</label><span>~DATA_FILTER_TYPE_DROPDOWN~</span><span class="tooltiptext">Select data filter type</span></div>
-          <div class="config-row tooltip"><label class="config-label">Min Flow Rate:</label>&nbsp;<input type="text" id="CONF_MIN_FLOW_RATE" name="CONF_MIN_FLOW_RATE" value="~CONF_MIN_FLOW_RATE~" class="config-text"><span class="tooltiptext">Used to filter out non-zero flow values when bench is not running </span></div>
-          <div class="config-row tooltip"><label class="config-label">Min Bench Pressure:</label>&nbsp;<input type="text" id="CONF_MIN_BENCH_PRESSURE" name="CONF_MIN_BENCH_PRESSURE" value="~CONF_MIN_BENCH_PRESSURE~" class="config-text"><span class="tooltiptext">Minimum reference pressure that bench is considered running</span></div>
+          <div class="config-row tooltip"><label class="config-label">Min Flow Rate (cfm):</label>&nbsp;<input type="text" id="CONF_MIN_FLOW_RATE" name="CONF_MIN_FLOW_RATE" value="~CONF_MIN_FLOW_RATE~" class="config-text"><span class="tooltiptext">Used to filter out non-zero flow values when bench is not running </span></div>
+          <div class="config-row tooltip"><label class="config-label">Min Bench Pressure (in/H2O):</label>&nbsp;<input type="text" id="CONF_MIN_BENCH_PRESSURE" name="CONF_MIN_BENCH_PRESSURE" value="~CONF_MIN_BENCH_PRESSURE~" class="config-text"><span class="tooltiptext">Minimum reference pressure that bench is considered running</span></div>
           <div class="config-row tooltip"><label class="config-label">MAF Min volts:</label>&nbsp;<input type="text" id="CONF_MAF_MIN_VOLTS" name="CONF_MAF_MIN_VOLTS" value="~CONF_MAF_MIN_VOLTS~" class="config-text"><span class="tooltiptext">Minimum MAF voltage that bench is considered running</span></div>
           <div class="config-row tooltip"><label class="config-label">Cyclical Average Buffer:</label>&nbsp;<input type="text" id="CONF_CYCLIC_AVERAGE_BUFFER" name="CONF_CYCLIC_AVERAGE_BUFFER" value="~CONF_CYCLIC_AVERAGE_BUFFER~" class="config-text"><span class="tooltiptext">Mean buffer size - Used for smoothing results.</span></div>
           <br>
-          <h3>Bench Settings</h3>
-          <div class="config-row tooltip"><label class="config-label">Bench Type:</label><span>~BENCH_TYPE_DROPDOWN~</span><span class="tooltiptext">Select bench type</span></div>
-          <div class="config-row tooltip"><label class="config-label">MAF Housing Diameter:</label>&nbsp;<input type="text" id="CONF_MAF_HOUSING_DIAMETER" name="CONF_MAF_HOUSING_DIAMETER" value="~CONF_MAF_HOUSING_DIAMETER~" class="config-text"><span class="tooltiptext">Diameter of MAF Housing. (Leave as zero to use standard housing diameter)</span></div>
-          <div class="config-row tooltip"><label class="config-label">Refresh Rate:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="~CONF_REFRESH_RATE~" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
-          <div class="config-row tooltip"><label class="config-label">Conversion Depression:</label>&nbsp;<input type="text" id="ADJ_FLOW_DEPRESSION" name="ADJ_FLOW_DEPRESSION" value="~ADJ_FLOW_DEPRESSION~" class="config-text"><span class="tooltiptext">Bench depression used for adjusted flow calcs</span></div>
-          <div class="config-row tooltip"><label class="config-label">Temperature Unit:</label><span>~TEMPERATURE_DROPDOWN~</span><span class="tooltiptext">Display unit of temperature</span></div>
-          <div class="config-row tooltip"><label class="config-label">Valve Lift Interval:</label>&nbsp;<input type="text" id="VALVE_LIFT_INTERVAL" name="VALVE_LIFT_INTERVAL" value="~VALVE_LIFT_INTERVAL~" class="config-text"><span class="tooltiptext">Distance between valve lift data points</span></div>
+          <h3>Conversion Settings</h3>
+          <div class="config-row tooltip"><label class="config-label">Adjusted Flow Depression (in/H2O):</label>&nbsp;<input type="text" id="ADJ_FLOW_DEPRESSION" name="ADJ_FLOW_DEPRESSION" value="~ADJ_FLOW_DEPRESSION~" class="config-text"><span class="tooltiptext">Bench depression used for adjusted flow calcs</span></div>
+          <div class="config-row tooltip"><label class="config-label">Standard Reference Conditions (SCFM):</label>
+            <select name='Standard ' class='config-select'>
+              <option value='1' selected>SAE J1394 / ISO 1585 (25&degC(68&degF) 100kPa  0%RH)</option>
+              <option value='2'>ISA (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
+              <option value='3'>ISO 13443 (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
+              <option value='4'>ISO 5011 (25&degC(68&degF) 1atm(101.3kPa) 50%RH)</option>
+              <option value='5'>ISO 2533 (15&degC(59&degF) 1atm(101.325kPa)  0% RH)</option>
+              <!--<option value='6'>NIST / EPA (20&degC(68&degF) 1atm(101.325kPa)  --RH(unspecified))</option>-->
+            </select>
+            <span class="tooltiptext">Standardised Temp, baro and humidity conditions.</span>
+          </div>
           <br>
           <h3>Calibration Orifice Settings</h3>
-          <div class="config-row tooltip"><label class="config-label">Calibration Orifice Flow Rate:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="~CONF_CAL_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice in cfm</span></div>
-          <div class="config-row tooltip"><label class="config-label">Calibration Orifice Test Pressure:</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="~CONF_CAL_REF_PRESS~" class="config-text"><span class="tooltiptext">Reference depression of calibration orifice in in/wg</span></div>
+          <div class="config-row tooltip"><label class="config-label">Calibration Orifice Flow Rate (cfm):</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="~CONF_CAL_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice in cfm</span></div>
+          <div class="config-row tooltip"><label class="config-label">Calibration Orifice Test Pressure (in/H2O):</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="~CONF_CAL_REF_PRESS~" class="config-text"><span class="tooltiptext">Reference depression of calibration orifice in in/wg</span></div>
           <br>
           <div id="orificeData">
             <h3>Orifice Data</h3>
-            <div class="config-row tooltip"><label class="config-label">Orifice #1 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE1_FLOW_RATE" name="ORIFICE1_FLOW_RATE" value="~ORIFICE1_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #1 in cfm</span></div>
-            <div class="config-row tooltip"><label class="config-label">Orifice #1 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE1_TEST_PRESSURE" name="ORIFICE1_TEST_PRESSURE" value="~ORIFICE1_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #1 in in/wg</span></div>
-            <div class="config-row tooltip"><label class="config-label">Orifice #2 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE2_FLOW_RATE" name="ORIFICE2_FLOW_RATE" value="~ORIFICE2_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #2 in cfm</span></div>
-            <div class="config-row tooltip"><label class="config-label">Orifice #2 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE2_TEST_PRESSURE" name="ORIFICE2_TEST_PRESSURE" value="~ORIFICE2_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #2 in in/wg</span></div>
-            <div class="config-row tooltip"><label class="config-label">Orifice #3 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE3_FLOW_RATE" name="ORIFICE3_FLOW_RATE" value="~ORIFICE3_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #3 in cfm</span></div>
-            <div class="config-row tooltip"><label class="config-label">Orifice #3 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE3_TEST_PRESSURE" name="ORIFICE3_TEST_PRESSURE" value="~ORIFICE3_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #3 in in/wg</span></div>
-            <div class="config-row tooltip"><label class="config-label">Orifice #4 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE4_FLOW_RATE" name="ORIFICE4_FLOW_RATE" value="~ORIFICE4_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #4 in cfm</span></div>
-            <div class="config-row tooltip"><label class="config-label">Orifice #4 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE4_TEST_PRESSURE" name="ORIFICE4_TEST_PRESSURE" value="~ORIFICE4_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #4 in in/wg</span></div>
-            <div class="config-row tooltip"><label class="config-label">Orifice #5 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE5_FLOW_RATE" name="ORIFICE5_FLOW_RATE" value="~ORIFICE5_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #5 in cfm</span></div>
-            <div class="config-row tooltip"><label class="config-label">Orifice #5 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE5_TEST_PRESSURE" name="ORIFICE5_TEST_PRESSURE" value="~ORIFICE5_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #5 in in/wg</span></div>
-            <div class="config-row tooltip"><label class="config-label">Orifice #6 Flow Rate:</label>&nbsp;<input type="text" id="ORIFICE6_FLOW_RATE" name="ORIFICE6_FLOW_RATE" value="~ORIFICE6_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #6 in cfm</span></div>
-            <div class="config-row tooltip"><label class="config-label">Orifice #6 Test Pressure:</label>&nbsp;<input type="text" id="ORIFICE6_TEST_PRESSURE" name="ORIFICE6_TEST_PRESSURE" value="~ORIFICE6_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #6 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #1 Flow Rate (cfm):</label>&nbsp;<input type="text" id="ORIFICE1_FLOW_RATE" name="ORIFICE1_FLOW_RATE" value="~ORIFICE1_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #1 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #1 Test Pressure (in/H2O):</label>&nbsp;<input type="text" id="ORIFICE1_TEST_PRESSURE" name="ORIFICE1_TEST_PRESSURE" value="~ORIFICE1_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #1 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #2 Flow Rate (cfm):</label>&nbsp;<input type="text" id="ORIFICE2_FLOW_RATE" name="ORIFICE2_FLOW_RATE" value="~ORIFICE2_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #2 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #2 Test Pressure (in/H2O):</label>&nbsp;<input type="text" id="ORIFICE2_TEST_PRESSURE" name="ORIFICE2_TEST_PRESSURE" value="~ORIFICE2_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #2 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #3 Flow Rate (cfm):</label>&nbsp;<input type="text" id="ORIFICE3_FLOW_RATE" name="ORIFICE3_FLOW_RATE" value="~ORIFICE3_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #3 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #3 Test Pressure (in/H2O):</label>&nbsp;<input type="text" id="ORIFICE3_TEST_PRESSURE" name="ORIFICE3_TEST_PRESSURE" value="~ORIFICE3_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #3 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #4 Flow Rate (cfm):</label>&nbsp;<input type="text" id="ORIFICE4_FLOW_RATE" name="ORIFICE4_FLOW_RATE" value="~ORIFICE4_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #4 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #4 Test Pressure (in/H2O):</label>&nbsp;<input type="text" id="ORIFICE4_TEST_PRESSURE" name="ORIFICE4_TEST_PRESSURE" value="~ORIFICE4_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #4 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #5 Flow Rate (cfm):</label>&nbsp;<input type="text" id="ORIFICE5_FLOW_RATE" name="ORIFICE5_FLOW_RATE" value="~ORIFICE5_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #5 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #5 Test Pressure (in/H2O):</label>&nbsp;<input type="text" id="ORIFICE5_TEST_PRESSURE" name="ORIFICE5_TEST_PRESSURE" value="~ORIFICE5_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #5 in in/wg</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #6 Flow Rate (cfm):</label>&nbsp;<input type="text" id="ORIFICE6_FLOW_RATE" name="ORIFICE6_FLOW_RATE" value="~ORIFICE6_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #6 in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">Orifice #6 Test Pressure (in/H2O):</label>&nbsp;<input type="text" id="ORIFICE6_TEST_PRESSURE" name="ORIFICE6_TEST_PRESSURE" value="~ORIFICE6_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #6 in in/wg</span></div>
             <br>
           </div>
+          <br>
+          <h3>API Settings</h3>
+          <div class="config-row tooltip"><label class="config-label">API Delimiter:</label>&nbsp;<input type="text" id="CONF_API_DELIM" name="CONF_API_DELIM" value="~CONF_API_DELIM~" class="config-text"><span class="tooltiptext">Character used to delimit API / Serial data </span></div>
+          <div class="config-row tooltip"><label class="config-label">Serial Baud Rate:</label>&nbsp;<input type="text" id="CONF_SERIAL_BAUD_RATE" name="CONF_SERIAL_BAUD_RATE" value="~CONF_SERIAL_BAUD_RATE~" class="config-text"><span class="tooltiptext">Baud rate for serial communication</span></div>
           <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
           <br>
           <br>
@@ -1213,11 +1226,11 @@ svg .dataCircle:hover {
         <br>
         <form method="POST" action="/api/savecalibration">
           <h2>Calibration Data</h2>
-          <div class="config-row tooltip"><label class="config-label">Calibration Offset:</label>&nbsp;<input type="text" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
-          <div class="config-row tooltip"><label class="config-label">Leak Test Baseline:</label>&nbsp;<input  type="text" id="LEAK_CAL_BASELINE" name="LEAK_CAL_BASELINE" value="~LEAK_CAL_BASELINE~" class="config-text"><span class="tooltiptext">Baseline Offset</span></div>
-          <div class="config-row tooltip"><label class="config-label">Leak Test Offset:</label>&nbsp;<input  type="text" id="LEAK_CAL_OFFSET" name="LEAK_CAL_OFFSET" value="~LEAK_CAL_OFFSET~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
-          <div class="config-row tooltip"><label class="config-label">Leak Test Baseline (Reverse):</label>&nbsp;<input  type="text" id="LEAK_CAL_BASELINE_REV" name="LEAK_CAL_BASELINE_REV" value="~LEAK_CAL_BASELINE_REV~" class="config-text"><span class="tooltiptext">Baseline Offset (Reverse Flow)</span></div>
-          <div class="config-row tooltip"><label class="config-label">Leak Test Offset (Reverse):</label>&nbsp;<input type="text" id="LEAK_CAL_OFFSET_REV" name="LEAK_CAL_OFFSET_REV" value="~LEAK_CAL_OFFSET_REV~" class="config-text"><span class="tooltiptext">Measured leak test value (Reverse Flow)</span></div>
+          <div class="config-row tooltip"><label class="config-label">Calibration Offset (cfm):</label>&nbsp;<input type="text" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
+          <div class="config-row tooltip"><label class="config-label">Leak Test Baseline (cfm):</label>&nbsp;<input  type="text" id="LEAK_CAL_BASELINE" name="LEAK_CAL_BASELINE" value="~LEAK_CAL_BASELINE~" class="config-text"><span class="tooltiptext">Baseline Offset</span></div>
+          <div class="config-row tooltip"><label class="config-label">Leak Test Offset (cfm):</label>&nbsp;<input  type="text" id="LEAK_CAL_OFFSET" name="LEAK_CAL_OFFSET" value="~LEAK_CAL_OFFSET~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
+          <div class="config-row tooltip"><label class="config-label">Leak Test Baseline (Reverse) (cfm):</label>&nbsp;<input  type="text" id="LEAK_CAL_BASELINE_REV" name="LEAK_CAL_BASELINE_REV" value="~LEAK_CAL_BASELINE_REV~" class="config-text"><span class="tooltiptext">Baseline Offset (Reverse Flow)</span></div>
+          <div class="config-row tooltip"><label class="config-label">Leak Test Offset (Reverse) (cfm):</label>&nbsp;<input type="text" id="LEAK_CAL_OFFSET_REV" name="LEAK_CAL_OFFSET_REV" value="~LEAK_CAL_OFFSET_REV~" class="config-text"><span class="tooltiptext">Measured leak test value (Reverse Flow)</span></div>
           <br>
           <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Overwrite"></div>
         </form>
