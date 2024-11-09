@@ -1300,6 +1300,32 @@ String Webserver::getDataJSON()
   // Flow depression value for AFLOW units
   dataJson["PADJUST"] = config.adj_flow_depression;
 
+  // Standard reference
+  switch (config.standardReference) {
+
+    case ISO_1585:
+      dataJson["STD_REF"] = "ISO-1585";
+    break;
+
+    case ISA :
+      dataJson["STD_REF"] = "ISA";
+    break;
+
+    case ISO_13443:
+      dataJson["STD_REF"] = "ISO-13443";
+    break;
+
+    case ISO_5011:
+      dataJson["STD_REF"] = "ISO-5011";
+    break;
+
+    case ISO_2533:
+      dataJson["STD_REF"] = "ISO-2533";
+    break;
+
+  }
+
+
   // Temperature deg C or F
   if (strstr(String(config.temp_unit).c_str(), String("Celcius").c_str())){
     dataJson["TEMP"] = sensorVal.TempDegC;
