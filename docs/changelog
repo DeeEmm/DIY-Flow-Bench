@@ -58,9 +58,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-24111101        - Added SCFM
-                - #212 Displau issues
-                - 
+24111101        - #208 Added SCFM
+                - #212 Display issues
 24110802        - #207 Decimal places on GUI
 24110801        - Code tidy up so the pressure sensors are correctly reported in the web GUI info page
 24110704        - Updated calls to #include "version.h"
