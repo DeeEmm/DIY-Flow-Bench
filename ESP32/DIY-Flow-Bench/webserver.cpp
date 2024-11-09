@@ -1692,7 +1692,33 @@ String Webserver::processTemplate(const String &var)
   if (var == "STD_REF_3" && config.standardReference == 3) return String("selected");
   if (var == "STD_REF_4" && config.standardReference == 4) return String("selected");
   if (var == "STD_REF_5" && config.standardReference == 5) return String("selected");
-  
+
+
+  if (var == "STD_REF" ) {
+    // Standard reference
+    switch (config.standardReference) {
+
+      case ISO_1585:
+        return String("ISO-1585");
+      break;
+
+      case ISA :
+        return String("ISA");
+      break;
+
+      case ISO_13443:
+        return String("ISO-13443");
+      break;
+
+      case ISO_5011:
+        return String("ISO-5011");
+      break;
+
+      case ISO_2533:
+        return String("ISO-2533");
+      break;
+    }
+  }
 
   // Flow Decimal type
   if (var == "FLOW_DECIMAL_LENGTH_DROPDOWN"){
