@@ -1656,6 +1656,14 @@ String Webserver::processTemplate(const String &var)
       return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>None</option><option value='INTEGER'>Whole number</option><option value='HALF' selected>Half value </option></select>");
     }
   }
+  
+  // Reference standard type dropdown selected item
+  if (var == "STD_REF_1" && config.standardReference == 1) return String("selected");
+  if (var == "STD_REF_2" && config.standardReference == 2) return String("selected");
+  if (var == "STD_REF_3" && config.standardReference == 3) return String("selected");
+  if (var == "STD_REF_4" && config.standardReference == 4) return String("selected");
+  if (var == "STD_REF_5" && config.standardReference == 5) return String("selected");
+  
 
   // Flow Decimal type
   if (var == "FLOW_DECIMAL_LENGTH_DROPDOWN"){

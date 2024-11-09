@@ -435,7 +435,7 @@ double Calculations::convertToSCFM(double ACFM, int standard) {
 
   switch (standard) {
 
-    case ISO1585:
+    case ISO_1585:
       tStd = 25;
       pStd = 100;
       rhStd = 0;
@@ -447,25 +447,25 @@ double Calculations::convertToSCFM(double ACFM, int standard) {
       rhStd = 0;
     break;
 
-    case ISO13443:
+    case ISO_13443:
       tStd = 15;
       pStd = 100.325;
       rhStd = 0;
     break;
 
-    case ISO5011:
+    case ISO_5011:
       tStd = 25;
       pStd = 100.3;
       rhStd = 50;
     break;
 
-    case ISO2533:
+    case ISO_2533:
       tStd = 15;
       pStd = 100.325;
       rhStd = 0;
     break;
 
-    default:
+    default: // ISO_1585
       tStd = 25;
       pStd = 100;
       rhStd = 0;
@@ -475,7 +475,6 @@ double Calculations::convertToSCFM(double ACFM, int standard) {
 
   // From Issue #208 
   // SCFM = sensorVal.FlowCFM * (sensorVal.PRefKPA / pStd) * (tStd / sensorVal.TempDegC) * (1 / (1 - ( sensorVal.RelH / 100)));
-
 
   // From https://neutrium.net/general-engineering/conversion-of-standard-volumetric-flow-rates-of-gas/
   airDensityAct = calculateAirDensity(sensorVal.TempDegC, sensorVal.BaroPA , sensorVal.RelH);
