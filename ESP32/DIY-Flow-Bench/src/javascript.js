@@ -53,7 +53,7 @@ if (!!window.EventSource) {
             document.getElementById(key).innerHTML = myObj[key];
            // we've not got a string... 
            } else {
-            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'FDIFF') {
+            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'SFLOW' || key === 'FDIFF') {
               //HACK: template vars - replaced before page load
               document.getElementById(key).innerHTML = myObj[key].toFixed(~FLOW_DECIMAL_LENGTH~);  
             } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {

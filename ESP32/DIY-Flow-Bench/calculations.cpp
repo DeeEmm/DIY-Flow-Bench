@@ -481,7 +481,7 @@ double Calculations::convertToSCFM(double ACFM, int standard) {
   airDensityAct = calculateAirDensity(sensorVal.TempDegC, sensorVal.BaroPA , sensorVal.RelH);
   airDensityStd = calculateAirDensity(tStd, convertPressure(pStd,PASCALS) , rhStd);
 
-  SCFM = sensorVal.FlowCFM *(airDensityStd / airDensityAct);
+  SCFM = sensorVal.FlowCFM * (airDensityStd / airDensityAct);
 
   return SCFM;
   

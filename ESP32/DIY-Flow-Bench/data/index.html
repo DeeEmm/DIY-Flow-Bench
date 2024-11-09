@@ -1184,7 +1184,7 @@ svg .dataCircle:hover {
           <div class="config-row tooltip"><label class="config-label">Adjusted Flow Depression (in/H2O):</label>&nbsp;<input type="text" id="ADJ_FLOW_DEPRESSION" name="ADJ_FLOW_DEPRESSION" value="~ADJ_FLOW_DEPRESSION~" class="config-text"><span class="tooltiptext">Bench depression used for adjusted flow calcs</span></div>
           <div class="config-row tooltip"><label class="config-label">Standard Reference Conditions (SCFM):</label>
             <select name='Standard ' class='config-select'>
-              <option value='1' selected>SAE J1394 / ISO 1585 (25&degC(68&degF) 100kPa  0%RH)</option>
+              <option value='1' selected>ISO 1585 (25&degC(68&degF) 100kPa  0%RH)</option>
               <option value='2'>ISA (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
               <option value='3'>ISO 13443 (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
               <option value='4'>ISO 5011 (25&degC(68&degF) 1atm(101.3kPa) 50%RH)</option>
@@ -1293,14 +1293,17 @@ if (!!window.EventSource) {
 
       for (key in myObj) {
         try {
+          // We've got a string...
           if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
             document.getElementById(key).innerHTML = myObj[key];
+           // we've not got a string... 
            } else {
-            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'FDIFF') {
+            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'SFLOW' || key === 'FDIFF') {
               //HACK: template vars - replaced before page load
               document.getElementById(key).innerHTML = myObj[key].toFixed(~FLOW_DECIMAL_LENGTH~);  
             } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
               document.getElementById(key).innerHTML = myObj[key].toFixed(~GEN_DECIMAL_LENGTH~); 
+            //} else if (key === '') {
             } else {
               document.getElementById(key).innerHTML = myObj[key];
             }

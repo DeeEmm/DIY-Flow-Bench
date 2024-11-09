@@ -173,6 +173,9 @@ void TASKgetSensorData( void * parameter ){
         }
 
 
+        // convert to standard flow
+        sensorVal.FlowSCFM = _calculations.convertToSCFM(sensorVal.FlowCFM, config.standardReference);
+
 
         // Create Flow differential values
         switch (sensorVal.FDiffType) {
