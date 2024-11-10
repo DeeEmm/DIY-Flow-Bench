@@ -58,6 +58,10 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24111102        - #212 Modal Window cropped
+24111101        - #208 Added SCFM
+                - #212 Display issues
+                - Redirect to Main after config change
 24110901        - Changed the pressure ratio formula to allow +/-ve values to be calculated
 24110802        - #207 Decimal places on GUI
 24110801        - Code tidy up so the pressure sensors are correctly reported in the web GUI info page
