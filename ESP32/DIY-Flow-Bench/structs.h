@@ -44,6 +44,7 @@ struct ConfigSettings {
   int flow_decimal_length = 1;                    // Flow decimal number of places 
   int gen_decimal_length = 2;                     // General decimal number of places 
   char data_filter_type[12] = "NONE";             // Data filter type 
+  int standardReference = 1;                      // Standard reference conditions (default ISO 1585)
   int cyc_av_buffer = 5;                          // [5] Scan # over which to average output (helps smooth results)
   bool show_alarms = true;                        // Display Alarms?
   bool debug_mode = false;                        // Global debug print override
@@ -173,6 +174,7 @@ struct SensorData {
   double FlowCFMraw = 0.0;
   double FlowCFMunc = 0.0;
   double FlowCFM = 0.0;
+  double FlowSCFM = 0.0;
   double FlowADJ = 0.0;
   double MafMv = 0.0;
   double TempDegC = 0.0;

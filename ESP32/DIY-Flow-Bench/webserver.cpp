@@ -598,6 +598,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
     config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
     config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
     configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
+    configData["STANDARD_REFERENCE"] = config.standardReference;
     configData["TEMP_UNIT"] = config.temp_unit;
     configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
     strcpy(config.bench_type, configData["BENCH_TYPE"]);
@@ -685,6 +686,7 @@ void Webserver::createConfigFile () {
   configData["CONF_API_DELIM"] = config.api_delim;
   configData["CONF_SERIAL_BAUD_RATE"] = config.serial_baud_rate;
   configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
+  configData["STANDARD_REFERENCE"] = config.standardReference;
   configData["TEMP_UNIT"] = config.temp_unit;
   configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
   configData["CONF_SHOW_ALARMS"] = config.show_alarms;
@@ -759,6 +761,7 @@ void Webserver::parseConfigurationForm(AsyncWebServerRequest *request)
   config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
   config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
   config.adj_flow_depression = configData["ADJ_FLOW_DEPRESSION"].as<int>();
+  config.standardReference = configData["STANDARD_REFERENCE"].as<int>();
   strcpy(config.temp_unit, configData["TEMP_UNIT"]);
   config.valveLiftInterval = configData["VALVE_LIFT_INTERVAL"].as<double>();
   strcpy(config.bench_type, configData["BENCH_TYPE"]);
@@ -786,7 +789,8 @@ void Webserver::parseConfigurationForm(AsyncWebServerRequest *request)
 
   _message.debugPrintf("Configuration Saved \n");
 
-  request->redirect("/?view=config");
+  // request->redirect("/?view=config");
+  request->redirect("/");
 
 }
 
@@ -835,7 +839,8 @@ void Webserver::parseCalibrationForm(AsyncWebServerRequest *request)
 
   _calibrate.saveCalibrationData();
 
-  request->redirect("/?view=config");
+  // request->redirect("/?view=config");
+  request->redirect("/");
 
 }
 
@@ -1273,16 +1278,19 @@ String Webserver::getDataJSON()
         dataJson["FLOW"] = sensorVal.FlowCFM;
         dataJson["MFLOW"] = sensorVal.FlowKGH;
         dataJson["AFLOW"] = sensorVal.FlowADJ;
+        dataJson["SFLOW"] = sensorVal.FlowSCFM;
     // Round to whole value    
     } else if (strstr(String(config.rounding_type).c_str(), String("INTEGER").c_str())) {
         dataJson["FLOW"] = round(sensorVal.FlowCFM);
         dataJson["MFLOW"] = round(sensorVal.FlowKGH);
         dataJson["AFLOW"] = round(sensorVal.FlowADJ);
+        dataJson["SFLOW"] = round(sensorVal.FlowSCFM);
     // Round to half (nearest 0.5)
     } else if (strstr(String(config.rounding_type).c_str(), String("HALF").c_str())) {
         dataJson["FLOW"] = round(sensorVal.FlowCFM * 2.0 ) / 2.0;
         dataJson["MFLOW"] = round(sensorVal.FlowKGH * 2.0) / 2.0;
         dataJson["AFLOW"] = round(sensorVal.FlowADJ * 2.0) / 2.0;
+        dataJson["SFLOW"] = round(sensorVal.FlowSCFM * 2.0) / 2.0;
     }
 
   }  else  {
@@ -1293,6 +1301,32 @@ String Webserver::getDataJSON()
 
   // Flow depression value for AFLOW units
   dataJson["PADJUST"] = config.adj_flow_depression;
+
+  // Standard reference
+  switch (config.standardReference) {
+
+    case ISO_1585:
+      dataJson["STD_REF"] = "ISO-1585";
+    break;
+
+    case ISA :
+      dataJson["STD_REF"] = "ISA";
+    break;
+
+    case ISO_13443:
+      dataJson["STD_REF"] = "ISO-13443";
+    break;
+
+    case ISO_5011:
+      dataJson["STD_REF"] = "ISO-5011";
+    break;
+
+    case ISO_2533:
+      dataJson["STD_REF"] = "ISO-2533";
+    break;
+
+  }
+
 
   // Temperature deg C or F
   if (strstr(String(config.temp_unit).c_str(), String("Celcius").c_str())){
@@ -1651,6 +1685,40 @@ String Webserver::processTemplate(const String &var)
       return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>None</option><option value='INTEGER' selected>Whole number</option><option value='HALF'>Half value </option></select>");
     } else if (strstr(String(config.rounding_type).c_str(), String("HALF").c_str())){
       return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>None</option><option value='INTEGER'>Whole number</option><option value='HALF' selected>Half value </option></select>");
+    }
+  }
+  
+  // Reference standard type dropdown selected item
+  if (var == "STD_REF_1" && config.standardReference == 1) return String("selected");
+  if (var == "STD_REF_2" && config.standardReference == 2) return String("selected");
+  if (var == "STD_REF_3" && config.standardReference == 3) return String("selected");
+  if (var == "STD_REF_4" && config.standardReference == 4) return String("selected");
+  if (var == "STD_REF_5" && config.standardReference == 5) return String("selected");
+
+
+  if (var == "STD_REF" ) {
+    // Standard reference
+    switch (config.standardReference) {
+
+      case ISO_1585:
+        return String("ISO-1585");
+      break;
+
+      case ISA :
+        return String("ISA");
+      break;
+
+      case ISO_13443:
+        return String("ISO-13443");
+      break;
+
+      case ISO_5011:
+        return String("ISO-5011");
+      break;
+
+      case ISO_2533:
+        return String("ISO-2533");
+      break;
     }
   }
 
