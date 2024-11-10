@@ -58,6 +58,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24111102        - #212 Modal Window cropped
 24111101        - #208 Added SCFM
                 - #212 Display issues
                 - Redirect to Main after config change
