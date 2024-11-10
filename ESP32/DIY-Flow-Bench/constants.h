@@ -91,10 +91,9 @@
 #define MPXV7007 4
 #define MPX4250 5
 #define MPXV7007DP 6
-#define _BME280 7
-#define SPARKFUN_BME280 8
-#define MPX4115 9
-#define SIMPLE_TEMP_DHT11 10
+#define SPARKFUN_BME280 7
+#define MPX4115 8
+#define SIMPLE_TEMP_DHT11 9
 
 /***********************************************************
  * Flow Differential types
@@ -102,6 +101,16 @@
 #define USERTARGET 1
 #define BASELINE 2
 #define BASELINE_LEAK 3
+
+/***********************************************************
+ * International Standards
+ ***/
+#define ISO_5011 1
+#define ISO_1585 2
+#define ISA 3
+#define ISO_13443 4
+#define ISO_2533 5
+
 
 
 /***********************************************************

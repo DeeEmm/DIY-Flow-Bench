@@ -79,6 +79,7 @@ double Calculations::convertPressure(double inputPressure, int unitsOut, int uni
       inputPressureKpa = inputPressure * 101.325;
       break;
 
+    case KPA:
     default:
       inputPressureKpa = inputPressure;
       break;
@@ -301,16 +302,8 @@ double Calculations::convertFlow(double massFlowKGH) {
 
   // TODO validate reference pressure adjustment - do we add it or subtract it? Should be baro pressure less vac amount
   double refPressurePascals = sensorVal.BaroPA - this->convertPressure(sensorVal.PRefKPA, PASCALS) ;
-  double tempInKelvin = this->convertTemperature(sensorVal.TempDegC, KELVIN, DEGC);
 
-  // Calculate saturation vapor pressure
-  waterVaporPressure = 0.61078 * exp((7.5 * sensorVal.TempDegC) / (sensorVal.TempDegC + 237.3)) * sensorVal.RelH;
-
-  // Calculate Dry air pressure
-  dryAirPressure = refPressurePascals - waterVaporPressure;
-
-  // Calculate air density from ratio of dry to wet air
-  airDensity = (dryAirPressure / (SPECIFIC_GAS_CONSTANT_DRY_AIR * tempInKelvin)) + (waterVaporPressure / (SPECIFIC_GAS_CONSTANT_WATER_VAPOUR * tempInKelvin));
+  airDensity = calculateAirDensity(sensorVal.TempDegC, refPressurePascals, sensorVal.RelH);
 
   // Multiply mass by density to get volume (m3/hr)
   flowM3H = massFlowKGH / airDensity; 
@@ -384,3 +377,111 @@ double Calculations::convertVelocityToVolumetric(double velocityFpm, double pipe
   return CFM;
   
 }
+
+
+/***********************************************************
+ * @brief Calculate air density
+ * @return air density
+ * @param TempC - Reference temperature
+ * @param baroKPA - Reference pressure
+ * @param relH - Reference humidity
+ ***/
+
+double Calculations::calculateAirDensity(double TempC, double refPressurePascals, double relH) {
+
+  extern struct SensorData sensorVal;
+
+  double airDensity = 0.0; // kg/m3
+  double waterVaporDensity = 0.0; // kg/m3
+  double waterVaporPressure = 0.0; // kg/m3
+  double dryAirPressure = 0.0; // kg/m3
+
+  double tempInKelvin = this->convertTemperature(TempC, KELVIN, DEGC);
+
+  // Calculate saturation vapor pressure
+  waterVaporPressure = 0.61078 * exp((7.5 * TempC) / (TempC + 237.3)) * relH;
+
+  // Calculate Dry air pressure
+  dryAirPressure = refPressurePascals - waterVaporPressure;
+
+  // Calculate air density from ratio of dry to wet air
+  airDensity = (dryAirPressure / (SPECIFIC_GAS_CONSTANT_DRY_AIR * tempInKelvin)) + (waterVaporPressure / (SPECIFIC_GAS_CONSTANT_WATER_VAPOUR * tempInKelvin));
+
+  return airDensity;
+
+
+}
+
+
+
+
+/***********************************************************
+ * @brief Convert flow to standard CFM (SCFM)
+ * @note Translates current flow to standardised flow based on international standards
+ * @note Default standard for project is ISO 1585 - Automotive engine testing
+ ***/
+
+double Calculations::convertToSCFM(double ACFM, int standard) {
+  
+  extern struct SensorData sensorVal; 
+
+  double SCFM;
+  double tStd;
+  double pStd;
+  double rhStd;
+  double airDensityStd;
+  double airDensityAct;
+
+  switch (standard) {
+
+    case ISO_1585:
+      tStd = 25;
+      pStd = 100;
+      rhStd = 0;
+    break;
+
+    case ISA:
+      tStd = 15;
+      pStd = 101.325;
+      rhStd = 0;
+    break;
+
+    case ISO_13443:
+      tStd = 15;
+      pStd = 100.325;
+      rhStd = 0;
+    break;
+
+    case ISO_5011:
+      tStd = 25;
+      pStd = 100.3;
+      rhStd = 50;
+    break;
+
+    case ISO_2533:
+      tStd = 15;
+      pStd = 100.325;
+      rhStd = 0;
+    break;
+
+    default: // ISO_1585
+      tStd = 25;
+      pStd = 100;
+      rhStd = 0;
+    break;
+
+  }
+
+  // From Issue #208 
+  // SCFM = sensorVal.FlowCFM * (sensorVal.PRefKPA / pStd) * (tStd / sensorVal.TempDegC) * (1 / (1 - ( sensorVal.RelH / 100)));
+
+  // From https://neutrium.net/general-engineering/conversion-of-standard-volumetric-flow-rates-of-gas/
+  airDensityAct = calculateAirDensity(sensorVal.TempDegC, sensorVal.BaroPA , sensorVal.RelH);
+  airDensityStd = calculateAirDensity(tStd, convertPressure(pStd,PASCALS) , rhStd);
+
+  SCFM = sensorVal.FlowCFM * (airDensityAct / airDensityStd);
+
+  return SCFM;
+  
+}
+

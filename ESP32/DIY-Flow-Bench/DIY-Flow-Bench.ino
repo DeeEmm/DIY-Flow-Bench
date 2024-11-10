@@ -140,7 +140,8 @@ void TASKgetSensorData( void * parameter ){
         }
 
         // Apply Flow calibration and leak offsets
-        sensorVal.FlowCFM = sensorVal.FlowCFMraw  + (calVal.leak_cal_baseline + calVal.leak_cal_offset  + calVal.flow_offset);
+        sensorVal.FlowCFM = sensorVal.FlowCFMraw  + (calVal.leak_cal_baseline + calVal.leak_cal_offset + calVal.flow_offset);
+
 
  
         // Apply Data filters...
@@ -172,6 +173,9 @@ void TASKgetSensorData( void * parameter ){
 
         }
 
+
+        // convert to standard flow
+        sensorVal.FlowSCFM = _calculations.convertToSCFM(sensorVal.FlowCFM, config.standardReference);
 
 
         // Create Flow differential values

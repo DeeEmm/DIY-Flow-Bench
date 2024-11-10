@@ -48,14 +48,17 @@ if (!!window.EventSource) {
 
       for (key in myObj) {
         try {
+          // We've got a string...
           if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
             document.getElementById(key).innerHTML = myObj[key];
+           // we've not got a string... 
            } else {
-            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'FDIFF') {
+            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'SFLOW' || key === 'FDIFF') {
               //HACK: template vars - replaced before page load
               document.getElementById(key).innerHTML = myObj[key].toFixed(~FLOW_DECIMAL_LENGTH~);  
             } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
               document.getElementById(key).innerHTML = myObj[key].toFixed(~GEN_DECIMAL_LENGTH~); 
+            //} else if (key === '') {
             } else {
               document.getElementById(key).innerHTML = myObj[key];
             }
@@ -249,6 +252,11 @@ function initialiseButtons() {
 
   document.getElementById('aflow-tile-title').addEventListener('click', function(){
     document.getElementById('aflow-tile').style.display='none';
+    document.getElementById('sflow-tile').style.display='block';
+  });
+
+  document.getElementById('sflow-tile-title').addEventListener('click', function(){
+    document.getElementById('sflow-tile').style.display='none';
     document.getElementById('maf-tile').style.display='block';
   });
 

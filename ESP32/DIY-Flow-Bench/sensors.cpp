@@ -231,6 +231,10 @@ void Sensors::initialise () {
 		this->_prefSensorType = "MPX4250";
 	#elif defined PREF_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
 		this->_prefSensorType = "MPXV7025";
+	#elif defined PREF_SENSOR_TYPE_XGZP6899A007KPDPN
+		this->_prefSensorType = "XGZP6899A007KPDPN";
+	#elif defined PREF_SENSOR_TYPE_XGZP6899A010KPDPN
+		this->_prefSensorType = "XGZP6899A010KPDPN";
 	#elif defined PREF_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
 		this->_prefSensorType = "TubePressure";
 	#elif defined PREF_SENSOR_TYPE_LINEAR_ANALOG
@@ -248,6 +252,10 @@ void Sensors::initialise () {
 		this->_pdiffSensorType = "ANALOG PIN: " + DIFF_PRESSURE_PIN;
 	#elif defined PDIFF_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
 		this->_pdiffSensorType = "MPXV7025";
+	#elif defined PREF_SENSOR_TYPE_XGZP6899A007KPDPN
+		this->_prefSensorType = "XGZP6899A007KPDPN";
+	#elif defined PREF_SENSOR_TYPE_XGZP6899A010KPDPN
+		this->_prefSensorType = "XGZP6899A010KPDPN";
 	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
 		this->_pdiffSensorType = "TubePressure";
 	#else 
@@ -263,6 +271,10 @@ void Sensors::initialise () {
 		this->_pitotSensorType = "MPXV7025";
 	#elif defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
 		this->_pitotSensorType = "ANALOG PIN: " + PITOT_PIN;
+	#elif defined PREF_SENSOR_TYPE_XGZP6899A007KPDPN
+		this->_prefSensorType = "XGZP6899A007KPDPN";
+	#elif defined PREF_SENSOR_TYPE_XGZP6899A010KPDPN
+		this->_prefSensorType = "XGZP6899A010KPDPN";
 	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
 		this->_pitotSensorType = "TubePressure";
 	#else 
