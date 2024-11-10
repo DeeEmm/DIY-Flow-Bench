@@ -379,7 +379,6 @@ double Calculations::convertVelocityToVolumetric(double velocityFpm, double pipe
 }
 
 
-
 /***********************************************************
  * @brief Calculate air density
  * @return air density
@@ -485,3 +484,4 @@ double Calculations::convertToSCFM(double ACFM, int standard) {
   return SCFM;
   
 }
+
