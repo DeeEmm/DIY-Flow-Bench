@@ -140,7 +140,8 @@ void TASKgetSensorData( void * parameter ){
         }
 
         // Apply Flow calibration and leak offsets
-        sensorVal.FlowCFM = sensorVal.FlowCFMraw  - calVal.leak_cal_baseline - calVal.leak_cal_offset  - calVal.flow_offset;
+        sensorVal.FlowCFM = sensorVal.FlowCFMraw  + (calVal.leak_cal_baseline + calVal.leak_cal_offset + calVal.flow_offset);
+
 
  
         // Apply Data filters...
@@ -178,17 +179,17 @@ void TASKgetSensorData( void * parameter ){
         switch (sensorVal.FDiffType) {
 
         case USERTARGET:
-          sensorVal.FDiff = sensorVal.FlowCFM - calVal.user_offset;
+          sensorVal.FDiff = sensorVal.FlowCFM + calVal.user_offset;
           strcpy(sensorVal.FDiffTypeDesc, "User Target (cfm)");
           break;
 
         case BASELINE:
-          sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline;
+          sensorVal.FDiff = sensorVal.FlowCFMraw + (calVal.flow_offset + calVal.leak_cal_baseline);
           strcpy(sensorVal.FDiffTypeDesc, "Baseline (cfm)");
           break;
         
         case BASELINE_LEAK :
-          sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline - calVal.leak_cal_offset;
+          sensorVal.FDiff = sensorVal.FlowCFMraw + (calVal.flow_offset + calVal.leak_cal_baseline + calVal.leak_cal_offset);
           strcpy(sensorVal.FDiffTypeDesc, "Offset (cfm)");
           break;
                 
