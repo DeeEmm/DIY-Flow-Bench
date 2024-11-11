@@ -1530,13 +1530,13 @@ String Webserver::processTemplate(const String &var)
   // Determine data graph flow axis scale
   // NOTE: currently 1000cfm is the largest flow that the graph will display. 
   // We could change scaling to be realtive to SVG height (surface currently fixed at 500)
-  if (maxcfm < 500) {
+  if (maxcfm < 500 || config.dataGraphMax == 1) {
     maxval = 250;
     scaleFactor = 2;
-  } else if (maxcfm > 250 && maxcfm < 500) {
+  } else if (maxcfm > 250 && maxcfm < 500 || config.dataGraphMax == 2) {
     maxval = 500;
     scaleFactor = 1;
-  } else if (maxcfm > 500){
+  } else if ((maxcfm > 500)  || config.dataGraphMax == 3){
     maxval = 1000; 
     scaleFactor = 0.5;
   }
