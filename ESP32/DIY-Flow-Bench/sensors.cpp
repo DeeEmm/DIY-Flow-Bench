@@ -483,6 +483,8 @@ double Sensors::getMafFlow(int units) {
 		// Q = V*A
 		// V = Q/A
 		// A = PI*r^2
+		// Q1 = Q2
+		// V1*A1 = V2*A2
 		// where Q = volumetric flow (m3/s) | A = area(m2) | V = velocity
 		
 		// Calculate original MAF area
@@ -490,11 +492,11 @@ double Sensors::getMafFlow(int units) {
 		// Calculate new MAF area
 		newMafArea = (PI * pow((config.maf_housing_diameter / 2), 2)) / 1000000;
 
-		// Calculate the 'velocity' for the original pipe area
-		mafVelocity = flowRateKGH / oldMafArea;
 		// scale the result with the new pipe area and convert back to mass flow
-		transposedflowRateKGH = mafVelocity * newMafArea;
+		transposedflowRateKGH = (flowRateKGH / oldMafArea) * newMafArea;
 
+		// Chat-GPT version		
+		// transposedflowRateKGH = flowRateKGH * (newMafArea / oldMafArea);
 
 
 		return transposedflowRateKGH;
