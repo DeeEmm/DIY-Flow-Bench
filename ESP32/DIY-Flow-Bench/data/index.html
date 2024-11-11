@@ -1173,12 +1173,13 @@ svg .dataCircle:hover {
           <div class="config-row tooltip"><label class="config-label">Temperature Unit (&degC / &degF):</label><span>~TEMPERATURE_DROPDOWN~</span><span class="tooltiptext">Display unit of temperature</span></div>
           <div class="config-row tooltip"><label class="config-label">Valve Lift Interval (mm / inch):</label>&nbsp;<input type="text" id="VALVE_LIFT_INTERVAL" name="VALVE_LIFT_INTERVAL" value="~VALVE_LIFT_INTERVAL~" class="config-text"><span class="tooltiptext">Distance between valve lift data points</span></div>
           <div class="config-row tooltip"><label class="config-label">Datagraph Max Value:</label>
-            <select name='DATAGRAPH_MAX_VALUE' class='config-select'>
+            <select name='DATAGRAPH_MAX' class='config-select'>
+              <option value='0' ~DATAGRAPH_MAX_0~>Auto</option>
               <option value='1' ~DATAGRAPH_MAX_1~>250 cfm</option>
               <option value='2' ~DATAGRAPH_MAX_2~>500 cfm</option>
               <option value='3' ~DATAGRAPH_MAX_3~>1000 cfm</option>
             </select>
-            <span class="tooltiptext">Standardised Temp, baro and humidity conditions.</span>
+            <span class="tooltiptext">Set max scaling for Data Graph.</span>
           </div>
           <br>
           <h3>Resolution and Accuracy</h3>

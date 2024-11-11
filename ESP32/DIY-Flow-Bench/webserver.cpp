@@ -1514,6 +1514,13 @@ String Webserver::processTemplate(const String &var)
   if (var == "PDIFF_SENSOR") return String(status.pdiffSensor);
   if (var == "STATUS_MESSAGE") return String(status.statusMessage);
 
+  //Datagraph Max Val selected item
+  if (var == "DATAGRAPH_MAX_0" && config.dataGraphMax == 0) return String("selected");
+  if (var == "DATAGRAPH_MAX_1" && config.dataGraphMax == 1) return String("selected");
+  if (var == "DATAGRAPH_MAX_2" && config.dataGraphMax == 2) return String("selected");
+  if (var == "DATAGRAPH_MAX_3" && config.dataGraphMax == 3) return String("selected");
+
+
   // Datagraph Stuff
   extern struct ValveLiftData valveData;
   int maxval = 0;
@@ -1530,16 +1537,18 @@ String Webserver::processTemplate(const String &var)
   // Determine data graph flow axis scale
   // NOTE: currently 1000cfm is the largest flow that the graph will display. 
   // We could change scaling to be realtive to SVG height (surface currently fixed at 500)
-  if (maxcfm < 500 || config.dataGraphMax == 1) {
+  if ((maxcfm < 500) || (config.dataGraphMax == 1)) {
     maxval = 250;
     scaleFactor = 2;
-  } else if (maxcfm > 250 && maxcfm < 500 || config.dataGraphMax == 2) {
+  } else if ((maxcfm > 250 && maxcfm < 500) || (config.dataGraphMax == 2)) {
     maxval = 500;
     scaleFactor = 1;
-  } else if ((maxcfm > 500)  || config.dataGraphMax == 3){
+  } else if ((maxcfm > 500)  || (config.dataGraphMax == 3)  || (config.dataGraphMax == 0)){
     maxval = 1000; 
     scaleFactor = 0.5;
   }
+
+
 
   // scale the data graph flow axis
   if (var == "flow1") return String(maxval / 10);
@@ -1690,11 +1699,6 @@ String Webserver::processTemplate(const String &var)
       return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>None</option><option value='INTEGER'>Whole number</option><option value='HALF' selected>Half value </option></select>");
     }
   }
-
-  //Datagraph MAx Val selected item
-  if (var == "DATAGRAPH_MAX_1" && config.dataGraphMax == 1) return String("selected");
-  if (var == "DATAGRAPH_MAX_2" && config.dataGraphMax == 2) return String("selected");
-  if (var == "DATAGRAPH_MAX_3" && config.dataGraphMax == 3) return String("selected");
 
 
   // Reference standard type dropdown selected item
