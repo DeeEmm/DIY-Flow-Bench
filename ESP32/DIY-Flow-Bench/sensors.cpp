@@ -396,6 +396,7 @@ double Sensors::getMafVolts() {
 /***********************************************************
  * @brief Returns MAF mass flow value in KG/H 
  * @note Interpolates lookupvalue from datatable key>value pairs
+ * @returns Mass flow in KG/H
  *
  ***/
 double Sensors::getMafFlow(int units) {
@@ -411,6 +412,10 @@ double Sensors::getMafFlow(int units) {
 	double flowRateKGH = 0.0;
 	double lookupValue = 0.0;
 	double transposedflowRateKGH = 0.0;
+	double oldMafArea = 0.0;
+	double newMafArea = 0.0;
+	double velocity1 = 0.0;
+	double velocity2 = 0.0;
 	double mafVelocity = 0.0;
 
 	// scale sensor reading to data table size using map function (0-5v : 0-keymax)
@@ -470,21 +475,27 @@ double Sensors::getMafFlow(int units) {
 	if (config.maf_housing_diameter > 0 && status.mafDiameter > 0 && config.maf_housing_diameter != status.mafDiameter) { 
 		// We are running a custom MAF Housing, lets translate the flow rates to the new diameter
 
-		// NOTE this transfer function is actually for volumetric flow but we can assume that the mass to volumetric conversion is ratiometric at any given instant in time.
+		// NOTE this transfer function is actually for volumetric flow (m3/s) but we can assume that the mass to volumetric conversion is ratiometric at any given instant in time.
 		// This is because any environmental influences apply equally to both parts of the equation and cancel each other out. 
 		// So we can reduce the mass flow conversion to the same simple ratio that we use for volumetric flow. 
 		// In short, the relationship between flow and pipe area applies equally to both mass flow and volumetric flow for a given instant in time.
 
-		// Q = A*V
+		// Q = V*A
 		// V = Q/A
 		// A = PI*r^2
-		// where Q = flow | A = area | V = velocity
+		// where Q = volumetric flow (m3/s) | A = area(m2) | V = velocity
+		
+		// Calculate original MAF area
+		oldMafArea = (PI * pow((status.mafDiameter / 2), 2)) / 1000000;
+		// Calculate new MAF area
+		newMafArea = (PI * pow((config.maf_housing_diameter / 2), 2)) / 1000000;
 
 		// Calculate the 'velocity' for the original pipe area
-		mafVelocity = flowRateKGH / PI * pow((status.mafDiameter / 2), 2);
-
+		mafVelocity = flowRateKGH / oldMafArea;
 		// scale the result with the new pipe area and convert back to mass flow
-		transposedflowRateKGH = mafVelocity * PI * pow((config.maf_housing_diameter / 2), 2);
+		transposedflowRateKGH = mafVelocity * newMafArea;
+
+
 
 		return transposedflowRateKGH;
 
