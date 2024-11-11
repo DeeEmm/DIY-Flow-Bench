@@ -599,6 +599,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
     config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
     configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
     configData["STANDARD_REFERENCE"] = config.standardReference;
+    configData["DATAGRAPH_MAX"] = config.dataGraphMax;
     configData["TEMP_UNIT"] = config.temp_unit;
     configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
     strcpy(config.bench_type, configData["BENCH_TYPE"]);
@@ -687,6 +688,7 @@ void Webserver::createConfigFile () {
   configData["CONF_SERIAL_BAUD_RATE"] = config.serial_baud_rate;
   configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
   configData["STANDARD_REFERENCE"] = config.standardReference;
+  configData["DATAGRAPH_MAX"] = config.dataGraphMax;
   configData["TEMP_UNIT"] = config.temp_unit;
   configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
   configData["CONF_SHOW_ALARMS"] = config.show_alarms;
@@ -762,6 +764,7 @@ void Webserver::parseConfigurationForm(AsyncWebServerRequest *request)
   config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
   config.adj_flow_depression = configData["ADJ_FLOW_DEPRESSION"].as<int>();
   config.standardReference = configData["STANDARD_REFERENCE"].as<int>();
+  config.dataGraphMax = configData["DATAGRAPH_MAX"].as<int>();
   strcpy(config.temp_unit, configData["TEMP_UNIT"]);
   config.valveLiftInterval = configData["VALVE_LIFT_INTERVAL"].as<double>();
   strcpy(config.bench_type, configData["BENCH_TYPE"]);
@@ -1687,7 +1690,13 @@ String Webserver::processTemplate(const String &var)
       return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>None</option><option value='INTEGER'>Whole number</option><option value='HALF' selected>Half value </option></select>");
     }
   }
-  
+
+  //Datagraph MAx Val selected item
+  if (var == "DATAGRAPH_MAX_1" && config.dataGraphMax == 1) return String("selected");
+  if (var == "DATAGRAPH_MAX_2" && config.dataGraphMax == 2) return String("selected");
+  if (var == "DATAGRAPH_MAX_3" && config.dataGraphMax == 3) return String("selected");
+
+
   // Reference standard type dropdown selected item
   if (var == "STD_REF_1" && config.standardReference == 1) return String("selected");
   if (var == "STD_REF_2" && config.standardReference == 2) return String("selected");
