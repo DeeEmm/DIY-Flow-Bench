@@ -225,7 +225,7 @@
           <div class="tile tile-aflow" id="aflow-tile">
             <p class="tile-title" id="aflow-tile-title">Adjusted Flow</p>
             <p><span class="tile-value" id="AFLOW">&nbsp;</span></p>
-            <p class="units">ACFM&nbsp;&commat;&nbsp;<span id="PADJUST">28</span>&nbsp;inH2O</p>
+            <p class="units">~AFLOW_UNITS~&nbsp;&commat;&nbsp;<span id="PADJUST">28</span>&nbsp;inH2O</p>
           </div>
           <div class="tile tile-sflow" id="sflow-tile">
             <p class="tile-title" id="sflow-tile-title">Standard Flow</p>
@@ -522,6 +522,7 @@
             </select>
             <span class="tooltiptext">Standardised Temp, baro and humidity conditions.</span>
           </div>
+          <div class="config-row tooltip"><label class="config-label">Standardised Adjusted Flow:</label>&nbsp;<input type="checkbox" id="STD_ADJ_FLOW" name="STD_ADJ_FLOW" value="1" ~STD_ADJ_FLOW~ class="config-text"><span class="tooltiptext">Adjusted flow uses SCFM</span></div>
           <br>
           <h3>Calibration Orifice Settings</h3>
           <div class="config-row tooltip"><label class="config-label">Calibration Orifice Flow Rate (cfm):</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="~CONF_CAL_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice in cfm</span></div>
