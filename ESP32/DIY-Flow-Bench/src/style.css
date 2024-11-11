@@ -390,6 +390,7 @@ flowTargetValInput {
   border: 1px solid #888;
    width: 850px; 
   border-radius: 5px;
+  overflow-y:scroll;
 }
 
 .calibrationModal {
