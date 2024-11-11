@@ -599,6 +599,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
     config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
     configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
     configData["STANDARD_REFERENCE"] = config.standardReference;
+    configData["STD_ADJ_FLOW"] = config.std_adj_flow;
     configData["DATAGRAPH_MAX"] = config.dataGraphMax;
     configData["TEMP_UNIT"] = config.temp_unit;
     configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
@@ -688,6 +689,7 @@ void Webserver::createConfigFile () {
   configData["CONF_SERIAL_BAUD_RATE"] = config.serial_baud_rate;
   configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
   configData["STANDARD_REFERENCE"] = config.standardReference;
+  configData["STD_ADJ_FLOW"] = config.std_adj_flow;
   configData["DATAGRAPH_MAX"] = config.dataGraphMax;
   configData["TEMP_UNIT"] = config.temp_unit;
   configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
@@ -764,6 +766,7 @@ void Webserver::parseConfigurationForm(AsyncWebServerRequest *request)
   config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
   config.adj_flow_depression = configData["ADJ_FLOW_DEPRESSION"].as<int>();
   config.standardReference = configData["STANDARD_REFERENCE"].as<int>();
+  config.std_adj_flow = configData["STD_ADJ_FLOW"].as<int>();
   config.dataGraphMax = configData["DATAGRAPH_MAX"].as<int>();
   strcpy(config.temp_unit, configData["TEMP_UNIT"]);
   config.valveLiftInterval = configData["VALVE_LIFT_INTERVAL"].as<double>();
@@ -1302,6 +1305,7 @@ String Webserver::getDataJSON()
     dataJson["AFLOW"] = 0.0;
   }
 
+
   // Flow depression value for AFLOW units
   dataJson["PADJUST"] = config.adj_flow_depression;
 
@@ -1700,6 +1704,16 @@ String Webserver::processTemplate(const String &var)
     }
   }
 
+
+  if (var == "STD_ADJ_FLOW" ) {
+    if (config.std_adj_flow == 1) {
+      return String("Checked");
+    }
+  }
+
+  if (var == "AFLOW_UNITS" && config.std_adj_flow == 0) return String("ACFM");
+  if (var == "AFLOW_UNITS" && config.std_adj_flow == 1) return String("SCFM");
+  
 
   // Reference standard type dropdown selected item
   if (var == "STD_REF_1" && config.standardReference == 1) return String("selected");
