@@ -45,6 +45,8 @@ struct ConfigSettings {
   int gen_decimal_length = 2;                     // General decimal number of places 
   char data_filter_type[12] = "NONE";             // Data filter type 
   int standardReference = 1;                      // Standard reference conditions (default ISO 1585)
+  int std_adj_flow = 0;                           // Standardised adjusted flow
+  int dataGraphMax = 0;                           // Data graph maximum Y value
   int cyc_av_buffer = 5;                          // [5] Scan # over which to average output (helps smooth results)
   bool show_alarms = true;                        // Display Alarms?
   bool debug_mode = false;                        // Global debug print override

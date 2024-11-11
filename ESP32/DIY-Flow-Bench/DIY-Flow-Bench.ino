@@ -200,13 +200,15 @@ void TASKgetSensorData( void * parameter ){
           break;
         }
         
-
-
         
         #ifdef PREF_IS_ENABLED 
         sensorVal.PRefKPA = _sensors.getPRefValue();
         sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
-        sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, config.adj_flow_depression, sensorVal.FlowCFM);
+        if (config.std_adj_flow == 1) {
+          sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, config.adj_flow_depression, sensorVal.FlowSCFM);
+        } else {
+          sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, config.adj_flow_depression, sensorVal.FlowCFM);
+        }
         #endif
 
         #ifdef PDIFF_IS_ENABLED
@@ -219,8 +221,6 @@ void TASKgetSensorData( void * parameter ){
         sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O);
         #endif
 
-
-        
         #ifdef SWIRL_IS_ENABLED
           uint8_t Swirl = Encoder.read();
 

@@ -58,6 +58,11 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24111107        - #222 Adjusted standard flow
+24111106        - #220 Datagraph max value
+24111105        - #212 Added scroll to modals
+24111104        - #217 add GPT version
+24111103        - #217 Scaled MAF housing returns O.O.R. value
 24111102        - #212 Modal Window cropped
 24111101        - #208 Added SCFM
                 - #212 Display issues
