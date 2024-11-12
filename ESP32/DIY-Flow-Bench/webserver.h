@@ -44,9 +44,7 @@ class Webserver {
 		StaticJsonDocument<1024> dataJson; 
 		StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftDataJson; 
 
-		String getFileListJSON ();
 		String getSystemStatusJSON();		
-		String byteDecode(size_t bytes);
 		void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 		static void processUpdate(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final);
@@ -63,8 +61,6 @@ class Webserver {
 		void sendIndexPage();
 		void uploadFile();
 		String index_html;
-		int getWifiConnection();
-		StaticJsonDocument<LIFT_DATA_JSON_SIZE> loadLiftData ();
 		void parseLiftData(StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData);
 		
 	public:
@@ -78,14 +74,11 @@ class Webserver {
 		
 		void begin();
 		// void writeJSONFile(String data, String filename, int dataSize);
-		String getDataJSON();
 		// StaticJsonDocument<CONFIG_JSON_SIZE> loadJSONFile(String filename);
 		void sendWebSocketMessage(String jsonValues);
 		void parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configData);
 		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfig ();
 		void createConfigFile ();
-		void resetWifi ( void );
-		void wifiReconnect ( void );
 		String getValveDataJSON();
 		
 		StaticJsonDocument<1024> getSDFile(String filename);
@@ -105,7 +98,6 @@ class Webserver {
 		void testFileIO(fs::FS &fs, const char * path);
 
 		// void createLiftDataFile();
-		static void clearLiftDataFile(AsyncWebServerRequest *request);
 		static void parseLiftDataForm(AsyncWebServerRequest *request);
 		static void parseUserFlowTargetForm(AsyncWebServerRequest *request);
 

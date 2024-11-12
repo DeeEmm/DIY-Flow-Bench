@@ -29,10 +29,11 @@
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
+#include "comms.h"
 
-#include <WiFi.h>
-#include <ESPmDNS.h>
-#include <esp_wifi.h>
+// #include <WiFi.h>
+// #include <ESPmDNS.h>
+// #include <esp_wifi.h>
 
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -42,7 +43,7 @@
 
 #include "calibration.h"
 #include "sensors.h"
-#include "pins.h"
+// #include "pins.h"
 #include "hardware.h"
 #include "messages.h"
 #include "calculations.h"
@@ -82,6 +83,7 @@ void Webserver::begin()
 
   Messages _message;
   Calibration _calibration;
+  DataHandler _data;
 
   // // Filesystem
   // _message.serialPrintf("File System Initialisation...\n");
@@ -109,18 +111,18 @@ void Webserver::begin()
   //   _calibration.createCalibrationFile();
   // }
 
-  // load json configuration files from SPIFFS memory
-  this->loadConfig();
-  this->loadLiftData();
-  _calibration.loadCalibrationData();
+  // // load json configuration files from SPIFFS memory
+  // this->loadConfig();
+  // this->loadLiftData();
+  // _calibration.loadCalibrationData();
   
-  // Display Filesystem Stats
-  status.spiffs_mem_size = SPIFFS.totalBytes();
-  status.spiffs_mem_used = SPIFFS.usedBytes();
+  // // Display Filesystem Stats
+  // status.spiffs_mem_size = SPIFFS.totalBytes();
+  // status.spiffs_mem_used = SPIFFS.usedBytes();
 
-  _message.serialPrintf("=== SPIFFS File system info === \n");
-  _message.serialPrintf("Total space:      %s \n", byteDecode(status.spiffs_mem_size));
-  _message.serialPrintf("Total space used: %s \n", byteDecode(status.spiffs_mem_used));
+  // _message.serialPrintf("=== SPIFFS File system info === \n");
+  // _message.serialPrintf("Total space:      %s \n", byteDecode(status.spiffs_mem_size));
+  // _message.serialPrintf("Total space used: %s \n", byteDecode(status.spiffs_mem_used));
 
   // // SD Card
   // #ifdef SD_CARD_IS_ENABLED
@@ -180,68 +182,68 @@ void Webserver::begin()
 
   // #endif
 
-  // WiFi
-  // if WiFi password is unedited or blank force AP mode
-  if ((strstr(String(config.wifi_pswd).c_str(), String("PASSWORD").c_str())) || (String(config.wifi_pswd).c_str() == "")) {
-    config.ap_mode = true;
-  } 
+  // // WiFi
+  // // if WiFi password is unedited or blank force AP mode
+  // if ((strstr(String(config.wifi_pswd).c_str(), String("PASSWORD").c_str())) || (String(config.wifi_pswd).c_str() == "")) {
+  //   config.ap_mode = true;
+  // } 
   
-  // Connect to WiFi
-  if (config.ap_mode == false)  {
-    // WiFi.useStaticBuffers(true);   
-    this->resetWifi();
-    WiFi.mode(WIFI_STA);
-    // Set MAC address
-    #ifdef MAC_ADDRESS
-      uint8_t newMACAddress[] = MAC_ADDRESS;
-      esp_wifi_set_mac(WIFI_IF_STA, &newMACAddress[0]);
-    #endif
-    // Display MAC Address
-    _message.serialPrintf("WiFi MAC Address: %s \n", String(WiFi.macAddress()).c_str());  
-    _message.serialPrintf("Connecting to WiFi \n");
-    #ifdef STATIC_IP
-      // Configures static IP address
-      if (!WiFi.config(STATIC_IP, GATEWAY, SUBNET)) {
-        Serial.println("STA Failed to configure");
-      }
-    #endif
-    wifiStatusCode = this->getWifiConnection();
-  }
+  // // Connect to WiFi
+  // if (config.ap_mode == false)  {
+  //   // WiFi.useStaticBuffers(true);   
+  //   this->resetWifi();
+  //   WiFi.mode(WIFI_STA);
+  //   // Set MAC address
+  //   #ifdef MAC_ADDRESS
+  //     uint8_t newMACAddress[] = MAC_ADDRESS;
+  //     esp_wifi_set_mac(WIFI_IF_STA, &newMACAddress[0]);
+  //   #endif
+  //   // Display MAC Address
+  //   _message.serialPrintf("WiFi MAC Address: %s \n", String(WiFi.macAddress()).c_str());  
+  //   _message.serialPrintf("Connecting to WiFi \n");
+  //   #ifdef STATIC_IP
+  //     // Configures static IP address
+  //     if (!WiFi.config(STATIC_IP, GATEWAY, SUBNET)) {
+  //       Serial.println("STA Failed to configure");
+  //     }
+  //   #endif
+  //   wifiStatusCode = this->getWifiConnection();
+  // }
 
-  // Test for connection success else create an accesspoint
-  if (wifiStatusCode == 3 && config.ap_mode == false) { 
-    // STA Connection success
-    _message.serialPrintf("\nConnected to %s \n", config.wifi_ssid);
-    status.local_ip_address = WiFi.localIP().toString().c_str();
-    _message.serialPrintf("IP address: %s \n", WiFi.localIP().toString().c_str());
-    WiFi.setAutoReconnect(true);
-    WiFi.persistent(true);
+  // // Test for connection success else create an accesspoint
+  // if (wifiStatusCode == 3 && config.ap_mode == false) { 
+  //   // STA Connection success
+  //   _message.serialPrintf("\nConnected to %s \n", config.wifi_ssid);
+  //   status.local_ip_address = WiFi.localIP().toString().c_str();
+  //   _message.serialPrintf("IP address: %s \n", WiFi.localIP().toString().c_str());
+  //   WiFi.setAutoReconnect(true);
+  //   WiFi.persistent(true);
     
-  }  else  { // Go into AP Mode
-    if (config.ap_mode == true) { // AP mode is Default
-      _message.serialPrintf("\nDefaulting to AP Mode \n");
-    } else { // AP mode is Fallback
-      _message.serialPrintf("\nFailed to connect to Wifi \n");
-      _message.serialPrintf("Wifi Status message: ");
-      _message.serialPrintf(String(wifiStatusCode).c_str());
-      _message.serialPrintf("\n");
-    }
+  // }  else  { // Go into AP Mode
+  //   if (config.ap_mode == true) { // AP mode is Default
+  //     _message.serialPrintf("\nDefaulting to AP Mode \n");
+  //   } else { // AP mode is Fallback
+  //     _message.serialPrintf("\nFailed to connect to Wifi \n");
+  //     _message.serialPrintf("Wifi Status message: ");
+  //     _message.serialPrintf(String(wifiStatusCode).c_str());
+  //     _message.serialPrintf("\n");
+  //   }
 
-    _message.serialPrintf("Creating WiFi Access Point:  %s  \n", config.wifi_ap_ssid); // NOTE: Default AP SSID / PW = DIYFB / 123456789
-    WiFi.mode(WIFI_AP);
-    WiFi.softAP(config.wifi_ap_ssid, config.wifi_ap_pswd);
-    status.local_ip_address = WiFi.softAPIP().toString().c_str();
-    _message.serialPrintf("Access Point IP address: %s \n", WiFi.softAPIP().toString().c_str());
-    status.apMode = true;
-  }
+  //   _message.serialPrintf("Creating WiFi Access Point:  %s  \n", config.wifi_ap_ssid); // NOTE: Default AP SSID / PW = DIYFB / 123456789
+  //   WiFi.mode(WIFI_AP);
+  //   WiFi.softAP(config.wifi_ap_ssid, config.wifi_ap_pswd);
+  //   status.local_ip_address = WiFi.softAPIP().toString().c_str();
+  //   _message.serialPrintf("Access Point IP address: %s \n", WiFi.softAPIP().toString().c_str());
+  //   status.apMode = true;
+  // }
 
-  // Set up Multicast DNS
-  if (!MDNS.begin(config.hostname))  {
-    _message.serialPrintf("Error starting mDNS \n");
-  }  else  {
-    status.hostname = config.hostname;
-    _message.serialPrintf("Multicast: http://%s.local \n", status.hostname);
-  }
+  // // Set up Multicast DNS
+  // if (!MDNS.begin(config.hostname))  {
+  //   _message.serialPrintf("Error starting mDNS \n");
+  // }  else  {
+  //   status.hostname = config.hostname;
+  //   _message.serialPrintf("Multicast: http://%s.local \n", status.hostname);
+  // }
 
   // API request handlers [JSON confirmation response]
   server->on("/api/bench/on", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -431,8 +433,8 @@ void Webserver::begin()
   
   // Send JSON Data
   server->on("/api/json", HTTP_GET, [](AsyncWebServerRequest *request){
-    Webserver _webserver;
-    request->send(200, "text/html", String(_webserver.getDataJSON()).c_str());
+    DataHandler _data;
+    request->send(200, "text/html", String(_data.getDataJSON()).c_str());
   });
 
 
@@ -452,7 +454,10 @@ void Webserver::begin()
   server->on("/api/saveorifice", HTTP_POST, parseOrificeForm);
 
   // Clear Lift Data
-  server->on("/api/clearLiftData", HTTP_POST, clearLiftDataFile);  
+  server->on("/api/clearLiftData", HTTP_POST, [](AsyncWebServerRequest *request) {
+    DataHandler _data;
+    _data.clearLiftDataFile;
+  });  
 
   // index.html
   server->rewrite("/index.html", "/");
@@ -486,23 +491,6 @@ void Webserver::begin()
   _message.serialPrintf("Server Running \n");
 }
 
-
-/***********************************************************
- * @brief byteDecode
- * @param bytes size to be decoded
- * @details Byte Decode (returns string i.e '52 GB')
- ***/
-String Webserver::byteDecode(size_t bytes)
-{
-  if (bytes < 1024)
-    return String(bytes) + " B";
-  else if (bytes < (1024 * 1024))
-    return String(bytes / 1024.0) + " KB";
-  else if (bytes < (1024 * 1024 * 1024))
-    return String(bytes / 1024.0 / 1024.0) + " MB";
-  else
-    return String(bytes / 1024.0 / 1024.0 / 1024.0) + " GB";
-}
 
 
 /***********************************************************
@@ -563,72 +551,72 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
 
 
-/***********************************************************
-* @brief loadConfig
-* @details read configuration data from config.json file and loads into global struct
-***/ 
-StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
+// /***********************************************************
+// * @brief loadConfig
+// * @details read configuration data from config.json file and loads into global struct
+// ***/ 
+// StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
 
-  extern struct ConfigSettings config;
+//   extern struct ConfigSettings config;
 
-  StaticJsonDocument<CONFIG_JSON_SIZE> configData;
-  DataHandler _data;
-  Messages _message;
+//   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
+//   DataHandler _data;
+//   Messages _message;
 
-  _message.serialPrintf("Loading Configuration... \n");     
+//   _message.serialPrintf("Loading Configuration... \n");     
 
-  if (SPIFFS.exists("/config.json"))  {
+//   if (SPIFFS.exists("/config.json"))  {
 
-    configData = _data.loadJSONFile("/config.json");
+//     configData = _data.loadJSONFile("/config.json");
 
-    strcpy(config.wifi_ssid, configData["CONF_WIFI_SSID"]);
-    strcpy(config.wifi_pswd, configData["CONF_WIFI_PSWD"]);
-    strcpy(config.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
-    strcpy(config.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
-    strcpy(config.hostname, configData["CONF_HOSTNAME"]);
-    config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
-    config.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
-    config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
-    config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
-    config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
-    strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
-    strcpy(config.rounding_type, configData["ROUNDING_TYPE"]);
-    config.flow_decimal_length, configData["FLOW_DECIMAL_LENGTH"];
-    config.gen_decimal_length, configData["GEN_DECIMAL_LENGTH"];
-    config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
-    config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
-    strcpy(config.api_delim, configData["CONF_API_DELIM"]);
-    config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
-    config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
-    configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
-    configData["STANDARD_REFERENCE"] = config.standardReference;
-    configData["STD_ADJ_FLOW"] = config.std_adj_flow;
-    configData["DATAGRAPH_MAX"] = config.dataGraphMax;
-    configData["TEMP_UNIT"] = config.temp_unit;
-    configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
-    strcpy(config.bench_type, configData["BENCH_TYPE"]);
-    config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
-    config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
-    config.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
-    config.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
-    config.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
-    config.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
-    config.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
-    config.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
-    config.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
-    config.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
-    config.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
-    config.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
-    config.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
-    config.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
+//     strcpy(config.wifi_ssid, configData["CONF_WIFI_SSID"]);
+//     strcpy(config.wifi_pswd, configData["CONF_WIFI_PSWD"]);
+//     strcpy(config.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
+//     strcpy(config.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
+//     strcpy(config.hostname, configData["CONF_HOSTNAME"]);
+//     config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
+//     config.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
+//     config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
+//     config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
+//     config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
+//     strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
+//     strcpy(config.rounding_type, configData["ROUNDING_TYPE"]);
+//     config.flow_decimal_length, configData["FLOW_DECIMAL_LENGTH"];
+//     config.gen_decimal_length, configData["GEN_DECIMAL_LENGTH"];
+//     config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
+//     config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
+//     strcpy(config.api_delim, configData["CONF_API_DELIM"]);
+//     config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
+//     config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
+//     configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
+//     configData["STANDARD_REFERENCE"] = config.standardReference;
+//     configData["STD_ADJ_FLOW"] = config.std_adj_flow;
+//     configData["DATAGRAPH_MAX"] = config.dataGraphMax;
+//     configData["TEMP_UNIT"] = config.temp_unit;
+//     configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
+//     strcpy(config.bench_type, configData["BENCH_TYPE"]);
+//     config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
+//     config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
+//     config.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
+//     config.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
+//     config.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
+//     config.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
+//     config.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
+//     config.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
+//     config.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
+//     config.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
+//     config.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
+//     config.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
+//     config.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
+//     config.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
 
-  } else {
-    _message.serialPrintf("Configuration file not found \n");
-  }
+//   } else {
+//     _message.serialPrintf("Configuration file not found \n");
+//   }
   
-  return configData;  
+//   return configData;  
 
-}
+// }
 
 
 
@@ -946,43 +934,43 @@ void Webserver::toggleFlowDiffTile () {
 
 
 
-/***********************************************************
-* @brief loadLiftDataFile
-* @details read lift data from liftdata.json file
-***/ 
-StaticJsonDocument<LIFT_DATA_JSON_SIZE> Webserver::loadLiftData () {
+// /***********************************************************
+// * @brief loadLiftDataFile
+// * @details read lift data from liftdata.json file
+// ***/ 
+// StaticJsonDocument<LIFT_DATA_JSON_SIZE> Webserver::loadLiftData () {
 
-  extern struct ValveLiftData valveData;
-  StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
-  DataHandler _data;
-  Messages _message;
+//   extern struct ValveLiftData valveData;
+//   StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
+//   DataHandler _data;
+//   Messages _message;
 
-  _message.serialPrintf("Loading Lift Data... \n");     
+//   _message.serialPrintf("Loading Lift Data... \n");     
 
-  if (SPIFFS.exists("/liftdata.json"))  {
+//   if (SPIFFS.exists("/liftdata.json"))  {
     
-    liftData = _data.loadJSONFile("/liftdata.json");
+//     liftData = _data.loadJSONFile("/liftdata.json");
     
-    valveData.LiftData1 = liftData["LIFTDATA1"].as<double>();
-    valveData.LiftData2 = liftData["LIFTDATA2"].as<double>();
-    valveData.LiftData3 = liftData["LIFTDATA3"].as<double>();
-    valveData.LiftData4 = liftData["LIFTDATA4"].as<double>();
-    valveData.LiftData5 = liftData["LIFTDATA5"].as<double>();
-    valveData.LiftData6 = liftData["LIFTDATA6"].as<double>();
-    valveData.LiftData7 = liftData["LIFTDATA7"].as<double>();
-    valveData.LiftData8 = liftData["LIFTDATA8"].as<double>();
-    valveData.LiftData9 = liftData["LIFTDATA9"].as<double>();
-    valveData.LiftData10 = liftData["LIFTDATA10"].as<double>();
-    valveData.LiftData11 = liftData["LIFTDATA11"].as<double>();
-    valveData.LiftData12 = liftData["LIFTDATA12"].as<double>();
+//     valveData.LiftData1 = liftData["LIFTDATA1"].as<double>();
+//     valveData.LiftData2 = liftData["LIFTDATA2"].as<double>();
+//     valveData.LiftData3 = liftData["LIFTDATA3"].as<double>();
+//     valveData.LiftData4 = liftData["LIFTDATA4"].as<double>();
+//     valveData.LiftData5 = liftData["LIFTDATA5"].as<double>();
+//     valveData.LiftData6 = liftData["LIFTDATA6"].as<double>();
+//     valveData.LiftData7 = liftData["LIFTDATA7"].as<double>();
+//     valveData.LiftData8 = liftData["LIFTDATA8"].as<double>();
+//     valveData.LiftData9 = liftData["LIFTDATA9"].as<double>();
+//     valveData.LiftData10 = liftData["LIFTDATA10"].as<double>();
+//     valveData.LiftData11 = liftData["LIFTDATA11"].as<double>();
+//     valveData.LiftData12 = liftData["LIFTDATA12"].as<double>();
 
-  } else {
-    _message.serialPrintf("LiftData file not found \n");
-  }
+//   } else {
+//     _message.serialPrintf("LiftData file not found \n");
+//   }
   
-  return liftData;  
+//   return liftData;  
 
-}
+// }
 
 
 
@@ -1019,26 +1007,26 @@ StaticJsonDocument<LIFT_DATA_JSON_SIZE> Webserver::loadLiftData () {
 
 
 
-/***********************************************************
-* @brief clearLiftDataFile
-* @details Delete and recreate default lift data file
-***/
-void Webserver::clearLiftDataFile(AsyncWebServerRequest *request){
+// /***********************************************************
+// * @brief clearLiftDataFile
+// * @details Delete and recreate default lift data file
+// ***/
+// void Webserver::clearLiftDataFile(AsyncWebServerRequest *request){
 
-  DataHandler _data;
-  Webserver _webserver;
+//   DataHandler _data;
+//   Webserver _webserver;
   
-  if (SPIFFS.exists("/liftdata.json"))  {
-    SPIFFS.remove("/liftdata.json");
-  }
+//   if (SPIFFS.exists("/liftdata.json"))  {
+//     SPIFFS.remove("/liftdata.json");
+//   }
   
-  _data.createLiftDataFile();
+//   _data.createLiftDataFile();
 
-  _webserver.loadLiftData();
+//   _webserver.loadLiftData();
 
-  request->redirect("/?view=graph");
+//   request->redirect("/?view=graph");
 
-}
+// }
 
 
 
@@ -1221,180 +1209,6 @@ void Webserver::parseOrificeForm(AsyncWebServerRequest *request)
 
 }
 
-
-
-
-
-
-/***********************************************************
- * @brief getFileListJSON
- * @details Get SPIFFS File List in JSON format
- ***/
-String Webserver::getFileListJSON()
-{
-
-  String jsonString;
-  String fileName;
-  size_t fileSize;
-
-  StaticJsonDocument<1024> dataJson;
-
-  Messages _message;
-
-  _message.statusPrintf("Filesystem contents: \n");
-  FILESYSTEM.begin();
-  File root = FILESYSTEM.open("/");
-  File file = root.openNextFile();
-  while (file)  {
-    fileName = file.name();
-    fileSize = file.size();
-    dataJson[fileName] = String(fileSize);
-    _message.statusPrintf("%s : %s \n", fileName, byteDecode(fileSize));
-    file = root.openNextFile();
-  }
-
-  serializeJson(dataJson, jsonString);
-  return jsonString;
-}
-
-
-
-/***********************************************************
- * @brief getDataJSON
- * @details Package up current bench data into JSON string
- ***/
-String Webserver::getDataJSON()
-{
-
-  extern struct DeviceStatus status;
-  extern struct ConfigSettings config;
-  extern struct SensorData sensorVal;
-
-  Hardware _hardware;
-  Calculations _calculations;
-
-  String jsonString;
-
-  StaticJsonDocument<DATA_JSON_SIZE> dataJson;
-
-  // Reference pressure
-  dataJson["PREF"] = sensorVal.PRefH2O;
-
-  double flowComp = fabs(sensorVal.FlowCFM);
-  double pRefComp = fabs(sensorVal.PRefH2O);
-
-  // Flow Rate
-  if ((flowComp > config.min_flow_rate) && (pRefComp > config.min_bench_pressure))  {
-
-    // Check if we need to round values
-     if (strstr(String(config.rounding_type).c_str(), String("NONE").c_str())) {
-        dataJson["FLOW"] = sensorVal.FlowCFM;
-        dataJson["MFLOW"] = sensorVal.FlowKGH;
-        dataJson["AFLOW"] = sensorVal.FlowADJ;
-        dataJson["SFLOW"] = sensorVal.FlowSCFM;
-    // Round to whole value    
-    } else if (strstr(String(config.rounding_type).c_str(), String("INTEGER").c_str())) {
-        dataJson["FLOW"] = round(sensorVal.FlowCFM);
-        dataJson["MFLOW"] = round(sensorVal.FlowKGH);
-        dataJson["AFLOW"] = round(sensorVal.FlowADJ);
-        dataJson["SFLOW"] = round(sensorVal.FlowSCFM);
-    // Round to half (nearest 0.5)
-    } else if (strstr(String(config.rounding_type).c_str(), String("HALF").c_str())) {
-        dataJson["FLOW"] = round(sensorVal.FlowCFM * 2.0 ) / 2.0;
-        dataJson["MFLOW"] = round(sensorVal.FlowKGH * 2.0) / 2.0;
-        dataJson["AFLOW"] = round(sensorVal.FlowADJ * 2.0) / 2.0;
-        dataJson["SFLOW"] = round(sensorVal.FlowSCFM * 2.0) / 2.0;
-    }
-
-  }  else  {
-    dataJson["FLOW"] = 0.0;
-    dataJson["MFLOW"] = 0.0;
-    dataJson["AFLOW"] = 0.0;
-  }
-
-
-  // Flow depression value for AFLOW units
-  dataJson["PADJUST"] = config.adj_flow_depression;
-
-  // Standard reference
-  switch (config.standardReference) {
-
-    case ISO_1585:
-      dataJson["STD_REF"] = "ISO-1585";
-    break;
-
-    case ISA :
-      dataJson["STD_REF"] = "ISA";
-    break;
-
-    case ISO_13443:
-      dataJson["STD_REF"] = "ISO-13443";
-    break;
-
-    case ISO_5011:
-      dataJson["STD_REF"] = "ISO-5011";
-    break;
-
-    case ISO_2533:
-      dataJson["STD_REF"] = "ISO-2533";
-    break;
-
-  }
-
-
-  // Temperature deg C or F
-  if (strstr(String(config.temp_unit).c_str(), String("Celcius").c_str())){
-    dataJson["TEMP"] = sensorVal.TempDegC;
-  } else {
-    dataJson["TEMP"] = sensorVal.TempDegF;
-  }
-
-
-  // Bench Type for status pane
-  if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())) {
-    dataJson["BENCH_TYPE"] = "MAF";
-  } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())) {
-    dataJson["BENCH_TYPE"] = "ORIFICE";
-  } else if (strstr(String(config.bench_type).c_str(), String("VENTURI").c_str())) {
-    dataJson["BENCH_TYPE"] = "VENTURI";
-  } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())) {
-    dataJson["BENCH_TYPE"] = "PITOT";
-  }
-
-
-  dataJson["BARO"] = sensorVal.BaroHPA; // GUI  displays mbar (hPa)
-  dataJson["RELH"] = sensorVal.RelH;
-
-  // Pitot
-  dataJson["PITOT"] = sensorVal.PitotH2O;
-
-  // Differential pressure
-  dataJson["PDIFF"] = sensorVal.PDiffH2O;
-
-  // Swirl (+/- rpm)
-  dataJson["SWIRL"] = sensorVal.Swirl;
-
-  // Flow Differential
-  dataJson["FDIFF"] = sensorVal.FDiff;
-  dataJson["FDIFFTYPEDESC"] = sensorVal.FDiffTypeDesc;
-
-  if (1!=1) {  // TODO if message handler is active display the active message
-    dataJson["STATUS_MESSAGE"] = status.statusMessage;
-  } else { // else lets just show the uptime
-    dataJson["STATUS_MESSAGE"] = "Uptime: " + String(_hardware.uptime()) + " (hh.mm)";      
-  }
-
-  // Active Orifice
-  dataJson["ACTIVE_ORIFICE"] = status.activeOrifice;
-  // Orifice Max Flow
-  dataJson["ORIFICE_MAX_FLOW"] = status.activeOrificeFlowRate;
-  // Orifice Calibration Depression
-  dataJson["ORIFICE_CALIBRATED_DEPRESSION"] = status.activeOrificeTestPressure;
-
-  serializeJson(dataJson, jsonString);
-
-  return jsonString;
-}
 
 
 
@@ -1864,74 +1678,10 @@ String Webserver::processTemplate(const String &var)
 
 
 
-/***********************************************************
- * @brief reset wifi connection
- * @note helps to overcome ESP32/Arduino Wifi bug [#111]
- * @note https://github.com/espressif/arduino-esp32/issues/2501
- ***/
-void Webserver::resetWifi ( void ) {
-	WiFi.persistent(false);
-  // WiFi.disconnect(true);
-    WiFi.disconnect(true, true); // clears NVS
-    WiFi.mode(WIFI_OFF);
-    WiFi.mode(WIFI_MODE_NULL);
-  // delay(500);
-}
 
 
 
 
-/***********************************************************
- * @brief reset wifi connection
- * @note helps to overcome ESP32/Arduino Wifi bug [#111]
- * @note https://github.com/espressif/arduino-esp32/issues/2501
- * @note instantiated via API call
- * @todo instatiate via I/O (pushbutton)
- ***/
-void Webserver::wifiReconnect ( void ) {
-
-  WiFi.reconnect();
-    
-}
-
-
-
-
-
-/***********************************************************
- * @brief get wifi connection
- * @return status value
- * @var wifi_retries : number of retry attempts
- * @var wifi_timeout : time in milliseconds
- ***/
-int Webserver::getWifiConnection(){
-
-  Messages _message;
-  extern struct ConfigSettings config;
-  
-  uint8_t wifiConnectionAttempt = 1;
-  uint8_t wifiConnectionStatus;
-
-  for(;;) {
-          
-          WiFi.begin(config.wifi_ssid, config.wifi_pswd); 
-          wifiConnectionStatus = WiFi.waitForConnectResult(config.wifi_timeout);
-          if (wifiConnectionStatus == WL_CONNECTED || wifiConnectionAttempt > config.wifi_retries){
-            break;
-          } else if (wifiConnectionStatus != WL_DISCONNECTED) {
-            resetWifi();
-            delay (2000);
-          } else {
-            WiFi.disconnect();
-          }
-          _message.serialPrintf(".");
-          wifiConnectionAttempt++;
-          // WiFi.reconnect();
-  }
- 
-  return wifiConnectionStatus;
-
-}
 
 
 

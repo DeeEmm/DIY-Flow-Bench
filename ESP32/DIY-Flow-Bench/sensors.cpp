@@ -21,7 +21,7 @@
 
 #include "configuration.h"
 #include "constants.h"
-#include "pins.h"
+// // #include "pins.h"
 #include "structs.h"
 
 #include <Wire.h>

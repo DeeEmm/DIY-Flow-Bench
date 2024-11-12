@@ -19,12 +19,14 @@
 
 #include <Arduino.h>
 
+#include <ArduinoJson.h>
+
 #include "system.h"
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
-#include "pins.h"
 #include "version.h"
+#include "datahandler.h"
 
 #include <Wire.h>
 #include "hardware.h"
@@ -32,6 +34,7 @@
 #include "calculations.h"
 #include "messages.h"
 #include LANGUAGE_FILE
+
 
 #ifdef ADC_IS_ENABLED
 #include <ADS1115_lite.h>
@@ -50,101 +53,99 @@ Hardware::Hardware() {
 
 
 
+
 /***********************************************************
  * @brief Configure pins
- * @note Conditional configiration based on board type and hardware
+ * @note Conditional configuration based on board type and hardware
+ * @details reads pin con figuration in from pins.json file
  *
  ***/
-void Hardware::configurePins () {
- 
-  // Inputs
-  #ifdef VCC_3V3_PIN
-  pinMode(VCC_3V3_PIN, INPUT); 
-  #endif
+void Hardware::assignIO (JsonObject pinData) {
 
-  pinMode(VCC_5V_PIN, INPUT);    //This is required as it is used to get the supply voltage for the MPVX7007 pressure calc.
+  extern struct Pins pins;
+  extern struct DeviceStatus status;
 
-  #ifdef SPEED_SENSOR_PIN
-  pinMode(SPEED_SENSOR_PIN, INPUT);
-  #endif
+  status.boardType = pinData["BOARD_TYPE"].as<String>();
 
-  #ifdef ORIFICE_BCD_BIT1_PIN
-  pinMode(ORIFICE_BCD_BIT1_PIN, INPUT); 
-  #endif
+  // Store input pin values in struct
+  pins.VCC_3V3_PIN = pinData["VCC_3V3_PIN"].as<int>();
+  pins.VCC_5V_PIN = pinData["VCC_5V_PIN"].as<int>();
+  pins.SPEED_SENSOR_PIN = pinData["SPEED_SENSOR_PIN"].as<int>();
+  pins.ORIFICE_BCD_BIT1_PIN = pinData["ORIFICE_BCD_BIT1_PIN"].as<int>();
+  pins.ORIFICE_BCD_BIT2_PIN = pinData["ORIFICE_BCD_BIT2_PIN"].as<int>();
+  pins.ORIFICE_BCD_BIT3_PIN = pinData["ORIFICE_BCD_BIT3_PIN"].as<int>();
+  pins.MAF_PIN = pinData["MAF_SRC_IS_PIN"].as<int>();
+  pins.REF_PRESSURE_PIN = pinData["PREF_SRC_PIN"].as<int>();
+  pins.DIFF_PRESSURE_PIN = pinData["PDIFF_SRC_IS_PIN"].as<int>();
+  pins.PITOT_PIN = pinData["PITOT_SRC_IS_PIN"].as<int>();
+  pins.TEMPERATURE_PIN = pinData["TEMPERATURE_PIN"].as<int>();
+  pins.HUMIDITY_PIN = pinData["HUMIDITY_PIN"].as<int>();
+  pins.REF_BARO_PIN = pinData["REF_BARO_PIN"].as<int>();
+  pins.SERIAL0_TX_PIN = pinData["SERIAL0_TX_PIN"].as<int>();
+  pins.SERIAL0_RX_PIN = pinData["SERIAL0_RX_PIN"].as<int>();
+  pins.SERIAL2_TX_PIN = pinData["SERIAL2_TX_PIN"].as<int>();
+  pins.SERIAL2_RX_PIN = pinData["SERIAL2_RX_PIN"].as<int>();
+  pins.SDA_PIN = pinData["SDA_PIN"].as<int>();
+  pins.SCL_PIN = pinData["SCL_PIN"].as<int>();
+  pins.SD_CS_PIN = pinData["SD_CS_PIN"].as<int>();
+  pins.SD_MOSI_PIN = pinData["SD_MOSI_PIN"].as<int>();
+  pins.SD_MISO_PIN = pinData["SD_MISO_PIN"].as<int>();
+  pins.SD_SCK_PIN = pinData["SD_SCK_PIN"].as<int>();
+  pins.WEMOS_SPARE_PIN_1 = pinData["WEMOS_SPARE_PIN_1"].as<int>();
 
-  #ifdef ORIFICE_BCD_BIT2_PIN
-  pinMode(ORIFICE_BCD_BIT2_PIN, INPUT); 
-  #endif
-
-  #ifdef ORIFICE_BCD_BIT3_PIN
-  pinMode(ORIFICE_BCD_BIT3_PIN, INPUT); 
-  #endif
-
-  #ifdef MAF_SRC_IS_PIN
-  pinMode(MAF_PIN, INPUT); 
-  #endif
-
-  #ifdef PREF_SRC_PIN
-  pinMode(REF_PRESSURE_PIN, INPUT); 
-  #endif
-
-  #ifdef PDIFF_SRC_IS_PIN
-  pinMode(DIFF_PRESSURE_PIN, INPUT); 
-  #endif
-
-  #ifdef PITOT_SRC_IS_PIN
-  pinMode(PITOT_PIN, INPUT); 
-  #endif
-
-  #if defined TEMP_SENSOR_TYPE_LINEAR_ANALOG || defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
-    pinMode(TEMPERATURE_PIN, INPUT); 
-  #endif
-  #if defined RELH_SENSOR_TYPE_LINEAR_ANALOG || defined RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
-    pinMode(HUMIDITY_PIN, INPUT);  
-  #endif
-  #if defined BARO_SENSOR_TYPE_LINEAR_ANALOG || defined BARO_SENSOR_TYPE_MPX4115
-    pinMode(REF_BARO_PIN, INPUT);
-  #endif
+  // Store output pin values in struct
+  pins.VAC_BANK_1_PIN = pinData["VAC_BANK_1_PIN"].as<int>();
+  pins.VAC_BANK_2_PIN = pinData["VAC_BANK_2_PIN"].as<int>();
+  pins.VAC_BANK_3_PIN = pinData["VAC_BANK_3_PIN"].as<int>();
+  pins.VAC_SPEED_PIN = pinData["VAC_SPEED_PIN"].as<int>();
+  pins.VAC_BLEED_VALVE_PIN = pinData["VAC_BLEED_VALVE_PIN"].as<int>();
+  pins.AVO_STEP_PIN = pinData["AVO_STEP_PIN"].as<int>();
+  pins.AVO_DIR_PIN = pinData["AVO_DIR_PIN"].as<int>();
+  pins.AVO_DIR_PIN = pinData["AVO_DIR_PIN"].as<int>();
+  pins.FLOW_VALVE_STEP_PIN = pinData["FLOW_VALVE_STEP_PIN"].as<int>();
+  pins.FLOW_VALVE_DIR_PIN = pinData["FLOW_VALVE_DIR_PIN"].as<int>();
   
+    // Set Inputs
+  pinMode(pins.VCC_3V3_PIN, INPUT);   
+  pinMode(pins.VCC_5V_PIN, INPUT);   
+  pinMode(pins.SPEED_SENSOR_PIN, INPUT);   
+  pinMode(pins.ORIFICE_BCD_BIT1_PIN, INPUT);   
+  pinMode(pins.ORIFICE_BCD_BIT2_PIN, INPUT);   
+  pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
+  pinMode(pins.MAF_PIN, INPUT);   
+  pinMode(pins.REF_PRESSURE_PIN, INPUT);   
+  pinMode(pins.DIFF_PRESSURE_PIN, INPUT);   
+  pinMode(pins.PITOT_PIN, INPUT);   
+  pinMode(pins.TEMPERATURE_PIN, INPUT);   
+  pinMode(pins.HUMIDITY_PIN, INPUT);   
+  pinMode(pins.REF_BARO_PIN, INPUT);   
+  pinMode(pins.SERIAL0_TX_PIN, INPUT);   
+  pinMode(pins.SERIAL0_RX_PIN, INPUT);   
+  pinMode(pins.SERIAL2_TX_PIN, INPUT);   
+  pinMode(pins.SERIAL2_RX_PIN, INPUT);   
+  pinMode(pins.SDA_PIN, INPUT);   
+  pinMode(pins.SCL_PIN, INPUT);   
+  pinMode(pins.SD_CS_PIN, INPUT);   
+  pinMode(pins.SD_MOSI_PIN, INPUT);   
+  pinMode(pins.SD_MISO_PIN, INPUT);   
+  pinMode(pins.SD_SCK_PIN, INPUT);   
+  pinMode(pins.WEMOS_SPARE_PIN_1, INPUT);   
 
-  // Outputs
-  #ifdef VAC_BANK_1_PIN
-  pinMode(VAC_BANK_1_PIN, OUTPUT);
-  #endif
-
-  #ifdef VAC_BANK_2_PIN
-  pinMode(VAC_BANK_2_PIN, OUTPUT);
-  #endif
-
-  #ifdef VAC_BANK_3_PIN
-  pinMode(VAC_BANK_3_PIN, OUTPUT);
-  #endif
-
-  #ifdef VAC_SPEED_PIN
-  pinMode(VAC_SPEED_PIN, OUTPUT);
-  #endif
-
-  #ifdef VAC_BLEED_VALVE_PIN
-  pinMode(VAC_BLEED_VALVE_PIN, OUTPUT);
-  #endif
-
-  #ifdef AVO_STEP_PIN
-  pinMode(AVO_STEP_PIN, OUTPUT);
-  #endif
-
-  #ifdef AVO_DIR_PIN
-  pinMode(AVO_DIR_PIN, OUTPUT);
-  #endif
-
-  #ifdef FLOW_VALVE_STEP_PIN
-  pinMode(FLOW_VALVE_STEP_PIN, OUTPUT);
-  #endif
-
-  #ifdef FLOW_VALVE_DIR_PIN
-  pinMode(FLOW_VALVE_DIR_PIN, OUTPUT);
-  #endif
+  // Set Outputs
+  pinMode(pins.VAC_BANK_1_PIN , OUTPUT);
+  pinMode(pins.VAC_BANK_2_PIN , OUTPUT);
+  pinMode(pins.VAC_BANK_3_PIN , OUTPUT);
+  pinMode(pins.VAC_SPEED_PIN , OUTPUT);
+  pinMode(pins.VAC_BLEED_VALVE_PIN , OUTPUT);
+  pinMode(pins.AVO_STEP_PIN , OUTPUT);
+  pinMode(pins.AVO_DIR_PIN , OUTPUT);
+  pinMode(pins.AVO_DIR_PIN , OUTPUT);
+  pinMode(pins.FLOW_VALVE_STEP_PIN , OUTPUT);
+  pinMode(pins.FLOW_VALVE_DIR_PIN , OUTPUT);
 
 }
+
+
 
 /***********************************************************
  * @brief begin function
@@ -158,10 +159,8 @@ void Hardware::begin () {
 
   extern struct DeviceStatus status;
   
-  this->beginSerial();                                      // Start of serial comms
   this->initialise();                                       // Initialise hardware
 
-  
 }
 
 
@@ -177,7 +176,6 @@ void Hardware::initialise () {
   _message.serialPrintf("\r\nDIY Flow Bench \nVersion: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);    
   _message.serialPrintf("Initialising Hardware \n");
 
-  configurePins(); // Load pin definitions from pins.h
   this->getI2CList(); // Scan and list I2C devices to serial monitor
 
   #ifdef ADC_IS_ENABLED
@@ -201,25 +199,6 @@ void Hardware::initialise () {
 }
 
 
-
-
-/***********************************************************
- * @brief Begin Serial
- *
- * @note Default port Serial0 (U0UXD) is used. (Same as programming port / usb)
- * @note Serial1 is reserved for SPI
- * @note Serial2 is reserved for gauge comms
- *
- * @note Serial.begin(baud-rate, protocol, RX pin, TX pin);
- *
- ***/
-void Hardware::beginSerial(void) {
-	
-	#if defined SERIAL0_ENABLED
-		Serial.begin(SERIAL0_BAUD, SERIAL_8N1 , SERIAL0_RX_PIN, SERIAL0_TX_PIN); 
-	#endif
-	
-}
 
 
 
@@ -343,13 +322,16 @@ int32_t Hardware::getADCRawData(int channel) {
  ***/
 double Hardware::get5vSupplyVolts() {   
 
-  long rawVoltageValue = analogRead(VCC_5V_PIN);  
-  double vcc5vSupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
+  extern struct Pins pins;
+  extern struct ConfigSettings config;
+
 
   #ifdef USE_FIXED_5V_VALUE
     return 5.0; 
   #else
-    return vcc5vSupplyVolts + VCC_5V_TRIMPOT;
+    long rawVoltageValue = analogRead(pins.VCC_5V_PIN);  
+    double vcc5vSupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
+    return vcc5vSupplyVolts + config.VCC_5V_TRIMPOT;
   #endif
 }
 
@@ -451,7 +433,10 @@ void Hardware::checkRefPressure() {
  * 
  ***/
 void Hardware::benchOn() {
-  digitalWrite(VAC_BANK_1_PIN, HIGH);
+
+  extern struct Pins pins;
+
+  digitalWrite(pins.VAC_BANK_1_PIN, HIGH);
 }
 
 
@@ -460,7 +445,10 @@ void Hardware::benchOn() {
  * @details Switches vac motor 1 output off
  ***/
 void Hardware::benchOff() {
-  digitalWrite(VAC_BANK_1_PIN, LOW);
+
+  extern struct Pins pins;
+
+  digitalWrite(pins.VAC_BANK_1_PIN, LOW);
 }
 
 

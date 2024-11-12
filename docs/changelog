@@ -58,7 +58,10 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-24111201        - Stepper validation
+
+24111201        - index.html versioning
+                - Move data related methods into dedicated datahandler class
+                - Move pins.h into JSON file
                 - Added index.html versioning
 24111107        - #222 Adjusted standard flow
 24111106        - #220 Datagraph max value

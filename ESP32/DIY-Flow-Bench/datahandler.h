@@ -21,7 +21,7 @@
 #include <Arduino.h>
 #include "system.h"
 #include <ArduinoJson.h>
-// #include <ESPAsyncWebServer.h>
+#include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 
 class DataHandler {
@@ -40,11 +40,12 @@ class DataHandler {
 
     protected:
 
+		String byteDecode(size_t bytes);
 
 
     private:
 
-
+		String getFileListJSON ();
 
 
     public:
@@ -59,6 +60,14 @@ class DataHandler {
 		void createLiftDataFile();
 		void createCalibrationFile ();
 		StaticJsonDocument<CONFIG_JSON_SIZE> loadJSONFile(String filename);
+		void beginSerial(void);
+		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfig ();
+		StaticJsonDocument<LIFT_DATA_JSON_SIZE> loadLiftData ();
+		static void clearLiftDataFile(AsyncWebServerRequest *request);
+		StaticJsonDocument<1024> loadCalibrationData ();
+		void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
+		String getDataJSON();
+		void bootLoop();
 
 
 };

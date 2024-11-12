@@ -49,7 +49,7 @@
 #include "system.h"
 #include "configuration.h"
 #include "structs.h"
-#include "pins.h"
+// #include "pins.h"
 
 #include "mafData/maf.h"
 #include "hardware.h" // bench type config needed here
@@ -70,6 +70,7 @@ SensorData sensorVal;
 ValveLiftData valveData;
 Translator translate;
 CalibrationData calVal;
+Pins pins;
 
 // Initiate Classes
 DataHandler _data;
@@ -288,22 +289,14 @@ void TASKgetEnviroData( void * parameter ){
  ***/
 void setup(void) {
 
+  extern struct Pins pins;
 
   // Initialise Data environment
   _data.begin();
 
-
-
-
   // REVIEW
   // set message queue length
   xQueueCreate( 256, 2048);
-  
-  // We need to call Wire globally so that it is available to both hardware and sensor classes so lets do that here
-  Wire.begin (SDA_PIN, SCL_PIN); 
-  Wire.setClock(100000);
-  // Wire.setClock(300000); // ok for wemos D1
-  // Wire.setClock(400000);
     
   _hardware.begin();
   _sensors.begin();
@@ -372,7 +365,7 @@ void loop () {
         status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes
         
         // Push data to client using Server Side Events (SSE)
-        jsonString = _webserver.getDataJSON();
+        jsonString = _data.getDataJSON();
         _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore

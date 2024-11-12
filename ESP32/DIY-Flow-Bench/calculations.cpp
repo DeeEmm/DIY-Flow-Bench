@@ -23,7 +23,7 @@
 
 #include "constants.h"
 #include "structs.h"
-#include "pins.h"
+// #include "pins.h"
 
 #include "calculations.h"
 #include "sensors.h"

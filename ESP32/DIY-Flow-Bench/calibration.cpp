@@ -97,13 +97,16 @@ bool Calibration::setLeakOffset() {
   Calculations _calculations;
   Sensors _sensors;
   Messages _message;
+  DataHandler _data;
+
+
 
   extern struct CalibrationData calVal;
   extern struct Translator translate;
   extern struct SensorData sensorVal;
 
   // load current calibration data
-  loadCalibrationData();
+  _data.loadCalibrationData();
 
   _message.debugPrintf("Calibration::setLeakTest \n");
 
@@ -242,43 +245,6 @@ void Calibration::saveCalibrationData() {
 }
 
 
-
-
-/***********************************************************
-* loadCalibration
-* Read calibration data from cal.json file
-***/
-StaticJsonDocument<1024> Calibration::loadCalibrationData () {
-
-  DataHandler _data;
-  Messages _message;
-  _message.debugPrintf("Calibration::loadCalibration \n");
-  
-  StaticJsonDocument<1024> calibrationData;
-  calibrationData = _data.loadJSONFile("/cal.json");
-  parseCalibrationData(calibrationData);
-  return calibrationData;
-}
-
-
-
-
-
-/***********************************************************
-* @brief Parse Calibration Data
-* @param calibrationData JSON document containing calibration data
-***/
-void Calibration::parseCalibrationData(StaticJsonDocument<1024> calData) {
-
-  extern struct CalibrationData calVal;
-
-  calVal.flow_offset = calData["FLOW_OFFSET"];
-  calVal.user_offset = calData["USER_OFFSET"];
-  calVal.leak_cal_baseline = calData["LEAK_CAL_BASELINE"];
-  calVal.leak_cal_baseline_rev = calData["LEAK_CAL_BASELINE_REV"];
-  calVal.leak_cal_offset = calData["LEAK_CAL_OFFSET"];
-  calVal.leak_cal_offset_rev = calData["LEAK_CAL_OFFSET_REV"];
-}
 
 
 

@@ -24,13 +24,15 @@
 
 #include "API.h"
 #include <esp32/rom/crc.h> 
-#include "pins.h"
+// #include "pins.h"
 #include "hardware.h"
 #include "sensors.h"
 #include "calculations.h"
 #include "messages.h"
 #include "calibration.h"
 #include "webserver.h"
+#include "datahandler.h"
+#include "comms.h"
 // #include LANGUAGE_FILE
 
 extern struct ConfigSettings config;
@@ -108,6 +110,8 @@ void API::ParseMessage(char apiMessage) {
   Hardware _hardware;
   Webserver _webserver;
   Calibration _calibration;
+  DataHandler _data;
+  Comms _comms;
   
   extern TaskHandle_t sensorDataTask;
   extern TaskHandle_t enviroDataTask;
@@ -241,7 +245,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'J': // JSON Data
-          jsonString = _webserver.getDataJSON();
+          jsonString = _data.getDataJSON();
           snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", config.api_delim, String(jsonString).c_str());
       break;
       
@@ -409,7 +413,7 @@ void API::ParseMessage(char apiMessage) {
       case '$': // Recover server
           snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", "Attempting to recover WiFi Connection");
           // config.api_enabled = false;
-          _webserver.wifiReconnect();
+          _comms.wifiReconnect();
           // config.api_enabled = true;
       break;
 

@@ -28,9 +28,17 @@
 #include <SD.h>
 #include <Update.h>
 #include <SPIFFS.h>
+#include <ArduinoJson.h>
+#include <ESPAsyncWebServer.h>
+#include "Wire.h"
 
 #include "structs.h"
 #include "constants.h"
+#include "hardware.h"
+#include "messages.h"
+#include "calculations.h"
+#include "comms.h"
+
 
 #include "version.h"
 
@@ -39,22 +47,75 @@
 void DataHandler::begin() {
 
     extern struct ConfigSettings config;
-    // extern struct Translator translate; // TODO: stuct currently part of lang file - need to move into JSON
+    extern struct Language language;
     extern struct DeviceStatus status;
+
+    Hardware _hardware;
+    Pins pins;
+    Messages _message;
+    Comms _comms;
+
+    StaticJsonDocument<1024> pinData;
+    bool doBootLoop = false;
 
     // Need to set up the data environment...
 
+    // Start serial comms
+    this->beginSerial();                                      
+
     // initialise SPIFFS Filesystem
-    // _message.serialPrintf("File System Initialisation...\n"); // TODO:  Initialise messages once pins / serial is running
+    _message.serialPrintf("File System Initialisation...\n"); // TODO:  Initialise messages once pins / serial is running
     if (SPIFFS.begin()) {
-        // _message.serialPrintf("Complete.\n");
+        _message.serialPrintf("Complete.\n");
     } else {
-        // _message.serialPrintf("Failed.\n");
+        _message.serialPrintf("Failed.\n");
         #if defined FORMAT_FILESYSTEM_IF_FAILED
             SPIFFS.format();
-            // _message.serialPrintf("!! File System Formatted !!\n");
+            _message.serialPrintf("!! File System Formatted !!\n");
         #endif
     }
+
+    // Check if config / calibration / liftdata json files exist. If not create them.
+    if (!SPIFFS.exists("/config.json")) createConfigFile();
+    if (!SPIFFS.exists("/liftdata.json")) createLiftDataFile();
+    if (!SPIFFS.exists("/cal.json")) createCalibrationFile();
+
+    // load json configuration files from SPIFFS memory
+    this->loadConfig();
+    this->loadLiftData();
+    this->loadCalibrationData();
+
+    if (SPIFFS.exists("/pins.json"))  {
+        pinData = loadJSONFile("/pins.json");
+        if (!pinData.containsKey("BOARD_TYPE")) doBootLoop = true;
+    } else {
+        doBootLoop = true;
+    }
+
+    // Check for index file
+    if (!SPIFFS.exists("/index.html")) doBootLoop = true;
+
+    // Initialise WiFi
+    _comms.initaliseWifi();
+
+    // Error Handler - critical files are missing
+    if (doBootLoop == true) bootLoop();
+
+    // Get a reference to the root object
+    JsonObject jsonObj = pinData.as<JsonObject>();
+
+    _hardware.assignIO(jsonObj);
+
+    // Start Wire (I2C)
+    Wire.begin (pins.SDA_PIN, pins.SCL_PIN); 
+    Wire.setClock(100000);
+    // Wire.setClock(300000); // ok for wemos D1
+    // Wire.setClock(400000);
+
+
+    // Now that serial is set up set up messaging
+
+    
 
     // TODO Initialise SD card
     #ifdef SD_CARD_IS_ENABLED
@@ -115,28 +176,19 @@ void DataHandler::begin() {
     #endif
 
 
-    // Check if config / calibration / liftdata json files exist. If not create them.
-    // NOTE Combined filesize cannot exceed SPIFFS partition
-    if (!SPIFFS.exists("/config.json")) createConfigFile();
-    if (!SPIFFS.exists("/liftdata.json")) createLiftDataFile();
-    if (!SPIFFS.exists("/cal.json")) createCalibrationFile();
-
-
-    // Load pin definition file if exists
-    if (!SPIFFS.exists("/pins.json")) {
-
-
-        
-    }
 
 
 
+    
+    // Display Filesystem Stats
+    status.spiffs_mem_size = SPIFFS.totalBytes();
+    status.spiffs_mem_used = SPIFFS.usedBytes();
 
-    // Initialise JSON
+    _message.serialPrintf("=== SPIFFS File system info === \n");
+    _message.serialPrintf("Total space:      %s \n", byteDecode(status.spiffs_mem_size));
+    _message.serialPrintf("Total space used: %s \n", byteDecode(status.spiffs_mem_used));
 
 
-
-    // Read in and populate global vars from config files (settings / config / language / MAFdata / etc)
 
     // Manage on-boarding (index and config file uploading)
 
@@ -154,11 +206,11 @@ void DataHandler::begin() {
 void DataHandler::createConfigFile () {
 
   extern struct ConfigSettings config;
-//   Messages _message;
+  Messages _message;
   String jsonString;  
   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
 
-//   _message.serialPrintf("Creating config.json file... \n"); 
+  _message.serialPrintf("Creating config.json file... \n"); 
  
   configData["PAGE_TITLE"] = config.pageTitle;
   configData["CONF_WIFI_SSID"] = config.wifi_ssid;
@@ -215,18 +267,18 @@ void DataHandler::createConfigFile () {
  ***/
 void DataHandler::writeJSONFile(String data, String filename, int dataSize){
 
-//   Messages _message;
+  Messages _message;
 
   // StaticJsonDocument<dataSize> jsonData;
   DynamicJsonDocument jsonData(dataSize);
   DeserializationError error = deserializeJson(jsonData, data);
   if (!error)  {
-    // _message.debugPrintf("Writing JSON file... \n");
+    _message.debugPrintf("Writing JSON file... \n");
     File outputFile = SPIFFS.open(filename, FILE_WRITE);
     serializeJsonPretty(jsonData, outputFile);
     outputFile.close();
   }  else  {
-    // _message.statusPrintf("Webserver::writeJSONFile ERROR \n");
+    _message.statusPrintf("Webserver::writeJSONFile ERROR \n");
   }
 }
 
@@ -240,11 +292,11 @@ void DataHandler::writeJSONFile(String data, String filename, int dataSize){
 ***/
 void DataHandler::createLiftDataFile () {
 
-//   Messages _message;
+  Messages _message;
   String jsonString;  
   StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
 
-//   _message.serialPrintf("Creating liftdata.json file... \n"); 
+  _message.serialPrintf("Creating liftdata.json file... \n"); 
 
   liftData["LIFTDATA1"] = 0.0;
   liftData["LIFTDATA2"] = 0.0;
@@ -275,11 +327,11 @@ void DataHandler::createLiftDataFile () {
 void DataHandler::createCalibrationFile () {
 
   extern struct CalibrationData calVal;
-//   Messages _message;
+  Messages _message;
   String jsonString;
   StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
   
-//   _message.debugPrintf("Creating cal.json file... \n"); 
+  _message.debugPrintf("Creating cal.json file... \n"); 
   
   calData["FLOW_OFFSET"] = calVal.flow_offset;
   calData["USER_OFFSET"] = calVal.user_offset;
@@ -307,7 +359,7 @@ void DataHandler::createCalibrationFile () {
 StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadJSONFile(String filename)
 {
 
-//   Messages _message;
+  Messages _message;
 
 //   extern struct Translator translate;
 
@@ -320,7 +372,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadJSONFile(String filename)
 
     if (!jsonFile)    {
     //   _message.Handler(translate.LANG_ERROR_LOADING_FILE);
-    //   _message.statusPrintf("Failed to open file for reading \n");
+      _message.statusPrintf("Failed to open file for reading \n");
     }    else    {
       size_t size = jsonFile.size();
       if (size > CONFIG_JSON_SIZE)    {
@@ -329,7 +381,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadJSONFile(String filename)
 
       DeserializationError error = deserializeJson(jsonData, jsonFile);
       if (error)      {
-        // _message.statusPrintf("loadJSONFile->deserializeJson() failed: %s \n", error.f_str());
+        _message.statusPrintf("loadJSONFile->deserializeJson() failed: %s \n", error.f_str());
       }
 
       jsonFile.close();
@@ -338,8 +390,454 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadJSONFile(String filename)
     }
     jsonFile.close();
   }  else  {
-    // _message.statusPrintf("File missing \n");
+    _message.statusPrintf("File missing \n");
   }
 
   return jsonData;
+
+}
+
+
+
+/***********************************************************
+ * @brief Begin Serial
+ *
+ * @note Default port Serial0 (U0UXD) is used. (Same as programming port / usb)
+ * @note Serial1 is reserved for SPI
+ * @note Serial2 is reserved for gauge comms
+ *
+ * @note Serial.begin(baud-rate, protocol, RX pin, TX pin);
+ *
+ ***/
+void DataHandler::beginSerial(void) {
+	
+  extern struct Pins pins;
+
+	// #if defined SERIAL0_ENABLED
+	// 	Serial.begin(SERIAL0_BAUD, SERIAL_8N1 , pins.SERIAL0_RX_PIN, pins.SERIAL0_TX_PIN); 
+	// #endif
+	
+    Serial.begin(SERIAL0_BAUD);
+
+}
+
+
+
+
+
+
+/***********************************************************
+* @brief loadConfig
+* @details read configuration data from config.json file and loads into global struct
+***/ 
+StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfig () {
+
+  extern struct ConfigSettings config;
+
+  StaticJsonDocument<CONFIG_JSON_SIZE> configData;
+  DataHandler _data;
+  Messages _message;
+
+  _message.serialPrintf("Loading Configuration... \n");     
+
+  if (SPIFFS.exists("/config.json"))  {
+
+    configData = _data.loadJSONFile("/config.json");
+
+    strcpy(config.wifi_ssid, configData["CONF_WIFI_SSID"]);
+    strcpy(config.wifi_pswd, configData["CONF_WIFI_PSWD"]);
+    strcpy(config.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
+    strcpy(config.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
+    strcpy(config.hostname, configData["CONF_HOSTNAME"]);
+    config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
+    config.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
+    config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
+    config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
+    config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
+    strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
+    strcpy(config.rounding_type, configData["ROUNDING_TYPE"]);
+    config.flow_decimal_length, configData["FLOW_DECIMAL_LENGTH"];
+    config.gen_decimal_length, configData["GEN_DECIMAL_LENGTH"];
+    config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
+    config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
+    strcpy(config.api_delim, configData["CONF_API_DELIM"]);
+    config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
+    config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
+    configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
+    configData["STANDARD_REFERENCE"] = config.standardReference;
+    configData["STD_ADJ_FLOW"] = config.std_adj_flow;
+    configData["DATAGRAPH_MAX"] = config.dataGraphMax;
+    configData["TEMP_UNIT"] = config.temp_unit;
+    configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
+    strcpy(config.bench_type, configData["BENCH_TYPE"]);
+    config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
+    config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
+    config.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
+    config.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
+    config.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
+    config.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
+    config.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
+    config.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
+    config.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
+    config.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
+    config.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
+    config.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
+    config.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
+    config.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
+
+  } else {
+    _message.serialPrintf("Configuration file not found \n");
+  }
+  
+  return configData;  
+
+}
+
+
+
+
+
+
+/***********************************************************
+* @brief loadLiftDataFile
+* @details read lift data from liftdata.json file
+***/ 
+StaticJsonDocument<LIFT_DATA_JSON_SIZE> DataHandler::loadLiftData () {
+
+  extern struct ValveLiftData valveData;
+  StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
+  DataHandler _data;
+  Messages _message;
+
+  _message.serialPrintf("Loading Lift Data... \n");     
+
+  if (SPIFFS.exists("/liftdata.json"))  {
+    
+    liftData = _data.loadJSONFile("/liftdata.json");
+    
+    valveData.LiftData1 = liftData["LIFTDATA1"].as<double>();
+    valveData.LiftData2 = liftData["LIFTDATA2"].as<double>();
+    valveData.LiftData3 = liftData["LIFTDATA3"].as<double>();
+    valveData.LiftData4 = liftData["LIFTDATA4"].as<double>();
+    valveData.LiftData5 = liftData["LIFTDATA5"].as<double>();
+    valveData.LiftData6 = liftData["LIFTDATA6"].as<double>();
+    valveData.LiftData7 = liftData["LIFTDATA7"].as<double>();
+    valveData.LiftData8 = liftData["LIFTDATA8"].as<double>();
+    valveData.LiftData9 = liftData["LIFTDATA9"].as<double>();
+    valveData.LiftData10 = liftData["LIFTDATA10"].as<double>();
+    valveData.LiftData11 = liftData["LIFTDATA11"].as<double>();
+    valveData.LiftData12 = liftData["LIFTDATA12"].as<double>();
+
+  } else {
+    _message.serialPrintf("LiftData file not found \n");
+  }
+  
+  return liftData;  
+
+}
+
+
+
+
+
+/***********************************************************
+* @brief clearLiftDataFile
+* @details Delete and recreate default lift data file
+***/
+void DataHandler::clearLiftDataFile(AsyncWebServerRequest *request){
+
+  DataHandler _data;
+  
+  if (SPIFFS.exists("/liftdata.json"))  {
+    SPIFFS.remove("/liftdata.json");
+  }
+  
+  _data.createLiftDataFile();
+
+  _data.loadLiftData();
+
+  request->redirect("/?view=graph");
+
+}
+
+
+
+
+
+
+
+/***********************************************************
+* loadCalibration
+* Read calibration data from cal.json file
+***/
+StaticJsonDocument<1024> DataHandler::loadCalibrationData () {
+
+  DataHandler _data;
+  Messages _message;
+  _message.debugPrintf("Calibration::loadCalibration \n");
+  
+  StaticJsonDocument<1024> calibrationData;
+  calibrationData = _data.loadJSONFile("/cal.json");
+  parseCalibrationData(calibrationData);
+  return calibrationData;
+}
+
+
+
+
+
+
+/***********************************************************
+* @brief Parse Calibration Data
+* @param calibrationData JSON document containing calibration data
+***/
+void DataHandler::parseCalibrationData(StaticJsonDocument<1024> calData) {
+
+  extern struct CalibrationData calVal;
+
+  calVal.flow_offset = calData["FLOW_OFFSET"];
+  calVal.user_offset = calData["USER_OFFSET"];
+  calVal.leak_cal_baseline = calData["LEAK_CAL_BASELINE"];
+  calVal.leak_cal_baseline_rev = calData["LEAK_CAL_BASELINE_REV"];
+  calVal.leak_cal_offset = calData["LEAK_CAL_OFFSET"];
+  calVal.leak_cal_offset_rev = calData["LEAK_CAL_OFFSET_REV"];
+}
+
+
+
+
+
+
+/***********************************************************
+ * @brief byteDecode
+ * @param bytes size to be decoded
+ * @details Byte Decode (returns string i.e '52 GB')
+ ***/
+String DataHandler::byteDecode(size_t bytes)
+{
+  if (bytes < 1024)
+    return String(bytes) + " B";
+  else if (bytes < (1024 * 1024))
+    return String(bytes / 1024.0) + " KB";
+  else if (bytes < (1024 * 1024 * 1024))
+    return String(bytes / 1024.0 / 1024.0) + " MB";
+  else
+    return String(bytes / 1024.0 / 1024.0 / 1024.0) + " GB";
+}
+
+
+
+
+
+
+
+
+/***********************************************************
+ * @brief getFileListJSON
+ * @details Get SPIFFS File List in JSON format
+ ***/
+String DataHandler::getFileListJSON()
+{
+
+  String jsonString;
+  String fileName;
+  size_t fileSize;
+
+  StaticJsonDocument<1024> dataJson;
+
+  Messages _message;
+
+  _message.statusPrintf("Filesystem contents: \n");
+  FILESYSTEM.begin();
+  File root = FILESYSTEM.open("/");
+  File file = root.openNextFile();
+  while (file)  {
+    fileName = file.name();
+    fileSize = file.size();
+    dataJson[fileName] = String(fileSize);
+    _message.statusPrintf("%s : %s \n", fileName, byteDecode(fileSize));
+    file = root.openNextFile();
+  }
+
+  serializeJson(dataJson, jsonString);
+  return jsonString;
+}
+
+
+
+/***********************************************************
+ * @brief getDataJSON
+ * @details Package up current bench data into JSON string
+ ***/
+String DataHandler::getDataJSON()
+{
+
+  extern struct DeviceStatus status;
+  extern struct ConfigSettings config;
+  extern struct SensorData sensorVal;
+
+  Hardware _hardware;
+  Calculations _calculations;
+
+  String jsonString;
+
+  StaticJsonDocument<DATA_JSON_SIZE> dataJson;
+
+  // Reference pressure
+  dataJson["PREF"] = sensorVal.PRefH2O;
+
+  double flowComp = fabs(sensorVal.FlowCFM);
+  double pRefComp = fabs(sensorVal.PRefH2O);
+
+  // Flow Rate
+  if ((flowComp > config.min_flow_rate) && (pRefComp > config.min_bench_pressure))  {
+
+    // Check if we need to round values
+     if (strstr(String(config.rounding_type).c_str(), String("NONE").c_str())) {
+        dataJson["FLOW"] = sensorVal.FlowCFM;
+        dataJson["MFLOW"] = sensorVal.FlowKGH;
+        dataJson["AFLOW"] = sensorVal.FlowADJ;
+        dataJson["SFLOW"] = sensorVal.FlowSCFM;
+    // Round to whole value    
+    } else if (strstr(String(config.rounding_type).c_str(), String("INTEGER").c_str())) {
+        dataJson["FLOW"] = round(sensorVal.FlowCFM);
+        dataJson["MFLOW"] = round(sensorVal.FlowKGH);
+        dataJson["AFLOW"] = round(sensorVal.FlowADJ);
+        dataJson["SFLOW"] = round(sensorVal.FlowSCFM);
+    // Round to half (nearest 0.5)
+    } else if (strstr(String(config.rounding_type).c_str(), String("HALF").c_str())) {
+        dataJson["FLOW"] = round(sensorVal.FlowCFM * 2.0 ) / 2.0;
+        dataJson["MFLOW"] = round(sensorVal.FlowKGH * 2.0) / 2.0;
+        dataJson["AFLOW"] = round(sensorVal.FlowADJ * 2.0) / 2.0;
+        dataJson["SFLOW"] = round(sensorVal.FlowSCFM * 2.0) / 2.0;
+    }
+
+  }  else  {
+    dataJson["FLOW"] = 0.0;
+    dataJson["MFLOW"] = 0.0;
+    dataJson["AFLOW"] = 0.0;
+  }
+
+
+  // Flow depression value for AFLOW units
+  dataJson["PADJUST"] = config.adj_flow_depression;
+
+  // Standard reference
+  switch (config.standardReference) {
+
+    case ISO_1585:
+      dataJson["STD_REF"] = "ISO-1585";
+    break;
+
+    case ISA :
+      dataJson["STD_REF"] = "ISA";
+    break;
+
+    case ISO_13443:
+      dataJson["STD_REF"] = "ISO-13443";
+    break;
+
+    case ISO_5011:
+      dataJson["STD_REF"] = "ISO-5011";
+    break;
+
+    case ISO_2533:
+      dataJson["STD_REF"] = "ISO-2533";
+    break;
+
+  }
+
+
+  // Temperature deg C or F
+  if (strstr(String(config.temp_unit).c_str(), String("Celcius").c_str())){
+    dataJson["TEMP"] = sensorVal.TempDegC;
+  } else {
+    dataJson["TEMP"] = sensorVal.TempDegF;
+  }
+
+
+  // Bench Type for status pane
+  if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())) {
+    dataJson["BENCH_TYPE"] = "MAF";
+  } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())) {
+    dataJson["BENCH_TYPE"] = "ORIFICE";
+  } else if (strstr(String(config.bench_type).c_str(), String("VENTURI").c_str())) {
+    dataJson["BENCH_TYPE"] = "VENTURI";
+  } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())) {
+    dataJson["BENCH_TYPE"] = "PITOT";
+  }
+
+
+  dataJson["BARO"] = sensorVal.BaroHPA; // GUI  displays mbar (hPa)
+  dataJson["RELH"] = sensorVal.RelH;
+
+  // Pitot
+  dataJson["PITOT"] = sensorVal.PitotH2O;
+
+  // Differential pressure
+  dataJson["PDIFF"] = sensorVal.PDiffH2O;
+
+  // Swirl (+/- rpm)
+  dataJson["SWIRL"] = sensorVal.Swirl;
+
+  // Flow Differential
+  dataJson["FDIFF"] = sensorVal.FDiff;
+  dataJson["FDIFFTYPEDESC"] = sensorVal.FDiffTypeDesc;
+
+  if (1!=1) {  // TODO if message handler is active display the active message
+    dataJson["STATUS_MESSAGE"] = status.statusMessage;
+  } else { // else lets just show the uptime
+    dataJson["STATUS_MESSAGE"] = "Uptime: " + String(_hardware.uptime()) + " (hh.mm)";      
+  }
+
+  // Active Orifice
+  dataJson["ACTIVE_ORIFICE"] = status.activeOrifice;
+  // Orifice Max Flow
+  dataJson["ORIFICE_MAX_FLOW"] = status.activeOrificeFlowRate;
+  // Orifice Calibration Depression
+  dataJson["ORIFICE_CALIBRATED_DEPRESSION"] = status.activeOrificeTestPressure;
+
+  serializeJson(dataJson, jsonString);
+
+  return jsonString;
+}
+
+
+
+
+
+
+
+/***********************************************************
+ * @brief bootLoop
+ * @details Loop until files uploaded
+ ***/
+void DataHandler::bootLoop()
+{
+
+    extern struct DeviceStatus status;
+    extern struct ConfigSettings config;
+    extern struct SensorData sensorVal;
+
+    Hardware _hardware;
+    Calculations _calculations;
+    Messages _message;
+
+    String jsonString;
+
+    StaticJsonDocument<DATA_JSON_SIZE> dataJson;
+    bool doLoop = true;
+
+    do {
+    // TODO Error handler
+    // and then waits for files to be uploaded
+    // once files are uploaded ESP reboots
+
+    
+    
+    }
+    while (doLoop = true);
+
+
+
 }

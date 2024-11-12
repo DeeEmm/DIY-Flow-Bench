@@ -220,3 +220,97 @@ struct ValveLiftData {
   double LiftData11 = 0.0;
   double LiftData12 = 0.0;
 };
+
+
+
+
+/***********************************************************
+ * Pin Data
+ * @note we need to set serial pins as default minimum
+ ***/
+struct Pins {
+  int VAC_SPEED_PIN = -1;
+  int VAC_BLEED_VALVE_PIN = -1;
+  int VAC_BANK_1_PIN = -1;
+  int VAC_BANK_2_PIN = -1; 
+  int VAC_BANK_3_PIN = -1;
+  int AVO_STEP_PIN =  -1;
+  int AVO_DIR_PIN = -1;
+  int FLOW_VALVE_STEP_PIN = -1;
+  int FLOW_VALVE_DIR_PIN = -1;
+  int VCC_3V3_PIN = -1;
+  int VCC_5V_PIN = -1;
+  int SPEED_SENSOR_PIN = -1;
+  int SWIRL_ENCODER_PIN_A = -1;
+  int SWIRL_ENCODER_PIN_B = -1;
+  int ORIFICE_BCD_BIT1_PIN = -1;
+  int ORIFICE_BCD_BIT2_PIN = -1;
+  int ORIFICE_BCD_BIT3_PIN = -1;
+  int MAF_PIN = -1;
+  int REF_PRESSURE_PIN = -1;
+  int DIFF_PRESSURE_PIN = -1;
+  int PITOT_PIN = -1;
+  int TEMPERATURE_PIN = -1;
+  int REF_BARO_PIN = -1;
+  int HUMIDITY_PIN = -1;
+  int SERIAL0_TX_PIN = 1; // Default for most ESP32
+  int SERIAL0_RX_PIN = 3; // Default for most ESP32
+  int SERIAL2_TX_PIN = -1;
+  int SERIAL2_RX_PIN = -1;
+  int SDA_PIN = 21; // Default for most ESP32
+  int SCL_PIN = 22; // Default for most ESP32
+  int SD_CS_PIN = -1;
+  int SD_MOSI_PIN = -1;
+  int SD_MISO_PIN = -1;             
+  int SD_SCK_PIN = -1;
+  int WEMOS_SPARE_PIN_1 = -1;
+};
+
+
+
+/***********************************************************
+ * @brief Language Data
+ * @note default language is english but can beoverwritten by language.json 
+ ***/
+struct Language {
+    char LANG_BLANK[50] = " "; 
+    char LANG_NULL[50] = "NULL";
+    char LANG_NO_ERROR[50] = "Status OK";
+    char LANG_SERVER_RUNNING[50] = "Server Running";
+    char LANG_WARNING[50] = "Warning!";
+    char LANG_FLOW_LIMIT_EXCEEDED[50] = "Warning! Flow Limit Error";
+    char LANG_REF_PRESS_LOW[50] = "Warning! Low Reference Pressure";
+    char LANG_LEAK_TEST_PASS[50] = "Leak test OK";
+    char LANG_LEAK_TEST_FAILED[50] = "Leak test fail";
+    char LANG_ERROR_LOADING_CONFIG[50] = "Error loading config file";
+    char LANG_ERROR_SAVING_CONFIG[50] = "Error saving config file";
+    char LANG_SAVING_CONFIG[50] = "Saving config file";
+    char LANG_SAVING_CALIBRATION[50] = "Error saving calibration file";
+    char LANG_ERROR_LOADING_FILE[50] = "Error loading file";
+    char LANG_DHT11_READ_FAIL[50] = "DHT11 Read fail";
+    char LANG_BME280_READ_FAIL[50] = "BME280 Read fail";
+    char LANG_LOW_FLOW_CAL_VAL[50] = "Low Cal Value: ";
+    char LANG_HIGH_FLOW_CAL_VAL[50] = "High Cal Value: ";
+    char LANG_REF_PRESS_VALUE[50] = "Ref Press Val: ";
+    char LANG_NOT_ENABLED[50] = "Not Enabled";
+    char LANG_START_REF_PRESSURE[50] = "Using Startup Ref Pressure";
+    char LANG_FIXED_VALUE[50] = "Fixed value: ";
+    char LANG_CALIBRATING[50] = "Calibrating FLow Offset...";
+    char LANG_LEAK_CALIBRATING[50] = "Calibrating Leak Test...";
+    char LANG_CAL_OFFET_VALUE[50] = "Cal Value: ";
+    char LANG_LEAK_CAL_VALUE[50] = "Leak Cal Value: ";
+    char LANG_RUN_BENCH_TO_CALIBRATE[50] = "Bench must be running to calibrate";
+    char LANG_BENCH_RUNNING[50] = "Bench running";
+    char LANG_BENCH_STOPPED[50] = "Bench stopped";
+    char LANG_DEBUG_MODE[50] = "Debug Mode";
+    char LANG_DEV_MODE[50] = "Developer Mode";
+    char LANG_SYSTEM_REBOOTING[50] = "System Rebooting";
+    char LANG_CANNOT_DELETE_INDEX[50] = "Cannot delete index.html (overwrite it instead!)";
+    char LANG_DELETE_FAILED[50] = "File Delete Failed";
+    char LANG_INVALID_ORIFICE_SELECTED[50] = "Invalid Orifice selected";
+    char LANG_ORIFICE_CHANGE[50] = "Orifice Plate Changed";
+    char LANG_UPLOAD_FAILED_NO_SPACE[50] = "Upload rejected, not enough space";
+    char LANG_FILE_UPLOADED[50] = "File uploaded";
+    char LANG_NO_BOARD_LOADED[50] = "No board loaded";  
+};
+
