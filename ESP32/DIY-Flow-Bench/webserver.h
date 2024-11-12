@@ -77,9 +77,9 @@ class Webserver {
 		AsyncEventSource *events;
 		
 		void begin();
-		void writeJSONFile(String data, String filename, int dataSize);
+		// void writeJSONFile(String data, String filename, int dataSize);
 		String getDataJSON();
-		StaticJsonDocument<CONFIG_JSON_SIZE> loadJSONFile(String filename);
+		// StaticJsonDocument<CONFIG_JSON_SIZE> loadJSONFile(String filename);
 		void sendWebSocketMessage(String jsonValues);
 		void parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configData);
 		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfig ();
@@ -104,7 +104,7 @@ class Webserver {
 		void deleteFile(fs::FS &fs, const char *path);
 		void testFileIO(fs::FS &fs, const char * path);
 
-		void createLiftDataFile();
+		// void createLiftDataFile();
 		static void clearLiftDataFile(AsyncWebServerRequest *request);
 		static void parseLiftDataForm(AsyncWebServerRequest *request);
 		static void parseUserFlowTargetForm(AsyncWebServerRequest *request);

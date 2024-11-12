@@ -20,6 +20,7 @@
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
+#include "datahandler.h"
 
 #include "calibration.h"
 #include <SPIFFS.h>
@@ -163,35 +164,35 @@ double Calibration::getLeakOffsetReverse() {
 
 
 
-/***********************************************************
-* @brief createCalibration File
-* @details Create configuration json file
-* @note Called from Webserver::Initialise() if config.json not found
-***/
-void Calibration::createCalibrationFile () {
+// /***********************************************************
+// * @brief createCalibration File
+// * @details Create configuration json file
+// * @note Called from Webserver::Initialise() if config.json not found
+// ***/
+// void Calibration::createCalibrationFile () {
 
-  extern struct CalibrationData calVal;
-  Webserver _webserver;
-  Messages _message;
-  String jsonString;
-  StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
+//   extern struct CalibrationData calVal;
+//   Webserver _webserver;
+//   Messages _message;
+//   String jsonString;
+//   StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
   
-  _message.debugPrintf("Creating cal.json file... \n"); 
+//   _message.debugPrintf("Creating cal.json file... \n"); 
   
-  calData["FLOW_OFFSET"] = calVal.flow_offset;
-  calData["USER_OFFSET"] = calVal.user_offset;
-  calData["LEAK_CAL_BASELINE"] = calVal.leak_cal_baseline;
-  calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
-  calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
-  calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
+//   calData["FLOW_OFFSET"] = calVal.flow_offset;
+//   calData["USER_OFFSET"] = calVal.user_offset;
+//   calData["LEAK_CAL_BASELINE"] = calVal.leak_cal_baseline;
+//   calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
+//   calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
+//   calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
 
-  serializeJsonPretty(calData, jsonString);
+//   serializeJsonPretty(calData, jsonString);
 
-  File outputFile = SPIFFS.open("/cal.json", FILE_WRITE);
-  serializeJsonPretty(calData, outputFile);
-  outputFile.close();
+//   File outputFile = SPIFFS.open("/cal.json", FILE_WRITE);
+//   serializeJsonPretty(calData, outputFile);
+//   outputFile.close();
   
-}
+// }
 
 
 
@@ -205,7 +206,7 @@ void Calibration::saveCalibrationData() {
   
   Messages _message;
 
-  Webserver _webserver;
+  DataHandler _data;
   String jsonString;
   StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
 
@@ -233,7 +234,7 @@ void Calibration::saveCalibrationData() {
   serializeJsonPretty(calData, outputFile);
   outputFile.close();
   
-  _webserver.writeJSONFile(jsonString, "/cal.json", CAL_DATA_JSON_SIZE);
+  _data.writeJSONFile(jsonString, "/cal.json", CAL_DATA_JSON_SIZE);
 
   _message.debugPrintf("Calibration Saved \n");
 

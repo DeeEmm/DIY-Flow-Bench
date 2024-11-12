@@ -43,6 +43,7 @@
 #include <MD_REncoder.h>
 #include <math.h>
 
+#include "datahandler.h"
 #include "version.h"
 #include "constants.h"
 #include "configuration.h"
@@ -70,6 +71,7 @@ Translator translate;
 CalibrationData calVal;
 
 // Initiate Classes
+DataHandler _data;
 API _api;
 Calculations _calculations;
 Hardware _hardware;
@@ -284,6 +286,13 @@ void TASKgetEnviroData( void * parameter ){
  * @note We can assign tasks to specific cores if required (currently disabled)
  ***/
 void setup(void) {
+
+
+  // Initialise Data environment
+  _data.begin();
+
+
+
 
   // REVIEW
   // set message queue length

@@ -8,6 +8,17 @@ var gzip = require('gulp-gzip');
 var removeHtmlComments = require('gulp-remove-html-comments');
 var clean = require('gulp-clean');
 fs = require('fs');
+const versionFile = require('./version.h');
+console.log(versionFile.BUILD_NUMBER);
+
+
+gulp.task('html', function(done) {
+	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
+		.pipe(htmlmin({ collapseWhitespace: true }))
+		.pipe(gulp.dest('esp32/DIY-Flow-Bench/build'))
+		done();
+	});
+	
 
 gulp.task('css', function(done){    
 	return gulp.src('esp32/DIY-Flow-Bench/src/style.css')       
@@ -65,19 +76,22 @@ gulp.task('compress', function(done) {
 });
 
 	
-
 gulp.task('html', function() {
 	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
 	 	.pipe(removeHtmlComments())
 		.pipe(replace(/<link rel="stylesheet" type="text\/css" href="\/style.css"[^>]*>/, function(s) {
-			 var style = fs.readFileSync('esp32/DIY-Flow-Bench/build/style.css', 'utf8');
-			 return '<style>\n' + style + '\n</style>';
-		   }))
+			var style = fs.readFileSync('esp32/DIY-Flow-Bench/build/style.css', 'utf8');
+			return '<style>\n' + style + '\n</style>';
+		}))
 		.pipe(replace(/<script src="\/javascript.js"\><\/script\>/, function(s) {
-			 var script = fs.readFileSync('esp32/DIY-Flow-Bench/build/javascript.js', 'utf8');
-			 return '<script>\n' + script + '\n</script>';
-		   }))
-		.pipe(htmlmin({ collapseWhitespace: true }))
+			var script = fs.readFileSync('esp32/DIY-Flow-Bench/build/javascript.js', 'utf8');
+			return '<script>\n' + script + '\n</script>';
+		}))
+		.pipe(replace("@@version@@", function(s) {
+			var script = fs.readFileSync('esp32/DIY-Flow-Bench/version.h', 'utf8');
+			return script;
+		}))
+  	  .pipe(htmlmin({ collapseWhitespace: true }))
 	   .pipe(gulp.dest('esp32/DIY-Flow-Bench/build'));
 	});	
 
