@@ -31,10 +31,6 @@
 #include "structs.h"
 #include "comms.h"
 
-// #include <WiFi.h>
-// #include <ESPmDNS.h>
-// #include <esp_wifi.h>
-
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
@@ -43,11 +39,11 @@
 
 #include "calibration.h"
 #include "sensors.h"
-// #include "pins.h"
+
 #include "hardware.h"
 #include "messages.h"
 #include "calculations.h"
-#include LANGUAGE_FILE
+// // #include LANGUAGE_FILE
 
 #include <sstream>
 using namespace std;
@@ -56,25 +52,13 @@ using namespace std;
 
 // RTC_DATA_ATTR int bootCount; // flash mem
 
-/***********************************************************
- * @brief INITIALISE SERVER
- * @note WiFi Error Codes
- * Value	Constant	Meaning
- * 0	WL_IDLE_STATUS	temporary status assigned when WiFi.begin() is called
- * 1	WL_NO_SSID_AVAIL	 when no SSID are available
- * 2	WL_SCAN_COMPLETED	scan networks is completed
- * 3	WL_CONNECTED	when connected to a WiFi network
- * 4	WL_CONNECT_FAILED	when the connection fails for all the attempts
- * 5	WL_CONNECTION_LOST	when the connection is lost
- * 6	WL_DISCONNECTED	when disconnected from a network
- * 
- ***/
+const char LANDING_PAGE[] PROGMEM = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/api/file/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~pins_STATUS~</p> <!--<p>~SETTINGS_STATUS~</p>--> <br> <form method='POST' action='/api/file/upload' enctype='multipart/form-data'> <div class=\"input_container\"> <input type=\"file\" name=\"upload\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
+
 void Webserver::begin()
 {
-
   extern struct ConfigSettings config;
-  extern struct Translator translate;
-  extern DeviceStatus status;
+  extern struct Language language;
+  extern struct DeviceStatus status;
 
   int wifiStatusCode;
 
@@ -85,171 +69,11 @@ void Webserver::begin()
   Calibration _calibration;
   DataHandler _data;
 
-  // // Filesystem
-  // _message.serialPrintf("File System Initialisation...\n");
-  // if (SPIFFS.begin()) {
-  //   _message.serialPrintf("Complete.\n");
-  // } else {
-  //   _message.serialPrintf("Failed.\n");
-  //   #if defined FORMAT_FILESYSTEM_IF_FAILED
-  //       SPIFFS.format();
-  //       _message.serialPrintf("!! File System Formatted !!\n");
-  //   #endif
-  // }
-
-  // // Check if config / calibration / liftdata json files exist. If not create them.
-  // // NOTE Combined filesize cannot exceed SPIFFS partition
-  // if (!SPIFFS.exists("/config.json"))  {
-  //   createConfigFile();
-  // }
-
-  // if (!SPIFFS.exists("/liftdata.json")) {
-  //   createLiftDataFile();
-  // }
-
-  // if (!SPIFFS.exists("/cal.json")) {
-  //   _calibration.createCalibrationFile();
-  // }
-
-  // // load json configuration files from SPIFFS memory
-  // this->loadConfig();
-  // this->loadLiftData();
-  // _calibration.loadCalibrationData();
-  
-  // // Display Filesystem Stats
-  // status.spiffs_mem_size = SPIFFS.totalBytes();
-  // status.spiffs_mem_used = SPIFFS.usedBytes();
-
-  // _message.serialPrintf("=== SPIFFS File system info === \n");
-  // _message.serialPrintf("Total space:      %s \n", byteDecode(status.spiffs_mem_size));
-  // _message.serialPrintf("Total space used: %s \n", byteDecode(status.spiffs_mem_used));
-
-  // // SD Card
-  // #ifdef SD_CARD_IS_ENABLED
-
-  // // test code from https://github.com/espressif/arduino-esp32/blob/master/libraries/SD/examples/SD_Test/SD_Test.ino
-
-  // _message.serialPrintf("=== SDCARD File system info === \n");
-
-  // int sck = SD_SCK_PIN;
-  // int miso = SD_MISO_PIN;
-  // int mosi = SD_MOSI_PIN;
-  // int cs = SD_CS_PIN;
-
-  // SPIClass spi = SPIClass(VSPI);
-
-  //   SPI.begin(sck, miso, mosi, cs);
-  //   if (!SD.begin(cs, spi, 2000000U)) {
-  //     Serial.println("Card Mount Failed");
-
-  //   } else {
-
-  //     uint8_t cardType = SD.cardType();
-
-  //     if (cardType == CARD_NONE) {
-  //       Serial.println("No SD card attached");
-  //     }
-
-  //     Serial.print("SD Card Type: ");
-  //     if (cardType == CARD_MMC) {
-  //       Serial.println("MMC");
-  //     } else if (cardType == CARD_SD) {
-  //       Serial.println("SDSC");
-  //     } else if (cardType == CARD_SDHC) {
-  //       Serial.println("SDHC");
-  //     } else {
-  //       Serial.println("UNKNOWN");
-  //     }
-
-  //     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-  //     Serial.printf("SD Card Size: %lluMB\n", cardSize);
-
-  //     listDir(SD, "/", 0);
-  //     createDir(SD, "/mydir");
-  //     listDir(SD, "/", 0);
-  //     removeDir(SD, "/mydir");
-  //     listDir(SD, "/", 2);
-  //     writeFile(SD, "/hello.txt", "Hello ");
-  //     appendFile(SD, "/hello.txt", "World!\n");
-  //     readFile(SD, "/hello.txt");
-  //     deleteFile(SD, "/foo.txt");
-  //     renameFile(SD, "/hello.txt", "/foo.txt");
-  //     readFile(SD, "/foo.txt");
-  //     testFileIO(SD, "/test.txt");
-  //     Serial.printf("Total space: %lluMB\n", SD.totalBytes() / (1024 * 1024));
-  //     Serial.printf("Used space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
-  //   }
-
-  // #endif
-
-  // // WiFi
-  // // if WiFi password is unedited or blank force AP mode
-  // if ((strstr(String(config.wifi_pswd).c_str(), String("PASSWORD").c_str())) || (String(config.wifi_pswd).c_str() == "")) {
-  //   config.ap_mode = true;
-  // } 
-  
-  // // Connect to WiFi
-  // if (config.ap_mode == false)  {
-  //   // WiFi.useStaticBuffers(true);   
-  //   this->resetWifi();
-  //   WiFi.mode(WIFI_STA);
-  //   // Set MAC address
-  //   #ifdef MAC_ADDRESS
-  //     uint8_t newMACAddress[] = MAC_ADDRESS;
-  //     esp_wifi_set_mac(WIFI_IF_STA, &newMACAddress[0]);
-  //   #endif
-  //   // Display MAC Address
-  //   _message.serialPrintf("WiFi MAC Address: %s \n", String(WiFi.macAddress()).c_str());  
-  //   _message.serialPrintf("Connecting to WiFi \n");
-  //   #ifdef STATIC_IP
-  //     // Configures static IP address
-  //     if (!WiFi.config(STATIC_IP, GATEWAY, SUBNET)) {
-  //       Serial.println("STA Failed to configure");
-  //     }
-  //   #endif
-  //   wifiStatusCode = this->getWifiConnection();
-  // }
-
-  // // Test for connection success else create an accesspoint
-  // if (wifiStatusCode == 3 && config.ap_mode == false) { 
-  //   // STA Connection success
-  //   _message.serialPrintf("\nConnected to %s \n", config.wifi_ssid);
-  //   status.local_ip_address = WiFi.localIP().toString().c_str();
-  //   _message.serialPrintf("IP address: %s \n", WiFi.localIP().toString().c_str());
-  //   WiFi.setAutoReconnect(true);
-  //   WiFi.persistent(true);
-    
-  // }  else  { // Go into AP Mode
-  //   if (config.ap_mode == true) { // AP mode is Default
-  //     _message.serialPrintf("\nDefaulting to AP Mode \n");
-  //   } else { // AP mode is Fallback
-  //     _message.serialPrintf("\nFailed to connect to Wifi \n");
-  //     _message.serialPrintf("Wifi Status message: ");
-  //     _message.serialPrintf(String(wifiStatusCode).c_str());
-  //     _message.serialPrintf("\n");
-  //   }
-
-  //   _message.serialPrintf("Creating WiFi Access Point:  %s  \n", config.wifi_ap_ssid); // NOTE: Default AP SSID / PW = DIYFB / 123456789
-  //   WiFi.mode(WIFI_AP);
-  //   WiFi.softAP(config.wifi_ap_ssid, config.wifi_ap_pswd);
-  //   status.local_ip_address = WiFi.softAPIP().toString().c_str();
-  //   _message.serialPrintf("Access Point IP address: %s \n", WiFi.softAPIP().toString().c_str());
-  //   status.apMode = true;
-  // }
-
-  // // Set up Multicast DNS
-  // if (!MDNS.begin(config.hostname))  {
-  //   _message.serialPrintf("Error starting mDNS \n");
-  // }  else  {
-  //   status.hostname = config.hostname;
-  //   _message.serialPrintf("Multicast: http://%s.local \n", status.hostname);
-  // }
-
   // API request handlers [JSON confirmation response]
   server->on("/api/bench/on", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Hardware _hardware;
-      _message.Handler(translate.LANG_BENCH_RUNNING);
+      _message.Handler(language.LANG_BENCH_RUNNING);
       _message.debugPrintf("Bench On \n");
       _hardware.benchOn(); 
       request->send(200, "text/html", "{\"bench\":\"on\"}"); 
@@ -258,7 +82,7 @@ void Webserver::begin()
   server->on("/api/bench/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Hardware _hardware;
-      _message.Handler(translate.LANG_BENCH_STOPPED);
+      _message.Handler(language.LANG_BENCH_STOPPED);
       _message.debugPrintf("Bench Off \n");
       _hardware.benchOff(); 
       request->send(200, "text/html", "{\"bench\":\"off\"}"); 
@@ -266,28 +90,28 @@ void Webserver::begin()
 
   server->on("/api/debug/on", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      _message.Handler(translate.LANG_DEBUG_MODE);
+      _message.Handler(language.LANG_DEBUG_MODE);
       _message.debugPrintf("Debug Mode On\n");
       config.debug_mode = true;
       request->send(200, "text/html", "{\"debug\":\"on\"}"); });
 
   server->on("/api/debug/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      _message.Handler(translate.LANG_BLANK);
+      _message.Handler(language.LANG_BLANK);
       _message.debugPrintf("Debug Mode Off\n");
       config.debug_mode = false;
       request->send(200, "text/html", "{\"debug\":\"off\"}"); });
 
   server->on("/api/dev/on", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
-      _message.Handler(translate.LANG_DEV_MODE);
+      _message.Handler(language.LANG_DEV_MODE);
       _message.debugPrintf("Developer Mode On\n");
       config.dev_mode = true;
       request->send(200, "text/html", "{\"dev\":\"on\"}"); });
 
   server->on("/api/dev/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      _message.Handler(translate.LANG_BLANK);
+      _message.Handler(language.LANG_BLANK);
       _message.debugPrintf("Developer Mode Off\n");
       config.dev_mode = false;
       request->send(200, "text/html", "{\"dev\":\"off\"}"); });
@@ -295,20 +119,20 @@ void Webserver::begin()
   server->on("/api/clear-message", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
       status.statusMessage = "";
-      _message.Handler(translate.LANG_NO_ERROR);
+      _message.Handler(language.LANG_NO_ERROR);
       _message.debugPrintf("Clearing messages...\n");
        });
 
     server->on("/api/orifice-change", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      _message.Handler(translate.LANG_ORIFICE_CHANGE);
+      _message.Handler(language.LANG_ORIFICE_CHANGE);
       _message.debugPrintf("Active Orifice Changed\n");
       status.activeOrifice = request->arg("orifice");
       request->send(200, "text/html", "{\"orifice\":changed\"\"}"); });
 
   server->on("/api/bench/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
-      _message.Handler(translate.LANG_SYSTEM_REBOOTING);
+      _message.Handler(language.LANG_SYSTEM_REBOOTING);
       request->send(200, "text/html", "{\"reboot\":\"true\"}");
       ESP.restart(); 
       request->redirect("/"); });
@@ -318,12 +142,12 @@ void Webserver::begin()
       Calibration _calibrate;
       Hardware _hardware;
       if (_hardware.benchIsRunning()) {
-        _message.Handler(translate.LANG_CALIBRATING);
+        _message.Handler(language.LANG_CALIBRATING);
         _message.debugPrintf("Calibrating Flow...\n");
         request->send(200, "text/html", "{\"calibrate\":\"true\"}");
         _calibrate.setFlowOffset();         
       } else {
-        _message.Handler(translate.LANG_RUN_BENCH_TO_CALIBRATE);
+        _message.Handler(language.LANG_RUN_BENCH_TO_CALIBRATE);
         request->send(200, "text/html", "{\"calibrate\":\"false\"}");
       }  
       request->redirect("/");
@@ -334,12 +158,12 @@ void Webserver::begin()
       Calibration _calibrate;
       Hardware _hardware;
       if (_hardware.benchIsRunning()) {
-        _message.Handler(translate.LANG_LEAK_CALIBRATING);
+        _message.Handler(language.LANG_LEAK_CALIBRATING);
         _message.debugPrintf("Calibrating Leak Test...\n");
         request->send(200, "text/html", "{\"leakcal\":\"true\"}");
         _calibrate.setLeakOffset();
       } else {
-        _message.Handler(translate.LANG_RUN_BENCH_TO_CALIBRATE);
+        _message.Handler(language.LANG_RUN_BENCH_TO_CALIBRATE);
         request->send(200, "text/html", "{\"leakcal\":\"false\"}");
       } 
       request->redirect("/"); });
@@ -409,7 +233,7 @@ void Webserver::begin()
           SPIFFS.remove(fileToDelete);
         }  else {
           _message.debugPrintf("Delete Failed: %s", fileToDelete);  
-          _message.Handler(translate.LANG_DELETE_FAILED);    
+          _message.Handler(language.LANG_DELETE_FAILED);    
         } 
         if (fileToDelete == "/index.html"){
           request->redirect("/");
@@ -423,7 +247,7 @@ void Webserver::begin()
   // Toggle Flow Dif Tile
   server->on("/api/fdiff", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
-      // _message.Handler(translate.LANG_BENCH_RUNNING);
+      // _message.Handler(language.LANG_BENCH_RUNNING);
       _message.debugPrintf("/api/fdiff \n");
       toggleFlowDiffTile();
       request->send(200);
@@ -480,16 +304,18 @@ void Webserver::begin()
       if (SPIFFS.exists("/index.html")) {
         request->send(SPIFFS, "/index.html", "text/html", false, processTemplate);
        } else {
-        request->send(200, "text/html", LANG_INDEX_HTML); 
+        request->send_P(200, "text/html", LANDING_PAGE, processLandingPageTemplate); 
       }});
 
   server->onFileUpload(processUpload);
   server->addHandler(events);
   server->begin();
 
-  _message.Handler(translate.LANG_SERVER_RUNNING);
+  _message.Handler(language.LANG_SERVER_RUNNING);
   _message.serialPrintf("Server Running \n");
 }
+
+
 
 
 
@@ -502,7 +328,7 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
   Messages _message;
   extern struct FileUploadData fileUploadData;
-  extern struct Translator translate;
+  extern struct Language language;
   String redirectURL;
 
   if (!filename.startsWith("/")){
@@ -521,11 +347,11 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
   if (len)  {
     fileUploadData.file_size += len;
     if (fileUploadData.file_size > freespace)    {
-      _message.Handler(translate.LANG_UPLOAD_FAILED_NO_SPACE);
+      _message.Handler(language.LANG_UPLOAD_FAILED_NO_SPACE);
       _message.debugPrintf("Upload failed, no Space: %s \n", freespace);
       fileUploadData.upload_error = true;
     }    else    {
-      _message.Handler(translate.LANG_FILE_UPLOADED);
+      _message.Handler(language.LANG_FILE_UPLOADED);
       _message.debugPrintf("Writing file: '%s' index=%u len=%u \n", filename, index, len);
       // stream the incoming chunk to the opened file
       request->_tempFile.write(data, len);
@@ -549,161 +375,6 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
 
 
-
-
-// /***********************************************************
-// * @brief loadConfig
-// * @details read configuration data from config.json file and loads into global struct
-// ***/ 
-// StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
-
-//   extern struct ConfigSettings config;
-
-//   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
-//   DataHandler _data;
-//   Messages _message;
-
-//   _message.serialPrintf("Loading Configuration... \n");     
-
-//   if (SPIFFS.exists("/config.json"))  {
-
-//     configData = _data.loadJSONFile("/config.json");
-
-//     strcpy(config.wifi_ssid, configData["CONF_WIFI_SSID"]);
-//     strcpy(config.wifi_pswd, configData["CONF_WIFI_PSWD"]);
-//     strcpy(config.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
-//     strcpy(config.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
-//     strcpy(config.hostname, configData["CONF_HOSTNAME"]);
-//     config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
-//     config.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
-//     config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
-//     config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
-//     config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
-//     strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
-//     strcpy(config.rounding_type, configData["ROUNDING_TYPE"]);
-//     config.flow_decimal_length, configData["FLOW_DECIMAL_LENGTH"];
-//     config.gen_decimal_length, configData["GEN_DECIMAL_LENGTH"];
-//     config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
-//     config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
-//     strcpy(config.api_delim, configData["CONF_API_DELIM"]);
-//     config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
-//     config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
-//     configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
-//     configData["STANDARD_REFERENCE"] = config.standardReference;
-//     configData["STD_ADJ_FLOW"] = config.std_adj_flow;
-//     configData["DATAGRAPH_MAX"] = config.dataGraphMax;
-//     configData["TEMP_UNIT"] = config.temp_unit;
-//     configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
-//     strcpy(config.bench_type, configData["BENCH_TYPE"]);
-//     config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
-//     config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
-//     config.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
-//     config.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
-//     config.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
-//     config.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
-//     config.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
-//     config.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
-//     config.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
-//     config.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
-//     config.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
-//     config.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
-//     config.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
-//     config.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
-
-//   } else {
-//     _message.serialPrintf("Configuration file not found \n");
-//   }
-  
-//   return configData;  
-
-// }
-
-
-
-// /***********************************************************
-// * @brief loadCalibration
-// * @details read configuration data from cal.json file
-// ***/ 
-// StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
-
-//   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
-
-//   Messages _message;
-//   _message.serialPrintf("Loading Configuration... \n");     
-//   if (SPIFFS.exists("/config.json"))  {
-//     configData = loadJSONFile("/config.json");
-//     parseConfigSettings(configData);
-//   } else {
-//     _message.serialPrintf("Configuration file not found \n");
-//   }
-  
-//   return configData;  
-
-// }
-
-
-
-
-
-// /***********************************************************
-// * @brief createConfig
-// * @details Create basic minimum configuration json file
-// * @note Called from Webserver::Initialise() if config.json not found
-// ***/
-// void Webserver::createConfigFile () {
-
-//   extern struct ConfigSettings config;
-//   Messages _message;
-//   String jsonString;  
-//   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
-
-//   _message.serialPrintf("Creating config.json file... \n"); 
- 
-//   configData["PAGE_TITLE"] = config.pageTitle;
-//   configData["CONF_WIFI_SSID"] = config.wifi_ssid;
-//   configData["CONF_WIFI_PSWD"] = config.wifi_pswd;
-//   configData["CONF_WIFI_AP_SSID"] = config.wifi_ap_ssid;
-//   configData["CONF_WIFI_AP_PSWD"] = config.wifi_ap_pswd;
-//   configData["CONF_HOSTNAME"] = config.hostname;
-//   configData["CONF_WIFI_TIMEOUT"] = config.wifi_timeout;
-//   configData["CONF_MAF_HOUSING_DIAMETER"] = config.maf_housing_diameter;
-//   configData["CONF_REFRESH_RATE"] = config.refresh_rate;
-//   configData["CONF_MIN_BENCH_PRESSURE"] = config.min_bench_pressure;
-//   configData["CONF_MIN_FLOW_RATE"] = config.min_flow_rate;
-//   configData["DATA_FILTER_TYPE"] = config.data_filter_type;
-//   configData["ROUNDING_TYPE"] = config.rounding_type;
-//   configData["FLOW_DECIMAL_LENGTH"] = config.flow_decimal_length;
-//   configData["GEN_DECIMAL_LENGTH"] = config.gen_decimal_length;
-//   configData["CONF_CYCLIC_AVERAGE_BUFFER"] = config.cyc_av_buffer;
-//   configData["CONF_MAF_MIN_VOLTS"] = config.maf_min_volts;
-//   configData["CONF_API_DELIM"] = config.api_delim;
-//   configData["CONF_SERIAL_BAUD_RATE"] = config.serial_baud_rate;
-//   configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
-//   configData["STANDARD_REFERENCE"] = config.standardReference;
-//   configData["STD_ADJ_FLOW"] = config.std_adj_flow;
-//   configData["DATAGRAPH_MAX"] = config.dataGraphMax;
-//   configData["TEMP_UNIT"] = config.temp_unit;
-//   configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
-//   configData["CONF_SHOW_ALARMS"] = config.show_alarms;
-//   configData["BENCH_TYPE"] = config.bench_type;
-//   configData["CONF_CAL_FLOW_RATE"] = config.cal_flow_rate;
-//   configData["CONF_CAL_REF_PRESS"] = config.cal_ref_press;
-//   configData["ORIFICE1_FLOW_RATE"] = config.orificeOneFlow;
-//   configData["ORIFICE1_TEST_PRESSURE"] = config.orificeOneDepression;
-//   configData["ORIFICE2_FLOW_RATE"] = config.orificeTwoFlow;
-//   configData["ORIFICE2_TEST_PRESSURE"] = config.orificeThreeDepression;
-//   configData["ORIFICE3_FLOW_RATE"] = config.orificeThreeFlow;
-//   configData["ORIFICE4_FLOW_RATE"] = config.orificeFourFlow;
-//   configData["ORIFICE4_TEST_PRESSURE"] = config.orificeFourDepression;
-//   configData["ORIFICE5_FLOW_RATE"] = config.orificeFiveFlow;
-//   configData["ORIFICE5_TEST_PRESSURE"] = config.orificeFiveDepression;
-//   configData["ORIFICE6_FLOW_RATE"] = config.orificeSixFlow;
-//   configData["ORIFICE7_TEST_PRESSURE"] = config.orificeSixDepression;
-
-//   serializeJsonPretty(configData, jsonString);
-//   writeJSONFile(jsonString, "/config.json", CONFIG_JSON_SIZE);
-
-// }
 
 
 
@@ -934,101 +605,6 @@ void Webserver::toggleFlowDiffTile () {
 
 
 
-// /***********************************************************
-// * @brief loadLiftDataFile
-// * @details read lift data from liftdata.json file
-// ***/ 
-// StaticJsonDocument<LIFT_DATA_JSON_SIZE> Webserver::loadLiftData () {
-
-//   extern struct ValveLiftData valveData;
-//   StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
-//   DataHandler _data;
-//   Messages _message;
-
-//   _message.serialPrintf("Loading Lift Data... \n");     
-
-//   if (SPIFFS.exists("/liftdata.json"))  {
-    
-//     liftData = _data.loadJSONFile("/liftdata.json");
-    
-//     valveData.LiftData1 = liftData["LIFTDATA1"].as<double>();
-//     valveData.LiftData2 = liftData["LIFTDATA2"].as<double>();
-//     valveData.LiftData3 = liftData["LIFTDATA3"].as<double>();
-//     valveData.LiftData4 = liftData["LIFTDATA4"].as<double>();
-//     valveData.LiftData5 = liftData["LIFTDATA5"].as<double>();
-//     valveData.LiftData6 = liftData["LIFTDATA6"].as<double>();
-//     valveData.LiftData7 = liftData["LIFTDATA7"].as<double>();
-//     valveData.LiftData8 = liftData["LIFTDATA8"].as<double>();
-//     valveData.LiftData9 = liftData["LIFTDATA9"].as<double>();
-//     valveData.LiftData10 = liftData["LIFTDATA10"].as<double>();
-//     valveData.LiftData11 = liftData["LIFTDATA11"].as<double>();
-//     valveData.LiftData12 = liftData["LIFTDATA12"].as<double>();
-
-//   } else {
-//     _message.serialPrintf("LiftData file not found \n");
-//   }
-  
-//   return liftData;  
-
-// }
-
-
-
-// /***********************************************************
-// * @brief createLiftDataFile
-// * @details Create blank lift data json file
-// * @note Called from Webserver::Initialise() if liftdata.json not found
-// ***/
-// void Webserver::createLiftDataFile () {
-
-//   Messages _message;
-//   String jsonString;  
-//   StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
-
-//   _message.serialPrintf("Creating liftdata.json file... \n"); 
-
-//   liftData["LIFTDATA1"] = 0.0;
-//   liftData["LIFTDATA2"] = 0.0;
-//   liftData["LIFTDATA3"] = 0.0;
-//   liftData["LIFTDATA4"] = 0.0;
-//   liftData["LIFTDATA5"] = 0.0;
-//   liftData["LIFTDATA6"] = 0.0;
-//   liftData["LIFTDATA7"] = 0.0;
-//   liftData["LIFTDATA8"] = 0.0;
-//   liftData["LIFTDATA9"] = 0.0;
-//   liftData["LIFTDATA10"] = 0.0;
-//   liftData["LIFTDATA11"] = 0.0;
-//   liftData["LIFTDATA12"] = 0.0;
-
-//   serializeJsonPretty(liftData, jsonString);
-//   writeJSONFile(jsonString, "/liftdata.json", LIFT_DATA_JSON_SIZE);
-
-// }
-
-
-
-// /***********************************************************
-// * @brief clearLiftDataFile
-// * @details Delete and recreate default lift data file
-// ***/
-// void Webserver::clearLiftDataFile(AsyncWebServerRequest *request){
-
-//   DataHandler _data;
-//   Webserver _webserver;
-  
-//   if (SPIFFS.exists("/liftdata.json"))  {
-//     SPIFFS.remove("/liftdata.json");
-//   }
-  
-//   _data.createLiftDataFile();
-
-//   _webserver.loadLiftData();
-
-//   request->redirect("/?view=graph");
-
-// }
-
-
 
 
 
@@ -1212,71 +788,7 @@ void Webserver::parseOrificeForm(AsyncWebServerRequest *request)
 
 
 
-// /***********************************************************
-//  * @brief writeJSONFile
-//  * @details write JSON string to file
-//  ***/
-// void Webserver::writeJSONFile(String data, String filename, int dataSize){
 
-//   Messages _message;
-
-//   // StaticJsonDocument<dataSize> jsonData;
-//   DynamicJsonDocument jsonData(dataSize);
-//   DeserializationError error = deserializeJson(jsonData, data);
-//   if (!error)  {
-//     _message.debugPrintf("Writing JSON file... \n");
-//     File outputFile = SPIFFS.open(filename, FILE_WRITE);
-//     serializeJsonPretty(jsonData, outputFile);
-//     outputFile.close();
-//   }  else  {
-//     _message.statusPrintf("Webserver::writeJSONFile ERROR \n");
-//   }
-// }
-
-
-// /***********************************************************
-//  * @brief loadJSONFile
-//  * @details Loads JSON data from file
-//  ***/
-// StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadJSONFile(String filename)
-// {
-
-//   Messages _message;
-
-//   extern struct Translator translate;
-
-//   // Allocate the memory pool on the stack.
-//   // Use arduinojson.org/assistant to compute the capacity.
-//   StaticJsonDocument<CONFIG_JSON_SIZE> jsonData;
-
-//   if (SPIFFS.exists(filename))  {
-//     File jsonFile = SPIFFS.open(filename, FILE_READ);
-
-//     if (!jsonFile)    {
-//       _message.Handler(translate.LANG_ERROR_LOADING_FILE);
-//       _message.statusPrintf("Failed to open file for reading \n");
-//     }    else    {
-//       size_t size = jsonFile.size();
-//       if (size > CONFIG_JSON_SIZE)    {
-
-//       }
-
-//       DeserializationError error = deserializeJson(jsonData, jsonFile);
-//       if (error)      {
-//         _message.statusPrintf("loadJSONFile->deserializeJson() failed: %s \n", error.f_str());
-//       }
-
-//       jsonFile.close();
-//       return jsonData;
-
-//     }
-//     jsonFile.close();
-//   }  else  {
-//     _message.statusPrintf("File missing \n");
-//   }
-
-//   return jsonData;
-// }
 
 
 /***********************************************************
@@ -1680,6 +1192,32 @@ String Webserver::processTemplate(const String &var)
 
 
 
+/***********************************************************
+ * @brief processLandingPage
+ * @details Replaces template placeholders with variable values
+ * @param &var HTML payload 
+ * @note ~PLACEHOLDER_FORMAT~
+ * @note using IF statements for this sucks but C++ switch statement cannot handle text operators
+ ***/
+String Webserver::processLandingPageTemplate(const String &var) {
+
+  extern struct DeviceStatus status;
+
+  if (var == "INDEX_STATUS") {
+    if (!SPIFFS.exists("/index.html")) return String("index.html");
+  }  
+  
+  if (var == "pins_STATUS" ) {
+    if (!SPIFFS.exists("/pins.json")) return String("pins.json");    
+  }
+
+  if (var == "SETTINGS_STATUS") {
+    if (!SPIFFS.exists("/settings.json")) return String("settings.json");
+  }
+
+  return "";
+
+}
 
 
 

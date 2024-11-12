@@ -60,7 +60,7 @@
 #include "API.h"
 #include "Wire.h"
 
-#include LANGUAGE_FILE
+// // #include LANGUAGE_FILE
 
 // Initiate Structs
 ConfigSettings config;
@@ -68,7 +68,7 @@ DeviceStatus status;
 FileUploadData fileUploadData;
 SensorData sensorVal;
 ValveLiftData valveData;
-Translator translate;
+Language language;
 CalibrationData calVal;
 Pins pins;
 
@@ -299,6 +299,7 @@ void setup(void) {
   xQueueCreate( 256, 2048);
     
   _hardware.begin();
+
   _sensors.begin();
 
   // Confirm default core - NOTE: setup() and loop() are automatically created on default core 

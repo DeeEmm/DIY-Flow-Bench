@@ -29,7 +29,7 @@
 #include "calculations.h"
 #include "messages.h"
 #include "webserver.h"
-#include LANGUAGE_FILE
+// // #include LANGUAGE_FILE
 
 
 Calibration::Calibration () {
@@ -51,7 +51,7 @@ bool Calibration::setFlowOffset() {
 
   extern struct ConfigSettings config;
   extern struct CalibrationData calVal;
-  extern struct Translator translate;
+  extern struct Language language;
   extern struct SensorData sensorVal;
   
   Sensors _sensors; 
@@ -65,7 +65,7 @@ bool Calibration::setFlowOffset() {
 
   saveCalibrationData();    
 
-  _message.Handler(translate.LANG_CAL_OFFET_VALUE + calVal.flow_offset);
+  // _message.Handler(language.LANG_CAL_OFFET_VALUE + calVal.flow_offset);
   
   return true;
   
@@ -102,7 +102,7 @@ bool Calibration::setLeakOffset() {
 
 
   extern struct CalibrationData calVal;
-  extern struct Translator translate;
+  extern struct Language language;
   extern struct SensorData sensorVal;
 
   // load current calibration data
@@ -117,14 +117,14 @@ bool Calibration::setLeakOffset() {
   // De we have Pressure or Vacuum | Forwards or Reverse Flow?
   // if (_calculations.convertPressure(_sensors.getPRefValue(), INH2O) > 0) {
   //   calVal.leak_cal_offset_rev = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
-  //   _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset_rev);
+  //   _message.Handler(language.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset_rev);
   // } else {
     // calVal.leak_cal_offset = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
-    // _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
+    // _message.Handler(language.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
   // }
 
     calVal.leak_cal_offset = sensorVal.FlowCFM;
-    _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
+    // _message.Handler(language.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
 
   saveCalibrationData();    
   
@@ -214,7 +214,7 @@ void Calibration::saveCalibrationData() {
   StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
 
   extern struct CalibrationData calVal;
-  extern struct Translator translate;
+  extern struct Language language;
 
   _message.debugPrintf("Writing to cal.json file... \n");
     
@@ -226,7 +226,7 @@ void Calibration::saveCalibrationData() {
   calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
   calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
 
-  _message.Handler(translate.LANG_SAVING_CALIBRATION);
+  _message.Handler(language.LANG_SAVING_CALIBRATION);
   
   serializeJsonPretty(calData, jsonString);
 

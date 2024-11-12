@@ -33,7 +33,7 @@
 #include "sensors.h"
 #include "calculations.h"
 #include "messages.h"
-#include LANGUAGE_FILE
+// #include LANGUAGE_FILE
 
 
 #ifdef ADC_IS_ENABLED
@@ -375,7 +375,7 @@ bool Hardware::benchIsRunning() {
   Sensors _sensors;
   
   extern struct ConfigSettings config;
-  extern struct Translator translate;
+  extern struct Language language;
   extern struct SensorData sensorVal;
 
   double refPressure;
@@ -390,10 +390,10 @@ bool Hardware::benchIsRunning() {
 
   if ((refPressure > config.min_bench_pressure))
   {
-	  _message.Handler(translate.LANG_BENCH_RUNNING);
+	  _message.Handler(language.LANG_BENCH_RUNNING);
 	  return true;
   } else {
-    _message.Handler(translate.LANG_NO_ERROR);
+    _message.Handler(language.LANG_NO_ERROR);
 	  return false;
   }
 }
@@ -410,7 +410,7 @@ void Hardware::checkRefPressure() {
 
   extern struct SensorData sensorVal;
   extern struct ConfigSettings config;
-  extern struct Translator translate;
+  extern struct Language language;
   
   double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
     
@@ -420,7 +420,7 @@ void Hardware::checkRefPressure() {
   // Is this a redundant check? Maybe a different alert would be more appropriate
   if ((refPressure < (config.cal_ref_press * (MIN_TEST_PRESSURE_PERCENTAGE / 100))) && (Hardware::benchIsRunning()))
   {
-    _message.Handler(translate.LANG_REF_PRESS_LOW);
+    _message.Handler(language.LANG_REF_PRESS_LOW);
   }
 }
 

@@ -29,6 +29,7 @@
 #include <Update.h>
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
+#include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include "Wire.h"
 
@@ -38,10 +39,9 @@
 #include "messages.h"
 #include "calculations.h"
 #include "comms.h"
-
-
+#include "webserver.h"
+#include "API.h"
 #include "version.h"
-
 
 
 void DataHandler::begin() {
@@ -99,6 +99,7 @@ void DataHandler::begin() {
     _comms.initaliseWifi();
 
     // Error Handler - critical files are missing
+    // Manage on-boarding (index and config file uploading)
     if (doBootLoop == true) bootLoop();
 
     // Get a reference to the root object
@@ -112,10 +113,6 @@ void DataHandler::begin() {
     // Wire.setClock(300000); // ok for wemos D1
     // Wire.setClock(400000);
 
-
-    // Now that serial is set up set up messaging
-
-    
 
     // TODO Initialise SD card
     #ifdef SD_CARD_IS_ENABLED
@@ -175,10 +172,6 @@ void DataHandler::begin() {
 
     #endif
 
-
-
-
-
     
     // Display Filesystem Stats
     status.spiffs_mem_size = SPIFFS.totalBytes();
@@ -187,11 +180,6 @@ void DataHandler::begin() {
     _message.serialPrintf("=== SPIFFS File system info === \n");
     _message.serialPrintf("Total space:      %s \n", byteDecode(status.spiffs_mem_size));
     _message.serialPrintf("Total space used: %s \n", byteDecode(status.spiffs_mem_used));
-
-
-
-    // Manage on-boarding (index and config file uploading)
-
 
 }
 
@@ -361,7 +349,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadJSONFile(String filename)
 
   Messages _message;
 
-//   extern struct Translator translate;
+//   extern struct Language language;
 
   // Allocate the memory pool on the stack.
   // Use arduinojson.org/assistant to compute the capacity.
@@ -371,7 +359,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadJSONFile(String filename)
     File jsonFile = SPIFFS.open(filename, FILE_READ);
 
     if (!jsonFile)    {
-    //   _message.Handler(translate.LANG_ERROR_LOADING_FILE);
+    //   _message.Handler(language.LANG_ERROR_LOADING_FILE);
       _message.statusPrintf("Failed to open file for reading \n");
     }    else    {
       size_t size = jsonFile.size();
@@ -822,22 +810,51 @@ void DataHandler::bootLoop()
     Hardware _hardware;
     Calculations _calculations;
     Messages _message;
+    Webserver _webserver;
+    API _api;
+    DataHandler _data;
 
     String jsonString;
 
     StaticJsonDocument<DATA_JSON_SIZE> dataJson;
     bool doLoop = true;
+    bool shouldReboot = false;
+
+    _message.serialPrintf("doing bootloop");
 
     do {
-    // TODO Error handler
-    // and then waits for files to be uploaded
-    // once files are uploaded ESP reboots
+    // Display index.html and wait for files to be uploaded
 
-    
+        // Process API comms
+        if (config.api_enabled) {        
+            if (millis() > status.apiPollTimer) {
+                if (Serial.available() > 0) {
+                    status.serialData = Serial.read();
+                    _api.ParseMessage(status.serialData);
+                }
+            }                            
+        }
+
+        if (millis() > status.browserUpdateTimer) {        
+                status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task execute
+                // Push data to client using Server Side Events (SSE)
+                jsonString = _data.getDataJSON();
+                char* result = strcpy((char*)malloc(jsonString.length()+1), jsonString.c_str()); 
+                // _webserver.events->send(result, "JSON_DATA", millis()); 
+                // _webserver.events->send(result, "JSON_DATA", millis()); 
+        }
+
+        if (status.shouldReboot) {
+            _message.serialPrintf("Rebooting...");
+            delay(100);
+            ESP.restart();
+        }
+        vTaskDelay( 100 );
     
     }
     while (doLoop = true);
 
+    // once files are uploaded ESP reboots ????
 
 
 }

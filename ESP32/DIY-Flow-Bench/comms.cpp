@@ -43,7 +43,7 @@
 void Comms::initaliseWifi() {
 
   extern struct ConfigSettings config;
-  // extern struct Translator translate;
+  // extern struct Language language;
   extern struct DeviceStatus status;
 
   int wifiStatusCode;
@@ -179,19 +179,19 @@ int Comms::getWifiConnection(){
 
   for(;;) {
           
-          WiFi.begin(config.wifi_ssid, config.wifi_pswd); 
-          wifiConnectionStatus = WiFi.waitForConnectResult(config.wifi_timeout);
-          if (wifiConnectionStatus == WL_CONNECTED || wifiConnectionAttempt > config.wifi_retries){
-            break;
-          } else if (wifiConnectionStatus != WL_DISCONNECTED) {
-            resetWifi();
-            delay (2000);
-          } else {
-            WiFi.disconnect();
-          }
-          _message.serialPrintf(".");
-          wifiConnectionAttempt++;
-          // WiFi.reconnect();
+    WiFi.begin(config.wifi_ssid, config.wifi_pswd); 
+    wifiConnectionStatus = WiFi.waitForConnectResult(config.wifi_timeout);
+    if (wifiConnectionStatus == WL_CONNECTED || wifiConnectionAttempt > config.wifi_retries){
+      break;
+    } else if (wifiConnectionStatus != WL_DISCONNECTED) {
+      resetWifi();
+      delay (2000);
+    } else {
+      WiFi.disconnect();
+    }
+    _message.serialPrintf(".");
+    wifiConnectionAttempt++;
+    // WiFi.reconnect();
   }
  
   return wifiConnectionStatus;

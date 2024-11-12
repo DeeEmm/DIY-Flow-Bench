@@ -54,7 +54,7 @@ class Webserver {
 
 		int decodeMessageHeader (char *data);
 		static String processTemplate(const String& var);
-		
+		static String processLandingPageTemplate(const String& var);
 	
 	private:
 		
@@ -73,8 +73,6 @@ class Webserver {
 		AsyncEventSource *events;
 		
 		void begin();
-		// void writeJSONFile(String data, String filename, int dataSize);
-		// StaticJsonDocument<CONFIG_JSON_SIZE> loadJSONFile(String filename);
 		void sendWebSocketMessage(String jsonValues);
 		void parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configData);
 		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfig ();
@@ -97,19 +95,11 @@ class Webserver {
 		void deleteFile(fs::FS &fs, const char *path);
 		void testFileIO(fs::FS &fs, const char * path);
 
-		// void createLiftDataFile();
 		static void parseLiftDataForm(AsyncWebServerRequest *request);
 		static void parseUserFlowTargetForm(AsyncWebServerRequest *request);
 
 		static void toggleFlowDiffTile (); 
 
-
-
-		// StaticJsonDocument<1024> loadCalibrationSettings ();
-		// StaticJsonDocument<1024> loadCalibrationData ();
-		// void parseCalibrationSettings(StaticJsonDocument<1024> calibrationData);
-		// void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
-		// void createCalibrationFile ();
 
 
 		
