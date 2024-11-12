@@ -58,7 +58,7 @@ bool Calibration::setFlowOffset() {
   Messages _message;
  
   // update config var
-  calVal.flow_offset = sensorVal.FlowCFM - config.cal_flow_rate;
+  calVal.flow_offset = config.cal_flow_rate - (config.cal_flow_rate - sensorVal.FlowCFM);
   
   _message.debugPrintf("Calibration::setFlowOffset $ \n", calVal.flow_offset);
 
