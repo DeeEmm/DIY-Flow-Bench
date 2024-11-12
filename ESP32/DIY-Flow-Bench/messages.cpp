@@ -43,6 +43,7 @@
 #include <Arduino.h>
 
 #include "configuration.h"
+#include "system.h"
 #include "constants.h"
 #include "structs.h"
 #include "pins.h"

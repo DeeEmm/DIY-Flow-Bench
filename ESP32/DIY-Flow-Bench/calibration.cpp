@@ -250,12 +250,12 @@ void Calibration::saveCalibrationData() {
 ***/
 StaticJsonDocument<1024> Calibration::loadCalibrationData () {
 
-  Webserver _webserver;
+  DataHandler _data;
   Messages _message;
   _message.debugPrintf("Calibration::loadCalibration \n");
   
   StaticJsonDocument<1024> calibrationData;
-  calibrationData = _webserver.loadJSONFile("/cal.json");
+  calibrationData = _data.loadJSONFile("/cal.json");
   parseCalibrationData(calibrationData);
   return calibrationData;
 }

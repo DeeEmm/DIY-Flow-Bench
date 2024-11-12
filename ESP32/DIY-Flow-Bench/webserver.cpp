@@ -25,6 +25,7 @@
 
 #include "datahandler.h"
 #include "version.h"
+#include "system.h"
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
@@ -571,13 +572,14 @@ StaticJsonDocument<CONFIG_JSON_SIZE> Webserver::loadConfig () {
   extern struct ConfigSettings config;
 
   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
+  DataHandler _data;
   Messages _message;
 
   _message.serialPrintf("Loading Configuration... \n");     
 
   if (SPIFFS.exists("/config.json"))  {
 
-    configData = loadJSONFile("/config.json");
+    configData = _data.loadJSONFile("/config.json");
 
     strcpy(config.wifi_ssid, configData["CONF_WIFI_SSID"]);
     strcpy(config.wifi_pswd, configData["CONF_WIFI_PSWD"]);
@@ -952,13 +954,14 @@ StaticJsonDocument<LIFT_DATA_JSON_SIZE> Webserver::loadLiftData () {
 
   extern struct ValveLiftData valveData;
   StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
+  DataHandler _data;
   Messages _message;
 
   _message.serialPrintf("Loading Lift Data... \n");     
 
   if (SPIFFS.exists("/liftdata.json"))  {
     
-    liftData = loadJSONFile("/liftdata.json");
+    liftData = _data.loadJSONFile("/liftdata.json");
     
     valveData.LiftData1 = liftData["LIFTDATA1"].as<double>();
     valveData.LiftData2 = liftData["LIFTDATA2"].as<double>();

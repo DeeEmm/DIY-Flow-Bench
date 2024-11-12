@@ -19,6 +19,7 @@
 #pragma once
 
 #include "Arduino.h"
+#include "system.h"
 #include "configuration.h"
 
 

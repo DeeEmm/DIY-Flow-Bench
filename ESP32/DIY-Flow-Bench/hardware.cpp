@@ -19,6 +19,7 @@
 
 #include <Arduino.h>
 
+#include "system.h"
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
