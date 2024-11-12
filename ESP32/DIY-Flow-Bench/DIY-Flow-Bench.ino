@@ -187,12 +187,12 @@ void TASKgetSensorData( void * parameter ){
           break;
 
         case BASELINE:
-          sensorVal.FDiff = sensorVal.FlowCFMraw - (calVal.flow_offset + calVal.leak_cal_baseline);
+          sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline;
           strcpy(sensorVal.FDiffTypeDesc, "Baseline (cfm)");
           break;
         
         case BASELINE_LEAK :
-          sensorVal.FDiff = sensorVal.FlowCFMraw - (calVal.flow_offset + calVal.leak_cal_baseline + calVal.leak_cal_offset);
+          sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline - calVal.leak_cal_offset;
           strcpy(sensorVal.FDiffTypeDesc, "Offset (cfm)");
           break;
                 
