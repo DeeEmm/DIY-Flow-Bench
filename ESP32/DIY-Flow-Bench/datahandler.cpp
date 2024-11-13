@@ -18,6 +18,8 @@
  * 
  ***/
 
+
+
 #include "Arduino.h"
 
 #include "datahandler.h"
@@ -61,14 +63,17 @@ void DataHandler::begin() {
     // Need to set up the data environment...
 
     // Start serial comms
-    this->beginSerial();                                      
+    this->beginSerial(); 
+
+    _message.serialPrintf("\r\nDIY Flow Bench");                                         
+    // _message.serialPrintf("\nDIYFB Version: %s \nBuild: %s \nGUI: %s \n", RELEASE, BUILD_NUMBER, GUI_BUILD_NUMBER);                                         
+    _message.serialPrintf("\nDIYFB Version: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);                                         
 
     // initialise SPIFFS Filesystem
-    _message.serialPrintf("File System Initialisation...\n"); // TODO:  Initialise messages once pins / serial is running
+    _message.serialPrintf("Initialising File System \n"); // TODO:  Initialise messages once pins / serial is running
     if (SPIFFS.begin()) {
-        _message.serialPrintf("Complete.\n");
     } else {
-        _message.serialPrintf("Failed.\n");
+        _message.serialPrintf("...Failed\n");
         #if defined FORMAT_FILESYSTEM_IF_FAILED
             SPIFFS.format();
             _message.serialPrintf("!! File System Formatted !!\n");
@@ -399,13 +404,15 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadJSONFile(String filename)
  ***/
 void DataHandler::beginSerial(void) {
 	
-  extern struct Pins pins;
+    Messages _message;
+    extern struct Pins pins;
 
 	// #if defined SERIAL0_ENABLED
 	// 	Serial.begin(SERIAL0_BAUD, SERIAL_8N1 , pins.SERIAL0_RX_PIN, pins.SERIAL0_TX_PIN); 
 	// #endif
 	
     Serial.begin(SERIAL0_BAUD);
+    _message.serialPrintf("Serial started \n"); 
 
 }
 
@@ -426,7 +433,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfig () {
   DataHandler _data;
   Messages _message;
 
-  _message.serialPrintf("Loading Configuration... \n");     
+  _message.serialPrintf("Loading Configuration \n");     
 
   if (SPIFFS.exists("/config.json"))  {
 
@@ -497,7 +504,7 @@ StaticJsonDocument<LIFT_DATA_JSON_SIZE> DataHandler::loadLiftData () {
   DataHandler _data;
   Messages _message;
 
-  _message.serialPrintf("Loading Lift Data... \n");     
+  _message.serialPrintf("Loading Lift Data \n");     
 
   if (SPIFFS.exists("/liftdata.json"))  {
     
@@ -562,8 +569,8 @@ StaticJsonDocument<1024> DataHandler::loadCalibrationData () {
 
   DataHandler _data;
   Messages _message;
-  _message.debugPrintf("Calibration::loadCalibration \n");
-  
+  _message.serialPrintf("Loading Calibration Data \n");     
+
   StaticJsonDocument<1024> calibrationData;
   calibrationData = _data.loadJSONFile("/cal.json");
   parseCalibrationData(calibrationData);
@@ -820,7 +827,31 @@ void DataHandler::bootLoop()
     bool doLoop = true;
     bool shouldReboot = false;
 
-    _message.serialPrintf("doing bootloop");
+
+    _message.serialPrintf("spin up temporary web server");
+
+    tempServer = new AsyncWebServer(80);
+    tempServerEvents = new AsyncEventSource("/events");
+
+    // const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
+
+    // Index page request handler
+    tempServer->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
+        // extern struct DeviceStatus status;
+        // if ((SPIFFS.exists("/index.html")) && (SPIFFS.exists("/pins.json"))) {
+        //     request->send(SPIFFS, "/index.html", "text/html", false, processTemplate);
+        // } else {
+        //     // request->send_P(200, "text/html", LANDING_PAGE, processLandingPageTemplate); 
+        // }
+            request->send_P(200, "text/html", "HELLOEEEE"); 
+        });
+
+    // server->onFileUpload(processUpload);
+    tempServer->addHandler(tempServerEvents);
+    tempServer->begin();
+
+
+    _message.serialPrintf("Doing bootloop...");
 
     do {
     // Display index.html and wait for files to be uploaded
@@ -839,9 +870,8 @@ void DataHandler::bootLoop()
                 status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task execute
                 // Push data to client using Server Side Events (SSE)
                 jsonString = _data.getDataJSON();
-                char* result = strcpy((char*)malloc(jsonString.length()+1), jsonString.c_str()); 
-                // _webserver.events->send(result, "JSON_DATA", millis()); 
-                // _webserver.events->send(result, "JSON_DATA", millis()); 
+                tempServerEvents->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
+
         }
 
         if (status.shouldReboot) {
@@ -849,12 +879,13 @@ void DataHandler::bootLoop()
             delay(100);
             ESP.restart();
         }
-        vTaskDelay( 100 );
+        // vTaskDelay( xDelay );
+        delay(50);
     
     }
     while (doLoop = true);
 
     // once files are uploaded ESP reboots ????
-
+    tempServer->reset();
 
 }

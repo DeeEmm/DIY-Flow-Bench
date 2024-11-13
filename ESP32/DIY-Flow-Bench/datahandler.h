@@ -21,6 +21,7 @@
 #include <Arduino.h>
 #include "system.h"
 #include <ArduinoJson.h>
+#include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 
@@ -41,7 +42,7 @@ class DataHandler {
     protected:
 
 		String byteDecode(size_t bytes);
-
+    	AsyncWebServer *tempServer;
 
     private:
 
@@ -51,8 +52,11 @@ class DataHandler {
     public:
 		
         DataHandler() {
-
+			tempServer = NULL;
+			tempServerEvents = NULL;
 		}
+
+		AsyncEventSource *tempServerEvents;
 
 		void begin();
 		void createConfigFile ();

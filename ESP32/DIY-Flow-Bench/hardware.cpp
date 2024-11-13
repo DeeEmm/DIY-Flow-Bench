@@ -173,7 +173,6 @@ void Hardware::initialise () {
 
   Messages _message;
 
-  _message.serialPrintf("\r\nDIY Flow Bench \nVersion: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);    
   _message.serialPrintf("Initialising Hardware \n");
 
   this->getI2CList(); // Scan and list I2C devices to serial monitor

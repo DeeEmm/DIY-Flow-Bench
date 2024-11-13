@@ -301,11 +301,13 @@ void Webserver::begin()
   
   // Index page request handler
   server->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
-      if (SPIFFS.exists("/index.html")) {
+      extern struct DeviceStatus status;
+      if ((SPIFFS.exists("/index.html")) && (SPIFFS.exists("/pins.json"))) {
         request->send(SPIFFS, "/index.html", "text/html", false, processTemplate);
        } else {
         request->send_P(200, "text/html", LANDING_PAGE, processLandingPageTemplate); 
-      }});
+       }
+      });
 
   server->onFileUpload(processUpload);
   server->addHandler(events);

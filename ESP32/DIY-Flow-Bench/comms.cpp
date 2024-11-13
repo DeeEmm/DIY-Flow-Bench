@@ -84,7 +84,7 @@ void Comms::initaliseWifi() {
   // Test for connection success else create an accesspoint
   if (wifiStatusCode == 3 && config.ap_mode == false) { 
     // STA Connection success
-    _message.serialPrintf("\nConnected to %s \n", config.wifi_ssid);
+    _message.serialPrintf("Connected to %s \n", config.wifi_ssid);
     status.local_ip_address = WiFi.localIP().toString().c_str();
     _message.serialPrintf("IP address: %s \n", WiFi.localIP().toString().c_str());
     WiFi.setAutoReconnect(true);
@@ -92,9 +92,9 @@ void Comms::initaliseWifi() {
     
   }  else  { // Go into AP Mode
     if (config.ap_mode == true) { // AP mode is Default
-      _message.serialPrintf("\nDefaulting to AP Mode \n");
+      _message.serialPrintf("Defaulting to AP Mode \n");
     } else { // AP mode is Fallback
-      _message.serialPrintf("\nFailed to connect to Wifi \n");
+      _message.serialPrintf("Failed to connect to Wifi \n");
       _message.serialPrintf("Wifi Status message: ");
       _message.serialPrintf(String(wifiStatusCode).c_str());
       _message.serialPrintf("\n");
