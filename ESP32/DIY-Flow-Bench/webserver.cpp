@@ -246,13 +246,13 @@ void Webserver::begin()
 
   // Toggle Flow Dif Tile
   server->on("/api/fdiff", HTTP_GET, [](AsyncWebServerRequest *request){
-      Messages _message;
-      // _message.Handler(language.LANG_BENCH_RUNNING);
-      _message.debugPrintf("/api/fdiff \n");
-      toggleFlowDiffTile();
-      request->send(200);
-      // request->send(200, "text/html", "{\"fdiff\":\"changed\"}"); 
-      });
+    Messages _message;
+    // _message.Handler(language.LANG_BENCH_RUNNING);
+    _message.debugPrintf("/api/fdiff \n");
+    toggleFlowDiffTile();
+    request->send(200);
+    // request->send(200, "text/html", "{\"fdiff\":\"changed\"}"); 
+  });
 
   
   // Send JSON Data
@@ -361,7 +361,7 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
   } 
 
   // Set redirect to file Upload modal unless uploading the index file
-  if (filename == String("/index.html.gz") || filename == String("/index.html"))  {
+  if (filename == String("/index.html.gz") || (filename == String("/index.html")) || (filename == String("/pins.json")))  {
     redirectURL = "/";
   }  else  {
     redirectURL = "/?view=upload";

@@ -803,9 +803,61 @@ String DataHandler::getDataJSON()
 
 
 
+
+
+
+/***********************************************************
+ * @brief Process File Upload
+ ***/
+void DataHandler::fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+{
+
+  Messages _message;
+  int file_size = 0;
+
+  _message.debugPrintf("File Upload");
+
+  if (!filename.startsWith("/")){
+    filename = "/" + filename;
+  }
+
+  uint32_t freespace = SPIFFS.totalBytes() - SPIFFS.usedBytes();
+
+  if (!index)  {
+    _message.debugPrintf("UploadStart: %s \n", filename);
+    request->_tempFile = SPIFFS.open(filename, "w");
+  }
+
+  if (len)  {
+    file_size += len;
+    if (file_size > freespace)    {
+      _message.debugPrintf("Upload failed, no Space: %s \n", freespace);
+    }    else    {
+      _message.debugPrintf("Writing file: '%s' index=%u len=%u \n", filename, index, len);
+      request->_tempFile.write(data, len);
+    }
+  } 
+
+  if (final)  {
+    _message.debugPrintf("Upload Complete: %s,%u \n", filename, file_size);
+    request->_tempFile.close();
+    request->redirect("/");
+  }
+}
+
+
+
+
+
+
+
+
+
+
 /***********************************************************
  * @brief bootLoop
- * @details Loop until files uploaded
+ * @details Server waits for missing files to be present
+ * @note Prevents critical code from bwing run with missing data 
  ***/
 void DataHandler::bootLoop()
 {
@@ -827,31 +879,32 @@ void DataHandler::bootLoop()
     bool doLoop = true;
     bool shouldReboot = false;
 
-
-    _message.serialPrintf("spin up temporary web server");
+    _message.serialPrintf("Spinning up temporary web server\n");
 
     tempServer = new AsyncWebServer(80);
     tempServerEvents = new AsyncEventSource("/events");
 
-    // const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
+    // Upload request handler
+    tempServer->on("/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
+        Messages _message;
+        _message.debugPrintf("/upload \n");
+        request->send(200);
+        },
+        _webserver.processUpload);
 
     // Index page request handler
     tempServer->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
-        // extern struct DeviceStatus status;
-        // if ((SPIFFS.exists("/index.html")) && (SPIFFS.exists("/pins.json"))) {
-        //     request->send(SPIFFS, "/index.html", "text/html", false, processTemplate);
-        // } else {
-        //     // request->send_P(200, "text/html", LANDING_PAGE, processLandingPageTemplate); 
-        // }
-            request->send_P(200, "text/html", "HELLOEEEE"); 
+        Language language;
+        Webserver _webserver;
+            request->send_P(200, "text/html", language.LANG_INDEX_HTML, _webserver.processLandingPageTemplate); 
         });
 
-    // server->onFileUpload(processUpload);
+    tempServer->onFileUpload(fileUpload);
     tempServer->addHandler(tempServerEvents);
     tempServer->begin();
 
 
-    _message.serialPrintf("Doing bootloop...");
+    _message.serialPrintf("Doing bootloop...\n");
 
     do {
     // Display index.html and wait for files to be uploaded
@@ -879,8 +932,7 @@ void DataHandler::bootLoop()
             delay(100);
             ESP.restart();
         }
-        // vTaskDelay( xDelay );
-        delay(50);
+        vTaskDelay( 1 );
     
     }
     while (doLoop = true);
@@ -889,3 +941,6 @@ void DataHandler::bootLoop()
     tempServer->reset();
 
 }
+
+
+

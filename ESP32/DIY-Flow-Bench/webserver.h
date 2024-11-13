@@ -46,7 +46,6 @@ class Webserver {
 
 		String getSystemStatusJSON();		
 		void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
-		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 		static void processUpdate(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final);
 		static void parseConfigurationForm(AsyncWebServerRequest *request);
 		static void parseCalibrationForm(AsyncWebServerRequest *request);
@@ -54,12 +53,11 @@ class Webserver {
 
 		int decodeMessageHeader (char *data);
 		static String processTemplate(const String& var);
-		static String processLandingPageTemplate(const String& var);
 	
 	private:
 		
 		void sendIndexPage();
-		void uploadFile();
+		// void uploadFile();
 		String index_html;
 		void parseLiftData(StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData);
 		
@@ -97,8 +95,10 @@ class Webserver {
 
 		static void parseLiftDataForm(AsyncWebServerRequest *request);
 		static void parseUserFlowTargetForm(AsyncWebServerRequest *request);
+		static String processLandingPageTemplate(const String& var);
 
 		static void toggleFlowDiffTile (); 
+		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 
 
 

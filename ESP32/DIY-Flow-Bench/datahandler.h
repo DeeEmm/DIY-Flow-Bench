@@ -71,7 +71,7 @@ class DataHandler {
 		StaticJsonDocument<1024> loadCalibrationData ();
 		void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
 		String getDataJSON();
+		static void fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 		void bootLoop();
-
 
 };
