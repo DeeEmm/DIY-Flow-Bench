@@ -141,7 +141,8 @@ void TASKgetSensorData( void * parameter ){
         }
 
         // Apply Flow calibration and leak offsets
-        sensorVal.FlowCFM = sensorVal.FlowCFMraw  - calVal.leak_cal_baseline - calVal.leak_cal_offset  - calVal.flow_offset;
+        sensorVal.FlowCFM = sensorVal.FlowCFMraw  - calVal.leak_cal_baseline - calVal.leak_cal_offset - calVal.flow_offset;
+
 
  
         // Apply Data filters...
