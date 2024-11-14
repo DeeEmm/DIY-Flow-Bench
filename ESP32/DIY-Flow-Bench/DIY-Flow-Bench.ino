@@ -37,6 +37,7 @@
  * 
  *
  **/
+
 #include <Arduino.h>
 #include "freertos/semphr.h"
 #include "esp_task_wdt.h"
@@ -44,12 +45,10 @@
 #include <math.h>
 
 #include "datahandler.h"
-#include "version.h"
 #include "constants.h"
 #include "system.h"
 #include "configuration.h"
 #include "structs.h"
-// #include "pins.h"
 
 #include "mafData/maf.h"
 #include "hardware.h" // bench type config needed here
@@ -60,12 +59,10 @@
 #include "API.h"
 #include "Wire.h"
 
-// // #include LANGUAGE_FILE
 
 // Initiate Structs
 ConfigSettings config;
 DeviceStatus status;
-FileUploadData fileUploadData;
 SensorData sensorVal;
 ValveLiftData valveData;
 Language language;
@@ -339,7 +336,6 @@ void setup(void) {
  ***/
 void loop () {
   
-
   // Process API comms
   if (config.api_enabled) {        
     if (millis() > status.apiPollTimer) {

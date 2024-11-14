@@ -155,17 +155,6 @@ struct DeviceStatus {
 
 
 /***********************************************************
- * File upload data
- ***/
-struct FileUploadData {
-  String file_name;
-  bool upload_error = false;
-  int file_size = 0;
-};
-
-
-
-/***********************************************************
  * Sensor data
  ***/
 struct SensorData {

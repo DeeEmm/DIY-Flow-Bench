@@ -25,7 +25,6 @@
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
-#include "version.h"
 #include "datahandler.h"
 
 #include <Wire.h>
@@ -33,7 +32,6 @@
 #include "sensors.h"
 #include "calculations.h"
 #include "messages.h"
-// #include LANGUAGE_FILE
 
 
 #ifdef ADC_IS_ENABLED

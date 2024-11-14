@@ -43,7 +43,6 @@
 #include "comms.h"
 #include "webserver.h"
 #include "API.h"
-#include "version.h"
 
 
 void DataHandler::begin() {
@@ -77,6 +76,9 @@ void DataHandler::begin() {
         #if defined FORMAT_FILESYSTEM_IF_FAILED
             SPIFFS.format();
             _message.serialPrintf("!! File System Formatted !!\n");
+            _message.serialPrintf("!! DIYFB Restarting !!\n");            
+            delay(2000);
+            ESP.restart();
         #endif
     }
 
@@ -95,16 +97,21 @@ void DataHandler::begin() {
         if (!pinData.containsKey("BOARD_TYPE")) doBootLoop = true;
     } else {
         doBootLoop = true;
+        _message.serialPrintf("!! pins.json file missing !!\n");            
     }
 
     // Check for index file
-    if (!SPIFFS.exists("/index.html")) doBootLoop = true;
+    if (!SPIFFS.exists("/index.html")) {
+        doBootLoop = true;
+        _message.serialPrintf("!! index.html file missing !!\n");            
+    }
 
     // Initialise WiFi
     _comms.initaliseWifi();
 
-    // Error Handler - critical files are missing
+    // Error Handler - critical files are missing !!
     // Manage on-boarding (index and config file uploading)
+    // BootLoop method traps program pointer within loop until files are uplaoded
     if (doBootLoop == true) bootLoop();
 
     // Get a reference to the root object
@@ -856,12 +863,11 @@ void DataHandler::fileUpload(AsyncWebServerRequest *request, String filename, si
 
 /***********************************************************
  * @brief bootLoop
- * @details Server waits for missing files to be present
- * @note Prevents critical code from bwing run with missing data 
+ * @details Temporary server presents upload form and waits for missing files to be present
+ * @note Traps program pointer in do-while loop until pins and index files are uploaded
  ***/
 void DataHandler::bootLoop()
 {
-
     extern struct DeviceStatus status;
     extern struct ConfigSettings config;
     extern struct SensorData sensorVal;
@@ -880,6 +886,7 @@ void DataHandler::bootLoop()
     bool shouldReboot = false;
 
     _message.serialPrintf("Spinning up temporary web server\n");
+    _message.serialPrintf("View browser to upload missing files\n");
 
     tempServer = new AsyncWebServer(80);
     tempServerEvents = new AsyncEventSource("/events");
@@ -904,10 +911,10 @@ void DataHandler::bootLoop()
     tempServer->begin();
 
 
-    _message.serialPrintf("Doing bootloop...\n");
+    _message.serialPrintf("Waiting...\n");
 
     do {
-    // Display index.html and wait for files to be uploaded
+    // capture program pointer in loop and wait for files to be uploaded
 
         // Process API comms
         if (config.api_enabled) {        
@@ -919,25 +926,12 @@ void DataHandler::bootLoop()
             }                            
         }
 
-        if (millis() > status.browserUpdateTimer) {        
-                status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task execute
-                // Push data to client using Server Side Events (SSE)
-                jsonString = _data.getDataJSON();
-                tempServerEvents->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
+        if (SPIFFS.exists("/pins.json") && SPIFFS.exists("/index.html")) doLoop = false;
 
-        }
-
-        if (status.shouldReboot) {
-            _message.serialPrintf("Rebooting...");
-            delay(100);
-            ESP.restart();
-        }
         vTaskDelay( 1 );
     
-    }
-    while (doLoop = true);
+    } while (doLoop = true);
 
-    // once files are uploaded ESP reboots ????
     tempServer->reset();
 
 }

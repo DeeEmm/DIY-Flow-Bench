@@ -49,7 +49,7 @@ https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/CONTRIBUTING.md
 
 
 ===================================================================
-!! Don't forget to update the build number in version.h !!
+!! Don't forget to update the build number in // version.h !!
 ===================================================================
 
 Build numbers follow format YY MM DD VV Where VV is the incremental daily version
@@ -58,7 +58,12 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-
+24111401        - Added GUI version to info pane
+                - Moved system settings into system.h 
+                - Split webserver methods out into comms / data / server functions
+                - Added pre-compile build vars for version in main code
+                - Tidied platformio.ini
+                -Aded auto version for main code
 24111201        - index.html versioning
                 - Move data related methods into dedicated datahandler class
                 - Move pins.h into JSON file
@@ -75,8 +80,8 @@ Build #         - Description of Change
 24110901        - Changed the pressure ratio formula to allow +/-ve values to be calculated
 24110802        - #207 Decimal places on GUI
 24110801        - Code tidy up so the pressure sensors are correctly reported in the web GUI info page
-24110704        - Updated calls to #include "version.h"
-24110703        - Added call to version.h in webserver.h
+24110704        - Updated calls to // #include " version.h"
+24110703        - Added call to // version.h in webserver.h
 24110702        - Changed min pressure threshold to allow -ve values
                 - Moved version vars into dedicated file
 24110701        - M5Stack Tube pressure sensors initialisation

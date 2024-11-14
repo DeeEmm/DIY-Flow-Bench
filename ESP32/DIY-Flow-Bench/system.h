@@ -1,9 +1,6 @@
 #pragma once
-
-
-
-
-
+#include <string>
+using namespace std;
 
 
 
@@ -12,7 +9,7 @@
 * CONFIGURE FILESYSTEM
 ***/
 
-// #define FORMAT_FILESYSTEM_IF_FAILED
+#define FORMAT_FILESYSTEM_IF_FAILED
 
 
 /***********************************************************
@@ -41,7 +38,6 @@
  ***/
 #define BOOT_MESSAGE "May the flow be with you..."
 #define PAGE_TITLE "DIY Flow Bench"
-#define LANGUAGE_FILE "language/EN_language.h"
 #define SHOW_ALARMS true
 #define MIN_REFRESH_RATE 250
 #define API_IS_ENABLED                                  
@@ -52,7 +48,6 @@
 #define API_SCAN_DELAY_MS 250
 #define PRINT_BUFFER_LENGTH 128
 // #define API_CHECKSUM_IS_ENABLED                       
-// #define WEBSOCK_CLEAN_FREQ 600000 // DEPRECATED
 #define FILESYSTEM SPIFFS
 #define SENSOR_TASK_MEM_STACK 2400 // 2200
 #define ENVIRO_TASK_MEM_STACK 2000 // 1800
@@ -74,3 +69,18 @@
 #define STATUS_UPDATE_RATE 500                              // time between SSE push in milliseconds
 
 
+#ifndef MAJOR_VERSION 
+#error MAJOR_VERSION UNDEFINED
+#endif
+#ifndef MINOR_VERSION 
+#error MINOR_VERSION UNDEFINED
+#endif
+#ifndef BUILD_NUMBER 
+#error BUILD_NUMBER UNDEFINED
+#endif
+#ifndef RELEASE 
+#error RELEASE UNDEFINED 
+#endif
+#ifndef DEV_BRANCH
+#error DEV_BRANCH UNDEFINED
+#endif

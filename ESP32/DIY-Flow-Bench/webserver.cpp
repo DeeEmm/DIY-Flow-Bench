@@ -24,7 +24,6 @@
 #include <Update.h>
 
 #include "datahandler.h"
-#include "version.h"
 #include "system.h"
 #include "configuration.h"
 #include "constants.h"
@@ -43,7 +42,7 @@
 #include "hardware.h"
 #include "messages.h"
 #include "calculations.h"
-// // #include LANGUAGE_FILE
+
 
 #include <sstream>
 using namespace std;
@@ -329,9 +328,11 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 {
 
   Messages _message;
-  extern struct FileUploadData fileUploadData;
   extern struct Language language;
   String redirectURL;
+
+  bool upload_error = false;
+  int file_size = 0;
 
   if (!filename.startsWith("/")){
     filename = "/" + filename;
@@ -339,7 +340,7 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
   uint32_t freespace = SPIFFS.totalBytes() - SPIFFS.usedBytes();
 
-//  if (!index && !fileUploadData.upload_error)  {
+//  if (!index && !upload_error)  {
   if (!index)  {
     _message.debugPrintf("UploadStart: %s \n", filename);
     // open the file on first call and store the file handle in the request object
@@ -347,11 +348,11 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
   }
 
   if (len)  {
-    fileUploadData.file_size += len;
-    if (fileUploadData.file_size > freespace)    {
+    file_size += len;
+    if (file_size > freespace)    {
       _message.Handler(language.LANG_UPLOAD_FAILED_NO_SPACE);
       _message.debugPrintf("Upload failed, no Space: %s \n", freespace);
-      fileUploadData.upload_error = true;
+      upload_error = true;
     }    else    {
       _message.Handler(language.LANG_FILE_UPLOADED);
       _message.debugPrintf("Writing file: '%s' index=%u len=%u \n", filename, index, len);
@@ -368,7 +369,7 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
   }
 
   if (final)  {
-    _message.debugPrintf("Upload Complete: %s,%u \n", filename, fileUploadData.file_size);
+    _message.debugPrintf("Upload Complete: %s,%u \n", filename, file_size);
     request->_tempFile.close();
     request->redirect(redirectURL);
   }
@@ -818,18 +819,19 @@ String Webserver::processTemplate(const String &var)
     status.benchType = "Pitot Style";
   }
 
-  // Board definitions for system status pane
-  #if defined WEMOS_D1_R32                    
-    status.boardType = "WEMOS_D1_R32";
-  #elif defined ARDUCAM_ESP32S
-    status.boardType = "ARDUCAM_ESP32S";
-  #elif defined ESP32DUINO
-    status.boardType = "ESP32DUINO";
-  #elif defined ESP32_WROVER_KIT 
-    status.boardType = "ESP32_WROVER_KIT";
-  #else
-    status.boardType = "CUSTOM_PIN_MAPPING";
-  #endif
+  // // Board definitions for system status pane
+  // #if defined WEMOS_D1_R32                    
+  //   status.boardType = "WEMOS_D1_R32";
+  // #elif defined ARDUCAM_ESP32S
+  //   status.boardType = "ARDUCAM_ESP32S";
+  // #elif defined ESP32DUINO
+  //   status.boardType = "ESP32DUINO";
+  // #elif defined ESP32_WROVER_KIT 
+  //   status.boardType = "ESP32_WROVER_KIT";
+  // #else
+  //   status.boardType = "CUSTOM_PIN_MAPPING";
+  // #endif
+
 
   // Config Info
   if (var == "RELEASE") return RELEASE;
