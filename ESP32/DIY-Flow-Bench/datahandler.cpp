@@ -34,6 +34,10 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include "Wire.h"
+#include <HTTPClient.h>
+#include <cstring>
+#include <string>
+#include <stdio.h>
 
 #include "structs.h"
 #include "constants.h"
@@ -57,7 +61,7 @@ void DataHandler::begin() {
     Comms _comms;
 
     StaticJsonDocument<1024> pinData;
-    bool doBootLoop = false;
+    // StaticJsonDocument<1024> mafData;
 
     // Need to set up the data environment...
 
@@ -69,7 +73,7 @@ void DataHandler::begin() {
     _message.serialPrintf("\nDIYFB Version: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);                                         
 
     // initialise SPIFFS Filesystem
-    _message.serialPrintf("Initialising File System \n"); // TODO:  Initialise messages once pins / serial is running
+    _message.serialPrintf("Initialising File System \n"); 
     if (SPIFFS.begin()) {
     } else {
         _message.serialPrintf("...Failed\n");
@@ -87,23 +91,34 @@ void DataHandler::begin() {
     if (!SPIFFS.exists("/liftdata.json")) createLiftDataFile();
     if (!SPIFFS.exists("/cal.json")) createCalibrationFile();
 
-    // load json configuration files from SPIFFS memory
+    // load config / calibration / liftdata files
     this->loadConfig();
     this->loadLiftData();
     this->loadCalibrationData();
 
-    if (SPIFFS.exists("/pins.json"))  {
-        pinData = loadJSONFile("/pins.json");
-        if (!pinData.containsKey("BOARD_TYPE")) doBootLoop = true;
+    // Check for PINS file
+    if (checkUserFile(PINSFILE)) {
+      if (!SPIFFS.exists(status.pinsFilename)) {
+          status.doBootLoop = true;
+          _message.serialPrintf("!! PINS file not found !!\n");  
+      }
     } else {
-        doBootLoop = true;
-        _message.serialPrintf("!! pins.json file missing !!\n");            
+          status.doBootLoop = true;
+          _message.serialPrintf("!! PINS file not found !!\n");  
+    }
+
+    // Check for MAF file
+    if (checkUserFile(MAFFILE)) {
+      if (!SPIFFS.exists(status.mafFilename)) {
+          status.doBootLoop = true;
+          _message.serialPrintf("!! MAF file not found !!\n");  
+      }
     }
 
     // Check for index file
     if (!SPIFFS.exists("/index.html")) {
-        doBootLoop = true;
-        _message.serialPrintf("!! index.html file missing !!\n");            
+        status.doBootLoop = true;
+        _message.serialPrintf("!! index.html file not found !!\n");  
     }
 
     // Initialise WiFi
@@ -112,11 +127,11 @@ void DataHandler::begin() {
     // Error Handler - critical files are missing !!
     // Manage on-boarding (index and config file uploading)
     // BootLoop method traps program pointer within loop until files are uplaoded
-    if (doBootLoop == true) bootLoop();
+    if (status.doBootLoop == true) bootLoop();
 
     // Get a reference to the root object
     JsonObject jsonObj = pinData.as<JsonObject>();
-
+    
     _hardware.assignIO(jsonObj);
 
     // Start Wire (I2C)
@@ -196,6 +211,90 @@ void DataHandler::begin() {
 }
 
 
+/***********************************************************
+* @name checkSubstring.cpp
+* @brief Checks for presence of second string within first string
+* @param firstString
+* @param secindString
+* @returns true if string found
+***/
+bool DataHandler::checkSubstring(std::string firstString, std::string secondString){
+    if(secondString.size() > firstString.size())
+        return false;
+
+    for (int i = 0; i < firstString.size(); i++){
+        int j = 0;
+        // If the first characters match
+        if(firstString[i] == secondString[j]){
+            int k = i;
+            while (firstString[i] == secondString[j] && j < secondString.size()){
+                j++;
+                i++;
+            }
+            if (j == secondString.size())
+                return true;
+            else // Re-initialize i to its original value
+                i = k;
+        }
+    }
+    return false;
+}
+
+
+/***********************************************************
+* @name checkUserFile.cpp
+* @brief Loop through all files in SPIFFS to match filename prefix
+* @param filetype INT (MAFFILE or PINSFILE [default])
+* @returns true if file found
+* @see status.pinsFilename 
+* @see variable status.mafFilename 
+***/
+bool DataHandler::checkUserFile(int filetype) {
+      
+// TODO Change to accept prefix as arguement
+
+    Messages _message;
+    extern struct DeviceStatus status;
+
+    FILESYSTEM.begin();
+    File root = FILESYSTEM.open("/");
+    File file = root.openNextFile();
+
+    std::string matchPINS = "PINS";
+    std::string matchMAF = "MAF";
+    std::string spiffsFile;
+    std::string pinsFile;
+    std::string mafFile;
+
+    // Check SPIFFS for pins and MAF files
+    while (file)  {
+      spiffsFile = file.name();
+
+      if (checkSubstring(spiffsFile.c_str(), matchPINS.c_str())  && (filetype == PINSFILE)) {
+        // PINS_*******.json file found
+        pinsFile = "/" + spiffsFile;
+        _message.serialPrintf("PINS file Found: %s\n", pinsFile.c_str() );  
+        status.pinsFilename = pinsFile.c_str();
+        status.pinsLoaded = true;
+        return true;
+      }   
+      
+      // if ((spiffsFile.find(matchMAF) == 0) && (filetype == MAFFILE)) {
+      //   // MAF_********.json file found
+      //   mafFile = "/" , spiffsFile;
+      //   _message.serialPrintf("MAF file Found: %s\n", mafFile.c_str() );  
+      //   status.mafFilename = mafFile.c_str();
+      //   status.mafLoaded = true;
+      //   return true;
+      // }
+
+      file = root.openNextFile();
+    }
+
+    return false;
+
+}
+
 
 
 /***********************************************************
@@ -203,7 +302,7 @@ void DataHandler::begin() {
 * @details Create basic minimum configuration json file
 * @note Called from DataHandler::begin() if config.json not found
 ***/
-void DataHandler::createConfigFile () {
+void DataHandler::createConfigFile() {
 
   extern struct ConfigSettings config;
   Messages _message;
@@ -660,6 +759,7 @@ String DataHandler::getFileListJSON()
     _message.statusPrintf("%s : %s \n", fileName, byteDecode(fileSize));
     file = root.openNextFile();
   }
+  // FILESYSTEM.end();
 
   serializeJson(dataJson, jsonString);
   return jsonString;
@@ -820,9 +920,12 @@ void DataHandler::fileUpload(AsyncWebServerRequest *request, String filename, si
 {
 
   Messages _message;
+  DataHandler _data;
+  extern struct DeviceStatus status;
+
   int file_size = 0;
 
-  _message.debugPrintf("File Upload");
+  // _message.serialPrintf("File Upload");
 
   if (!filename.startsWith("/")){
     filename = "/" + filename;
@@ -831,23 +934,27 @@ void DataHandler::fileUpload(AsyncWebServerRequest *request, String filename, si
   uint32_t freespace = SPIFFS.totalBytes() - SPIFFS.usedBytes();
 
   if (!index)  {
-    _message.debugPrintf("UploadStart: %s \n", filename);
+    _message.serialPrintf("UploadStart: %s \n", filename.c_str());
     request->_tempFile = SPIFFS.open(filename, "w");
   }
 
   if (len)  {
     file_size += len;
     if (file_size > freespace)    {
-      _message.debugPrintf("Upload failed, no Space: %s \n", freespace);
+      _message.serialPrintf("Upload failed, no Space: %s \n", freespace);
     }    else    {
-      _message.debugPrintf("Writing file: '%s' index=%u len=%u \n", filename, index, len);
+      _message.serialPrintf("Writing file: '%s' index=%u len=%u \n", filename.c_str(), index, len);
       request->_tempFile.write(data, len);
     }
   } 
 
   if (final)  {
-    _message.debugPrintf("Upload Complete: %s,%u \n", filename, file_size);
+    _message.serialPrintf("Upload Complete: %s, %u bytes\n", filename.c_str(), file_size);
     request->_tempFile.close();
+
+    if (_data.checkUserFile(PINSFILE))status.pinsLoaded = true;
+    if (_data.checkUserFile(MAFFILE)) status.mafLoaded = true;  
+
     request->redirect("/");
   }
 }
@@ -857,7 +964,40 @@ void DataHandler::fileUpload(AsyncWebServerRequest *request, String filename, si
 
 
 
+/***********************************************************
+ * @brief getRemote
+ * @details read file from remote server
+ * @param serverName remote URL of file to be loaded
+ * @returns payload: contents of remote file
+ * @note Currently no validation is carried out
+ ***/
+String DataHandler::getRemote(const char* serverName = "https://raw.githubusercontent.com/DeeEmm/DIY-Flow-Bench/refs/heads/DEV/ESP32/DIY-Flow-Bench/version.json") {
+  HTTPClient http;
 
+  Messages _message;
+    
+  // Your IP address with path or Domain name with URL path 
+  http.begin(serverName);
+  
+  // Send HTTP POST request
+  int httpResponseCode = http.GET();
+  
+  String payload = "{}"; 
+  
+  if (httpResponseCode>0) {
+    _message.debugPrintf("Downloading remote file: %s/n", serverName);
+    _message.debugPrintf("HTTP response code: %u /n", httpResponseCode);
+    payload = http.getString();
+  }
+  else {
+    _message.debugPrintf("Downloading failed: %s/n", serverName);
+    _message.debugPrintf("HTTP response code: %u /n", httpResponseCode);
+  }
+  // Free resources
+  http.end();
+
+  return payload;
+}
 
 
 
@@ -882,7 +1022,6 @@ void DataHandler::bootLoop()
     String jsonString;
 
     StaticJsonDocument<DATA_JSON_SIZE> dataJson;
-    bool doLoop = true;
     bool shouldReboot = false;
 
     _message.serialPrintf("Spinning up temporary web server\n");
@@ -897,7 +1036,7 @@ void DataHandler::bootLoop()
         _message.debugPrintf("/upload \n");
         request->send(200);
         },
-        _webserver.processUpload);
+        fileUpload);
 
     // Index page request handler
     tempServer->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
@@ -909,7 +1048,6 @@ void DataHandler::bootLoop()
     tempServer->onFileUpload(fileUpload);
     tempServer->addHandler(tempServerEvents);
     tempServer->begin();
-
 
     _message.serialPrintf("Waiting...\n");
 
@@ -926,11 +1064,12 @@ void DataHandler::bootLoop()
             }                            
         }
 
-        if (SPIFFS.exists("/pins.json") && SPIFFS.exists("/index.html")) doLoop = false;
+        // if (status.pinsFilename.isEmpty();
+        if ((status.pinsLoaded == true) && (SPIFFS.exists("/index.html"))) status.doBootLoop = false;
 
         vTaskDelay( 1 );
     
-    } while (doLoop = true);
+    } while (status.doBootLoop = true);
 
     tempServer->reset();
 

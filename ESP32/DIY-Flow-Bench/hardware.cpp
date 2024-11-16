@@ -32,6 +32,7 @@
 #include "sensors.h"
 #include "calculations.h"
 #include "messages.h"
+#include "system.h"
 
 
 #ifdef ADC_IS_ENABLED
@@ -55,7 +56,7 @@ Hardware::Hardware() {
 /***********************************************************
  * @brief Configure pins
  * @note Conditional configuration based on board type and hardware
- * @details reads pin con figuration in from pins.json file
+ * @details reads pin configuration in from pins_.json file`
  *
  ***/
 void Hardware::assignIO (JsonObject pinData) {
@@ -103,43 +104,44 @@ void Hardware::assignIO (JsonObject pinData) {
   pins.FLOW_VALVE_STEP_PIN = pinData["FLOW_VALVE_STEP_PIN"].as<int>();
   pins.FLOW_VALVE_DIR_PIN = pinData["FLOW_VALVE_DIR_PIN"].as<int>();
   
-    // Set Inputs
-  pinMode(pins.VCC_3V3_PIN, INPUT);   
-  pinMode(pins.VCC_5V_PIN, INPUT);   
-  pinMode(pins.SPEED_SENSOR_PIN, INPUT);   
-  pinMode(pins.ORIFICE_BCD_BIT1_PIN, INPUT);   
-  pinMode(pins.ORIFICE_BCD_BIT2_PIN, INPUT);   
-  pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
-  pinMode(pins.MAF_PIN, INPUT);   
-  pinMode(pins.REF_PRESSURE_PIN, INPUT);   
-  pinMode(pins.DIFF_PRESSURE_PIN, INPUT);   
-  pinMode(pins.PITOT_PIN, INPUT);   
-  pinMode(pins.TEMPERATURE_PIN, INPUT);   
-  pinMode(pins.HUMIDITY_PIN, INPUT);   
-  pinMode(pins.REF_BARO_PIN, INPUT);   
-  pinMode(pins.SERIAL0_TX_PIN, INPUT);   
-  pinMode(pins.SERIAL0_RX_PIN, INPUT);   
-  pinMode(pins.SERIAL2_TX_PIN, INPUT);   
-  pinMode(pins.SERIAL2_RX_PIN, INPUT);   
-  pinMode(pins.SDA_PIN, INPUT);   
-  pinMode(pins.SCL_PIN, INPUT);   
-  pinMode(pins.SD_CS_PIN, INPUT);   
-  pinMode(pins.SD_MOSI_PIN, INPUT);   
-  pinMode(pins.SD_MISO_PIN, INPUT);   
-  pinMode(pins.SD_SCK_PIN, INPUT);   
-  pinMode(pins.WEMOS_SPARE_PIN_1, INPUT);   
+  // Set Inputs
+  if (pins.VCC_3V3_PIN >= 0 ) pinMode(pins.VCC_3V3_PIN, INPUT);   
+  if (pins.VCC_5V_PIN >= 0 ) pinMode(pins.VCC_5V_PIN, INPUT);   
+  if (pins.SPEED_SENSOR_PIN >= 0 ) pinMode(pins.SPEED_SENSOR_PIN, INPUT);   
+  if (pins.ORIFICE_BCD_BIT1_PIN >= 0 ) pinMode(pins.ORIFICE_BCD_BIT1_PIN, INPUT);   
+  if (pins.ORIFICE_BCD_BIT2_PIN >= 0 ) pinMode(pins.ORIFICE_BCD_BIT2_PIN, INPUT);   
+  if (pins.ORIFICE_BCD_BIT3_PIN >= 0 ) pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
+  if (pins.MAF_PIN >= 0 ) pinMode(pins.MAF_PIN, INPUT);   
+  if (pins.REF_PRESSURE_PIN >= 0 ) pinMode(pins.REF_PRESSURE_PIN, INPUT);   
+  if (pins.DIFF_PRESSURE_PIN >= 0 ) pinMode(pins.DIFF_PRESSURE_PIN, INPUT);   
+  if (pins.PITOT_PIN >= 0 ) pinMode(pins.PITOT_PIN, INPUT);   
+  if (pins.TEMPERATURE_PIN >= 0 ) pinMode(pins.TEMPERATURE_PIN, INPUT);   
+  if (pins.HUMIDITY_PIN >= 0 ) pinMode(pins.HUMIDITY_PIN, INPUT);   
+  if (pins.REF_BARO_PIN >= 0 ) pinMode(pins.REF_BARO_PIN, INPUT);   
+  if (pins.SERIAL0_TX_PIN >= 0 ) pinMode(pins.SERIAL0_TX_PIN, INPUT);   
+  if (pins.SERIAL0_RX_PIN >= 0 ) pinMode(pins.SERIAL0_RX_PIN, INPUT);   
+  if (pins.SERIAL2_TX_PIN >= 0 ) pinMode(pins.SERIAL2_TX_PIN, INPUT);   
+  if (pins.SERIAL2_RX_PIN >= 0 ) pinMode(pins.SERIAL2_RX_PIN, INPUT);   
+  if (pins.SDA_PIN >= 0 ) pinMode(pins.SDA_PIN, INPUT);   
+  if (pins.SCL_PIN >= 0 ) pinMode(pins.SCL_PIN, INPUT);   
+  if (pins.SD_CS_PIN >= 0 ) pinMode(pins.SD_CS_PIN, INPUT);   
+  if (pins.SD_MOSI_PIN >= 0 ) pinMode(pins.SD_MOSI_PIN, INPUT);   
+  if (pins.SD_MISO_PIN >= 0 ) pinMode(pins.SD_MISO_PIN, INPUT);   
+  if (pins.SD_SCK_PIN >= 0 ) pinMode(pins.SD_SCK_PIN, INPUT);   
+  if (pins.WEMOS_SPARE_PIN_1 >= 0 ) pinMode(pins.WEMOS_SPARE_PIN_1, INPUT);   
 
   // Set Outputs
-  pinMode(pins.VAC_BANK_1_PIN , OUTPUT);
-  pinMode(pins.VAC_BANK_2_PIN , OUTPUT);
-  pinMode(pins.VAC_BANK_3_PIN , OUTPUT);
-  pinMode(pins.VAC_SPEED_PIN , OUTPUT);
-  pinMode(pins.VAC_BLEED_VALVE_PIN , OUTPUT);
-  pinMode(pins.AVO_STEP_PIN , OUTPUT);
-  pinMode(pins.AVO_DIR_PIN , OUTPUT);
-  pinMode(pins.AVO_DIR_PIN , OUTPUT);
-  pinMode(pins.FLOW_VALVE_STEP_PIN , OUTPUT);
-  pinMode(pins.FLOW_VALVE_DIR_PIN , OUTPUT);
+  if (pins.VAC_BANK_1_PIN >= 0 ) pinMode(pins.VAC_BANK_1_PIN , OUTPUT);
+  if (pins.VAC_BANK_2_PIN >= 0 ) pinMode(pins.VAC_BANK_2_PIN , OUTPUT);
+  if (pins.VAC_BANK_3_PIN >= 0 ) pinMode(pins.VAC_BANK_3_PIN , OUTPUT);
+  if (pins.VAC_SPEED_PIN >= 0 ) pinMode(pins.VAC_SPEED_PIN , OUTPUT);
+  if (pins.VAC_BLEED_VALVE_PIN >= 0 ) pinMode(pins.VAC_BLEED_VALVE_PIN , OUTPUT);
+  if (pins.AVO_STEP_PIN >= 0 ) pinMode(pins.AVO_STEP_PIN , OUTPUT);
+  if (pins.AVO_DIR_PIN >= 0 ) pinMode(pins.AVO_DIR_PIN , OUTPUT);
+  if (pins.FLOW_VALVE_STEP_PIN >= 0 ) pinMode(pins.FLOW_VALVE_STEP_PIN , OUTPUT);
+  if (pins.FLOW_VALVE_DIR_PIN >= 0 ) pinMode(pins.FLOW_VALVE_DIR_PIN , OUTPUT);
+
+  status.pinsLoaded = true;
 
 }
 

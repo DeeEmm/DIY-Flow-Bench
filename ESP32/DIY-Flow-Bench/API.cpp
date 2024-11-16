@@ -327,6 +327,7 @@ void API::ParseMessage(char apiMessage) {
             file = root.openNextFile();
           }
           snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s" , fileListBlob);
+          // FILESYSTEM.end();
         }
       break;
 

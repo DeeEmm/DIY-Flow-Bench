@@ -24,6 +24,7 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
+#include "constants.h"
 
 class DataHandler {
 
@@ -73,5 +74,8 @@ class DataHandler {
 		String getDataJSON();
 		static void fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 		void bootLoop();
+		String getRemote(const char* serverName);
+		bool checkUserFile(int filetype = PINSFILE); 
+		bool checkSubstring(std::string firstString, std::string secondString);
 
 };

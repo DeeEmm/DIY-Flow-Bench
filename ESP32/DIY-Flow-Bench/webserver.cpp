@@ -51,7 +51,7 @@ using namespace std;
 
 // RTC_DATA_ATTR int bootCount; // flash mem
 
-const char LANDING_PAGE[] PROGMEM = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/api/file/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~pins_STATUS~</p> <!--<p>~SETTINGS_STATUS~</p>--> <br> <form method='POST' action='/api/file/upload' enctype='multipart/form-data'> <div class=\"input_container\"> <input type=\"file\" name=\"upload\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
+const char LANDING_PAGE[] PROGMEM = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/api/file/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~PINS_STATUS~</p> <!--<p>~SETTINGS_STATUS~</p>--> <br> <form method='POST' action='/api/file/upload' enctype='multipart/form-data'> <div class=\"input_container\"> <input type=\"file\" name=\"upload\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
 
 void Webserver::begin()
 {
@@ -224,16 +224,20 @@ void Webserver::begin()
   server->on("/api/file/delete", HTTP_POST, [](AsyncWebServerRequest *request){              
       Messages _message;
       String fileToDelete;
+      DataHandler _data;
       AsyncWebParameter *p = request->getParam("filename", true);
       fileToDelete = p->value();      
       // Don't delete index.html (you can overwrite it!!)
       // if (fileToDelete != "/index.html"){
         if(SPIFFS.exists(fileToDelete)){
+          _message.debugPrintf("Deleting File: %s\n", fileToDelete.c_str());  
           SPIFFS.remove(fileToDelete);
         }  else {
-          _message.debugPrintf("Delete Failed: %s", fileToDelete);  
+          _message.debugPrintf("Delete Failed: %s\n", fileToDelete.c_str());  
           _message.Handler(language.LANG_DELETE_FAILED);    
         } 
+        if (_data.checkSubstring(fileToDelete.c_str(), status.pinsFilename.c_str())) status.pinsLoaded = false;
+        if (_data.checkSubstring(fileToDelete.c_str(), status.mafFilename.c_str())) status.mafLoaded = false;
         if (fileToDelete == "/index.html"){
           request->redirect("/");
         } else {
@@ -301,7 +305,7 @@ void Webserver::begin()
   // Index page request handler
   server->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
       extern struct DeviceStatus status;
-      if ((SPIFFS.exists("/index.html")) && (SPIFFS.exists("/pins.json"))) {
+      if ((SPIFFS.exists("/index.html")) && ((status.pinsLoaded == true))) {
         request->send(SPIFFS, "/index.html", "text/html", false, processTemplate);
        } else {
         request->send_P(200, "text/html", LANDING_PAGE, processLandingPageTemplate); 
@@ -328,8 +332,11 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 {
 
   Messages _message;
-  extern struct Language language;
+  DataHandler _data;
   String redirectURL;
+  extern struct DeviceStatus status;
+  extern struct Language language;
+  extern struct DeviceStatus status;
 
   bool upload_error = false;
   int file_size = 0;
@@ -342,7 +349,7 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
 //  if (!index && !upload_error)  {
   if (!index)  {
-    _message.debugPrintf("UploadStart: %s \n", filename);
+    _message.debugPrintf("UploadStart: %s \n", filename.c_str());
     // open the file on first call and store the file handle in the request object
     request->_tempFile = SPIFFS.open(filename, "w");
   }
@@ -355,22 +362,26 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
       upload_error = true;
     }    else    {
       _message.Handler(language.LANG_FILE_UPLOADED);
-      _message.debugPrintf("Writing file: '%s' index=%u len=%u \n", filename, index, len);
+      _message.debugPrintf("Writing file: '%s' index=%u len=%u \n", filename.c_str(), index, len);
       // stream the incoming chunk to the opened file
       request->_tempFile.write(data, len);
     }
   } 
 
   // Set redirect to file Upload modal unless uploading the index file
-  if (filename == String("/index.html.gz") || (filename == String("/index.html")) || (filename == String("/pins.json")))  {
+  if (filename == String("/index.html.gz") || (filename == String("/index.html")) || (filename == String(status.pinsFilename)))  {
     redirectURL = "/";
   }  else  {
     redirectURL = "/?view=upload";
   }
 
   if (final)  {
-    _message.debugPrintf("Upload Complete: %s,%u \n", filename, file_size);
+    _message.debugPrintf("Upload Complete: %s, %u bytes\n", filename.c_str(), file_size);
     request->_tempFile.close();
+
+    if (_data.checkUserFile(PINSFILE)) status.pinsLoaded = true;
+    if (_data.checkUserFile(MAFFILE)) status.mafLoaded = true;  
+
     request->redirect(redirectURL);
   }
 }
@@ -1186,6 +1197,7 @@ String Webserver::processTemplate(const String &var)
       fileList += "<div class='fileListRow'><span class='column left'><a href='/api/file/download/" + fileName + "' download class='file-link'>" + fileName + "</a></span><span class='column middle'><span class='fileSizeTxt'>" + fileSize + " bytes</span></span><span class='column right'><form method='POST' action='/api/file/delete'><input type='hidden' name='filename' value='/" + fileName + "'><input id='delete-button'  class='button-sml' type='submit' value='Delete'></form></span></div>";
       file = root.openNextFile();
     }
+    // FILESYSTEM.end();
     return fileList;
   }
 
@@ -1211,12 +1223,21 @@ String Webserver::processLandingPageTemplate(const String &var) {
     if (!SPIFFS.exists("/index.html")) return String("index.html");
   }  
   
-  if (var == "pins_STATUS" ) {
-    if (!SPIFFS.exists("/pins.json")) return String("pins.json");    
-  }
-
   if (var == "SETTINGS_STATUS") {
     if (!SPIFFS.exists("/settings.json")) return String("settings.json");
+  }
+
+  if (var == "PINS_STATUS" ) {
+    if (status.pinsLoaded == false) return String("PINS_***.json");    
+    // if (!SPIFFS.exists(status.pinsFilename)) return String("PINS_***.json");    
+  }
+
+  if (var == "MAF_STATUS" ) {
+    if (status.mafLoaded == false) return String("MAF_***.json");    
+  }
+
+  if (var == "CONFIGURATION_STATUS") {
+    if (!SPIFFS.exists("/configuration.json")) return String("configuration.json");
   }
 
   return "";
@@ -1624,8 +1645,14 @@ void Webserver::renameFile(fs::FS &fs, const char *path1, const char *path2) {
 }
 
 void Webserver::deleteFile(fs::FS &fs, const char *path) {
+
+  Messages _message;
+  extern struct DeviceStatus status;
+  extern struct DataHandler _data;
+
   Serial.printf("Deleting file: %s\n", path);
   if (fs.remove(path)) {
+    _message.debugPrintf("deleting file: %s", path);   
     Serial.println("File deleted");
   } else {
     Serial.println("Delete failed");
