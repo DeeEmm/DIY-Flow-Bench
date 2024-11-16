@@ -13,43 +13,14 @@ https://github.com/DeeEmm/DIY-Flow-Bench/issues
 
 
 ===================================================================
-For 'Ron...
-===================================================================
-
-https://codepen.io/makhtar/pen/YzPJRpX
-https://github.com/gridstack/gridstack.js
-http://www.shumatech.com/support/chinese_scales.htm
-https://www.yuriystoys.com/2013/07/chinese-caliper-data-format.html
-https://hackaday.io/project/511-digital-dial-indicator-cnc-surface-probe/log/814-the-digital-dial-indicator-and-how-to-read-from-it
-https://hackaday.io/project/511-digital-dial-indicator-cnc-surface-probe/log/1470-interfacing-dial-indicator-to-computer-using-pic-chip
-https://robotroom.com/Caliper-Digital-Data-Port.html
-https://robotroom.com/Caliper-Digital-Data-Port-2.html
-https://robotroom.com/Caliper-Digital-Data-Port-3.html
-
-https://arduino.stackexchange.com/questions/69261/arduino-10bit-adc-is-not-accurate/69266
-
-https://www.sciencedirect.com/topics/engineering/dry-air-mass-flow
-https://www.conservationphysics.org/atmcalc/atmoclc1.html
-https://chem.libretexts.org/Bookshelves/Physical_and_Theoretical_Chemistry_Textbook_Maps/Supplemental_Modules_(Physical_and_Theoretical_Chemistry)/Physical_Properties_of_Matter/States_of_Matter/Properties_of_Gases/Gases_(Waterloo)/The_Ideal_Gas_Law
-https://www.calctool.org/atmospheric-thermodynamics/air-density
-https://www.engineeringtoolbox.com/ideal-gas-law-d_157.html
-https://www.engineeringtoolbox.com/density-air-d_680.html
-
-1 kg/h ~= 0.4803099 ft³/m
-1 mg/s ~= 0.00172911 ft³/m
-
-
-
-===================================================================
-Contributing
+Contribution Guidelines
 ===================================================================
 
 https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/CONTRIBUTING.md
 
 
-
 ===================================================================
-!! Don't forget to update the build number in // version.h !!
+!! Don't forget to update the build number in // version.json !!
 ===================================================================
 
 Build numbers follow format YY MM DD VV Where VV is the incremental daily version
@@ -58,12 +29,21 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-24111401        - Added GUI version to info pane
+24111601        - Code Re-factor
+                - Added check to pins initialisation
+24111501        - Added pins.json files
+                - added 'QuickStart.md' to Docs
+                - Updated contributing.md
+                - Created getRemote() function to read remote file
+                - Allow non-specific file name for pins and maf uploads
+24111401        - GUI Updated
+                - Added GUI version to info pane
                 - Moved system settings into system.h 
                 - Split webserver methods out into comms / data / server functions
                 - Added pre-compile build vars for version in main code
                 - Tidied platformio.ini
-                -Aded auto version for main code
+                - Added auto version for main code
+                - created user-actions.py for compile time tasks (requires python installed)
 24111201        - index.html versioning
                 - Move data related methods into dedicated datahandler class
                 - Move pins.h into JSON file

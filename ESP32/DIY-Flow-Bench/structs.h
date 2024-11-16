@@ -150,6 +150,12 @@ struct DeviceStatus {
   double activeOrificeFlowRate;
   double activeOrificeTestPressure;
   bool shouldReboot = false;
+  bool pinsLoaded = false;
+  bool mafLoaded = false;
+  bool configLoaded = false;
+  String pinsFilename;
+  String mafFilename;
+  bool doBootLoop = false;
 };
 
 
@@ -218,23 +224,23 @@ struct ValveLiftData {
  * @note we need to set serial pins as default minimum
  ***/
 struct Pins {
-  int VAC_SPEED_PIN = -1;
-  int VAC_BLEED_VALVE_PIN = -1;
-  int VAC_BANK_1_PIN = -1;
-  int VAC_BANK_2_PIN = -1; 
-  int VAC_BANK_3_PIN = -1;
-  int AVO_STEP_PIN =  -1;
-  int AVO_DIR_PIN = -1;
-  int FLOW_VALVE_STEP_PIN = -1;
-  int FLOW_VALVE_DIR_PIN = -1;
+  int VAC_SPEED_PIN = 25;
+  int VAC_BLEED_VALVE_PIN = 26;
+  int VAC_BANK_1_PIN = 13;
+  int VAC_BANK_2_PIN = 12; 
+  int VAC_BANK_3_PIN = 14;
+  int AVO_STEP_PIN =  15;
+  int AVO_DIR_PIN = 27;
+  int FLOW_VALVE_STEP_PIN = 32;
+  int FLOW_VALVE_DIR_PIN = 33;
   int VCC_3V3_PIN = -1;
-  int VCC_5V_PIN = -1;
-  int SPEED_SENSOR_PIN = -1;
-  int SWIRL_ENCODER_PIN_A = -1;
-  int SWIRL_ENCODER_PIN_B = -1;
-  int ORIFICE_BCD_BIT1_PIN = -1;
-  int ORIFICE_BCD_BIT2_PIN = -1;
-  int ORIFICE_BCD_BIT3_PIN = -1;
+  int VCC_5V_PIN = 35;
+  int SPEED_SENSOR_PIN = 2;
+  int SWIRL_ENCODER_PIN_A = 2;
+  int SWIRL_ENCODER_PIN_B = 4;
+  int ORIFICE_BCD_BIT1_PIN = 34;
+  int ORIFICE_BCD_BIT2_PIN = 36;
+  int ORIFICE_BCD_BIT3_PIN = 39;
   int MAF_PIN = -1;
   int REF_PRESSURE_PIN = -1;
   int DIFF_PRESSURE_PIN = -1;
@@ -244,14 +250,14 @@ struct Pins {
   int HUMIDITY_PIN = -1;
   int SERIAL0_TX_PIN = 1; // Default for most ESP32
   int SERIAL0_RX_PIN = 3; // Default for most ESP32
-  int SERIAL2_TX_PIN = -1;
-  int SERIAL2_RX_PIN = -1;
+  int SERIAL2_TX_PIN = 16;
+  int SERIAL2_RX_PIN = 17;
   int SDA_PIN = 21; // Default for most ESP32
   int SCL_PIN = 22; // Default for most ESP32
-  int SD_CS_PIN = -1;
-  int SD_MOSI_PIN = -1;
-  int SD_MISO_PIN = -1;             
-  int SD_SCK_PIN = -1;
+  int SD_CS_PIN = 5;
+  int SD_MOSI_PIN = 23;
+  int SD_MISO_PIN = 19;             
+  int SD_SCK_PIN = 18;
   int WEMOS_SPARE_PIN_1 = -1;
 };
 
@@ -301,6 +307,6 @@ struct Language {
     char LANG_UPLOAD_FAILED_NO_SPACE[50] = "Upload rejected, not enough space";
     char LANG_FILE_UPLOADED[50] = "File uploaded";
     char LANG_NO_BOARD_LOADED[50] = "No board loaded";  
-    char LANG_INDEX_HTML[2500] = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~pins_STATUS~</p> <!--<p>~SETTINGS_STATUS~</p>--> <br> <form method=\"POST\" action='/upload' enctype=\"multipart/form-data\"> <div class=\"input_container\"> <input type=\"file\" name=\"file\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
+    char LANG_INDEX_HTML[2500] = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~PINS_STATUS~</p> <!--<p>~SETTINGS_STATUS~</p>--> <br> <form method=\"POST\" action='/upload' enctype=\"multipart/form-data\"> <div class=\"input_container\"> <input type=\"file\" name=\"file\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
 };
 
