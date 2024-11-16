@@ -117,15 +117,12 @@ void Hardware::assignIO (JsonObject pinData) {
   if (pins.PITOT_PIN >= 0 ) pinMode(pins.PITOT_PIN, INPUT);   
   if (pins.TEMPERATURE_PIN >= 0 ) pinMode(pins.TEMPERATURE_PIN, INPUT);   
   if (pins.HUMIDITY_PIN >= 0 ) pinMode(pins.HUMIDITY_PIN, INPUT);   
-  if (pins.REF_BARO_PIN >= 0 ) pinMode(pins.REF_BARO_PIN, INPUT);   
-  if (pins.SERIAL0_TX_PIN >= 0 ) pinMode(pins.SERIAL0_TX_PIN, INPUT);   
+  if (pins.REF_BARO_PIN >= 0 ) pinMode(pins.REF_BARO_PIN, INPUT);     
   if (pins.SERIAL0_RX_PIN >= 0 ) pinMode(pins.SERIAL0_RX_PIN, INPUT);   
-  if (pins.SERIAL2_TX_PIN >= 0 ) pinMode(pins.SERIAL2_TX_PIN, INPUT);   
   if (pins.SERIAL2_RX_PIN >= 0 ) pinMode(pins.SERIAL2_RX_PIN, INPUT);   
-  if (pins.SDA_PIN >= 0 ) pinMode(pins.SDA_PIN, INPUT);   
-  if (pins.SCL_PIN >= 0 ) pinMode(pins.SCL_PIN, INPUT);   
-  if (pins.SD_CS_PIN >= 0 ) pinMode(pins.SD_CS_PIN, INPUT);   
-  if (pins.SD_MOSI_PIN >= 0 ) pinMode(pins.SD_MOSI_PIN, INPUT);   
+  if (pins.SDA_PIN >= 0 ) pinMode(pins.SDA_PIN, INPUT_PULLUP);   
+  if (pins.SCL_PIN >= 0 ) pinMode(pins.SCL_PIN, INPUT_PULLUP);   
+  if (pins.SD_CS_PIN >= 0 ) pinMode(pins.SD_CS_PIN, INPUT);     
   if (pins.SD_MISO_PIN >= 0 ) pinMode(pins.SD_MISO_PIN, INPUT);   
   if (pins.SD_SCK_PIN >= 0 ) pinMode(pins.SD_SCK_PIN, INPUT);   
   if (pins.WEMOS_SPARE_PIN_1 >= 0 ) pinMode(pins.WEMOS_SPARE_PIN_1, INPUT);   
@@ -140,6 +137,9 @@ void Hardware::assignIO (JsonObject pinData) {
   if (pins.AVO_DIR_PIN >= 0 ) pinMode(pins.AVO_DIR_PIN , OUTPUT);
   if (pins.FLOW_VALVE_STEP_PIN >= 0 ) pinMode(pins.FLOW_VALVE_STEP_PIN , OUTPUT);
   if (pins.FLOW_VALVE_DIR_PIN >= 0 ) pinMode(pins.FLOW_VALVE_DIR_PIN , OUTPUT);
+  if (pins.SD_MOSI_PIN >= 0 ) pinMode(pins.SD_MOSI_PIN, OUTPUT);
+  if (pins.SERIAL0_TX_PIN >= 0 ) pinMode(pins.SERIAL0_TX_PIN, OUTPUT);
+  if (pins.SERIAL2_TX_PIN >= 0 ) pinMode(pins.SERIAL2_TX_PIN, OUTPUT);
 
   status.pinsLoaded = true;
 
