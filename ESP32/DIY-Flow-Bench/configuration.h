@@ -36,8 +36,8 @@
 // #define ARDUCAM_ESP32S // Untested - Needs validating + refining
 // #define ARDUCAM_LOTAI  // Untested - Needs validating + refining
 // #define ESP32_WROVER_KIT // DEBUG BUILD ONLY
-// #define ARDUINO_M5STACK_CORE2 // DEBUG BUILD ONLY 
-#define ESPRESSIF_ESP32_S3_DEV_KITC
+// #define M5STACK_CORE2 // DEBUG BUILD ONLY 
+#define ESP32_S3_DEV_KITC // DEBUG BUILD ONLY
 
 
 
