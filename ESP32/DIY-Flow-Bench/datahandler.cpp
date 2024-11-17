@@ -59,6 +59,7 @@ void DataHandler::begin() {
     Pins pins;
     Messages _message;
     Comms _comms;
+    DataHandler _data;
 
     StaticJsonDocument<1024> pinData;
     // StaticJsonDocument<1024> mafData;
@@ -130,11 +131,8 @@ void DataHandler::begin() {
     // Manage on-boarding (index and config file uploading)
     // BootLoop method traps program pointer within loop until files are uplaoded
     if (status.doBootLoop == true) bootLoop();
-
-    // Get a reference to the root object
-    JsonObject jsonObj = pinData.as<JsonObject>();
     
-    _hardware.assignIO(jsonObj);
+    _hardware.assignIO();
 
     // Start Wire (I2C)
     Wire.begin (pins.SDA_PIN, pins.SCL_PIN); 
@@ -255,6 +253,7 @@ bool DataHandler::checkUserFile(int filetype) {
       
 // TODO Change to accept prefix as arguement
 
+    DataHandler _data;
     Messages _message;
     extern struct DeviceStatus status;
 
@@ -276,7 +275,8 @@ bool DataHandler::checkUserFile(int filetype) {
         // PINS_*******.json file found
         pinsFile = "/" + spiffsFile;
         _message.serialPrintf("PINS file Found: %s\n", pinsFile.c_str() );  
-        status.pinsFilename = pinsFile.c_str();
+        status.pinsFilename = pinsFile.c_str();        
+        _data.parsePinsData(_data.loadPinsData());
         status.pinsLoaded = true;
         return true;
       }   
@@ -670,8 +670,9 @@ void DataHandler::clearLiftDataFile(AsyncWebServerRequest *request){
 
 
 /***********************************************************
-* loadCalibration
-* Read calibration data from cal.json file
+* @name loadCalibrationData
+* @brief Read calibration data from calibration.json file
+* @return calibrationData 
 ***/
 StaticJsonDocument<1024> DataHandler::loadCalibrationData () {
 
@@ -704,6 +705,86 @@ void DataHandler::parseCalibrationData(StaticJsonDocument<1024> calData) {
   calVal.leak_cal_baseline_rev = calData["LEAK_CAL_BASELINE_REV"];
   calVal.leak_cal_offset = calData["LEAK_CAL_OFFSET"];
   calVal.leak_cal_offset_rev = calData["LEAK_CAL_OFFSET_REV"];
+}
+
+
+
+
+
+
+
+/***********************************************************
+* @brief Parse Pins Data
+* @param pinsData JSON document containing calibration data
+***/
+void DataHandler::parsePinsData(StaticJsonDocument<1024> pinData) {
+
+  extern struct CalibrationData calVal;
+  extern struct Pins pins;
+  extern struct DeviceStatus status;
+
+
+  status.boardType = pinData["BOARD_TYPE"].as<String>();
+
+  // Store input pin values in struct
+  pins.VCC_3V3_PIN = pinData["VCC_3V3_PIN"].as<int>();
+  pins.VCC_5V_PIN = pinData["VCC_5V_PIN"].as<int>();
+  pins.SPEED_SENSOR_PIN = pinData["SPEED_SENSOR_PIN"].as<int>();
+  pins.ORIFICE_BCD_BIT1_PIN = pinData["ORIFICE_BCD_BIT1_PIN"].as<int>();
+  pins.ORIFICE_BCD_BIT2_PIN = pinData["ORIFICE_BCD_BIT2_PIN"].as<int>();
+  pins.ORIFICE_BCD_BIT3_PIN = pinData["ORIFICE_BCD_BIT3_PIN"].as<int>();
+  pins.MAF_PIN = pinData["MAF_SRC_IS_PIN"].as<int>();
+  pins.REF_PRESSURE_PIN = pinData["PREF_SRC_PIN"].as<int>();
+  pins.DIFF_PRESSURE_PIN = pinData["PDIFF_SRC_IS_PIN"].as<int>();
+  pins.PITOT_PIN = pinData["PITOT_SRC_IS_PIN"].as<int>();
+  pins.TEMPERATURE_PIN = pinData["TEMPERATURE_PIN"].as<int>();
+  pins.HUMIDITY_PIN = pinData["HUMIDITY_PIN"].as<int>();
+  pins.REF_BARO_PIN = pinData["REF_BARO_PIN"].as<int>();
+  pins.SERIAL0_TX_PIN = pinData["SERIAL0_TX_PIN"].as<int>();
+  pins.SERIAL0_RX_PIN = pinData["SERIAL0_RX_PIN"].as<int>();
+  pins.SERIAL2_TX_PIN = pinData["SERIAL2_TX_PIN"].as<int>();
+  pins.SERIAL2_RX_PIN = pinData["SERIAL2_RX_PIN"].as<int>();
+  pins.SDA_PIN = pinData["SDA_PIN"].as<int>();
+  pins.SCL_PIN = pinData["SCL_PIN"].as<int>();
+  pins.SD_CS_PIN = pinData["SD_CS_PIN"].as<int>();
+  pins.SD_MOSI_PIN = pinData["SD_MOSI_PIN"].as<int>();
+  pins.SD_MISO_PIN = pinData["SD_MISO_PIN"].as<int>();
+  pins.SD_SCK_PIN = pinData["SD_SCK_PIN"].as<int>();
+  pins.WEMOS_SPARE_PIN_1 = pinData["WEMOS_SPARE_PIN_1"].as<int>();
+
+  // Store output pin values in struct
+  pins.VAC_BANK_1_PIN = pinData["VAC_BANK_1_PIN"].as<int>();
+  pins.VAC_BANK_2_PIN = pinData["VAC_BANK_2_PIN"].as<int>();
+  pins.VAC_BANK_3_PIN = pinData["VAC_BANK_3_PIN"].as<int>();
+  pins.VAC_SPEED_PIN = pinData["VAC_SPEED_PIN"].as<int>();
+  pins.VAC_BLEED_VALVE_PIN = pinData["VAC_BLEED_VALVE_PIN"].as<int>();
+  pins.AVO_STEP_PIN = pinData["AVO_STEP_PIN"].as<int>();
+  pins.AVO_DIR_PIN = pinData["AVO_DIR_PIN"].as<int>();
+  pins.AVO_DIR_PIN = pinData["AVO_DIR_PIN"].as<int>();
+  pins.FLOW_VALVE_STEP_PIN = pinData["FLOW_VALVE_STEP_PIN"].as<int>();
+  pins.FLOW_VALVE_DIR_PIN = pinData["FLOW_VALVE_DIR_PIN"].as<int>();
+}
+
+
+
+/***********************************************************
+* @name loadPinsData
+* @brief Read pins data from pins.json file
+* @return pinsData 
+***/
+StaticJsonDocument<1024> DataHandler::loadPinsData () {
+
+  DataHandler _data;
+  Messages _message;
+  Hardware _hardware;
+  extern struct DeviceStatus status;
+
+  _message.serialPrintf("Loading Pins Data \n");     
+
+  StaticJsonDocument<1024> pinsData;
+  pinsData = _data.loadJSONFile(status.pinsFilename);
+  parsePinsData(pinsData);
+  return pinsData;
 }
 
 

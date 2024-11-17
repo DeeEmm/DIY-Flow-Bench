@@ -32,6 +32,9 @@ Build #         - Description of Change
 24111702        - #213 Pitot changes
                 - GUI Updated
                 - Added help prompt to serial monitor boot sequence
+                - Stepper Unit tests
+                - Updated PINS_WEMOS.json
+                - Updated pins loading and assignment 
 24111701        - #237 Update pin assignmnt
 24111601        - Code Re-factor
                 - Added check to pins initialisation

@@ -56,54 +56,25 @@ Hardware::Hardware() {
 /***********************************************************
  * @brief Configure pins
  * @note Conditional configuration based on board type and hardware
- * @details reads pin configuration in from pins_.json file`
+ * @details Initliaes I/O from pin configuration in struct
  *
  ***/
-void Hardware::assignIO (JsonObject pinData) {
+void Hardware::assignIO () {
 
+  Messages _message;
   extern struct Pins pins;
   extern struct DeviceStatus status;
 
-  status.boardType = pinData["BOARD_TYPE"].as<String>();
-
-  // Store input pin values in struct
-  pins.VCC_3V3_PIN = pinData["VCC_3V3_PIN"].as<int>();
-  pins.VCC_5V_PIN = pinData["VCC_5V_PIN"].as<int>();
-  pins.SPEED_SENSOR_PIN = pinData["SPEED_SENSOR_PIN"].as<int>();
-  pins.ORIFICE_BCD_BIT1_PIN = pinData["ORIFICE_BCD_BIT1_PIN"].as<int>();
-  pins.ORIFICE_BCD_BIT2_PIN = pinData["ORIFICE_BCD_BIT2_PIN"].as<int>();
-  pins.ORIFICE_BCD_BIT3_PIN = pinData["ORIFICE_BCD_BIT3_PIN"].as<int>();
-  pins.MAF_PIN = pinData["MAF_SRC_IS_PIN"].as<int>();
-  pins.REF_PRESSURE_PIN = pinData["PREF_SRC_PIN"].as<int>();
-  pins.DIFF_PRESSURE_PIN = pinData["PDIFF_SRC_IS_PIN"].as<int>();
-  pins.PITOT_PIN = pinData["PITOT_SRC_IS_PIN"].as<int>();
-  pins.TEMPERATURE_PIN = pinData["TEMPERATURE_PIN"].as<int>();
-  pins.HUMIDITY_PIN = pinData["HUMIDITY_PIN"].as<int>();
-  pins.REF_BARO_PIN = pinData["REF_BARO_PIN"].as<int>();
-  pins.SERIAL0_TX_PIN = pinData["SERIAL0_TX_PIN"].as<int>();
-  pins.SERIAL0_RX_PIN = pinData["SERIAL0_RX_PIN"].as<int>();
-  pins.SERIAL2_TX_PIN = pinData["SERIAL2_TX_PIN"].as<int>();
-  pins.SERIAL2_RX_PIN = pinData["SERIAL2_RX_PIN"].as<int>();
-  pins.SDA_PIN = pinData["SDA_PIN"].as<int>();
-  pins.SCL_PIN = pinData["SCL_PIN"].as<int>();
-  pins.SD_CS_PIN = pinData["SD_CS_PIN"].as<int>();
-  pins.SD_MOSI_PIN = pinData["SD_MOSI_PIN"].as<int>();
-  pins.SD_MISO_PIN = pinData["SD_MISO_PIN"].as<int>();
-  pins.SD_SCK_PIN = pinData["SD_SCK_PIN"].as<int>();
-  pins.WEMOS_SPARE_PIN_1 = pinData["WEMOS_SPARE_PIN_1"].as<int>();
-
-  // Store output pin values in struct
-  pins.VAC_BANK_1_PIN = pinData["VAC_BANK_1_PIN"].as<int>();
-  pins.VAC_BANK_2_PIN = pinData["VAC_BANK_2_PIN"].as<int>();
-  pins.VAC_BANK_3_PIN = pinData["VAC_BANK_3_PIN"].as<int>();
-  pins.VAC_SPEED_PIN = pinData["VAC_SPEED_PIN"].as<int>();
-  pins.VAC_BLEED_VALVE_PIN = pinData["VAC_BLEED_VALVE_PIN"].as<int>();
-  pins.AVO_STEP_PIN = pinData["AVO_STEP_PIN"].as<int>();
-  pins.AVO_DIR_PIN = pinData["AVO_DIR_PIN"].as<int>();
-  pins.AVO_DIR_PIN = pinData["AVO_DIR_PIN"].as<int>();
-  pins.FLOW_VALVE_STEP_PIN = pinData["FLOW_VALVE_STEP_PIN"].as<int>();
-  pins.FLOW_VALVE_DIR_PIN = pinData["FLOW_VALVE_DIR_PIN"].as<int>();
+  _message.serialPrintf("Initialising I/O \n");   
   
+  _message.serialPrintf("pins.AVO_STEP_PIN %u\n", pins.AVO_STEP_PIN );
+  _message.serialPrintf("pins.AVO_DIR_PIN %u\n", pins.AVO_DIR_PIN );
+  _message.serialPrintf("pins.FLOW_VALVE_STEP_PIN %u\n", pins.FLOW_VALVE_STEP_PIN );
+  _message.serialPrintf("pins.FLOW_VALVE_DIR_PIN %u\n", pins.FLOW_VALVE_DIR_PIN );
+
+
+  // try {
+
   // Set Inputs
   if (pins.VCC_3V3_PIN >= 0 ) pinMode(pins.VCC_3V3_PIN, INPUT);   
   if (pins.VCC_5V_PIN >= 0 ) pinMode(pins.VCC_5V_PIN, INPUT);   
@@ -127,7 +98,7 @@ void Hardware::assignIO (JsonObject pinData) {
   if (pins.SD_SCK_PIN >= 0 ) pinMode(pins.SD_SCK_PIN, INPUT);   
   if (pins.WEMOS_SPARE_PIN_1 >= 0 ) pinMode(pins.WEMOS_SPARE_PIN_1, INPUT);   
 
-  // Set Outputs
+  // // Set Outputs
   if (pins.VAC_BANK_1_PIN >= 0 ) pinMode(pins.VAC_BANK_1_PIN , OUTPUT);
   if (pins.VAC_BANK_2_PIN >= 0 ) pinMode(pins.VAC_BANK_2_PIN , OUTPUT);
   if (pins.VAC_BANK_3_PIN >= 0 ) pinMode(pins.VAC_BANK_3_PIN , OUTPUT);
@@ -141,7 +112,14 @@ void Hardware::assignIO (JsonObject pinData) {
   if (pins.SERIAL0_TX_PIN >= 0 ) pinMode(pins.SERIAL0_TX_PIN, OUTPUT);
   if (pins.SERIAL2_TX_PIN >= 0 ) pinMode(pins.SERIAL2_TX_PIN, OUTPUT);
 
-  status.pinsLoaded = true;
+  // }
+
+  // catch (...) {
+
+  // }
+
+
+  _message.debugPrintf("I/O Initialised");
 
 }
 
@@ -436,6 +414,8 @@ void Hardware::benchOn() {
   extern struct Pins pins;
 
   digitalWrite(pins.VAC_BANK_1_PIN, HIGH);
+//  digitalWrite(pins.VAC_BANK_2_PIN, HIGH);
+//  digitalWrite(pins.VAC_BANK_3_PIN, HIGH);
 }
 
 
@@ -448,6 +428,8 @@ void Hardware::benchOff() {
   extern struct Pins pins;
 
   digitalWrite(pins.VAC_BANK_1_PIN, LOW);
+//  digitalWrite(pins.VAC_BANK_2_PIN, LOW);
+//  digitalWrite(pins.VAC_BANK_3_PIN, LOW);
 }
 
 
@@ -496,5 +478,49 @@ void Hardware::setVFDRef() {
  * @ref https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/dac.html
  ***/
 void Hardware::setBleedValveRef() {
+
+}
+
+
+
+
+
+void Hardware::stepperTest() {
+
+  extern struct DeviceStatus status;
+  extern struct Pins pins;
+
+  Messages _message;
+
+  int numberOfSteps = 50;
+  int pulseWidthMicros = 10;  // microseconds
+  int millisbetweenSteps = 250; // milliseconds - or try 1000 for slower steps
+
+
+  _message.serialPrintf("Testing Stepper\n");
+
+  digitalWrite(pins.AVO_DIR_PIN, HIGH);
+  for(int n = 0; n < numberOfSteps; n++) {
+    digitalWrite(pins.AVO_STEP_PIN, HIGH);
+    delayMicroseconds(pulseWidthMicros); // this line is probably unnecessary
+    digitalWrite(pins.AVO_STEP_PIN, LOW);
+    
+    delay(millisbetweenSteps);
+    
+  }
+  
+  delay(1000);
+  
+
+  digitalWrite(pins.AVO_DIR_PIN, LOW);
+  for(int n = 0; n < numberOfSteps; n++) {
+    digitalWrite(pins.AVO_STEP_PIN, HIGH);
+    delayMicroseconds(pulseWidthMicros); // probably not needed
+    digitalWrite(pins.AVO_STEP_PIN, LOW);
+    
+    delay(millisbetweenSteps);
+  }
+
+  _message.serialPrintf("Stepper Test Finished\n");
 
 }

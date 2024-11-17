@@ -364,7 +364,8 @@ void API::ParseMessage(char apiMessage) {
 
       case 'Z': // TEST
           // snprintf(apiResponse, API_RESPONSE_LENGTH, "Z%s%d", config.api_delim , status.mafScaling);
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "Z%s%d", config.api_delim , status.mafUnits);
+          // snprintf(apiResponse, API_RESPONSE_LENGTH, "Z%s%d", config.api_delim , status.mafUnits);
+          _hardware.stepperTest();
 
       break;
       
