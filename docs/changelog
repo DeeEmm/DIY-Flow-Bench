@@ -32,6 +32,7 @@ Build #         - Description of Change
 24111701        - #213 Pitot changes
                 - GUI Updated
                 - Added help prompt to serial monitor boot sequence
+24111701        - #237 Update pin assignmnt
 24111601        - Code Re-factor
                 - Added check to pins initialisation
 24111501        - Added pins.json files
