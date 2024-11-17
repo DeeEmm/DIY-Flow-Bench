@@ -29,7 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-24111701        - #213 Pitot changes
+24111702        - #213 Pitot changes
                 - GUI Updated
                 - Added help prompt to serial monitor boot sequence
 24111701        - #237 Update pin assignmnt
