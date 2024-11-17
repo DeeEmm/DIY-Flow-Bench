@@ -68,9 +68,11 @@ void DataHandler::begin() {
     // Start serial comms
     this->beginSerial(); 
 
-    _message.serialPrintf("\r\nDIY Flow Bench");                                         
+    _message.serialPrintf("\r\nDIY Flow Bench\n");                                         
     // _message.serialPrintf("\nDIYFB Version: %s \nBuild: %s \nGUI: %s \n", RELEASE, BUILD_NUMBER, GUI_BUILD_NUMBER);                                         
-    _message.serialPrintf("\nDIYFB Version: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);                                         
+    _message.serialPrintf("DIYFB Version: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);                                         
+    _message.serialPrintf("For help please visit the WIKI:\n");                                         
+    _message.serialPrintf("https://github.com/DeeEmm/DIY-Flow-Bench/wiki\n");                                         
 
     // initialise SPIFFS Filesystem
     _message.serialPrintf("Initialising File System \n"); 
