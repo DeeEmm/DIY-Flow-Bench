@@ -29,7 +29,6 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-<<<<<<< HEAD
 24111901        - Added Create-Issue-Branch workflow
                 - General project refactor
 24111801        - Added BME680 Configuration
@@ -41,8 +40,6 @@ Build #         - Description of Change
                 - Stepper Unit tests
                 - Updated PINS_WEMOS.json
                 - Updated pins loading and assignment 
-=======
->>>>>>> origin/DEV
 24111701        - #237 Update pin assignmnt
 24111601        - Code Re-factor
                 - Added check to pins initialisation
