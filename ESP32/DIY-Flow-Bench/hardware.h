@@ -36,10 +36,9 @@ class Hardware {
 	public:
 		Hardware();
 		void begin ();
-		void initialise ();
 		void getI2CList();
 		void getI2CDeviceList();
-		void assignIO ();
+		void initaliseIO ();
 		
 		int32_t getADCRawData(int channel);
 		double get3v3SupplyVolts();

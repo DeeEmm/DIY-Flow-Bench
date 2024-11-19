@@ -132,7 +132,7 @@ void DataHandler::begin() {
     // BootLoop method traps program pointer within loop until files are uplaoded
     if (status.doBootLoop == true) bootLoop();
     
-    _hardware.assignIO();
+    _hardware.initaliseIO();
 
     // Start Wire (I2C)
     Wire.begin (pins.SDA_PIN, pins.SCL_PIN); 
@@ -276,7 +276,7 @@ bool DataHandler::checkUserFile(int filetype) {
         pinsFile = "/" + spiffsFile;
         _message.serialPrintf("PINS file Found: %s\n", pinsFile.c_str() );  
         status.pinsFilename = pinsFile.c_str();        
-        _data.parsePinsData(_data.loadPinsData());
+        _data.loadPinsData();
         status.pinsLoaded = true;
         return true;
       }   
@@ -292,6 +292,8 @@ bool DataHandler::checkUserFile(int filetype) {
 
       file = root.openNextFile();
     }
+
+
 
     return false;
 
@@ -714,8 +716,9 @@ void DataHandler::parseCalibrationData(StaticJsonDocument<1024> calData) {
 
 
 /***********************************************************
-* @brief Parse Pins Data
-* @param pinsData JSON document containing calibration data
+* @name ParsePinsData
+* @brief Updates pins struct from passed JSON data
+* @param pinsData JSON document containing pins data
 ***/
 void DataHandler::parsePinsData(StaticJsonDocument<1024> pinData) {
 
@@ -723,46 +726,48 @@ void DataHandler::parsePinsData(StaticJsonDocument<1024> pinData) {
   extern struct Pins pins;
   extern struct DeviceStatus status;
 
+  Messages _message;
+
+  _message.serialPrintf("Parsing Pins Data \n");    
 
   status.boardType = pinData["BOARD_TYPE"].as<String>();
 
   // Store input pin values in struct
-  pins.VCC_3V3_PIN = pinData["VCC_3V3_PIN"].as<int>();
-  pins.VCC_5V_PIN = pinData["VCC_5V_PIN"].as<int>();
-  pins.SPEED_SENSOR_PIN = pinData["SPEED_SENSOR_PIN"].as<int>();
-  pins.ORIFICE_BCD_BIT1_PIN = pinData["ORIFICE_BCD_BIT1_PIN"].as<int>();
-  pins.ORIFICE_BCD_BIT2_PIN = pinData["ORIFICE_BCD_BIT2_PIN"].as<int>();
-  pins.ORIFICE_BCD_BIT3_PIN = pinData["ORIFICE_BCD_BIT3_PIN"].as<int>();
-  pins.MAF_PIN = pinData["MAF_SRC_IS_PIN"].as<int>();
-  pins.REF_PRESSURE_PIN = pinData["PREF_SRC_PIN"].as<int>();
-  pins.DIFF_PRESSURE_PIN = pinData["PDIFF_SRC_IS_PIN"].as<int>();
-  pins.PITOT_PIN = pinData["PITOT_SRC_IS_PIN"].as<int>();
-  pins.TEMPERATURE_PIN = pinData["TEMPERATURE_PIN"].as<int>();
-  pins.HUMIDITY_PIN = pinData["HUMIDITY_PIN"].as<int>();
-  pins.REF_BARO_PIN = pinData["REF_BARO_PIN"].as<int>();
-  pins.SERIAL0_TX_PIN = pinData["SERIAL0_TX_PIN"].as<int>();
-  pins.SERIAL0_RX_PIN = pinData["SERIAL0_RX_PIN"].as<int>();
-  pins.SERIAL2_TX_PIN = pinData["SERIAL2_TX_PIN"].as<int>();
-  pins.SERIAL2_RX_PIN = pinData["SERIAL2_RX_PIN"].as<int>();
-  pins.SDA_PIN = pinData["SDA_PIN"].as<int>();
-  pins.SCL_PIN = pinData["SCL_PIN"].as<int>();
-  pins.SD_CS_PIN = pinData["SD_CS_PIN"].as<int>();
-  pins.SD_MOSI_PIN = pinData["SD_MOSI_PIN"].as<int>();
-  pins.SD_MISO_PIN = pinData["SD_MISO_PIN"].as<int>();
-  pins.SD_SCK_PIN = pinData["SD_SCK_PIN"].as<int>();
-  pins.WEMOS_SPARE_PIN_1 = pinData["WEMOS_SPARE_PIN_1"].as<int>();
+  pins.VCC_3V3_PIN = pinData["VCC_3V3_PIN"];
+  pins.VCC_5V_PIN = pinData["VCC_5V_PIN"];
+  pins.SPEED_SENSOR_PIN = pinData["SPEED_SENSOR_PIN"];
+  pins.ORIFICE_BCD_BIT1_PIN = pinData["ORIFICE_BCD_BIT1_PIN"];
+  pins.ORIFICE_BCD_BIT2_PIN = pinData["ORIFICE_BCD_BIT2_PIN"];
+  pins.ORIFICE_BCD_BIT3_PIN = pinData["ORIFICE_BCD_BIT3_PIN"];
+  pins.MAF_PIN = pinData["MAF_SRC_IS_PIN"];
+  pins.REF_PRESSURE_PIN = pinData["PREF_SRC_PIN"];
+  pins.DIFF_PRESSURE_PIN = pinData["PDIFF_SRC_IS_PIN"];
+  pins.PITOT_PIN = pinData["PITOT_SRC_IS_PIN"];
+  pins.TEMPERATURE_PIN = pinData["TEMPERATURE_PIN"];
+  pins.HUMIDITY_PIN = pinData["HUMIDITY_PIN"];
+  pins.REF_BARO_PIN = pinData["REF_BARO_PIN"];
+  pins.SERIAL0_RX_PIN = pinData["SERIAL0_RX_PIN"];
+  pins.SERIAL2_RX_PIN = pinData["SERIAL2_RX_PIN"];
+  pins.SDA_PIN = pinData["SDA_PIN"];
+  pins.SCL_PIN = pinData["SCL_PIN"];
+  pins.SD_CS_PIN = pinData["SD_CS_PIN"];
+  pins.SD_MISO_PIN = pinData["SD_MISO_PIN"];
+  pins.SD_SCK_PIN = pinData["SD_SCK_PIN"];
+  pins.WEMOS_SPARE_PIN_1 = pinData["WEMOS_SPARE_PIN_1"];
 
   // Store output pin values in struct
-  pins.VAC_BANK_1_PIN = pinData["VAC_BANK_1_PIN"].as<int>();
-  pins.VAC_BANK_2_PIN = pinData["VAC_BANK_2_PIN"].as<int>();
-  pins.VAC_BANK_3_PIN = pinData["VAC_BANK_3_PIN"].as<int>();
-  pins.VAC_SPEED_PIN = pinData["VAC_SPEED_PIN"].as<int>();
-  pins.VAC_BLEED_VALVE_PIN = pinData["VAC_BLEED_VALVE_PIN"].as<int>();
-  pins.AVO_STEP_PIN = pinData["AVO_STEP_PIN"].as<int>();
-  pins.AVO_DIR_PIN = pinData["AVO_DIR_PIN"].as<int>();
-  pins.AVO_DIR_PIN = pinData["AVO_DIR_PIN"].as<int>();
-  pins.FLOW_VALVE_STEP_PIN = pinData["FLOW_VALVE_STEP_PIN"].as<int>();
-  pins.FLOW_VALVE_DIR_PIN = pinData["FLOW_VALVE_DIR_PIN"].as<int>();
+  pins.VAC_BANK_1_PIN = pinData["VAC_BANK_1_PIN"];
+  pins.VAC_BANK_2_PIN = pinData["VAC_BANK_2_PIN"];
+  pins.VAC_BANK_3_PIN = pinData["VAC_BANK_3_PIN"];
+  pins.VAC_SPEED_PIN = pinData["VAC_SPEED_PIN"];
+  pins.VAC_BLEED_VALVE_PIN = pinData["VAC_BLEED_VALVE_PIN"];
+  pins.AVO_STEP_PIN = pinData["AVO_STEP_PIN"];
+  pins.AVO_DIR_PIN = pinData["AVO_DIR_PIN"];
+  pins.FLOW_VALVE_STEP_PIN = pinData["FLOW_VALVE_STEP_PIN"];
+  pins.FLOW_VALVE_DIR_PIN = pinData["FLOW_VALVE_DIR_PIN"];
+  pins.SD_MOSI_PIN = pinData["SD_MOSI_PIN"];
+  pins.SERIAL0_TX_PIN = pinData["SERIAL0_TX_PIN"];
+  pins.SERIAL2_TX_PIN = pinData["SERIAL2_TX_PIN"];
 }
 
 
@@ -772,7 +777,7 @@ void DataHandler::parsePinsData(StaticJsonDocument<1024> pinData) {
 * @brief Read pins data from pins.json file
 * @return pinsData 
 ***/
-StaticJsonDocument<1024> DataHandler::loadPinsData () {
+void DataHandler::loadPinsData () {
 
   DataHandler _data;
   Messages _message;
@@ -781,10 +786,11 @@ StaticJsonDocument<1024> DataHandler::loadPinsData () {
 
   _message.serialPrintf("Loading Pins Data \n");     
 
-  StaticJsonDocument<1024> pinsData;
-  pinsData = _data.loadJSONFile(status.pinsFilename);
-  parsePinsData(pinsData);
-  return pinsData;
+  StaticJsonDocument<1024> pinsFileData;
+  pinsFileData = _data.loadJSONFile(status.pinsFilename);
+
+  parsePinsData(pinsFileData);
+
 }
 
 
@@ -1035,8 +1041,14 @@ void DataHandler::fileUpload(AsyncWebServerRequest *request, String filename, si
     _message.serialPrintf("Upload Complete: %s, %u bytes\n", filename.c_str(), file_size);
     request->_tempFile.close();
 
-    if (_data.checkUserFile(PINSFILE))status.pinsLoaded = true;
-    if (_data.checkUserFile(MAFFILE)) status.mafLoaded = true;  
+    if (_data.checkUserFile(PINSFILE)){
+      _data.loadPinsData();
+      status.pinsLoaded = true;
+    } 
+    if (_data.checkUserFile(MAFFILE)) {
+      // _data.loadMafData();
+      status.mafLoaded = true;  
+    }
 
     request->redirect("/");
   }

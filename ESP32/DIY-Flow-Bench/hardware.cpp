@@ -56,67 +56,164 @@ Hardware::Hardware() {
 /***********************************************************
  * @brief Configure pins
  * @note Conditional configuration based on board type and hardware
- * @details Initliaes I/O from pin configuration in struct
+ * @details Initiates I/O from pin configuration in struct and reports to serial monitor
+ * @details Messaging identifies I/O in event initialisation crash
  *
  ***/
-void Hardware::assignIO () {
+void Hardware::initaliseIO () {
 
   Messages _message;
+
   extern struct Pins pins;
   extern struct DeviceStatus status;
 
   _message.serialPrintf("Initialising I/O \n");   
-  
-  _message.serialPrintf("pins.AVO_STEP_PIN %u\n", pins.AVO_STEP_PIN );
-  _message.serialPrintf("pins.AVO_DIR_PIN %u\n", pins.AVO_DIR_PIN );
-  _message.serialPrintf("pins.FLOW_VALVE_STEP_PIN %u\n", pins.FLOW_VALVE_STEP_PIN );
-  _message.serialPrintf("pins.FLOW_VALVE_DIR_PIN %u\n", pins.FLOW_VALVE_DIR_PIN );
 
 
-  // try {
+  try {
 
   // Set Inputs
-  if (pins.VCC_3V3_PIN >= 0 ) pinMode(pins.VCC_3V3_PIN, INPUT);   
-  if (pins.VCC_5V_PIN >= 0 ) pinMode(pins.VCC_5V_PIN, INPUT);   
-  if (pins.SPEED_SENSOR_PIN >= 0 ) pinMode(pins.SPEED_SENSOR_PIN, INPUT);   
-  if (pins.ORIFICE_BCD_BIT1_PIN >= 0 ) pinMode(pins.ORIFICE_BCD_BIT1_PIN, INPUT);   
-  if (pins.ORIFICE_BCD_BIT2_PIN >= 0 ) pinMode(pins.ORIFICE_BCD_BIT2_PIN, INPUT);   
-  if (pins.ORIFICE_BCD_BIT3_PIN >= 0 ) pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
-  if (pins.MAF_PIN >= 0 ) pinMode(pins.MAF_PIN, INPUT);   
-  if (pins.REF_PRESSURE_PIN >= 0 ) pinMode(pins.REF_PRESSURE_PIN, INPUT);   
-  if (pins.DIFF_PRESSURE_PIN >= 0 ) pinMode(pins.DIFF_PRESSURE_PIN, INPUT);   
-  if (pins.PITOT_PIN >= 0 ) pinMode(pins.PITOT_PIN, INPUT);   
-  if (pins.TEMPERATURE_PIN >= 0 ) pinMode(pins.TEMPERATURE_PIN, INPUT);   
-  if (pins.HUMIDITY_PIN >= 0 ) pinMode(pins.HUMIDITY_PIN, INPUT);   
-  if (pins.REF_BARO_PIN >= 0 ) pinMode(pins.REF_BARO_PIN, INPUT);     
-  if (pins.SERIAL0_RX_PIN >= 0 ) pinMode(pins.SERIAL0_RX_PIN, INPUT);   
-  if (pins.SERIAL2_RX_PIN >= 0 ) pinMode(pins.SERIAL2_RX_PIN, INPUT);   
-  if (pins.SDA_PIN >= 0 ) pinMode(pins.SDA_PIN, INPUT_PULLUP);   
-  if (pins.SCL_PIN >= 0 ) pinMode(pins.SCL_PIN, INPUT_PULLUP);   
-  if (pins.SD_CS_PIN >= 0 ) pinMode(pins.SD_CS_PIN, INPUT);     
-  if (pins.SD_MISO_PIN >= 0 ) pinMode(pins.SD_MISO_PIN, INPUT);   
-  if (pins.SD_SCK_PIN >= 0 ) pinMode(pins.SD_SCK_PIN, INPUT);   
-  if (pins.WEMOS_SPARE_PIN_1 >= 0 ) pinMode(pins.WEMOS_SPARE_PIN_1, INPUT);   
+  if (pins.VCC_3V3_PIN >= 0 ) {
+    _message.serialPrintf("Input VCC_3V3_PIN: %d\n", pins.VCC_3V3_PIN );
+    pinMode(pins.VCC_3V3_PIN, INPUT);   
+  }
+  if (pins.VCC_5V_PIN >= 0 ) {
+    _message.serialPrintf("Input VCC_5V_PIN: %d\n", pins.VCC_5V_PIN );  
+    pinMode(pins.VCC_5V_PIN, INPUT);
+  }  
+  if (pins.SPEED_SENSOR_PIN >= 0 ) {
+    _message.serialPrintf("Input SPEED_SENSOR_PIN: %d\n", pins.SPEED_SENSOR_PIN );
+    pinMode(pins.SPEED_SENSOR_PIN, INPUT);   
+  }
+  if (pins.ORIFICE_BCD_BIT1_PIN >= 0 ) {
+    _message.serialPrintf("Input ORIFICE_BCD_BIT1_PIN: %d\n", pins.ORIFICE_BCD_BIT1_PIN );
+    pinMode(pins.ORIFICE_BCD_BIT1_PIN, INPUT);   
+  }
+  if (pins.ORIFICE_BCD_BIT2_PIN >= 0 ) {
+    _message.serialPrintf("Input ORIFICE_BCD_BIT2_PIN: %d\n", pins.ORIFICE_BCD_BIT2_PIN );
+    pinMode(pins.ORIFICE_BCD_BIT2_PIN, INPUT);   
+  }
+  if (pins.ORIFICE_BCD_BIT3_PIN >= 0 ) {
+    pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
+    _message.serialPrintf("Input ORIFICE_BCD_BIT3_PIN: %d\n", pins.ORIFICE_BCD_BIT3_PIN );
+    pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
+  }
+  if (pins.MAF_PIN >= 0 ) {
+    _message.serialPrintf("Input MAF_PIN: %d\n", pins.MAF_PIN );
+    pinMode(pins.MAF_PIN, INPUT);   
+  }
+  if (pins.REF_PRESSURE_PIN >= 0 ) {
+    _message.serialPrintf("Input REF_PRESSURE_PIN: %d\n", pins.REF_PRESSURE_PIN );
+    pinMode(pins.REF_PRESSURE_PIN, INPUT);   
+  }
+  if (pins.DIFF_PRESSURE_PIN >= 0 ) {
+    _message.serialPrintf("Input DIFF_PRESSURE_PIN: %d\n", pins.DIFF_PRESSURE_PIN );
+    pinMode(pins.DIFF_PRESSURE_PIN, INPUT);   
+  }
+  if (pins.PITOT_PIN >= 0 ) {
+    _message.serialPrintf("Input PITOT_PIN: %d\n", pins.PITOT_PIN );
+    pinMode(pins.PITOT_PIN, INPUT);   
+  }
+  if (pins.TEMPERATURE_PIN >= 0 ) {
+    _message.serialPrintf("Input TEMPERATURE_PIN: %d\n", pins.TEMPERATURE_PIN );
+    pinMode(pins.TEMPERATURE_PIN, INPUT);   
+  }
+  if (pins.HUMIDITY_PIN >= 0 ) {
+    _message.serialPrintf("Input HUMIDITY_PIN: %d\n", pins.HUMIDITY_PIN );
+    pinMode(pins.HUMIDITY_PIN, INPUT);   
+  }
+  if (pins.REF_BARO_PIN >= 0 ) {
+    _message.serialPrintf("Input REF_BARO_PIN: %d\n", pins.REF_BARO_PIN );
+    pinMode(pins.REF_BARO_PIN, INPUT);     
+  }
+  if (pins.SERIAL0_RX_PIN >= 0 ) {
+    _message.serialPrintf("Input SERIAL0_RX_PIN: %d\n", pins.SERIAL0_RX_PIN );
+    pinMode(pins.SERIAL0_RX_PIN, INPUT);   
+  }
+  if (pins.SERIAL2_RX_PIN >= 0 ) {
+    _message.serialPrintf("Input SERIAL2_RX_PIN: %d\n", pins.SERIAL2_RX_PIN );
+    pinMode(pins.SERIAL2_RX_PIN, INPUT);   
+  }
+  if (pins.SDA_PIN >= 0 ) {
+    _message.serialPrintf("Input SDA_PIN: %d\n", pins.SDA_PIN );
+    pinMode(pins.SDA_PIN, INPUT_PULLUP);   
+  }
+  if (pins.SCL_PIN >= 0 ) {
+    _message.serialPrintf("Input SCL_PIN: %d\n", pins.SCL_PIN );
+    pinMode(pins.SCL_PIN, INPUT_PULLUP);   
+  }
+  if (pins.SD_CS_PIN >= 0 ) {
+    _message.serialPrintf("Input SD_CS_PIN: %d\n", pins.SD_CS_PIN );
+    pinMode(pins.SD_CS_PIN, INPUT);     
+  }
+  if (pins.SD_MISO_PIN >= 0 ) {
+    _message.serialPrintf("Input SD_MISO_PIN: %d\n", pins.SD_MISO_PIN );
+    pinMode(pins.SD_MISO_PIN, INPUT);   
+  }
+  if (pins.SD_SCK_PIN >= 0 ) {
+    _message.serialPrintf("Input SD_SCK_PIN: %d\n", pins.SD_SCK_PIN );
+    pinMode(pins.SD_SCK_PIN, INPUT);   
+  }
+  if (pins.WEMOS_SPARE_PIN_1 >= 0 ) {
+    _message.serialPrintf("Input WEMOS_SPARE_PIN_1: %d\n", pins.WEMOS_SPARE_PIN_1 );
+    pinMode(pins.WEMOS_SPARE_PIN_1, INPUT);   
+  }
 
   // // Set Outputs
-  if (pins.VAC_BANK_1_PIN >= 0 ) pinMode(pins.VAC_BANK_1_PIN , OUTPUT);
-  if (pins.VAC_BANK_2_PIN >= 0 ) pinMode(pins.VAC_BANK_2_PIN , OUTPUT);
-  if (pins.VAC_BANK_3_PIN >= 0 ) pinMode(pins.VAC_BANK_3_PIN , OUTPUT);
-  if (pins.VAC_SPEED_PIN >= 0 ) pinMode(pins.VAC_SPEED_PIN , OUTPUT);
-  if (pins.VAC_BLEED_VALVE_PIN >= 0 ) pinMode(pins.VAC_BLEED_VALVE_PIN , OUTPUT);
-  if (pins.AVO_STEP_PIN >= 0 ) pinMode(pins.AVO_STEP_PIN , OUTPUT);
-  if (pins.AVO_DIR_PIN >= 0 ) pinMode(pins.AVO_DIR_PIN , OUTPUT);
-  if (pins.FLOW_VALVE_STEP_PIN >= 0 ) pinMode(pins.FLOW_VALVE_STEP_PIN , OUTPUT);
-  if (pins.FLOW_VALVE_DIR_PIN >= 0 ) pinMode(pins.FLOW_VALVE_DIR_PIN , OUTPUT);
-  if (pins.SD_MOSI_PIN >= 0 ) pinMode(pins.SD_MOSI_PIN, OUTPUT);
-  if (pins.SERIAL0_TX_PIN >= 0 ) pinMode(pins.SERIAL0_TX_PIN, OUTPUT);
-  if (pins.SERIAL2_TX_PIN >= 0 ) pinMode(pins.SERIAL2_TX_PIN, OUTPUT);
+  if (pins.VAC_BANK_1_PIN >= 0 ) {
+    _message.serialPrintf("Output VAC_BANK_1_PIN: %d\n", pins.VAC_BANK_1_PIN );
+    pinMode(pins.VAC_BANK_1_PIN , OUTPUT);
+  }
+  if (pins.VAC_BANK_2_PIN >= 0 ) {
+    _message.serialPrintf("Output VAC_BANK_2_PIN: %d\n", pins.VAC_BANK_2_PIN );
+    pinMode(pins.VAC_BANK_2_PIN , OUTPUT);
+  }
+  if (pins.VAC_BANK_3_PIN >= 0 ) {
+    _message.serialPrintf("Output VAC_BANK_3_PIN: %d\n", pins.VAC_BANK_3_PIN );
+    pinMode(pins.VAC_BANK_3_PIN , OUTPUT);
+  }
+  if (pins.VAC_SPEED_PIN >= 0 ) {
+    _message.serialPrintf("Output VAC_SPEED_PIN: %d\n", pins.VAC_SPEED_PIN );
+    pinMode(pins.VAC_SPEED_PIN , OUTPUT);
+  }
+  if (pins.VAC_BLEED_VALVE_PIN >= 0 ) {
+    _message.serialPrintf("Output VAC_BLEED_VALVE_PIN: %d\n", pins.VAC_BLEED_VALVE_PIN );
+    pinMode(pins.VAC_BLEED_VALVE_PIN , OUTPUT);
+  }
+  if (pins.AVO_STEP_PIN >= 0 ) {
+    _message.serialPrintf("Output AVO_STEP_PIN: %d\n", pins.AVO_STEP_PIN );
+    pinMode(pins.AVO_STEP_PIN , OUTPUT);
+  }
+  if (pins.AVO_DIR_PIN >= 0 ) {
+    _message.serialPrintf("Output AVO_DIR_PIN: %d\n", pins.AVO_DIR_PIN );
+    pinMode(pins.AVO_DIR_PIN , OUTPUT);
+  }
+  if (pins.FLOW_VALVE_STEP_PIN >= 0 ) {
+    _message.serialPrintf("Output FLOW_VALVE_STEP_PIN: %d\n", pins.FLOW_VALVE_STEP_PIN );
+    pinMode(pins.FLOW_VALVE_STEP_PIN , OUTPUT);
+  }
+  if (pins.FLOW_VALVE_DIR_PIN >= 0 ) {
+    _message.serialPrintf("Output FLOW_VALVE_DIR_PIN: %d\n", pins.FLOW_VALVE_DIR_PIN );
+    pinMode(pins.FLOW_VALVE_DIR_PIN , OUTPUT);
+  }
+  if (pins.SD_MOSI_PIN >= 0 ) {
+    _message.serialPrintf("Output SD_MOSI_PIN: %d\n", pins.SD_MOSI_PIN );
+    pinMode(pins.SD_MOSI_PIN, OUTPUT);
+  }
+  if (pins.SERIAL0_TX_PIN >= 0 ) {
+    _message.serialPrintf("Output SERIAL0_TX_PIN: %d\n", pins.SERIAL0_TX_PIN );
+    pinMode(pins.SERIAL0_TX_PIN, OUTPUT);
+  }
+  if (pins.SERIAL2_TX_PIN >= 0 ) {
+    _message.serialPrintf("Output SERIAL2_TX_PIN: %d\n", pins.SERIAL2_TX_PIN );
+    pinMode(pins.SERIAL2_TX_PIN, OUTPUT);
+  }
 
-  // }
+  }
 
-  // catch (...) {
+  catch (...) {
 
-  // }
+  }
 
 
   _message.debugPrintf("I/O Initialised");
@@ -126,28 +223,11 @@ void Hardware::assignIO () {
 
 
 /***********************************************************
- * @brief begin function
+ * @name begin
+ * @brief Hardware initialisation and set up
  * 
- * TODO: Need to move ALL hardware initialisation into here
  **/
 void Hardware::begin () {
-
-  Messages _message;
-  ConfigSettings config;
-
-  extern struct DeviceStatus status;
-  
-  this->initialise();                                       // Initialise hardware
-
-}
-
-
-
-
-/***********************************************************
- * @brief Initialise hardware
- ***/
-void Hardware::initialise () {
 
   Messages _message;
 
@@ -171,7 +251,6 @@ void Hardware::initialise () {
   #endif
 
   _message.serialPrintf("Hardware Initialised \n");
-
 
 }
 
@@ -197,10 +276,11 @@ void Hardware::getI2CList() {
     Wire.beginTransmission (address);          
     // if (Wire.endTransmission () == 0)  {  
     error = Wire.endTransmission ();
-    // _message.serialPrintf("Error: %u (0x%X)\n", error, address); // Uncomment to report all failed addresses
     if (error == 0)  {  
       _message.serialPrintf("Found address: %u (0x%X)\n", address, address);
       count++;
+    } else {
+      // _message.serialPrintf("Error: %u (0x%X)\n", error, address); // Uncomment to report all failed addresses
     }
   }
   

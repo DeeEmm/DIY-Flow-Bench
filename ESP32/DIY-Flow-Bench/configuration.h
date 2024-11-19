@@ -80,11 +80,25 @@
 *  Check the report shown in serial monitor on boot for addresses of I2C devices and update BME280_I2C_ADDR accordingly
 ***/
 
-#define BME_IS_ENABLED                                      // Comment to disable BME related code
+// #define BME280_IS_ENABLED                                      // Comment to disable BME related code
 
 const int BME280_I2C_ADDR = 0x76;                           
 // const int BME280_I2C_ADDR = 0x77;       
-#define BME_SCAN_DELAY_MS 1000                              // Does not need to be faster than this as sensor read speed is around 30 secs!!       
+#define BME280_SCAN_DELAY_MS 1000                              // Does not need to be faster than this as sensor read speed is around 30 secs!!       
+
+
+/***********************************************************
+* CONFIGURE BME680
+*
+*  Default address 0x77
+*  Check the report shown in serial monitor on boot for addresses of I2C devices and update BME680_I2C_ADDR accordingly
+***/
+
+#define BME680_IS_ENABLED                                      // Comment to disable BME related code
+
+// const int BME680_I2C_ADDR = 0x76;                           
+const int BME680_I2C_ADDR = 0x77;       
+#define BME680_SCAN_DELAY_MS 1000                              // Does not need to be faster than this as sensor read speed is around 30 secs!!       
 
 
 
@@ -278,7 +292,8 @@ const int ADC_I2C_ADDR = 0x48;
 // Uncomment One line only
 // #define BARO_SENSOR_TYPE_FIXED_VALUE
 // #define BARO_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from REF_BARO_PIN
-#define BARO_SENSOR_TYPE_BME280
+// #define BARO_SENSOR_TYPE_BME280
+#define BARO_SENSOR_TYPE_BME680
 // #define BARO_SENSOR_TYPE_MPX4115                         // use absolute pressure sensor
 
 #define FIXED_BARO_VALUE 101.3529                           // Default pressure in kPa
@@ -310,7 +325,8 @@ const int ADC_I2C_ADDR = 0x48;
 // #define TEMP_SENSOR_NOT_USED
 // #define TEMP_SENSOR_TYPE_FIXED_VALUE
 // #define TEMP_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from TEMPERATURE_PIN
-#define TEMP_SENSOR_TYPE_BME280
+// #define TEMP_SENSOR_TYPE_BME280
+#define TEMP_SENSOR_TYPE_BME680
 // #define TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 
 #define TEMP_MV_TRIMPOT 0.0                                 // Millivolt offset
@@ -334,6 +350,7 @@ const int ADC_I2C_ADDR = 0x48;
 // #define RELH_SENSOR_TYPE_FIXED_VALUE
 // #define RELH_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from HUMIDITY_PIN
 #define RELH_SENSOR_TYPE_BME280
+#define RELH_SENSOR_TYPE_BME680
 // #define RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
 
 #define RELH_MV_TRIMPOT 0.0                                 // Millivolt offset
