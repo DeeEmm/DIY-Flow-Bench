@@ -77,5 +77,7 @@ class DataHandler {
 		String getRemote(const char* serverName);
 		bool checkUserFile(int filetype = PINSFILE); 
 		bool checkSubstring(std::string firstString, std::string secondString);
+		void loadPinsData ();
+		void parsePinsData(StaticJsonDocument<1024> pinData);
 
 };

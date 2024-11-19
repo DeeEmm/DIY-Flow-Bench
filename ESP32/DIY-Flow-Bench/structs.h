@@ -194,6 +194,7 @@ struct SensorData {
   double FDiff = 0.0;
   int FDiffType = 1;
   char FDiffTypeDesc[32] = "BASELINE";
+  int32_t test = 0;
 };
 
 
@@ -221,44 +222,43 @@ struct ValveLiftData {
 
 /***********************************************************
  * Pin Data
- * @note we need to set serial pins as default minimum
  ***/
 struct Pins {
-  int VAC_SPEED_PIN = 25;
-  int VAC_BLEED_VALVE_PIN = 26;
-  int VAC_BANK_1_PIN = 13;
-  int VAC_BANK_2_PIN = 12; 
-  int VAC_BANK_3_PIN = 14;
-  int AVO_STEP_PIN =  15;
-  int AVO_DIR_PIN = 27;
-  int FLOW_VALVE_STEP_PIN = 32;
-  int FLOW_VALVE_DIR_PIN = 33;
-  int VCC_3V3_PIN = -1;
-  int VCC_5V_PIN = 35;
-  int SPEED_SENSOR_PIN = 2;
-  int SWIRL_ENCODER_PIN_A = 2;
-  int SWIRL_ENCODER_PIN_B = 4;
-  int ORIFICE_BCD_BIT1_PIN = 34;
-  int ORIFICE_BCD_BIT2_PIN = 36;
-  int ORIFICE_BCD_BIT3_PIN = 39;
-  int MAF_PIN = -1;
-  int REF_PRESSURE_PIN = -1;
-  int DIFF_PRESSURE_PIN = -1;
-  int PITOT_PIN = -1;
-  int TEMPERATURE_PIN = -1;
-  int REF_BARO_PIN = -1;
-  int HUMIDITY_PIN = -1;
-  int SERIAL0_TX_PIN = 1; // Default for most ESP32
-  int SERIAL0_RX_PIN = 3; // Default for most ESP32
-  int SERIAL2_TX_PIN = 16;
-  int SERIAL2_RX_PIN = 17;
-  int SDA_PIN = 21; // Default for most ESP32
-  int SCL_PIN = 22; // Default for most ESP32
-  int SD_CS_PIN = 5;
-  int SD_MOSI_PIN = 23;
-  int SD_MISO_PIN = 19;             
-  int SD_SCK_PIN = 18;
-  int WEMOS_SPARE_PIN_1 = -1;
+  int VAC_SPEED_PIN;
+  int VAC_BLEED_VALVE_PIN;
+  int VAC_BANK_1_PIN;
+  int VAC_BANK_2_PIN; 
+  int VAC_BANK_3_PIN;
+  int AVO_STEP_PIN;
+  int AVO_DIR_PIN;
+  int FLOW_VALVE_STEP_PIN;
+  int FLOW_VALVE_DIR_PIN;
+  int VCC_3V3_PIN;
+  int VCC_5V_PIN;
+  int SPEED_SENSOR_PIN;
+  int SWIRL_ENCODER_PIN_A;
+  int SWIRL_ENCODER_PIN_B;
+  int ORIFICE_BCD_BIT1_PIN;
+  int ORIFICE_BCD_BIT2_PIN;
+  int ORIFICE_BCD_BIT3_PIN;
+  int MAF_PIN;
+  int REF_PRESSURE_PIN;
+  int DIFF_PRESSURE_PIN;
+  int PITOT_PIN;
+  int TEMPERATURE_PIN;
+  int REF_BARO_PIN;
+  int HUMIDITY_PIN;
+  int SERIAL0_TX_PIN;
+  int SERIAL0_RX_PIN;
+  int SERIAL2_TX_PIN;
+  int SERIAL2_RX_PIN;
+  int SDA_PIN;
+  int SCL_PIN;
+  int SD_CS_PIN;
+  int SD_MOSI_PIN;
+  int SD_MISO_PIN;             
+  int SD_SCK_PIN;
+  int WEMOS_SPARE_PIN_1;
 };
 
 
