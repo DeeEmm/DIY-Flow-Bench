@@ -21,7 +21,6 @@
 
 #include "configuration.h"
 #include "constants.h"
-// // #include "pins.h"
 #include "structs.h"
 
 #include <Wire.h>
@@ -29,12 +28,6 @@
 #include "sensors.h"
 #include "messages.h"
 #include "driver/pcnt.h"
-// #include LANGUAGE_FILE
-
-
-// #ifdef MAF_IS_ENABLED
-// #include "mafData/maf.h"
-// #endif
 
 #ifdef MAF_IS_ENABLED
 #include MAF_DATA_FILE
@@ -48,10 +41,8 @@ TwoWire I2CBME = TwoWire(0);
 #endif
 
 #ifdef BME680_IS_ENABLED
-#define TINY_BME680_I2C
 #include "DeeEmm_BME680.h" 
-BME680_Class BME680;
-TwoWire I2CBME = TwoWire(0);
+BME680_Class _BME680Sensor;
 #endif
 
 
@@ -139,17 +130,18 @@ void Sensors::begin () {
 	
 		_message.serialPrintf("Initialising BME680 \n");	
 
-		while (!BME680.begin(I2C_STANDARD_MODE, BME680_I2C_ADDR)) { 
+		// while (!_BME680Sensor.begin(I2C_STANDARD_MODE, BME680_I2C_ADDR)) { 
+		while (!_BME680Sensor.begin(I2C_STANDARD_MODE, BME680_I2C_ADDR)) { 
 			_message.serialPrintf("-  Unable to find BME680. Trying again in 5 seconds.\n");
 			delay(5000);
-		}  // loop until device is located
+		}  
 
-		BME680.setOversampling(TemperatureSensor, Oversample16);  
-		BME680.setOversampling(HumiditySensor, Oversample16);     
-		BME680.setOversampling(PressureSensor, Oversample16);     
-		BME680.setOversampling(GasSensor, SensorOff);   
-		BME680.setIIRFilter(IIR4);  							
-		BME680.setGas(0, 0);                                     // Turns off gas measurements
+		_BME680Sensor.setOversampling(TemperatureSensor, Oversample16);  
+		_BME680Sensor.setOversampling(HumiditySensor, Oversample16);     
+		_BME680Sensor.setOversampling(PressureSensor, Oversample16);     
+		_BME680Sensor.setOversampling(GasSensor, SensorOff);   
+		_BME680Sensor.setIIRFilter(IIR4);  							
+		_BME680Sensor.setGas(0, 0); // Turns off gas measurements
 	#endif
 
 
@@ -953,9 +945,9 @@ double Sensors::getTempValue() {
 
 	extern struct SensorData sensorVal;
 
+	double  refTempDegC;
 	int32_t  refTempDegC_INT;
-	int32_t  unused;   
-	double refTempDegC;
+	int32_t  unusedRH, unusedBaro, unusedGas;
 	
 	#ifdef TEMP_SENSOR_TYPE_LINEAR_ANALOG
 	
@@ -971,7 +963,7 @@ double Sensors::getTempValue() {
 
 	#elif defined TEMP_SENSOR_TYPE_BME680 && defined BME680_IS_ENABLED
 
-		BME680.getSensorData(refTempDegC_INT, unused, unused, unused);
+		_BME680Sensor.getSensorData(refTempDegC_INT, unusedRH, unusedBaro, unusedGas, false);
 		refTempDegC = double(refTempDegC_INT / 100.00F);
 
 		sensorVal.test = refTempDegC_INT;
@@ -1009,7 +1001,9 @@ double Sensors::getBaroValue() {
 	Hardware _hardware;
 	double baroPressureHpa;
 	int32_t  baroPressureHpa_INT;
-	int32_t  unused;   
+	int32_t  unusedTemp;   
+	int32_t  unusedRH;   
+	int32_t  unusedGas;   
 		
 	#if defined BARO_SENSOR_TYPE_LINEAR_ANALOG
 		
@@ -1031,7 +1025,7 @@ double Sensors::getBaroValue() {
 		
 	#elif defined BARO_SENSOR_TYPE_BME680 && defined BME680_IS_ENABLED
 
-		BME680.getSensorData(unused, unused, baroPressureHpa_INT, unused);
+		_BME680Sensor.getSensorData(unusedTemp, unusedRH, baroPressureHpa_INT, unusedGas);
 		baroPressureHpa = baroPressureHpa_INT / 100.00F; 
 		
 	#elif defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
@@ -1066,8 +1060,9 @@ double Sensors::getRelHValue() {
 
 	double relativeHumidity;
 	int32_t  relativeHumidity_INT;
-	int32_t  unused;   
-		
+	int32_t  unusedTemp;   
+	int32_t  unusedBaro;   
+	int32_t  unusedGas;   		
 	#ifdef RELH_SENSOR_TYPE_LINEAR_ANALOG
 	
 		long rawRelhValue = analogRead(HUMIDITY_PIN);
@@ -1094,7 +1089,7 @@ double Sensors::getRelHValue() {
 		
 	#elif defined RELH_SENSOR_TYPE_BME680 && defined BME680_IS_ENABLED
 
-		BME680.getSensorData(unused, relativeHumidity_INT, unused, unused);
+		_BME680Sensor.getSensorData(unusedTemp, relativeHumidity_INT, unusedBaro, unusedGas);
 		relativeHumidity = relativeHumidity_INT / 1000.00F;
 		
 	#else
