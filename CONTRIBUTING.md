@@ -2,9 +2,28 @@
 
 ###
 
-The following guidelines explain how contributions to the project are managed. The reason for having these the guidelines is so that the project is maintained in a well-organised manner and easy to use for both the end user and future developers alike.
+The following guidelines explain how contributions to the project are managed. The reason for having these the guidelines is so that the project is maintained in a well-organised manner and easy to use for both the end user and future developers alike. 
 
 The project stretches across a number of platforms and disciplines, and so trying to make a one-size-fits-all set of 'rules' is likely impossible as there are many things do not apply equally to all. So the guidelines seek to set out some basic concepts that can then be implimented in the best manner across each of the platforms.
+
+## Workflow
+
+There are three basic kinds of branches to the project
+
+Master Branch - The main default branch asigned by GitHub. This is read only and is at the same level as the current release.
+DEV Branch - This is a staging branch where all code changes are staged. At a new release, changes in DEV are pushed to master.
+Feature branches - Branches for individual features or bug fixes. Once tested feature branches are merged into DEV.
+
+### Basic feature / bug development workflow
+
+- Create an issue for the feature / bugfix
+- Request a new issue 'branch' is created (looking ato auutomate this with git workflows)
+- Check out to your local machine by 'Opening with GitHub Desktop'
+- Carry out your modifications and changes to your local version
+- Be sure to update the changelog and version.json files
+- Test your changes!!! Make sure the code compiles and works!!!
+- Create a 'pull request' to have your changes merged with the branch
+- Your changes will then be reviewed and merged
 
 
 ## Coding standards
@@ -38,14 +57,6 @@ As the project is hosted by GitHub it makes sense to utilise the GIT versioning 
 
 If you are familiar with GIT or use it as part of your current IDE or Code editor, that's great, then you will already know what to do. However if you have no idea what it is or how to use it then we recommend using GitHub Desktop to manage checking out and committing files. 
 
-Essentially you will: 
-
-- Create a 'fork' of the code
-- Carry out your modifications and changes to your local fork.
-- Create a 'pull request' to have your changes merged with the main code
-- Your changes will then be reviewed and merged
-
-
 How to use GIT is a bit outside of the scope of this document but you can find many how-to's online that explain how to use github desktop. We recommend the user guides that are provided with GitHub Desktop as a good starting point 
 
 If you do get stuck, you can also reach out and give us a shout out on our #developer channel on Discord. If you don't have access, message the owner of the repository or give a shout out on one of the other channels. All contributors are welcomed and encouraged to join the #developer channel.
@@ -71,7 +82,6 @@ Commit descriptions should give a brief list of all changes that are formatted a
 > : Fixed load issue for Baro and Pitot 
 
 NOTE: This is the same format used in the changelog
-
 
 
 ## Changelog
