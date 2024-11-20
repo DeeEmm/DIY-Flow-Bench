@@ -10,9 +10,9 @@ The project stretches across a number of platforms and disciplines, and so tryin
 
 There are three basic kinds of branches to the project
 
-Master Branch - The main default branch asigned by GitHub. This is read only and is at the same level as the current release.
-DEV Branch - This is a staging branch where all code changes are staged. At a new release, changes in DEV are pushed to master.
-Feature branches - Branches for individual features or bug fixes. Once tested feature branches are merged into DEV.
+- Master Branch - The main default branch asigned by GitHub. This is read only and is at the same level as the current release.
+- DEV Branch - This is a staging branch where all code changes are staged. At a new release, changes in DEV are pushed to master.
+- Feature branches - Branches for individual features or bug fixes. Once tested feature branches are merged into DEV.
 
 ### Basic feature / bug development workflow
 
