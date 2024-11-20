@@ -18,7 +18,7 @@ There are three basic kinds of branches to the project
 ### Basic feature / bug development workflow
 
 - Create an issue for the feature / bugfix
-- Request a new issue 'branch' is created (looking ato auutomate this with git workflows)
+- Request a new issue 'branch' is created (we looking to automate this with git workflows)
 - Check out to your local machine by 'Opening with GitHub Desktop'
 - Carry out your modifications and changes to your local version
 - Be sure to update the changelog and version.json files
