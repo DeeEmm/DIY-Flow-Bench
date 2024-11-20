@@ -265,9 +265,47 @@ struct Pins {
 
 /***********************************************************
  * @brief Language Data
- * @note default language is english but can beoverwritten by language.json 
+ * @note default language is English but can be overwritten by uploading a language.json file to GUI
+ * @note LANG_INDEX_HTML - HTML is intended to be rewritten. This is the On-boarding page to upload missing files. Full source can be found in src/preload.html
  ***/
 struct Language {
+    char LANG_INDEX_HTML[2500] = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~PINS_STATUS~</p> <!--<p>~SETTINGS_STATUS~</p>--> <br> <form method=\"POST\" action='/upload' enctype=\"multipart/form-data\"> <div class=\"input_container\"> <input type=\"file\" name=\"file\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
+    char LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE[50] = "Select lift value before capture";
+    char LANG_GUI_LIFT_VALUE[50] = "Lift Value";
+    char LANG_GUI_LIFT_CAPTURE[50] = "Capture";
+    char LANG_GUI_UPLOAD_FIRMWARE_BINARY[50] = "Upload Firmware Binary (firmware.bin)";
+    char LANG_GUI_FIRMWARE_UPDATE[50] = "Update";
+    char LANG_GUI_USER_FLOW_TARGET_VALUE[50] = "User Flow Target Value";
+    char LANG_GUI_USER_FLOW_TARGET_SAVE[50] = "Save";
+    char LANG_GUI_CAL_FLOW_OFFSET[50] = "Calibrate Flow Offset";
+    char LANG_GUI_CAL_LEAK_TEST[50] = "Calibrate Leak Test";
+    char LANG_GUI_LOAD_LIFT_PROFILE[50] = "Load Lift Profile";
+    char LANG_GUI_LOAD_LIFT_PROFILE_LOAD[50] = "Load";
+    char LANG_GUI_SAVE_LIFT_DATA[50] = "Save Lift Data";
+    char LANG_GUI_SAVE_GRAPH_FILENAME[50] = "Filename";
+    char LANG_GUI_FILE_MANAGER[50] = "File Manager";
+    char LANG_GUI_FILEMANAGER_UPLOAD[50] = "Upload";
+    char LANG_GUI_FIRMWARE[50] = "Firmware";
+    char LANG_GUI_VERSION[50] = "Version";
+    char LANG_GUI_BUILD[50] = "Build";
+    char LANG_GUI_GUI[50] = "GUI";
+    char LANG_GUI_MEM_SIZE[50] = "Memory Size";
+    char LANG_GUI_MEM_USED[50] = "Memory Used";
+    char LANG_GUI_STORAGE[50] = "Storage";
+    char LANG_GUI_NETWORK[50] = "Network";
+    char LANG_GUI_IP_ADDRESS[50] = "IP Address";
+    char LANG_GUI_HARDWARE_CONFIG[50] = "Hardware Configuration";
+    char LANG_GUI_BENCH_TYPE[50] = "Bench Type";
+    char LANG_GUI_BOARD_TYPE[50] = "Board Type";
+    char LANG_GUI_AUTO[50] = "Auto";
+    char LANG_GUI_SENSOR_CONFIG[50] = "Sensor Configuration";
+    char LANG_GUI_MAF_DATA_FILE[50] = "MAF Data File";
+    char LANG_GUI_REF_PRESSURE_SENSOR[50] = "Reference Pressure Sensor";
+    char LANG_GUI_TEMP_SENSOR[50] = "Temperature Sensor";
+    char LANG_GUI_HUMIDITY_SENSOR[50] = "Humidity Sensor";
+    char LANG_GUI_BARO_SENSOR[50] = "Baro Sensor";
+    char LANG_GUI_PITOT_SENSOR[50] = "Pitot Sensor";
+    char LANG_GUI_DIFFERENTIAL_SENSOR[50] = "Differential Sensor";    
     char LANG_BLANK[50] = " "; 
     char LANG_NULL[50] = "NULL";
     char LANG_NO_ERROR[50] = "Status OK";
@@ -307,6 +345,83 @@ struct Language {
     char LANG_UPLOAD_FAILED_NO_SPACE[50] = "Upload rejected, not enough space";
     char LANG_FILE_UPLOADED[50] = "File uploaded";
     char LANG_NO_BOARD_LOADED[50] = "No board loaded";  
-    char LANG_INDEX_HTML[2500] = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~PINS_STATUS~</p> <!--<p>~SETTINGS_STATUS~</p>--> <br> <form method=\"POST\" action='/upload' enctype=\"multipart/form-data\"> <div class=\"input_container\"> <input type=\"file\" name=\"file\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
+    char LANG_GUI_PITOT[50] = "Pitot";  
+    char LANG_GUI_PREF[50] = "Depression";  
+    char LANG_GUI_PDIFF[50] = "Differential";
+    char LANG_GUI_FLOW[50] = "Flow Rate";
+    char LANG_GUI_AFLOW[50] = "Adjusted Flow";
+    char LANG_GUI_SFLOW[50] = "Standard Flow";
+    char LANG_GUI_MFLOW[50] = "MAF Flow";
+    char LANG_GUI_SWIRL[50] = "Swirl";
+    char LANG_GUI_FLOW_DIFF[50] = "Flow Diff";
+    char LANG_GUI_TEMP[50] = "Temperature";
+    char LANG_GUI_BARO[50] = "Baro Pressure";
+    char LANG_GUI_HUMIDITY[50] = "Humidity";
+    char LANG_GUI_START[50] = "Start Bench";
+    char LANG_GUI_STOP[50] = "Stop Bench";
+    char LANG_GUI_CLEAR_ALARM[1302] = "Clear Alarm";
+    char LANG_GUI_CAPTURE[50] = "Capture";
+    char LANG_GUI_DASHBOARD[50] = "Dashboard";
+    char LANG_GUI_DATA[50] = "Data";
+    char LANG_GUI_CONFIG[50] = "Configuration";
+    char LANG_GUI_CLEAR[50] = "Clear";
+    char LANG_GUI_EXPORT[50] = "Export";
+    char LANG_GUI_IMAGE[50] = "Image";
+    char LANG_GUI_SYS_SETTINGS[50] = "System Settings";
+    char LANG_GUI_WIFI_INFO[50] = "Wifi Info";
+    char LANG_GUI_WIFI_SSID[50] = "WiFi SSID";
+    char LANG_GUI_WIFI_PASS[50] = "WiFi Password";
+    char LANG_GUI_WIFI_AP_SSID[50] = "WiFi AP SSID";
+    char LANG_GUI_WIFI_AP_PASS[50] = "WiFi AP Password";
+    char LANG_GUI_HOSTNAME[50] = "WiFi Hostname";
+    char LANG_GUI_WIFI_TIMEOUT[50] = "WiFi Timeout";
+    char LANG_GUI_BENCH_SETTINGS[50] = "Bench Settings";
+    char LANG_GUI_MAF_HOUSING_DIAMETER[50] = "MAF Housing Diameter (mm):";
+    char LANG_GUI_REFRESH_RATE[50] = "GUI Refresh Rate (ms):";
+    char LANG_GUI_TEMPERATURE_UNIT[50] = "Temperature Unit (&degC / &degF):";
+    char LANG_GUI_VALVE_LIFT_INTERVAL[50] = "Valve Lift Interval (mm / inch):";
+    char LANG_GUI_DATA_GRAPH_MAX_VALUE[50] = "Data Graph Max Value:";
+    char LANG_GUI_RESOLUTION_AND_ACCURACY[50] = "Resolution and Accuracy";
+    char LANG_GUI_FLOW_VALUE_ROUNDING[50] = "Flow Value Rounding";
+    char LANG_GUI_FLOW_DECIMAL_ROUNDING[50] = "Flow Decimal Accuracy";
+    char LANG_GUI_GEN_DECIMAL_ACCURACY[50] = "General Decimal Accuracy";
+    char LANG_GUI_DATA_FILTERS[50] = "Data Filters";
+    char LANG_GUI_DATA_FILTER_TYPE[50] = "Data Filter Type";
+    char LANG_GUI_MIN_FLOW_RATE[50] = "Min Flow Rate (cfm)";
+    char LANG_GUI_MIN_BENCH_PRESSURE[50] = "Min Bench Pressure (in/H2O)";
+    char LANG_GUI_MAF_MIN_VOLTS[50] = "MAF Min volts";
+    char LANG_GUI_CYCLIC_AVERAGE_BUFFER[50] = "Cyclical Average Buffer";
+    char LANG_GUI_CONVERSION_SETTINGS[50] = "Conversion Settings";
+    char LANG_GUI_ADJUSTED_FLOW_DEPRESSION[50] = "Adjusted Flow Depression (in/H2O)";
+    char LANG_GUI_STANDARD_REF_CONDITIONS[50] = "Standard Reference Conditions (SCFM)";
+    char LANG_GUI_STANDARDISED_ADJ_FLOW[50] = "Standardised Adjusted Flow";
+    char LANG_GUI_CAL_ORIFICE_SETTINGS[50] = "Calibration Orifice Settings";
+    char LANG_GUI_CAL_ORIFICE_FLOW_RATE[50] = "Calibration Orifice Flow Rate (cfm)";
+    char LANG_GUI_CAL_ORIFICE_TEST_PRESSURE[50] = "Calibration Orifice Test Pressure (in/H2O)";
+    char LANG_GUI_ORIFICE_DATA[50] = "Orifice Data";
+    char LANG_GUI_ORIFICE1_FLOW[50] = "Orifice #1 Flow Rate (cfm)";
+    char LANG_GUI_ORIFICE1_PRESSURE[50] = "Orifice #1 Test Pressure (in/H2O)";
+    char LANG_GUI_ORIFICE2_FLOW[50] = "Orifice #2 Flow Rate (cfm)";
+    char LANG_GUI_ORIFICE2_PRESSURE[50] = "Orifice #2 Test Pressure (in/H2O)";
+    char LANG_GUI_ORIFICE3_FLOW[50] = "Orifice #3 Flow Rate (cfm)";
+    char LANG_GUI_ORIFICE3_PRESSURE[50] = "Orifice #3 Test Pressure (in/H2O)";
+    char LANG_GUI_ORIFICE4_FLOW[50] = "Orifice #4 Flow Rate (cfm)";
+    char LANG_GUI_ORIFICE4_PRESSURE[50] = "Orifice #4 Test Pressure (in/H2O)";
+    char LANG_GUI_ORIFICE5_FLOW[50] = "Orifice #5 Flow Rate (cfm)";
+    char LANG_GUI_ORIFICE5_PRESSURE[50] = "Orifice #5 Test Pressure (in/H2O)";
+    char LANG_GUI_ORIFICE6_FLOW[50] = "Orifice #6 Flow Rate (cfm)";
+    char LANG_GUI_ORIFICE6_PRESSURE[50] = "Orifice #6 Test Pressure (in/H2O)";
+    char LANG_GUI_API_SETTINGS[50] = "API Settings";
+    char LANG_GUI_API_DELIMITER[50] = "API Delimiter";
+    char LANG_GUI_SERIAL_BAUD_RATE[50] = "Serial Baud Rate";
+    char LANG_GUI_CALIBRATION_DATA[50] = "Calibration Data";
+    char LANG_GUI_CAL_OFFSET[50] = "Calibration Offset (cfm)";
+    char LANG_GUI_LEAK_TEST_BASELINE[50] = "Leak Test Baseline (cfm)";
+    char LANG_GUI_LEAK_TEST_OFFSET[50] = "Leak Test Offset (cfm)";
+    char LANG_GUI_LEAK_TEST_BASELINE_REVERSE[50] = "Leak Test Baseline (Reverse) (cfm)";
+    char LANG_GUI_LEAK_TEST_OFFSET_REVERSE[50] = "Leak Test Offset (Reverse) (cfm)";
+    char LANG_GUI_OVERWRITE[50] = "Overwrite";  
+
+
 };
 

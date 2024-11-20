@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24112001        - Added Language Template vars to GUI
 24111901        - Added Create-Issue-Branch workflow
                 - General project refactor
 24111801        - Added BME680 Configuration
