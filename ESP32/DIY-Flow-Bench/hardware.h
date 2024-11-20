@@ -36,10 +36,9 @@ class Hardware {
 	public:
 		Hardware();
 		void begin ();
-		void initialise ();
 		void getI2CList();
 		void getI2CDeviceList();
-		void assignIO (JsonObject pinData);
+		void initaliseIO ();
 		
 		int32_t getADCRawData(int channel);
 		double get3v3SupplyVolts();
@@ -53,6 +52,9 @@ class Hardware {
 		void benchOn();
 		void benchOff();
 		float uptime();
+
+		void stepperTest();
+
 
 	private:
 		// void configurePins ();

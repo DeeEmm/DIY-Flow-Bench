@@ -261,9 +261,10 @@ void TASKgetEnviroData( void * parameter ){
     if (millis() > status.bmePollTimer){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
-        status.bmePollTimer = millis() + BME_SCAN_DELAY_MS; // Only reset timer when task executes
+        status.bmePollTimer = millis() + BME280_SCAN_DELAY_MS; // Only reset timer when task executes
         
         sensorVal.TempDegC = _sensors.getTempValue();
+        		_message.debugPrintf("BME680 refTempDegC_INT: %d",sensorVal.test );
         sensorVal.TempDegF = _calculations.convertTemperature(_sensors.getTempValue(), DEGF);
         sensorVal.BaroHPA = _sensors.getBaroValue();
         sensorVal.BaroPA = sensorVal.BaroHPA * 100.00F;
@@ -315,7 +316,7 @@ void setup(void) {
   xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENSOR_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
   #endif
 
-  #ifdef BME_IS_ENABLED // Compile time directive used for testing
+  #ifdef BME280_IS_ENABLED // Compile time directive used for testing
   xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
   #endif
 
