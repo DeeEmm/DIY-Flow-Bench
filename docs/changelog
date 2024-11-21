@@ -29,6 +29,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+
+24112102        - Updated pins files
 24112101        - Working pitot velocity
                 - Zero reset for pitot and PDiff sensors
                 - Added pitot velocity calcs
