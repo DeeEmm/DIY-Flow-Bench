@@ -148,12 +148,13 @@ void DataHandler::begin() {
 
     _message.serialPrintf("=== SDCARD File system info === \n");
 
-    int sck = SD_SCK_PIN;
-    int miso = SD_MISO_PIN;
-    int mosi = SD_MOSI_PIN;
-    int cs = SD_CS_PIN;
+    //int sck = pins.SD_SCK_PIN;
+    //int miso = pins.SD_MISO_PIN;
+    //int mosi = pins.SD_MOSI_PIN;
+    //int cs = pins.SD_CS_PIN;
 
-    SPIClass spi = SPIClass(VSPI);
+    /*******
+     *  SPIClass spi = SPIClass(VSPI);
 
         SPI.begin(sck, miso, mosi, cs);
         if (!SD.begin(cs, spi, 2000000U)) {
@@ -196,8 +197,11 @@ void DataHandler::begin() {
         Serial.printf("Total space: %lluMB\n", SD.totalBytes() / (1024 * 1024));
         Serial.printf("Used space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
         }
+      /**** */
 
     #endif
+
+
 
     
     // Display Filesystem Stats
@@ -739,10 +743,10 @@ void DataHandler::parsePinsData(StaticJsonDocument<1024> pinData) {
   pins.ORIFICE_BCD_BIT1_PIN = pinData["ORIFICE_BCD_BIT1_PIN"];
   pins.ORIFICE_BCD_BIT2_PIN = pinData["ORIFICE_BCD_BIT2_PIN"];
   pins.ORIFICE_BCD_BIT3_PIN = pinData["ORIFICE_BCD_BIT3_PIN"];
-  pins.MAF_PIN = pinData["MAF_SRC_IS_PIN"];
-  pins.REF_PRESSURE_PIN = pinData["PREF_SRC_PIN"];
-  pins.DIFF_PRESSURE_PIN = pinData["PDIFF_SRC_IS_PIN"];
-  pins.PITOT_PIN = pinData["PITOT_SRC_IS_PIN"];
+  pins.MAF_PIN = pinData["MAF_PIN"];
+  pins.REF_PRESSURE_PIN = pinData["PREF_PIN"];
+  pins.DIFF_PRESSURE_PIN = pinData["PDIFF_PIN"];
+  pins.PITOT_PIN = pinData["PITOT_PIN"];
   pins.TEMPERATURE_PIN = pinData["TEMPERATURE_PIN"];
   pins.HUMIDITY_PIN = pinData["HUMIDITY_PIN"];
   pins.REF_BARO_PIN = pinData["REF_BARO_PIN"];

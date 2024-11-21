@@ -224,44 +224,43 @@ struct ValveLiftData {
  * Pin Data
  ***/
 struct Pins {
-  int VAC_SPEED_PIN;
-  int VAC_BLEED_VALVE_PIN;
-  int VAC_BANK_1_PIN;
-  int VAC_BANK_2_PIN; 
-  int VAC_BANK_3_PIN;
-  int AVO_STEP_PIN;
-  int AVO_DIR_PIN;
-  int FLOW_VALVE_STEP_PIN;
-  int FLOW_VALVE_DIR_PIN;
-  int VCC_3V3_PIN;
-  int VCC_5V_PIN;
-  int SPEED_SENSOR_PIN;
-  int SWIRL_ENCODER_PIN_A;
-  int SWIRL_ENCODER_PIN_B;
-  int ORIFICE_BCD_BIT1_PIN;
-  int ORIFICE_BCD_BIT2_PIN;
-  int ORIFICE_BCD_BIT3_PIN;
-  int MAF_PIN;
-  int REF_PRESSURE_PIN;
-  int DIFF_PRESSURE_PIN;
-  int PITOT_PIN;
-  int TEMPERATURE_PIN;
-  int REF_BARO_PIN;
-  int HUMIDITY_PIN;
-  int SERIAL0_TX_PIN;
-  int SERIAL0_RX_PIN;
-  int SERIAL2_TX_PIN;
-  int SERIAL2_RX_PIN;
-  int SDA_PIN;
-  int SCL_PIN;
-  int SD_CS_PIN;
-  int SD_MOSI_PIN;
-  int SD_MISO_PIN;             
-  int SD_SCK_PIN;
-  int WEMOS_SPARE_PIN_1;
+  signed int VAC_SPEED_PIN = 99;
+  signed int VAC_BLEED_VALVE_PIN = 99;
+  signed int VAC_BANK_1_PIN = 99;
+  signed int VAC_BANK_2_PIN = 99; 
+  signed int VAC_BANK_3_PIN = 99;
+  signed int AVO_STEP_PIN = 99;
+  signed int AVO_DIR_PIN = 99;
+  signed int FLOW_VALVE_STEP_PIN = 99;
+  signed int FLOW_VALVE_DIR_PIN = 99;
+  signed int VCC_3V3_PIN = 99;
+  signed int VCC_5V_PIN = 99;
+  signed int SPEED_SENSOR_PIN = 99;
+  signed int SWIRL_ENCODER_PIN_A = 99;
+  signed int SWIRL_ENCODER_PIN_B = 99;
+  signed int ORIFICE_BCD_BIT1_PIN = 99;
+  signed int ORIFICE_BCD_BIT2_PIN = 99;
+  signed int ORIFICE_BCD_BIT3_PIN = 99;
+  signed int MAF_PIN = 99;
+  signed int REF_PRESSURE_PIN = 99;
+  signed int DIFF_PRESSURE_PIN = 99;
+  signed int PITOT_PIN = 99;
+  signed int TEMPERATURE_PIN = 99;
+  signed int REF_BARO_PIN = 99;
+  signed int HUMIDITY_PIN = 99;
+  signed int SERIAL0_TX_PIN = 99;
+  signed int SERIAL0_RX_PIN = 99;
+  signed int SERIAL2_TX_PIN = 99;
+  signed int SERIAL2_RX_PIN = 99;
+  signed int SDA_PIN = 99;
+  signed int SCL_PIN = 99;
+  signed int SD_CS_PIN = 99;
+  signed int SD_MOSI_PIN = 99;
+  signed int SD_MISO_PIN = 99;             
+  signed int SD_SCK_PIN = 99;
+  signed int WEMOS_SPARE_PIN_1 = 99;
 };
-
-
+  
 
 /***********************************************************
  * @brief Language Data

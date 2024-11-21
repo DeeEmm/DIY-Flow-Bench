@@ -47,7 +47,7 @@
 * CONFIGURE SD Card
 ***/
 
-// #define SD_CARD_IS_ENABLED
+//#define SD_CARD_IS_ENABLED
 
 
 /***********************************************************
