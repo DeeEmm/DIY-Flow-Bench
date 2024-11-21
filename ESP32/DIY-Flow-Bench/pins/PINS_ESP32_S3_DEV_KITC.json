@@ -34,5 +34,5 @@
     "SD_MOSI_PIN" : -1,
     "SD_MISO_PIN" : -1,             
     "SD_SCK_PIN" : -1,
-    "WEMOS_SPARE_PIN_1": -1
+    "WEMOS_SPARE_PIN_1" : -1
 }

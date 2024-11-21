@@ -93,8 +93,7 @@ void Hardware::initaliseIO () {
     _message.serialPrintf("Input ORIFICE_BCD_BIT2_PIN: %d\n", pins.ORIFICE_BCD_BIT2_PIN );
     pinMode(pins.ORIFICE_BCD_BIT2_PIN, INPUT);   
   }
-  if (pins.ORIFICE_BCD_BIT3_PIN >= 0 ) {
-    pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
+  if (pins.ORIFICE_BCD_BIT3_PIN >= 0 ) {   
     _message.serialPrintf("Input ORIFICE_BCD_BIT3_PIN: %d\n", pins.ORIFICE_BCD_BIT3_PIN );
     pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
   }
