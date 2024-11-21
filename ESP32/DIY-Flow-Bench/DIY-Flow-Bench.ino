@@ -100,7 +100,10 @@ void TASKgetSensorData( void * parameter ){
 
   extern struct DeviceStatus status;
   extern struct SensorData sensorVal;
-  Calculations _calculations;
+  extern struct CalibrationData calVal;
+  
+  Sensors _sensors;
+
   int sensorINT;
 
   for( ;; ) {
@@ -213,12 +216,13 @@ void TASKgetSensorData( void * parameter ){
 
         #ifdef PDIFF_IS_ENABLED
         sensorVal.PDiffKPA = _sensors.getPDiffValue();
-        sensorVal.PDiffH2O = _calculations.convertPressure(sensorVal.PDiffKPA, INH2O);
+        sensorVal.PDiffH2O = _calculations.convertPressure(sensorVal.PDiffKPA, INH2O) - calVal.pdiff_cal_offset;
         #endif
 
         #ifdef PITOT_IS_ENABLED
         sensorVal.PitotKPA = _sensors.getPitotValue();
         sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O);
+        sensorVal.PitotVelocity = _sensors.getPitotVelocity();
         #endif
 
         #ifdef SWIRL_IS_ENABLED
@@ -263,12 +267,14 @@ void TASKgetEnviroData( void * parameter ){
         status.bmePollTimer = millis() + BME280_SCAN_DELAY_MS; // Only reset timer when task executes
         
         sensorVal.TempDegC = _sensors.getTempValue();
-        		_message.debugPrintf("BME680 refTempDegC_INT: %d",sensorVal.test );
+        _message.debugPrintf("BME680 refTempDegC_INT: %d",sensorVal.test );
         sensorVal.TempDegF = _calculations.convertTemperature(_sensors.getTempValue(), DEGF);
         sensorVal.BaroHPA = _sensors.getBaroValue();
         sensorVal.BaroPA = sensorVal.BaroHPA * 100.00F;
         sensorVal.BaroKPA = sensorVal.BaroPA * 0.001F;
         sensorVal.RelH = _sensors.getRelHValue();
+        sensorVal.PitotVelocity = _sensors.getPitotVelocity();
+        sensorVal.PitotDelta = _calculations.convertPressure(_sensors.getPitotValue(),KPA, INH2O);
         xSemaphoreGive(i2c_task_mutex); // Release semaphore
       }
     }

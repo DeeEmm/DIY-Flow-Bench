@@ -166,7 +166,7 @@ double Calibration::getLeakOffsetReverse() {
 
 
 
-
+// TODO - #205 convert from pre-compile to post-compile 
 // /***********************************************************
 // * @brief createCalibration File
 // * @details Create configuration json file
@@ -201,6 +201,102 @@ double Calibration::getLeakOffsetReverse() {
 
 
 
+
+
+/***********************************************************
+* Zero pDiff value
+* 
+***/
+bool Calibration::setPdiffCalOffset() {
+
+  extern struct ConfigSettings config;
+  extern struct CalibrationData calVal;
+  extern struct Language language;
+  extern struct SensorData sensorVal;
+  
+  Sensors _sensors; 
+  Calculations _calculations;
+  Messages _message;
+ 
+  calVal.pdiff_cal_offset = sensorVal.PDiffH2O;
+  
+  _message.debugPrintf("Calibration::setPdiffOffset $ \n", calVal.pdiff_cal_offset);
+
+  saveCalibrationData();    
+
+  // _message.Handler(language.LANG_CAL_OFFET_VALUE + calVal.flow_offset);
+  
+  return true;
+  
+}
+
+
+
+/***********************************************************
+* Get pDiff offset
+* 
+***/
+double Calibration::getPdiffCalOffset() {
+
+  extern struct CalibrationData calVal;
+  
+  loadCalibrationFile();
+
+  return calVal.pdiff_cal_offset;
+
+}
+
+
+
+
+
+/***********************************************************
+* Zero pDiff value
+* 
+***/
+bool Calibration::setPitotCalOffset() {
+
+  extern struct ConfigSettings config;
+  extern struct CalibrationData calVal;
+  extern struct Language language;
+  extern struct SensorData sensorVal;
+  
+  Sensors _sensors; 
+  Calculations _calculations;
+  Messages _message;
+ 
+  // update config var
+  calVal.pitot_cal_offset = sensorVal.PitotKPA;
+  
+  _message.debugPrintf("Calibration::setPitotDeltaOffset $ \n", calVal.flow_offset);
+
+  saveCalibrationData();    
+
+  // _message.Handler(language.LANG_CAL_OFFET_VALUE + calVal.flow_offset);
+  
+  return true;
+  
+}
+
+
+
+/***********************************************************
+* Get pDiff offset
+* 
+***/
+double Calibration::getPitotCalOffset() {
+
+  extern struct CalibrationData calVal;
+  
+  loadCalibrationFile();
+
+  return calVal.pdiff_cal_offset;
+
+}
+
+
+
+
 /***********************************************************
 * @brief saveCalibration 
 * @details write calibration data to cal.json file
@@ -225,6 +321,8 @@ void Calibration::saveCalibrationData() {
   calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
   calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
   calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
+  calData["PDIFF_CAL_OFFSET"] = calVal.leak_cal_offset;
+  calData["PITOT_CAL_OFFSET"] = calVal.leak_cal_offset_rev;
 
   _message.Handler(language.LANG_SAVING_CALIBRATION);
   

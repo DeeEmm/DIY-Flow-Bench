@@ -1,8 +1,8 @@
 {
 "MAJOR_VERSION" : "V2",
 "MINOR_VERSION" : "0",
-"BUILD_NUMBER" : "24111901",
-"GUI_BUILD_NUMBER" : "24111702",
+"BUILD_NUMBER" : "24112101",
+"GUI_BUILD_NUMBER" : "24112101",
 "RELEASE" : "V2.0.RC.8",
 "DEV_BRANCH" : "https://github.com/DeeEmm/DIY-Flow-Bench/tree/DEV"
 }
