@@ -251,8 +251,30 @@ void Webserver::begin()
   server->on("/api/fdiff", HTTP_GET, [](AsyncWebServerRequest *request){
     Messages _message;
     // _message.Handler(language.LANG_BENCH_RUNNING);
-    _message.debugPrintf("/api/fdiff \n");
+    _message.debugPrintf("/api/fdiff/toggle \n");
     toggleFlowDiffTile();
+    request->send(200);
+    // request->send(200, "text/html", "{\"fdiff\":\"changed\"}"); 
+  });
+
+
+  // Zero pDiff value
+  server->on("/api/pdiff/zero", HTTP_GET, [](AsyncWebServerRequest *request){
+    Messages _message;
+    Calibration _cal;
+    _message.debugPrintf("/api/fdiff/zero \n");
+    _cal.setPdiffCalOffset();
+    request->send(200);
+    // request->send(200, "text/html", "{\"fdiff\":\"changed\"}"); 
+  });
+
+  
+  // Zero Pitot value
+  server->on("/api/pitot/zero", HTTP_GET, [](AsyncWebServerRequest *request){
+    Messages _message;
+    Calibration _cal;
+    _message.debugPrintf("/api/pitot/zero \n");
+    _cal.setPitotCalOffset();
     request->send(200);
     // request->send(200, "text/html", "{\"fdiff\":\"changed\"}"); 
   });
@@ -840,11 +862,12 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_FIRMWARE") return language.LANG_GUI_FIRMWARE;
   if (var == "LANG_GUI_VERSION") return language.LANG_GUI_VERSION;
   if (var == "LANG_GUI_GUI") return language.LANG_GUI_GUI;
+  if (var == "LANG_GUI_BUILD") return language.LANG_GUI_BUILD;
   if (var == "LANG_GUI_MEM_SIZE") return language.LANG_GUI_MEM_SIZE;
   if (var == "LANG_GUI_MEM_USED") return language.LANG_GUI_MEM_USED;
   if (var == "LANG_GUI_STORAGE") return language.LANG_GUI_STORAGE;
   if (var == "LANG_GUI_NETWORK") return language.LANG_GUI_NETWORK;
-  if (var == "LANG_GUI_BLANG_GUI_IP_ADDRESSUILD") return language.LANG_GUI_IP_ADDRESS;
+  if (var == "LANG_GUI_IP_ADDRESS") return language.LANG_GUI_IP_ADDRESS;
   if (var == "LANG_GUI_HOSTNAME") return language.LANG_GUI_HOSTNAME;
   if (var == "LANG_GUI_HARDWARE_CONFIG") return language.LANG_GUI_HARDWARE_CONFIG;
   if (var == "LANG_GUI_BENCH_TYPE") return language.LANG_GUI_BENCH_TYPE;
@@ -893,7 +916,7 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_REFRESH_RATE") return language.LANG_GUI_REFRESH_RATE;
   if (var == "LANG_GUI_TEMPERATURE_UNIT") return language.LANG_GUI_TEMPERATURE_UNIT;
   if (var == "LANG_GUI_VALVE_LIFT_INTERVAL") return language.LANG_GUI_VALVE_LIFT_INTERVAL;
-  if (var == "LANG_GUI_DATAGRAPH_MAX_VALUE") return language.LANG_GUI_DATA_GRAPH_MAX_VALUE;
+  if (var == "LANG_GUI_DATA_GRAPH_MAX_VALUE") return language.LANG_GUI_DATA_GRAPH_MAX_VALUE;
   if (var == "LANG_GUI_AUTO") return language.LANG_GUI_AUTO;
   if (var == "LANG_GUI_RESOLUTION_AND_ACCURACY") return language.LANG_GUI_RESOLUTION_AND_ACCURACY;
   if (var == "LANG_GUI_FLOW_VALUE_ROUNDING") return language.LANG_GUI_FLOW_VALUE_ROUNDING;
@@ -906,12 +929,12 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_MAF_MIN_VOLTS") return language.LANG_GUI_MAF_MIN_VOLTS;
   if (var == "LANG_GUI_CYCLIC_AVERAGE_BUFFER") return language.LANG_GUI_CYCLIC_AVERAGE_BUFFER;
   if (var == "LANG_GUI_CONVERSION_SETTINGS") return language.LANG_GUI_CONVERSION_SETTINGS;
-  if (var == "LANG_GUI_ADJUSTED_FLOW_DEPRESSION") return language.LANG_GUI_ADJUSTED_FLOW_DEPRESSION;
+  if (var == "LANG_GUI_ADJ_FLOW_DEPRESSION") return language.LANG_GUI_ADJ_FLOW_DEPRESSION;
   if (var == "LANG_GUI_STANDARD_REF_CONDITIONS") return language.LANG_GUI_STANDARD_REF_CONDITIONS;
   if (var == "LANG_GUI_STANDARDISED_ADJ_FLOW") return language.LANG_GUI_STANDARDISED_ADJ_FLOW;
   if (var == "LANG_GUI_CAL_ORIFICE_SETTINGS") return language.LANG_GUI_CAL_ORIFICE_SETTINGS;
   if (var == "LANG_GUI_CAL_ORIFICE_FLOW_RATE") return language.LANG_GUI_CAL_ORIFICE_FLOW_RATE;
-  if (var == "LANG_GUI_CAL_ORIFICE_TEST_PRESSURE") return language.LANG_GUI_CAL_ORIFICE_TEST_PRESSURE;
+  if (var == "LANG_GUI_CAL_ORIFICE_TEST_PRESS") return language.LANG_GUI_CAL_ORIFICE_TEST_PRESS;
   if (var == "LANG_GUI_ORIFICE_DATA") return language.LANG_GUI_ORIFICE_DATA;
   if (var == "LANG_GUI_ORIFICE1_FLOW") return language.LANG_GUI_ORIFICE1_FLOW;
   if (var == "LANG_GUI_ORIFICE1_PRESSURE") return language.LANG_GUI_ORIFICE1_PRESSURE;
@@ -932,8 +955,8 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_CAL_OFFSET") return language.LANG_GUI_CAL_OFFSET;
   if (var == "LANG_GUI_LEAK_TEST_BASELINE") return language.LANG_GUI_LEAK_TEST_BASELINE;
   if (var == "LANG_GUI_LEAK_TEST_OFFSET") return language.LANG_GUI_LEAK_TEST_OFFSET;
-  if (var == "LANG_GUI_LEAK_TEST_BASELINE_REVERSE") return language.LANG_GUI_LEAK_TEST_BASELINE_REVERSE;
-  if (var == "LANG_GUI_LEAK_TEST_OFFSET_REVERSE") return language.LANG_GUI_LEAK_TEST_OFFSET_REVERSE;
+  if (var == "LANG_GUI_LEAK_TEST_BASELINE_REV") return language.LANG_GUI_LEAK_TEST_BASELINE_REV;
+  if (var == "LANG_GUI_LEAK_TEST_OFFSET_REV") return language.LANG_GUI_LEAK_TEST_OFFSET_REV;
   if (var == "LANG_GUI_OVERWRITE") return language.LANG_GUI_OVERWRITE;
 
 

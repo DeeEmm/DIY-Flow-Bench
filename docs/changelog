@@ -29,6 +29,12 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24112101        - Working pitot velocity
+                - Zero reset for pitot and PDiff sensors
+                - Added pitot velocity calcs
+                - Typecast pins to pin struct from pins.json
+                - Change comparitor for testing pins in initialiseIO 
+                - Added additional checks to initialiseIO
 24112001        - Added Language Template vars to GUI
 24111901        - Added Create-Issue-Branch workflow
                 - General project refactor

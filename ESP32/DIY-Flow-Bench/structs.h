@@ -99,6 +99,8 @@ struct CalibrationData {
   double leak_cal_offset = 0.0;  
   double leak_cal_baseline_rev = 0.0;  
   double leak_cal_offset_rev = 0.0;  
+  double pdiff_cal_offset = 0.0;
+  double pitot_cal_offset = 0.0;
 };
 
 
@@ -190,6 +192,8 @@ struct SensorData {
   double PitotKPA = 0.0;
   double PitotH2O = 0.0;
   double PitotMv = 0.0;
+  double PitotDelta = 0.0;
+  double PitotVelocity = 0.0;
   double Swirl = 0.0;
   double FDiff = 0.0;
   int FDiffType = 1;
@@ -224,41 +228,41 @@ struct ValveLiftData {
  * Pin Data
  ***/
 struct Pins {
-  int VAC_SPEED_PIN;
-  int VAC_BLEED_VALVE_PIN;
-  int VAC_BANK_1_PIN;
-  int VAC_BANK_2_PIN; 
-  int VAC_BANK_3_PIN;
-  int AVO_STEP_PIN;
-  int AVO_DIR_PIN;
-  int FLOW_VALVE_STEP_PIN;
-  int FLOW_VALVE_DIR_PIN;
-  int VCC_3V3_PIN;
-  int VCC_5V_PIN;
-  int SPEED_SENSOR_PIN;
-  int SWIRL_ENCODER_PIN_A;
-  int SWIRL_ENCODER_PIN_B;
-  int ORIFICE_BCD_BIT1_PIN;
-  int ORIFICE_BCD_BIT2_PIN;
-  int ORIFICE_BCD_BIT3_PIN;
-  int MAF_PIN;
-  int REF_PRESSURE_PIN;
-  int DIFF_PRESSURE_PIN;
-  int PITOT_PIN;
-  int TEMPERATURE_PIN;
-  int REF_BARO_PIN;
-  int HUMIDITY_PIN;
-  int SERIAL0_TX_PIN;
-  int SERIAL0_RX_PIN;
-  int SERIAL2_TX_PIN;
-  int SERIAL2_RX_PIN;
-  int SDA_PIN;
-  int SCL_PIN;
-  int SD_CS_PIN;
-  int SD_MOSI_PIN;
-  int SD_MISO_PIN;             
-  int SD_SCK_PIN;
-  int WEMOS_SPARE_PIN_1;
+  int VAC_SPEED_PIN = 99;
+  int VAC_BLEED_VALVE_PIN = 99;
+  int VAC_BANK_1_PIN = 99;
+  int VAC_BANK_2_PIN = 99; 
+  int VAC_BANK_3_PIN = 99;
+  int AVO_STEP_PIN = 99;
+  int AVO_DIR_PIN = 99;
+  int FLOW_VALVE_STEP_PIN = 99;
+  int FLOW_VALVE_DIR_PIN = 99;
+  int VCC_3V3_PIN = 99;
+  int VCC_5V_PIN = 99;
+  int SPEED_SENSOR_PIN = 99;
+  int SWIRL_ENCODER_PIN_A = 99;
+  int SWIRL_ENCODER_PIN_B = 99;
+  int ORIFICE_BCD_BIT1_PIN = 99;
+  int ORIFICE_BCD_BIT2_PIN = 99;
+  int ORIFICE_BCD_BIT3_PIN = 99;
+  int MAF_PIN = 99;
+  int REF_PRESSURE_PIN = 99;
+  int DIFF_PRESSURE_PIN = 99;
+  int PITOT_PIN = 99;
+  int TEMPERATURE_PIN = 99;
+  int REF_BARO_PIN = 99;
+  int HUMIDITY_PIN = 99;
+  int SERIAL0_TX_PIN = 99;
+  int SERIAL0_RX_PIN = 99;
+  int SERIAL2_TX_PIN = 99;
+  int SERIAL2_RX_PIN = 99;
+  int SDA_PIN = 99;
+  int SCL_PIN = 99;
+  int SD_CS_PIN = 99;
+  int SD_MOSI_PIN = 99;
+  int SD_MISO_PIN = 99;             
+  int SD_SCK_PIN = 99;
+  int WEMOS_SPARE_PIN_1 = 99;
 };
 
 
@@ -392,12 +396,12 @@ struct Language {
     char LANG_GUI_MAF_MIN_VOLTS[50] = "MAF Min volts";
     char LANG_GUI_CYCLIC_AVERAGE_BUFFER[50] = "Cyclical Average Buffer";
     char LANG_GUI_CONVERSION_SETTINGS[50] = "Conversion Settings";
-    char LANG_GUI_ADJUSTED_FLOW_DEPRESSION[50] = "Adjusted Flow Depression (in/H2O)";
+    char LANG_GUI_ADJ_FLOW_DEPRESSION[50] = "Adjusted Flow Depression (in/H2O)";
     char LANG_GUI_STANDARD_REF_CONDITIONS[50] = "Standard Reference Conditions (SCFM)";
     char LANG_GUI_STANDARDISED_ADJ_FLOW[50] = "Standardised Adjusted Flow";
     char LANG_GUI_CAL_ORIFICE_SETTINGS[50] = "Calibration Orifice Settings";
     char LANG_GUI_CAL_ORIFICE_FLOW_RATE[50] = "Calibration Orifice Flow Rate (cfm)";
-    char LANG_GUI_CAL_ORIFICE_TEST_PRESSURE[50] = "Calibration Orifice Test Pressure (in/H2O)";
+    char LANG_GUI_CAL_ORIFICE_TEST_PRESS[50] = "Calibration Orifice Test Pressure (in/H2O)";
     char LANG_GUI_ORIFICE_DATA[50] = "Orifice Data";
     char LANG_GUI_ORIFICE1_FLOW[50] = "Orifice #1 Flow Rate (cfm)";
     char LANG_GUI_ORIFICE1_PRESSURE[50] = "Orifice #1 Test Pressure (in/H2O)";
@@ -418,8 +422,8 @@ struct Language {
     char LANG_GUI_CAL_OFFSET[50] = "Calibration Offset (cfm)";
     char LANG_GUI_LEAK_TEST_BASELINE[50] = "Leak Test Baseline (cfm)";
     char LANG_GUI_LEAK_TEST_OFFSET[50] = "Leak Test Offset (cfm)";
-    char LANG_GUI_LEAK_TEST_BASELINE_REVERSE[50] = "Leak Test Baseline (Reverse) (cfm)";
-    char LANG_GUI_LEAK_TEST_OFFSET_REVERSE[50] = "Leak Test Offset (Reverse) (cfm)";
+    char LANG_GUI_LEAK_TEST_BASELINE_REV[50] = "Leak Test Baseline (Reverse) (cfm)";
+    char LANG_GUI_LEAK_TEST_OFFSET_REV[50] = "Leak Test Offset (Reverse) (cfm)";
     char LANG_GUI_OVERWRITE[50] = "Overwrite";  
 
 

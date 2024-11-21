@@ -418,12 +418,19 @@ void API::ParseMessage(char apiMessage) {
           // snprintf(apiResponse, API_RESPONSE_LENGTH, "Z%s%d", config.api_delim , status.mafUnits);
           // _hardware.stepperTest();
 
-          if (status.debug == true) {
-            // snprintf(apiResponse, API_RESPONSE_LENGTH, "Temp: %f Baro: %f RelH: %f \n" , sensorVal.TempDegC, sensorVal.BaroHPA, sensorVal.RelH);
-            snprintf(apiResponse, API_RESPONSE_LENGTH, "Temp: %f Baro: %f RelH: %f \n" , sensorVal.test, sensorVal.BaroHPA, sensorVal.RelH);
-          } else {
-            snprintf(apiResponse, API_RESPONSE_LENGTH, "Temp: %f Baro: %f RelH: %f \n", _sensors.getTempValue(), _sensors.getBaroValue(), _sensors.getRelHValue() );
-          }
+          // BME680 Tests
+          // if (status.debug == true) {
+          //   // snprintf(apiResponse, API_RESPONSE_LENGTH, "Temp: %f Baro: %f RelH: %f \n" , sensorVal.TempDegC, sensorVal.BaroHPA, sensorVal.RelH);
+          //   snprintf(apiResponse, API_RESPONSE_LENGTH, "Temp: %f Baro: %f RelH: %f \n" , sensorVal.test, sensorVal.BaroHPA, sensorVal.RelH);
+          // } else {
+          //   snprintf(apiResponse, API_RESPONSE_LENGTH, "Temp: %f Baro: %f RelH: %f \n", _sensors.getTempValue(), _sensors.getBaroValue(), _sensors.getRelHValue() );
+          // }
+
+
+          // pin assignment tests
+          // _data.loadPinsData();
+          // _data.writeJSONFile();
+
 
       break; // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 

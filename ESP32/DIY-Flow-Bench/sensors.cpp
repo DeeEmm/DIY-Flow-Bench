@@ -22,6 +22,7 @@
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
+#include "calculations.h"
 
 #include <Wire.h>
 #include "hardware.h"
@@ -874,56 +875,110 @@ double Sensors::getPitotVolts() {
 double Sensors::getPitotValue() {
 	
 	extern struct ConfigSettings config;
+	extern struct SensorData sensorVal;
+	extern struct CalibrationData calVal;
 
+	Calculations _calculations;
 	Hardware _hardware;
 
-	double sensorVal = 0.0;
+	double pitotPressure = 0.0;
 	double sensorVolts = this->getPitotVolts();
+	double airDensity = 0.0;
+	double airVelocity = 0.0;
+	double totalPressure = 0.0;
+	double staticPressure = 0.0;	
 	
 	// Convert value to kPa according to sensor type
 	#if defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
 
-		sensorVal = getPitotVolts() * PITOT_ANALOG_SCALE;
+		pitotPressure = getPitotVolts() * PITOT_ANALOG_SCALE;
 	
 	#elif defined PITOT_SENSOR_TYPE_MPXV7007
 		
-		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
-		// sensorVal = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
-		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+		// Vout = Vcc x (0.057 x pitotPressure + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
+		// pitotPressure = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
+		pitotPressure = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
 
 
 	#elif defined PITOT_SENSOR_TYPE_MPXV7025
 
-		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+		pitotPressure = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
 
 
 	#elif defined PITOT_SENSOR_TYPE_XGZP6899A007KPDPN
 
 		// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
-		sensorVal = sensorVolts * 3.5 - 8.75;
+		pitotPressure = sensorVolts * 3.5 - 8.75;
 
 	#elif defined PITOT_SENSOR_TYPE_XGZP6899A010KPDPN
 
 		// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
-		sensorVal = sensorVolts * 5 - 12.5;
+		pitotPressure = sensorVolts * 5 - 12.5;
 
 	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure
 
 		//P: Actual test pressure value, unit (Kpa)
 		//Vout: sensor voltage output value
 		//P = (Vout-0.1)/3.0*300.0-100.0
-		sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;
+		pitotPressure = (sensorVolts-0.1)/3.0*300.0-100.0;
 
 	#else // use fixed value
 
-		sensorVal = 0.0001;
+		pitotPressure = 0.0001;
 
 	#endif
 
+
 	// Lets make sure we have a valid value to return - check it is above minimum threshold
-	double pitotComp = fabs(sensorVal);
+	double pitotComp = fabs(pitotPressure);
 	if (pitotComp > config.min_bench_pressure) { 
-		return sensorVal;
+		return pitotPressure;
+	} else { 
+		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in display)
+	}	
+
+}
+
+
+
+
+
+
+/***********************************************************
+ * @brief get Pitot velocity in m/sec
+ * @returns Pitot velocity in metres per second
+ * @note Default sensor MPXV7007DP - Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
+ ***/
+double Sensors::getPitotVelocity() {
+	
+	extern struct ConfigSettings config;
+	extern struct SensorData sensorVal;
+	extern struct CalibrationData calVal;
+
+	Calculations _calculations;
+
+	double pitotPressure = 0.0;
+	double sensorVolts = this->getPitotVolts();
+	double airDensity = 0.0;
+	double airVelocity = 0.0;
+	double totalPressure = 0.0;
+	double staticPressure = 0.0;	
+	
+	pitotPressure = this->getPitotValue();
+
+	// get air density
+	airDensity = _calculations.calculateAirDensity(sensorVal.TempDegC, sensorVal.BaroKPA, sensorVal.RelH);
+
+	pitotPressure -= calVal.pitot_cal_offset;
+
+	// Convert Pitot pressure to velocity (m3/min)
+	airVelocity = sqrt(2 * (pitotPressure - sensorVal.PRefKPA) / airDensity );
+
+	// Lets make sure we have a valid value to return - check it is above minimum threshold 
+	// TODO - 'borrowing' min_bench_pressure
+	double pitotComp = fabs(airVelocity);
+	if (pitotComp > config.min_bench_pressure) { 
+		return airVelocity;
 	} else { 
 		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in display)
 	}	

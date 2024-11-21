@@ -56,6 +56,7 @@ class Sensors {
 		double getPDiffValue();
 		double getPitotVolts();
 		double getPitotValue();
+		double getPitotVelocity();
 		void mafFreqCountISR();
 		void mafSetupISR(uint8_t irq_pin, void (*ISR_callback)(void), int value);
 

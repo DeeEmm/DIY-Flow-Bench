@@ -283,12 +283,33 @@ function initialiseButtons() {
 
   document.getElementById('FDIFFTYPEDESC').addEventListener('click', function(){
     console.log('Toggle Flow Diff');
-    xhr.open('GET', '/api/fdiff');
+    xhr.open('GET', '/api/fdiff/toggle');
     // xhr.onload = function() {
     //   if (xhr.status === 200) window.location.href = '/';
     // };
     xhr.send();
   });
+
+  document.getElementById('PDIFF').addEventListener('click', function(){
+    console.log('Zero pDiff Value');
+    xhr.open('GET', '/api/pdiff/zero');
+    // xhr.onload = function() {
+    //   if (xhr.status === 200) window.location.href = '/';
+    // };
+    xhr.send();
+  });
+
+  
+  document.getElementById('PITOT').addEventListener('click', function(){
+    console.log('Zero Pitot Value');
+    xhr.open('GET', '/api/pitot/zero');
+    // xhr.onload = function() {
+    //   if (xhr.status === 200) window.location.href = '/';
+    // };
+    xhr.send();
+  });
+
+  
 
   document.getElementById('on-button').addEventListener('click', function(){
     console.log('Bench On');
