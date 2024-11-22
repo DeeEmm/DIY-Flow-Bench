@@ -67,8 +67,6 @@ gulp.task('compress', function(done) {
 	done();
 });
 
-	
-
 gulp.task('html', function() {
 	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
 		.pipe(replace("@@version@@", json.GUI_BUILD_NUMBER))
