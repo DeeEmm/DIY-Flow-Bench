@@ -150,11 +150,11 @@ void Hardware::initaliseIO () {
   // }
    if (pins.SDA_PIN < 99 ) {
     _message.serialPrintf("Input SDA_PIN: %d\n", pins.SDA_PIN );
-    pinMode(pins.SDA_PIN, INPUT);   
+    pinMode(pins.SDA_PIN, INPUT_PULLUP);   
   }
   if (pins.SCL_PIN < 99 ) {
     _message.serialPrintf("Input SCL_PIN: %d\n", pins.SCL_PIN );
-    pinMode(pins.SCL_PIN, INPUT);   
+    pinMode(pins.SCL_PIN, INPUT_PULLUP);   
   }
   #ifdef SD_CARD_IS_ENABLED
   i  if (pins.SD_CS_PIN < 99 ) {
