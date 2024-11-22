@@ -166,7 +166,7 @@ hr {
 	color: #333;
 }
 
-#FDIFFTYPEDESC {
+#FDIFFTYPEDESC, #PDIFF, #PITOT {
   cursor: pointer;
 }
 
