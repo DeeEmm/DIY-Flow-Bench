@@ -1188,11 +1188,11 @@ String Webserver::processTemplate(const String &var)
   // Rounding type
   if (var == "ROUNDING_TYPE_DROPDOWN"){
     if (strstr(String(config.rounding_type).c_str(), String("NONE").c_str())){
-      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE' selected>None</option><option value='INTEGER'>Whole number</option><option value='HALF'>Half value </option></select>");
+      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE' selected>No Rounding</option><option value='INTEGER'>Integer</option><option value='HALF'>Half</option></select>");
     } else if (strstr(String(config.rounding_type).c_str(), String("INTEGER").c_str())) {
-      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>None</option><option value='INTEGER' selected>Whole number</option><option value='HALF'>Half value </option></select>");
+      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>No Rounding</option><option value='INTEGER' selected>Integer</option><option value='HALF'>Half</option></select>");
     } else if (strstr(String(config.rounding_type).c_str(), String("HALF").c_str())){
-      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>None</option><option value='INTEGER'>Whole number</option><option value='HALF' selected>Half value </option></select>");
+      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>No Rounding</option><option value='INTEGER'>Integer</option><option value='HALF' selected>Half</option></select>");
     }
   }
 
@@ -1244,22 +1244,22 @@ String Webserver::processTemplate(const String &var)
   // Flow Decimal type
   if (var == "FLOW_DECIMAL_LENGTH_DROPDOWN"){
     if (strstr(String(config.flow_decimal_length).c_str(), String("0").c_str())){
-      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0' selected>None</option><option value='1'>Tenths</option><option value='2'>Hundredths </option></select>");
+      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0' selected>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
     } else if (strstr(String(config.flow_decimal_length).c_str(), String("1").c_str())) {
-      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0'>None</option><option value='1' selected>Tenths</option><option value='2'>Hundredths </option></select>");
+      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0'>1 Whole</option><option value='1' selected>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
     } else if (strstr(String(config.flow_decimal_length).c_str(), String("2").c_str())){
-      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0'>None</option><option value='1'>Tenths</option><option value='2' selected>Hundredths </option></select>");
+      return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0'>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2' selected>0.01 Hundredths </option></select>");
     }
   }
 
   // General Decimal type
   if (var == "GEN_DECIMAL_LENGTH_DROPDOWN"){
     if (strstr(String(config.gen_decimal_length).c_str(), String("0").c_str())){
-      return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0' selected>None</option><option value='1'>Tenths</option><option value='2'>Hundredths </option></select>");
+      return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0' selected>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
     } else if (strstr(String(config.gen_decimal_length).c_str(), String("1").c_str())) {
-      return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0>None</option><option value='1' selected>Tenths</option><option value='2'>Hundredths </option></select>");
+      return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0>1 Whole</option><option value='1' selected>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
     } else if (strstr(String(config.gen_decimal_length).c_str(), String("2").c_str())){
-      return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0'>None</option><option value='1'>Tenths</option><option value='2' selected>Hundredths </option></select>");
+      return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0'>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2' selected>0.01 Hundredths </option></select>");
     }
   }
 
