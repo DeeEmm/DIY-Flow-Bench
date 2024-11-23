@@ -716,51 +716,51 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
   switch (switchval) {
 
     case 1:
-      valveData.LiftData1 = sensorVal.FlowCFM;
+      valveData.LiftData1 = flowValue;
       break;
 
     case 2:
-      valveData.LiftData2 = sensorVal.FlowCFM;
+      valveData.LiftData2 = flowValue;
       break;
 
     case 3:
-      valveData.LiftData3 = sensorVal.FlowCFM;
+      valveData.LiftData3 = flowValue;
       break;
 
     case 4:
-      valveData.LiftData4 = sensorVal.FlowCFM;
+      valveData.LiftData4 = flowValue;
       break;
 
     case 5:
-      valveData.LiftData5 = sensorVal.FlowCFM;
+      valveData.LiftData5 = flowValue;
       break;
 
     case 6:
-      valveData.LiftData6 = sensorVal.FlowCFM;
+      valveData.LiftData6 = flowValue;
       break;
 
     case 7:
-      valveData.LiftData7 = sensorVal.FlowCFM;
+      valveData.LiftData7 = flowValue;
       break;
 
     case 8:
-      valveData.LiftData8 = sensorVal.FlowCFM;
+      valveData.LiftData8 = flowValue;
       break;
 
     case 9:
-      valveData.LiftData9 = sensorVal.FlowCFM;
+      valveData.LiftData9 = flowValue;
       break;
 
     case 10:
-      valveData.LiftData10 = sensorVal.FlowCFM;
+      valveData.LiftData10 = flowValue;
       break;
 
     case 11:
-      valveData.LiftData11 = sensorVal.FlowCFM;
+      valveData.LiftData11 = flowValue;
       break;
 
     case 12:
-      valveData.LiftData12 = sensorVal.FlowCFM;
+      valveData.LiftData12 = flowValue;
       break;
   }
 
