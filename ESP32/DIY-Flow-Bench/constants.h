@@ -113,6 +113,14 @@
 #define ISO_13443 4
 #define ISO_2533 5
 
+/***********************************************************
+ * Capture Datatypes
+ ***/
+#define ACFM 1
+#define STD_ACFM 2
+#define ADJ_ACFM 3
+#define ADJ_STD_ACFM 4
+#define MAF 5
 
 
 /***********************************************************

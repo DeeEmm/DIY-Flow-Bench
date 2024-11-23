@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24112301        - #158 Add capture datatype selection
 24112203        - #212 Changed Modal Headers
 24112202        - #212 Change info modal to two column layout
 24112201        - #244 simplification of resolution / accuracy

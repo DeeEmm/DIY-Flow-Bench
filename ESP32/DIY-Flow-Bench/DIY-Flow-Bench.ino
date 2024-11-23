@@ -101,6 +101,7 @@ void TASKgetSensorData( void * parameter ){
   extern struct DeviceStatus status;
   extern struct SensorData sensorVal;
   extern struct CalibrationData calVal;
+  extern struct ConfigSettings config;
   
   Sensors _sensors;
 
@@ -212,6 +213,7 @@ void TASKgetSensorData( void * parameter ){
         } else {
           sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, config.adj_flow_depression, sensorVal.FlowCFM);
         }
+        sensorVal.FlowADJSCFM = _calculations.convertToSCFM(sensorVal.FlowADJ, config.standardReference );
         #endif
 
         #ifdef PDIFF_IS_ENABLED
