@@ -421,7 +421,7 @@ double Calculations::calculateAirDensity(double TempC, double refPressurePascals
  * @note Default standard for project is ISO 1585 - Automotive engine testing
  ***/
 
-double Calculations::convertToSCFM(double ACFM, int standard) {
+double Calculations::convertToSCFM(double flowCFM, int standard) {
   
   extern struct SensorData sensorVal; 
 
@@ -479,7 +479,8 @@ double Calculations::convertToSCFM(double ACFM, int standard) {
   airDensityAct = calculateAirDensity(sensorVal.TempDegC, sensorVal.BaroPA , sensorVal.RelH);
   airDensityStd = calculateAirDensity(tStd, convertPressure(pStd,PASCALS) , rhStd);
 
-  SCFM = sensorVal.FlowCFM * (airDensityAct / airDensityStd);
+  // SCFM = sensorVal.FlowCFM * (airDensityAct / airDensityStd);
+  SCFM = flowCFM * (airDensityAct / airDensityStd);
 
   return SCFM;
   

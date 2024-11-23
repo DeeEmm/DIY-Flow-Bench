@@ -660,12 +660,15 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
   StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
   extern struct SensorData sensorVal;
   extern struct ValveLiftData valveData;
+  extern struct ConfigSettings settings;
+  
   String jsonString;
   String liftPoint;
   int switchval;
   char *end;
   int params = request->params();
   const char* PARAM_INPUT = "lift-data";
+  double flowValue;
 
   _message.debugPrintf("Saving Lift Data...\n");
 
@@ -679,6 +682,33 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
         }
 
   }
+
+
+  // Get flow value based on capture Datatype
+  switch (settings.data_capture_datatype) {
+
+    case ACFM:
+      flowValue = sensorVal.FlowCFM;
+    break;
+    
+    case STD_ACFM:
+      flowValue = sensorVal.FlowSCFM;
+    break;
+    
+    case ADJ_ACFM:
+      flowValue = sensorVal.FlowADJ;
+    break;
+    
+    case ADJ_STD_ACFM:
+      flowValue = sensorVal.FlowADJSCFM;
+    break;
+    
+    case MAF:
+      flowValue = sensorVal.FlowKGH;
+    break;
+        
+  }
+
 
 
   switchval = strtol(liftPoint.c_str(), &end, 10); // convert std::str to int
@@ -910,7 +940,7 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_WIFI_AP_PASS") return language.LANG_GUI_WIFI_AP_PASS;
   if (var == "LANG_GUI_HOSTNAME") return language.LANG_GUI_HOSTNAME;
   if (var == "LANG_GUI_WIFI_TIMEOUT") return language.LANG_GUI_WIFI_TIMEOUT;
-  if (var == "LANG_GUI_BENCH_SETTINGS") return language.LANG_GUI_BENCH_SETTINGS;
+  if (var == "LANG_GUI_GENERAL_SETTINGS") return language.LANG_GUI_GENERAL_SETTINGS;
   if (var == "LANG_GUI_BENCH_TYPE") return language.LANG_GUI_BENCH_TYPE;
   if (var == "LANG_GUI_MAF_HOUSING_DIAMETER") return language.LANG_GUI_MAF_HOUSING_DIAMETER;
   if (var == "LANG_GUI_REFRESH_RATE") return language.LANG_GUI_REFRESH_RATE;
@@ -958,7 +988,15 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_LEAK_TEST_BASELINE_REV") return language.LANG_GUI_LEAK_TEST_BASELINE_REV;
   if (var == "LANG_GUI_LEAK_TEST_OFFSET_REV") return language.LANG_GUI_LEAK_TEST_OFFSET_REV;
   if (var == "LANG_GUI_OVERWRITE") return language.LANG_GUI_OVERWRITE;
-
+  if (var == "LANG_GUI_DATA_CAPTURE_SETTINGS") return language.LANG_GUI_DATA_CAPTURE_SETTINGS;
+  if (var == "LANG_GUI_CAPTURE_DATATYPE") return language.LANG_GUI_CAPTURE_DATATYPE;
+  if (var == "MAF_FLOW_UNIT") {
+      if (status.mafUnits == KG_H) {
+        return "kg/h";
+      } else {
+        return "mg/s";
+      }
+  }
 
   
   
@@ -1215,7 +1253,7 @@ String Webserver::processTemplate(const String &var)
   if (var == "STD_REF_5" && config.standardReference == 5) return String("selected");
 
 
-  if (var == "STD_REF" ) {
+  if (var == "STD_REF"  || var == "STANDARD_FLOW") {
     // Standard reference
     switch (config.standardReference) {
 
