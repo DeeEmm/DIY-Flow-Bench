@@ -1,5 +1,5 @@
 {
-    "BOARD_TYPE" : "esp32-s3-devkitc99",
+    "BOARD_TYPE" : "esp32-s3-devkitc",
     "VAC_SPEED_PIN" : 99, 
     "VAC_BLEED_VALVE_PIN" : 99,
     "VAC_BANK_1_PIN" : 99,
