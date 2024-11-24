@@ -167,6 +167,18 @@ hr {
 	color: #333;
 }
 
+.pitot-tile-value {
+	font-size: 2.1rem;
+	font-weight: bold;
+	color: ~PITOT_COLOUR~;
+}
+
+.differential-tile-value {
+	font-size: 2.1rem;
+	font-weight: bold;
+	color: ~PDIFF_COLOUR~;
+}
+
 #FDIFFTYPEDESC, #PDIFF, #PITOT {
   cursor: pointer;
 }

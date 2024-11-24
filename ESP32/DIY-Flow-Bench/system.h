@@ -68,6 +68,11 @@ using namespace std;
 ***/
 #define STATUS_UPDATE_RATE 500                              // time between SSE push in milliseconds
 
+#define GUI_COLOUR_UNSET "pink"
+#define GUI_COLOUR_SET "#44b112"
+#define GUI_COLOUR_ERROR "red"
+
+
 
 #ifndef MAJOR_VERSION 
 #error MAJOR_VERSION UNDEFINED
