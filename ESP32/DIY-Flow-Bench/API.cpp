@@ -142,8 +142,8 @@ void API::ParseMessage(char apiMessage) {
   5 : 5V Voltage Value
   B : Barometric Pressure
   C : Flow Offset Calibration
-  D : MAF data max value
-  d : MAF data key max value
+  D : Differential Pressure value
+  d : Differential Pressure voltage
   E : Enum1
   F : Flow Value in CFM
   f : Flow Value in KG/H
@@ -159,6 +159,8 @@ void API::ParseMessage(char apiMessage) {
   m : MAF Voltage
   N : Hostname
   o : Active Orifice
+  Q : MAF Data Max Value
+  q : MAF Data Key Max Value
   R : Reference Pressure Value
   r : Reference Pressure Voltage
   S : WiFi SSID
@@ -209,12 +211,12 @@ void API::ParseMessage(char apiMessage) {
           // TODO: confirm Flow Offset Calibration success in response
       break;      
 
-      case 'D': // mafdata max value
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%u", config.api_delim , status.mafDataValMax);
+      case 'D': // Differential Pressure value
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%u", config.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INH2O));
       break;      
 
-      case 'd': // mafdata max key value
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%u", config.api_delim , status.mafDataKeyMax);
+      case 'd': // Differential pressure sensor voltage
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%u", config.api_delim , sensorVal.PDiffMv);
       break;      
 
       case 'E': // Enum - Flow:Ref:Temp:Humidity:Baro
@@ -295,6 +297,15 @@ void API::ParseMessage(char apiMessage) {
       case 'o': // Active orifice  'O\r\n'        
           snprintf(apiResponse, API_RESPONSE_LENGTH, "o%s%s", config.api_delim , status.activeOrifice);
       break;      
+
+      case 'Q': // mafdata max value
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "Q%s%u", config.api_delim , status.mafDataValMax);
+      break;      
+
+      case 'q': // mafdata max key value
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "q%s%u", config.api_delim , status.mafDataKeyMax);
+      break;      
+
 
       case 'R': // Get measured Reference Pressure 'R.123.45\r\n'
           snprintf(apiResponse, API_RESPONSE_LENGTH, "R%s%f", config.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INH2O));

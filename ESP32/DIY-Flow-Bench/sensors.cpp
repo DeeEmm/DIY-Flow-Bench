@@ -969,8 +969,6 @@ double Sensors::getPitotVelocity() {
 	// get air density
 	airDensity = _calculations.calculateAirDensity(sensorVal.TempDegC, sensorVal.BaroKPA, sensorVal.RelH);
 
-	pitotPressure -= calVal.pitot_cal_offset;
-
 	// Convert Pitot pressure to velocity (m3/min)
 	// airVelocity = sqrt(2 * (pitotPressure - sensorVal.PRefKPA) / airDensity );
 	airVelocity = sqrt(2 * (pitotPressure) / airDensity );
