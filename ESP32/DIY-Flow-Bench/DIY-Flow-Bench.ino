@@ -101,6 +101,7 @@ void TASKgetSensorData( void * parameter ){
   extern struct DeviceStatus status;
   extern struct SensorData sensorVal;
   extern struct CalibrationData calVal;
+  extern struct ConfigSettings config;
   
   Sensors _sensors;
 
@@ -213,6 +214,7 @@ void TASKgetSensorData( void * parameter ){
         } else {
           sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, config.adj_flow_depression, sensorVal.FlowCFM);
         }
+        sensorVal.FlowADJSCFM = _calculations.convertToSCFM(sensorVal.FlowADJ, config.standardReference );
         #endif
 
         #ifdef PDIFF_IS_ENABLED
@@ -221,8 +223,8 @@ void TASKgetSensorData( void * parameter ){
         #endif
 
         #ifdef PITOT_IS_ENABLED
-        sensorVal.PitotKPA = _sensors.getPitotValue();
-        sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O);
+        sensorVal.PitotKPA = _sensors.getPitotValue() - calVal.pitot_cal_offset;
+        sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O) ;
         sensorVal.PitotVelocity = _sensors.getPitotVelocity();
         #endif
 
@@ -268,7 +270,11 @@ void TASKgetEnviroData( void * parameter ){
         status.bmePollTimer = millis() + BME280_SCAN_DELAY_MS; // Only reset timer when task executes
         
         sensorVal.TempDegC = _sensors.getTempValue();
-        _message.debugPrintf("BME680 refTempDegC_INT: %d",sensorVal.test );
+
+        // TEST BME commissioning
+        // _message.debugPrintf("BME680 refTempDegC_INT: %d",sensorVal.test );
+        // REMEMBER NO BREAKING TASKS WITHIN INTTERUPT ROUTINES (LIKE SERIAL PRINT)
+        
         sensorVal.TempDegF = _calculations.convertTemperature(_sensors.getTempValue(), DEGF);
         sensorVal.BaroHPA = _sensors.getBaroValue();
         sensorVal.BaroPA = sensorVal.BaroHPA * 100.00F;

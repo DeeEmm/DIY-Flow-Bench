@@ -213,15 +213,27 @@ bool Calibration::setPdiffCalOffset() {
   extern struct CalibrationData calVal;
   extern struct Language language;
   extern struct SensorData sensorVal;
+  extern struct DeviceStatus status;
   
   Sensors _sensors; 
   Calculations _calculations;
   Messages _message;
  
-  calVal.pdiff_cal_offset = sensorVal.PDiffH2O;
-  
-  _message.debugPrintf("Calibration::setPdiffOffset $ \n", calVal.pdiff_cal_offset);
+ 
+  if (calVal.pdiff_cal_offset == 0) {
+    // update config var
+    calVal.pdiff_cal_offset = sensorVal.PDiffH2O;
+    _message.debugPrintf("Calibration::setPdiffOffset %d \n", calVal.pdiff_cal_offset);
+  } else {
+    // update config var
+    calVal.pdiff_cal_offset = 0.0;
+    _message.debugPrintf("Calibration::resetPdiffOffset %d \n", 0.0);
+  }
 
+ 
+ 
+ 
+ 
   saveCalibrationData();    
 
   // _message.Handler(language.LANG_CAL_OFFET_VALUE + calVal.flow_offset);
@@ -251,8 +263,8 @@ double Calibration::getPdiffCalOffset() {
 
 
 /***********************************************************
-* Zero pDiff value
-* 
+* Zero Pitot value
+*  
 ***/
 bool Calibration::setPitotCalOffset() {
 
@@ -260,15 +272,22 @@ bool Calibration::setPitotCalOffset() {
   extern struct CalibrationData calVal;
   extern struct Language language;
   extern struct SensorData sensorVal;
+  extern struct DeviceStatus status;
   
   Sensors _sensors; 
   Calculations _calculations;
   Messages _message;
  
-  // update config var
-  calVal.pitot_cal_offset = sensorVal.PitotKPA;
-  
-  _message.debugPrintf("Calibration::setPitotDeltaOffset $ \n", calVal.flow_offset);
+
+  if (calVal.pitot_cal_offset == 0) {
+    // update config var
+    calVal.pitot_cal_offset = sensorVal.PitotKPA;
+    _message.debugPrintf("Calibration::setPitotDeltaOffset %d kPa\n", calVal.pitot_cal_offset);
+  } else {
+    // update config var
+    calVal.pitot_cal_offset = 0.0;
+    _message.debugPrintf("Calibration::resetPitotDeltaOffset %d \n", 0.0);
+  }
 
   saveCalibrationData();    
 
@@ -321,8 +340,8 @@ void Calibration::saveCalibrationData() {
   calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
   calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
   calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
-  calData["PDIFF_CAL_OFFSET"] = calVal.leak_cal_offset;
-  calData["PITOT_CAL_OFFSET"] = calVal.leak_cal_offset_rev;
+  calData["PDIFF_CAL_OFFSET"] = calVal.pitot_cal_offset;
+  calData["PITOT_CAL_OFFSET"] = calVal.pdiff_cal_offset;
 
   _message.Handler(language.LANG_SAVING_CALIBRATION);
   

@@ -866,6 +866,7 @@ String DataHandler::getDataJSON()
   extern struct DeviceStatus status;
   extern struct ConfigSettings config;
   extern struct SensorData sensorVal;
+  extern struct CalibrationData calVal;
 
   Hardware _hardware;
   Calculations _calculations;
@@ -963,10 +964,23 @@ String DataHandler::getDataJSON()
   dataJson["RELH"] = sensorVal.RelH;
 
   // Pitot
-  dataJson["PITOT"] = sensorVal.PitotH2O;
+  dataJson["PITOT"] = sensorVal.PitotVelocity;
+  dataJson["PITOT_DELTA"] = fabs(round(sensorVal.PitotDelta));
+  
+  if (calVal.pitot_cal_offset == 0) {
+    dataJson["PITOT_COLOUR"] = GUI_COLOUR_UNSET;
+  } else {
+    dataJson["PITOT_COLOUR"] = GUI_COLOUR_SET;
+  }
 
   // Differential pressure
   dataJson["PDIFF"] = sensorVal.PDiffH2O;
+  
+  if (calVal.pdiff_cal_offset == 0) {
+    dataJson["PDIFF_COLOUR"] =  GUI_COLOUR_UNSET;
+  } else {
+    dataJson["PDIFF_COLOUR"] =  GUI_COLOUR_SET;
+  }
 
   // Swirl (+/- rpm)
   dataJson["SWIRL"] = sensorVal.Swirl;

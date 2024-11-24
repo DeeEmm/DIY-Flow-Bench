@@ -218,7 +218,7 @@
           </div>
           <div class="tile tile-pdiff" id="tile-pdiff">
             <p class="tile-title" id="tile-pdiff-title">~LANG_GUI_PDIFF~</p>
-            <p><span class="tile-value" id="PDIFF">&nbsp;</span></p>
+            <p><span class="differential-tile-value" id="PDIFF">&nbsp;</span></p>
             <p class="units">inH2O</p>
           </div>
           <div class="tile tile-flow" id="flow-tile">
@@ -243,8 +243,8 @@
           </div>
           <div class="tile tile-pitot" id="tile-pitot">
             <p class="tile-title" id="tile-pitot-title">~LANG_GUI_PITOT~</p>
-            <p><span class="tile-value" id="PITOT">&nbsp;</span></p>
-            <p class="units">m/sec &Delta; <span id="PITOT_DELTA">~PITOT_DELTA~</span>&nbsp;inH2O</p>
+            <p><span class="pitot-tile-value" id="PITOT">&nbsp;</span></p>
+            <p class="units">m/sec &Delta; (<span id="PITOT_DELTA">~PITOT_DELTA~</span>&nbsp;inH2O)</p>
           </div>
           <div class="tile tile-swirl" id="tile-swirl">
             <p class="tile-title" id="tile-swirl-title">~LANG_GUI_SWIRL~</p>
@@ -485,10 +485,10 @@
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_HOSTNAME~:</label>&nbsp;<input type="text" id="CONF_HOSTNAME" name="CONF_HOSTNAME" value="~CONF_HOSTNAME~" class="config-text"><span class="tooltiptext">DNS Hostname (used for connecting via URL e.g. http://diyfb.local)</span></div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_WIFI_TIMEOUT~:</label>&nbsp;<input type="text" id="CONF_WIFI_TIMEOUT" name="CONF_WIFI_TIMEOUT" value="~CONF_WIFI_TIMEOUT~" class="config-text"><span class="tooltiptext">Number of milliseconds before WiFi retries connection</span></div>
           <br>
-          <h3>~LANG_GUI_BENCH_SETTINGS~</h3>
+          <h3>~LANG_GUI_GENERAL_SETTINGS~</h3>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_BENCH_TYPE~:</label><span>~BENCH_TYPE_DROPDOWN~</span><span class="tooltiptext">Select bench type</span></div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_MAF_HOUSING_DIAMETER~:</label>&nbsp;<input type="text" id="CONF_MAF_HOUSING_DIAMETER" name="CONF_MAF_HOUSING_DIAMETER" value="~CONF_MAF_HOUSING_DIAMETER~" class="config-text"><span class="tooltiptext">Diameter of MAF Housing. (Leave as zero to use standard housing diameter)</span></div>
-          <div class="config-row tooltip"><label class="config-label">~LANG_GUI_REFRESH_RATE:~</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="~CONF_REFRESH_RATE~" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
+          <div class="config-row tooltip"><label class="config-label">~LANG_GUI_REFRESH_RATE~:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="~CONF_REFRESH_RATE~" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_TEMPERATURE_UNIT~:</label><span>~TEMPERATURE_DROPDOWN~</span><span class="tooltiptext">Display unit of temperature</span></div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_VALVE_LIFT_INTERVAL~:</label>&nbsp;<input type="text" id="VALVE_LIFT_INTERVAL" name="VALVE_LIFT_INTERVAL" value="~VALVE_LIFT_INTERVAL~" class="config-text"><span class="tooltiptext">Distance between valve lift data points</span></div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_DATA_GRAPH_MAX_VALUE~:</label>
@@ -536,6 +536,19 @@
             <span class="tooltiptext">Standardised Temp, baro and humidity conditions.</span>
           </div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_STANDARDISED_ADJ_FLOW~:</label>&nbsp;<input type="checkbox" id="STD_ADJ_FLOW" name="STD_ADJ_FLOW" value="1" ~STD_ADJ_FLOW~ class="config-text"><span class="tooltiptext">Adjusted flow uses SCFM</span></div>
+          <br>
+          <h3>~LANG_GUI_DATA_CAPTURE_SETTINGS~</h3>
+          <div class="config-row tooltip"><label class="config-label">~LANG_GUI_CAPTURE_DATATYPE~:</label>
+            <select name='DATA_COLLECTION_STANDARD' class='config-select'>
+              <option value='1' ~CAP_MODE_1~>Flow (ACFM)</option>
+              <option value='1' ~CAP_MODE_2~>Standard Flow (ACFM - ~STANDARD_FLOW~)</option>
+              <option value='2' ~CAP_MODE_3~>Adjusted Flow (ACFM @ ~ADJ_FLOW_DEPRESSION~ in/H2O)</option>
+              <option value='3' ~CAP_MODE_4~>Adjusted Standard Flow (ACFM - ~STANDARD_FLOW~ @ ~ADJ_FLOW_DEPRESSION~ in/H2O)</option>
+              <option value='4' ~CAP_MODE_5~>MAF Flow (~MAF_FLOW_UNIT~)</option>
+            </select>
+            <span class="tooltiptext">Default data type for data capture.</span>
+          </div>
+
           <br>
           <h3>~LANG_GUI_CAL_ORIFICE_SETTINGS~</h3>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_CAL_ORIFICE_FLOW_RATE~:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="~CONF_CAL_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice in cfm</span></div>

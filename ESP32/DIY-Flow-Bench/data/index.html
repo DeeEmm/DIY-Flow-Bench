@@ -173,6 +173,18 @@ hr {
 	color: #333;
 }
 
+.pitot-tile-value {
+	font-size: 2.1rem;
+	font-weight: bold;
+	color: ~PITOT_COLOUR~;
+}
+
+.differential-tile-value {
+	font-size: 2.1rem;
+	font-weight: bold;
+	color: ~PDIFF_COLOUR~;
+}
+
 #FDIFFTYPEDESC, #PDIFF, #PITOT {
   cursor: pointer;
 }
@@ -885,7 +897,7 @@ svg .dataCircle:hover {
             <hr>
             <div class="config-row"><label class="config-label">~LANG_GUI_VERSION~: </label><span class="config-value" id="RELEASE">~RELEASE~</span></div>
             <div class="config-row"><label class="config-label">~LANG_GUI_BUILD~:  </label><span class="config-value" id="BUILD_NUMBER">~BUILD_NUMBER~</span></div>
-            <div class="config-row"><label class="config-label">~LANG_GUI_GUI~: </label><span class="config-value" id="VERSION">24112203</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_GUI~: </label><span class="config-value" id="VERSION">24112402</span></div>
             <h4>~LANG_GUI_STORAGE~</h4>
             <hr>
             <div class="config-row"><label class="config-label">~LANG_GUI_MEM_SIZE~:  </label><span class="config-value" id="SPIFFS_MEM_SIZE">~SPIFFS_MEM_SIZE~</span> (bytes)</div>
@@ -940,7 +952,7 @@ svg .dataCircle:hover {
           </div>
           <div class="tile tile-pdiff" id="tile-pdiff">
             <p class="tile-title" id="tile-pdiff-title">~LANG_GUI_PDIFF~</p>
-            <p><span class="tile-value" id="PDIFF">&nbsp;</span></p>
+            <p><span class="differential-tile-value" id="PDIFF">&nbsp;</span></p>
             <p class="units">inH2O</p>
           </div>
           <div class="tile tile-flow" id="flow-tile">
@@ -965,8 +977,8 @@ svg .dataCircle:hover {
           </div>
           <div class="tile tile-pitot" id="tile-pitot">
             <p class="tile-title" id="tile-pitot-title">~LANG_GUI_PITOT~</p>
-            <p><span class="tile-value" id="PITOT">&nbsp;</span></p>
-            <p class="units">m/sec &Delta; <span id="PITOT_DELTA">~PITOT_DELTA~</span>&nbsp;inH2O</p>
+            <p><span class="pitot-tile-value" id="PITOT">&nbsp;</span></p>
+            <p class="units">m/sec &Delta; (<span id="PITOT_DELTA">~PITOT_DELTA~</span>&nbsp;inH2O)</p>
           </div>
           <div class="tile tile-swirl" id="tile-swirl">
             <p class="tile-title" id="tile-swirl-title">~LANG_GUI_SWIRL~</p>
@@ -1207,10 +1219,10 @@ svg .dataCircle:hover {
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_HOSTNAME~:</label>&nbsp;<input type="text" id="CONF_HOSTNAME" name="CONF_HOSTNAME" value="~CONF_HOSTNAME~" class="config-text"><span class="tooltiptext">DNS Hostname (used for connecting via URL e.g. http://diyfb.local)</span></div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_WIFI_TIMEOUT~:</label>&nbsp;<input type="text" id="CONF_WIFI_TIMEOUT" name="CONF_WIFI_TIMEOUT" value="~CONF_WIFI_TIMEOUT~" class="config-text"><span class="tooltiptext">Number of milliseconds before WiFi retries connection</span></div>
           <br>
-          <h3>~LANG_GUI_BENCH_SETTINGS~</h3>
+          <h3>~LANG_GUI_GENERAL_SETTINGS~</h3>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_BENCH_TYPE~:</label><span>~BENCH_TYPE_DROPDOWN~</span><span class="tooltiptext">Select bench type</span></div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_MAF_HOUSING_DIAMETER~:</label>&nbsp;<input type="text" id="CONF_MAF_HOUSING_DIAMETER" name="CONF_MAF_HOUSING_DIAMETER" value="~CONF_MAF_HOUSING_DIAMETER~" class="config-text"><span class="tooltiptext">Diameter of MAF Housing. (Leave as zero to use standard housing diameter)</span></div>
-          <div class="config-row tooltip"><label class="config-label">~LANG_GUI_REFRESH_RATE:~</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="~CONF_REFRESH_RATE~" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
+          <div class="config-row tooltip"><label class="config-label">~LANG_GUI_REFRESH_RATE~:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="~CONF_REFRESH_RATE~" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_TEMPERATURE_UNIT~:</label><span>~TEMPERATURE_DROPDOWN~</span><span class="tooltiptext">Display unit of temperature</span></div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_VALVE_LIFT_INTERVAL~:</label>&nbsp;<input type="text" id="VALVE_LIFT_INTERVAL" name="VALVE_LIFT_INTERVAL" value="~VALVE_LIFT_INTERVAL~" class="config-text"><span class="tooltiptext">Distance between valve lift data points</span></div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_DATA_GRAPH_MAX_VALUE~:</label>
@@ -1258,6 +1270,19 @@ svg .dataCircle:hover {
             <span class="tooltiptext">Standardised Temp, baro and humidity conditions.</span>
           </div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_STANDARDISED_ADJ_FLOW~:</label>&nbsp;<input type="checkbox" id="STD_ADJ_FLOW" name="STD_ADJ_FLOW" value="1" ~STD_ADJ_FLOW~ class="config-text"><span class="tooltiptext">Adjusted flow uses SCFM</span></div>
+          <br>
+          <h3>~LANG_GUI_DATA_CAPTURE_SETTINGS~</h3>
+          <div class="config-row tooltip"><label class="config-label">~LANG_GUI_CAPTURE_DATATYPE~:</label>
+            <select name='DATA_COLLECTION_STANDARD' class='config-select'>
+              <option value='1' ~CAP_MODE_1~>Flow (ACFM)</option>
+              <option value='1' ~CAP_MODE_2~>Standard Flow (ACFM - ~STANDARD_FLOW~)</option>
+              <option value='2' ~CAP_MODE_3~>Adjusted Flow (ACFM @ ~ADJ_FLOW_DEPRESSION~ in/H2O)</option>
+              <option value='3' ~CAP_MODE_4~>Adjusted Standard Flow (ACFM - ~STANDARD_FLOW~ @ ~ADJ_FLOW_DEPRESSION~ in/H2O)</option>
+              <option value='4' ~CAP_MODE_5~>MAF Flow (~MAF_FLOW_UNIT~)</option>
+            </select>
+            <span class="tooltiptext">Default data type for data capture.</span>
+          </div>
+
           <br>
           <h3>~LANG_GUI_CAL_ORIFICE_SETTINGS~</h3>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_CAL_ORIFICE_FLOW_RATE~:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="~CONF_CAL_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice in cfm</span></div>
@@ -1358,7 +1383,10 @@ if (!!window.EventSource) {
         try {
           if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
           // We've got a string...
-          document.getElementById(key).innerHTML = myObj[key];
+            if (key === 'PITOT_COLOUR' || key === 'PDIFF_COLOUR' ){
+            } else {
+              document.getElementById(key).innerHTML = myObj[key];
+            }
  
           } else {
            // we've not got a string... 
@@ -1414,7 +1442,13 @@ if (!!window.EventSource) {
       // Get data filter type
       var dataFilterType = myObj["DATA_FILTER_TYPE"];
 
+      // Get Pitot Tile status colours
+      var pitotTileColour = myObj["PITOT_COLOUR"];
+      document.getElementById('PITOT').style.color=pitotTileColour;
 
+      // Get pDiff tile tatus colours
+      var pDiffTileColour = myObj["PDIFF_COLOUR"];
+      document.getElementById('PDIFF').style.color=pDiffTileColour;
     }
 
   }, false);
@@ -1471,7 +1505,83 @@ function onLoad(event) {
       
     
   }
- 
+
+  // Set tile status on page reload from cookie data
+  var tileStatus = getCookie('pressure-tile');
+  
+  switch (tileStatus) {
+
+    case "pdiff":
+      document.getElementById('tile-pref').style.display='none';
+      document.getElementById('tile-pdiff').style.display='block';
+    break;
+
+    case "pref":
+      document.getElementById('tile-pref').style.display='block';
+      document.getElementById('tile-pdiff').style.display='none';
+    break;
+
+  }
+
+  var tileStatus = getCookie('flow-tile');
+
+  switch (tileStatus){
+
+    case "flow":
+      document.getElementById('flow-tile').style.display='block';
+      document.getElementById('aflow-tile').style.display='none';
+      document.getElementById('sflow-tile').style.display='none';
+      document.getElementById('maf-tile').style.display='none';
+    break;
+
+    case "aflow":
+      document.getElementById('flow-tile').style.display='none';
+      document.getElementById('aflow-tile').style.display='block';
+      document.getElementById('sflow-tile').style.display='none';
+      document.getElementById('maf-tile').style.display='none';
+    break;
+
+    case "sflow":
+      document.getElementById('flow-tile').style.display='none';
+      document.getElementById('aflow-tile').style.display='none';
+      document.getElementById('sflow-tile').style.display='block';
+      document.getElementById('maf-tile').style.display='none';
+    break;
+
+    case "maf":
+      document.getElementById('flow-tile').style.display='none';
+      document.getElementById('aflow-tile').style.display='none';
+      document.getElementById('sflow-tile').style.display='none';
+      document.getElementById('maf-tile').style.display='block';
+    break;
+
+  }
+
+
+  var tileStatus = getCookie('tool-tile');
+
+  switch (tileStatus){
+
+    case "pitot":
+      document.getElementById('tile-pitot').style.display='block';
+      document.getElementById('tile-swirl').style.display='none';
+      document.getElementById('tile-fdiff').style.display='none';
+    break;
+
+    case "swirl":
+      document.getElementById('tile-pitot').style.display='none';
+      document.getElementById('tile-swirl').style.display='block';
+      document.getElementById('tile-fdiff').style.display='none';
+    break;
+
+    case "fdiff":
+      document.getElementById('tile-pitot').style.display='none';
+      document.getElementById('tile-swirl').style.display='none';
+      document.getElementById('tile-fdiff').style.display='block';
+    break;
+  
+  }
+
   console.log('Page Loaded');
   
 }
@@ -1544,50 +1654,63 @@ function initialiseButtons() {
     document.getElementById('updateModal').style.display='block';
   });
 
+  // Pressure tile
   document.getElementById('tile-pref-title').addEventListener('click', function(){
     document.getElementById('tile-pref').style.display='none';
     document.getElementById('tile-pdiff').style.display='block';
+    setCookie("pressure-tile","pdiff","365")    
   });
 
   document.getElementById('tile-pdiff-title').addEventListener('click', function(){
     document.getElementById('tile-pdiff').style.display='none';
     document.getElementById('tile-pref').style.display='block';
+    setCookie("pressure-tile","pref","365")
   });
 
+  // flow tile
   document.getElementById('flow-tile-title').addEventListener('click', function(){
     document.getElementById('flow-tile').style.display='none';
     document.getElementById('aflow-tile').style.display='block';
+    setCookie("flow-tile","aflow","365")    
   });
 
   document.getElementById('aflow-tile-title').addEventListener('click', function(){
     document.getElementById('aflow-tile').style.display='none';
     document.getElementById('sflow-tile').style.display='block';
+    setCookie("flow-tile","sflow","365")    
   });
 
   document.getElementById('sflow-tile-title').addEventListener('click', function(){
     document.getElementById('sflow-tile').style.display='none';
     document.getElementById('maf-tile').style.display='block';
+    setCookie("flow-tile","maf","365")    
   });
 
   document.getElementById('maf-tile-title').addEventListener('click', function(){
     document.getElementById('maf-tile').style.display='none';
     document.getElementById('flow-tile').style.display='block';
+    setCookie("flow-tile","flow","365")    
   });
+
+  // Tool tile
   document.getElementById('tile-pitot-title').addEventListener('click', function(){
     document.getElementById('tile-pitot').style.display='none';
     document.getElementById('tile-swirl').style.display='block';
-
+    setCookie("tool-tile","swirl","365")    
   });
 
   document.getElementById('tile-swirl-title').addEventListener('click', function(){
     document.getElementById('tile-swirl').style.display='none';
     document.getElementById('tile-fdiff').style.display='block';
+    setCookie("tool-tile","fdiff","365")    
   });
 
   document.getElementById('tile-fdiff-title').addEventListener('click', function(){
     document.getElementById('tile-fdiff').style.display='none';
     document.getElementById('tile-pitot').style.display='block';
+    setCookie("tool-tile","pitot","365")    
   });
+
 
   document.getElementById('FDIFFTYPEDESC').addEventListener('click', function(){
     console.log('Toggle Flow Diff');
@@ -1855,6 +1978,47 @@ function exportSVGAsPNG() {
   img.src = url;
 
 }
+
+
+// three cookies to remamber state of top three tiles - pressure / flow / tools
+
+// http://www.quirksmode.org/js/cookies.html
+// setCookie('ppkcookie','testcookie',7);
+
+// var x = getCookie('ppkcookie');
+// if (x) {
+//     [do something with x]
+// }
+function setCookie(name,value,days) {
+  var expires = "";
+  if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + (days*24*60*60*1000));
+      expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+}
+
+
+function getCookie(name) {
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(';');
+  for(var i=0;i < ca.length;i++) {
+      var c = ca[i];
+      while (c.charAt(0)==' ') c = c.substring(1,c.length);
+      if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+  }
+  return null;
+}
+
+// https://www.geeksforgeeks.org/javascript-cookies/
+function changeCookieValue(cookieName, newValue) {
+  document.cookie = 
+      `${cookieName}=${newValue}; 
+          expires=Thu, 5 March 2030 12:00:00 UTC; path=/`;
+}
+
+
 
 </script>
   </BODY>

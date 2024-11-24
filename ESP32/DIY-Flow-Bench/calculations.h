@@ -42,7 +42,7 @@ class Calculations {
 		double convertMassFlowUnits(double refFlow, int unitsOut = MG_S, int unitsIn = KG_H);
 		double convertKGHtoCFM(double massFlowKGH);
 		double calculateAirDensity(double TempC, double baroKPA, double RelHumidity);
-		double convertToSCFM(double ACFM, int standard);
+		double convertToSCFM(double flow, int standard);
 
 		double startupBaroPressure;
 

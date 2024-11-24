@@ -45,6 +45,7 @@ struct ConfigSettings {
   int flow_decimal_length = 1;                    // Flow decimal number of places 
   int gen_decimal_length = 2;                     // General decimal number of places 
   char data_filter_type[12] = "NONE";             // Data filter type 
+  int data_capture_datatype = 1;                  // Datacapture datatype
   int standardReference = 1;                      // Standard reference conditions (default ISO 1585)
   int std_adj_flow = 0;                           // Standardised adjusted flow
   int dataGraphMax = 0;                           // Data graph maximum Y value
@@ -176,6 +177,7 @@ struct SensorData {
   double FlowCFM = 0.0;
   double FlowSCFM = 0.0;
   double FlowADJ = 0.0;
+  double FlowADJSCFM = 0.0;
   double MafMv = 0.0;
   double TempDegC = 0.0;
   double TempDegF = 0.0;
@@ -379,7 +381,7 @@ struct Language {
     char LANG_GUI_WIFI_AP_PASS[50] = "WiFi AP Password";
     char LANG_GUI_HOSTNAME[50] = "WiFi Hostname";
     char LANG_GUI_WIFI_TIMEOUT[50] = "WiFi Timeout";
-    char LANG_GUI_BENCH_SETTINGS[50] = "Bench Settings";
+    char LANG_GUI_GENERAL_SETTINGS[50] = "Bench Settings";
     char LANG_GUI_MAF_HOUSING_DIAMETER[50] = "MAF Housing Diameter (mm):";
     char LANG_GUI_REFRESH_RATE[50] = "GUI Refresh Rate (ms):";
     char LANG_GUI_TEMPERATURE_UNIT[50] = "Temperature Unit (&degC / &degF):";
@@ -425,6 +427,9 @@ struct Language {
     char LANG_GUI_LEAK_TEST_BASELINE_REV[50] = "Leak Test Baseline (Reverse) (cfm)";
     char LANG_GUI_LEAK_TEST_OFFSET_REV[50] = "Leak Test Offset (Reverse) (cfm)";
     char LANG_GUI_OVERWRITE[50] = "Overwrite";  
+    char LANG_GUI_DATA_CAPTURE_SETTINGS[50] = "Data Capture Settings";
+    char LANG_GUI_CAPTURE_DATATYPE[50] = "Datatype";
+    
 
 
 };

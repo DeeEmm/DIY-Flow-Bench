@@ -29,6 +29,11 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24112402        - #213 Pitot / differential zeroing
+                - #254 Report sensor voltage to API
+                - Cookie to remember tile status
+24112401        - #158 Correction to output
+24112301        - #158 Add capture datatype selection
 24112203        - #212 Changed Modal Headers
 24112202        - #212 Change info modal to two column layout
 24112201        - #244 simplification of resolution / accuracy

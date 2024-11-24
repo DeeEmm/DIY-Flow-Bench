@@ -660,12 +660,15 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
   StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
   extern struct SensorData sensorVal;
   extern struct ValveLiftData valveData;
+  extern struct ConfigSettings config;
+  
   String jsonString;
   String liftPoint;
   int switchval;
   char *end;
   int params = request->params();
   const char* PARAM_INPUT = "lift-data";
+  double flowValue;
 
   _message.debugPrintf("Saving Lift Data...\n");
 
@@ -681,56 +684,83 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
   }
 
 
+  // Get flow value based on capture Datatype
+  switch (config.data_capture_datatype) {
+
+    case ACFM:
+      flowValue = sensorVal.FlowCFM;
+    break;
+    
+    case STD_ACFM:
+      flowValue = sensorVal.FlowSCFM;
+    break;
+    
+    case ADJ_ACFM:
+      flowValue = sensorVal.FlowADJ;
+    break;
+    
+    case ADJ_STD_ACFM:
+      flowValue = sensorVal.FlowADJSCFM;
+    break;
+    
+    case MAF:
+      flowValue = sensorVal.FlowKGH;
+    break;
+        
+  }
+
+
+  // Update lift point data
   switchval = strtol(liftPoint.c_str(), &end, 10); // convert std::str to int
 
   switch (switchval) {
 
     case 1:
-      valveData.LiftData1 = sensorVal.FlowCFM;
+      valveData.LiftData1 = flowValue;
       break;
 
     case 2:
-      valveData.LiftData2 = sensorVal.FlowCFM;
+      valveData.LiftData2 = flowValue;
       break;
 
     case 3:
-      valveData.LiftData3 = sensorVal.FlowCFM;
+      valveData.LiftData3 = flowValue;
       break;
 
     case 4:
-      valveData.LiftData4 = sensorVal.FlowCFM;
+      valveData.LiftData4 = flowValue;
       break;
 
     case 5:
-      valveData.LiftData5 = sensorVal.FlowCFM;
+      valveData.LiftData5 = flowValue;
       break;
 
     case 6:
-      valveData.LiftData6 = sensorVal.FlowCFM;
+      valveData.LiftData6 = flowValue;
       break;
 
     case 7:
-      valveData.LiftData7 = sensorVal.FlowCFM;
+      valveData.LiftData7 = flowValue;
       break;
 
     case 8:
-      valveData.LiftData8 = sensorVal.FlowCFM;
+      valveData.LiftData8 = flowValue;
       break;
 
     case 9:
-      valveData.LiftData9 = sensorVal.FlowCFM;
+      valveData.LiftData9 = flowValue;
       break;
 
     case 10:
-      valveData.LiftData10 = sensorVal.FlowCFM;
+      valveData.LiftData10 = flowValue;
       break;
 
     case 11:
-      valveData.LiftData11 = sensorVal.FlowCFM;
+      valveData.LiftData11 = flowValue;
       break;
 
     case 12:
-      valveData.LiftData12 = sensorVal.FlowCFM;
+      valveData.LiftData12 = flowValue;
       break;
   }
 
@@ -842,6 +872,8 @@ String Webserver::processTemplate(const String &var)
   extern struct CalibrationData calVal;
   extern struct Language language;
 
+  Messages _message;
+
   // Translate GUI
   // Note language struct is overwritten when language.json file is present
   if (var == "LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE") return language.LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE;
@@ -910,7 +942,7 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_WIFI_AP_PASS") return language.LANG_GUI_WIFI_AP_PASS;
   if (var == "LANG_GUI_HOSTNAME") return language.LANG_GUI_HOSTNAME;
   if (var == "LANG_GUI_WIFI_TIMEOUT") return language.LANG_GUI_WIFI_TIMEOUT;
-  if (var == "LANG_GUI_BENCH_SETTINGS") return language.LANG_GUI_BENCH_SETTINGS;
+  if (var == "LANG_GUI_GENERAL_SETTINGS") return language.LANG_GUI_GENERAL_SETTINGS;
   if (var == "LANG_GUI_BENCH_TYPE") return language.LANG_GUI_BENCH_TYPE;
   if (var == "LANG_GUI_MAF_HOUSING_DIAMETER") return language.LANG_GUI_MAF_HOUSING_DIAMETER;
   if (var == "LANG_GUI_REFRESH_RATE") return language.LANG_GUI_REFRESH_RATE;
@@ -958,10 +990,17 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_LEAK_TEST_BASELINE_REV") return language.LANG_GUI_LEAK_TEST_BASELINE_REV;
   if (var == "LANG_GUI_LEAK_TEST_OFFSET_REV") return language.LANG_GUI_LEAK_TEST_OFFSET_REV;
   if (var == "LANG_GUI_OVERWRITE") return language.LANG_GUI_OVERWRITE;
+  if (var == "LANG_GUI_DATA_CAPTURE_SETTINGS") return language.LANG_GUI_DATA_CAPTURE_SETTINGS;
+  if (var == "LANG_GUI_CAPTURE_DATATYPE") return language.LANG_GUI_CAPTURE_DATATYPE;
+  if (var == "MAF_FLOW_UNIT") {
 
+      if (status.mafUnits == KG_H) {
+        return "kg/h";
+      } else {
+        return "mg/s";
+      }
+  }
 
-  
-  
 
   // Bench definitions for system status pane 
   if (strstr(config.bench_type, "MAF")!=NULL) {
@@ -1009,6 +1048,26 @@ String Webserver::processTemplate(const String &var)
   if (var == "PITOT_SENSOR") return String(status.pitotSensor);
   if (var == "PDIFF_SENSOR") return String(status.pdiffSensor);
   if (var == "STATUS_MESSAGE") return String(status.statusMessage);
+
+  if (var == "PITOT_COLOUR"){
+    if (calVal.pitot_cal_offset == 0) {
+      return GUI_COLOUR_UNSET;
+      _message.debugPrintf("pitot unset");
+    } else {
+      return GUI_COLOUR_SET;
+      _message.debugPrintf("pitot set");
+    }
+  }
+
+  if (var == "PDIFF_COLOUR"){
+    if (calVal.pdiff_cal_offset == 0) {
+      return GUI_COLOUR_UNSET;
+      _message.debugPrintf("diff unset");
+    } else {
+      return GUI_COLOUR_SET;
+      _message.debugPrintf("diff set");
+    }
+  }
 
   //Datagraph Max Val selected item
   if (var == "DATAGRAPH_MAX_0" && config.dataGraphMax == 0) return String("selected");
@@ -1215,7 +1274,7 @@ String Webserver::processTemplate(const String &var)
   if (var == "STD_REF_5" && config.standardReference == 5) return String("selected");
 
 
-  if (var == "STD_REF" ) {
+  if (var == "STD_REF"  || var == "STANDARD_FLOW") {
     // Standard reference
     switch (config.standardReference) {
 
