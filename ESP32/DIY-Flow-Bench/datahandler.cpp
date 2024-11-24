@@ -707,6 +707,8 @@ void DataHandler::parseCalibrationData(StaticJsonDocument<1024> calData) {
   calVal.leak_cal_baseline_rev = calData["LEAK_CAL_BASELINE_REV"];
   calVal.leak_cal_offset = calData["LEAK_CAL_OFFSET"];
   calVal.leak_cal_offset_rev = calData["LEAK_CAL_OFFSET_REV"];
+  calVal.pdiff_cal_offset = calData["PDIFF_CAL_OFFSET"];
+  calVal.pitot_cal_offset = calData["PITOT_CAL_OFFSET"];
 }
 
 
@@ -733,41 +735,41 @@ void DataHandler::parsePinsData(StaticJsonDocument<1024> pinData) {
   status.boardType = pinData["BOARD_TYPE"].as<String>();
 
   // Store input pin values in struct
-  pins.VCC_3V3_PIN = pinData["VCC_3V3_PIN"];
-  pins.VCC_5V_PIN = pinData["VCC_5V_PIN"];
-  pins.SPEED_SENSOR_PIN = pinData["SPEED_SENSOR_PIN"];
-  pins.ORIFICE_BCD_BIT1_PIN = pinData["ORIFICE_BCD_BIT1_PIN"];
-  pins.ORIFICE_BCD_BIT2_PIN = pinData["ORIFICE_BCD_BIT2_PIN"];
-  pins.ORIFICE_BCD_BIT3_PIN = pinData["ORIFICE_BCD_BIT3_PIN"];
-  pins.MAF_PIN = pinData["MAF_SRC_IS_PIN"];
-  pins.REF_PRESSURE_PIN = pinData["PREF_SRC_PIN"];
-  pins.DIFF_PRESSURE_PIN = pinData["PDIFF_SRC_IS_PIN"];
-  pins.PITOT_PIN = pinData["PITOT_SRC_IS_PIN"];
-  pins.TEMPERATURE_PIN = pinData["TEMPERATURE_PIN"];
-  pins.HUMIDITY_PIN = pinData["HUMIDITY_PIN"];
-  pins.REF_BARO_PIN = pinData["REF_BARO_PIN"];
-  pins.SERIAL0_RX_PIN = pinData["SERIAL0_RX_PIN"];
-  pins.SERIAL2_RX_PIN = pinData["SERIAL2_RX_PIN"];
-  pins.SDA_PIN = pinData["SDA_PIN"];
-  pins.SCL_PIN = pinData["SCL_PIN"];
-  pins.SD_CS_PIN = pinData["SD_CS_PIN"];
-  pins.SD_MISO_PIN = pinData["SD_MISO_PIN"];
-  pins.SD_SCK_PIN = pinData["SD_SCK_PIN"];
-  pins.WEMOS_SPARE_PIN_1 = pinData["WEMOS_SPARE_PIN_1"];
+  pins.VCC_3V3_PIN = pinData["VCC_3V3_PIN"].as<int>();
+  pins.VCC_5V_PIN = pinData["VCC_5V_PIN"].as<int>();
+  pins.SPEED_SENSOR_PIN = pinData["SPEED_SENSOR_PIN"].as<int>();
+  pins.ORIFICE_BCD_BIT1_PIN = pinData["ORIFICE_BCD_BIT1_PIN"].as<int>();
+  pins.ORIFICE_BCD_BIT2_PIN = pinData["ORIFICE_BCD_BIT2_PIN"].as<int>();
+  pins.ORIFICE_BCD_BIT3_PIN = pinData["ORIFICE_BCD_BIT3_PIN"].as<int>();
+  pins.MAF_PIN = pinData["MAF_SRC_IS_PIN"].as<int>();
+  pins.REF_PRESSURE_PIN = pinData["PREF_SRC_PIN"].as<int>();
+  pins.DIFF_PRESSURE_PIN = pinData["PDIFF_SRC_IS_PIN"].as<int>();
+  pins.PITOT_PIN = pinData["PITOT_SRC_IS_PIN"].as<int>();
+  pins.TEMPERATURE_PIN = pinData["TEMPERATURE_PIN"].as<int>();
+  pins.HUMIDITY_PIN = pinData["HUMIDITY_PIN"].as<int>();
+  pins.REF_BARO_PIN = pinData["REF_BARO_PIN"].as<int>();
+  pins.SERIAL0_RX_PIN = pinData["SERIAL0_RX_PIN"].as<int>();
+  pins.SERIAL2_RX_PIN = pinData["SERIAL2_RX_PIN"].as<int>();
+  pins.SDA_PIN = pinData["SDA_PIN"].as<int>();
+  pins.SCL_PIN = pinData["SCL_PIN"].as<int>();
+  pins.SD_CS_PIN = pinData["SD_CS_PIN"].as<int>();
+  pins.SD_MISO_PIN = pinData["SD_MISO_PIN"].as<int>();
+  pins.SD_SCK_PIN = pinData["SD_SCK_PIN"].as<int>();
+  pins.WEMOS_SPARE_PIN_1 = pinData["WEMOS_SPARE_PIN_1"].as<int>();
 
   // Store output pin values in struct
-  pins.VAC_BANK_1_PIN = pinData["VAC_BANK_1_PIN"];
-  pins.VAC_BANK_2_PIN = pinData["VAC_BANK_2_PIN"];
-  pins.VAC_BANK_3_PIN = pinData["VAC_BANK_3_PIN"];
-  pins.VAC_SPEED_PIN = pinData["VAC_SPEED_PIN"];
-  pins.VAC_BLEED_VALVE_PIN = pinData["VAC_BLEED_VALVE_PIN"];
-  pins.AVO_STEP_PIN = pinData["AVO_STEP_PIN"];
-  pins.AVO_DIR_PIN = pinData["AVO_DIR_PIN"];
-  pins.FLOW_VALVE_STEP_PIN = pinData["FLOW_VALVE_STEP_PIN"];
-  pins.FLOW_VALVE_DIR_PIN = pinData["FLOW_VALVE_DIR_PIN"];
-  pins.SD_MOSI_PIN = pinData["SD_MOSI_PIN"];
-  pins.SERIAL0_TX_PIN = pinData["SERIAL0_TX_PIN"];
-  pins.SERIAL2_TX_PIN = pinData["SERIAL2_TX_PIN"];
+  pins.VAC_BANK_1_PIN = pinData["VAC_BANK_1_PIN"].as<int>();
+  pins.VAC_BANK_2_PIN = pinData["VAC_BANK_2_PIN"].as<int>();
+  pins.VAC_BANK_3_PIN = pinData["VAC_BANK_3_PIN"].as<int>();
+  pins.VAC_SPEED_PIN = pinData["VAC_SPEED_PIN"].as<int>();
+  pins.VAC_BLEED_VALVE_PIN = pinData["VAC_BLEED_VALVE_PIN"].as<int>();
+  pins.AVO_STEP_PIN = pinData["AVO_STEP_PIN"].as<int>();
+  pins.AVO_DIR_PIN = pinData["AVO_DIR_PIN"].as<int>();
+  pins.FLOW_VALVE_STEP_PIN = pinData["FLOW_VALVE_STEP_PIN"].as<int>();
+  pins.FLOW_VALVE_DIR_PIN = pinData["FLOW_VALVE_DIR_PIN"].as<int>();
+  pins.SD_MOSI_PIN = pinData["SD_MOSI_PIN"].as<int>();
+  pins.SERIAL0_TX_PIN = pinData["SERIAL0_TX_PIN"].as<int>();
+  pins.SERIAL2_TX_PIN = pinData["SERIAL2_TX_PIN"].as<int>();
 }
 
 
@@ -790,6 +792,15 @@ void DataHandler::loadPinsData () {
   pinsFileData = _data.loadJSONFile(status.pinsFilename);
 
   parsePinsData(pinsFileData);
+
+
+
+  // TEST - save pins data to file
+  // String output;
+  // serializeJson(pinsFileData, output);
+  // this->writeJSONFile(output,"/pintest.json", CONFIG_JSON_SIZE);
+  // TEST - print pins data to serial
+  // serializeJsonPretty(pinsFileData, Serial);
 
 }
 

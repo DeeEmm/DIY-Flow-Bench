@@ -272,7 +272,7 @@ const int ADC_I2C_ADDR = 0x48;
 // #define PITOT_SENSOR_TYPE_XGZP6899A010KPDPN        
 // #define PITOT_SENSOR_TYPE_M5STACK_TubePressure        
 
-#define PITOT_MV_TRIMPOT 0.0                       // Millivolt offset
+#define PITOT_MV_TRIMPOT 0.0163618                      // Millivolt offset = (inH2O/(0.65626025/249.08891) * 0.0001875)
 #define PITOT_ANALOG_SCALE 1.0                            // Scaling factor used for raw analog value
 #define PITOT_ADC_CHANNEL 3
 
