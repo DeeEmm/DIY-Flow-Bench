@@ -3,7 +3,7 @@ name: MAF Data
 about: Submit a MAF data file
 title: "[MAF DATA]"
 labels: enhancement
-assignees: DeeEmm
+assignees: ''
 
 ---
 
