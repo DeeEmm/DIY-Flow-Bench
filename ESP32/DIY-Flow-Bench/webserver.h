@@ -44,11 +44,8 @@ class Webserver {
 		StaticJsonDocument<1024> dataJson; 
 		StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftDataJson; 
 
-		String getFileListJSON ();
 		String getSystemStatusJSON();		
-		String byteDecode(size_t bytes);
 		void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
-		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 		static void processUpdate(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final);
 		static void parseConfigurationForm(AsyncWebServerRequest *request);
 		static void parseCalibrationForm(AsyncWebServerRequest *request);
@@ -56,15 +53,12 @@ class Webserver {
 
 		int decodeMessageHeader (char *data);
 		static String processTemplate(const String& var);
-		
 	
 	private:
 		
 		void sendIndexPage();
-		void uploadFile();
+		// void uploadFile();
 		String index_html;
-		int getWifiConnection();
-		StaticJsonDocument<LIFT_DATA_JSON_SIZE> loadLiftData ();
 		void parseLiftData(StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData);
 		
 	public:
@@ -77,15 +71,10 @@ class Webserver {
 		AsyncEventSource *events;
 		
 		void begin();
-		void writeJSONFile(String data, String filename, int dataSize);
-		String getDataJSON();
-		StaticJsonDocument<CONFIG_JSON_SIZE> loadJSONFile(String filename);
 		void sendWebSocketMessage(String jsonValues);
 		void parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configData);
 		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfig ();
 		void createConfigFile ();
-		void resetWifi ( void );
-		void wifiReconnect ( void );
 		String getValveDataJSON();
 		
 		StaticJsonDocument<1024> getSDFile(String filename);
@@ -104,20 +93,13 @@ class Webserver {
 		void deleteFile(fs::FS &fs, const char *path);
 		void testFileIO(fs::FS &fs, const char * path);
 
-		void createLiftDataFile();
-		static void clearLiftDataFile(AsyncWebServerRequest *request);
 		static void parseLiftDataForm(AsyncWebServerRequest *request);
 		static void parseUserFlowTargetForm(AsyncWebServerRequest *request);
+		static String processLandingPageTemplate(const String& var);
 
 		static void toggleFlowDiffTile (); 
+		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 
-
-
-		// StaticJsonDocument<1024> loadCalibrationSettings ();
-		// StaticJsonDocument<1024> loadCalibrationData ();
-		// void parseCalibrationSettings(StaticJsonDocument<1024> calibrationData);
-		// void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
-		// void createCalibrationFile ();
 
 
 		

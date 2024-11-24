@@ -37,17 +37,18 @@
  * 
  *
  **/
+
 #include <Arduino.h>
 #include "freertos/semphr.h"
 #include "esp_task_wdt.h"
 #include <MD_REncoder.h>
 #include <math.h>
 
-#include "version.h"
+#include "datahandler.h"
 #include "constants.h"
+#include "system.h"
 #include "configuration.h"
 #include "structs.h"
-#include "pins.h"
 
 #include "mafData/maf.h"
 #include "hardware.h" // bench type config needed here
@@ -58,18 +59,18 @@
 #include "API.h"
 #include "Wire.h"
 
-#include LANGUAGE_FILE
 
 // Initiate Structs
 ConfigSettings config;
 DeviceStatus status;
-FileUploadData fileUploadData;
 SensorData sensorVal;
 ValveLiftData valveData;
-Translator translate;
+Language language;
 CalibrationData calVal;
+Pins pins;
 
 // Initiate Classes
+DataHandler _data;
 API _api;
 Calculations _calculations;
 Hardware _hardware;
@@ -99,7 +100,11 @@ void TASKgetSensorData( void * parameter ){
 
   extern struct DeviceStatus status;
   extern struct SensorData sensorVal;
-  Calculations _calculations;
+  extern struct CalibrationData calVal;
+  extern struct ConfigSettings config;
+  
+  Sensors _sensors;
+
   int sensorINT;
 
   for( ;; ) {
@@ -208,16 +213,18 @@ void TASKgetSensorData( void * parameter ){
         } else {
           sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, config.adj_flow_depression, sensorVal.FlowCFM);
         }
+        sensorVal.FlowADJSCFM = _calculations.convertToSCFM(sensorVal.FlowADJ, config.standardReference );
         #endif
 
         #ifdef PDIFF_IS_ENABLED
         sensorVal.PDiffKPA = _sensors.getPDiffValue();
-        sensorVal.PDiffH2O = _calculations.convertPressure(sensorVal.PDiffKPA, INH2O);
+        sensorVal.PDiffH2O = _calculations.convertPressure(sensorVal.PDiffKPA, INH2O) - calVal.pdiff_cal_offset;
         #endif
 
         #ifdef PITOT_IS_ENABLED
-        sensorVal.PitotKPA = _sensors.getPitotValue();
-        sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O);
+        sensorVal.PitotKPA = _sensors.getPitotValue() - calVal.pitot_cal_offset;
+        sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O) ;
+        sensorVal.PitotVelocity = _sensors.getPitotVelocity();
         #endif
 
         #ifdef SWIRL_IS_ENABLED
@@ -259,14 +266,21 @@ void TASKgetEnviroData( void * parameter ){
     if (millis() > status.bmePollTimer){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
-        status.bmePollTimer = millis() + BME_SCAN_DELAY_MS; // Only reset timer when task executes
+        status.bmePollTimer = millis() + BME280_SCAN_DELAY_MS; // Only reset timer when task executes
         
         sensorVal.TempDegC = _sensors.getTempValue();
+
+        // TEST BME commissioning
+        // _message.debugPrintf("BME680 refTempDegC_INT: %d",sensorVal.test );
+        // REMEMBER NO BREAKING TASKS WITHIN INTTERUPT ROUTINES (LIKE SERIAL PRINT)
+        
         sensorVal.TempDegF = _calculations.convertTemperature(_sensors.getTempValue(), DEGF);
         sensorVal.BaroHPA = _sensors.getBaroValue();
         sensorVal.BaroPA = sensorVal.BaroHPA * 100.00F;
         sensorVal.BaroKPA = sensorVal.BaroPA * 0.001F;
         sensorVal.RelH = _sensors.getRelHValue();
+        sensorVal.PitotVelocity = _sensors.getPitotVelocity();
+        sensorVal.PitotDelta = _calculations.convertPressure(_sensors.getPitotValue(),KPA, INH2O);
         xSemaphoreGive(i2c_task_mutex); // Release semaphore
       }
     }
@@ -285,17 +299,17 @@ void TASKgetEnviroData( void * parameter ){
  ***/
 void setup(void) {
 
+  extern struct Pins pins;
+
+  // Initialise Data environment
+  _data.begin();
+
   // REVIEW
   // set message queue length
   xQueueCreate( 256, 2048);
-  
-  // We need to call Wire globally so that it is available to both hardware and sensor classes so lets do that here
-  Wire.begin (SDA_PIN, SCL_PIN); 
-  Wire.setClock(100000);
-  // Wire.setClock(300000); // ok for wemos D1
-  // Wire.setClock(400000);
     
   _hardware.begin();
+
   _sensors.begin();
 
   // Confirm default core - NOTE: setup() and loop() are automatically created on default core 
@@ -313,7 +327,7 @@ void setup(void) {
   xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENSOR_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
   #endif
 
-  #ifdef BME_IS_ENABLED // Compile time directive used for testing
+  #ifdef BME280_IS_ENABLED // Compile time directive used for testing
   xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
   #endif
 
@@ -335,7 +349,6 @@ void setup(void) {
  ***/
 void loop () {
   
-
   // Process API comms
   if (config.api_enabled) {        
     if (millis() > status.apiPollTimer) {
@@ -362,7 +375,7 @@ void loop () {
         status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes
         
         // Push data to client using Server Side Events (SSE)
-        jsonString = _webserver.getDataJSON();
+        jsonString = _data.getDataJSON();
         _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore

@@ -21,33 +21,33 @@
 
 #include "configuration.h"
 #include "constants.h"
-#include "pins.h"
 #include "structs.h"
+#include "calculations.h"
 
 #include <Wire.h>
 #include "hardware.h"
 #include "sensors.h"
 #include "messages.h"
 #include "driver/pcnt.h"
-#include LANGUAGE_FILE
-
-
-// #ifdef MAF_IS_ENABLED
-// #include "mafData/maf.h"
-// #endif
 
 #ifdef MAF_IS_ENABLED
 #include MAF_DATA_FILE
 #endif
 
-
-
-#ifdef BME_IS_ENABLED
+#ifdef BME280_IS_ENABLED
 #define TINY_BME280_I2C
 #include "TinyBME280.h"
-tiny::BME280 _BMESensor;
+tiny::BME280 _BME280Sensor;
 TwoWire I2CBME = TwoWire(0);
 #endif
+
+#ifdef BME680_IS_ENABLED
+#include "DeeEmm_BME680.h" 
+BME680_Class _BME680Sensor;
+#endif
+
+
+
 
 
 /***********************************************************
@@ -57,18 +57,6 @@ Sensors::Sensors() {
 
 }
 
-
-/***********************************************************
- * @brief Sensor begin method
- ***/
-void Sensors::begin () {
-
-	Messages _message;
-	_message.serialPrintf("Initialising Sensors \n");
-	Sensors::initialise ();
-	_message.serialPrintf("Sensors Initialised \n");
-}
-
 // REVIEW - Frequency style MAF Begin
 // NOTE: Voodoo needed to get interrupt to work within class structure for frequency measurement. 
 // We declare a new instance of the Sensor class so that we can use it for the MAF ISR
@@ -76,16 +64,18 @@ void Sensors::begin () {
 // Sensors __mafVoodoo;
 
 
- 
 /***********************************************************
- * @brief Initialise sensors 
+ * @name begin
+ * @brief Sensor initialisation and set up
  ***/
-void Sensors::initialise () {
+void Sensors::begin () {
 
 	Messages _message;
 
+	_message.serialPrintf("Initialising Sensors \n");
+
 	extern struct DeviceStatus status;
-    extern struct Translator translate;
+    extern struct Language language;
 	extern int mafOutputType;
 
 	// Initialise  MAF data
@@ -110,14 +100,13 @@ void Sensors::initialise () {
 
 	#endif
 
-
 	
-	//initialise BME
-	#ifdef BME_IS_ENABLED
+	//initialise BME280
+	#ifdef BME280_IS_ENABLED
 	
 		_message.serialPrintf("Initialising BME280 \n");	
 		
-		if (_BMESensor.beginI2C(BME280_I2C_ADDR) == false)
+		if (_BME280Sensor.beginI2C(BME280_I2C_ADDR) == false)
 		{
 			_message.serialPrintf("BME sensor did not respond. \n");
 			_message.serialPrintf("Please check wiring and I2C address\n");
@@ -127,13 +116,33 @@ void Sensors::initialise () {
 			_message.serialPrintf("BME280 Initialised\n");
 		}
 
-		_BMESensor.setTempOverSample(1);
-		_BMESensor.setPressureOverSample(1);
-		_BMESensor.setHumidityOverSample(1);
-		_BMESensor.setStandbyTime(0);
-		_BMESensor.setFilter(0);
-		_BMESensor.setMode(tiny::Mode::NORMAL); // NORMAL / FORCED / SLEEP
+		_BME280Sensor.setTempOverSample(1);
+		_BME280Sensor.setPressureOverSample(1);
+		_BME280Sensor.setHumidityOverSample(1);
+		_BME280Sensor.setStandbyTime(0);
+		_BME280Sensor.setFilter(0);
+		_BME280Sensor.setMode(tiny::Mode::NORMAL); // NORMAL / FORCED / SLEEP
 
+	#endif
+
+
+	//initialise BME680
+	#ifdef BME680_IS_ENABLED
+	
+		_message.serialPrintf("Initialising BME680 \n");	
+
+		// while (!_BME680Sensor.begin(I2C_STANDARD_MODE, BME680_I2C_ADDR)) { 
+		while (!_BME680Sensor.begin(I2C_STANDARD_MODE, BME680_I2C_ADDR)) { 
+			_message.serialPrintf("-  Unable to find BME680. Trying again in 5 seconds.\n");
+			delay(5000);
+		}  
+
+		_BME680Sensor.setOversampling(TemperatureSensor, Oversample16);  
+		_BME680Sensor.setOversampling(HumiditySensor, Oversample16);     
+		_BME680Sensor.setOversampling(PressureSensor, Oversample16);     
+		_BME680Sensor.setOversampling(GasSensor, SensorOff);   
+		_BME680Sensor.setIIRFilter(IIR4);  							
+		_BME680Sensor.setGas(0, 0); // Turns off gas measurements
 	#endif
 
 
@@ -167,64 +176,64 @@ void Sensors::initialise () {
 	#elif defined MAF_IS_ENABLED && defined MAF_SRC_IS_PIN
 		this->_mafSensorType = _maf.sensorType() + " on GPIO:" + MAF_PIN;
 	#else
-		this->_mafSensorType = translate.LANG_NOT_ENABLED;
+		this->_mafSensorType = language.LANG_NOT_ENABLED;
 	#endif
 
 	// Baro Sensor
 	#if defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
 		this->startupBaroPressure = this->getPRefValue();
-		this->_baroSensorType = translate.LANG_START_REF_PRESSURE;
+		this->_baroSensorType = language.LANG_START_REF_PRESSURE;
 	#elif defined BARO_SENSOR_TYPE_FIXED_VALUE
 		this->startupBaroPressure = FIXED_BARO_VALUE;
-		this->_baroSensorType = translate.LANG_FIXED_VALUE;
+		this->_baroSensorType = language.LANG_FIXED_VALUE;
 		this->_baroSensorType += FIXED_BARO_VALUE;
-	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
+	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME280_IS_ENABLED
 		this->_baroSensorType = "BME280";
 	#elif defined BARO_SENSOR_TYPE_MPX4115
 		this->_baroSensorType = "MPX4115";
 	#elif defined BARO_SENSOR_TYPE_LINEAR_ANALOG
 		this->_baroSensorType = "ANALOG PIN: " + REF_BARO_PIN;
 	#else 
-		this->_baroSensorType = translate.LANG_FIXED_VALUE + FIXED_BARO_VALUE;
+		this->_baroSensorType = language.LANG_FIXED_VALUE + String(FIXED_BARO_VALUE);
 	#endif
 	
 	//Temp Sensor
 	#ifdef TEMP_SENSOR_NOT_USED
 		this->startupBaroPressure = this->getPRefValue();
-		this->_tempSensorType = translate.LANG_NOT_ENABLED;
+		this->_tempSensorType = language.LANG_NOT_ENABLED;
 	#elif defined TEMP_SENSOR_TYPE_FIXED_VALUE
-		this->_tempSensorType = translate.LANG_FIXED_VALUE;
+		this->_tempSensorType = language.LANG_FIXED_VALUE;
 		this->_tempSensorType += FIXED_TEMP_VALUE;
-	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
+	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME280_IS_ENABLED
 		this->_tempSensorType = "BME280";
 	#elif defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 		this->_tempSensorType = "Simple DHT11";
 	#elif defined TEMP_SENSOR_TYPE_LINEAR_ANALOG
 		this->_tempSensorType = "ANALOG PIN: " + TEMPERATURE_PIN;
 	#else 
-		this->_tempSensorType = translate.LANG_FIXED_VALUE + FIXED_TEMP_VALUE;
+		this->_tempSensorType = language.LANG_FIXED_VALUE + String(FIXED_TEMP_VALUE);
 	#endif
 	
 	// Rel Humidity Sensor
 	#ifndef RELH_IS_ENABLED
 		this->startupBaroPressure = this->getPRefValue();
-		this->_relhSensorType = translate.LANG_NOT_ENABLED;
+		this->_relhSensorType = language.LANG_NOT_ENABLED;
 	#elif defined RELH_SENSOR_TYPE_FIXED_VALUE
-		this->_relhSensorType = translate.LANG_FIXED_VALUE;
+		this->_relhSensorType = language.LANG_FIXED_VALUE;
 		this->_relhSensorType += FIXED_RELH_VALUE;
-	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
+	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME280_IS_ENABLED
 		this->_relhSensorType = "BME280";
 	#elif defined RELH_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 		this->_relhSensorType = "Simple DHT11";
 	#elif defined RELH_SENSOR_TYPE_LINEAR_ANALOG
 		this->_relhSensorType = "ANALOG PIN: " + HUMIDITY_PIN;
 	#else 
-		this->_relhSensorType = translate.LANG_FIXED_VALUE + FIXED_RELH_VALUE;
+		this->_relhSensorType = language.LANG_FIXED_VALUE + String(FIXED_RELH_VALUE);
 	#endif
 
 	// reference pressure
 	#ifndef PREF_IS_ENABLED
-		this->_prefSensorType = translate.LANG_NOT_ENABLED;
+		this->_prefSensorType = language.LANG_NOT_ENABLED;
 	#elif defined PREF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_prefSensorType = "SMPXV7007";
 	#elif defined PREF_SENSOR_TYPE_MPX4250 && defined ADC_IS_ENABLED
@@ -240,12 +249,12 @@ void Sensors::initialise () {
 	#elif defined PREF_SENSOR_TYPE_LINEAR_ANALOG
 		this->_prefSensorType = "ANALOG PIN: " + REF_PRESSURE_PIN;
 	#else 
-		this->_prefSensorType = translate.LANG_NOT_ENABLED;
+		this->_prefSensorType = language.LANG_NOT_ENABLED;
 	#endif
 	
 	// differential pressure
 	#ifndef PDIFF_IS_ENABLED
-		this->_pdiffSensorType = translate.LANG_NOT_ENABLED;
+		this->_pdiffSensorType = language.LANG_NOT_ENABLED;
 	#elif defined PDIFF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_pdiffSensorType = "SMPXV7007";
 	#elif defined PDIFF_SENSOR_TYPE_LINEAR_ANALOG
@@ -259,12 +268,12 @@ void Sensors::initialise () {
 	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
 		this->_pdiffSensorType = "TubePressure";
 	#else 
-		this->_pdiffSensorType = translate.LANG_NOT_ENABLED;
+		this->_pdiffSensorType = language.LANG_NOT_ENABLED;
 	#endif
 	
 	// pitot pressure differential
     #ifndef PITOT_IS_ENABLED
-		this->_pitotSensorType = translate.LANG_NOT_ENABLED;
+		this->_pitotSensorType = language.LANG_NOT_ENABLED;
 	#elif defined PITOT_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
 		this->_pitotSensorType = "SMPXV7007";
 	#elif defined PITOT_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
@@ -278,7 +287,7 @@ void Sensors::initialise () {
 	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
 		this->_pitotSensorType = "TubePressure";
 	#else 
-		this->_pitotSensorType = translate.LANG_NOT_ENABLED;
+		this->_pitotSensorType = language.LANG_NOT_ENABLED;
 	#endif
 	
 	// Set status values for GUI
@@ -291,6 +300,8 @@ void Sensors::initialise () {
 	status.pitotSensor = this->_pitotSensorType;
 
 	// END System status definitions
+
+	_message.serialPrintf("Sensors Initialised \n");
 
 }
 
@@ -523,7 +534,7 @@ double Sensors::getDifferentialFlow() {
 	extern struct DeviceStatus status;
 	extern struct SensorData sensorVal;
 	extern struct ConfigSettings config;
-	extern struct Translator translate;
+	extern struct Language language;
 
 	Hardware _hardware;
     Messages _message;  
@@ -581,7 +592,7 @@ double Sensors::getDifferentialFlow() {
 			orificeFlowRate = config.orificeOneFlow;
 			orificeDepression = config.orificeOneDepression;
 			_message.serialPrintf("%s\n", "Invalid Orifice Data");
-			String statusMessage = translate.LANG_INVALID_ORIFICE_SELECTED;
+			String statusMessage = language.LANG_INVALID_ORIFICE_SELECTED;
         break;
 
 	}
@@ -864,56 +875,109 @@ double Sensors::getPitotVolts() {
 double Sensors::getPitotValue() {
 	
 	extern struct ConfigSettings config;
+	extern struct SensorData sensorVal;
+	extern struct CalibrationData calVal;
 
+	Calculations _calculations;
 	Hardware _hardware;
 
-	double sensorVal = 0.0;
+	double pitotPressure = 0.0;
 	double sensorVolts = this->getPitotVolts();
+	double airDensity = 0.0;
+	double airVelocity = 0.0;
+	double totalPressure = 0.0;
+	double staticPressure = 0.0;	
 	
 	// Convert value to kPa according to sensor type
 	#if defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
 
-		sensorVal = getPitotVolts() * PITOT_ANALOG_SCALE;
+		pitotPressure = getPitotVolts() * PITOT_ANALOG_SCALE;
 	
 	#elif defined PITOT_SENSOR_TYPE_MPXV7007
 		
-		// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
-		// sensorVal = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
-		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+		// Vout = Vcc x (0.057 x pitotPressure + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
+		// pitotPressure = (sensorVolts - 0.5 * _hardware.get5vSupplyVolts() ) / (0.057 * _hardware.get5vSupplyVolts() / 1000);
+		pitotPressure = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
 
 
 	#elif defined PITOT_SENSOR_TYPE_MPXV7025
 
-		sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+		pitotPressure = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
 
 
 	#elif defined PITOT_SENSOR_TYPE_XGZP6899A007KPDPN
 
 		// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
-		sensorVal = sensorVolts * 3.5 - 8.75;
+		pitotPressure = sensorVolts * 3.5 - 8.75;
 
 	#elif defined PITOT_SENSOR_TYPE_XGZP6899A010KPDPN
 
 		// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
-		sensorVal = sensorVolts * 5 - 12.5;
+		pitotPressure = sensorVolts * 5 - 12.5;
 
 	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure
 
 		//P: Actual test pressure value, unit (Kpa)
 		//Vout: sensor voltage output value
 		//P = (Vout-0.1)/3.0*300.0-100.0
-		sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;
+		pitotPressure = (sensorVolts-0.1)/3.0*300.0-100.0;
 
 	#else // use fixed value
 
-		sensorVal = 0.0001;
+		pitotPressure = 0.0001;
 
 	#endif
 
+
 	// Lets make sure we have a valid value to return - check it is above minimum threshold
-	double pitotComp = fabs(sensorVal);
+	double pitotComp = fabs(pitotPressure);
 	if (pitotComp > config.min_bench_pressure) { 
-		return sensorVal;
+		return pitotPressure;
+	} else { 
+		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in display)
+	}	
+
+}
+
+
+
+
+
+
+/***********************************************************
+ * @brief get Pitot velocity in m/sec
+ * @returns Pitot velocity in metres per second
+ * @note Default sensor MPXV7007DP - Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
+ ***/
+double Sensors::getPitotVelocity() {
+	
+	extern struct ConfigSettings config;
+	extern struct SensorData sensorVal;
+	extern struct CalibrationData calVal;
+
+	Calculations _calculations;
+
+	double pitotPressure = 0.0;
+	double sensorVolts = this->getPitotVolts();
+	double airDensity = 0.0;
+	double airVelocity = 0.0;
+	double totalPressure = 0.0;
+	double staticPressure = 0.0;	
+	
+	pitotPressure = this->getPitotValue();
+
+	// get air density
+	airDensity = _calculations.calculateAirDensity(sensorVal.TempDegC, sensorVal.BaroKPA, sensorVal.RelH);
+
+	// Convert Pitot pressure to velocity (m3/min)
+	// airVelocity = sqrt(2 * (pitotPressure - sensorVal.PRefKPA) / airDensity );
+	airVelocity = sqrt(2 * (pitotPressure) / airDensity );
+
+	// Lets make sure we have a valid value to return - check it is above minimum threshold 
+	// TODO - 'borrowing' min_bench_pressure
+	double pitotComp = fabs(airVelocity);
+	if (pitotComp > config.min_bench_pressure) { 
+		return airVelocity;
 	} else { 
 		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in display)
 	}	
@@ -933,8 +997,11 @@ double Sensors::getTempValue() {
 	Hardware _hardware;
 	Messages _message;
 
+	extern struct SensorData sensorVal;
 
-	double refTempDegC;
+	double  refTempDegC;
+	int32_t  refTempDegC_INT;
+	int32_t  unusedRH, unusedBaro, unusedGas;
 	
 	#ifdef TEMP_SENSOR_TYPE_LINEAR_ANALOG
 	
@@ -944,15 +1011,22 @@ double Sensors::getTempValue() {
 		refTempDegC = tempVolts * TEMP_ANALOG_SCALE;
 		refTempDegC +=  TEMP_FINE_ADJUST;
 		
-	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
+	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME280_IS_ENABLED
 
-		refTempDegC = _BMESensor.readFixedTempC() / 100.00F;
+		refTempDegC = _BME280Sensor.readFixedTempC() / 100.00F;
+
+	#elif defined TEMP_SENSOR_TYPE_BME680 && defined BME680_IS_ENABLED
+
+		_BME680Sensor.getSensorData(refTempDegC_INT, unusedRH, unusedBaro, unusedGas, false);
+		refTempDegC = double(refTempDegC_INT / 100.00F);
+
+		sensorVal.test = refTempDegC_INT;
 
 	#elif defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
 		int err = SimpleDHTErrSuccess;
 		if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
-		  _message.Handler(translate.LANG_DHT11_READ_FAIL); // Set error to display on screen
+		  _message.Handler(language.LANG_DHT11_READ_FAIL); // Set error to display on screen
 		  refTempDegC = 0;        
 		} else {
 		  refTempDegC = refTemp;
@@ -980,6 +1054,10 @@ double Sensors::getBaroValue() {
 	
 	Hardware _hardware;
 	double baroPressureHpa;
+	int32_t  baroPressureHpa_INT;
+	int32_t  unusedTemp;   
+	int32_t  unusedRH;   
+	int32_t  unusedGas;   
 		
 	#if defined BARO_SENSOR_TYPE_LINEAR_ANALOG
 		
@@ -995,9 +1073,14 @@ double Sensors::getBaroValue() {
 		baroPressureHpa = map(_hardware.getADCRawData(BARO_ADC_CHANNEL), 0, 4095, 15000, 115000);
 		baroPressureHpa += BARO_FINE_ADJUST;
 
-	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
+	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME280_IS_ENABLED
 
-		baroPressureHpa = _BMESensor.readFixedPressure() / 100.00F; 
+		baroPressureHpa = _BME280Sensor.readFixedPressure() / 100.00F; 
+		
+	#elif defined BARO_SENSOR_TYPE_BME680 && defined BME680_IS_ENABLED
+
+		_BME680Sensor.getSensorData(unusedTemp, unusedRH, baroPressureHpa_INT, unusedGas);
+		baroPressureHpa = baroPressureHpa_INT / 100.00F; 
 		
 	#elif defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
 		// No baro sensor defined so use value grabbed at startup from reference pressure sensor
@@ -1030,7 +1113,10 @@ double Sensors::getRelHValue() {
 	Hardware _hardware;
 
 	double relativeHumidity;
-		
+	int32_t  relativeHumidity_INT;
+	int32_t  unusedTemp;   
+	int32_t  unusedBaro;   
+	int32_t  unusedGas;   		
 	#ifdef RELH_SENSOR_TYPE_LINEAR_ANALOG
 	
 		long rawRelhValue = analogRead(HUMIDITY_PIN);
@@ -1044,16 +1130,21 @@ double Sensors::getRelHValue() {
 		// NOTE DHT11 sampling rate is max 1HZ. We may need to slow down read rate to every few secs
 		int err = SimpleDHTErrSuccess;
 		if ((err = dht11.read(&refTemp, &refRelh, NULL)) != SimpleDHTErrSuccess) {
-		  _message.Handler(translate.LANG_DHT11_READ_FAIL); // Set error to display on screen
+		  _message.Handler(language.LANG_DHT11_READ_FAIL); // Set error to display on screen
 		  relativeHumidity = 0;        
 		} else {
 		  relativeHumidity = refRelh;
 		}
 		relativeHumidity + RELH_FINE_ADJUST;
 
-	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME_IS_ENABLED
+	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME280_IS_ENABLED
 
-		relativeHumidity = _BMESensor.readFixedHumidity() / 1000.00F;
+		relativeHumidity = _BME280Sensor.readFixedHumidity() / 1000.00F;
+		
+	#elif defined RELH_SENSOR_TYPE_BME680 && defined BME680_IS_ENABLED
+
+		_BME680Sensor.getSensorData(unusedTemp, relativeHumidity_INT, unusedBaro, unusedGas);
+		relativeHumidity = relativeHumidity_INT / 1000.00F;
 		
 	#else
 		// we don't have a sensor so use nominal fixed value 

@@ -48,13 +48,17 @@ if (!!window.EventSource) {
 
       for (key in myObj) {
         try {
-          // We've got a string...
           if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
-            document.getElementById(key).innerHTML = myObj[key];
+          // We've got a string...
+            if (key === 'PITOT_COLOUR' || key === 'PDIFF_COLOUR' ){
+            } else {
+              document.getElementById(key).innerHTML = myObj[key];
+            }
+ 
+          } else {
            // we've not got a string... 
-           } else {
-            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'SFLOW' || key === 'FDIFF') {
-              //HACK: template vars - replaced before page load
+           if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'SFLOW' || key === 'FDIFF') {
+              // HACK: template vars - replaced before page load
               document.getElementById(key).innerHTML = myObj[key].toFixed(~FLOW_DECIMAL_LENGTH~);  
             } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
               document.getElementById(key).innerHTML = myObj[key].toFixed(~GEN_DECIMAL_LENGTH~); 
@@ -105,7 +109,13 @@ if (!!window.EventSource) {
       // Get data filter type
       var dataFilterType = myObj["DATA_FILTER_TYPE"];
 
+      // Get Pitot Tile status colours
+      var pitotTileColour = myObj["PITOT_COLOUR"];
+      document.getElementById('PITOT').style.color=pitotTileColour;
 
+      // Get pDiff tile tatus colours
+      var pDiffTileColour = myObj["PDIFF_COLOUR"];
+      document.getElementById('PDIFF').style.color=pDiffTileColour;
     }
 
   }, false);
@@ -162,7 +172,83 @@ function onLoad(event) {
       
     
   }
- 
+
+  // Set tile status on page reload from cookie data
+  var tileStatus = getCookie('pressure-tile');
+  
+  switch (tileStatus) {
+
+    case "pdiff":
+      document.getElementById('tile-pref').style.display='none';
+      document.getElementById('tile-pdiff').style.display='block';
+    break;
+
+    case "pref":
+      document.getElementById('tile-pref').style.display='block';
+      document.getElementById('tile-pdiff').style.display='none';
+    break;
+
+  }
+
+  var tileStatus = getCookie('flow-tile');
+
+  switch (tileStatus){
+
+    case "flow":
+      document.getElementById('flow-tile').style.display='block';
+      document.getElementById('aflow-tile').style.display='none';
+      document.getElementById('sflow-tile').style.display='none';
+      document.getElementById('maf-tile').style.display='none';
+    break;
+
+    case "aflow":
+      document.getElementById('flow-tile').style.display='none';
+      document.getElementById('aflow-tile').style.display='block';
+      document.getElementById('sflow-tile').style.display='none';
+      document.getElementById('maf-tile').style.display='none';
+    break;
+
+    case "sflow":
+      document.getElementById('flow-tile').style.display='none';
+      document.getElementById('aflow-tile').style.display='none';
+      document.getElementById('sflow-tile').style.display='block';
+      document.getElementById('maf-tile').style.display='none';
+    break;
+
+    case "maf":
+      document.getElementById('flow-tile').style.display='none';
+      document.getElementById('aflow-tile').style.display='none';
+      document.getElementById('sflow-tile').style.display='none';
+      document.getElementById('maf-tile').style.display='block';
+    break;
+
+  }
+
+
+  var tileStatus = getCookie('tool-tile');
+
+  switch (tileStatus){
+
+    case "pitot":
+      document.getElementById('tile-pitot').style.display='block';
+      document.getElementById('tile-swirl').style.display='none';
+      document.getElementById('tile-fdiff').style.display='none';
+    break;
+
+    case "swirl":
+      document.getElementById('tile-pitot').style.display='none';
+      document.getElementById('tile-swirl').style.display='block';
+      document.getElementById('tile-fdiff').style.display='none';
+    break;
+
+    case "fdiff":
+      document.getElementById('tile-pitot').style.display='none';
+      document.getElementById('tile-swirl').style.display='none';
+      document.getElementById('tile-fdiff').style.display='block';
+    break;
+  
+  }
+
   console.log('Page Loaded');
   
 }
@@ -235,59 +321,93 @@ function initialiseButtons() {
     document.getElementById('updateModal').style.display='block';
   });
 
+  // Pressure tile
   document.getElementById('tile-pref-title').addEventListener('click', function(){
     document.getElementById('tile-pref').style.display='none';
     document.getElementById('tile-pdiff').style.display='block';
+    setCookie("pressure-tile","pdiff","365")    
   });
 
   document.getElementById('tile-pdiff-title').addEventListener('click', function(){
     document.getElementById('tile-pdiff').style.display='none';
     document.getElementById('tile-pref').style.display='block';
+    setCookie("pressure-tile","pref","365")
   });
 
+  // flow tile
   document.getElementById('flow-tile-title').addEventListener('click', function(){
     document.getElementById('flow-tile').style.display='none';
     document.getElementById('aflow-tile').style.display='block';
+    setCookie("flow-tile","aflow","365")    
   });
 
   document.getElementById('aflow-tile-title').addEventListener('click', function(){
     document.getElementById('aflow-tile').style.display='none';
     document.getElementById('sflow-tile').style.display='block';
+    setCookie("flow-tile","sflow","365")    
   });
 
   document.getElementById('sflow-tile-title').addEventListener('click', function(){
     document.getElementById('sflow-tile').style.display='none';
     document.getElementById('maf-tile').style.display='block';
+    setCookie("flow-tile","maf","365")    
   });
 
   document.getElementById('maf-tile-title').addEventListener('click', function(){
     document.getElementById('maf-tile').style.display='none';
     document.getElementById('flow-tile').style.display='block';
+    setCookie("flow-tile","flow","365")    
   });
+
+  // Tool tile
   document.getElementById('tile-pitot-title').addEventListener('click', function(){
     document.getElementById('tile-pitot').style.display='none';
     document.getElementById('tile-swirl').style.display='block';
-
+    setCookie("tool-tile","swirl","365")    
   });
 
   document.getElementById('tile-swirl-title').addEventListener('click', function(){
     document.getElementById('tile-swirl').style.display='none';
     document.getElementById('tile-fdiff').style.display='block';
+    setCookie("tool-tile","fdiff","365")    
   });
 
   document.getElementById('tile-fdiff-title').addEventListener('click', function(){
     document.getElementById('tile-fdiff').style.display='none';
     document.getElementById('tile-pitot').style.display='block';
+    setCookie("tool-tile","pitot","365")    
   });
+
 
   document.getElementById('FDIFFTYPEDESC').addEventListener('click', function(){
     console.log('Toggle Flow Diff');
-    xhr.open('GET', '/api/fdiff');
+    xhr.open('GET', '/api/fdiff/toggle');
     // xhr.onload = function() {
     //   if (xhr.status === 200) window.location.href = '/';
     // };
     xhr.send();
   });
+
+  document.getElementById('PDIFF').addEventListener('click', function(){
+    console.log('Zero pDiff Value');
+    xhr.open('GET', '/api/pdiff/zero');
+    // xhr.onload = function() {
+    //   if (xhr.status === 200) window.location.href = '/';
+    // };
+    xhr.send();
+  });
+
+  
+  document.getElementById('PITOT').addEventListener('click', function(){
+    console.log('Zero Pitot Value');
+    xhr.open('GET', '/api/pitot/zero');
+    // xhr.onload = function() {
+    //   if (xhr.status === 200) window.location.href = '/';
+    // };
+    xhr.send();
+  });
+
+  
 
   document.getElementById('on-button').addEventListener('click', function(){
     console.log('Bench On');
@@ -525,3 +645,44 @@ function exportSVGAsPNG() {
   img.src = url;
 
 }
+
+
+// three cookies to remamber state of top three tiles - pressure / flow / tools
+
+// http://www.quirksmode.org/js/cookies.html
+// setCookie('ppkcookie','testcookie',7);
+
+// var x = getCookie('ppkcookie');
+// if (x) {
+//     [do something with x]
+// }
+function setCookie(name,value,days) {
+  var expires = "";
+  if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + (days*24*60*60*1000));
+      expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+}
+
+
+function getCookie(name) {
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(';');
+  for(var i=0;i < ca.length;i++) {
+      var c = ca[i];
+      while (c.charAt(0)==' ') c = c.substring(1,c.length);
+      if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+  }
+  return null;
+}
+
+// https://www.geeksforgeeks.org/javascript-cookies/
+function changeCookieValue(cookieName, newValue) {
+  document.cookie = 
+      `${cookieName}=${newValue}; 
+          expires=Thu, 5 March 2030 12:00:00 UTC; path=/`;
+}
+
+

@@ -3,6 +3,7 @@
 ###
 
 The following guidelines explain how contributions to the project are managed. The reason for having these the guidelines is so that the project is maintained in a well-organised manner and easy to use for both the end user and future developers alike. 
+The following guidelines explain how contributions to the project are managed. The reason for having these the guidelines is so that the project is maintained in a well-organised manner and easy to use for both the end user and future developers alike. 
 
 The project stretches across a number of platforms and disciplines, and so trying to make a one-size-fits-all set of 'rules' is likely impossible as there are many things do not apply equally to all. So the guidelines seek to set out some basic concepts that can then be implimented in the best manner across each of the platforms.
 
@@ -31,12 +32,26 @@ There are three basic kinds of branches to the project
 As there is no adopted formal coding standard in use, the style and methods employed are largely at the discretion and experience of the individual coder. We beleive that there is no **ONE** _RIGHT_ way of coding (Give a coding job to 10 softies and you will get very different 10 solutions) and so there is no expectation that the code is written a certain way. However with that said, it is expected that all code submissions follow the basic guidelines.
 
 
+## Workflow
+
+- The 'master' branch contains the current release. Do not branch from this.
+- The 'DEV' branch contains the curent code.
+- All code changes must be tied to a current issue
+- Use the 'create a branch' link on the issue page to create a branch (makes sure you change branch source to 'DEV')
+- Checkout the branch to your local machine and make your edits
+- Discuss all changes / raise questions in the issue
+- When you are done create a Pull Request for your changes.
+
+
+
 ### Basic guidelines
 
 Whilst we do not employ any specific coding standards, we do however have some very basic guidelines that we ask you to follow if possible.
 
-- One change per pull request. Do not combine changes unless they are directly related
+
+- One change per PR. Do not combine changes unless they are directly related
 - Do not reformat or tidy existing code. Unecessary changes complicate code review
+- Try not to make changes after you have created your PR as it complicates the review.
 - Keep your work neat so that it is easy for others to follow
 - Try to adhere to general good coding practice (no spaghetti logic please)
 - Include Doxygen style title blocks for code classes and functions
@@ -46,9 +61,10 @@ Whilst we do not employ any specific coding standards, we do however have some v
 - Prefix class references with underscores
 - Create constants for integer based logic to make code easier to read (e.g. switch case statements)
 - Consider that if you find your code difficult to follow, others will too.
+- If in doubt - ASK!
 
 
-Essentially it's all about making the code easy for others to read and follow. Remember that this is an open source project so people of all skill levels will be using it and trying to decypher what's going on. Also, please consider that the more help that is provided within the code, the less real-world help will be required to get people up and running, which will help minimise the real-world resources needed to support the project.
+Essentially it's all about making the code easy for others to read and follow. Remember that this is an open source project so people of all skill levels will be using it and trying to decypher what's going on. Also, please consider that the more help that is provided within the code in the form of comments, the less real-world help will be required to get people up and running, which will help minimise the real-world resources needed to support the project.
 
 
 ## Version control
@@ -62,7 +78,7 @@ How to use GIT is a bit outside of the scope of this document but you can find m
 If you do get stuck, you can also reach out and give us a shout out on our #developer channel on Discord. If you don't have access, message the owner of the repository or give a shout out on one of the other channels. All contributors are welcomed and encouraged to join the #developer channel.
 
 
-### GIT Commit Summaries 
+### GIT Commit Summaries (changelog)
 
 Commit Summaries should use the following format:
 
@@ -109,12 +125,14 @@ The software aspects of the project all follow basic release / build versioning 
 
 Release versioning follows standard **[major].[minor].[build]** numbering Each software change should increment the relevent identifier(s) as follows.
 
+Version numbers are stored in the version.json file in the project root.
+
 
 ### Build version incrementing 
 
 The build number increments every time that the code is updated. Basically every commit that is made should have a different Build number. Currently this is manually managed.
 
-The build number follows the same formatting as the commit summaries and changelog where the build number comprises of the current date and a two digit numerical series that increases with every seperate commit on that date:
+The build number follows the same formatting and is shared with both the commit summaries and changelog where the build number comprises of the current date and a two digit numerical series that increases with every seperate commit on that date:
 
 >YYMMDDXX
 
@@ -123,18 +141,20 @@ The build number follows the same formatting as the commit summaries and changel
 
 Each official release published on the GutHub releases page should increment the minor release number **unless** there has been a major code refactoring or major feature changes, in which case the Major version number should be incremented and the minor release number reset to zero.
 
-Generally major releases are planned as projects so major version number changes are known well in advance.
+Generally major and minor releases are planned as projects so version number changes are known in advance.
 
 
 ### Development version numbering
 
-Development versioning is used for all major releases. Development releases are identified as a prefix on the major version number. The major version number represents that of the new planned release.
+Development versioning is used for all major releases. Development releases are identified as a suffix on the version number. The major version number represents that of the new planned release.
 
 The prefixes are as follows:
 
 - A : Alpha release
 - B : Beta release
 - RC : Release Candidate
+
+For example: V2.0.RC.8
 
 Each stage of development is superceded by the next once any pre-agreed testing or project milestones are completed. Acceptance testing should be performed to allow release candidate testing to be superceded by the actual release.
 
@@ -163,4 +183,5 @@ Just as an easy summary of how to best manage workflow. You can of course elect 
 
 - Keep the changelog updated with a summary of each change as you work on it
 - Update the changelog version with the date that you commit your changes along with the current incremental number
+- Update version.json with the relevent build numbers for firmware and / or GUI
 - Use the changlog summary and version as your GIT description and summary

@@ -117,6 +117,7 @@ a:hover {
 
 hr {
   clear: both;
+  width: 95%;
 }
 
 .content {
@@ -166,7 +167,19 @@ hr {
 	color: #333;
 }
 
-#FDIFFTYPEDESC {
+.pitot-tile-value {
+	font-size: 2.1rem;
+	font-weight: bold;
+	color: ~PITOT_COLOUR~;
+}
+
+.differential-tile-value {
+	font-size: 2.1rem;
+	font-weight: bold;
+	color: ~PDIFF_COLOUR~;
+}
+
+#FDIFFTYPEDESC, #PDIFF, #PITOT {
   cursor: pointer;
 }
 
@@ -201,8 +214,7 @@ flowTargetValInput {
 }
 
 .config-value {
-  padding-right: 50px;
-  width: 300px;
+  padding-right: 10px;
   float: right;
 }
 
@@ -393,6 +405,41 @@ flowTargetValInput {
   overflow-y:scroll;
 }
 
+.info-modal-content {
+  background-color: #fefefe;
+  margin: 1px auto; /* 15pcnt from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 850px; 
+  height:400px;
+  border-radius: 5px;
+  overflow-y:scroll;
+}
+
+.info-modal {
+  font-size: 18px;
+}
+
+/* two column layout */
+.column {
+  float: left;
+  width: 50%;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+  .column {
+    width: 100%;
+  }
+}
+
 .calibrationModal {
   width:400px;
 }
@@ -442,6 +489,8 @@ input[type=file]::file-selector-button:hover {
   font-size: 22px;
   font-weight: bold;
   cursor: pointer;
+  height:40px;
+  width:100%;
 }
 
 .closeFlowTargetModalButton:hover,

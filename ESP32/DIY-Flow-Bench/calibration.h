@@ -36,10 +36,12 @@ class Calibration {
 		void writeCalibrationFile(String data, String filename);
 		void saveCalibrationData();
 		void createCalibrationFile ();
+		bool setPdiffCalOffset();
+		double getPdiffCalOffset();
+		bool setPitotCalOffset();
+		double getPitotCalOffset();
 		StaticJsonDocument<1024> loadCalibrationFile();		
-		StaticJsonDocument<1024> loadCalibrationData ();
 
-		void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
 
 	
 	private:

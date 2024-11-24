@@ -4,9 +4,9 @@
  * @link https://diyflowbench.com
  * @author DeeEmm aka Mick Percy deeemm@deeemm.com
  * 
- * @file hardware.h
+ * @file wifi.h
  * 
- * @brief Hardware class header file
+ * @brief wifi class header file
  * 
  * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
  * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
@@ -17,47 +17,23 @@
  * 
  ***/
 #pragma once
+#include <Arduino.h>
 
-#include <ArduinoJson.h>
+class Comms {
 
-class Hardware {
 
-	
-	friend class Messages;
-	friend class Maths;
+    private:
 
-	protected:
-		uint8_t		_i2cAddress;
-		uint32_t	_gain;
-		uint32_t	_mux;
-		uint8_t		_rate;			  
-        uint32_t 	_config;
+   		int getWifiConnection();
+
+
 
 	public:
-		Hardware();
-		void begin ();
-		void getI2CList();
-		void getI2CDeviceList();
-		void initaliseIO ();
-		
-		int32_t getADCRawData(int channel);
-		double get3v3SupplyVolts();
-		double get5vSupplyVolts();
-		double getADCVolts(int channel);
-		bool benchIsRunning();	
-		void checkRefPressure();
-		void setVFDRef();
-		void setBleedValveRef();
-		
-		void benchOn();
-		void benchOff();
-		float uptime();
 
-		void stepperTest();
+        void initaliseWifi();
+		void resetWifi ( void );
+ 		void wifiReconnect ( void );
 
 
-	private:
-		// void configurePins ();
-
-
+    
 };

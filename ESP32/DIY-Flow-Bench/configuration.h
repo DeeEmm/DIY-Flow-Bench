@@ -20,16 +20,6 @@
 
 #include "constants.h"
 
-/***********************************************************
-* SELECT DEFAULT BENCH TYPE
-* NOTE: Only MAF style bench working at this stage
-* Other bench types planned for V3 release
-***/
-
-#define MAF_STYLE_BENCH
-//#define ORIFICE_STYLE_BENCH
-//#define PITOT_STYLE_BENCH
-//#define VENTURI_STYLE_BENCH
 
 
 
@@ -50,11 +40,6 @@
 
 
 
-/***********************************************************
-* CONFIGURE FILESYSTEM
-***/
-
-#define FORMAT_FILESYSTEM_IF_FAILED true
 
 
 /***********************************************************
@@ -62,64 +47,6 @@
 ***/
 
 // #define SD_CARD_IS_ENABLED
-
-
-/***********************************************************
-* CONFIGURE COMMS
-*
-* Default comms port is 0 (U0UXD) - (USB programming port) This is used for API / Status Messages / Debugging
-* Port 2 (U2UXD) is used to communicate with digital gauge for automated measurements & logging
-*
-***/
-
-#define SERIAL0_ENABLED                                     // Default serial comms (API & status)
-// #define SERIAL2_ENABLED                                  // Digital guage serial protocol
-
-#define SERIAL0_BAUD 115200
-#define SERIAL2_BAUD 9600
-// #define MAC_ADDRESS {0x32, 0xAE, 0xA4, 0x07, 0x0D, 0x00}    // MAC Address (uncomment to enable)
-// #define STATIC_IP {192,168,1,222}                           // Static IP address (uncomment to enable)
-#define SUBNET {192,168,1,1}                                // Subnet (For static IP)
-#define GATEWAY {255,255,0,0}                               // Default gateway (For static IP)
-#define WEBSERVER_ENABLED                                   // Disable to run headless
-
-
-
-
-/***********************************************************
- * SYSTEM SETTINGS
- * NOTE: Some of these settings may break operation. Change with care.
- ***/
-#define BOOT_MESSAGE "May the flow be with you..."
-#define PAGE_TITLE "DIY Flow Bench"
-#define LANGUAGE_FILE "language/EN_language.h"
-#define SHOW_ALARMS true
-#define MIN_REFRESH_RATE 250
-#define API_IS_ENABLED                                  
-#define API_BLOB_LENGTH 1024
-#define API_RESPONSE_LENGTH 64
-#define API_STATUS_LENGTH 128
-#define API_JSON_LENGTH 1020
-#define API_SCAN_DELAY_MS 250
-#define PRINT_BUFFER_LENGTH 128
-// #define API_CHECKSUM_IS_ENABLED                       
-// #define WEBSOCK_CLEAN_FREQ 600000 // DEPRECATED
-#define FILESYSTEM SPIFFS
-#define SENSOR_TASK_MEM_STACK 2200
-#define ENVIRO_TASK_MEM_STACK 1800
-#define DATA_JSON_SIZE 1500
-#define CONFIG_JSON_SIZE 1700 //1536 //1200 
-#define CAL_DATA_JSON_SIZE 128
-#define LIFT_DATA_JSON_SIZE 384
-#define VTASK_DELAY_ADC 500
-#define VTASK_DELAY_BME 500
-#define VTASK_DELAY_SSE 500
-
-
-/***********************************************************
-* WEBUI SETTINGS
-***/
-#define STATUS_UPDATE_RATE 500                              // time between SSE push in milliseconds
 
 
 /***********************************************************
@@ -153,11 +80,25 @@
 *  Check the report shown in serial monitor on boot for addresses of I2C devices and update BME280_I2C_ADDR accordingly
 ***/
 
-#define BME_IS_ENABLED                                      // Comment to disable BME related code
+#define BME280_IS_ENABLED                                      // Comment to disable BME related code
 
 const int BME280_I2C_ADDR = 0x76;                           
 // const int BME280_I2C_ADDR = 0x77;       
-#define BME_SCAN_DELAY_MS 1000                              // Does not need to be faster than this as sensor read speed is around 30 secs!!       
+#define BME280_SCAN_DELAY_MS 1000                              // Does not need to be faster than this as sensor read speed is around 30 secs!!       
+
+
+/***********************************************************
+* CONFIGURE BME680
+*
+*  Default address 0x77
+*  Check the report shown in serial monitor on boot for addresses of I2C devices and update BME680_I2C_ADDR accordingly
+***/
+
+// #define BME680_IS_ENABLED                                      // Comment to disable BME related code
+
+// const int BME680_I2C_ADDR = 0x76;                           
+const int BME680_I2C_ADDR = 0x77;       
+#define BME680_SCAN_DELAY_MS 1000                              // Can be much faster than BME280!!       
 
 
 
@@ -352,6 +293,7 @@ const int ADC_I2C_ADDR = 0x48;
 // #define BARO_SENSOR_TYPE_FIXED_VALUE
 // #define BARO_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from REF_BARO_PIN
 #define BARO_SENSOR_TYPE_BME280
+// #define BARO_SENSOR_TYPE_BME680
 // #define BARO_SENSOR_TYPE_MPX4115                         // use absolute pressure sensor
 
 #define FIXED_BARO_VALUE 101.3529                           // Default pressure in kPa
@@ -384,6 +326,7 @@ const int ADC_I2C_ADDR = 0x48;
 // #define TEMP_SENSOR_TYPE_FIXED_VALUE
 // #define TEMP_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from TEMPERATURE_PIN
 #define TEMP_SENSOR_TYPE_BME280
+// #define TEMP_SENSOR_TYPE_BME680
 // #define TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
 
 #define TEMP_MV_TRIMPOT 0.0                                 // Millivolt offset
@@ -407,6 +350,7 @@ const int ADC_I2C_ADDR = 0x48;
 // #define RELH_SENSOR_TYPE_FIXED_VALUE
 // #define RELH_SENSOR_TYPE_LINEAR_ANALOG                   // Use analog signal from HUMIDITY_PIN
 #define RELH_SENSOR_TYPE_BME280
+// #define RELH_SENSOR_TYPE_BME680
 // #define RELH_SENSOR_TYPE_SIMPLE_RELH_DHT11
 
 #define RELH_MV_TRIMPOT 0.0                                 // Millivolt offset

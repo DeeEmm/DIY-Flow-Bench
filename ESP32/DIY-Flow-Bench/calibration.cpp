@@ -20,6 +20,7 @@
 #include "configuration.h"
 #include "constants.h"
 #include "structs.h"
+#include "datahandler.h"
 
 #include "calibration.h"
 #include <SPIFFS.h>
@@ -28,7 +29,7 @@
 #include "calculations.h"
 #include "messages.h"
 #include "webserver.h"
-#include LANGUAGE_FILE
+// // #include LANGUAGE_FILE
 
 
 Calibration::Calibration () {
@@ -50,7 +51,7 @@ bool Calibration::setFlowOffset() {
 
   extern struct ConfigSettings config;
   extern struct CalibrationData calVal;
-  extern struct Translator translate;
+  extern struct Language language;
   extern struct SensorData sensorVal;
   
   Sensors _sensors; 
@@ -64,7 +65,7 @@ bool Calibration::setFlowOffset() {
 
   saveCalibrationData();    
 
-  _message.Handler(translate.LANG_CAL_OFFET_VALUE + calVal.flow_offset);
+  // _message.Handler(language.LANG_CAL_OFFET_VALUE + calVal.flow_offset);
   
   return true;
   
@@ -96,13 +97,16 @@ bool Calibration::setLeakOffset() {
   Calculations _calculations;
   Sensors _sensors;
   Messages _message;
+  DataHandler _data;
+
+
 
   extern struct CalibrationData calVal;
-  extern struct Translator translate;
+  extern struct Language language;
   extern struct SensorData sensorVal;
 
   // load current calibration data
-  loadCalibrationData();
+  _data.loadCalibrationData();
 
   _message.debugPrintf("Calibration::setLeakTest \n");
 
@@ -113,14 +117,14 @@ bool Calibration::setLeakOffset() {
   // De we have Pressure or Vacuum | Forwards or Reverse Flow?
   // if (_calculations.convertPressure(_sensors.getPRefValue(), INH2O) > 0) {
   //   calVal.leak_cal_offset_rev = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
-  //   _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset_rev);
+  //   _message.Handler(language.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset_rev);
   // } else {
     // calVal.leak_cal_offset = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
-    // _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
+    // _message.Handler(language.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
   // }
 
     calVal.leak_cal_offset = sensorVal.FlowCFM;
-    _message.Handler(translate.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
+    // _message.Handler(language.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
 
   saveCalibrationData();    
   
@@ -162,37 +166,152 @@ double Calibration::getLeakOffsetReverse() {
 
 
 
+// TODO - #205 convert from pre-compile to post-compile 
+// /***********************************************************
+// * @brief createCalibration File
+// * @details Create configuration json file
+// * @note Called from Webserver::Initialise() if config.json not found
+// ***/
+// void Calibration::createCalibrationFile () {
+
+//   extern struct CalibrationData calVal;
+//   Webserver _webserver;
+//   Messages _message;
+//   String jsonString;
+//   StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
+  
+//   _message.debugPrintf("Creating cal.json file... \n"); 
+  
+//   calData["FLOW_OFFSET"] = calVal.flow_offset;
+//   calData["USER_OFFSET"] = calVal.user_offset;
+//   calData["LEAK_CAL_BASELINE"] = calVal.leak_cal_baseline;
+//   calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
+//   calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
+//   calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
+
+//   serializeJsonPretty(calData, jsonString);
+
+//   File outputFile = SPIFFS.open("/cal.json", FILE_WRITE);
+//   serializeJsonPretty(calData, outputFile);
+//   outputFile.close();
+  
+// }
+
+
+
+
+
+
 
 /***********************************************************
-* @brief createCalibration File
-* @details Create configuration json file
-* @note Called from Webserver::Initialise() if config.json not found
+* Zero pDiff value
+* 
 ***/
-void Calibration::createCalibrationFile () {
+bool Calibration::setPdiffCalOffset() {
 
+  extern struct ConfigSettings config;
   extern struct CalibrationData calVal;
-  Webserver _webserver;
+  extern struct Language language;
+  extern struct SensorData sensorVal;
+  extern struct DeviceStatus status;
+  
+  Sensors _sensors; 
+  Calculations _calculations;
   Messages _message;
-  String jsonString;
-  StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
-  
-  _message.debugPrintf("Creating cal.json file... \n"); 
-  
-  calData["FLOW_OFFSET"] = calVal.flow_offset;
-  calData["USER_OFFSET"] = calVal.user_offset;
-  calData["LEAK_CAL_BASELINE"] = calVal.leak_cal_baseline;
-  calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
-  calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
-  calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
+ 
+ 
+  if (calVal.pdiff_cal_offset == 0) {
+    // update config var
+    calVal.pdiff_cal_offset = sensorVal.PDiffH2O;
+    _message.debugPrintf("Calibration::setPdiffOffset %d \n", calVal.pdiff_cal_offset);
+  } else {
+    // update config var
+    calVal.pdiff_cal_offset = 0.0;
+    _message.debugPrintf("Calibration::resetPdiffOffset %d \n", 0.0);
+  }
 
-  serializeJsonPretty(calData, jsonString);
+ 
+ 
+ 
+ 
+  saveCalibrationData();    
 
-  File outputFile = SPIFFS.open("/cal.json", FILE_WRITE);
-  serializeJsonPretty(calData, outputFile);
-  outputFile.close();
+  // _message.Handler(language.LANG_CAL_OFFET_VALUE + calVal.flow_offset);
+  
+  return true;
   
 }
 
+
+
+/***********************************************************
+* Get pDiff offset
+* 
+***/
+double Calibration::getPdiffCalOffset() {
+
+  extern struct CalibrationData calVal;
+  
+  loadCalibrationFile();
+
+  return calVal.pdiff_cal_offset;
+
+}
+
+
+
+
+
+/***********************************************************
+* Zero Pitot value
+*  
+***/
+bool Calibration::setPitotCalOffset() {
+
+  extern struct ConfigSettings config;
+  extern struct CalibrationData calVal;
+  extern struct Language language;
+  extern struct SensorData sensorVal;
+  extern struct DeviceStatus status;
+  
+  Sensors _sensors; 
+  Calculations _calculations;
+  Messages _message;
+ 
+
+  if (calVal.pitot_cal_offset == 0) {
+    // update config var
+    calVal.pitot_cal_offset = sensorVal.PitotKPA;
+    _message.debugPrintf("Calibration::setPitotDeltaOffset %d kPa\n", calVal.pitot_cal_offset);
+  } else {
+    // update config var
+    calVal.pitot_cal_offset = 0.0;
+    _message.debugPrintf("Calibration::resetPitotDeltaOffset %d \n", 0.0);
+  }
+
+  saveCalibrationData();    
+
+  // _message.Handler(language.LANG_CAL_OFFET_VALUE + calVal.flow_offset);
+  
+  return true;
+  
+}
+
+
+
+/***********************************************************
+* Get pDiff offset
+* 
+***/
+double Calibration::getPitotCalOffset() {
+
+  extern struct CalibrationData calVal;
+  
+  loadCalibrationFile();
+
+  return calVal.pdiff_cal_offset;
+
+}
 
 
 
@@ -205,12 +324,12 @@ void Calibration::saveCalibrationData() {
   
   Messages _message;
 
-  Webserver _webserver;
+  DataHandler _data;
   String jsonString;
   StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
 
   extern struct CalibrationData calVal;
-  extern struct Translator translate;
+  extern struct Language language;
 
   _message.debugPrintf("Writing to cal.json file... \n");
     
@@ -221,8 +340,10 @@ void Calibration::saveCalibrationData() {
   calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
   calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
   calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
+  calData["PDIFF_CAL_OFFSET"] = calVal.pitot_cal_offset;
+  calData["PITOT_CAL_OFFSET"] = calVal.pdiff_cal_offset;
 
-  _message.Handler(translate.LANG_SAVING_CALIBRATION);
+  _message.Handler(language.LANG_SAVING_CALIBRATION);
   
   serializeJsonPretty(calData, jsonString);
 
@@ -233,7 +354,7 @@ void Calibration::saveCalibrationData() {
   serializeJsonPretty(calData, outputFile);
   outputFile.close();
   
-  _webserver.writeJSONFile(jsonString, "/cal.json", CAL_DATA_JSON_SIZE);
+  _data.writeJSONFile(jsonString, "/cal.json", CAL_DATA_JSON_SIZE);
 
   _message.debugPrintf("Calibration Saved \n");
 
@@ -241,43 +362,6 @@ void Calibration::saveCalibrationData() {
 }
 
 
-
-
-/***********************************************************
-* loadCalibration
-* Read calibration data from cal.json file
-***/
-StaticJsonDocument<1024> Calibration::loadCalibrationData () {
-
-  Webserver _webserver;
-  Messages _message;
-  _message.debugPrintf("Calibration::loadCalibration \n");
-  
-  StaticJsonDocument<1024> calibrationData;
-  calibrationData = _webserver.loadJSONFile("/cal.json");
-  parseCalibrationData(calibrationData);
-  return calibrationData;
-}
-
-
-
-
-
-/***********************************************************
-* @brief Parse Calibration Data
-* @param calibrationData JSON document containing calibration data
-***/
-void Calibration::parseCalibrationData(StaticJsonDocument<1024> calData) {
-
-  extern struct CalibrationData calVal;
-
-  calVal.flow_offset = calData["FLOW_OFFSET"];
-  calVal.user_offset = calData["USER_OFFSET"];
-  calVal.leak_cal_baseline = calData["LEAK_CAL_BASELINE"];
-  calVal.leak_cal_baseline_rev = calData["LEAK_CAL_BASELINE_REV"];
-  calVal.leak_cal_offset = calData["LEAK_CAL_OFFSET"];
-  calVal.leak_cal_offset_rev = calData["LEAK_CAL_OFFSET_REV"];
-}
 
 
 
