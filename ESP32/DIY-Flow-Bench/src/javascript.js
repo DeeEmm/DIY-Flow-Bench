@@ -637,7 +637,7 @@ function exportSVGAsPNG() {
     const a = document.createElement('a');
     a.download = 'LiftGraph.png';
     document.body.appendChild(a);
-    a.href = canvas.toDataURL();
+    a.href = canvas.toDataURL('image/jpeg');
     a.click();
     a.remove();
 
