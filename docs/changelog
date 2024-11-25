@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24112601        - #213 Revert change to allow -ve delta / velocity
 24112503        - #213 Pitot offset error
 24112502        - #157 Updated datagraph settings
                 - Capture radio retains selection
