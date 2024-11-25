@@ -964,7 +964,7 @@ double Sensors::getPitotVelocity() {
 	double totalPressure = 0.0;
 	double staticPressure = 0.0;	
 	
-	pitotPressure = this->getPitotValue();
+	pitotPressure = sensorVal.PitotKPA;
 
 	// get air density
 	airDensity = _calculations.calculateAirDensity(sensorVal.TempDegC, sensorVal.BaroKPA, sensorVal.RelH);

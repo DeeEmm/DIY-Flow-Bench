@@ -1,0 +1,3 @@
+branchName: '${issue.number}-${issue.title}'
+autoLinkIssue: true
+defaultBranch: 'DEV'
