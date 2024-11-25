@@ -617,7 +617,7 @@ function exportSVGAsPNG() {
   // convert the blob object to a dedicated URL
   const url = URL.createObjectURL(svgBlob);
 
-  // load the SVG blob to a flesh image object
+  // load the SVG blob to a fresh image object
   const img = new Image();
   img.addEventListener('load', () => {
     

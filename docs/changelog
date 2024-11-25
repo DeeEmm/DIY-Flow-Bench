@@ -29,6 +29,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24112502        - #157 Updated datagraph settings
+                - Capture radio retains selection
 24112501        - Update API
 24112402        - #213 Pitot / differential zeroing
                 - #254 Report sensor voltage to API
