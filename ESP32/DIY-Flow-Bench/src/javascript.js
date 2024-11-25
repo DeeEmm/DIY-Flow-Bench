@@ -635,7 +635,7 @@ function exportSVGAsPNG() {
 
     // trigger a synthetic download operation with a temporary link
     const a = document.createElement('a');
-    a.download = 'LiftGraph.png';
+    a.download = 'LiftGraph.jpg';
     document.body.appendChild(a);
     a.href = canvas.toDataURL('image/jpeg');
     a.click();
