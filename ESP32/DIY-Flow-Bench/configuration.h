@@ -81,7 +81,7 @@
 *  Check the report shown in serial monitor on boot for addresses of I2C devices and update BME280_I2C_ADDR accordingly
 ***/
 
-#define BME280_IS_ENABLED                                      // Comment to disable BME related code
+//#define BME280_IS_ENABLED                                      // Comment to disable BME related code
 
 const int BME280_I2C_ADDR = 0x76;                           
 // const int BME280_I2C_ADDR = 0x77;       
