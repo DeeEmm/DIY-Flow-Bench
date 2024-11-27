@@ -233,7 +233,7 @@ void API::ParseMessage(char apiMessage) {
       break;      
 
       case 'D': // Differential Pressure value
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%u", config.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INH2O));
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%F", config.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INH2O));
       break;      
 
       // DEPRECATED 
@@ -332,7 +332,7 @@ void API::ParseMessage(char apiMessage) {
       break;      
 
       case 'P': // Get measured Pitot Pressure 'P.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "R%s%f", config.api_delim , _calculations.convertPressure(sensorVal.PitotKPA, INH2O));
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "P%s%f", config.api_delim , _calculations.convertPressure(sensorVal.PitotKPA, INH2O));
       break;
       
       // DEPRECATED 

@@ -930,7 +930,7 @@ double Sensors::getPitotValue() {
 
 
 	// Lets make sure we have a valid value to return - check it is above minimum threshold
-	double pitotComp = (pitotPressure);
+	double pitotComp = fabs(pitotPressure);
 	if (pitotComp > config.min_bench_pressure) { 
 		return pitotComp;
 	} else { 
@@ -971,7 +971,7 @@ double Sensors::getPitotVelocity() {
 
 	// Convert Pitot pressure to velocity (m3/min)
 	// airVelocity = sqrt(2 * (pitotPressure - sensorVal.PRefKPA) / airDensity );
-	airVelocity = sqrt(2 * (pitotPressure) / airDensity );
+	airVelocity = sqrt(2 * fabs(pitotPressure) / airDensity );
 
 	// Lets make sure we have a valid value to return - check it is above minimum threshold 
 	// TODO - 'borrowing' min_bench_pressure
