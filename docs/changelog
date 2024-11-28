@@ -29,8 +29,13 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-24112504        - Datagraph image format (jpg)
+24112901        - Pitot Tile not displaying correct value for ∆P
+                - Correction in calibaration.cpp for calData pdiff and pitot.
+                - API Corrections
+                - Added merge-firmware.py
+                - Capitalised DOCS + CHANGELOG directories
 24112601        - #213 Revert change to allow -ve delta / velocity
+24112504        - Datagraph image format (jpg)
 24112503        - #213 Pitot offset error
 24112502        - #157 Updated datagraph settings
                 - Capture radio retains selection
