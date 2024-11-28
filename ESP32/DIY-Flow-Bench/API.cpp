@@ -144,7 +144,7 @@ void API::ParseMessage(char apiMessage) {
   a : ADC Raw Values Maf:pRef:pDiff:Pitot
   B : Barometric Pressure
   C : Flow Offset Calibration
-  D : Differential Pressure value
+  D : Differential Pressure value inH2O
   E : Enum1 Flow:Ref:Temp:Humidity:Baro
   e : Enum2 Pitot:Swirl
   F : Flow Value in CFM
@@ -160,11 +160,12 @@ void API::ParseMessage(char apiMessage) {
   M : MAF RAW ADC Value
   m : MAF Voltage
   N : Hostname
+  O : Flowrate
   o : Active Orifice
-  P : Pitot Value
+  P : Pitot Value inH2O
   Q : MAF Data Max Value
   q : MAF Data Key Max Value
-  R : Reference Pressure Value
+  R : Reference Pressure Value inH20
   S : Swirl value
   T : Temperature in Celcius
   t : Temperature in Fahrenheit
@@ -233,7 +234,7 @@ void API::ParseMessage(char apiMessage) {
       break;      
 
       case 'D': // Differential Pressure value
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%F", config.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INH2O));
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%F", config.api_delim , _calculations.convertPressure(sensorVal.PDiffKPA, INH2O));
       break;      
 
       // DEPRECATED 
@@ -254,7 +255,7 @@ void API::ParseMessage(char apiMessage) {
       
       case 'e': // Enum2 - Pitot:Swirl
           
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "E%s%f%s%f", 
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "e%s%f%s%f", 
           config.api_delim, sensorVal.PitotKPA, 
           config.api_delim, sensorVal.Swirl); 
       break;      
