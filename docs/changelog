@@ -34,6 +34,7 @@ Build #         - Description of Change
                 - API Corrections
                 - Added merge-firmware.py
                 - Capitalised DOCS + CHANGELOG directories
+                - Change datagraph image download to JPG
 24112601        - #213 Revert change to allow -ve delta / velocity
 24112504        - Datagraph image format (jpg)
 24112503        - #213 Pitot offset error
