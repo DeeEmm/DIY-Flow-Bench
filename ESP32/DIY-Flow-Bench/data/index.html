@@ -897,7 +897,7 @@ svg .dataCircle:hover {
             <hr>
             <div class="config-row"><label class="config-label">~LANG_GUI_VERSION~: </label><span class="config-value" id="RELEASE">~RELEASE~</span></div>
             <div class="config-row"><label class="config-label">~LANG_GUI_BUILD~:  </label><span class="config-value" id="BUILD_NUMBER">~BUILD_NUMBER~</span></div>
-            <div class="config-row"><label class="config-label">~LANG_GUI_GUI~: </label><span class="config-value" id="VERSION">24112503</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_GUI~: </label><span class="config-value" id="VERSION">24112502</span></div>
             <h4>~LANG_GUI_STORAGE~</h4>
             <hr>
             <div class="config-row"><label class="config-label">~LANG_GUI_MEM_SIZE~:  </label><span class="config-value" id="SPIFFS_MEM_SIZE">~SPIFFS_MEM_SIZE~</span> (bytes)</div>
@@ -1634,7 +1634,7 @@ function initialiseButtons() {
 
   document.getElementById('capture-graph-data-button').addEventListener('click', function(){
     // initiate datagraph image download from browser
-    exportSVGAsJPG();
+    exportSVGAsPNG();
   });
 
   document.getElementById('STATUS_MESSAGE').addEventListener('dblclick', function(){
@@ -1934,10 +1934,10 @@ document.addEventListener("keydown", ({key}) => {
 
 
 /***********************************************************
-* Export Data Graph as PNG Image (temp change to jpg)
+* Export Data Graph as PNG Image
 * Source: https://takuti.me/note/javascript-save-svg-as-image/
 ***/
-function exportSVGAsJPG() {
+function exportSVGAsPNG() {
 
   const svg = document.querySelector('svg');
 
@@ -1967,7 +1967,7 @@ function exportSVGAsJPG() {
 
     // trigger a synthetic download operation with a temporary link
     const a = document.createElement('a');
-    a.download = 'LiftGraph.jpg';
+    a.download = 'LiftGraph.png';
     document.body.appendChild(a);
     a.href = canvas.toDataURL();
     a.click();

@@ -302,7 +302,7 @@ function initialiseButtons() {
 
   document.getElementById('capture-graph-data-button').addEventListener('click', function(){
     // initiate datagraph image download from browser
-    exportSVGAsJPG();
+    exportSVGAsPNG();
   });
 
   document.getElementById('STATUS_MESSAGE').addEventListener('dblclick', function(){
@@ -602,10 +602,10 @@ document.addEventListener("keydown", ({key}) => {
 
 
 /***********************************************************
-* Export Data Graph as PNG Image (temp change to jpg)
+* Export Data Graph as PNG Image
 * Source: https://takuti.me/note/javascript-save-svg-as-image/
 ***/
-function exportSVGAsJPG() {
+function exportSVGAsPNG() {
 
   const svg = document.querySelector('svg');
 
@@ -635,9 +635,9 @@ function exportSVGAsJPG() {
 
     // trigger a synthetic download operation with a temporary link
     const a = document.createElement('a');
-    a.download = 'LiftGraph.jpg';
+    a.download = 'LiftGraph.png';
     document.body.appendChild(a);
-    a.href = canvas.toDataURL();
+    a.href = canvas.toDataURL('image/jpeg');
     a.click();
     a.remove();
 
