@@ -1186,11 +1186,15 @@ void DataHandler::bootLoop()
         }
 
         // if (status.pinsFilename.isEmpty();
-        if ((status.pinsLoaded == true) && (SPIFFS.exists("/index.html"))) status.doBootLoop = false;
-
+        if ((status.pinsLoaded == true) && (SPIFFS.exists("/index.html"))) {status.doBootLoop = false;
+        }
         vTaskDelay( 1 );
     
-    } while (status.doBootLoop = true);
+    } while (status.doBootLoop == true);
+
+    tempServer->end();  // Stops the server and releases the port
+
+    delay(2000);  // 2000ms delay to ensure the port is released
 
     tempServer->reset();
 
