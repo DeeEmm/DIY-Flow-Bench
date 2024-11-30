@@ -25,9 +25,8 @@
     "ADC_GAIN" : 6.144,
     
     "MAF_IS_ENABLED" : true,
+    "MAF_SRC" : 11,
     "MAF_DATA_FILE" : "mafData/BOSCH_0280218067.cpp",
-    "MAF_SRC_IS_PIN" : false,
-    "MAF_SRC_IS_ADC" : true,
     "MAF_MV_TRIMPOT" : 0.0,
     "MAF_ADC_CHANNEL" : 0,
     

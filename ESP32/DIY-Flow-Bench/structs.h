@@ -123,10 +123,9 @@ struct Configuration {
   double ADC_GAIN = 6.144;
 
   bool MAF_IS_ENABLED = true;
-  int MAF_TYPE = 11;
+  int MAF_SRC = 11;
   const char MAF_DATA_FILE[35] = "BOSCH_0280218067.cpp";
-  // bool MAF_SRC_IS_PIN = false;
-  // bool MAF_SRC_IS_ADC = true;
+  int MAF_SRC = 11;
   double MAF_MV_TRIMPOT = 0.0;
   int MAF_ADC_CHANNEL = 0;
 

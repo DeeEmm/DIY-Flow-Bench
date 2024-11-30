@@ -604,8 +604,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
     
     config.MAF_IS_ENABLED = configurationJSON["MAF_IS_ENABLED"].as<bool>();
     // strcpy(config.MAF_DATA_FILE, configurationJSON["MAF_DATA_FILE"]);
-    // config.MAF_SRC_IS_PIN = configurationJSON["MAF_SRC_IS_PIN"].as<bool>();
-    // config.MAF_SRC_IS_ADC =  configurationJSON["MAF_SRC_IS_ADC"].as<bool>();
+    config.MAF_SRC =  configurationJSON["MAF_SRC"].as<int>();
     config.MAF_MV_TRIMPOT = configurationJSON["MAF_MV_TRIMPOT"].as<int>();
     config.MAF_ADC_CHANNEL = configurationJSON["MAF_ADC_CHANNEL"].as<int>();
 

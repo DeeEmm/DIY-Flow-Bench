@@ -99,48 +99,34 @@ void Hardware::initaliseIO () {
     _message.serialPrintf("Input ORIFICE_BCD_BIT3_PIN: %d\n", pins.ORIFICE_BCD_BIT3_PIN );
     pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
   }
-  #ifdef MAF_SRC_IS_PIN
-  if ((pins.MAF_PIN < 99)  ) {
+  if (config.MAF_SRC == LINEAR_ANALOG && pins.MAF_PIN < 99) {
     _message.serialPrintf("Input MAF_PIN: %d\n", pins.MAF_PIN );
     pinMode(pins.MAF_PIN, INPUT);   
   }
-  #endif
-  #ifdef PREF_SRC_PIN
-  if (pins.REF_PRESSURE_PIN < 99 ) {
+  if (config.PREF_SENSOR_TYPE == LINEAR_ANALOG && pins.REF_PRESSURE_PIN < 99){
     _message.serialPrintf("Input REF_PRESSURE_PIN: %d\n", pins.REF_PRESSURE_PIN );
     pinMode(pins.REF_PRESSURE_PIN, INPUT);   
   }
-  #endif
-  #ifdef PDIFF_SRC_IS_PIN
-  if (pins.DIFF_PRESSURE_PIN < 99 ) {
+  if (config.PDIFF_SENSOR_TYPE == LINEAR_ANALOG && pins.DIFF_PRESSURE_PIN < 99) {
     _message.serialPrintf("Input DIFF_PRESSURE_PIN: %d\n", pins.DIFF_PRESSURE_PIN );
     pinMode(pins.DIFF_PRESSURE_PIN, INPUT);   
   }
-  #endif
-  #ifdef PITOT_SRC_IS_PIN
-  if (pins.PITOT_PIN < 99 ) {
+  if (config.PITOT_SENSOR_TYPE && pins.PITOT_PIN < 99) {
     _message.serialPrintf("Input PITOT_PIN: %d\n", pins.PITOT_PIN );
     pinMode(pins.PITOT_PIN, INPUT);   
   }
-  #endif
-  #ifdef TEMP_SENSOR_TYPE_LINEAR_ANALOG
-  if (pins.TEMPERATURE_PIN < 99 ) {
+  if (config.TEMP_SENSOR_TYPE == LINEAR_ANALOG && pins.TEMPERATURE_PIN < 99) {
     _message.serialPrintf("Input TEMPERATURE_PIN: %d\n", pins.TEMPERATURE_PIN );
     pinMode(pins.TEMPERATURE_PIN, INPUT);   
   }
-  #endif
-  #ifdef RELH_SENSOR_TYPE_LINEAR_ANALOG
-  if (pins.HUMIDITY_PIN < 99 ) {
+  if (config.RELH_SENSOR_TYPE == LINEAR_ANALOG && pins.HUMIDITY_PIN < 99 ){
     _message.serialPrintf("Input HUMIDITY_PIN: %d\n", pins.HUMIDITY_PIN );
     pinMode(pins.HUMIDITY_PIN, INPUT);   
   }
-  #endif
-  #ifdef BARO_SENSOR_TYPE_LINEAR_ANALOG
-  if (pins.REF_BARO_PIN < 99 ) {
+  if (config.BARO_SENSOR_TYPE == LINEAR_ANALOG && pins.REF_BARO_PIN < 99 ) {
     _message.serialPrintf("Input REF_BARO_PIN: %d\n", pins.REF_BARO_PIN );
     pinMode(pins.REF_BARO_PIN, INPUT);     
   }
-  #endif
   // if (pins.SERIAL0_RX_PIN < 99 ) {
   //   _message.serialPrintf("Input SERIAL0_RX_PIN: %d\n", pins.SERIAL0_RX_PIN );
   //   pinMode(pins.SERIAL0_RX_PIN, INPUT);   

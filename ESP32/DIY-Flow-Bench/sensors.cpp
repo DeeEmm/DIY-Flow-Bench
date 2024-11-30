@@ -77,14 +77,6 @@ void Sensors::begin () {
 			// get size of the MAF datatable 
 			status.mafDataTableRows = status.mafJsonObject.size() -1;
 
-			// REVIEW - Probably not worth doing
-			// could be used instead of array / vector
-			// get iterator - access object by index
-			// https://arduinojson.org/v6/api/jsonobject/begin_end/
-			// JsonObject::iterator ite = status.mafLookupTable.end();
-			// const char* someVal = ite->value().as<const char*>();
-			// const char* someKey = ite->key().c_str();
-
 			// Create 2D arrray
 			int mafArray[status.mafDataTableRows][2];
 			int idx = 0;
@@ -358,26 +350,36 @@ long Sensors::getMafRaw() {
 	
 	Hardware _hardware;
 	extern struct SensorData sensorVal;
+	extern struct Configuration config;
+	extern struct Pins pin;
 
-	#ifdef MAF_IS_ENABLED
-	Maf _maf;
+	if (config.MAF_IS_ENABLED){
 
-	#if defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
-		sensorVal.MafRAW = _hardware.getADCRawData(MAF_ADC_CHANNEL);
-		
-	#elif defined MAF_SRC_IS_PIN	
-		long mafFlowRaw = analogRead(MAF_PIN);
-	#else
-		mafFlowRaw = 1;
-	#endif
+		switch (config.MAF_SRC) {
 
-	return sensorVal.MafRAW;
+			case ADS1115:{
+				sensorVal.MafRAW = _hardware.getADCRawData(config.MAF_ADC_CHANNEL);
+				break;
+			}
 
-	#else
+			case LINEAR_ANALOG: {
+				long mafFlowRaw = analogRead(pin.MAF_PIN);
+				break;
+			}
 
-	return 0; // MAF is disabled so lets return 1
+			default: {
+				return 0;
+				break;
+			}
+		}
 
-	#endif
+		return sensorVal.MafRAW;
+
+	} else {
+
+		return 0; // MAF is disabled so lets return 1
+
+	}
 }
 
 
@@ -389,21 +391,30 @@ long Sensors::getMafRaw() {
 double Sensors::getMafVolts() {
 
 	extern struct Configuration config;
-	
+	extern struct Pins pin;
 	Hardware _hardware;
-
 	double sensorVolts = 0.00F;
-	
-	#if defined MAF_SRC_IS_ADC && defined MAF_IS_ENABLED && defined ADC_IS_ENABLED
-		sensorVolts = _hardware.getADCVolts(MAF_ADC_CHANNEL);
-				
-	#elif defined MAF_SRC_IS_PIN	
-		long mafRaw = analogRead(MAF_PIN);
-		sensorVolts = mafRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
-	#else
-		sensorVolts = 1.0;
-		return sensorVolts;
-	#endif
+
+	switch (config.MAF_SRC) {
+
+		case ADS1115:{
+			sensorVolts = _hardware.getADCVolts(config.MAF_ADC_CHANNEL);
+			break;
+		}
+
+		case LINEAR_ANALOG: {
+			long mafRaw = analogRead(pin.MAF_PIN);
+			sensorVolts = mafRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
+			break;
+		}
+
+		default: {
+			sensorVolts = 1.0;
+			return sensorVolts;
+			break;
+		}
+	}
+
 	
 	// Lets make sure we have a valid value to return
 	if (sensorVolts > 0) {
@@ -461,12 +472,6 @@ double Sensors::getMafFlow(int units) {
 			lookupValue = Val; // lets use the associated lookup value
 			sensorVal.MafLookup = Val;
 			break;
-			
-		// } else if ( Key > refValue && rowNum == 0) { // we were only on the first row so there is no previous value to interpolate with, so lets set the flow value to zero and consider it no flow
-
-		// 	sensorVal.MafLookup = 0;
-		// 	return 0; 
-		// 	break;
 
 		} else if (Key > refValue && rowNum > 0) { // The value is somewhere between this and the previous key value so let's use linear interpolation to calculate the actual value: 
 
@@ -530,11 +535,11 @@ double Sensors::getMafFlow(int units) {
 		// Chat-GPT version		
 		// transposedflowRateKGH = flowRateKGH * (newMafArea / oldMafArea);
 
-
 		return transposedflowRateKGH;
 
-	} else { // lets send the standard MAF data
+	} else { 
 
+		// lets send the standard MAF data
 		return flowRateKGH;
 	}
 
