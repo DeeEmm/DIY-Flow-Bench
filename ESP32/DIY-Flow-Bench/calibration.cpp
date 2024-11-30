@@ -340,8 +340,8 @@ void Calibration::saveCalibrationData() {
   calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
   calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
   calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
-  calData["PDIFF_CAL_OFFSET"] = calVal.pdiff_cal_offset;
-  calData["PITOT_CAL_OFFSET"] = calVal.pitot_cal_offset;
+  calData["PDIFF_CAL_OFFSET"] = calVal.pitot_cal_offset;
+  calData["PITOT_CAL_OFFSET"] = calVal.pdiff_cal_offset;
 
   _message.Handler(language.LANG_SAVING_CALIBRATION);
   
