@@ -1192,6 +1192,10 @@ void DataHandler::bootLoop()
     
     } while (status.doBootLoop == true);
 
+    tempServer->end();  // Stops the server and releases the port
+
+    delay(1000);  // 1000ms delay to ensure the port is released
+
     tempServer->reset();
 
 }
