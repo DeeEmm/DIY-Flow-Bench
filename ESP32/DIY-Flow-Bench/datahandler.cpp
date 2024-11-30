@@ -907,7 +907,7 @@ void DataHandler::parsePinsData(StaticJsonDocument<1024> pinData) {
   status.boardType = pinData["BOARD_TYPE"].as<String>();
 
   // Store input pin values in struct
-  pins.VCC_3V3_PIN = pinData["VCC_3V3_PIN"].as<int>();exluse him from StaticJsonBuffer
+  pins.VCC_3V3_PIN = pinData["VCC_3V3_PIN"].as<int>();
   pins.VCC_5V_PIN = pinData["VCC_5V_PIN"].as<int>();
   pins.SPEED_SENSOR_PIN = pinData["SPEED_SENSOR_PIN"].as<int>();
   pins.ORIFICE_BCD_BIT1_PIN = pinData["ORIFICE_BCD_BIT1_PIN"].as<int>();
