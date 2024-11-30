@@ -124,8 +124,7 @@ struct Configuration {
 
   bool MAF_IS_ENABLED = true;
   int MAF_SRC = 11;
-  const char MAF_DATA_FILE[35] = "BOSCH_0280218067.cpp";
-  int MAF_SRC = 11;
+  const char MAF_SENSOR_TYPE[35] = "BOSCH_0280218067.cpp";
   double MAF_MV_TRIMPOT = 0.0;
   int MAF_ADC_CHANNEL = 0;
 

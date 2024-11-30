@@ -67,6 +67,7 @@ void Sensors::begin () {
     extern struct Language language;
 	extern int mafOutputType;
 	extern struct Configuration config;
+	extern struct Pins pins;
 
 	// Initialise  MAF data
 	if (config.MAF_IS_ENABLED){	
@@ -174,141 +175,95 @@ void Sensors::begin () {
 */	
 
 
-	// Sensor definitions for system status pane
-	// MAF Sensor
-	#if defined MAF_IS_ENABLED && defined MAF_SRC_IS_ADC && defined ADC_IS_ENABLED
-		this->_mafSensorType = _maf.sensorType();
-	#elif defined MAF_IS_ENABLED && defined MAF_SRC_IS_PIN
-		this->_mafSensorType = _maf.sensorType() + " on GPIO:" + MAF_PIN;
-	#else
-		this->_mafSensorType = language.LANG_NOT_ENABLED;
-	#endif
-
-	// Baro Sensor
-	#if defined BARO_SENSOR_TYPE_REF_PRESS_AS_BARO
-		this->startupBaroPressure = this->getPRefValue();
-		this->_baroSensorType = language.LANG_START_REF_PRESSURE;
-	#elif defined BARO_SENSOR_TYPE_FIXED_VALUE
-		this->startupBaroPressure = FIXED_BARO_VALUE;
-		this->_baroSensorType = language.LANG_FIXED_VALUE;
-		this->_baroSensorType += FIXED_BARO_VALUE;
-	#elif defined BARO_SENSOR_TYPE_BME280 && defined BME280_IS_ENABLED
-		this->_baroSensorType = "BME280";
-	#elif defined BARO_SENSOR_TYPE_MPX4115
-		this->_baroSensorType = "MPX4115";
-	#elif defined BARO_SENSOR_TYPE_LINEAR_ANALOG
-		this->_baroSensorType = "ANALOG PIN: " + REF_BARO_PIN;
-	#else 
-		this->_baroSensorType = language.LANG_FIXED_VALUE + String(config.FIXED_BARO_VALUE);
-	#endif
-	
-	//Temp Sensor
-	#ifdef TEMP_SENSOR_NOT_USED
-		this->startupBaroPressure = this->getPRefValue();
-		this->_tempSensorType = language.LANG_NOT_ENABLED;
-	#elif defined TEMP_SENSOR_TYPE_FIXED_VALUE
-		this->_tempSensorType = language.LANG_FIXED_VALUE;
-		this->_tempSensorType += FIXED_TEMP_VALUE;
-	#elif defined TEMP_SENSOR_TYPE_BME280 && defined BME280_IS_ENABLED
-		this->_tempSensorType = "BME280";
-	#elif defined TEMP_SENSOR_TYPE_SIMPLE_TEMP_DHT11
-		this->_tempSensorType = "Simple DHT11";
-	#elif defined TEMP_SENSOR_TYPE_LINEAR_ANALOG
-		this->_tempSensorType = "ANALOG PIN: " + TEMPERATURE_PIN;
-	#else 
-		this->_tempSensorType = language.LANG_FIXED_VALUE + String(config.FIXED_TEMP_VALUE);
-	#endif
-	
-	// Rel Humidity Sensor
-	#ifndef RELH_IS_ENABLED
-		this->startupBaroPressure = this->getPRefValue();
-		this->_relhSensorType = language.LANG_NOT_ENABLED;
-	#elif defined RELH_SENSOR_TYPE_FIXED_VALUE
-		this->_relhSensorType = language.LANG_FIXED_VALUE;
-		this->_relhSensorType += FIXED_RELH_VALUE;
-	#elif defined RELH_SENSOR_TYPE_BME280 && defined BME280_IS_ENABLED
-		this->_relhSensorType = "BME280";
-	#elif defined RELH_SENSOR_TYPE_SIMPLE_TEMP_DHT11
-		this->_relhSensorType = "Simple DHT11";
-	#elif defined RELH_SENSOR_TYPE_LINEAR_ANALOG
-		this->_relhSensorType = "ANALOG PIN: " + HUMIDITY_PIN;
-	#else 
-		this->_relhSensorType = language.LANG_FIXED_VALUE + String(FIXED_RELH_VALUE);
-	#endif
-
-	// reference pressure
-	#ifndef PREF_IS_ENABLED
-		this->_prefSensorType = language.LANG_NOT_ENABLED;
-	#elif defined PREF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
-		this->_prefSensorType = "SMPXV7007";
-	#elif defined PREF_SENSOR_TYPE_MPX4250 && defined ADC_IS_ENABLED
-		this->_prefSensorType = "MPX4250";
-	#elif defined PREF_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
-		this->_prefSensorType = "MPXV7025";
-	#elif defined PREF_SENSOR_TYPE_XGZP6899A007KPDPN
-		this->_prefSensorType = "XGZP6899A007KPDPN";
-	#elif defined PREF_SENSOR_TYPE_XGZP6899A010KPDPN
-		this->_prefSensorType = "XGZP6899A010KPDPN";
-	#elif defined PREF_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
-		this->_prefSensorType = "TubePressure";
-	#elif defined PREF_SENSOR_TYPE_LINEAR_ANALOG
-		this->_prefSensorType = "ANALOG PIN: " + REF_PRESSURE_PIN;
-	#else 
-		this->_prefSensorType = language.LANG_NOT_ENABLED;
-	#endif
-	
-	// differential pressure
-	#ifndef PDIFF_IS_ENABLED
-		this->_pdiffSensorType = language.LANG_NOT_ENABLED;
-	#elif defined PDIFF_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
-		this->_pdiffSensorType = "SMPXV7007";
-	#elif defined PDIFF_SENSOR_TYPE_LINEAR_ANALOG
-		this->_pdiffSensorType = "ANALOG PIN: " + DIFF_PRESSURE_PIN;
-	#elif defined PDIFF_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
-		this->_pdiffSensorType = "MPXV7025";
-	#elif defined PREF_SENSOR_TYPE_XGZP6899A007KPDPN
-		this->_prefSensorType = "XGZP6899A007KPDPN";
-	#elif defined PREF_SENSOR_TYPE_XGZP6899A010KPDPN
-		this->_prefSensorType = "XGZP6899A010KPDPN";
-	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
-		this->_pdiffSensorType = "TubePressure";
-	#else 
-		this->_pdiffSensorType = language.LANG_NOT_ENABLED;
-	#endif
-	
-	// pitot pressure differential
-    #ifndef PITOT_IS_ENABLED
-		this->_pitotSensorType = language.LANG_NOT_ENABLED;
-	#elif defined PITOT_SENSOR_TYPE_MPXV7007 && defined ADC_IS_ENABLED
-		this->_pitotSensorType = "SMPXV7007";
-	#elif defined PITOT_SENSOR_TYPE_MPXV7025 && defined ADC_IS_ENABLED
-		this->_pitotSensorType = "MPXV7025";
-	#elif defined PITOT_SENSOR_TYPE_LINEAR_ANALOG
-		this->_pitotSensorType = "ANALOG PIN: " + PITOT_PIN;
-	#elif defined PREF_SENSOR_TYPE_XGZP6899A007KPDPN
-		this->_prefSensorType = "XGZP6899A007KPDPN";
-	#elif defined PREF_SENSOR_TYPE_XGZP6899A010KPDPN
-		this->_prefSensorType = "XGZP6899A010KPDPN";
-	#elif defined PITOT_SENSOR_TYPE_M5STACK_TubePressure && defined ADC_IS_ENABLED
-		this->_pitotSensorType = "TubePressure";
-	#else 
-		this->_pitotSensorType = language.LANG_NOT_ENABLED;
-	#endif
-	
 	// Set status values for GUI
-	status.mafSensor = this->_mafSensorType;
-	status.baroSensor = this->_baroSensorType;
-	status.tempSensor = this->_tempSensorType;
-	status.relhSensor = this->_relhSensorType;
-	status.prefSensor = this->_prefSensorType;
-	status.pdiffSensor = this->_pdiffSensorType;
-	status.pitotSensor = this->_pitotSensorType;
+	status.mafSensor = config.MAF_SENSOR_TYPE;
+	status.baroSensor = getSensorType(config.BARO_SENSOR_TYPE);
+	status.tempSensor  = getSensorType(config.TEMP_SENSOR_TYPE);
+	status.relhSensor = getSensorType(config.RELH_SENSOR_TYPE);
+	status.prefSensor = getSensorType(config.PREF_SENSOR_TYPE);
+	status.pdiffSensor = getSensorType(config.PDIFF_SENSOR_TYPE);
+	status.pitotSensor = getSensorType(config.PREF_SENSOR_TYPE);
 
 	// END System status definitions
 
 	_message.serialPrintf("Sensors Initialised \n");
 
+
+
 }
+/***********************************************************
+  * @brief Get Sensor Type
+  * @note returns description for statis pane.
+  ***/
+String Sensors::getSensorType(int sensorType) {
+
+	extern struct Language language;
+
+	String sensorDescription;
+
+	switch (sensorType) {
+
+		case NOT_USED: {
+			sensorDescription = language.LANG_NOT_ENABLED;
+			break;
+		}
+		case MPXV7007: {
+			sensorDescription = "SMPXV7007";
+			break;
+		}
+		case MPXV7025: {
+			sensorDescription = "MPXV7025";
+			break;
+		}
+		case LINEAR_ANALOG: {
+			sensorDescription = "ANALOG PIN";
+			break;
+		}	
+		case XGZP6899A007KPDPN: {
+			sensorDescription = "XGZP6899A007KPDPN";
+			break;
+		}
+		case XGZP6899A010KPDPN: {
+			sensorDescription = "XGZP6899A010KPDPN";
+			break;
+		}
+		case M5STACK_TubePressure: {
+			sensorDescription = "TubePressure";
+			break;
+		}
+		case BOSCH_BME280: {
+			sensorDescription = "BME280";
+			break;
+		}
+		case BOSCH_BME680: {
+			sensorDescription = "BME680";
+			break;
+		}
+		case SIMPLE_TEMP_DHT11: {
+			sensorDescription = "DHT11";
+			break;
+		}
+		case FIXED_VALUE: {
+			sensorDescription = "Fixed Value";
+			break;
+		}		
+		case MPX4115: {
+			sensorDescription = "MPX4115";
+			break;
+		}		
+		default: {
+			sensorDescription = language.LANG_NOT_ENABLED;
+			break;
+		}
+
+	}
+
+	return sensorDescription;
+}
+
+
+
+
 
 // REVIEW - MAF Interrupt service routine setup
 /***********************************************************
@@ -351,7 +306,7 @@ long Sensors::getMafRaw() {
 	Hardware _hardware;
 	extern struct SensorData sensorVal;
 	extern struct Configuration config;
-	extern struct Pins pin;
+	extern struct Pins pins;
 
 	if (config.MAF_IS_ENABLED){
 
@@ -363,7 +318,7 @@ long Sensors::getMafRaw() {
 			}
 
 			case LINEAR_ANALOG: {
-				long mafFlowRaw = analogRead(pin.MAF_PIN);
+				long mafFlowRaw = analogRead(pins.MAF_PIN);
 				break;
 			}
 
@@ -391,7 +346,7 @@ long Sensors::getMafRaw() {
 double Sensors::getMafVolts() {
 
 	extern struct Configuration config;
-	extern struct Pins pin;
+	extern struct Pins pins;
 	Hardware _hardware;
 	double sensorVolts = 0.00F;
 
@@ -403,7 +358,7 @@ double Sensors::getMafVolts() {
 		}
 
 		case LINEAR_ANALOG: {
-			long mafRaw = analogRead(pin.MAF_PIN);
+			long mafRaw = analogRead(pins.MAF_PIN);
 			sensorVolts = mafRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
 			break;
 		}

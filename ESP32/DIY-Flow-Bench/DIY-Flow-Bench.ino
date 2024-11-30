@@ -66,7 +66,7 @@ ValveLiftData valveData;
 Language language;
 CalibrationData calVal;
 Configuration config;
-Pins pins;
+Pins pin;
 
 // Initiate Classes
 DataHandler _data;

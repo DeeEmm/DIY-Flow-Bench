@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24120101        - Tidied up status definitions in sensors.begin
 24113002        - Removed precompile macros assoc/w configuration.h
 24113001        - #205 Post compile configuration refactor
 24112901        - Pitot Tile not displaying correct value for ∆P
