@@ -51,9 +51,10 @@
 
 void DataHandler::begin() {
 
-    extern struct ConfigSettings config;
+    extern struct BenchSettings settings;
     extern struct Language language;
     extern struct DeviceStatus status;
+    extern struct Configuration config;
 
     Hardware _hardware;
     Pins pins;
@@ -70,7 +71,7 @@ void DataHandler::begin() {
     this->beginSerial(); 
 
     _message.serialPrintf("\r\nDIY Flow Bench\n");                                         
-    // _message.serialPrintf("\nDIYFB Version: %s \nBuild: %s \nGUI: %s \n", RELEASE, BUILD_NUMBER, GUI_BUILD_NUMBER);                                         
+    // Note RELEASE and BUILD_NUMBER defined at compile time
     _message.serialPrintf("DIYFB Version: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);                                         
     _message.serialPrintf("For help please visit the WIKI:\n");                                         
     _message.serialPrintf("https://github.com/DeeEmm/DIY-Flow-Bench/wiki\n");                                         
@@ -89,15 +90,22 @@ void DataHandler::begin() {
         #endif
     }
 
-    // Check if config / calibration / liftdata json files exist. If not create them.
-    if (!SPIFFS.exists("/config.json")) createConfigFile();
+    // Check if settings / calibration / liftdata json files exist. If not create them.
+    if (!SPIFFS.exists("/settings.json")) createSettingsFile();
     if (!SPIFFS.exists("/liftdata.json")) createLiftDataFile();
     if (!SPIFFS.exists("/cal.json")) createCalibrationFile();
 
     // load config / calibration / liftdata files
-    this->loadConfig();
+    this->loadSettings();
     this->loadLiftData();
     this->loadCalibrationData();
+
+    // Check if config files exists. If not send to boot loop until it is uploaded
+    if (!SPIFFS.exists("/configuration.json")) {
+      status.doBootLoop = true;
+    } else {
+      this->loadConfiguration();
+    }
 
     // Check for PINS file
     if (checkUserFile(PINSFILE)) {
@@ -111,11 +119,20 @@ void DataHandler::begin() {
     }
 
     // Check for MAF file
+    // TODO - Only if MAF is enabled !!!!!
+    // NOTE cannot determine MAF data until config is loaded.
+    // Probably need to force a reboot after config is uploaded
+    // to force reload of config then MAF
+    // or we can just expect that the MAF file is missing and 
+    // send user to upload screen as we do with index.html
     if (checkUserFile(MAFFILE)) {
       if (!SPIFFS.exists(status.mafFilename)) {
           status.doBootLoop = true;
           _message.serialPrintf("!! MAF file not found !!\n");  
       }
+    } else {
+          status.doBootLoop = true;
+          _message.serialPrintf("!! MAF file not found !!\n");  
     }
 
     // Check for index file
@@ -142,62 +159,62 @@ void DataHandler::begin() {
 
 
     // TODO Initialise SD card
-    #ifdef SD_CARD_IS_ENABLED
+    if (config.SD_CARD_IS_ENABLED) {
 
     // test code from https://github.com/espressif/arduino-esp32/blob/master/libraries/SD/examples/SD_Test/SD_Test.ino
 
-    _message.serialPrintf("=== SDCARD File system info === \n");
+    // _message.serialPrintf("=== SDCARD File system info === \n");
 
-    int sck = SD_SCK_PIN;
-    int miso = SD_MISO_PIN;
-    int mosi = SD_MOSI_PIN;
-    int cs = SD_CS_PIN;
+    // int sck = SD_SCK_PIN;
+    // int miso = SD_MISO_PIN;
+    // int mosi = SD_MOSI_PIN;
+    // int cs = SD_CS_PIN;
 
-    SPIClass spi = SPIClass(VSPI);
+    // SPIClass spi = SPIClass(VSPI);
 
-        SPI.begin(sck, miso, mosi, cs);
-        if (!SD.begin(cs, spi, 2000000U)) {
-        Serial.println("Card Mount Failed");
+    //     SPI.begin(sck, miso, mosi, cs);
+    //     if (!SD.begin(cs, spi, 2000000U)) {
+    //     Serial.println("Card Mount Failed");
 
-        } else {
+    //     } else {
 
-        uint8_t cardType = SD.cardType();
+    //     uint8_t cardType = SD.cardType();
 
-        if (cardType == CARD_NONE) {
-            Serial.println("No SD card attached");
-        }
+    //     if (cardType == CARD_NONE) {
+    //         Serial.println("No SD card attached");
+    //     }
 
-        Serial.print("SD Card Type: ");
-        if (cardType == CARD_MMC) {
-            Serial.println("MMC");
-        } else if (cardType == CARD_SD) {
-            Serial.println("SDSC");
-        } else if (cardType == CARD_SDHC) {
-            Serial.println("SDHC");
-        } else {
-            Serial.println("UNKNOWN");
-        }
+    //     Serial.print("SD Card Type: ");
+    //     if (cardType == CARD_MMC) {
+    //         Serial.println("MMC");
+    //     } else if (cardType == CARD_SD) {
+    //         Serial.println("SDSC");
+    //     } else if (cardType == CARD_SDHC) {
+    //         Serial.println("SDHC");
+    //     } else {
+    //         Serial.println("UNKNOWN");
+    //     }
 
-        uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-        Serial.printf("SD Card Size: %lluMB\n", cardSize);
+    //     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
+    //     Serial.printf("SD Card Size: %lluMB\n", cardSize);
 
-        listDir(SD, "/", 0);
-        createDir(SD, "/mydir");
-        listDir(SD, "/", 0);
-        removeDir(SD, "/mydir");
-        listDir(SD, "/", 2);
-        writeFile(SD, "/hello.txt", "Hello ");
-        appendFile(SD, "/hello.txt", "World!\n");
-        readFile(SD, "/hello.txt");
-        deleteFile(SD, "/foo.txt");
-        renameFile(SD, "/hello.txt", "/foo.txt");
-        readFile(SD, "/foo.txt");
-        testFileIO(SD, "/test.txt");
-        Serial.printf("Total space: %lluMB\n", SD.totalBytes() / (1024 * 1024));
-        Serial.printf("Used space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
-        }
+    //     listDir(SD, "/", 0);
+    //     createDir(SD, "/mydir");
+    //     listDir(SD, "/", 0);
+    //     removeDir(SD, "/mydir");
+    //     listDir(SD, "/", 2);
+    //     writeFile(SD, "/hello.txt", "Hello ");
+    //     appendFile(SD, "/hello.txt", "World!\n");
+    //     readFile(SD, "/hello.txt");
+    //     deleteFile(SD, "/foo.txt");
+    //     renameFile(SD, "/hello.txt", "/foo.txt");
+    //     readFile(SD, "/foo.txt");
+    //     testFileIO(SD, "/test.txt");
+    //     Serial.printf("Total space: %lluMB\n", SD.totalBytes() / (1024 * 1024));
+    //     Serial.printf("Used space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
+    //     }
 
-    #endif
+    }
 
     
     // Display Filesystem Stats
@@ -241,6 +258,8 @@ bool DataHandler::checkSubstring(std::string firstString, std::string secondStri
 }
 
 
+
+
 /***********************************************************
 * @name checkUserFile.cpp
 * @brief Loop through all files in SPIFFS to match filename prefix
@@ -281,14 +300,14 @@ bool DataHandler::checkUserFile(int filetype) {
         return true;
       }   
       
-      // if ((spiffsFile.find(matchMAF) == 0) && (filetype == MAFFILE)) {
-      //   // MAF_********.json file found
-      //   mafFile = "/" , spiffsFile;
-      //   _message.serialPrintf("MAF file Found: %s\n", mafFile.c_str() );  
-      //   status.mafFilename = mafFile.c_str();
-      //   status.mafLoaded = true;
-      //   return true;
-      // }
+      if ((spiffsFile.find(matchMAF) == 0) && (filetype == MAFFILE)) {
+        // MAF_********.json file found
+        mafFile = "/" , spiffsFile;
+        _message.serialPrintf("MAF file Found: %s\n", mafFile.c_str() );  
+        status.mafFilename = mafFile.c_str();
+        status.mafLoaded = true;
+        return true;
+      }
 
       file = root.openNextFile();
     }
@@ -304,60 +323,60 @@ bool DataHandler::checkUserFile(int filetype) {
 /***********************************************************
 * @brief createConfig
 * @details Create basic minimum configuration json file
-* @note Called from DataHandler::begin() if config.json not found
+* @note Called from DataHandler::begin() if settings.json not found
 ***/
-void DataHandler::createConfigFile() {
+void DataHandler::createSettingsFile() {
 
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   Messages _message;
   String jsonString;  
   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
 
-  _message.serialPrintf("Creating config.json file... \n"); 
+  _message.serialPrintf("Creating settings.json file... \n"); 
  
-  configData["PAGE_TITLE"] = config.pageTitle;
-  configData["CONF_WIFI_SSID"] = config.wifi_ssid;
-  configData["CONF_WIFI_PSWD"] = config.wifi_pswd;
-  configData["CONF_WIFI_AP_SSID"] = config.wifi_ap_ssid;
-  configData["CONF_WIFI_AP_PSWD"] = config.wifi_ap_pswd;
-  configData["CONF_HOSTNAME"] = config.hostname;
-  configData["CONF_WIFI_TIMEOUT"] = config.wifi_timeout;
-  configData["CONF_MAF_HOUSING_DIAMETER"] = config.maf_housing_diameter;
-  configData["CONF_REFRESH_RATE"] = config.refresh_rate;
-  configData["CONF_MIN_BENCH_PRESSURE"] = config.min_bench_pressure;
-  configData["CONF_MIN_FLOW_RATE"] = config.min_flow_rate;
-  configData["DATA_FILTER_TYPE"] = config.data_filter_type;
-  configData["ROUNDING_TYPE"] = config.rounding_type;
-  configData["FLOW_DECIMAL_LENGTH"] = config.flow_decimal_length;
-  configData["GEN_DECIMAL_LENGTH"] = config.gen_decimal_length;
-  configData["CONF_CYCLIC_AVERAGE_BUFFER"] = config.cyc_av_buffer;
-  configData["CONF_MAF_MIN_VOLTS"] = config.maf_min_volts;
-  configData["CONF_API_DELIM"] = config.api_delim;
-  configData["CONF_SERIAL_BAUD_RATE"] = config.serial_baud_rate;
-  configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
-  configData["STANDARD_REFERENCE"] = config.standardReference;
-  configData["STD_ADJ_FLOW"] = config.std_adj_flow;
-  configData["DATAGRAPH_MAX"] = config.dataGraphMax;
-  configData["TEMP_UNIT"] = config.temp_unit;
-  configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
-  configData["CONF_SHOW_ALARMS"] = config.show_alarms;
-  configData["BENCH_TYPE"] = config.bench_type;
-  configData["CONF_CAL_FLOW_RATE"] = config.cal_flow_rate;
-  configData["CONF_CAL_REF_PRESS"] = config.cal_ref_press;
-  configData["ORIFICE1_FLOW_RATE"] = config.orificeOneFlow;
-  configData["ORIFICE1_TEST_PRESSURE"] = config.orificeOneDepression;
-  configData["ORIFICE2_FLOW_RATE"] = config.orificeTwoFlow;
-  configData["ORIFICE2_TEST_PRESSURE"] = config.orificeThreeDepression;
-  configData["ORIFICE3_FLOW_RATE"] = config.orificeThreeFlow;
-  configData["ORIFICE4_FLOW_RATE"] = config.orificeFourFlow;
-  configData["ORIFICE4_TEST_PRESSURE"] = config.orificeFourDepression;
-  configData["ORIFICE5_FLOW_RATE"] = config.orificeFiveFlow;
-  configData["ORIFICE5_TEST_PRESSURE"] = config.orificeFiveDepression;
-  configData["ORIFICE6_FLOW_RATE"] = config.orificeSixFlow;
-  configData["ORIFICE7_TEST_PRESSURE"] = config.orificeSixDepression;
+  configData["PAGE_TITLE"] = settings.pageTitle;
+  configData["CONF_WIFI_SSID"] = settings.wifi_ssid;
+  configData["CONF_WIFI_PSWD"] = settings.wifi_pswd;
+  configData["CONF_WIFI_AP_SSID"] = settings.wifi_ap_ssid;
+  configData["CONF_WIFI_AP_PSWD"] = settings.wifi_ap_pswd;
+  configData["CONF_HOSTNAME"] = settings.hostname;
+  configData["CONF_WIFI_TIMEOUT"] = settings.wifi_timeout;
+  configData["CONF_MAF_HOUSING_DIAMETER"] = settings.maf_housing_diameter;
+  configData["CONF_REFRESH_RATE"] = settings.refresh_rate;
+  configData["CONF_MIN_BENCH_PRESSURE"] = settings.min_bench_pressure;
+  configData["CONF_MIN_FLOW_RATE"] = settings.min_flow_rate;
+  configData["DATA_FILTER_TYPE"] = settings.data_filter_type;
+  configData["ROUNDING_TYPE"] = settings.rounding_type;
+  configData["FLOW_DECIMAL_LENGTH"] = settings.flow_decimal_length;
+  configData["GEN_DECIMAL_LENGTH"] = settings.gen_decimal_length;
+  configData["CONF_CYCLIC_AVERAGE_BUFFER"] = settings.cyc_av_buffer;
+  configData["CONF_MAF_MIN_VOLTS"] = settings.maf_min_volts;
+  configData["CONF_API_DELIM"] = settings.api_delim;
+  configData["CONF_SERIAL_BAUD_RATE"] = settings.serial_baud_rate;
+  configData["ADJ_FLOW_DEPRESSION"] = settings.adj_flow_depression;
+  configData["STANDARD_REFERENCE"] = settings.standardReference;
+  configData["STD_ADJ_FLOW"] = settings.std_adj_flow;
+  configData["DATAGRAPH_MAX"] = settings.dataGraphMax;
+  configData["TEMP_UNIT"] = settings.temp_unit;
+  configData["VALVE_LIFT_INTERVAL"] = settings.valveLiftInterval;
+  configData["CONF_SHOW_ALARMS"] = settings.show_alarms;
+  configData["BENCH_TYPE"] = settings.bench_type;
+  configData["CONF_CAL_FLOW_RATE"] = settings.cal_flow_rate;
+  configData["CONF_CAL_REF_PRESS"] = settings.cal_ref_press;
+  configData["ORIFICE1_FLOW_RATE"] = settings.orificeOneFlow;
+  configData["ORIFICE1_TEST_PRESSURE"] = settings.orificeOneDepression;
+  configData["ORIFICE2_FLOW_RATE"] = settings.orificeTwoFlow;
+  configData["ORIFICE2_TEST_PRESSURE"] = settings.orificeThreeDepression;
+  configData["ORIFICE3_FLOW_RATE"] = settings.orificeThreeFlow;
+  configData["ORIFICE4_FLOW_RATE"] = settings.orificeFourFlow;
+  configData["ORIFICE4_TEST_PRESSURE"] = settings.orificeFourDepression;
+  configData["ORIFICE5_FLOW_RATE"] = settings.orificeFiveFlow;
+  configData["ORIFICE5_TEST_PRESSURE"] = settings.orificeFiveDepression;
+  configData["ORIFICE6_FLOW_RATE"] = settings.orificeSixFlow;
+  configData["ORIFICE7_TEST_PRESSURE"] = settings.orificeSixDepression;
 
   serializeJsonPretty(configData, jsonString);
-  writeJSONFile(jsonString, "/config.json", CONFIG_JSON_SIZE);
+  writeJSONFile(jsonString, "/settings.json", CONFIG_JSON_SIZE);
 
 }
 
@@ -425,7 +444,7 @@ void DataHandler::createLiftDataFile () {
 /***********************************************************
 * @brief createCalibration File
 * @details Create configuration json file
-* @note Called from DataHandler::begin() if config.json not found
+* @note Called from DataHandler::begin() if cal.json not found
 ***/
 void DataHandler::createCalibrationFile () {
 
@@ -531,13 +550,137 @@ void DataHandler::beginSerial(void) {
 
 
 
-/***********************************************************
-* @brief loadConfig
-* @details read configuration data from config.json file and loads into global struct
-***/ 
-StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfig () {
 
-  extern struct ConfigSettings config;
+
+
+
+/***********************************************************
+* @brief loadConfiguration
+* @details read settings from config.json file and loads into global struct
+* @note Repalces original config.h file
+***/ 
+StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
+
+  extern struct Configuration config;
+
+  StaticJsonDocument<CONFIG_JSON_SIZE> configurationJSON;
+  Messages _message;
+
+  _message.serialPrintf("Loading Configuration... \n");     
+
+  if (SPIFFS.exists("/config.json"))  {
+
+    configurationJSON = loadJSONFile("/config.json");
+
+    // strcpy(config.wifi_ssid, configurationJSON["CONF_WIFI_SSID"]);
+    // strcpy(config.wifi_pswd, configurationJSON["CONF_WIFI_PSWD"]);
+    // config.orificeSixDepression = configurationJSON["ORIFICE6_TEST_PRESSURE"].as<double>();
+
+    config.SD_CARD_IS_ENABLED = configurationJSON["SD_CARD_IS_ENABLED"].as<bool>();
+    config.MIN_TEST_PRESSURE_PERCENTAGE = configurationJSON["MIN_TEST_PRESSURE_PERCENTAGE"].as<int>();
+    config.PIPE_RADIUS_IN_FEET = configurationJSON["PIPE_RADIUS_IN_FEET"].as<int>();
+
+    config.VCC_3V3_TRIMPOT = configurationJSON["VCC_3V3_TRIMPOT"].as<int>();
+    config.VCC_5V_TRIMPOT = configurationJSON["VCC_5V_TRIMPOT"].as<int>();
+    config.USE_FIXED_3_3V_VALUE =  configurationJSON["USE_FIXED_3_3V_VALUE"].as<bool>();
+    config.USE_FIXED_5V_VALUE = configurationJSON["USE_FIXED_5V_VALUE"].as<bool>();
+
+    config.BME280_IS_ENABLED = configurationJSON["BME280_IS_ENABLED"].as<bool>();
+    config.BME280_I2C_ADDR = configurationJSON["BME280_I2C_ADDR"].as<int>();
+    config.BME280_SCAN_DELAY_MS =  configurationJSON["BME280_SCAN_DELAY_MS"].as<int>();
+
+    config.BME680_IS_ENABLED = configurationJSON["BME680_IS_ENABLED"].as<bool>();
+    config.BME680_I2C_ADDR = configurationJSON["BME680_I2C_ADDR"].as<int>();
+    config.BME680_SCAN_DELAY_MS =  configurationJSON["BME680_SCAN_DELAY_MS"].as<int>();
+
+    config.ADC_IS_ENABLED = configurationJSON["ADC_IS_ENABLED"].as<bool>();
+    config.ADC_TYPE =  configurationJSON["ADC_TYPE"].as<bool>();
+    config.ADC_I2C_ADDR = configurationJSON["ADC_I2C_ADDR"].as<int>();
+    config.ADC_SCAN_DELAY_MS = configurationJSON["ADC_SCAN_DELAY_MS"].as<bool>();
+    config.ADC_MAX_RETRIES  =  configurationJSON["ADC_MAX_RETRIES"].as<int>();
+    config.ADC_MAX_RETRIES = configurationJSON["ADC_MAX_RETRIES"].as<int>();
+    config.ADC_RANGE = configurationJSON["ADC_RANGE"].as<int>();
+    config.ADC_GAIN = configurationJSON["ADC_GAIN"].as<int>();
+    
+    config.MAF_IS_ENABLED = configurationJSON["MAF_IS_ENABLED"].as<bool>();
+    // strcpy(config.MAF_DATA_FILE, configurationJSON["MAF_DATA_FILE"]);
+    // config.MAF_SRC_IS_PIN = configurationJSON["MAF_SRC_IS_PIN"].as<bool>();
+    // config.MAF_SRC_IS_ADC =  configurationJSON["MAF_SRC_IS_ADC"].as<bool>();
+    config.MAF_MV_TRIMPOT = configurationJSON["MAF_MV_TRIMPOT"].as<int>();
+    config.MAF_ADC_CHANNEL = configurationJSON["MAF_ADC_CHANNEL"].as<int>();
+
+    config.PREF_IS_ENABLED = configurationJSON["PREF_IS_ENABLED"].as<bool>();
+    config.PREF_SENSOR_TYPE = configurationJSON["PREF_SENSOR_TYPE"].as<int>();
+    config.FIXED_REF_PRESS_VALUE = configurationJSON["FIXED_REF_PRESS_VALUE"].as<bool>();
+    config.PREF_MV_TRIMPOT = configurationJSON["PREF_MV_TRIMPOT"].as<int>();
+    config.PREF_ANALOG_SCALE = configurationJSON["PREF_ANALOG_SCALE"].as<double>();
+    config.PREF_ADC_CHANNEL = configurationJSON["PREF_ADC_CHANNEL"].as<int>();
+
+    config.PDIFF_IS_ENABLED = configurationJSON["PDIFF_IS_ENABLED"].as<bool>();
+    config.PDIFF_SENSOR_TYPE = configurationJSON["PDIFF_SENSOR_TYPE"].as<int>();
+    config.FIXED_DIFF_PRESS_VALUE = configurationJSON["FIXED_DIFF_PRESS_VALUE"].as<int>();
+    config.PDIFF_MV_TRIMPOT = configurationJSON["PDIFF_MV_TRIMPOT"].as<int>();
+    config.PDIFF_ADC_CHANNEL = configurationJSON["PDIFF_ADC_CHANNEL"].as<int>();
+
+    config.PDIFF_IS_ENABLED = configurationJSON["PITOT_IS_ENABLED"].as<bool>();
+    config.PITOT_SENSOR_TYPE =  configurationJSON["PITOT_SENSOR_TYPE"].as<int>();
+    config.PITOT_MV_TRIMPOT = configurationJSON["PITOT_MV_TRIMPOT"].as<int>();
+    config.PITOT_ANALOG_SCALE = configurationJSON["PITOT_ANALOG_SCALE"].as<double>();
+    config.PITOT_ADC_CHANNEL = configurationJSON["PITOT_ADC_CHANNEL"].as<int>();
+
+
+    config.BARO_IS_ENABLED = configurationJSON["BARO_IS_ENABLED"].as<bool>();
+    config.BARO_SENSOR_TYPE = configurationJSON["BARO_SENSOR_TYPE"].as<int>();
+    config.FIXED_BARO_VALUE = configurationJSON["FIXED_BARO_VALUE"].as<double>();
+    config.BARO_ANALOG_SCALE = configurationJSON["BARO_ANALOG_SCALE"].as<double>();
+    config.BARO_MV_TRIMPOT = configurationJSON["BARO_MV_TRIMPOT"].as<int>();
+    config.BARO_FINE_ADJUST = configurationJSON["BARO_FINE_ADJUST"].as<double>();
+    config.startupBaroScalingFactor = configurationJSON["startupBaroScalingFactor"].as<double>();
+    config.startupBaroScalingOffset = configurationJSON["startupBaroScalingOffset"].as<double>();
+
+    config.SEALEVELPRESSURE_HPA = configurationJSON["SEALEVELPRESSURE_HPA"].as<double>();
+    config.TEMP_IS_ENABLED = configurationJSON["TEMP_IS_ENABLED"].as<bool>();
+    config.TEMP_SENSOR_TYPE = configurationJSON["TEMP_SENSOR_TYPE"].as<int>();
+    config.FIXED_TEMP_VALUE = configurationJSON["FIXED_TEMP_VALUE"].as<double>();
+    config.TEMP_ANALOG_SCALE = configurationJSON["TEMP_ANALOG_SCALE"].as<double>();
+    config.TEMP_MV_TRIMPOT = configurationJSON["TEMP_MV_TRIMPOT"].as<int>();
+    config.TEMP_FINE_ADJUST = configurationJSON["TEMP_FINE_ADJUST"].as<double>();
+    
+    config.RELH_IS_ENABLED = configurationJSON["RELH_IS_ENABLED"].as<bool>();
+    config.RELH_SENSOR_TYPE = configurationJSON["RELH_SENSOR_TYPE"].as<int>();
+    config.FIXED_RELH_VALUE = configurationJSON["FIXED_RELH_VALUE"].as<double>();
+    config.RELH_ANALOG_SCALE = configurationJSON["RELH_ANALOG_SCALE"].as<double>();
+    config.RELH_FINE_ADJUST = configurationJSON["RELH_FINE_ADJUST"].as<double>();
+
+    config.SWIRL_IS_ENABLED = configurationJSON["SWIRL_IS_ENABLED"].as<bool>();
+    
+    // config.PLACEHOLDER = configurationJSON["PLACEHOLDER"])
+
+
+  } else {
+    _message.serialPrintf("Configuration file not found \n");
+  }
+  
+  return configurationJSON;  
+
+}
+
+
+
+
+
+
+
+
+
+
+/***********************************************************
+* @brief loadSettings
+* @details read settings settings.json file and loads into global struct
+***/ 
+StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadSettings () {
+
+  extern struct BenchSettings settings;
 
   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
   DataHandler _data;
@@ -545,50 +688,50 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfig () {
 
   _message.serialPrintf("Loading Configuration \n");     
 
-  if (SPIFFS.exists("/config.json"))  {
+  if (SPIFFS.exists("/settings.json"))  {
 
-    configData = _data.loadJSONFile("/config.json");
+    configData = _data.loadJSONFile("/settings.json");
 
-    strcpy(config.wifi_ssid, configData["CONF_WIFI_SSID"]);
-    strcpy(config.wifi_pswd, configData["CONF_WIFI_PSWD"]);
-    strcpy(config.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
-    strcpy(config.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
-    strcpy(config.hostname, configData["CONF_HOSTNAME"]);
-    config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
-    config.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
-    config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
-    config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
-    config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
-    strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
-    strcpy(config.rounding_type, configData["ROUNDING_TYPE"]);
-    config.flow_decimal_length, configData["FLOW_DECIMAL_LENGTH"];
-    config.gen_decimal_length, configData["GEN_DECIMAL_LENGTH"];
-    config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
-    config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
-    strcpy(config.api_delim, configData["CONF_API_DELIM"]);
-    config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
-    config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
-    configData["ADJ_FLOW_DEPRESSION"] = config.adj_flow_depression;
-    configData["STANDARD_REFERENCE"] = config.standardReference;
-    configData["STD_ADJ_FLOW"] = config.std_adj_flow;
-    configData["DATAGRAPH_MAX"] = config.dataGraphMax;
-    configData["TEMP_UNIT"] = config.temp_unit;
-    configData["VALVE_LIFT_INTERVAL"] = config.valveLiftInterval;
-    strcpy(config.bench_type, configData["BENCH_TYPE"]);
-    config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
-    config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
-    config.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
-    config.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
-    config.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
-    config.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
-    config.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
-    config.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
-    config.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
-    config.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
-    config.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
-    config.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
-    config.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
-    config.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
+    strcpy(settings.wifi_ssid, configData["CONF_WIFI_SSID"]);
+    strcpy(settings.wifi_pswd, configData["CONF_WIFI_PSWD"]);
+    strcpy(settings.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
+    strcpy(settings.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
+    strcpy(settings.hostname, configData["CONF_HOSTNAME"]);
+    settings.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
+    settings.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
+    settings.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
+    settings.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
+    settings.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
+    strcpy(settings.data_filter_type, configData["DATA_FILTER_TYPE"]);
+    strcpy(settings.rounding_type, configData["ROUNDING_TYPE"]);
+    settings.flow_decimal_length, configData["FLOW_DECIMAL_LENGTH"];
+    settings.gen_decimal_length, configData["GEN_DECIMAL_LENGTH"];
+    settings.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
+    settings.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
+    strcpy(settings.api_delim, configData["CONF_API_DELIM"]);
+    settings.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
+    settings.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
+    configData["ADJ_FLOW_DEPRESSION"] = settings.adj_flow_depression;
+    configData["STANDARD_REFERENCE"] = settings.standardReference;
+    configData["STD_ADJ_FLOW"] = settings.std_adj_flow;
+    configData["DATAGRAPH_MAX"] = settings.dataGraphMax;
+    configData["TEMP_UNIT"] = settings.temp_unit;
+    configData["VALVE_LIFT_INTERVAL"] = settings.valveLiftInterval;
+    strcpy(settings.bench_type, configData["BENCH_TYPE"]);
+    settings.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
+    settings.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
+    settings.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
+    settings.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
+    settings.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
+    settings.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
+    settings.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
+    settings.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
+    settings.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
+    settings.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
+    settings.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
+    settings.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
+    settings.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
+    settings.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
 
   } else {
     _message.serialPrintf("Configuration file not found \n");
@@ -598,6 +741,36 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfig () {
 
 }
 
+
+
+
+
+
+
+/***********************************************************
+* @brief load MAF File
+* @details read MAF data from MAF.json file
+***/ 
+void DataHandler::loadMAFData () {
+
+  DataHandler _data;
+  Messages _message;
+  extern struct DeviceStatus status;
+
+  StaticJsonDocument<MAF_JSON_SIZE> mafData;
+
+  mafData = _data.loadJSONFile(status.pinsFilename);
+
+  status.mafSensorType, mafData["sensor_type"]; // "ACDELCO_92281162"
+  strcpy(status.mafOutputType, mafData["output_type"]); // "voltage"
+  strcpy(status.mafUnits, mafData["maf_units"]); // "KG_H"
+  status.mafScaling = mafData["maf_scaling"]; // 0.1
+  status.mafDiameter = mafData["maf_diameter"]; // 94
+
+  // Load MAF lookup table into JSON object
+  status.mafJsonObject = mafData["maf_lookup_table"];
+
+}
 
 
 
@@ -774,6 +947,8 @@ void DataHandler::parsePinsData(StaticJsonDocument<1024> pinData) {
 
 
 
+
+
 /***********************************************************
 * @name loadPinsData
 * @brief Read pins data from pins.json file
@@ -792,6 +967,9 @@ void DataHandler::loadPinsData () {
   pinsFileData = _data.loadJSONFile(status.pinsFilename);
 
   parsePinsData(pinsFileData);
+
+
+
 
 
 
@@ -875,7 +1053,7 @@ String DataHandler::getDataJSON()
 {
 
   extern struct DeviceStatus status;
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   extern struct SensorData sensorVal;
   extern struct CalibrationData calVal;
 
@@ -893,22 +1071,22 @@ String DataHandler::getDataJSON()
   double pRefComp = fabs(sensorVal.PRefH2O);
 
   // Flow Rate
-  if ((flowComp > config.min_flow_rate) && (pRefComp > config.min_bench_pressure))  {
+  if ((flowComp > settings.min_flow_rate) && (pRefComp > settings.min_bench_pressure))  {
 
     // Check if we need to round values
-     if (strstr(String(config.rounding_type).c_str(), String("NONE").c_str())) {
+     if (strstr(String(settings.rounding_type).c_str(), String("NONE").c_str())) {
         dataJson["FLOW"] = sensorVal.FlowCFM;
         dataJson["MFLOW"] = sensorVal.FlowKGH;
         dataJson["AFLOW"] = sensorVal.FlowADJ;
         dataJson["SFLOW"] = sensorVal.FlowSCFM;
     // Round to whole value    
-    } else if (strstr(String(config.rounding_type).c_str(), String("INTEGER").c_str())) {
+    } else if (strstr(String(settings.rounding_type).c_str(), String("INTEGER").c_str())) {
         dataJson["FLOW"] = round(sensorVal.FlowCFM);
         dataJson["MFLOW"] = round(sensorVal.FlowKGH);
         dataJson["AFLOW"] = round(sensorVal.FlowADJ);
         dataJson["SFLOW"] = round(sensorVal.FlowSCFM);
     // Round to half (nearest 0.5)
-    } else if (strstr(String(config.rounding_type).c_str(), String("HALF").c_str())) {
+    } else if (strstr(String(settings.rounding_type).c_str(), String("HALF").c_str())) {
         dataJson["FLOW"] = round(sensorVal.FlowCFM * 2.0 ) / 2.0;
         dataJson["MFLOW"] = round(sensorVal.FlowKGH * 2.0) / 2.0;
         dataJson["AFLOW"] = round(sensorVal.FlowADJ * 2.0) / 2.0;
@@ -923,10 +1101,10 @@ String DataHandler::getDataJSON()
 
 
   // Flow depression value for AFLOW units
-  dataJson["PADJUST"] = config.adj_flow_depression;
+  dataJson["PADJUST"] = settings.adj_flow_depression;
 
   // Standard reference
-  switch (config.standardReference) {
+  switch (settings.standardReference) {
 
     case ISO_1585:
       dataJson["STD_REF"] = "ISO-1585";
@@ -952,7 +1130,7 @@ String DataHandler::getDataJSON()
 
 
   // Temperature deg C or F
-  if (strstr(String(config.temp_unit).c_str(), String("Celcius").c_str())){
+  if (strstr(String(settings.temp_unit).c_str(), String("Celcius").c_str())){
     dataJson["TEMP"] = sensorVal.TempDegC;
   } else {
     dataJson["TEMP"] = sensorVal.TempDegF;
@@ -960,13 +1138,13 @@ String DataHandler::getDataJSON()
 
 
   // Bench Type for status pane
-  if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())) {
+  if (strstr(String(settings.bench_type).c_str(), String("MAF").c_str())) {
     dataJson["BENCH_TYPE"] = "MAF";
-  } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())) {
+  } else if (strstr(String(settings.bench_type).c_str(), String("ORIFICE").c_str())) {
     dataJson["BENCH_TYPE"] = "ORIFICE";
-  } else if (strstr(String(config.bench_type).c_str(), String("VENTURI").c_str())) {
+  } else if (strstr(String(settings.bench_type).c_str(), String("VENTURI").c_str())) {
     dataJson["BENCH_TYPE"] = "VENTURI";
-  } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())) {
+  } else if (strstr(String(settings.bench_type).c_str(), String("PITOT").c_str())) {
     dataJson["BENCH_TYPE"] = "PITOT";
   }
 
@@ -977,7 +1155,7 @@ String DataHandler::getDataJSON()
   // Pitot
   dataJson["PITOT"] = sensorVal.PitotVelocity;
   // dataJson["PITOT_DELTA"] = fabs(round(sensorVal.PitotDelta));
-  dataJson["PITOT_DELTA"] = round(sensorVal.PitotDelta);
+  dataJson["PITOT_DELTA"] = round(sensorVal.PitotH2O);
   
   if (calVal.pitot_cal_offset == 0) {
     dataJson["PITOT_COLOUR"] = GUI_COLOUR_UNSET;
@@ -1130,7 +1308,7 @@ String DataHandler::getRemote(const char* serverName = "https://raw.githubuserco
 void DataHandler::bootLoop()
 {
     extern struct DeviceStatus status;
-    extern struct ConfigSettings config;
+    extern struct BenchSettings settings;
     extern struct SensorData sensorVal;
 
     Hardware _hardware;
@@ -1176,7 +1354,7 @@ void DataHandler::bootLoop()
     // capture program pointer in loop and wait for files to be uploaded
 
         // Process API comms
-        if (config.api_enabled) {        
+        if (settings.api_enabled) {        
             if (millis() > status.apiPollTimer) {
                 if (Serial.available() > 0) {
                     status.serialData = Serial.read();
@@ -1185,8 +1363,12 @@ void DataHandler::bootLoop()
             }                            
         }
 
+        // This is the escape function. When all files are present and loaded we can leave the loop
+        if ((status.pinsLoaded == true) && (status.mafLoaded == true) && (SPIFFS.exists("/index.html")) && (SPIFFS.exists("/configuration.json"))){
+          status.doBootLoop = false; 
+          break;
+        } 
         // if (status.pinsFilename.isEmpty();
-        if ((status.pinsLoaded == true) && (SPIFFS.exists("/index.html"))) status.doBootLoop = false;
 
         vTaskDelay( 1 );
     

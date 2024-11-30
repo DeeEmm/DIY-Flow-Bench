@@ -72,9 +72,9 @@ class Webserver {
 		
 		void begin();
 		void sendWebSocketMessage(String jsonValues);
-		void parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configData);
-		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfig ();
-		void createConfigFile ();
+		void parseBenchSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configData);
+		StaticJsonDocument<CONFIG_JSON_SIZE> loadSettings ();
+		void createSettingsFile ();
 		String getValveDataJSON();
 		
 		StaticJsonDocument<1024> getSDFile(String filename);

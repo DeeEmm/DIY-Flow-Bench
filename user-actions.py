@@ -5,6 +5,12 @@ from SCons.Script import Import
 
 Import("env")
 
+# run default gulp task
+# env.Execute("cd /Users/mick/Zoho\ WorkDrive\ \(joeblow\)/My\ Folders/ESP32\ Projects/DIY-Flow-Bench/DIY-Flow-Bench/")
+# env.Execute("gulp")
+env.Execute("npx gulp combine")
+
+
 print("Reading version.json")
 
 # read json file into var
@@ -17,3 +23,4 @@ print("Adding version data to build environment")
 for key, value in json_data.items():
     env.Append(CPPDEFINES=[f'{key}=\\"{value}\\"'])
     print(f'{key}="{value}"')
+

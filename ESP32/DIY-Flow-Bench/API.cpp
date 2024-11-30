@@ -19,12 +19,10 @@
 
 #include "constants.h"
 #include "structs.h"
-#include "configuration.h"
-// #include " version.h"
 
 #include "API.h"
 #include <esp32/rom/crc.h> 
-// #include "pins.h"
+
 #include "hardware.h"
 #include "sensors.h"
 #include "calculations.h"
@@ -33,9 +31,8 @@
 #include "webserver.h"
 #include "datahandler.h"
 #include "comms.h"
-// // #include LANGUAGE_FILE
 
-extern struct ConfigSettings config;
+extern struct BenchSettings settings;
 
 
 API::API() {
@@ -62,14 +59,14 @@ uint32_t API::calcCRC (const char* str) {
  ***/
 String API::getConfigJSON() { 
   
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   String jsonString;
   StaticJsonDocument<1024> dataJson;    
   
   // Can add more settings as required
-  dataJson["MIN_FLOW_RATE"] = config.min_flow_rate;
-  dataJson["MIN_BENCH_PRESSURE"] = config.min_bench_pressure;
-  dataJson["REFRESH_RATE"] = config.refresh_rate;
+  dataJson["MIN_FLOW_RATE"] = settings.min_flow_rate;
+  dataJson["MIN_BENCH_PRESSURE"] = settings.min_bench_pressure;
+  dataJson["REFRESH_RATE"] = settings.refresh_rate;
 
   
   serializeJson(dataJson, jsonString);  
@@ -99,10 +96,11 @@ String API::getConfigJSON() {
  ***/
 void API::ParseMessage(char apiMessage) {
 
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   extern struct CalibrationData calVal;
   extern struct SensorData sensorVal;
   extern struct DeviceStatus status;
+  extern struct Configuration config;
 
   Calculations _calculations;
   Sensors _sensors;
@@ -144,7 +142,7 @@ void API::ParseMessage(char apiMessage) {
   a : ADC Raw Values Maf:pRef:pDiff:Pitot
   B : Barometric Pressure
   C : Flow Offset Calibration
-  D : Differential Pressure value
+  D : Differential Pressure value inH2O
   E : Enum1 Flow:Ref:Temp:Humidity:Baro
   e : Enum2 Pitot:Swirl
   F : Flow Value in CFM
@@ -161,10 +159,10 @@ void API::ParseMessage(char apiMessage) {
   m : MAF Voltage
   N : Hostname
   o : Active Orifice
-  P : Pitot Value
+  P : Pitot Value inH2O
   Q : MAF Data Max Value
   q : MAF Data Key Max Value
-  R : Reference Pressure Value
+  R : Reference Pressure Value inH2O
   S : Swirl value
   T : Temperature in Celcius
   t : Temperature in Fahrenheit
@@ -197,216 +195,216 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case '3': // Get 3v board supply voltage (mv) 'v.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "3%s%f", config.api_delim ,_hardware.get3v3SupplyVolts());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "3%s%f", settings.api_delim ,_hardware.get3v3SupplyVolts());
       break;
       
       case '5': // Get 5v board supply voltage (mv) 'v.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "5%s%f", config.api_delim , _hardware.get5vSupplyVolts());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "5%s%f", settings.api_delim , _hardware.get5vSupplyVolts());
       break;
 
       case 'A': // Report ADC voltage values
           snprintf(apiResponse, API_RESPONSE_LENGTH, "A%s%f%s%f%s%f%s%f", 
-          config.api_delim, _hardware.getADCVolts(MAF_ADC_CHANNEL), 
-          config.api_delim, _hardware.getADCVolts(PREF_ADC_CHANNEL), 
-          config.api_delim, _hardware.getADCVolts(PDIFF_ADC_CHANNEL), 
-          config.api_delim, _hardware.getADCVolts(PITOT_ADC_CHANNEL)); 
+          settings.api_delim, _hardware.getADCVolts(config.MAF_ADC_CHANNEL), 
+          settings.api_delim, _hardware.getADCVolts(config.PREF_ADC_CHANNEL), 
+          settings.api_delim, _hardware.getADCVolts(config.PDIFF_ADC_CHANNEL), 
+          settings.api_delim, _hardware.getADCVolts(config.PITOT_ADC_CHANNEL)); 
      break;
 
 
       case 'a': // Report Raw ADC values
           snprintf(apiResponse, API_RESPONSE_LENGTH, "a%s%u%s%u%s%u%s%u", 
-          config.api_delim, _hardware.getADCRawData(MAF_ADC_CHANNEL), 
-          config.api_delim, _hardware.getADCRawData(PREF_ADC_CHANNEL), 
-          config.api_delim, _hardware.getADCRawData(PDIFF_ADC_CHANNEL), 
-          config.api_delim, _hardware.getADCRawData(PITOT_ADC_CHANNEL)); 
+          settings.api_delim, _hardware.getADCRawData(config.MAF_ADC_CHANNEL), 
+          settings.api_delim, _hardware.getADCRawData(config.PREF_ADC_CHANNEL), 
+          settings.api_delim, _hardware.getADCRawData(config.PDIFF_ADC_CHANNEL), 
+          settings.api_delim, _hardware.getADCRawData(config.PITOT_ADC_CHANNEL)); 
      break;
 
 
       case 'B': // Get measured Baro Pressure in hPa'B.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "B%s%f", config.api_delim , sensorVal.BaroHPA);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "B%s%f", settings.api_delim , sensorVal.BaroHPA);
       break;
 
       case 'C': // Flow Offset Calibration  'O\r\n'        
           // _calibration.setFlowOffset();
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "C%s%f", config.api_delim , calVal.flow_offset);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "C%s%f", settings.api_delim , calVal.flow_offset);
           // TODO: confirm Flow Offset Calibration success in response
       break;      
 
       case 'D': // Differential Pressure value
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%u", config.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INH2O));
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%u", settings.api_delim , _calculations.convertPressure(sensorVal.PDiffKPA, INH2O));
       break;      
 
       // DEPRECATED 
       // case 'd': // Differential pressure sensor voltage
-      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%u", config.api_delim , sensorVal.PDiffMv);
+      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%u", settings.api_delim , sensorVal.PDiffMv);
       // break;      
 
       case 'E': // Enum1 - Flow:Ref:Temp:Humidity:Baro
           
           snprintf(apiResponse, API_RESPONSE_LENGTH, "E%s%f%s%f%s%f%s%f%s%f", 
-          config.api_delim, sensorVal.FlowCFM, 
-          config.api_delim, _calculations.convertPressure(sensorVal.PRefKPA, KPA), 
-          config.api_delim, _calculations.convertTemperature(sensorVal.TempDegC, DEGC), 
-          config.api_delim, _calculations.convertRelativeHumidity(sensorVal.RelH, PERCENT), 
-          config.api_delim, sensorVal.BaroKPA);
+          settings.api_delim, sensorVal.FlowCFM, 
+          settings.api_delim, _calculations.convertPressure(sensorVal.PRefKPA, KPA), 
+          settings.api_delim, _calculations.convertTemperature(sensorVal.TempDegC, DEGC), 
+          settings.api_delim, _calculations.convertRelativeHumidity(sensorVal.RelH, PERCENT), 
+          settings.api_delim, sensorVal.BaroKPA);
       break;      
 
       
       case 'e': // Enum2 - Pitot:Swirl
           
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "E%s%f%s%f", 
-          config.api_delim, sensorVal.PitotKPA, 
-          config.api_delim, sensorVal.Swirl); 
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "e%s%f%s%f", 
+          settings.api_delim, sensorVal.PitotKPA, 
+          settings.api_delim, sensorVal.Swirl); 
       break;      
 
       
       
       case 'F': // Get measured Flow in CFM 'F123.45\r\n'       
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "F%s%f", config.api_delim , sensorVal.FlowCFM);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "F%s%f", settings.api_delim , sensorVal.FlowCFM);
       break;
 
       case 'f': // Get measured Mass Flow 'F123.45\r\n'       
-          // snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", config.api_delim , sensorVal.FlowKGH);
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", config.api_delim , _sensors.getMafFlow());
+          // snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", settings.api_delim , sensorVal.FlowKGH);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", settings.api_delim , _sensors.getMafFlow());
       break;
 
       case 'H': // Get measured Humidity 'H.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "H%s%f", config.api_delim , sensorVal.RelH);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "H%s%f", settings.api_delim , sensorVal.RelH);
       break;
 
       case 'I': // IP Address
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "I%s%s", config.api_delim, status.local_ip_address.c_str());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "I%s%s", settings.api_delim, status.local_ip_address.c_str());
       break;
 
       case 'J': // JSON Data
           jsonString = _data.getDataJSON();
-          snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", config.api_delim, String(jsonString).c_str());
+          snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", settings.api_delim, String(jsonString).c_str());
       break;
       
       case 'j': // Current configuration in JSON
           jsonString = this->getConfigJSON();
           jsonString.toCharArray(charDataJSON, API_JSON_LENGTH);
-          snprintf(apiResponseBlob, API_BLOB_LENGTH, "C%s%s", config.api_delim, charDataJSON);
+          snprintf(apiResponseBlob, API_BLOB_LENGTH, "C%s%s", settings.api_delim, charDataJSON);
       break;
       
       case 'K': // MAF Data Key Value 
           // refValue =  map(_sensors.getMafVolts(), 0, 5, 0, status.mafDataKeyMax); 
           refValue = (status.mafDataKeyMax / 5) * _sensors.getMafVolts();
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "K%s MAF DATA Key value: %d ", config.api_delim , refValue); 
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "K%s MAF DATA Key value: %d ", settings.api_delim , refValue); 
       break;
 
       case 'k': // MAF Data lookup value
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "k%s MAF DATA Lookup value: %d ", config.api_delim , sensorVal.MafLookup); 
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "k%s MAF DATA Lookup value: %d ", settings.api_delim , sensorVal.MafLookup); 
       break;
 
       case 'L': // Perform Leak Test Calibration 'L\r\n'
           _calibration.setLeakOffset();
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "L%s%F", config.api_delim , calVal.leak_cal_offset );
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "L%s%F", settings.api_delim , calVal.leak_cal_offset );
           // TODO: confirm Leak Test Calibration success in response
       break;
       
       case 'l': // Perform Leak Test 'l\r\n'      
-          // TODO: apiResponse = ("l") + config.api_delim + leakTest();
+          // TODO: apiResponse = ("l") + settings.api_delim + leakTest();
           // TODO: confirm Leak Test success in response
       break;
       
       case 'M': // Get MAF raw sensor data'  
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "M%s%u", config.api_delim, _hardware.getADCRawData(MAF_ADC_CHANNEL));   
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "M%s%u", settings.api_delim, _hardware.getADCRawData(config.MAF_ADC_CHANNEL));   
       break;
       
       // DEPRECATED 
       // case 'm': // Get MAF output voltage'
-      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "m%s%f", config.api_delim , _sensors.getMafVolts());
+      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "m%s%f", settings.api_delim , _sensors.getMafVolts());
       // break;     
       
       case 'N': // Hostname
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "N%s%s", config.api_delim, config.hostname);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "N%s%s", settings.api_delim, settings.hostname);
       break;
       
       case 'O': // Active orifice flow rate 'o\r\n'        
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "O%s%f", config.api_delim , status.activeOrificeFlowRate);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "O%s%f", settings.api_delim , status.activeOrificeFlowRate);
       break;      
 
       case 'o': // Active orifice  'O\r\n'        
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "o%s%s", config.api_delim , status.activeOrifice);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "o%s%s", settings.api_delim , status.activeOrifice);
       break;      
 
       case 'P': // Get measured Pitot Pressure 'P.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "R%s%f", config.api_delim , _calculations.convertPressure(sensorVal.PitotKPA, INH2O));
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "P%s%f", settings.api_delim , _calculations.convertPressure(sensorVal.PitotKPA, INH2O));
       break;
       
       // DEPRECATED 
       // case 'p': // Get Pitot sensor output voltage          
-      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "r%s%f", config.api_delim , _sensors.getPitotVolts());
+      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "r%s%f", settings.api_delim , _sensors.getPitotVolts());
       // break;   
 
       case 'Q': // mafdata max value
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "Q%s%u", config.api_delim , status.mafDataValMax);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "Q%s%u", settings.api_delim , status.mafDataValMax);
       break;      
 
       case 'q': // mafdata max key value
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "q%s%u", config.api_delim , status.mafDataKeyMax);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "q%s%u", settings.api_delim , status.mafDataKeyMax);
       break;      
 
       case 'R': // Get measured Reference Pressure 'R.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "R%s%f", config.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INH2O));
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "R%s%f", settings.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INH2O));
       break;
       
       // DEPRECATED 
       // case 'r': // Get Reference Pressure sensor output voltage          
-      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "r%s%f", config.api_delim , _sensors.getPRefVolts());
+      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "r%s%f", settings.api_delim , _sensors.getPRefVolts());
       // break;      
       
       case 'S': // Get Swirl Value (rpm) 'S.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "S%s%f", config.api_delim , sensorVal.Swirl);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "S%s%f", settings.api_delim , sensorVal.Swirl);
       break;
       
       case 't': // Get measured Temperature in Fahrenheit 'F.123.45\r\n'
           double TdegF;
           TdegF = _calculations.convertTemperature(sensorVal.TempDegC, DEGF);
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "t%s%f", config.api_delim , TdegF);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "t%s%f", settings.api_delim , TdegF);
       break;      
       
       case 'T': // Get measured Temperature in Celcius 'T.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "T%s%f", config.api_delim , sensorVal.TempDegC);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "T%s%f", settings.api_delim , sensorVal.TempDegC);
       break;
       
       case 'u': // Uptime in minutes     
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "u%s%u", config.api_delim , (millis() - status.boot_time) / 60000);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "u%s%u", settings.api_delim , (millis() - status.boot_time) / 60000);
       break;
 
       case 'U': // Uptime in hhhh.mm      
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "U%s%g", config.api_delim , _hardware.uptime() );
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "U%s%g", settings.api_delim , _hardware.uptime() );
       break;
 
       case 'V': // Get Version 'VMmYYMMDDXX\r\n'          
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "V%s%s.%s.%s", config.api_delim , MAJOR_VERSION, MINOR_VERSION, BUILD_NUMBER);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "V%s%s.%s.%s", settings.api_delim , MAJOR_VERSION, MINOR_VERSION, BUILD_NUMBER);
       break;
 
       case 'v': // Valve lift Data
           jsonString = _webserver.getValveDataJSON();
-          snprintf(apiResponseBlob, API_BLOB_LENGTH, "v%s%s", config.api_delim, String(jsonString).c_str());
+          snprintf(apiResponseBlob, API_BLOB_LENGTH, "v%s%s", settings.api_delim, String(jsonString).c_str());
       break;
       
       case 'W': // WiFi SSID
           if (status.apMode == true) {
-            snprintf(apiResponse, API_RESPONSE_LENGTH, "W%s%s", config.api_delim, config.wifi_ap_ssid);
+            snprintf(apiResponse, API_RESPONSE_LENGTH, "W%s%s", settings.api_delim, settings.wifi_ap_ssid);
           } else {
-            snprintf(apiResponse, API_RESPONSE_LENGTH, "W%s%s", config.api_delim, config.wifi_ssid);
+            snprintf(apiResponse, API_RESPONSE_LENGTH, "W%s%s", settings.api_delim, settings.wifi_ssid);
           }
       break;
 
       case 'X': // Print xTask memory usage (Stack high water mark) to serial monitor 
-          snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack Free Memory EnviroTask=%d / SensorTask=%d ", config.api_delim , uxTaskGetStackHighWaterMark(enviroDataTask), uxTaskGetStackHighWaterMark(sensorDataTask)); 
+          snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack Free Memory EnviroTask=%d / SensorTask=%d ", settings.api_delim , uxTaskGetStackHighWaterMark(enviroDataTask), uxTaskGetStackHighWaterMark(sensorDataTask)); 
       break;
       
       case '@': // Status Print Mode (Stream status messages to serial)
-        if (config.status_print_mode == true){
-          config.status_print_mode = false;
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "@%s%s", config.api_delim, "Status Data Disabled" ); 
+        if (settings.status_print_mode == true){
+          settings.status_print_mode = false;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "@%s%s", settings.api_delim, "Status Data Disabled" ); 
         } else {
-          config.status_print_mode = true;
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "@%s%s", config.api_delim, "Status Data Enabled~" ); 
+          settings.status_print_mode = true;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "@%s%s", settings.api_delim, "Status Data Enabled~" ); 
         }
       break;
       
@@ -436,22 +434,22 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case '!': // Debug Mode (enable verbose debug messages)
-        if (config.debug_mode == true){
-          config.debug_mode = false;
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "!%s%s", config.api_delim, "Debug Mode Off" ); 
+        if (settings.debug_mode == true){
+          settings.debug_mode = false;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "!%s%s", settings.api_delim, "Debug Mode Off" ); 
         } else {
-          config.debug_mode = true;
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "!%s%s", config.api_delim, "Debug Mode On" ); 
+          settings.debug_mode = true;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "!%s%s", settings.api_delim, "Debug Mode On" ); 
         }
       break;
       
       case '#': // Developer Mode (Enable additional developer tools)
-        if (config.dev_mode == true){
-          config.dev_mode = false;
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", config.api_delim, "Developer Mode Off" ); 
+        if (settings.dev_mode == true){
+          settings.dev_mode = false;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "Developer Mode Off" ); 
         } else {
-          config.dev_mode = true;
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", config.api_delim, "Developer Mode On" ); 
+          settings.dev_mode = true;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "Developer Mode On" ); 
         }
       break;
       
@@ -466,15 +464,15 @@ void API::ParseMessage(char apiMessage) {
 
       case '$': // Recover server
           snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", "Attempting to recover WiFi Connection");
-          // config.api_enabled = false;
+          // settings.api_enabled = false;
           _comms.wifiReconnect();
-          // config.api_enabled = true;
+          // settings.api_enabled = true;
       break;
 
       case ' ': // <<<<(TEST [space] exclude from API listing)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 
            
-          // snprintf(apiResponse, API_RESPONSE_LENGTH, "Z%s%d", config.api_delim , status.mafScaling);
-          // snprintf(apiResponse, API_RESPONSE_LENGTH, "Z%s%d", config.api_delim , status.mafUnits);
+          // snprintf(apiResponse, API_RESPONSE_LENGTH, "Z%s%d", settings.api_delim , status.mafScaling);
+          // snprintf(apiResponse, API_RESPONSE_LENGTH, "Z%s%d", settings.api_delim , status.mafUnits);
           // _hardware.stepperTest();
 
           // BME680 Tests
@@ -510,12 +508,12 @@ void API::ParseMessage(char apiMessage) {
       uint32_t crcValue = calcCRC(apiResponse);
 
       if (*apiResponseBlob != 0)   {
-        _message.blobPrintf("%s%s%s\n", apiResponseBlob, config.api_delim, (String)crcValue);              
+        _message.blobPrintf("%s%s%s\n", apiResponseBlob, settings.api_delim, (String)crcValue);              
       } else if (*apiResponse != 0) {
-        _message.serialPrintf("%s%s%s\n", apiResponse, config.api_delim, (String)crcValue);      
+        _message.serialPrintf("%s%s%s\n", apiResponse, settings.api_delim, (String)crcValue);      
       } else {
         //invalid response
-        _message.serialPrintf("%s%s%s\n", "Invalid Response", config.api_delim, (String)crcValue);
+        _message.serialPrintf("%s%s%s\n", "Invalid Response", settings.api_delim, (String)crcValue);
       }
   #else
       if (*apiResponseBlob != 0) {

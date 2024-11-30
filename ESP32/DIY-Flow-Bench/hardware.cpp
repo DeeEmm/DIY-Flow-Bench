@@ -22,7 +22,6 @@
 #include <ArduinoJson.h>
 
 #include "system.h"
-#include "configuration.h"
 #include "constants.h"
 #include "structs.h"
 #include "datahandler.h"
@@ -34,20 +33,20 @@
 #include "messages.h"
 #include "system.h"
 
-
-#ifdef ADC_IS_ENABLED
 #include <ADS1115_lite.h>
-ADS1115_lite adc(ADC_I2C_ADDR);
-#endif
 
 
+extern struct Configuration config;
+
+ADS1115_lite adc(config.ADC_I2C_ADDR);
 
 
 /***********************************************************
  * @brief CONSTRUCTOR
  ***/
 Hardware::Hardware() {
-  
+
+
 }
 
 
@@ -66,10 +65,13 @@ void Hardware::initaliseIO () {
 
   extern struct Pins pins;
   extern struct DeviceStatus status;
+  extern struct Configuration config;
 
   _message.serialPrintf("Initialising I/O \n");   
 
-
+  // if (config.ADC_IS_ENABLED){
+  //   ADS1115_lite adc(config.ADC_I2C_ADDR);
+  // }
 
   // Set Inputs
   if (pins.VCC_3V3_PIN < 99 ) {
@@ -155,20 +157,20 @@ void Hardware::initaliseIO () {
     _message.serialPrintf("Input SCL_PIN: %d\n", pins.SCL_PIN );
     pinMode(pins.SCL_PIN, INPUT);   
   }
-  #ifdef SD_CARD_IS_ENABLED
-  i  if (pins.SD_CS_PIN < 99 ) {
-    _message.serialPrintf("Input SD_CS_PIN: %d\n", pins.SD_CS_PIN );
-    pinMode(pins.SD_CS_PIN, INPUT);     
+  if (config.SD_CARD_IS_ENABLED) {
+    // if (pins.SD_CS_PIN < 99 ) {
+    //   _message.serialPrintf("Input SD_CS_PIN: %d\n", pins.SD_CS_PIN );
+    //   pinMode(pins.SD_CS_PIN, INPUT);     
+    // }
+    // if (pins.SD_MISO_PIN < 99 ) {
+    //   _message.serialPrintf("Input SD_MISO_PIN: %d\n", pins.SD_MISO_PIN );
+    //   pinMode(pins.SD_MISO_PIN, INPUT);   
+    // }
+    // if (pins.SD_SCK_PIN < 99 ) {
+    //   _message.serialPrintf("Input SD_SCK_PIN: %d\n", pins.SD_SCK_PIN );
+    //   pinMode(pins.SD_SCK_PIN, INPUT);   
+    // }
   }
-  if (pins.SD_MISO_PIN < 99 ) {
-    _message.serialPrintf("Input SD_MISO_PIN: %d\n", pins.SD_MISO_PIN );
-    pinMode(pins.SD_MISO_PIN, INPUT);   
-  }
-  if (pins.SD_SCK_PIN < 99 ) {
-    _message.serialPrintf("Input SD_SCK_PIN: %d\n", pins.SD_SCK_PIN );
-    pinMode(pins.SD_SCK_PIN, INPUT);   
-  }
-  #endif
   // if (pins.WEMOS_SPARE_PIN_1 >= 0 ) {
   //   _message.serialPrintf("Input WEMOS_SPARE_PIN_1: %d\n", pins.WEMOS_SPARE_PIN_1 );
   //   pinMode(pins.WEMOS_SPARE_PIN_1, INPUT);   
@@ -211,12 +213,12 @@ void Hardware::initaliseIO () {
     _message.serialPrintf("Output FLOW_VALVE_DIR_PIN: %d\n", pins.FLOW_VALVE_DIR_PIN );
     pinMode(pins.FLOW_VALVE_DIR_PIN, OUTPUT);
   }
-  #ifdef SD_CARD_IS_ENABLED
-  if (pins.SD_MOSI_PIN < 99 ) {
-    _message.serialPrintf("Output SD_MOSI_PIN: %d\n", pins.SD_MOSI_PIN );
-    pinMode(pins.SD_MOSI_PIN, OUTPUT);
+  if (config.SD_CARD_IS_ENABLED) {
+    // if (pins.SD_MOSI_PIN < 99 ) {
+    //   _message.serialPrintf("Output SD_MOSI_PIN: %d\n", pins.SD_MOSI_PIN );
+    //   pinMode(pins.SD_MOSI_PIN, OUTPUT);
+    // }
   }
-  #endif
   // if (pins.SERIAL0_TX_PIN < 99 ) {
   //   _message.serialPrintf("Output SERIAL0_TX_PIN: %d\n", pins.SERIAL0_TX_PIN );
   //   pinMode(pins.SERIAL0_TX_PIN, OUTPUT);
@@ -239,26 +241,29 @@ void Hardware::initaliseIO () {
  **/
 void Hardware::begin () {
 
+  extern struct Configuration config;
+
+  Hardware _hardware;
   Messages _message;
 
   _message.serialPrintf("Initialising Hardware \n");
 
   this->getI2CList(); // Scan and list I2C devices to serial monitor
 
-  #ifdef ADC_IS_ENABLED
-  _message.serialPrintf("Initialising ADS1115 \n");
+  if (config.ADC_IS_ENABLED) {
+    _message.serialPrintf("Initialising ADS1115 \n");
 
-  adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
-  adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
-  // adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
-  
-  if (!adc.testConnection()) {
-    _message.serialPrintf("ADS1115 Connection failed");
-		while(1); //Freeze
-	} else {
-		_message.serialPrintf("ADS1115 Initialised\n");
+    adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
+    adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
+    // adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
+    
+    if (!adc.testConnection()) {
+      _message.serialPrintf("ADS1115 Connection failed");
+      while(1); //Freeze
+    } else {
+      _message.serialPrintf("ADS1115 Initialised\n");
+    }
   }
-  #endif
 
   _message.serialPrintf("Hardware Initialised \n");
 
@@ -308,9 +313,11 @@ void Hardware::getI2CList() {
  ***/
 int32_t Hardware::getADCRawData(int channel) {
 
+  extern struct Configuration config;
+
   int32_t rawADCval = 0;
 
-  #ifdef ADC_IS_ENABLED
+  if (config.ADC_IS_ENABLED){
 
   if (channel > 3) {
     return 0;
@@ -338,7 +345,7 @@ int32_t Hardware::getADCRawData(int channel) {
   adc.triggerConversion(); // Start a conversion. This immediately returns
   rawADCval = adc.getConversion(); // This polls the ADS1115 and wait for conversion to finish, THEN returns the value
 
-  #endif
+  }
 
   return rawADCval;
 
@@ -355,23 +362,25 @@ int32_t Hardware::getADCRawData(int channel) {
  ***/
  double Hardware::getADCVolts(int channel) {
 
+  extern struct Configuration config;
+  
   double volts;
 
   int rawADCval = getADCRawData(channel);
   
-  #if defined ADC_TYPE_ADS1115 && defined ADC_IS_ENABLED 
+  if (config.ADC_TYPE == 11 && config.ADC_IS_ENABLED) { 
     
-    volts = rawADCval * ADC_GAIN / ADC_RANGE; 
+    volts = rawADCval * config.ADC_GAIN / config.ADC_RANGE; 
   
-  #elif defined ADC_TYPE_ADS1015 && defined ADC_IS_ENABLED 
+  } else if ((config.ADC_TYPE == 10) && config.ADC_IS_ENABLED) {
 
-    volts = rawADCval * ADC_GAIN / 2047.00F; 
+    volts = rawADCval * config.ADC_GAIN / 2047.00F; 
   
-  #else
+  } else {
 
     return 1.00F;
 
-  #endif
+  }
   
   return volts;
 }
@@ -390,16 +399,17 @@ int32_t Hardware::getADCRawData(int channel) {
 double Hardware::get5vSupplyVolts() {   
 
   extern struct Pins pins;
-  extern struct ConfigSettings config;
+  extern struct Configuration config;
 
+  double vcc5vSupplyVolts = 5.0;
 
-  #ifdef USE_FIXED_5V_VALUE
-    return 5.0; 
-  #else
+  if (config.USE_FIXED_5V_VALUE) {
+    return vcc5vSupplyVolts; 
+  } else {
     long rawVoltageValue = analogRead(pins.VCC_5V_PIN);  
-    double vcc5vSupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
+    vcc5vSupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
     return vcc5vSupplyVolts + config.VCC_5V_TRIMPOT;
-  #endif
+  }
 }
 
 
@@ -412,18 +422,20 @@ double Hardware::get5vSupplyVolts() {
  * @note Use a 0.1uf cap on input to help filter noise
  * @note ESP32 has 12 bit ADC (0-3300mv = 0-4095)
  ***/
-double Hardware::get3v3SupplyVolts() {   
+double Hardware::get3v3SupplyVolts() {    
 
-  #ifdef VCC_3V3_PIN  
-  long rawVoltageValue = analogRead(VCC_3V3_PIN);  
-  double vcc3v3SupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
-  #endif
+  extern struct Pins pins; 
+  extern struct Configuration config;
 
-  #ifdef USE_FIXED_3_3V_VALUE
-    return 3.3; 
-  #else
-    return vcc3v3SupplyVolts + VCC_3V3_TRIMPOT;
-  #endif
+  double vcc3v3SupplyVolts = 3.3;
+
+  if (config.USE_FIXED_3_3V_VALUE) {
+    return vcc3v3SupplyVolts; 
+  } else {
+    long rawVoltageValue = analogRead(pins.VCC_3V3_PIN );  
+    vcc3v3SupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
+    return vcc3v3SupplyVolts + config.VCC_3V3_TRIMPOT;
+  }
 }
 
 
@@ -441,7 +453,7 @@ bool Hardware::benchIsRunning() {
   Calculations _calculations;
   Sensors _sensors;
   
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   extern struct Language language;
   extern struct SensorData sensorVal;
 
@@ -455,7 +467,7 @@ bool Hardware::benchIsRunning() {
   // comvert negative value into posotive
   refPressure = fabs(refPressure); 
 
-  if ((refPressure > config.min_bench_pressure))
+  if ((refPressure > settings.min_bench_pressure))
   {
 	  _message.Handler(language.LANG_BENCH_RUNNING);
 	  return true;
@@ -476,8 +488,9 @@ void Hardware::checkRefPressure() {
   Calculations _calculations;
 
   extern struct SensorData sensorVal;
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   extern struct Language language;
+  extern struct Configuration config;
   
   double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
     
@@ -485,7 +498,7 @@ void Hardware::checkRefPressure() {
   // Check that pressure does not fall below limit set by MIN_TEST_PRESSURE_PERCENTAGE when bench is running
   // note alarm commented out in alarm function as 'nag' can get quite annoying
   // Is this a redundant check? Maybe a different alert would be more appropriate
-  if ((refPressure < (config.cal_ref_press * (MIN_TEST_PRESSURE_PERCENTAGE / 100))) && (Hardware::benchIsRunning()))
+  if ((refPressure < (settings.cal_ref_press * (config.MIN_TEST_PRESSURE_PERCENTAGE / 100))) && (Hardware::benchIsRunning()))
   {
     _message.Handler(language.LANG_REF_PRESS_LOW);
   }

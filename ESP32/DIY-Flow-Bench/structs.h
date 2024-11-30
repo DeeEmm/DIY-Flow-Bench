@@ -19,9 +19,11 @@
 #pragma once
 
 #include "Arduino.h"
-#include "system.h"
-#include "configuration.h"
+#include <vector>
 
+#include "system.h"
+#include "constants.h"
+#include <ArduinoJson.h>
 
 /***********************************************************
  * Default / Fallback Configuration Settings
@@ -31,7 +33,7 @@
  * If you edit these, you may get locked out of your system or brick your device.
  * You can easily edit the config settings via the browser after you connect!
  ***/
-struct ConfigSettings {
+struct BenchSettings {
   int api_response_length = 64;                   // API Serial comms message length
   long serial_baud_rate = 115200;                 // Default baud rate 
   unsigned long wifi_timeout = 4000;              // Duration of Wifi connection attempt in millisec's
@@ -84,6 +86,97 @@ struct ConfigSettings {
   double orificeSixFlow = 0.0;
   double orificeSixDepression = 0.0;
 };
+
+
+
+
+
+
+
+/***********************************************************
+ * Configuration Data
+ ***/
+struct Configuration {
+  bool SD_CARD_IS_ENABLED = false;
+  int MIN_TEST_PRESSURE_PERCENTAGE = 80;
+  double PIPE_RADIUS_IN_FEET = 0.328084;
+
+  double VCC_3V3_TRIMPOT = 0.0;
+  double VCC_5V_TRIMPOT = 0.0;
+  bool USE_FIXED_3_3V_VALUE = false;
+  bool USE_FIXED_5V_VALUE = false;
+
+  bool BME280_IS_ENABLED = true;
+  int BME280_I2C_ADDR = 0x76;
+  int BME280_SCAN_DELAY_MS =  1000;
+
+  bool BME680_IS_ENABLED = true;
+  int BME680_I2C_ADDR = 0x76;
+  int BME680_SCAN_DELAY_MS =  1000;
+
+  bool ADC_IS_ENABLED = true;
+  int ADC_TYPE = 11;
+  int ADC_I2C_ADDR = 0x48; 
+  int ADC_SCAN_DELAY_MS = 250;
+  int ADC_MAX_RETRIES = 10;
+  int ADC_RANGE = 32767;
+  double ADC_GAIN = 6.144;
+
+  bool MAF_IS_ENABLED = true;
+  int MAF_TYPE = 11;
+  const char MAF_DATA_FILE[35] = "BOSCH_0280218067.cpp";
+  // bool MAF_SRC_IS_PIN = false;
+  // bool MAF_SRC_IS_ADC = true;
+  double MAF_MV_TRIMPOT = 0.0;
+  int MAF_ADC_CHANNEL = 0;
+
+  bool PREF_IS_ENABLED = true;
+  int PREF_SENSOR_TYPE = 2;
+  int FIXED_REF_PRESS_VALUE = 1;
+  double PREF_MV_TRIMPOT =  0.0;
+  double PREF_ANALOG_SCALE =  1.0;
+  int PREF_ADC_CHANNEL = 1;
+
+  bool PDIFF_IS_ENABLED = true;
+  int PDIFF_SENSOR_TYPE = 11; 
+  int FIXED_DIFF_PRESS_VALUE = 1;
+  double PDIFF_MV_TRIMPOT = 0.0;
+  double PDIFF_ANALOG_SCALE = 1.0;
+  int PDIFF_ADC_CHANNEL = 2;
+  
+  bool PITOT_IS_ENABLED = true;
+  int PITOT_SENSOR_TYPE = 2;
+  double PITOT_MV_TRIMPOT = 0.0;
+  double PITOT_ANALOG_SCALE = 1.0;
+  int PITOT_ADC_CHANNEL = 3;
+
+  bool BARO_IS_ENABLED = true;
+  int BARO_SENSOR_TYPE = BOSCH_BME280;
+  double FIXED_BARO_VALUE = 101.3529;
+  double BARO_ANALOG_SCALE = 1.0;  
+  double startupBaroScalingFactor = 1.0;
+  double startupBaroScalingOffset = 100;
+  double BARO_MV_TRIMPOT = 0.0;
+  double BARO_FINE_ADJUST = 0.0;
+  double SEALEVELPRESSURE_HPA = 1016.90;
+  int BARO_ADC_CHANNEL = 4;
+
+  bool TEMP_IS_ENABLED = true;
+  int TEMP_SENSOR_TYPE = 7;
+  double FIXED_TEMP_VALUE = 21.0;
+  double TEMP_ANALOG_SCALE = 1.0;
+  double TEMP_MV_TRIMPOT = 0.0;
+  double TEMP_FINE_ADJUST = 0.0;
+
+  bool RELH_IS_ENABLED = true;
+  int RELH_SENSOR_TYPE = 7;
+  double FIXED_RELH_VALUE = 36.0;
+  double RELH_ANALOG_SCALE = 1.0;
+  double RELH_MV_TRIMPOT = 0.0;
+  double RELH_FINE_ADJUST = 0.0;
+  bool SWIRL_IS_ENABLED = false;
+};
+
 
 
 
@@ -143,12 +236,6 @@ struct DeviceStatus {
   double HWMBME = 0.0;
   double HWMADC = 0.0;
   double HWMSSE = 0.0;
-  long mafDataTableRows = 0;
-  long mafDataValMax = 0;
-  long mafDataKeyMax = 0;
-  int mafUnits = 0;
-  double mafScaling = 1;
-  int mafDiameter = 0;
   String activeOrifice = "1";
   double activeOrificeFlowRate;
   double activeOrificeTestPressure;
@@ -159,7 +246,20 @@ struct DeviceStatus {
   String pinsFilename;
   String mafFilename;
   bool doBootLoop = false;
+
+  long mafDataTableRows = 0;
+  long mafDataValMax = 0;
+  long mafDataKeyMax = 0;
+  char mafUnits[5];
+  double mafScaling = 1;
+  int mafDiameter = 0;
+  char mafSensorType[30];
+  char mafOutputType[10];
+  JsonObject mafJsonObject;
+  std::vector<std::vector<long>> mafLookupTable;
 };
+
+
 
 
 

@@ -60,13 +60,15 @@ class DataHandler {
 		AsyncEventSource *tempServerEvents;
 
 		void begin();
-		void createConfigFile ();
+		void createSettingsFile ();
 		void writeJSONFile(String data, String filename, int dataSize);
 		void createLiftDataFile();
 		void createCalibrationFile ();
 		StaticJsonDocument<CONFIG_JSON_SIZE> loadJSONFile(String filename);
 		void beginSerial(void);
-		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfig ();
+		void loadMAFData();
+		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfiguration();
+		StaticJsonDocument<SETTINGS_JSON_SIZE> loadSettings ();
 		StaticJsonDocument<LIFT_DATA_JSON_SIZE> loadLiftData ();
 		static void clearLiftDataFile(AsyncWebServerRequest *request);
 		StaticJsonDocument<1024> loadCalibrationData ();

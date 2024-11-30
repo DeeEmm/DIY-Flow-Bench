@@ -46,6 +46,18 @@ def extract_gui_build():
             return None
         
 
+def delete_files_in_directory(directory_path):
+   try:
+     files = os.listdir(directory_path)
+     for file in files:
+       file_path = os.path.join(directory_path, file)
+       if os.path.isfile(file_path):
+         os.remove(file_path)
+     print("All files deleted successfully.")
+   except OSError:
+     print("Error occurred while deleting files.")
+        
+
 def merge_bin(source, target, env):
 
     print("Creating merged binary...")
@@ -64,7 +76,13 @@ def merge_bin(source, target, env):
     update_file = os.path.join(release_path, f"{release}_{build}_update.bin")
 
     GUI_file = os.path.join(project_path, f"data/index.html")
+    GUI_output_file = os.path.join(project_path, f"data/index.html")
+    releases_directory =  os.path.join(project_path, f"release/")
+    data_directory =  os.path.join(project_path, f"data/")
     GUI_release = os.path.join(release_path, f"{release}_{gui_build}_index.html")
+
+    # clear the release directory
+    delete_files_in_directory(releases_directory)
 
     # Run esptool to merge images into a single binary
     env.Execute(
@@ -92,8 +110,16 @@ def merge_bin(source, target, env):
 
     # env.Execute(f'esptool.py --chip ESP32 merge_bin -o "%s" % {merged_file} --flash_mode dio --flash_size 4MB 0x1000 {bootloader_path} 0x8000 {partitions_path} 0x10000 {firmware_path}')
 
+    # Create the update.bin file
     shutil.copy(".pio/build/esp32dev/firmware.bin", update_file)
+
+    # create the index.html file from minified gul[p file]
     shutil.copy(GUI_file, GUI_release)
+
+    # Remove minified gulp file from data directory (prevents users using file without version name)
+    # try: os.remove(GUI_output_file)
+    # except FileNotFoundError: print(f"File '{GUI_output_file}' not found.")
+    delete_files_in_directory(data_directory)
 
 # Add a post action that runs esptoolpy to merge available flash images
 env.AddPostAction(APP_BIN , merge_bin)

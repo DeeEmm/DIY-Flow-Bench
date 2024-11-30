@@ -42,15 +42,12 @@
  
 #include <Arduino.h>
 
-#include "configuration.h"
 #include "system.h"
 #include "constants.h"
 #include "structs.h"
-// #include "pins.h"
 
 #include <Wire.h>
 #include "messages.h"
-// #include LANGUAGE_FILE
 
 
 Messages::Messages() {
@@ -153,9 +150,9 @@ size_t Messages::statusPrintf(const std::string format, ...) {
 
 	#ifdef SERIAL0_ENABLED
 	
-		extern struct ConfigSettings config;
+		extern struct BenchSettings settings;
 	
-		if (config.status_print_mode) {
+		if (settings.status_print_mode) {
 			char buf[API_STATUS_LENGTH];
 			va_list ap;
 			va_start(ap, format);
@@ -182,9 +179,9 @@ size_t Messages::debugPrintf(const std::string format, ...) {
 
 	#ifdef SERIAL0_ENABLED
 	
-		extern struct ConfigSettings config;
+		extern struct BenchSettings settings;
 	
-		if (config.debug_mode) {
+		if (settings.debug_mode) {
 			char buf[API_STATUS_LENGTH];
 			va_list ap;
 			va_start(ap, format);
