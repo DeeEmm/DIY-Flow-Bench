@@ -1194,7 +1194,7 @@ void DataHandler::bootLoop()
 
     tempServer->end();  // Stops the server and releases the port
 
-    delay(2000);  // 2000ms delay to ensure the port is released
+    delay(1000);  // 1000ms delay to ensure the port is released
 
     tempServer->reset();
 
