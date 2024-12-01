@@ -66,7 +66,7 @@ ValveLiftData valveData;
 Language language;
 CalibrationData calVal;
 Configuration config;
-Pins pin;
+Pins pins;
 
 // Initiate Classes
 DataHandler _data;
@@ -301,7 +301,7 @@ void TASKgetEnviroData( void * parameter ){
  ***/
 void setup(void) {
 
-  extern struct Pins pinss;
+  extern struct Pins pins;
   extern struct Configuration config;
 
   if (config.SWIRL_IS_ENABLED){
