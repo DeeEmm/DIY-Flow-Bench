@@ -117,7 +117,7 @@ void TASKgetSensorData( void * parameter ){
         // Get flow data
         // Bench is MAF type...
         if (strstr(String(settings.bench_type).c_str(), String("MAF").c_str())){
-          if (config.MAF_IS_ENABLED) {
+          if (config.MAF_SRC_TYPE != SENSOR_DISABLED) {
             sensorVal.FlowKGH = _sensors.getMafFlow();
             sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
           }
@@ -205,7 +205,7 @@ void TASKgetSensorData( void * parameter ){
         }
         
         
-        if (config.PREF_IS_ENABLED) {
+        if (config.PREF_SENSOR_TYPE != SENSOR_DISABLED) {
           sensorVal.PRefKPA = _sensors.getPRefValue();
           sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
           if (settings.std_adj_flow == 1) {
@@ -216,12 +216,12 @@ void TASKgetSensorData( void * parameter ){
           sensorVal.FlowADJSCFM = _calculations.convertToSCFM(sensorVal.FlowADJ, settings.standardReference );
         }
 
-        if (config.PDIFF_IS_ENABLED) {
+        if (config.PDIFF_SENSOR_TYPE != SENSOR_DISABLED) {
           sensorVal.PDiffKPA = _sensors.getPDiffValue();
           sensorVal.PDiffH2O = _calculations.convertPressure(sensorVal.PDiffKPA, INH2O) - calVal.pdiff_cal_offset;
         }
 
-        if (config.PITOT_IS_ENABLED) {
+        if (config.PITOT_SENSOR_TYPE != SENSOR_DISABLED) {
           sensorVal.PitotKPA = _sensors.getPitotValue() - calVal.pitot_cal_offset;
           sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O) ;
           sensorVal.PitotVelocity = _sensors.getPitotVelocity();
@@ -331,7 +331,7 @@ void setup(void) {
     _webserver.begin();
   #endif
 
-  if (config.ADC_IS_ENABLED) { 
+  if (config.ADC_TYPE != SENSOR_DISABLED) { 
     xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENSOR_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
   }
 

@@ -87,7 +87,7 @@
 /***********************************************************
  * Sensor types
  ***/
-#define NOT_USED 1
+#define SENSOR_DISABLED 1
 #define REF_PRESS_AS_BARO 2
 #define FIXED_VALUE 3
 #define MPXV7007 4

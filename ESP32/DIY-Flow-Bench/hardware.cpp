@@ -69,7 +69,7 @@ void Hardware::initaliseIO () {
 
   _message.serialPrintf("Initialising I/O \n");   
 
-  // if (config.ADC_IS_ENABLED){
+  // if (config.ADC_TYPE != SENSOR_DISABLED){
   //   ADS1115_lite adc(config.ADC_I2C_ADDR);
   // }
 
@@ -99,7 +99,7 @@ void Hardware::initaliseIO () {
     _message.serialPrintf("Input ORIFICE_BCD_BIT3_PIN: %d\n", pins.ORIFICE_BCD_BIT3_PIN );
     pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
   }
-  if (config.MAF_SRC == LINEAR_ANALOG && pins.MAF_PIN < 99) {
+  if (config.MAF_SRC_TYPE == LINEAR_ANALOG && pins.MAF_PIN < 99) {
     _message.serialPrintf("Input MAF_PIN: %d\n", pins.MAF_PIN );
     pinMode(pins.MAF_PIN, INPUT);   
   }
@@ -111,7 +111,7 @@ void Hardware::initaliseIO () {
     _message.serialPrintf("Input DIFF_PRESSURE_PIN: %d\n", pins.DIFF_PRESSURE_PIN );
     pinMode(pins.DIFF_PRESSURE_PIN, INPUT);   
   }
-  if (config.PITOT_SENSOR_TYPE && pins.PITOT_PIN < 99) {
+  if (config.PITOT_SENSOR_TYPE  == LINEAR_ANALOG && pins.PITOT_PIN < 99) {
     _message.serialPrintf("Input PITOT_PIN: %d\n", pins.PITOT_PIN );
     pinMode(pins.PITOT_PIN, INPUT);   
   }
@@ -236,7 +236,7 @@ void Hardware::begin () {
 
   this->getI2CList(); // Scan and list I2C devices to serial monitor
 
-  if (config.ADC_IS_ENABLED) {
+  if (config.ADC_TYPE != SENSOR_DISABLED) {
     _message.serialPrintf("Initialising ADS1115 \n");
 
     adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
@@ -303,7 +303,7 @@ int32_t Hardware::getADCRawData(int channel) {
 
   int32_t rawADCval = 0;
 
-  if (config.ADC_IS_ENABLED){
+  if (config.ADC_TYPE != SENSOR_DISABLED){
 
   if (channel > 3) {
     return 0;
@@ -354,11 +354,11 @@ int32_t Hardware::getADCRawData(int channel) {
 
   int rawADCval = getADCRawData(channel);
   
-  if (config.ADC_TYPE == 11 && config.ADC_IS_ENABLED) { 
+  if (config.ADC_TYPE == 11 && config.ADC_TYPE != SENSOR_DISABLED) { 
     
     volts = rawADCval * config.ADC_GAIN / config.ADC_RANGE; 
   
-  } else if ((config.ADC_TYPE == 10) && config.ADC_IS_ENABLED) {
+  } else if ((config.ADC_TYPE == 10) && config.ADC_TYPE != SENSOR_DISABLED) {
 
     volts = rawADCval * config.ADC_GAIN / 2047.00F; 
   

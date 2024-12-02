@@ -114,7 +114,6 @@ struct Configuration {
   int BME680_I2C_ADDR = 0x76;
   int BME680_SCAN_DELAY_MS =  1000;
 
-  bool ADC_IS_ENABLED = true;
   int ADC_TYPE = 11;
   int ADC_I2C_ADDR = 0x48; 
   int ADC_SCAN_DELAY_MS = 250;
@@ -122,34 +121,29 @@ struct Configuration {
   int ADC_RANGE = 32767;
   double ADC_GAIN = 6.144;
 
-  bool MAF_IS_ENABLED = true;
-  int MAF_SRC = 11;
-  const char MAF_SENSOR_TYPE[35] = "BOSCH_0280218067.cpp";
+  int MAF_SRC_TYPE = 11;
+  const char MAF_SENSOR_TYPE[35] = "Not Set";
   double MAF_MV_TRIMPOT = 0.0;
   int MAF_ADC_CHANNEL = 0;
 
-  bool PREF_IS_ENABLED = true;
   int PREF_SENSOR_TYPE = 2;
   int FIXED_REF_PRESS_VALUE = 1;
   double PREF_MV_TRIMPOT =  0.0;
   double PREF_ANALOG_SCALE =  1.0;
   int PREF_ADC_CHANNEL = 1;
 
-  bool PDIFF_IS_ENABLED = true;
   int PDIFF_SENSOR_TYPE = 11; 
   int FIXED_DIFF_PRESS_VALUE = 1;
   double PDIFF_MV_TRIMPOT = 0.0;
   double PDIFF_ANALOG_SCALE = 1.0;
   int PDIFF_ADC_CHANNEL = 2;
   
-  bool PITOT_IS_ENABLED = true;
-  int PITOT_SENSOR_TYPE = 2;
+  int PITOT_SENSOR_TYPE = SENSOR_DISABLED;
   double PITOT_MV_TRIMPOT = 0.0;
   double PITOT_ANALOG_SCALE = 1.0;
   int PITOT_ADC_CHANNEL = 3;
 
-  bool BARO_IS_ENABLED = true;
-  int BARO_SENSOR_TYPE = BOSCH_BME280;
+  int BARO_SENSOR_TYPE = BOSCH_BME280; //7
   double FIXED_BARO_VALUE = 101.3529;
   double BARO_ANALOG_SCALE = 1.0;  
   double startupBaroScalingFactor = 1.0;
@@ -159,15 +153,13 @@ struct Configuration {
   double SEALEVELPRESSURE_HPA = 1016.90;
   int BARO_ADC_CHANNEL = 4;
 
-  bool TEMP_IS_ENABLED = true;
-  int TEMP_SENSOR_TYPE = 7;
+  int TEMP_SENSOR_TYPE = BOSCH_BME280; //7
   double FIXED_TEMP_VALUE = 21.0;
   double TEMP_ANALOG_SCALE = 1.0;
   double TEMP_MV_TRIMPOT = 0.0;
   double TEMP_FINE_ADJUST = 0.0;
 
-  bool RELH_IS_ENABLED = true;
-  int RELH_SENSOR_TYPE = 7;
+  int RELH_SENSOR_TYPE = BOSCH_BME280; //7
   double FIXED_RELH_VALUE = 36.0;
   double RELH_ANALOG_SCALE = 1.0;
   double RELH_MV_TRIMPOT = 0.0;

@@ -70,7 +70,7 @@ void Sensors::begin () {
 	extern struct Pins pins;
 
 	// Initialise  MAF data
-	if (config.MAF_IS_ENABLED){	
+	if (config.MAF_SRC_TYPE != SENSOR_DISABLED){	
 
 			// TODO Do we need to include json version of maf data file here?
 			// or do we load it earlier???
@@ -203,7 +203,7 @@ String Sensors::getSensorType(int sensorType) {
 
 	switch (sensorType) {
 
-		case NOT_USED: {
+		case SENSOR_DISABLED: {
 			sensorDescription = language.LANG_NOT_ENABLED;
 			break;
 		}
@@ -308,9 +308,9 @@ long Sensors::getMafRaw() {
 	extern struct Configuration config;
 	extern struct Pins pins;
 
-	if (config.MAF_IS_ENABLED){
+	if (config.MAF_SRC_TYPE != SENSOR_DISABLED){
 
-		switch (config.MAF_SRC) {
+		switch (config.MAF_SRC_TYPE) {
 
 			case ADS1115:{
 				sensorVal.MafRAW = _hardware.getADCRawData(config.MAF_ADC_CHANNEL);
@@ -350,7 +350,7 @@ double Sensors::getMafVolts() {
 	Hardware _hardware;
 	double sensorVolts = 0.00F;
 
-	switch (config.MAF_SRC) {
+	switch (config.MAF_SRC_TYPE) {
 
 		case ADS1115:{
 			sensorVolts = _hardware.getADCVolts(config.MAF_ADC_CHANNEL);

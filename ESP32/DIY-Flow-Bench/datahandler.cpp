@@ -593,7 +593,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
     config.BME680_I2C_ADDR = configurationJSON["BME680_I2C_ADDR"].as<int>();
     config.BME680_SCAN_DELAY_MS =  configurationJSON["BME680_SCAN_DELAY_MS"].as<int>();
 
-    config.ADC_IS_ENABLED = configurationJSON["ADC_IS_ENABLED"].as<bool>();
+
     config.ADC_TYPE =  configurationJSON["ADC_TYPE"].as<bool>();
     config.ADC_I2C_ADDR = configurationJSON["ADC_I2C_ADDR"].as<int>();
     config.ADC_SCAN_DELAY_MS = configurationJSON["ADC_SCAN_DELAY_MS"].as<bool>();
@@ -602,33 +602,27 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
     config.ADC_RANGE = configurationJSON["ADC_RANGE"].as<int>();
     config.ADC_GAIN = configurationJSON["ADC_GAIN"].as<int>();
     
-    config.MAF_IS_ENABLED = configurationJSON["MAF_IS_ENABLED"].as<bool>();
-    // strcpy(config.MAF_DATA_FILE, configurationJSON["MAF_DATA_FILE"]);
-    config.MAF_SRC =  configurationJSON["MAF_SRC"].as<int>();
+    config.MAF_SRC_TYPE =  configurationJSON["MAF_SRC_TYPE"].as<int>();
     config.MAF_MV_TRIMPOT = configurationJSON["MAF_MV_TRIMPOT"].as<int>();
     config.MAF_ADC_CHANNEL = configurationJSON["MAF_ADC_CHANNEL"].as<int>();
 
-    config.PREF_IS_ENABLED = configurationJSON["PREF_IS_ENABLED"].as<bool>();
     config.PREF_SENSOR_TYPE = configurationJSON["PREF_SENSOR_TYPE"].as<int>();
     config.FIXED_REF_PRESS_VALUE = configurationJSON["FIXED_REF_PRESS_VALUE"].as<bool>();
     config.PREF_MV_TRIMPOT = configurationJSON["PREF_MV_TRIMPOT"].as<int>();
     config.PREF_ANALOG_SCALE = configurationJSON["PREF_ANALOG_SCALE"].as<double>();
     config.PREF_ADC_CHANNEL = configurationJSON["PREF_ADC_CHANNEL"].as<int>();
 
-    config.PDIFF_IS_ENABLED = configurationJSON["PDIFF_IS_ENABLED"].as<bool>();
     config.PDIFF_SENSOR_TYPE = configurationJSON["PDIFF_SENSOR_TYPE"].as<int>();
     config.FIXED_DIFF_PRESS_VALUE = configurationJSON["FIXED_DIFF_PRESS_VALUE"].as<int>();
     config.PDIFF_MV_TRIMPOT = configurationJSON["PDIFF_MV_TRIMPOT"].as<int>();
     config.PDIFF_ADC_CHANNEL = configurationJSON["PDIFF_ADC_CHANNEL"].as<int>();
 
-    config.PDIFF_IS_ENABLED = configurationJSON["PITOT_IS_ENABLED"].as<bool>();
     config.PITOT_SENSOR_TYPE =  configurationJSON["PITOT_SENSOR_TYPE"].as<int>();
     config.PITOT_MV_TRIMPOT = configurationJSON["PITOT_MV_TRIMPOT"].as<int>();
     config.PITOT_ANALOG_SCALE = configurationJSON["PITOT_ANALOG_SCALE"].as<double>();
     config.PITOT_ADC_CHANNEL = configurationJSON["PITOT_ADC_CHANNEL"].as<int>();
 
 
-    config.BARO_IS_ENABLED = configurationJSON["BARO_IS_ENABLED"].as<bool>();
     config.BARO_SENSOR_TYPE = configurationJSON["BARO_SENSOR_TYPE"].as<int>();
     config.FIXED_BARO_VALUE = configurationJSON["FIXED_BARO_VALUE"].as<double>();
     config.BARO_ANALOG_SCALE = configurationJSON["BARO_ANALOG_SCALE"].as<double>();
@@ -636,16 +630,14 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
     config.BARO_FINE_ADJUST = configurationJSON["BARO_FINE_ADJUST"].as<double>();
     config.startupBaroScalingFactor = configurationJSON["startupBaroScalingFactor"].as<double>();
     config.startupBaroScalingOffset = configurationJSON["startupBaroScalingOffset"].as<double>();
-
     config.SEALEVELPRESSURE_HPA = configurationJSON["SEALEVELPRESSURE_HPA"].as<double>();
-    config.TEMP_IS_ENABLED = configurationJSON["TEMP_IS_ENABLED"].as<bool>();
+
     config.TEMP_SENSOR_TYPE = configurationJSON["TEMP_SENSOR_TYPE"].as<int>();
     config.FIXED_TEMP_VALUE = configurationJSON["FIXED_TEMP_VALUE"].as<double>();
     config.TEMP_ANALOG_SCALE = configurationJSON["TEMP_ANALOG_SCALE"].as<double>();
     config.TEMP_MV_TRIMPOT = configurationJSON["TEMP_MV_TRIMPOT"].as<int>();
     config.TEMP_FINE_ADJUST = configurationJSON["TEMP_FINE_ADJUST"].as<double>();
-    
-    config.RELH_IS_ENABLED = configurationJSON["RELH_IS_ENABLED"].as<bool>();
+
     config.RELH_SENSOR_TYPE = configurationJSON["RELH_SENSOR_TYPE"].as<int>();
     config.FIXED_RELH_VALUE = configurationJSON["FIXED_RELH_VALUE"].as<double>();
     config.RELH_ANALOG_SCALE = configurationJSON["RELH_ANALOG_SCALE"].as<double>();
