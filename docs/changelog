@@ -29,8 +29,9 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+24120203        - Update sensor type handling
 24120202        - Update sensor enable handling
-24120201        - Maf data file json format
+24120201        - MAF data file json format
 24120102        - Fixed compile error
 24120101        - Tidied up status definitions in sensors.begin
 24113002        - Removed precompile macros assoc/w configuration.h

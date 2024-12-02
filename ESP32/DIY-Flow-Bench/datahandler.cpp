@@ -905,10 +905,10 @@ void DataHandler::parsePinsData(StaticJsonDocument<1024> pinData) {
   pins.ORIFICE_BCD_BIT1_PIN = pinData["ORIFICE_BCD_BIT1_PIN"].as<int>();
   pins.ORIFICE_BCD_BIT2_PIN = pinData["ORIFICE_BCD_BIT2_PIN"].as<int>();
   pins.ORIFICE_BCD_BIT3_PIN = pinData["ORIFICE_BCD_BIT3_PIN"].as<int>();
-  pins.MAF_PIN = pinData["MAF_SRC_IS_PIN"].as<int>();
-  pins.REF_PRESSURE_PIN = pinData["PREF_SRC_PIN"].as<int>();
-  pins.DIFF_PRESSURE_PIN = pinData["PDIFF_SRC_IS_PIN"].as<int>();
-  pins.PITOT_PIN = pinData["PITOT_SRC_IS_PIN"].as<int>();
+  pins.MAF_PIN = pinData["MAF_PIN"].as<int>();
+  pins.REF_PRESSURE_PIN = pinData["PREF_PIN"].as<int>();
+  pins.DIFF_PRESSURE_PIN = pinData["PDIFF_PIN"].as<int>();
+  pins.PITOT_PIN = pinData["PITOT_PIN"].as<int>();
   pins.TEMPERATURE_PIN = pinData["TEMPERATURE_PIN"].as<int>();
   pins.HUMIDITY_PIN = pinData["HUMIDITY_PIN"].as<int>();
   pins.REF_BARO_PIN = pinData["REF_BARO_PIN"].as<int>();
