@@ -64,7 +64,7 @@ class DataHandler {
 		void writeJSONFile(String data, String filename, int dataSize);
 		void createLiftDataFile();
 		void createCalibrationFile ();
-		StaticJsonDocument<CONFIG_JSON_SIZE> loadJSONFile(String filename);
+		StaticJsonDocument<JSON_FILE_SIZE> loadJSONFile(String filename);
 		void beginSerial(void);
 		void loadMAFData();
 		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfiguration();

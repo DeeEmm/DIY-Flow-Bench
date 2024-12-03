@@ -101,10 +101,10 @@ void DataHandler::begin() {
     this->loadCalibrationData();
 
     // Check if config files exists. If not send to boot loop until it is uploaded
-    if (!SPIFFS.exists("/configuration.json")) {
-      status.doBootLoop = true;
-    } else {
+    if (SPIFFS.exists("/configuration.json")) {
       this->loadConfiguration();
+    } else {
+      status.doBootLoop = true;
     }
 
     // Check for PINS file
@@ -290,7 +290,7 @@ bool DataHandler::checkUserFile(int filetype) {
     while (file)  {
       spiffsFile = file.name();
 
-      if (checkSubstring(spiffsFile.c_str(), matchPINS.c_str())  && (filetype == PINSFILE)) {
+      if (checkSubstring(spiffsFile.c_str(), matchPINS.c_str()) && (filetype == PINSFILE)) {
         // PINS_*******.json file found
         pinsFile = "/" + spiffsFile;
         _message.serialPrintf("PINS file Found: %s\n", pinsFile.c_str() );  
@@ -300,11 +300,12 @@ bool DataHandler::checkUserFile(int filetype) {
         return true;
       }   
       
-      if ((spiffsFile.find(matchMAF) == 0) && (filetype == MAFFILE)) {
+      if (checkSubstring(spiffsFile.c_str(), matchMAF.c_str()) && (filetype == MAFFILE)) {
         // MAF_********.json file found
-        mafFile = "/" , spiffsFile;
+        mafFile = "/" + spiffsFile;
         _message.serialPrintf("MAF file Found: %s\n", mafFile.c_str() );  
         status.mafFilename = mafFile.c_str();
+        loadMAFData();
         status.mafLoaded = true;
         return true;
       }
@@ -478,8 +479,8 @@ void DataHandler::createCalibrationFile () {
  * @brief loadJSONFile
  * @details Loads JSON data from file
  ***/
-StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadJSONFile(String filename)
-{
+StaticJsonDocument<JSON_FILE_SIZE> DataHandler::loadJSONFile(String filename) {
+
 
   Messages _message;
 
@@ -487,7 +488,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadJSONFile(String filename)
 
   // Allocate the memory pool on the stack.
   // Use arduinojson.org/assistant to compute the capacity.
-  StaticJsonDocument<CONFIG_JSON_SIZE> jsonData;
+  StaticJsonDocument <JSON_FILE_SIZE> jsonData;
 
   if (SPIFFS.exists(filename))  {
     File jsonFile = SPIFFS.open(filename, FILE_READ);
@@ -497,7 +498,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadJSONFile(String filename)
       _message.statusPrintf("Failed to open file for reading \n");
     }    else    {
       size_t size = jsonFile.size();
-      if (size > CONFIG_JSON_SIZE)    {
+      if (size > JSON_FILE_SIZE)    {
 
       }
 
@@ -564,13 +565,14 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
   extern struct Configuration config;
 
   StaticJsonDocument<CONFIG_JSON_SIZE> configurationJSON;
+
   Messages _message;
 
-  _message.serialPrintf("Loading Configuration... \n");     
+  _message.serialPrintf("Loading Configuration \n");     
 
-  if (SPIFFS.exists("/config.json"))  {
+  if (SPIFFS.exists("/configuration.json"))  {
 
-    configurationJSON = loadJSONFile("/config.json");
+    configurationJSON = loadJSONFile("/configuration.json");
 
     // strcpy(config.wifi_ssid, configurationJSON["CONF_WIFI_SSID"]);
     // strcpy(config.wifi_pswd, configurationJSON["CONF_WIFI_PSWD"]);
@@ -586,13 +588,24 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
     config.USE_FIXED_5V_VALUE = configurationJSON["USE_FIXED_5V_VALUE"].as<bool>();
 
     config.BME280_IS_ENABLED = configurationJSON["BME280_IS_ENABLED"].as<bool>();
-    config.BME280_I2C_ADDR = configurationJSON["BME280_I2C_ADDR"].as<int>();
+
+// TEST - test format of I2C address conversion from JSON to struct
+
+    // serializeJsonPretty(configurationJSON, Serial); //<-- full data is there 
+    // _message.serialPrintf("BME280_I2C_ADDR: string %s\n", configurationJSON["BME280_I2C_ADDR"]); // prints garbage
+    // _message.serialPrintf("BME280_I2C_ADDR: hex %#04x\n", configurationJSON["BME280_I2C_ADDR"].as<int>()); // prints 0000
+    // _message.serialPrintf("BME280_I2C_ADDR: u_int %u\n",configurationJSON["BME280_I2C_ADDR"].as<int>()); // prints 0
+    // _message.serialPrintf("BME280_I2C_ADDR: int %u\n",config.BME280_I2C_ADDR); // default value 118 (fron struct init)
+
+
+    config.BME280_I2C_ADDR = configurationJSON["BME280_I2C_ADDR"];
+    // strcpy(config.BME280_I2C_ADDR, configurationJSON["BME280_I2C_ADDR"]);
     config.BME280_SCAN_DELAY_MS =  configurationJSON["BME280_SCAN_DELAY_MS"].as<int>();
 
     config.BME680_IS_ENABLED = configurationJSON["BME680_IS_ENABLED"].as<bool>();
-    config.BME680_I2C_ADDR = configurationJSON["BME680_I2C_ADDR"].as<int>();
+    config.BME680_I2C_ADDR = configurationJSON["BME680_I2C_ADDR"];
+    // strcpy(config.BME680_I2C_ADDR, configurationJSON["BME680_I2C_ADDR"]);
     config.BME680_SCAN_DELAY_MS =  configurationJSON["BME680_SCAN_DELAY_MS"].as<int>();
-
 
     config.ADC_TYPE =  configurationJSON["ADC_TYPE"].as<bool>();
     config.ADC_I2C_ADDR = configurationJSON["ADC_I2C_ADDR"].as<int>();
@@ -669,15 +682,15 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
 * @brief loadSettings
 * @details read settings settings.json file and loads into global struct
 ***/ 
-StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadSettings () {
+StaticJsonDocument<SETTINGS_JSON_SIZE> DataHandler::loadSettings () {
 
   extern struct BenchSettings settings;
 
-  StaticJsonDocument<CONFIG_JSON_SIZE> configData;
+  StaticJsonDocument<SETTINGS_JSON_SIZE> configData;
   DataHandler _data;
   Messages _message;
 
-  _message.serialPrintf("Loading Configuration \n");     
+  _message.serialPrintf("Loading Bench Settings \n");     
 
   if (SPIFFS.exists("/settings.json"))  {
 
@@ -725,7 +738,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadSettings () {
     settings.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
 
   } else {
-    _message.serialPrintf("Configuration file not found \n");
+    _message.serialPrintf("Bench Settings file not found \n");
   }
   
   return configData;  
@@ -750,17 +763,22 @@ void DataHandler::loadMAFData () {
 
   StaticJsonDocument<MAF_JSON_SIZE> mafData;
 
-  mafData = _data.loadJSONFile(status.pinsFilename);
+  // mafData = _data.loadJSONFile(status.mafFilename);
 
-  status.mafSensorType, mafData["sensor_type"]; // "ACDELCO_92281162"
-  strcpy(status.mafOutputType, mafData["output_type"]); // "voltage"
-  strcpy(status.mafUnits, mafData["maf_units"]); // "KG_H"
-  status.mafScaling = mafData["maf_scaling"]; // 0.1
-  status.mafDiameter = mafData["maf_diameter"]; // 94
+  mafData = _data.loadJSONFile(status.mafFilename);
+
+  strcpy(status.mafSensorType, mafData["sensor_type"]); // "ACDELCO_92281162"
+  strcpy(status.mafOutputType, mafData["output_type"]); // "voltage / frequency"
+  strcpy(status.mafUnits, mafData["maf_units"]); // "KG_H / MG_S"
+  status.mafScaling = mafData["maf_scaling"]; // 0.1 / 0.01 / 0.001
+  status.mafDiameter = mafData["maf_diameter"]; // 94 (mm)
 
   // Load MAF lookup table into JSON object
   status.mafJsonObject = mafData["maf_lookup_table"];
 
+  // Print size of MAF data to serial
+  _message.serialPrintf("MAF Data size: %u \n", mafData.memoryUsage()); 
+  _message.serialPrintf("MAF Data JSON Object size: %u \n", status.mafJsonObject.memoryUsage()); 
 }
 
 
@@ -1241,7 +1259,7 @@ void DataHandler::fileUpload(AsyncWebServerRequest *request, String filename, si
       status.pinsLoaded = true;
     } 
     if (_data.checkUserFile(MAFFILE)) {
-      // _data.loadMafData();
+      _data.loadMAFData();
       status.mafLoaded = true;  
     }
 
@@ -1363,7 +1381,7 @@ void DataHandler::bootLoop()
 
         vTaskDelay( 1 );
     
-    } while (status.doBootLoop = true);
+    } while (status.doBootLoop == true);
 
     tempServer->reset();
 

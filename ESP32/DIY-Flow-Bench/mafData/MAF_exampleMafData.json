@@ -1,0 +1,42 @@
+/* Note this is an example maf.json file.
+    JSON files cannot contain commentes, so if you use this
+    as the basis for yoour file, please remove all comments
+    The MAF lookup table takes the form of {key, value}
+
+    Keys may represent analog units, volts, hertz, baked beans or or any other input value.
+    Data table length is not fixed 
+    Keys do not need to be contiguous nor linear
+    Keys do not need to finish at a specific value
+    Whatever value you input into the getMafRaw method will return the relevant lookup table value
+    
+    
+    NOTE:
+    Generally with analog sensor data the keys represent the sensor signal range and so are usually contiguous and to the order of bit^resolution.
+    i.e. 10 bit data range has a table size of 2^10 = 1024 bits long, which means that there will be 1024 entries (as per this example).
+    However, it should be noted that whilst the ESP32 inputs have 12 bit resolution, it is not necessary for the data table to share 
+    this resolution. Lookup table results are interpolated and so input resolution does not need to match the lookup table size
+    
+    NOTE: that there should be a zero value!!!!
+
+    */
+
+{
+    "sensor_type" : "ACDELCO_92281162",
+    "output_type" : "voltage", // voltage or frequency
+    "maf_units" : "KG_H", // KG_H or MG_S
+    "maf_scaling" : 0.1, // Scaling factor for value
+    "maf_diameter" : 94, // Original housing diameter in mm
+    "maf_lookup_table" : { // Key : Value pair
+        "0" : 0,
+        "8" : 28,
+        "15" : 34,
+        "23" : 43,
+ 
+        /// etc ///
+ 
+        "477" : 15091,
+        "485" : 15954,
+        "492" : 16852,
+        "500" : 17787 
+    }
+}

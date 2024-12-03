@@ -65,10 +65,10 @@ void Sensors::begin () {
 
 	extern struct DeviceStatus status;
     extern struct Language language;
-	extern int mafOutputType;
 	extern struct Configuration config;
 	extern struct Pins pins;
-
+	extern int mafOutputType;
+	
 	// Initialise  MAF data
 	if (config.MAF_SRC_TYPE != SENSOR_DISABLED){	
 
@@ -78,26 +78,55 @@ void Sensors::begin () {
 			// get size of the MAF datatable 
 			status.mafDataTableRows = status.mafJsonObject.size() -1;
 
-			// Create 2D arrray
-			int mafArray[status.mafDataTableRows][2];
-			int idx = 0;
 
-			// Walk through JSON object to populate vectors
-			for (JsonPair kv : status.mafJsonObject) {
-				
-				status.mafLookupTable[idx][0] = stoi(kv.key().c_str());
-				status.mafLookupTable[idx][1] = kv.value().as<int>();
+/***[TEST]******************************************************************* */			
 
-				idx += 1;
+// Test to determine best way to manage mafdata
 
-				// Serial.println(kv.key().c_str());
-				// Serial.println(kv.value().as<const char*>());
-			}
+// Do we have the maf data in JSON object??? [YES!! - TEST SUCCESSFUL]
+//_message.serialPrintf("print mafJsonObject:\n");
+//serializeJsonPretty(status.mafJsonObject, Serial);
 
 
-			// get highest MAF input value from data table
-			status.mafDataValMax = status.mafLookupTable[status.mafDataTableRows][1];
-			status.mafDataKeyMax = status.mafLookupTable[status.mafDataTableRows][0];
+// Can we access JSON object via iterator?? [YES!! - TEST UNSUCCESSFUL] 
+// use interator to get mafdata values
+int index = 1;
+JsonObject::iterator it = status.mafJsonObject.begin();	
+it += index;
+//_message.serialPrintf(it->value()); //<- correct format 
+
+
+
+
+
+
+
+/***[END TEST]*************************************************************** */			
+
+			// Commented out for testing
+
+			// // Create 2D arrray
+			// int mafArray[status.mafDataTableRows][2];
+			// int rowNum = 0;
+
+			// // Walk through JSON object to populate vectors
+			// for (JsonPair keyValue : status.mafJsonObject) {
+			// // for (int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { 
+
+			// 	status.mafLookupTable[rowNum][0] = atoi(keyValue.key().c_str());
+			// 	status.mafLookupTable[rowNum][1] = keyValue.value().as<int>();
+
+			// 	Serial.println(keyValue.key().c_str());
+			// 	Serial.println(keyValue.value().as<const char*>());
+
+			// 	rowNum += 1;
+
+			// }
+
+
+			// // get highest MAF input value from data table
+			// status.mafDataValMax = status.mafLookupTable[status.mafDataTableRows][1];
+			// status.mafDataKeyMax = status.mafLookupTable[status.mafDataTableRows][0];
 		
 
 	}
@@ -106,10 +135,11 @@ void Sensors::begin () {
 	//initialise BME280
 	if (config.BME280_IS_ENABLED) {
 
-		_message.serialPrintf("Initialising BME280 \n");	
+		// uint8_t I2CAddress = (unsigned int)config.BME280_I2C_ADDR;
+
+		_message.serialPrintf("Initialising BME280: %u\n", config.BME280_I2C_ADDR);	
 		
-		if (_BME280Sensor.beginI2C(config.BME280_I2C_ADDR) == false)
-		{
+		if (_BME280Sensor.beginI2C(config.BME280_I2C_ADDR) == false) {
 			_message.serialPrintf("BME sensor did not respond. \n");
 			_message.serialPrintf("Please check wiring and I2C address\n");
 			_message.serialPrintf("BME I2C address %s set in configuration.h. \n", config.BME280_I2C_ADDR);

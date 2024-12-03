@@ -38,26 +38,35 @@ using namespace std;
  ***/
 #define BOOT_MESSAGE "May the flow be with you..."
 #define PAGE_TITLE "DIY Flow Bench"
+#define FILESYSTEM SPIFFS
+#define PRINT_BUFFER_LENGTH 128
 #define SHOW_ALARMS true
 #define MIN_REFRESH_RATE 250
+
+// API data
 #define API_IS_ENABLED                                  
+// #define API_CHECKSUM_IS_ENABLED                       
 #define API_BLOB_LENGTH 1024
 #define API_RESPONSE_LENGTH 64
 #define API_STATUS_LENGTH 128
 #define API_JSON_LENGTH 1020
 #define API_SCAN_DELAY_MS 250
-#define PRINT_BUFFER_LENGTH 128
-// #define API_CHECKSUM_IS_ENABLED                       
-#define FILESYSTEM SPIFFS
+
+// Memory assignment
 #define SENSOR_TASK_MEM_STACK 2400 // 2200
 #define ENVIRO_TASK_MEM_STACK 2000 // 1800
+
+// JSON memory allocation
 #define DATA_JSON_SIZE 1500
 #define SETTINGS_JSON_SIZE 1700 //1200 
 #define LANGUAGE_JSON_SIZE 1200
-#define CONFIG_JSON_SIZE 1700 //1536 //1200 
+#define CONFIG_JSON_SIZE 1800 //1536 //1200 
 #define CAL_DATA_JSON_SIZE 128
 #define LIFT_DATA_JSON_SIZE 384
-#define MAF_JSON_SIZE 3000
+#define MAF_JSON_SIZE 1500 // 6k for Bosch file 25k for Delphi 
+#define JSON_FILE_SIZE 1500 
+
+// Loop Delays
 #define VTASK_DELAY_ADC 500
 #define VTASK_DELAY_BME 500
 #define VTASK_DELAY_SSE 500
@@ -66,14 +75,16 @@ using namespace std;
 /***********************************************************
 * WEBUI SETTINGS
 ***/
-#define STATUS_UPDATE_RATE 500                              // time between SSE push in milliseconds
+#define STATUS_UPDATE_RATE 500 // time between SSE push in milliseconds
 
 #define GUI_COLOUR_UNSET "pink"
 #define GUI_COLOUR_SET "#44b112"
 #define GUI_COLOUR_ERROR "red"
 
 
-
+/***********************************************************
+* Precompile macro error flags
+***/
 #ifndef MAJOR_VERSION 
 #error MAJOR_VERSION UNDEFINED
 #endif

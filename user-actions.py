@@ -5,6 +5,9 @@ from SCons.Script import Import
 
 Import("env")
 
+
+# if not env.IsCleanTarget():
+    
 # run default gulp task
 # env.Execute("cd /Users/mick/Zoho\ WorkDrive\ \(joeblow\)/My\ Folders/ESP32\ Projects/DIY-Flow-Bench/DIY-Flow-Bench/")
 # env.Execute("gulp")
