@@ -30,6 +30,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 Build #         - Description of Change
 
 24120301        - Update index.html
+                - Change I2C addressing to decimal
 24120205        - Update MAF.json handling
                 - Address issue with loading configuration.json
 24120204        - Update GUI file load management
