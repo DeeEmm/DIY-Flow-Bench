@@ -135,10 +135,14 @@ void DataHandler::begin() {
           _message.serialPrintf("!! MAF file not found !!\n");  
     }
 
-    // Check for index file
-    if (!SPIFFS.exists("/index.html")) {
-        status.doBootLoop = true;
-        _message.serialPrintf("!! index.html file not found !!\n");  
+    if (checkUserFile(INDEXFILE)) {
+      if (!SPIFFS.exists(status.indexFilename)) {
+          status.doBootLoop = true;
+          _message.serialPrintf("!! index.html file not found !!\n");  
+      }
+    } else {
+          status.doBootLoop = true;
+          _message.serialPrintf("!! index.html file not found !!\n");  
     }
 
     // Initialise WiFi
@@ -282,9 +286,11 @@ bool DataHandler::checkUserFile(int filetype) {
 
     std::string matchPINS = "PINS";
     std::string matchMAF = "MAF";
+    std::string matchINDEX = "index";
     std::string spiffsFile;
     std::string pinsFile;
     std::string mafFile;
+    std::string indexFile;
 
     // Check SPIFFS for pins and MAF files
     while (file)  {
@@ -307,6 +313,15 @@ bool DataHandler::checkUserFile(int filetype) {
         status.mafFilename = mafFile.c_str();
         loadMAFData();
         status.mafLoaded = true;
+        return true;
+      }
+      
+      if (checkSubstring(spiffsFile.c_str(), matchINDEX.c_str()) && (filetype == INDEXFILE)) {
+        // index.html file found
+        indexFile = "/" + spiffsFile;
+        _message.serialPrintf("index file Found: %s\n", indexFile.c_str() );  
+        status.indexFilename = indexFile.c_str();
+        status.GUIexists = true;
         return true;
       }
 
@@ -978,10 +993,6 @@ void DataHandler::loadPinsData () {
   parsePinsData(pinsFileData);
 
 
-
-
-
-
   // TEST - save pins data to file
   // String output;
   // serializeJson(pinsFileData, output);
@@ -1215,57 +1226,60 @@ String DataHandler::getDataJSON()
 
 
 
-/***********************************************************
- * @brief Process File Upload
- ***/
-void DataHandler::fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
-{
+// /***********************************************************
+//  * @brief Process File Upload
+//  ***/
+// void DataHandler::fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+// {
 
-  Messages _message;
-  DataHandler _data;
-  extern struct DeviceStatus status;
+//   Messages _message;
+//   DataHandler _data;
+//   extern struct DeviceStatus status;
 
-  int file_size = 0;
+//   int file_size = 0;
 
-  // _message.serialPrintf("File Upload");
+//   // _message.serialPrintf("File Upload");
 
-  if (!filename.startsWith("/")){
-    filename = "/" + filename;
-  }
+//   if (!filename.startsWith("/")){
+//     filename = "/" + filename;
+//   }
 
-  uint32_t freespace = SPIFFS.totalBytes() - SPIFFS.usedBytes();
+//   uint32_t freespace = SPIFFS.totalBytes() - SPIFFS.usedBytes();
 
-  if (!index)  {
-    _message.serialPrintf("UploadStart: %s \n", filename.c_str());
-    request->_tempFile = SPIFFS.open(filename, "w");
-  }
+//   if (!index)  {
+//     _message.serialPrintf("UploadStart: %s \n", filename.c_str());
+//     request->_tempFile = SPIFFS.open(filename, "w");
+//   }
 
-  if (len)  {
-    file_size += len;
-    if (file_size > freespace)    {
-      _message.serialPrintf("Upload failed, no Space: %s \n", freespace);
-    }    else    {
-      _message.serialPrintf("Writing file: '%s' index=%u len=%u \n", filename.c_str(), index, len);
-      request->_tempFile.write(data, len);
-    }
-  } 
+//   if (len)  {
+//     file_size += len;
+//     if (file_size > freespace)    {
+//       _message.serialPrintf("Upload failed, no Space: %s \n", freespace);
+//     }    else    {
+//       _message.serialPrintf("Writing file: '%s' index=%u len=%u \n", filename.c_str(), index, len);
+//       request->_tempFile.write(data, len);
+//     }
+//   } 
 
-  if (final)  {
-    _message.serialPrintf("Upload Complete: %s, %u bytes\n", filename.c_str(), file_size);
-    request->_tempFile.close();
+//   if (final)  {
+//     _message.serialPrintf("Upload Complete: %s, %u bytes\n", filename.c_str(), file_size);
+//     request->_tempFile.close();
 
-    if (_data.checkUserFile(PINSFILE)){
-      _data.loadPinsData();
-      status.pinsLoaded = true;
-    } 
-    if (_data.checkUserFile(MAFFILE)) {
-      _data.loadMAFData();
-      status.mafLoaded = true;  
-    }
+//     if (_data.checkUserFile(PINSFILE)){
+//       _data.loadPinsData();
+//       status.pinsLoaded = true;
+//     } 
+//     if (_data.checkUserFile(MAFFILE)) {
+//       _data.loadMAFData();
+//       status.mafLoaded = true;  
+//     }
+//     if (_data.checkUserFile(INDEXFILE)) {
+//       status.GUIexists = true;  
+//     }
 
-    request->redirect("/");
-  }
-}
+//     request->redirect("/");
+//   }
+// }
 
 
 
@@ -1327,37 +1341,40 @@ void DataHandler::bootLoop()
     API _api;
     DataHandler _data;
 
-    String jsonString;
-
-    StaticJsonDocument<DATA_JSON_SIZE> dataJson;
     bool shouldReboot = false;
 
-    _message.serialPrintf("Spinning up temporary web server\n");
-    _message.serialPrintf("View browser to upload missing files\n");
+    // if the weberver is already running skip sever initialisation
+    if (!status.webserverIsRunning) {
 
-    tempServer = new AsyncWebServer(80);
-    tempServerEvents = new AsyncEventSource("/events");
+      _message.serialPrintf("Spinning up temporary web server\n");
+      _message.serialPrintf("View browser to upload missing files\n");
 
-    // Upload request handler
-    tempServer->on("/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
-        Messages _message;
-        _message.debugPrintf("/upload \n");
-        request->send(200);
-        },
-        fileUpload);
+      tempServer = new AsyncWebServer(80);
+      tempServerEvents = new AsyncEventSource("/events");
 
-    // Index page request handler
-    tempServer->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
-        Language language;
-        Webserver _webserver;
-            request->send_P(200, "text/html", language.LANG_INDEX_HTML, _webserver.processLandingPageTemplate); 
-        });
+      // Upload request handler
+      tempServer->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
+          Messages _message;
+          _message.debugPrintf("/api/file/upload \n");
+          request->send(200);
+          },
+          _webserver.fileUpload); 
 
-    tempServer->onFileUpload(fileUpload);
-    tempServer->addHandler(tempServerEvents);
-    tempServer->begin();
+      // Index page request handler
+      tempServer->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
+          Language language;
+          Webserver _webserver;
+              request->send_P(200, "text/html", language.LANG_INDEX_HTML, _webserver.processLandingPageTemplate); 
+          });
 
-    _message.serialPrintf("Waiting...\n");
+      tempServer->onFileUpload(_webserver.fileUpload);
+      tempServer->addHandler(tempServerEvents);
+      tempServer->begin();
+
+      _message.serialPrintf("Waiting...\n");
+    
+    }
+
 
     do {
     // capture program pointer in loop and wait for files to be uploaded
@@ -1373,7 +1390,7 @@ void DataHandler::bootLoop()
         }
 
         // This is the escape function. When all files are present and loaded we can leave the loop
-        if ((status.pinsLoaded == true) && (status.mafLoaded == true) && (SPIFFS.exists("/index.html")) && (SPIFFS.exists("/configuration.json"))){
+        if ((status.pinsLoaded == true) && (status.mafLoaded == true) && (status.GUIexists == true) && (SPIFFS.exists("/configuration.json"))){
           status.doBootLoop = false; 
           break;
         } 
@@ -1383,7 +1400,13 @@ void DataHandler::bootLoop()
     
     } while (status.doBootLoop == true);
 
-    tempServer->reset();
+
+    // if the weberver is already running skip sever reset
+    if (!status.webserverIsRunning) {
+      tempServer->end();  // Stops the server and releases the port
+      delay(1000);  // 1000ms delay to ensure the port is released
+      tempServer->reset();
+    }
 
 }
 

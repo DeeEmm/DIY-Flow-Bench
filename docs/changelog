@@ -29,6 +29,13 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2412050001      - Update build number format [2 to 4 digit]
+                - Auto build number update
+24120401        - Utilise api/file/upload path for all uploads
+                - Remove redirect from valve lift capture (change to XHR)
+                - Updated gulp to auto version GUI html file
+24120302        - Remove redirect from bench on/off
+                - Utilise boot loop for runtime file handling
 24120301        - Update index.html
                 - Change I2C addressing to decimal
 24120205        - Update MAF.json handling

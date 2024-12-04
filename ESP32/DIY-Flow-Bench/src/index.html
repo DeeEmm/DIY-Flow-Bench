@@ -17,7 +17,7 @@
         <h3>~LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE~</h3>
         <hr>
         <div class="align-center">
-          <form method="POST" action="/api/saveliftdata" enctype="multipart/form-data">
+          <form method="POST" class="lift-data-form" enctype="multipart/form-data">
             <label>~LANG_GUI_LIFT_VALUE~</label>
             <br>
               <div class="switch-field">
@@ -46,7 +46,7 @@
                 <input type="radio" id="lift-twelve" name="lift-data" value="12" />
                 <label for="lift-twelve">~lift12~</label>
               </div>
-            <input class="button submit-button" type="submit" id="capture-lift-data-button" value="~LANG_GUI_LIFT_CAPTURE~"/>
+            <input class="button submit-button" type="button" id="capture-lift-data-button" value="~LANG_GUI_LIFT_CAPTURE~"/>
           </form>
         </div>
         <div class="clear-both">&nbsp;</div>
@@ -463,7 +463,7 @@
           <br>
           <button id="clear-graph-data-button" class="control-button">~LANG_GUI_CLEAR~</button> 
           <button id="export-graph-data-button" class="control-button">~LANG_GUI_EXPORT~</button> 
-          <button id="capture-graph-data-button" class="control-button">~LANG_GUI_IMAGE~</button> 
+          <button id="export-graph-image-button" class="control-button">~LANG_GUI_IMAGE~</button> 
           <!-- Export button fires javascript function to click link below forcing the download-->
           <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
         </div>

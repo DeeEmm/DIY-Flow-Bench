@@ -134,7 +134,7 @@ function onFileUpload(event) {
   const {file} = this.state;
   const data = new FormData;
   data.append('data', file);
-  fetch('/upload', {
+  fetch('/api/file/upload', {
       method: 'POST',
       body: data
   })
@@ -300,10 +300,34 @@ function initialiseButtons() {
     document.getElementById('file-data-download').click();
   });
 
-  document.getElementById('capture-graph-data-button').addEventListener('click', function(){
+  document.getElementById('export-graph-image-button').addEventListener('click', function(){
     // initiate datagraph image download from browser
     exportSVGAsJPG();
   });
+
+
+  document.getElementById('capture-lift-data-button').addEventListener('click', function(){
+    console.log('Capture Lift Data');
+    var liftDataForm = document.querySelector('.lift-data-form')
+    var formData = new FormData(liftDataForm)
+    // xhr.open('GET', '/api/saveliftdata');
+    XHR.addEventListener('load', function() {
+      /* submitted */
+    })
+    XHR.addEventListener('error', function() {
+      /* error */
+     })
+    xhr.open('POST', '#')
+    xhr.send(formData)
+
+    // xhr.onload = function() {
+    //   if (xhr.status === 200) window.location.href = '/';
+    // };
+    // xhr.send();
+  });
+  
+
+
 
   document.getElementById('STATUS_MESSAGE').addEventListener('dblclick', function(){
     document.getElementById('calibrationModal').style.display='block';
@@ -407,23 +431,23 @@ function initialiseButtons() {
     xhr.send();
   });
 
-  
+
 
   document.getElementById('on-button').addEventListener('click', function(){
     console.log('Bench On');
     xhr.open('GET', '/api/bench/on');
-    xhr.onload = function() {
-      if (xhr.status === 200) window.location.href = '/';
-    };
+    // xhr.onload = function() {
+    //   if (xhr.status === 200) window.location.href = '/';
+    // };
     xhr.send();
   });
 
   document.getElementById('off-button').addEventListener('click', function(){
     console.log('Bench Off');
     xhr.open('GET', '/api/bench/off');
-    xhr.onload = function() {
-      if (xhr.status === 200) window.location.href = '/';
-    };
+    // xhr.onload = function() {
+    //   if (xhr.status === 200) window.location.href = '/';
+    // };
     xhr.send();
   });
 

@@ -51,7 +51,8 @@ using namespace std;
 
 // RTC_DATA_ATTR int bootCount; // flash mem
 
-const char LANDING_PAGE[] PROGMEM = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/api/file/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~CONFIGURATION_STATUS~</p> <p>~PINS_STATUS~</p> <p>~MAF_STATUS~</p> <br> <form method='POST' action='/api/file/upload' enctype='multipart/form-data'> <div class=\"input_container\"> <input type=\"file\" name=\"upload\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
+// DEPRECATED
+// const char LANDING_PAGE[] PROGMEM = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/api/file/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~CONFIGURATION_STATUS~</p> <p>~PINS_STATUS~</p> <p>~MAF_STATUS~</p> <br> <form method='POST' action='/api/file/upload' enctype='multipart/form-data'> <div class=\"input_container\"> <input type=\"file\" name=\"upload\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
 
 void Webserver::begin()
 {
@@ -171,10 +172,10 @@ void Webserver::begin()
   server->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
       Messages _message;
       _message.debugPrintf("/api/file/upload \n");
-      request->send(200);
+      // request->send(200);
       // request->redirect("/?view=upload"); 
       },
-      processUpload);
+      fileUpload);
 
   // Download request handler
   server->on("/api/file/download", HTTP_GET, [](AsyncWebServerRequest *request){              
@@ -238,8 +239,12 @@ void Webserver::begin()
         } 
         if (_data.checkSubstring(fileToDelete.c_str(), status.pinsFilename.c_str())) status.pinsLoaded = false;
         if (_data.checkSubstring(fileToDelete.c_str(), status.mafFilename.c_str())) status.mafLoaded = false;
-        if (fileToDelete == "/index.html"){
-          request->redirect("/");
+        if (_data.checkSubstring(fileToDelete.c_str(), status.indexFilename.c_str())) status.GUIexists = false;
+        // if (fileToDelete == "/index.html"){
+        if (fileToDelete == status.indexFilename || fileToDelete == status.pinsFilename || fileToDelete == status.mafFilename){
+          request->send_P(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
+          _data.bootLoop();
+          // request->redirect("/");
         } else {
           request->redirect("/?view=upload");
         }
@@ -327,19 +332,28 @@ void Webserver::begin()
   // Index page request handler
   server->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
       extern struct DeviceStatus status;
-      if ((SPIFFS.exists("/index.html")) && ((status.pinsLoaded == true))) {
-        request->send(SPIFFS, "/index.html", "text/html", false, processTemplate);
+      if ((SPIFFS.exists(status.indexFilename)) && ((status.pinsLoaded == true))) {
+        request->send(SPIFFS, status.indexFilename, "text/html", false, processTemplate);
        } else {
-        request->send_P(200, "text/html", LANDING_PAGE, processLandingPageTemplate); 
+          DataHandler _data;
+          // request->send_P(200, "text/html", LANDING_PAGE, processLandingPageTemplate); 
+          // TEST Lets reboot the ESP32 here and manage file upload in the bootloop
+          // ESP.restart(); 
+          // request->redirect("/");
+          // We should only be here if the index page is missing so lets redirect to the boot loop          
+          request->send_P(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
+          _data.bootLoop();
        }
       });
 
-  server->onFileUpload(processUpload);
+  server->onFileUpload(fileUpload);
   server->addHandler(events);
   server->begin();
 
   _message.Handler(language.LANG_SERVER_RUNNING);
   _message.serialPrintf("Server Running \n");
+
+  status.webserverIsRunning = true;
 }
 
 
@@ -350,7 +364,7 @@ void Webserver::begin()
  * @brief Process File Upload
  * @note Redirects browser back to Upload modal unless upload is index file
  ***/
-void Webserver::processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+void Webserver::fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
 
   Messages _message;
@@ -362,6 +376,8 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
   bool upload_error = false;
   int file_size = 0;
+
+  redirectURL = "/";
 
   if (!filename.startsWith("/")){
     filename = "/" + filename;
@@ -390,19 +406,30 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
     }
   } 
 
-  // Set redirect to file Upload modal unless uploading the index file
-  if (filename == String("/index.html.gz") || (filename == String("/index.html")) || (filename == String(status.pinsFilename)))  {
-    redirectURL = "/";
-  }  else  {
-    redirectURL = "/?view=upload";
-  }
 
   if (final)  {
     _message.debugPrintf("Upload Complete: %s, %u bytes\n", filename.c_str(), file_size);
     request->_tempFile.close();
 
-    if (_data.checkUserFile(PINSFILE)) status.pinsLoaded = true;
-    if (_data.checkUserFile(MAFFILE)) status.mafLoaded = true;  
+    if (_data.checkUserFile(PINSFILE)){
+      _data.loadPinsData();
+      status.pinsLoaded = true;
+      redirectURL = "/";
+      // redirectURL = "/?view=upload";
+    } 
+    if (_data.checkUserFile(MAFFILE)) {
+      _data.loadMAFData();
+      status.mafLoaded = true;  
+      redirectURL = "/";
+      // redirectURL = "/?view=upload";
+    }
+    if (_data.checkUserFile(INDEXFILE)) {
+      status.GUIexists = true;  
+      redirectURL = "/";
+    }
+
+    // TEST - tying to get rid of 500 error after upload but before page refresh
+    delay(2000);
 
     request->redirect(redirectURL);
   }
@@ -709,7 +736,6 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
         
   }
 
-
   // Update lift point data
   switchval = strtol(liftPoint.c_str(), &end, 10); // convert std::str to int
 
@@ -784,8 +810,7 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
   }
   _data.writeJSONFile(jsonString, "/liftdata.json", LIFT_DATA_JSON_SIZE);
 
-  request->redirect("/");
-
+  // request->redirect("/");
 
 }
 
@@ -1430,7 +1455,8 @@ String Webserver::processLandingPageTemplate(const String &var) {
   extern struct DeviceStatus status;
 
   if (var == "INDEX_STATUS") {
-    if (!SPIFFS.exists("/index.html")) return String("index.html");
+    if (status.GUIexists == false) return String("index.html");    
+    // if (!SPIFFS.exists(status.indexFilename)) return String("index.html");
   }  
   
   if (var == "SETTINGS_STATUS") {

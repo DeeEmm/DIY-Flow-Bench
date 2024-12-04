@@ -27,6 +27,7 @@
 #define ARDUINOJSON_ENABLE_STD_STRING 1 // allow support for std::string
 #define PINSFILE 1
 #define MAFFILE 2
+#define INDEXFILE 3
 
 
 /***********************************************************

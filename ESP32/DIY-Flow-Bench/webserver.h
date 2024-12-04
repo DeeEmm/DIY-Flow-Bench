@@ -98,7 +98,7 @@ class Webserver {
 		static String processLandingPageTemplate(const String& var);
 
 		static void toggleFlowDiffTile (); 
-		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
+		static void fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 
 
 
