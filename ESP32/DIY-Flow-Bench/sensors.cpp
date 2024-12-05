@@ -1085,7 +1085,11 @@ double Sensors::getTempValue() {
 
 	}
 
-	if (config.TEMP_FINE_ADJUST != 0) refTempDegC += config.TEMP_FINE_ADJUST;
+
+	_message.debugPrintf("config.TEMP_SENSOR_TYPE %d\n",config.TEMP_SENSOR_TYPE);
+
+	// if (config.TEMP_FINE_ADJUST != 0) refTempDegC += config.TEMP_FINE_ADJUST;
+	refTempDegC += config.TEMP_FINE_ADJUST;
 	return refTempDegC;
 }
 
@@ -1100,6 +1104,7 @@ double Sensors::getTempValue() {
 double Sensors::getBaroValue() {
 	
 	Hardware _hardware;
+	Messages _message;
 
 	extern struct Configuration config;
 	extern struct Pins pins;
@@ -1156,11 +1161,14 @@ double Sensors::getBaroValue() {
 	}
 
 
+	_message.debugPrintf("config.BARO_SENSOR_TYPE %d\n",config.BARO_SENSOR_TYPE);
+
 	// Truncate to 2 decimal places
 	// int value = baroPressureKpa * 100 + .5;
     // return (double)value / 100;
 
-	if (config.BARO_FINE_ADJUST != 0) baroPressureKpa += config.BARO_FINE_ADJUST;
+	// if (config.BARO_FINE_ADJUST != 0) baroPressureKpa += config.BARO_FINE_ADJUST;
+	baroPressureHpa += config.BARO_FINE_ADJUST;
 	return baroPressureHpa;
 
 }
@@ -1175,6 +1183,7 @@ double Sensors::getBaroValue() {
 double Sensors::getRelHValue() {
 	
 	Hardware _hardware;
+	Messages _message;
 
 	extern struct Configuration config;
 	extern struct Pins pins;
@@ -1228,7 +1237,11 @@ double Sensors::getRelHValue() {
 
 	}
 
-	if (config.RELH_FINE_ADJUST != 0) relativeHumidity += config.RELH_FINE_ADJUST;
+
+	_message.debugPrintf("config.RELH_SENSOR_TYPE %d\n",config.RELH_SENSOR_TYPE);
+
+	// if (config.RELH_FINE_ADJUST != 0) relativeHumidity += config.RELH_FINE_ADJUST;
+	relativeHumidity += config.RELH_FINE_ADJUST;
 	return relativeHumidity;
 	
 }

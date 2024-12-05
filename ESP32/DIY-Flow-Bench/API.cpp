@@ -22,6 +22,9 @@
 
 #include "API.h"
 #include <esp32/rom/crc.h> 
+#include <ArduinoJson.h>
+#include <FS.h>
+#include <SPIFFS.h>
 
 #include "hardware.h"
 #include "sensors.h"
@@ -141,7 +144,7 @@ void API::ParseMessage(char apiMessage) {
   A : ADC Voltage Values Maf:pRef:pDiff:Pitot
   a : ADC Raw Values Maf:pRef:pDiff:Pitot
   B : Barometric Pressure
-  C : Flow Offset Calibration
+  C : configuration.json
   D : Differential Pressure value inH2O
   E : Enum1 Flow:Ref:Temp:Humidity:Baro
   e : Enum2 Pitot:Swirl
@@ -155,8 +158,7 @@ void API::ParseMessage(char apiMessage) {
   k : MAF Data Lookup Value
   L : Leak Test Calibration
   l : Leak Test
-  M : MAF RAW ADC Value
-  m : MAF Voltage
+  M : MAF.json
   N : Hostname
   o : Active Orifice
   P : Pitot Value inH2O
@@ -224,11 +226,13 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "B%s%f", settings.api_delim , sensorVal.BaroHPA);
       break;
 
-      case 'C': // Flow Offset Calibration  'O\r\n'        
-          // _calibration.setFlowOffset();
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "C%s%f", settings.api_delim , calVal.flow_offset);
-          // TODO: confirm Flow Offset Calibration success in response
-      break;      
+      case 'C': { // Show configuration.json  'C\r\n'        
+            StaticJsonDocument<CONFIG_JSON_SIZE> configurationJSON;
+            if (SPIFFS.exists("/configuration.json"))  {
+              configurationJSON = _data.loadJSONFile("/configuration.json");
+            }
+            serializeJsonPretty(configurationJSON, Serial);
+      break; }
 
       case 'D': // Differential Pressure value
           snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%u", settings.api_delim , _calculations.convertPressure(sensorVal.PDiffKPA, INH2O));
@@ -308,14 +312,14 @@ void API::ParseMessage(char apiMessage) {
           // TODO: confirm Leak Test success in response
       break;
       
-      case 'M': // Get MAF raw sensor data'  
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "M%s%u", settings.api_delim, _hardware.getADCRawData(config.MAF_ADC_CHANNEL));   
-      break;
-      
-      // DEPRECATED 
-      // case 'm': // Get MAF output voltage'
-      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "m%s%f", settings.api_delim , _sensors.getMafVolts());
-      // break;     
+      case 'M': { // Get MAF.json 
+            StaticJsonDocument<MAF_JSON_SIZE> mafJSON;
+            if (SPIFFS.exists(status.mafFilename))  {
+              mafJSON = _data.loadJSONFile(status.mafFilename);
+            }
+            serializeJsonPretty(mafJSON, Serial);
+      break; }
+     
       
       case 'N': // Hostname
           snprintf(apiResponse, API_RESPONSE_LENGTH, "N%s%s", settings.api_delim, settings.hostname);
@@ -490,6 +494,15 @@ void API::ParseMessage(char apiMessage) {
 
 
       break; // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+      case '}': // Flow Offset Calibration  'O\r\n'        
+          // _calibration.setFlowOffset();
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "C%s%f", settings.api_delim , calVal.flow_offset);
+          // TODO: confirm Flow Offset Calibration success in response
+      break;      
+
+
 
 
       // We've got here without a valid API request so lets get outta here before we send garbage to the serial comms

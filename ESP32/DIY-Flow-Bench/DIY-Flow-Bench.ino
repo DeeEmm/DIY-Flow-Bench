@@ -304,17 +304,13 @@ void setup(void) {
   extern struct Pins pins;
   extern struct Configuration config;
 
-  if (config.SWIRL_IS_ENABLED){
-    // TODO #227
-    // MD_REncoder Encoder = MD_REncoder(SWIRL_ENCODER_PIN_A, SWIRL_ENCODER_PIN_B);
-  }
-
   // Initialise Data environment
   _data.begin();
 
   // REVIEW
   // set message queue length
   xQueueCreate( 256, 2048);
+  // xQueueCreate( 1280, 8192);
     
   _hardware.begin();
 
@@ -339,8 +335,9 @@ void setup(void) {
     xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
   }
 
-  if (config.SWIRL_IS_ENABLED) {
-    // Encoder.begin();
+  if (config.SWIRL_IS_ENABLED){
+    // TODO #227
+    // MD_REncoder Encoder = MD_REncoder(SWIRL_ENCODER_PIN_A, SWIRL_ENCODER_PIN_B);
   }
 
 }

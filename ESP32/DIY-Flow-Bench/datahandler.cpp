@@ -496,7 +496,6 @@ void DataHandler::createCalibrationFile () {
  ***/
 StaticJsonDocument<JSON_FILE_SIZE> DataHandler::loadJSONFile(String filename) {
 
-
   Messages _message;
 
 //   extern struct Language language;
@@ -514,7 +513,7 @@ StaticJsonDocument<JSON_FILE_SIZE> DataHandler::loadJSONFile(String filename) {
     }    else    {
       size_t size = jsonFile.size();
       if (size > JSON_FILE_SIZE)    {
-
+          _message.statusPrintf("File too large \n");
       }
 
       DeserializationError error = deserializeJson(jsonData, jsonFile);
@@ -589,6 +588,9 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
 
     configurationJSON = loadJSONFile("/configuration.json");
 
+    // TEST print configuration.json
+    // serializeJsonPretty(configurationJSON, Serial);
+
     // strcpy(config.wifi_ssid, configurationJSON["CONF_WIFI_SSID"]);
     // strcpy(config.wifi_pswd, configurationJSON["CONF_WIFI_PSWD"]);
     // config.orificeSixDepression = configurationJSON["ORIFICE6_TEST_PRESSURE"].as<double>();
@@ -603,23 +605,11 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
     config.USE_FIXED_5V_VALUE = configurationJSON["USE_FIXED_5V_VALUE"].as<bool>();
 
     config.BME280_IS_ENABLED = configurationJSON["BME280_IS_ENABLED"].as<bool>();
-
-// TEST - test format of I2C address conversion from JSON to struct
-
-    // serializeJsonPretty(configurationJSON, Serial); //<-- full data is there 
-    // _message.serialPrintf("BME280_I2C_ADDR: string %s\n", configurationJSON["BME280_I2C_ADDR"]); // prints garbage
-    // _message.serialPrintf("BME280_I2C_ADDR: hex %#04x\n", configurationJSON["BME280_I2C_ADDR"].as<int>()); // prints 0000
-    // _message.serialPrintf("BME280_I2C_ADDR: u_int %u\n",configurationJSON["BME280_I2C_ADDR"].as<int>()); // prints 0
-    // _message.serialPrintf("BME280_I2C_ADDR: int %u\n",config.BME280_I2C_ADDR); // default value 118 (fron struct init)
-
-
     config.BME280_I2C_ADDR = configurationJSON["BME280_I2C_ADDR"];
-    // strcpy(config.BME280_I2C_ADDR, configurationJSON["BME280_I2C_ADDR"]);
     config.BME280_SCAN_DELAY_MS =  configurationJSON["BME280_SCAN_DELAY_MS"].as<int>();
 
     config.BME680_IS_ENABLED = configurationJSON["BME680_IS_ENABLED"].as<bool>();
     config.BME680_I2C_ADDR = configurationJSON["BME680_I2C_ADDR"];
-    // strcpy(config.BME680_I2C_ADDR, configurationJSON["BME680_I2C_ADDR"]);
     config.BME680_SCAN_DELAY_MS =  configurationJSON["BME680_SCAN_DELAY_MS"].as<int>();
 
     config.ADC_TYPE =  configurationJSON["ADC_TYPE"].as<bool>();
@@ -651,7 +641,8 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
     config.PITOT_ADC_CHANNEL = configurationJSON["PITOT_ADC_CHANNEL"].as<int>();
 
 
-    config.BARO_SENSOR_TYPE = configurationJSON["BARO_SENSOR_TYPE"].as<int>();
+    // config.BARO_SENSOR_TYPE = configurationJSON["BARO_SENSOR_TYPE"].as<int>();
+    config.BARO_SENSOR_TYPE = configurationJSON["BARO_SENSOR_TYPE"];
     config.FIXED_BARO_VALUE = configurationJSON["FIXED_BARO_VALUE"].as<double>();
     config.BARO_ANALOG_SCALE = configurationJSON["BARO_ANALOG_SCALE"].as<double>();
     config.BARO_MV_TRIMPOT = configurationJSON["BARO_MV_TRIMPOT"].as<int>();
@@ -660,13 +651,15 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
     config.startupBaroScalingOffset = configurationJSON["startupBaroScalingOffset"].as<double>();
     config.SEALEVELPRESSURE_HPA = configurationJSON["SEALEVELPRESSURE_HPA"].as<double>();
 
-    config.TEMP_SENSOR_TYPE = configurationJSON["TEMP_SENSOR_TYPE"].as<int>();
+    // config.TEMP_SENSOR_TYPE = configurationJSON["TEMP_SENSOR_TYPE"].as<int>();
+    config.TEMP_SENSOR_TYPE = configurationJSON["TEMP_SENSOR_TYPE"];
     config.FIXED_TEMP_VALUE = configurationJSON["FIXED_TEMP_VALUE"].as<double>();
     config.TEMP_ANALOG_SCALE = configurationJSON["TEMP_ANALOG_SCALE"].as<double>();
     config.TEMP_MV_TRIMPOT = configurationJSON["TEMP_MV_TRIMPOT"].as<int>();
     config.TEMP_FINE_ADJUST = configurationJSON["TEMP_FINE_ADJUST"].as<double>();
 
-    config.RELH_SENSOR_TYPE = configurationJSON["RELH_SENSOR_TYPE"].as<int>();
+    // config.RELH_SENSOR_TYPE = configurationJSON["RELH_SENSOR_TYPE"].as<int>();
+    config.RELH_SENSOR_TYPE = int(configurationJSON["RELH_SENSOR_TYPE"]);
     config.FIXED_RELH_VALUE = configurationJSON["FIXED_RELH_VALUE"].as<double>();
     config.RELH_ANALOG_SCALE = configurationJSON["RELH_ANALOG_SCALE"].as<double>();
     config.RELH_FINE_ADJUST = configurationJSON["RELH_FINE_ADJUST"].as<double>();

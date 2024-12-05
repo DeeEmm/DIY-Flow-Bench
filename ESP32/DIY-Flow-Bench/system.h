@@ -53,18 +53,20 @@ using namespace std;
 #define API_SCAN_DELAY_MS 250
 
 // Memory assignment
-#define SENSOR_TASK_MEM_STACK 2400 // 2200
-#define ENVIRO_TASK_MEM_STACK 2000 // 1800
+#define SENSOR_TASK_MEM_STACK 2800 // 1800 Free 580
+#define ENVIRO_TASK_MEM_STACK 3000 // 2000 Free 404
 
 // JSON memory allocation
-#define DATA_JSON_SIZE 1500
-#define SETTINGS_JSON_SIZE 1700 //1200 
-#define LANGUAGE_JSON_SIZE 1200
-#define CONFIG_JSON_SIZE 1800 //1536 //1200 
-#define CAL_DATA_JSON_SIZE 128
+// Use ArduinJSON memory assistant to determine size requirements
+// https://arduinojson.org/v6/assistant
+#define DATA_JSON_SIZE 768
+#define SETTINGS_JSON_SIZE 2048 
+#define LANGUAGE_JSON_SIZE 8192 // TODO this could be an issue
+#define CONFIG_JSON_SIZE 2600  
+#define CAL_DATA_JSON_SIZE 348
 #define LIFT_DATA_JSON_SIZE 384
-#define MAF_JSON_SIZE 1500 // 6k for Bosch file 25k for Delphi 
-#define JSON_FILE_SIZE 1500 
+#define MAF_JSON_SIZE 6000 // 6k for Bosch file 25k for Delphi 
+#define JSON_FILE_SIZE 6000 // 2800
 
 // Loop Delays
 #define VTASK_DELAY_ADC 500
