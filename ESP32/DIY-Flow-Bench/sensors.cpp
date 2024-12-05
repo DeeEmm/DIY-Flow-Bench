@@ -72,64 +72,54 @@ void Sensors::begin () {
 	// Initialise  MAF data
 	if (config.MAF_SRC_TYPE != SENSOR_DISABLED){	
 
-			// TODO Do we need to include json version of maf data file here?
-			// or do we load it earlier???
-			
 			// get size of the MAF datatable 
 			status.mafDataTableRows = status.mafJsonObject.size() -1;
 
+			u_int rowNum = 0;
+			u_int key;
+			u_int value;
 
-/***[TEST]******************************************************************* */			
+			// Get JSON Object iterator
+			JsonObject::iterator it = status.mafJsonObject.begin();
 
-// Test to determine best way to manage mafdata
+			// Walk through JSON object to populate vectors
+			for (u_int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { 
 
-// Do we have the maf data in JSON object??? [YES!! - TEST SUCCESSFUL]
-//_message.serialPrintf("print mafJsonObject:\n");
-//serializeJsonPretty(status.mafJsonObject, Serial);
+				key = stoi(it->key().c_str());
+				value = stoi(it->value().as<std::string>());
 
+				// TEST
+				// _message.serialPrintf(" rowNum: %i\n", rowNum);
+				// _message.serialPrintf(" maf key: %i\n", key);
+				// _message.serialPrintf(" maf value: %i\n", value);
 
-// Can we access JSON object via iterator?? [YES!! - TEST UNSUCCESSFUL] 
-// use interator to get mafdata values
-int index = 1;
-JsonObject::iterator it = status.mafJsonObject.begin();	
-it += index;
-//_message.serialPrintf(it->value()); //<- correct format 
+				status.mafLookupTable.push_back( { key , value } );
 
+				rowNum += 1;
+				it += 1;
+				
+			}
 
+			// get highest MAF input value from data table
+			status.mafDataValMax = status.mafLookupTable[status.mafDataTableRows][1];
+			status.mafDataKeyMax = status.mafLookupTable[status.mafDataTableRows][0];
 
-
-
-
-
-/***[END TEST]*************************************************************** */			
-
-			// Commented out for testing
-
-			// // Create 2D arrray
-			// int mafArray[status.mafDataTableRows][2];
-			// int rowNum = 0;
-
-			// // Walk through JSON object to populate vectors
-			// for (JsonPair keyValue : status.mafJsonObject) {
-			// // for (int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { 
-
-			// 	status.mafLookupTable[rowNum][0] = atoi(keyValue.key().c_str());
-			// 	status.mafLookupTable[rowNum][1] = keyValue.value().as<int>();
-
-			// 	Serial.println(keyValue.key().c_str());
-			// 	Serial.println(keyValue.value().as<const char*>());
-
-			// 	rowNum += 1;
-
-			// }
-
-
-			// // get highest MAF input value from data table
-			// status.mafDataValMax = status.mafLookupTable[status.mafDataTableRows][1];
-			// status.mafDataKeyMax = status.mafLookupTable[status.mafDataTableRows][0];
-		
+			_message.serialPrintf(" status.mafDataValMax: %lu\n", status.mafDataValMax);
+			_message.serialPrintf(" status.mafDataKeyMax: %lu\n", status.mafDataKeyMax);
 
 	}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	//initialise BME280
@@ -428,6 +418,7 @@ double Sensors::getMafFlow(int units) {
 	extern struct BenchSettings settings;
 
 	Hardware _hardware;
+	Messages message;
 
 	double flowRateCFM = 0.0;
 	double flowRateMGS = 0.0;
@@ -440,16 +431,21 @@ double Sensors::getMafFlow(int units) {
 	double velocity2 = 0.0;
 	double mafVelocity = 0.0;
 
+
+// message.serialPrintf("MAF TEST VAL: %li ", status.mafDataKeyMax);
+
 	// scale sensor reading to data table size using map function (0-5v : 0-keymax)
 	// NOTE Discrepency with MAP calculated value
 	// long refValue =  map(this->getMafVolts(), 0, _hardware.get5vSupplyVolts(), 0, status.mafDataKeyMax ); 
 	// long refValue =  map(this->getMafVolts(), 0, 5, 0, status.mafDataKeyMax); 
-	long refValue = (status.mafDataKeyMax / 5) * this->getMafVolts();
+	u_int refValue = (status.mafDataKeyMax / 5) * this->getMafVolts();
+
+// message.serialPrintf("MAF REF VAL: %l ", refValue);
 
 	for (int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { // iterate the data table comparing the Lookup Value to the refValue for each row
 
-		long Key = status.mafLookupTable[rowNum][0]; // Key Value for this row (x2)
-		long Val = status.mafLookupTable[rowNum][1]; // Flow Value for this row (y2)
+		u_int Key = status.mafLookupTable[rowNum][0]; // Key Value for this row (x2)
+		u_int Val = status.mafLookupTable[rowNum][1]; // Flow Value for this row (y2)
 
 		// Did we get a match??
 		if (refValue == Key) { // Great!!! we've got the exact key value
@@ -460,8 +456,8 @@ double Sensors::getMafFlow(int units) {
 
 		} else if (Key > refValue && rowNum > 0) { // The value is somewhere between this and the previous key value so let's use linear interpolation to calculate the actual value: 
 
-			long KeyPrev = status.mafLookupTable[rowNum - 1][0]; // Key value for the previous row (x1)
-			long ValPrev = status.mafLookupTable[rowNum - 1][1]; // Flow value for the previous row (y1)
+			u_int KeyPrev = status.mafLookupTable[rowNum - 1][0]; // Key value for the previous row (x1)
+			u_int ValPrev = status.mafLookupTable[rowNum - 1][1]; // Flow value for the previous row (y1)
 
 			// Linear interpolation y = y1 + (x-x1)((y2-y1)/(x2-x1)) where x1+y1 are coord1 and x2_y2 are coord2
 			lookupValue = ValPrev + (refValue - KeyPrev)*((Val-ValPrev)/(Key-KeyPrev));

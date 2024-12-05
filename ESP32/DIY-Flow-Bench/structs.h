@@ -239,16 +239,16 @@ struct DeviceStatus {
   String indexFilename;
   bool doBootLoop = false;
   bool webserverIsRunning = false;
-  long mafDataTableRows = 0;
-  long mafDataValMax = 0;
-  long mafDataKeyMax = 0;
+  int mafDataTableRows = 0;
+  u_int mafDataValMax = 0;
+  u_int mafDataKeyMax = 0;
   char mafUnits[5];
   double mafScaling = 1;
   int mafDiameter = 0;
   char mafSensorType[30];
   char mafOutputType[10];
   JsonObject mafJsonObject;
-  std::vector<std::vector<long>> mafLookupTable;
+  std::vector<std::vector<u_int>> mafLookupTable;  
 };
 
 

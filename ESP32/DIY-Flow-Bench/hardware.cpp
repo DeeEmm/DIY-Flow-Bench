@@ -353,20 +353,27 @@ int32_t Hardware::getADCRawData(int channel) {
   double volts;
 
   int rawADCval = getADCRawData(channel);
-  
-  if (config.ADC_TYPE == 11 && config.ADC_TYPE != SENSOR_DISABLED) { 
-    
-    volts = rawADCval * config.ADC_GAIN / config.ADC_RANGE; 
-  
-  } else if ((config.ADC_TYPE == 10) && config.ADC_TYPE != SENSOR_DISABLED) {
 
-    volts = rawADCval * config.ADC_GAIN / 2047.00F; 
-  
-  } else {
+  switch (config.ADC_TYPE) {
 
-    return 1.00F;
+    case SENSOR_DISABLED:
+      return 1.00F;
+    break;
+
+    case ADS1115:
+      volts = rawADCval * config.ADC_GAIN / config.ADC_RANGE;
+    break;
+
+    case ADS1015:
+      volts = rawADCval * config.ADC_GAIN / 2047.00F; 
+    break;
+
+    default:
+      return 1.00F;
+    break;
 
   }
+  
   
   return volts;
 }

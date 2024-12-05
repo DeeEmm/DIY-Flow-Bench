@@ -612,7 +612,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
     config.BME680_I2C_ADDR = configurationJSON["BME680_I2C_ADDR"];
     config.BME680_SCAN_DELAY_MS =  configurationJSON["BME680_SCAN_DELAY_MS"].as<int>();
 
-    config.ADC_TYPE =  configurationJSON["ADC_TYPE"].as<bool>();
+    config.ADC_TYPE =  configurationJSON["ADC_TYPE"].as<int>();
     config.ADC_I2C_ADDR = configurationJSON["ADC_I2C_ADDR"].as<int>();
     config.ADC_SCAN_DELAY_MS = configurationJSON["ADC_SCAN_DELAY_MS"].as<bool>();
     config.ADC_MAX_RETRIES  =  configurationJSON["ADC_MAX_RETRIES"].as<int>();
@@ -633,6 +633,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
     config.PDIFF_SENSOR_TYPE = configurationJSON["PDIFF_SENSOR_TYPE"].as<int>();
     config.FIXED_DIFF_PRESS_VALUE = configurationJSON["FIXED_DIFF_PRESS_VALUE"].as<int>();
     config.PDIFF_MV_TRIMPOT = configurationJSON["PDIFF_MV_TRIMPOT"].as<int>();
+    config.PDIFF_ANALOG_SCALE = configurationJSON["PDIFF_ANALOG_SCALE"].as<double>();
     config.PDIFF_ADC_CHANNEL = configurationJSON["PDIFF_ADC_CHANNEL"].as<int>();
 
     config.PITOT_SENSOR_TYPE =  configurationJSON["PITOT_SENSOR_TYPE"].as<int>();
@@ -640,8 +641,6 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
     config.PITOT_ANALOG_SCALE = configurationJSON["PITOT_ANALOG_SCALE"].as<double>();
     config.PITOT_ADC_CHANNEL = configurationJSON["PITOT_ADC_CHANNEL"].as<int>();
 
-
-    // config.BARO_SENSOR_TYPE = configurationJSON["BARO_SENSOR_TYPE"].as<int>();
     config.BARO_SENSOR_TYPE = configurationJSON["BARO_SENSOR_TYPE"];
     config.FIXED_BARO_VALUE = configurationJSON["FIXED_BARO_VALUE"].as<double>();
     config.BARO_ANALOG_SCALE = configurationJSON["BARO_ANALOG_SCALE"].as<double>();
@@ -651,14 +650,12 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
     config.startupBaroScalingOffset = configurationJSON["startupBaroScalingOffset"].as<double>();
     config.SEALEVELPRESSURE_HPA = configurationJSON["SEALEVELPRESSURE_HPA"].as<double>();
 
-    // config.TEMP_SENSOR_TYPE = configurationJSON["TEMP_SENSOR_TYPE"].as<int>();
     config.TEMP_SENSOR_TYPE = configurationJSON["TEMP_SENSOR_TYPE"];
     config.FIXED_TEMP_VALUE = configurationJSON["FIXED_TEMP_VALUE"].as<double>();
     config.TEMP_ANALOG_SCALE = configurationJSON["TEMP_ANALOG_SCALE"].as<double>();
     config.TEMP_MV_TRIMPOT = configurationJSON["TEMP_MV_TRIMPOT"].as<int>();
     config.TEMP_FINE_ADJUST = configurationJSON["TEMP_FINE_ADJUST"].as<double>();
 
-    // config.RELH_SENSOR_TYPE = configurationJSON["RELH_SENSOR_TYPE"].as<int>();
     config.RELH_SENSOR_TYPE = int(configurationJSON["RELH_SENSOR_TYPE"]);
     config.FIXED_RELH_VALUE = configurationJSON["FIXED_RELH_VALUE"].as<double>();
     config.RELH_ANALOG_SCALE = configurationJSON["RELH_ANALOG_SCALE"].as<double>();
