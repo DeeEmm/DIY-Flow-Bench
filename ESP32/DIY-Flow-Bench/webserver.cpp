@@ -241,6 +241,7 @@ void Webserver::begin()
         if (_data.checkSubstring(fileToDelete.c_str(), status.mafFilename.c_str())) status.mafLoaded = false;
         if (_data.checkSubstring(fileToDelete.c_str(), status.indexFilename.c_str())) status.GUIexists = false;
         // if (fileToDelete == "/index.html"){
+        // If we delete a system file, send user back to boot loop to upload missing file
         if (fileToDelete == status.indexFilename || fileToDelete == status.pinsFilename || fileToDelete == status.mafFilename){
           request->send_P(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
           _data.bootLoop();
@@ -1455,25 +1456,25 @@ String Webserver::processLandingPageTemplate(const String &var) {
   extern struct DeviceStatus status;
 
   if (var == "INDEX_STATUS") {
-    if (status.GUIexists == false) return String("index.html");    
+    if (status.GUIexists == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/release/' target='_BLANK'>index.html</a>");    
     // if (!SPIFFS.exists(status.indexFilename)) return String("index.html");
   }  
   
-  if (var == "SETTINGS_STATUS") {
-    if (!SPIFFS.exists("/settings.json")) return String("settings.json");
-  }
+  // if (var == "SETTINGS_STATUS") {
+  //   if (!SPIFFS.exists("/settings.json")) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/release/' target='_BLANK'>settings.json</a>");
+  // }
 
   if (var == "PINS_STATUS" ) {
-    if (status.pinsLoaded == false) return String("PINS.json");    
+    if (status.pinsLoaded == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/pins/' target='_BLANK'>pins.json</a>");    
     // if (!SPIFFS.exists(status.pinsFilename)) return String("PINS_***.json");    
   }
 
   if (var == "MAF_STATUS" ) {
-    if (status.mafLoaded == false) return String("MAF.json");    
+    if (status.mafLoaded == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/mafData/' target='_BLANK'>maf.json</a>");    
   }
 
   if (var == "CONFIGURATION_STATUS") {
-    if (!SPIFFS.exists("/configuration.json")) return String("configuration.json");
+    if (!SPIFFS.exists("/configuration.json")) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/' target='_BLANK'>configuration.json</a>");
   }
 
   return "";

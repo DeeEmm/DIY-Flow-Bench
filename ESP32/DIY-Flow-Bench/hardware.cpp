@@ -391,6 +391,8 @@ int32_t Hardware::getADCRawData(int channel) {
  ***/
 double Hardware::get5vSupplyVolts() {   
 
+  // TODO wifi / AC2 issue - https://github.com/espressif/esp-idf/issues/3714
+
   extern struct Pins pins;
   extern struct Configuration config;
 

@@ -89,6 +89,7 @@ void Comms::initaliseWifi() {
     _message.serialPrintf("IP address: %s \n", WiFi.localIP().toString().c_str());
     WiFi.setAutoReconnect(true);
     WiFi.persistent(true);
+    esp_wifi_set_ps(WIFI_PS_NONE); // ADC2 / Wifi STA fix - https://github.com/espressif/esp-idf/issues/3714
     
   }  else  { // Go into AP Mode
     if (settings.ap_mode == true) { // AP mode is Default

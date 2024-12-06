@@ -71,7 +71,7 @@ void DataHandler::begin() {
     this->beginSerial(); 
 
     _message.serialPrintf("\r\nDIY Flow Bench\n");                                         
-    // Note RELEASE and BUILD_NUMBER defined at compile time
+    // Note RELEASE and BUILD_NUMBER are defined at compile time within extra_scripts directive in user_actions_pre.py 
     _message.serialPrintf("DIYFB Version: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);                                         
     _message.serialPrintf("For help please visit the WIKI:\n");                                         
     _message.serialPrintf("https://github.com/DeeEmm/DIY-Flow-Bench/wiki\n");                                         
@@ -118,7 +118,17 @@ void DataHandler::begin() {
           _message.serialPrintf("!! PINS file not found !!\n");  
     }
 
-    // Check for MAF file
+    if (checkUserFile(INDEXFILE)) {
+      if (!SPIFFS.exists(status.indexFilename)) {
+          status.doBootLoop = true;
+          _message.serialPrintf("!! index.html file not found !!\n");  
+      }
+    } else {
+          status.doBootLoop = true;
+          _message.serialPrintf("!! index.html file not found !!\n");  
+    }
+    
+        // Check for MAF file
     // TODO - Only if MAF is enabled !!!!!
     // NOTE cannot determine MAF data until config is loaded.
     // Probably need to force a reboot after config is uploaded
@@ -135,15 +145,6 @@ void DataHandler::begin() {
           _message.serialPrintf("!! MAF file not found !!\n");  
     }
 
-    if (checkUserFile(INDEXFILE)) {
-      if (!SPIFFS.exists(status.indexFilename)) {
-          status.doBootLoop = true;
-          _message.serialPrintf("!! index.html file not found !!\n");  
-      }
-    } else {
-          status.doBootLoop = true;
-          _message.serialPrintf("!! index.html file not found !!\n");  
-    }
 
     // Initialise WiFi
     _comms.initaliseWifi();
@@ -1340,13 +1341,13 @@ void DataHandler::bootLoop()
       _message.serialPrintf("View browser to upload missing files\n");
 
       tempServer = new AsyncWebServer(80);
-      tempServerEvents = new AsyncEventSource("/events");
+      // tempServerEvents = new AsyncEventSource("/events");
 
       // Upload request handler
       tempServer->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
           Messages _message;
           _message.debugPrintf("/api/file/upload \n");
-          request->send(200);
+          // request->send(200);
           },
           _webserver.fileUpload); 
 
@@ -1358,7 +1359,7 @@ void DataHandler::bootLoop()
           });
 
       tempServer->onFileUpload(_webserver.fileUpload);
-      tempServer->addHandler(tempServerEvents);
+      // tempServer->addHandler(tempServerEvents);
       tempServer->begin();
 
       _message.serialPrintf("Waiting...\n");

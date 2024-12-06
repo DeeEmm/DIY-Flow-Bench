@@ -29,6 +29,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2412060044      - Updated Serial API responses (inc boot loop)
+2412060001      - Update boot loop file prompts to link to Github
 2412050201      - Convert MAF JSON to vector of vectors
                 - Change key>val longs to u_ints
 2412050090      - Recalculated JSON memory allocation

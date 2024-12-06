@@ -97,15 +97,19 @@ void Sensors::begin () {
 
 				rowNum += 1;
 				it += 1;
+
+				status.mafDataKeyMax = key;
+				status.mafDataValMax = value;
 				
 			}
 
 			// get highest MAF input value from data table
-			status.mafDataValMax = status.mafLookupTable[status.mafDataTableRows][1];
-			status.mafDataKeyMax = status.mafLookupTable[status.mafDataTableRows][0];
+			// status.mafDataValMax = status.mafLookupTable[status.mafDataTableRows][1];
+			// status.mafDataKeyMax = status.mafLookupTable[status.mafDataTableRows][0];
 
-			_message.serialPrintf(" status.mafDataValMax: %lu\n", status.mafDataValMax);
-			_message.serialPrintf(" status.mafDataKeyMax: %lu\n", status.mafDataKeyMax);
+			// TEST
+			// _message.serialPrintf(" status.mafDataValMax: %lu\n", status.mafDataValMax);
+			// _message.serialPrintf(" status.mafDataKeyMax: %lu\n", status.mafDataKeyMax);
 
 	}
 
@@ -228,7 +232,7 @@ String Sensors::getSensorType(int sensorType) {
 			break;
 		}
 		case MPXV7007: {
-			sensorDescription = "SMPXV7007";
+			sensorDescription = "MPXV7007";
 			break;
 		}
 		case MPXV7025: {
@@ -328,33 +332,35 @@ long Sensors::getMafRaw() {
 	extern struct Configuration config;
 	extern struct Pins pins;
 
-	if (config.MAF_SRC_TYPE != SENSOR_DISABLED){
 
-		switch (config.MAF_SRC_TYPE) {
+	switch (config.MAF_SRC_TYPE) {
 
-			case ADS1115:{
-				sensorVal.MafRAW = _hardware.getADCRawData(config.MAF_ADC_CHANNEL);
-				break;
-			}
-
-			case LINEAR_ANALOG: {
-				long mafFlowRaw = analogRead(pins.MAF_PIN);
-				break;
-			}
-
-			default: {
-				return 0;
-				break;
-			}
+		case SENSOR_DISABLED: {
+			return 0;
+			break;
 		}
 
-		return sensorVal.MafRAW;
 
-	} else {
+		case ADS1115:{
+			sensorVal.MafRAW = _hardware.getADCRawData(config.MAF_ADC_CHANNEL);
+			break;
+		}
 
-		return 0; // MAF is disabled so lets return 1
+		case LINEAR_ANALOG: {
+			long mafFlowRaw = analogRead(pins.MAF_PIN);
+			break;
+		}
+
+		default: {
+			return 0;
+			break;
+		}
 
 	}
+
+	return sensorVal.MafRAW;
+
+
 }
 
 
@@ -678,6 +684,7 @@ double Sensors::getPRefVolts() {
 double Sensors::getPRefValue() {
 
 	Hardware _hardware;
+	Messages message;
 	extern struct BenchSettings settings;
 	extern struct Configuration config;
 

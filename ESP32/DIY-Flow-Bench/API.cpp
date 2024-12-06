@@ -165,12 +165,40 @@ void API::ParseMessage(char apiMessage) {
   Q : MAF Data Max Value
   q : MAF Data Key Max Value
   R : Reference Pressure Value inH2O
-  S : Swirl value
+  S : Status
   T : Temperature in Celcius
   t : Temperature in Fahrenheit
   U : Uptime in hhhh.mm
   V : Version
   v : Valve lift data in JSON format
+  W : WiFi SSID
+  X : xTask memory usage   
+  ? : Help
+  / : SPIFFS File List
+  ~ : Restart ESP
+  $ : Reset WiFi
+  @ : Stream Status
+  ! : Debug Mode
+  < : Last Error
+  ============================== 
+  )";
+
+  //API Response for boot loop
+  char bootHelpText[] = R"(
+  DIYFB BOOT LOOP Commands
+  ==============================
+  API Response Format
+  Command : Value : Checksum
+  ==============================
+  C : configuration.json
+  I : IP Address
+  J : JSON Status Data
+  j : JSON Configuration Data
+  M : MAF.json
+  N : Hostname
+  S : Status
+  U : Uptime in hhhh.mm
+  V : Version
   W : WiFi SSID
   X : xTask memory usage   
   ? : Help
@@ -189,22 +217,27 @@ void API::ParseMessage(char apiMessage) {
       // NOTE: Responses are alphabetised
 
       case '0': // Bench Off
+          if (status.doBootLoop) break;
           _hardware.benchOff();
       break;
       
       case '1': // Bench On
+          if (status.doBootLoop) break;
           _hardware.benchOn();
       break;
       
       case '3': // Get 3v board supply voltage (mv) 'v.123.45\r\n'
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "3%s%f", settings.api_delim ,_hardware.get3v3SupplyVolts());
       break;
       
       case '5': // Get 5v board supply voltage (mv) 'v.123.45\r\n'
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "5%s%f", settings.api_delim , _hardware.get5vSupplyVolts());
       break;
 
       case 'A': // Report ADC voltage values
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "A%s%f%s%f%s%f%s%f", 
           settings.api_delim, _hardware.getADCVolts(config.MAF_ADC_CHANNEL), 
           settings.api_delim, _hardware.getADCVolts(config.PREF_ADC_CHANNEL), 
@@ -214,6 +247,7 @@ void API::ParseMessage(char apiMessage) {
 
 
       case 'a': // Report Raw ADC values
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "a%s%u%s%u%s%u%s%u", 
           settings.api_delim, _hardware.getADCRawData(config.MAF_ADC_CHANNEL), 
           settings.api_delim, _hardware.getADCRawData(config.PREF_ADC_CHANNEL), 
@@ -223,18 +257,21 @@ void API::ParseMessage(char apiMessage) {
 
 
       case 'B': // Get measured Baro Pressure in hPa'B.123.45\r\n'
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "B%s%f", settings.api_delim , sensorVal.BaroHPA);
       break;
 
       case 'C': { // Show configuration.json  'C\r\n'        
-            StaticJsonDocument<CONFIG_JSON_SIZE> configurationJSON;
-            if (SPIFFS.exists("/configuration.json"))  {
-              configurationJSON = _data.loadJSONFile("/configuration.json");
-            }
-            serializeJsonPretty(configurationJSON, Serial);
+          StaticJsonDocument<CONFIG_JSON_SIZE> configurationJSON;
+          if (SPIFFS.exists("/configuration.json"))  {
+            configurationJSON = _data.loadJSONFile("/configuration.json");
+          }
+          serializeJsonPretty(configurationJSON, Serial);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "t%s", ""); // send an empty string to prevent Invalid Response
       break; }
 
       case 'D': // Differential Pressure value
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%u", settings.api_delim , _calculations.convertPressure(sensorVal.PDiffKPA, INH2O));
       break;      
 
@@ -244,7 +281,7 @@ void API::ParseMessage(char apiMessage) {
       // break;      
 
       case 'E': // Enum1 - Flow:Ref:Temp:Humidity:Baro
-          
+          if (status.doBootLoop) break;          
           snprintf(apiResponse, API_RESPONSE_LENGTH, "E%s%f%s%f%s%f%s%f%s%f", 
           settings.api_delim, sensorVal.FlowCFM, 
           settings.api_delim, _calculations.convertPressure(sensorVal.PRefKPA, KPA), 
@@ -255,7 +292,7 @@ void API::ParseMessage(char apiMessage) {
 
       
       case 'e': // Enum2 - Pitot:Swirl
-          
+          if (status.doBootLoop) break;          
           snprintf(apiResponse, API_RESPONSE_LENGTH, "e%s%f%s%f", 
           settings.api_delim, sensorVal.PitotKPA, 
           settings.api_delim, sensorVal.Swirl); 
@@ -264,15 +301,18 @@ void API::ParseMessage(char apiMessage) {
       
       
       case 'F': // Get measured Flow in CFM 'F123.45\r\n'       
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "F%s%f", settings.api_delim , sensorVal.FlowCFM);
       break;
 
       case 'f': // Get measured Mass Flow 'F123.45\r\n'       
+          if (status.doBootLoop) break;
           // snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", settings.api_delim , sensorVal.FlowKGH);
           snprintf(apiResponse, API_RESPONSE_LENGTH, "f%s%f", settings.api_delim , _sensors.getMafFlow());
       break;
 
       case 'H': // Get measured Humidity 'H.123.45\r\n'
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "H%s%f", settings.api_delim , sensorVal.RelH);
       break;
 
@@ -281,33 +321,39 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'J': // JSON Data
+          if (status.doBootLoop) break;
           jsonString = _data.getDataJSON();
           snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", settings.api_delim, String(jsonString).c_str());
       break;
       
       case 'j': // Current configuration in JSON
+          if (status.doBootLoop) break;
           jsonString = this->getConfigJSON();
           jsonString.toCharArray(charDataJSON, API_JSON_LENGTH);
           snprintf(apiResponseBlob, API_BLOB_LENGTH, "C%s%s", settings.api_delim, charDataJSON);
       break;
       
       case 'K': // MAF Data Key Value 
+          if (status.doBootLoop) break;
           // refValue =  map(_sensors.getMafVolts(), 0, 5, 0, status.mafDataKeyMax); 
           refValue = (status.mafDataKeyMax / 5) * _sensors.getMafVolts();
           snprintf(apiResponse, API_RESPONSE_LENGTH, "K%s MAF DATA Key value: %d ", settings.api_delim , refValue); 
       break;
 
       case 'k': // MAF Data lookup value
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "k%s MAF DATA Lookup value: %d ", settings.api_delim , sensorVal.MafLookup); 
       break;
 
       case 'L': // Perform Leak Test Calibration 'L\r\n'
+          if (status.doBootLoop) break;
           _calibration.setLeakOffset();
           snprintf(apiResponse, API_RESPONSE_LENGTH, "L%s%F", settings.api_delim , calVal.leak_cal_offset );
           // TODO: confirm Leak Test Calibration success in response
       break;
       
       case 'l': // Perform Leak Test 'l\r\n'      
+          if (status.doBootLoop) break;
           // TODO: apiResponse = ("l") + settings.api_delim + leakTest();
           // TODO: confirm Leak Test success in response
       break;
@@ -318,6 +364,7 @@ void API::ParseMessage(char apiMessage) {
               mafJSON = _data.loadJSONFile(status.mafFilename);
             }
             serializeJsonPretty(mafJSON, Serial);
+            snprintf(apiResponse, API_RESPONSE_LENGTH, "t%s", ""); // send an empty string to prevent Invalid Response
       break; }
      
       
@@ -326,14 +373,17 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'O': // Active orifice flow rate 'o\r\n'        
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "O%s%f", settings.api_delim , status.activeOrificeFlowRate);
       break;      
 
       case 'o': // Active orifice  'O\r\n'        
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "o%s%s", settings.api_delim , status.activeOrifice);
       break;      
 
       case 'P': // Get measured Pitot Pressure 'P.123.45\r\n'
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "P%s%f", settings.api_delim , _calculations.convertPressure(sensorVal.PitotKPA, INH2O));
       break;
       
@@ -343,14 +393,17 @@ void API::ParseMessage(char apiMessage) {
       // break;   
 
       case 'Q': // mafdata max value
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "Q%s%u", settings.api_delim , status.mafDataValMax);
       break;      
 
       case 'q': // mafdata max key value
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "q%s%u", settings.api_delim , status.mafDataKeyMax);
       break;      
 
       case 'R': // Get measured Reference Pressure 'R.123.45\r\n'
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "R%s%f", settings.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INH2O));
       break;
       
@@ -359,17 +412,71 @@ void API::ParseMessage(char apiMessage) {
       //     snprintf(apiResponse, API_RESPONSE_LENGTH, "r%s%f", settings.api_delim , _sensors.getPRefVolts());
       // break;      
       
-      case 'S': // Get Swirl Value (rpm) 'S.123.45\r\n'
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "S%s%f", settings.api_delim , sensorVal.Swirl);
-      break;
+      case 'S': { // Status  'S.123.45\r\n'
+
+          _message.serialPrintf("debug = %d\n",status.debug ? "true" : "false");
+          _message.serialPrintf("spiffs_mem_size = %i\n", status.spiffs_mem_size);
+          _message.serialPrintf("spiffs_mem_used = %i\n", status.spiffs_mem_used);
+          _message.serialPrintf("pageSize = %i\n", status.pageSize);
+          _message.serialPrintf("local_ip_address = %s\n", status.local_ip_address);
+          _message.serialPrintf("hostname = %s\n", status.hostname);
+          _message.serialPrintf("boardType = %s\n", status.boardType);
+          _message.serialPrintf("benchType = %s\n", status.benchType);
+          _message.serialPrintf("mafSensor = %s\n", status.mafSensor);
+          _message.serialPrintf("prefSensor = %s\n", status.prefSensor);
+          _message.serialPrintf("pdiffSensor = %s\n", status.pdiffSensor);
+          _message.serialPrintf("tempSensor = %s\n", status.tempSensor);
+          _message.serialPrintf("relhSensor = %s\n", status.relhSensor);
+          _message.serialPrintf("baroSensor = %s\n", status.baroSensor);
+          _message.serialPrintf("pitotSensor = %s\n", status.pitotSensor);
+          _message.serialPrintf("boot_time = %i\n", status.boot_time);
+          _message.serialPrintf("liveStream = %s\n", status.liveStream ? "true" : "false");
+          _message.serialPrintf("adcPollTimer = %lu\n", status.adcPollTimer);
+          _message.serialPrintf("bmePollTimer = %lu\n", status.bmePollTimer);
+          _message.serialPrintf("apiPollTimer = %lu\n", status.apiPollTimer);
+          _message.serialPrintf("browserUpdateTimer = %lu\n", status.browserUpdateTimer);
+          _message.serialPrintf("wsCLeanPollTimer = %lu\n", status.wsCLeanPollTimer);
+          _message.serialPrintf("pollTimer = %i\n", status.pollTimer);
+          _message.serialPrintf("serialData = %i\n", status.serialData);;
+          _message.serialPrintf("statusMessage = %s\n", status.statusMessage);
+          _message.serialPrintf("apMode = %s\n",status.apMode ? "true" : "false");
+          _message.serialPrintf("HWMBME = %d\n",status.HWMBME);
+          _message.serialPrintf("HWMADC = %d\n",status.HWMADC);
+          _message.serialPrintf("HWMSSE = %d\n",status.HWMSSE);
+          _message.serialPrintf("activeOrifice =  %s\n", status.activeOrifice);
+
+          _message.serialPrintf("activeOrificeFlowRate =  %d\n", status.activeOrifice);
+          _message.serialPrintf("activeOrificeTestPressure =  %d\n", status.activeOrifice);
+          _message.serialPrintf("shouldReboot  =  %s\n", status.activeOrifice ? "true" : "false");
+          _message.serialPrintf("pinsLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
+          _message.serialPrintf("mafLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
+          _message.serialPrintf("configLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
+          _message.serialPrintf("GUIexists  =  %s", status.activeOrifice);
+          _message.serialPrintf("pinsFilename =  %s\n", status.pinsFilename);
+          _message.serialPrintf("mafFilename =  %s\n", status.mafFilename);
+          _message.serialPrintf("indexFilename =  %s\n", status.indexFilename);
+          _message.serialPrintf("doBootLoop =  %s\n", status.doBootLoop ? "true" : "false");
+          _message.serialPrintf("webserverIsRunning  =  %s\n", status.webserverIsRunning ? "true" : "false");
+          _message.serialPrintf("mafDataTableRows  =  %i\n", status.mafDataTableRows);
+          _message.serialPrintf("mafDataValMax  =  %s\n", status.mafDataValMax ? "true" : "false");
+          _message.serialPrintf("mafDataKeyMax  =  %s\n", status.mafDataKeyMax ? "true" : "false");
+          _message.serialPrintf("mafUnits =  %s\n", status.mafUnits);
+          _message.serialPrintf("mafScaling  =  %d\n", status.mafScaling);
+          _message.serialPrintf("mafDiameter  =  %i\n", status.mafDiameter);
+          _message.serialPrintf("mafSensorType=  %s\n", status.mafSensorType);
+          _message.serialPrintf("mafOutputType =  %s\n", status.mafOutputType);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "t%s", ""); // send an empty string to prevent Invalid Response
+      break;}
       
       case 't': // Get measured Temperature in Fahrenheit 'F.123.45\r\n'
+          if (status.doBootLoop) break;
           double TdegF;
           TdegF = _calculations.convertTemperature(sensorVal.TempDegC, DEGF);
           snprintf(apiResponse, API_RESPONSE_LENGTH, "t%s%f", settings.api_delim , TdegF);
       break;      
       
       case 'T': // Get measured Temperature in Celcius 'T.123.45\r\n'
+          if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "T%s%f", settings.api_delim , sensorVal.TempDegC);
       break;
       
@@ -386,6 +493,7 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'v': // Valve lift Data
+          if (status.doBootLoop) break;
           jsonString = _webserver.getValveDataJSON();
           snprintf(apiResponseBlob, API_BLOB_LENGTH, "v%s%s", settings.api_delim, String(jsonString).c_str());
       break;
@@ -403,19 +511,24 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case '@': // Status Print Mode (Stream status messages to serial)
-        if (settings.status_print_mode == true){
-          settings.status_print_mode = false;
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "@%s%s", settings.api_delim, "Status Data Disabled" ); 
-        } else {
-          settings.status_print_mode = true;
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "@%s%s", settings.api_delim, "Status Data Enabled~" ); 
-        }
+          if (status.doBootLoop) break;
+          if (settings.status_print_mode == true){
+            settings.status_print_mode = false;
+            snprintf(apiResponse, API_RESPONSE_LENGTH, "@%s%s", settings.api_delim, "Status Data Disabled" ); 
+          } else {
+            settings.status_print_mode = true;
+            snprintf(apiResponse, API_RESPONSE_LENGTH, "@%s%s", settings.api_delim, "Status Data Enabled~" ); 
+          }
       break;
       
       
 
       case '?': // Help      
-        snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s", apiHelpText);
+          if (status.doBootLoop) {
+            snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s", bootHelpText);            
+          } else {
+            snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s", apiHelpText);
+          }
       break;
       
       case '/': // SPIFFS File List
@@ -497,6 +610,7 @@ void API::ParseMessage(char apiMessage) {
 
 
       case '}': // Flow Offset Calibration  'O\r\n'        
+          if (status.doBootLoop) break;
           // _calibration.setFlowOffset();
           snprintf(apiResponse, API_RESPONSE_LENGTH, "C%s%f", settings.api_delim , calVal.flow_offset);
           // TODO: confirm Flow Offset Calibration success in response
