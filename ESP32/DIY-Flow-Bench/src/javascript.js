@@ -50,8 +50,9 @@ if (!!window.EventSource) {
         try {
           if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
           // We've got a string...
-            if (key === 'PITOT_COLOUR' || key === 'PDIFF_COLOUR' ){
+            if (key === 'PITOT_COLOUR' || key === 'PDIFF_COLOUR' ) {
             } else {
+              // it' a template variable
               document.getElementById(key).innerHTML = myObj[key];
             }
  
@@ -69,8 +70,8 @@ if (!!window.EventSource) {
           }
         } catch (error) {
           console.log('Missing or incorrect JSON data');
-          console.log(error);
-          console.log(key);
+          console.log(" error: " + error + " key: " + key );
+          // console.log(key);
         }
       } 
 

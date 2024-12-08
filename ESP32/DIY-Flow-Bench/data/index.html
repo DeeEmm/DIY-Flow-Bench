@@ -897,7 +897,7 @@ svg .dataCircle:hover {
             <hr>
             <div class="config-row"><label class="config-label">~LANG_GUI_VERSION~: </label><span class="config-value" id="RELEASE">~RELEASE~</span></div>
             <div class="config-row"><label class="config-label">~LANG_GUI_BUILD~:  </label><span class="config-value" id="BUILD_NUMBER">~BUILD_NUMBER~</span></div>
-            <div class="config-row"><label class="config-label">~LANG_GUI_GUI~: </label><span class="config-value" id="VERSION">2412060001</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_GUI~: </label><span class="config-value" id="VERSION">@@version@@</span></div>
             <h4>~LANG_GUI_STORAGE~</h4>
             <hr>
             <div class="config-row"><label class="config-label">~LANG_GUI_MEM_SIZE~:  </label><span class="config-value" id="SPIFFS_MEM_SIZE">~SPIFFS_MEM_SIZE~</span> (bytes)</div>
@@ -1382,8 +1382,9 @@ if (!!window.EventSource) {
         try {
           if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
           // We've got a string...
-            if (key === 'PITOT_COLOUR' || key === 'PDIFF_COLOUR' ){
+            if (key === 'PITOT_COLOUR' || key === 'PDIFF_COLOUR' ) {
             } else {
+              // it' a template variable
               document.getElementById(key).innerHTML = myObj[key];
             }
  
@@ -1401,8 +1402,8 @@ if (!!window.EventSource) {
           }
         } catch (error) {
           console.log('Missing or incorrect JSON data');
-          console.log(error);
-          console.log(key);
+          console.log(" error: " + error + " key: " + key );
+          // console.log(key);
         }
       } 
 

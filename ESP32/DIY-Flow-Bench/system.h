@@ -53,8 +53,8 @@ using namespace std;
 #define API_SCAN_DELAY_MS 250
 
 // Memory assignment
-#define SENSOR_TASK_MEM_STACK 2800 // 1800 Free 580
-#define ENVIRO_TASK_MEM_STACK 3000 // 2000 Free 404
+#define SENSOR_TASK_MEM_STACK 2800 // Free 776
+#define ENVIRO_TASK_MEM_STACK 2000 // Free 640
 
 // JSON memory allocation
 // Use ArduinJSON memory assistant to determine size requirements

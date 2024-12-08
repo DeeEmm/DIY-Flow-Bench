@@ -1241,11 +1241,8 @@ double Sensors::getRelHValue() {
 	}
 
 
-	_message.debugPrintf("config.RELH_SENSOR_TYPE %d\n",config.RELH_SENSOR_TYPE);
-
 	// if (config.RELH_FINE_ADJUST != 0) relativeHumidity += config.RELH_FINE_ADJUST;
 	relativeHumidity += config.RELH_FINE_ADJUST;
 	return relativeHumidity;
 	
 }
-

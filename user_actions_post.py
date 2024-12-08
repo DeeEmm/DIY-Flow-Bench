@@ -57,17 +57,17 @@ def extract_json_val(jsonKey):
 
 
 
-
-def delete_files_in_directory(directory_path):
-   try:
-     files = os.listdir(directory_path)
-     for file in files:
-       file_path = os.path.join(directory_path, file)
-       if os.path.isfile(file_path):
-         os.remove(file_path)
-     print("All files deleted successfully.")
-   except OSError:
-     print("Error occurred while deleting files.")
+# DEPRECATED 
+# def delete_files_in_directory(directory_path):
+#    try:
+#      files = os.listdir(directory_path)
+#      for file in files:
+#        file_path = os.path.join(directory_path, file)
+#        if os.path.isfile(file_path):
+#          os.remove(file_path)
+#      print("All files deleted successfully.")
+#    except OSError:
+#      print("Error occurred while deleting files.")
 
 
 # DEPRECATED - Search for wildcard filenames  
@@ -99,18 +99,8 @@ def after_build(source, target, env):
     partitions_path = ".pio/build/esp32dev/partitions.bin"
     firmware_path = ".pio/build/esp32dev/firmware.bin"
 
-    # build = extract_build()
-    # release = extract_release()
     build = extract_json_val("BUILD_NUMBER")
     release = extract_json_val("RELEASE")
-
-    # old_merged_file = os.path.join(release_path, f"{release}_{build}_install.bin")
-    # old_update_file = os.path.join(release_path, f"{release}_{build}_update.bin")
-
-    # del_wildcard(old_merged_file)
-    # del_wildcard(old_update_file)
-
-    # print(old_merged_file)
 
     merged_file = os.path.join(release_path, f"{release}_{build}_install.bin")
     update_file = os.path.join(release_path, f"{release}_{build}_update.bin")
@@ -118,11 +108,8 @@ def after_build(source, target, env):
     releases_directory =  os.path.join(project_path, f"release/")
     data_directory =  os.path.join(project_path, f"data/")
 
-    # clear the release directory
-    # delete_files_in_directory(releases_directory)
     release = extract_json_val("RELEASE")
     print(release)
-    # os.remove("demofile.txt")
 
     # Run esptool to merge images into a single binary
     env.Execute(
@@ -151,7 +138,5 @@ def after_build(source, target, env):
 
     # Create the update.bin file
     shutil.copy(".pio/build/esp32dev/firmware.bin", update_file)
-
-
 
 env.AddPostAction(APP_BIN , after_build)

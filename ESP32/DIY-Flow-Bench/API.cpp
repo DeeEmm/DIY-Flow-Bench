@@ -129,6 +129,7 @@ void API::ParseMessage(char apiMessage) {
   charDataJSON[0] = 0;
   fileListBlob[0] = 0;
   
+
   String jsonString;
   long refValue;
   
@@ -320,11 +321,15 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "I%s%s", settings.api_delim, status.local_ip_address.c_str());
       break;
 
-      case 'J': // JSON Data
+      case 'J':{ // JSON Data
           if (status.doBootLoop) break;
+          StaticJsonDocument <DATA_JSON_SIZE> jsondoc;
           jsonString = _data.getDataJSON();
-          snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", settings.api_delim, String(jsonString).c_str());
-      break;
+          deserializeJson(jsondoc, jsonString);
+          serializeJsonPretty(jsondoc, Serial);
+          // snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", settings.api_delim, String(jsonString).c_str());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", ""); // send an empty string to prevent Invalid Response
+      break;}
       
       case 'j': // Current configuration in JSON
           if (status.doBootLoop) break;
@@ -364,7 +369,7 @@ void API::ParseMessage(char apiMessage) {
               mafJSON = _data.loadJSONFile(status.mafFilename);
             }
             serializeJsonPretty(mafJSON, Serial);
-            snprintf(apiResponse, API_RESPONSE_LENGTH, "t%s", ""); // send an empty string to prevent Invalid Response
+            snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", ""); // send an empty string to prevent Invalid Response
       break; }
      
       

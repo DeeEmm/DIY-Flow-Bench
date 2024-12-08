@@ -27,12 +27,13 @@ del_file = 'esp32/DIY-Flow-Bench/release/' + json.RELEASE + '_' + json.GUI_BUILD
 // lets delete the old file
 fs.unlinkSync(del_file);
 
-
+// get current datetime
 const dtnow = new Date();
 year = dtnow.getFullYear().toString().substr(2);
 month = dtnow.getMonth()  + 1;
 date = dtnow.getDate();
 
+// create new build number
 bn_year = build_num[0] + build_num[1]
 bn_month = build_num[2] + build_num[3]
 bn_date = build_num[4] + build_num[5]
@@ -43,7 +44,7 @@ console.log("yr: " + bn_year +  " mth: " + bn_month + " dte: " + bn_date + " inc
 //  check build date incremental count
 if (bn_year == year && bn_month == month && bn_date == date) {
     incremental = Number(bn_inc)
-    incremental += 1 
+    incremental = incremental + 1 
 } else {
 	incremental = 1
 }
@@ -51,15 +52,16 @@ if (bn_year == year && bn_month == month && bn_date == date) {
 // pad with leading zeroes
 inc_str = String(pad(incremental, 4))
 
-//  create build number
-json.GUI_BUILD_NUMBER = year + String(pad(month,2)) + String(pad(date,2)) + inc_str
+// Create GUI build number
+new_build_number = year + String(pad(month,2)) + String(pad(date,2)) + inc_str
+json.GUI_BUILD_NUMBER = new_build_number
 
-
+// update version.json
 fs.writeFileSync('esp32/DIY-Flow-Bench/version.json', JSON.stringify(json, null, 2) );
 
-
-
 // console.log(json);
+
+
 
 gulp.task('css', function(done){    
 	return gulp.src('esp32/DIY-Flow-Bench/src/style.css')       
@@ -118,7 +120,7 @@ gulp.task('compress', function(done) {
 
 gulp.task('html', function() {
 	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
-	.pipe(replace("@@version@@", json.GUI_BUILD_NUMBER))
+	// .pipe(replace("@@version@@", new_build_number))
 	.pipe(removeHtmlComments())
 	.pipe(replace(/<link rel="stylesheet" type="text\/css" href="\/style.css"[^>]*>/, function(s) {
 		var style = fs.readFileSync('esp32/DIY-Flow-Bench/build/style.css', 'utf8');
@@ -134,7 +136,7 @@ gulp.task('html', function() {
 
 gulp.task('htmlmax', function() {
 	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
-	.pipe(replace("@@version@@", json.GUI_BUILD_NUMBER))
+	// .pipe(replace("@@version@@", new_build_number))
 	.pipe(replace(/<link rel="stylesheet" type="text\/css" href="\/style.css"[^>]*>/, function(s) {
 		var style = fs.readFileSync('esp32/DIY-Flow-Bench/build/style.css', 'utf8');
 		return '<style>\n' + style + '\n</style>';
@@ -150,9 +152,19 @@ gulp.task('combine', gulp.series('cssmax', 'jsmax', 'htmlmax', 'compress', 'clea
 gulp.task('combine+minify', gulp.series('css', 'js', 'html', 'compress', 'clean'));
 gulp.task('combine+minify+gzip', gulp.series('css', 'js', 'html', 'compress+gzip', 'clean'));
 
-dest_file = 'esp32/DIY-Flow-Bench/release/' + json.RELEASE + '_' + json.GUI_BUILD_NUMBER + '_index.html';
+dest_file = 'esp32/DIY-Flow-Bench/release/' + json.RELEASE + '_' + new_build_number + '_index.html';
 
-fs.copyFile('esp32/DIY-Flow-Bench/data/index.html', dest_file, (err) => {
-	if (err) throw err;
-	console.log('File was copied to destination');
-  });
+// fs.copyFile('esp32/DIY-Flow-Bench/data/index.html', dest_file, (err) => {
+// 	if (err) throw err;
+// 	console.log('File was copied to destination');
+//   });
+
+fs.readFile('esp32/DIY-Flow-Bench/data/index.html', 'utf8', function (err,data) {
+if (err) return console.log(err);
+
+var result = data.replace("@@version@@", new_build_number);
+
+fs.writeFile(dest_file, result, 'utf8', function (err) {
+	if (err) return console.log(err);
+});
+});
