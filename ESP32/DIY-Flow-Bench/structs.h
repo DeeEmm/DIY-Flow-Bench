@@ -126,19 +126,22 @@ struct Configuration {
   double MAF_MV_TRIMPOT = 0.0;
   int MAF_ADC_CHANNEL = 0;
 
-  int PREF_SENSOR_TYPE = 2;
+  int PREF_SENSOR_TYPE = 4;
+  int PREF_SRC_TYPE = 11;
   int FIXED_REF_PRESS_VALUE = 1;
   double PREF_MV_TRIMPOT =  0.0;
   double PREF_ANALOG_SCALE =  1.0;
   int PREF_ADC_CHANNEL = 1;
 
-  int PDIFF_SENSOR_TYPE = 11; 
+  int PDIFF_SENSOR_TYPE = 4; 
+  int PDIFF_SRC_TYPE = 11;
   int FIXED_DIFF_PRESS_VALUE = 1;
   double PDIFF_MV_TRIMPOT = 0.0;
   double PDIFF_ANALOG_SCALE = 1.0;
   int PDIFF_ADC_CHANNEL = 2;
   
   int PITOT_SENSOR_TYPE = SENSOR_DISABLED;
+  int PITOT_SRC_TYPE = 11;
   double PITOT_MV_TRIMPOT = 0.0;
   double PITOT_ANALOG_SCALE = 1.0;
   int PITOT_ADC_CHANNEL = 3;

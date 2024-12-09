@@ -305,31 +305,31 @@ int32_t Hardware::getADCRawData(int channel) {
 
   if (config.ADC_TYPE != SENSOR_DISABLED){
 
-  if (channel > 3) {
-    return 0;
-  }
+    if (channel > 3) {
+      return 0;
+    }
 
-  switch (channel) // MUX - Multiplex channel
-  {
-    case (0):
-        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_0); // 0x4000
-    break;
+    switch (channel) // MUX - Multiplex channel
+    {
+      case (0):
+          adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_0); // 0x4000
+      break;
 
-    case (1):
-        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_1); // 0x5000
-    break;
+      case (1):
+          adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_1); // 0x5000
+      break;
 
-    case (2):
-        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_2); // 0x6000
-    break;
+      case (2):
+          adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_2); // 0x6000
+      break;
 
-    case (3):
-        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_3); // 0x7000
-    break;
-  }
-  
-  adc.triggerConversion(); // Start a conversion. This immediately returns
-  rawADCval = adc.getConversion(); // This polls the ADS1115 and wait for conversion to finish, THEN returns the value
+      case (3):
+          adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_3); // 0x7000
+      break;
+    }
+    
+    adc.triggerConversion(); // Start a conversion. This immediately returns
+    rawADCval = adc.getConversion(); // This polls the ADS1115 and wait for conversion to finish, THEN returns the value
 
   }
 
@@ -398,7 +398,7 @@ double Hardware::get5vSupplyVolts() {
 
   double vcc5vSupplyVolts = 5.0;
 
-  if (config.USE_FIXED_5V_VALUE) {
+  if (config.USE_FIXED_5V_VALUE == true) {
     return vcc5vSupplyVolts; 
   } else {
     long rawVoltageValue = analogRead(pins.VCC_5V_PIN);  

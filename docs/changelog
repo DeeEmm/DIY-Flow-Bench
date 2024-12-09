@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2412090109      - Fixed sensor_src type
 2412090065      - Fixed XHR form submission
 2412090001      - #277 Temperature correction for ISO 5011
 2412080010      - GUI fixed version increment in GUI info

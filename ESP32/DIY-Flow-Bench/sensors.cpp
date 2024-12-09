@@ -390,6 +390,7 @@ double Sensors::getMafVolts() {
 		}
 
 		default: {
+			// return a fixed value to aid fault diagnosis
 			sensorVolts = 1.0;
 			return sensorVolts;
 			break;
@@ -641,7 +642,7 @@ double Sensors::getPRefVolts() {
 
 	double sensorVolts = 0.0;
 
-	switch (config.PREF_SENSOR_TYPE) 	{
+	switch (config.PREF_SRC_TYPE) 	{
 
 		case ADS1115 : {
 			sensorVolts = _hardware.getADCVolts(config.PREF_ADC_CHANNEL);
@@ -655,7 +656,7 @@ double Sensors::getPRefVolts() {
 		}
 
 		default: {
-			// return a fixed value
+			// return a fixed value to aid fault diagnosis
 			sensorVolts = 1.0;
 			return sensorVolts;
 			break;
@@ -689,12 +690,13 @@ double Sensors::getPRefValue() {
 	extern struct Configuration config;
 
 	double sensorVal = 0.0;
-	double sensorVolts = this->getPRefVolts();
+	// double sensorVolts = this->getPRefVolts();
+	double sensorVolts = getPRefVolts();
 
 	switch (config.PREF_SENSOR_TYPE)  {
 
 		case LINEAR_ANALOG: 	
-				sensorVal = this->getPRefVolts() * config.PREF_ANALOG_SCALE;
+				sensorVal = sensorVolts * config.PREF_ANALOG_SCALE;
 		break;
 
 		case MPXV7007:
@@ -755,7 +757,7 @@ double Sensors::getPDiffVolts() {
 
 	double sensorVolts = 0.0;
 
-	switch (config.PDIFF_SENSOR_TYPE) 	{
+	switch (config.PDIFF_SRC_TYPE) 	{
 
 		case ADS1115 : {
 			sensorVolts = _hardware.getADCVolts(config.PDIFF_ADC_CHANNEL);
@@ -769,7 +771,7 @@ double Sensors::getPDiffVolts() {
 		}
 
 		default: {
-			// return a fixed value
+			// return a fixed value to aid fault diagnosis
 			sensorVolts = 1.0;
 			return sensorVolts;
 			break;
@@ -869,7 +871,7 @@ double Sensors::getPitotVolts() {
 
 	double sensorVolts = 0.0;
 
-		switch (config.PITOT_SENSOR_TYPE) 	{
+		switch (config.PITOT_SRC_TYPE) 	{
 
 		case ADS1115 : {
 			sensorVolts = _hardware.getADCVolts(config.PDIFF_ADC_CHANNEL);
@@ -883,7 +885,7 @@ double Sensors::getPitotVolts() {
 		}
 
 		default: {
-			// return a fixed value
+			// return a fixed value to aid fault diagnosis
 			sensorVolts = 1.0;
 			return sensorVolts;
 			break;
