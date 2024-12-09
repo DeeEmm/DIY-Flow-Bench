@@ -5,8 +5,8 @@
     
     "VCC_3V3_TRIMPOT" : 0.0,
     "VCC_5V_TRIMPOT" : 0.0,
-    "USE_FIXED_3_3V_VALUE" : false,
-    "USE_FIXED_5V_VALUE" : false,
+    "USE_FIXED_3_3V_VALUE" : true,
+    "USE_FIXED_5V_VALUE" : true,
     
     "BME280_IS_ENABLED" : true,
     "BME280_I2C_ADDR" : 118,

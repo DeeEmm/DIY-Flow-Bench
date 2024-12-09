@@ -750,8 +750,8 @@ svg .dataCircle:hover {
         <span class="closeCaptureLiftDataModalButton">&times;</span>
         <h3>~LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE~</h3>
         <hr>
-        <div class="align-center">
-          <form method="POST" class="lift-data-form" enctype="multipart/form-data">
+        <div class="align-center" >
+          <form method="POST" class="lift_data_form" name="lift_data_form" enctype="multipart/form-data">
             <label>~LANG_GUI_LIFT_VALUE~</label>
             <br>
               <div class="switch-field">
@@ -1251,7 +1251,7 @@ svg .dataCircle:hover {
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ADJ_FLOW_DEPRESSION~:</label>&nbsp;<input type="text" id="ADJ_FLOW_DEPRESSION" name="ADJ_FLOW_DEPRESSION" value="~ADJ_FLOW_DEPRESSION~" class="config-text"><span class="tooltiptext">Bench depression used for adjusted flow calcs</span></div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_STANDARD_REF_CONDITIONS~:</label>
             <select name='STANDARD_REFERENCE' class='config-select'>
-              <option value='1' ~STD_REF_1~>ISO 5011 (25&degC(68&degF) 1atm(101.3kPa) 50%RH)</option>
+              <option value='1' ~STD_REF_1~>ISO 5011 (20&degC(68&degF) 1atm(101.3kPa) 50%RH)</option>
               <option value='2' ~STD_REF_2~>ISO 1585 (25&degC(68&degF) 100kPa  0%RH)</option>
               <option value='3' ~STD_REF_3~>ISA (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
               <option value='4' ~STD_REF_4~>ISO 13443 (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
@@ -1641,26 +1641,26 @@ function initialiseButtons() {
 
   document.getElementById('capture-lift-data-button').addEventListener('click', function(){
     console.log('Capture Lift Data');
-    var liftDataForm = document.querySelector('.lift-data-form')
-    var formData = new FormData(liftDataForm)
-    // xhr.open('GET', '/api/saveliftdata');
-    XHR.addEventListener('load', function() {
-      /* submitted */
-    })
-    XHR.addEventListener('error', function() {
-      /* error */
-     })
-    xhr.open('POST', '#')
-    xhr.send(formData)
+    // var liftDataForm = document.querySelector('.lift_data_form')
+    // var formData = new FormData(liftDataForm)
+    let formData = new FormData(document.forms.lift_data_form);
+    xhr.open('POST', '/api/saveliftdata');
 
-    // xhr.onload = function() {
-    //   if (xhr.status === 200) window.location.href = '/';
-    // };
-    // xhr.send();
+    // XHR.addEventListener('load', function() {
+    //   /* submitted */
+    // })
+
+    // XHR.addEventListener('error', function() {
+    //   /* error */
+    //  })
+    
+    // xhr.setRequestHeader("Content-Type", "multipart/form-data");
+    xhr.send(formData)
+    xhr.onload = function() {
+      if (xhr.status === 200) console.log('Lift data saved');;
+    };
   });
   
-
-
 
   document.getElementById('STATUS_MESSAGE').addEventListener('dblclick', function(){
     document.getElementById('calibrationModal').style.display='block';

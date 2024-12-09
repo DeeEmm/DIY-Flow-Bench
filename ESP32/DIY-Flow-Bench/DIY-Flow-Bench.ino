@@ -203,8 +203,7 @@ void TASKgetSensorData( void * parameter ){
         default:
           break;
         }
-        
-        
+          
         if (config.PREF_SENSOR_TYPE != SENSOR_DISABLED) {
           sensorVal.PRefKPA = _sensors.getPRefValue();
           sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);

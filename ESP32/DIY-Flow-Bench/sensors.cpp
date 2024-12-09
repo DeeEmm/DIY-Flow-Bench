@@ -684,7 +684,7 @@ double Sensors::getPRefVolts() {
 double Sensors::getPRefValue() {
 
 	Hardware _hardware;
-	Messages message;
+	Messages _message;
 	extern struct BenchSettings settings;
 	extern struct Configuration config;
 
@@ -731,7 +731,7 @@ double Sensors::getPRefValue() {
 
 	// Lets make sure we have a valid value to return
 	double pRefComp = fabs(sensorVal);
-	if (pRefComp > settings.min_bench_pressure) { 
+	if (pRefComp > settings.min_bench_pressure) {
 		return sensorVal;
 	} else { 
 		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in display)
@@ -1088,9 +1088,6 @@ double Sensors::getTempValue() {
 
 	}
 
-
-	_message.debugPrintf("config.TEMP_SENSOR_TYPE %d\n",config.TEMP_SENSOR_TYPE);
-
 	// if (config.TEMP_FINE_ADJUST != 0) refTempDegC += config.TEMP_FINE_ADJUST;
 	refTempDegC += config.TEMP_FINE_ADJUST;
 	return refTempDegC;
@@ -1162,9 +1159,6 @@ double Sensors::getBaroValue() {
 			break;
 		}
 	}
-
-
-	_message.debugPrintf("config.BARO_SENSOR_TYPE %d\n",config.BARO_SENSOR_TYPE);
 
 	// Truncate to 2 decimal places
 	// int value = baroPressureKpa * 100 + .5;

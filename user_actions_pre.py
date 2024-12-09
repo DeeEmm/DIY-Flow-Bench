@@ -8,13 +8,12 @@ from SCons.Script import Import
 
 Import("env")
 
-# Check build target
+# Check build 
 def is_pio_build():
     from SCons.Script import DefaultEnvironment
     env = DefaultEnvironment()
-    if "IsCleanTarget" in dir(env) and env.IsCleanTarget(): return False
+    if ("IsCleanTarget" in dir(env) and env.IsCleanTarget()) or env. monitor : return False
     return not env.IsIntegrationDump()
-
 
 
 if is_pio_build :
@@ -85,7 +84,7 @@ if is_pio_build :
         json.dump(json_data, x, indent=2)
 
     # Iterate through JSON vars and add them to the build environment
-    # build var tempalte items get updated as part of build
+    # Build var template items get updated as part of build
     print("Adding version data to build environment...")
     for key, value in json_data.items():
         env.Append(CPPDEFINES=[f'{key}=\\"{value}\\"'])

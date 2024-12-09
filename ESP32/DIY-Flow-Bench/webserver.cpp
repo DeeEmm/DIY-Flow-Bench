@@ -678,8 +678,7 @@ void Webserver::toggleFlowDiffTile () {
  * @details captures lift data to working memory
  * 
  ***/
-void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
-{
+void Webserver::parseLiftDataForm(AsyncWebServerRequest *request){
 
   Messages _message;
   DataHandler _data;
@@ -698,17 +697,27 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
   const char* PARAM_INPUT = "lift-data";
   double flowValue;
 
-  _message.debugPrintf("Saving Lift Data...\n");
+  _message.debugPrintf("Saving Lift Data....\n");
+
+
+  for(int i=0;i<params;i++){
+    AsyncWebParameter* p = request->getParam(i);
+    if(p->isFile()){ //p->isPost() is also true
+      Serial.printf("FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
+    } else if(p->isPost()){
+      Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+    } else {
+      Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
+    }
+  }
 
   // Convert POST vars to JSON 
   for(int i=0;i<params;i++){
     AsyncWebParameter* p = request->getParam(i);
-
         // get selected radio button and store it (radio button example from https://www.electrorules.com/esp32-web-server-control-stepper-motor-html-form/)
         if (p->name() == PARAM_INPUT) {
           liftPoint = p->value();
         }
-
   }
 
 
@@ -812,6 +821,7 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
   _data.writeJSONFile(jsonString, "/liftdata.json", LIFT_DATA_JSON_SIZE);
 
   // request->redirect("/");
+  request->send(200);
 
 }
 

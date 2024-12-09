@@ -320,7 +320,7 @@ bool DataHandler::checkUserFile(int filetype) {
       if (checkSubstring(spiffsFile.c_str(), matchINDEX.c_str()) && (filetype == INDEXFILE)) {
         // index.html file found
         indexFile = "/" + spiffsFile;
-        _message.serialPrintf("index file Found: %s\n", indexFile.c_str() );  
+        _message.serialPrintf("Index file Found: %s\n", indexFile.c_str() );  
         status.indexFilename = indexFile.c_str();
         status.GUIexists = true;
         return true;
@@ -1070,6 +1070,7 @@ String DataHandler::getDataJSON()
 
   Hardware _hardware;
   Calculations _calculations;
+  Messages _message;
 
   String jsonString;
 

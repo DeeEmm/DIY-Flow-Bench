@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2412090065      - Fixed XHR form submission
 2412080010      - GUI fixed version increment in GUI info
 2412080005      - Test build target for pre user actions
 2412060066      - Reformat JSON Data in API

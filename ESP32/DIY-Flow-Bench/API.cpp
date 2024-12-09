@@ -328,7 +328,7 @@ void API::ParseMessage(char apiMessage) {
           deserializeJson(jsondoc, jsonString);
           serializeJsonPretty(jsondoc, Serial);
           // snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", settings.api_delim, String(jsonString).c_str());
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", ""); // send an empty string to prevent Invalid Response
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
       break;}
       
       case 'j': // Current configuration in JSON

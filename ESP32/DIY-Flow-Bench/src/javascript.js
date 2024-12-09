@@ -309,26 +309,26 @@ function initialiseButtons() {
 
   document.getElementById('capture-lift-data-button').addEventListener('click', function(){
     console.log('Capture Lift Data');
-    var liftDataForm = document.querySelector('.lift-data-form')
-    var formData = new FormData(liftDataForm)
-    // xhr.open('GET', '/api/saveliftdata');
-    XHR.addEventListener('load', function() {
-      /* submitted */
-    })
-    XHR.addEventListener('error', function() {
-      /* error */
-     })
-    xhr.open('POST', '#')
-    xhr.send(formData)
+    // var liftDataForm = document.querySelector('.lift_data_form')
+    // var formData = new FormData(liftDataForm)
+    let formData = new FormData(document.forms.lift_data_form);
+    xhr.open('POST', '/api/saveliftdata');
 
-    // xhr.onload = function() {
-    //   if (xhr.status === 200) window.location.href = '/';
-    // };
-    // xhr.send();
+    // XHR.addEventListener('load', function() {
+    //   /* submitted */
+    // })
+
+    // XHR.addEventListener('error', function() {
+    //   /* error */
+    //  })
+    
+    // xhr.setRequestHeader("Content-Type", "multipart/form-data");
+    xhr.send(formData)
+    xhr.onload = function() {
+      if (xhr.status === 200) console.log('Lift data saved');;
+    };
   });
   
-
-
 
   document.getElementById('STATUS_MESSAGE').addEventListener('dblclick', function(){
     document.getElementById('calibrationModal').style.display='block';
