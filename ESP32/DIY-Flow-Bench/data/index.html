@@ -897,7 +897,7 @@ svg .dataCircle:hover {
             <hr>
             <div class="config-row"><label class="config-label">~LANG_GUI_VERSION~: </label><span class="config-value" id="RELEASE">~RELEASE~</span></div>
             <div class="config-row"><label class="config-label">~LANG_GUI_BUILD~:  </label><span class="config-value" id="BUILD_NUMBER">~BUILD_NUMBER~</span></div>
-            <div class="config-row"><label class="config-label">~LANG_GUI_GUI~: </label><span class="config-value" id="VERSION">24112502</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_GUI~: </label><span class="config-value" id="VERSION">2412090001</span></div>
             <h4>~LANG_GUI_STORAGE~</h4>
             <hr>
             <div class="config-row"><label class="config-label">~LANG_GUI_MEM_SIZE~:  </label><span class="config-value" id="SPIFFS_MEM_SIZE">~SPIFFS_MEM_SIZE~</span> (bytes)</div>
@@ -1251,7 +1251,7 @@ svg .dataCircle:hover {
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ADJ_FLOW_DEPRESSION~:</label>&nbsp;<input type="text" id="ADJ_FLOW_DEPRESSION" name="ADJ_FLOW_DEPRESSION" value="~ADJ_FLOW_DEPRESSION~" class="config-text"><span class="tooltiptext">Bench depression used for adjusted flow calcs</span></div>
           <div class="config-row tooltip"><label class="config-label">~LANG_GUI_STANDARD_REF_CONDITIONS~:</label>
             <select name='STANDARD_REFERENCE' class='config-select'>
-              <option value='1' ~STD_REF_1~>ISO 5011 (20&degC(68&degF) 1atm(101.3kPa) 50%RH)</option>
+              <option value='1' ~STD_REF_1~>ISO 5011 (25&degC(68&degF) 1atm(101.3kPa) 50%RH)</option>
               <option value='2' ~STD_REF_2~>ISO 1585 (25&degC(68&degF) 100kPa  0%RH)</option>
               <option value='3' ~STD_REF_3~>ISA (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
               <option value='4' ~STD_REF_4~>ISO 13443 (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
@@ -1969,7 +1969,7 @@ function exportSVGAsPNG() {
     const a = document.createElement('a');
     a.download = 'LiftGraph.png';
     document.body.appendChild(a);
-    a.href = canvas.toDataURL();
+    a.href = canvas.toDataURL('image/jpeg');
     a.click();
     a.remove();
 
