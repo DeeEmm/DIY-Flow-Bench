@@ -200,7 +200,7 @@ void Sensors::begin () {
 
 
 	// Set status values for GUI
-	status.mafSensor = config.MAF_SENSOR_TYPE;
+	status.mafSensor = status.mafSensorType;
 	status.baroSensor = getSensorType(config.BARO_SENSOR_TYPE);
 	status.tempSensor  = getSensorType(config.TEMP_SENSOR_TYPE);
 	status.relhSensor = getSensorType(config.RELH_SENSOR_TYPE);
@@ -443,9 +443,9 @@ double Sensors::getMafFlow(int units) {
 
 	// scale sensor reading to data table size using map function (0-5v : 0-keymax)
 	// NOTE Discrepency with MAP calculated value
-	// long refValue =  map(this->getMafVolts(), 0, _hardware.get5vSupplyVolts(), 0, status.mafDataKeyMax ); 
-	// long refValue =  map(this->getMafVolts(), 0, 5, 0, status.mafDataKeyMax); 
-	u_int refValue = (status.mafDataKeyMax / 5) * this->getMafVolts();
+	// u_int refValue =  map(this->getMafVolts(), 0, _hardware.get5vSupplyVolts(), 0, status.mafDataKeyMax ); 
+	// u_int refValue =  map(this->getMafVolts(), 0, 5, 0, status.mafDataKeyMax); 
+	u_int refValue = (status.mafDataKeyMax / _hardware.get5vSupplyVolts()) * this->getMafVolts();
 
 // message.serialPrintf("MAF REF VAL: %l ", refValue);
 

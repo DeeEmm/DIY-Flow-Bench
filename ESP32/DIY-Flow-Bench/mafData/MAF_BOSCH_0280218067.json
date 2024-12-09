@@ -1,6 +1,6 @@
 {
     "sensor_type" : "BOSCH_0280218067",
-    "output_type" : "noltage",
+    "output_type" : "voltage",
     "maf_units" : "KG_H",
     "maf_scaling" : 0.1,  
     "maf_diameter" : 82,  
