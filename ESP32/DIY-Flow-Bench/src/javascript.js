@@ -61,7 +61,7 @@ if (!!window.EventSource) {
            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'SFLOW' || key === 'FDIFF') {
               // HACK: template vars - replaced before page load
               document.getElementById(key).innerHTML = myObj[key].toFixed(~FLOW_DECIMAL_LENGTH~);  
-            } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
+            } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'PITOT_DELTA' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
               document.getElementById(key).innerHTML = myObj[key].toFixed(~GEN_DECIMAL_LENGTH~); 
             //} else if (key === '') {
             } else {
@@ -309,23 +309,15 @@ function initialiseButtons() {
 
   document.getElementById('capture-lift-data-button').addEventListener('click', function(){
     console.log('Capture Lift Data');
-    // var liftDataForm = document.querySelector('.lift_data_form')
-    // var formData = new FormData(liftDataForm)
     let formData = new FormData(document.forms.lift_data_form);
     xhr.open('POST', '/api/saveliftdata');
-
-    // XHR.addEventListener('load', function() {
-    //   /* submitted */
-    // })
-
-    // XHR.addEventListener('error', function() {
-    //   /* error */
-    //  })
-    
-    // xhr.setRequestHeader("Content-Type", "multipart/form-data");
     xhr.send(formData)
     xhr.onload = function() {
-      if (xhr.status === 200) console.log('Lift data saved');;
+      if (xhr.status === 200) {
+        console.log('Lift data saved');
+        // update datagraph
+      }
+
     };
   });
   

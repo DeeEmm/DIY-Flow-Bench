@@ -699,17 +699,17 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request){
 
   _message.debugPrintf("Saving Lift Data....\n");
 
-
-  for(int i=0;i<params;i++){
-    AsyncWebParameter* p = request->getParam(i);
-    if(p->isFile()){ //p->isPost() is also true
-      Serial.printf("FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
-    } else if(p->isPost()){
-      Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-    } else {
-      Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
-    }
-  }
+  // TEST 
+  // for(int i=0;i<params;i++){
+  //   AsyncWebParameter* p = request->getParam(i);
+  //   if(p->isFile()){ //p->isPost() is also true
+  //     Serial.printf("FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
+  //   } else if(p->isPost()){
+  //     Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+  //   } else {
+  //     Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
+  //   }
+  // }
 
   // Convert POST vars to JSON 
   for(int i=0;i<params;i++){
@@ -719,7 +719,6 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request){
           liftPoint = p->value();
         }
   }
-
 
   // Get flow value based on capture Datatype
   switch (settings.data_capture_datatype) {
@@ -747,7 +746,7 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request){
   }
 
   // Update lift point data
-  switchval = strtol(liftPoint.c_str(), &end, 10); // convert std::str to int
+  switchval = stoi(liftPoint.c_str()); // convert std::str to int
 
   switch (switchval) {
 
