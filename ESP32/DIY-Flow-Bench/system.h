@@ -102,3 +102,6 @@ using namespace std;
 #ifndef DEV_BRANCH
 #error DEV_BRANCH UNDEFINED
 #endif
+#ifndef UPDATE_SERVER
+#error UPDATE_SERVER UNDEFINED
+#endif

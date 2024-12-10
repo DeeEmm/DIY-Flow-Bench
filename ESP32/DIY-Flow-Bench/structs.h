@@ -375,7 +375,7 @@ struct Language {
     char LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE[50] = "Select lift value before capture";
     char LANG_GUI_LIFT_VALUE[50] = "Lift Value";
     char LANG_GUI_LIFT_CAPTURE[50] = "Capture";
-    char LANG_GUI_UPLOAD_FIRMWARE_BINARY[50] = "Upload Firmware Binary (firmware.bin)";
+    char LANG_GUI_UPLOAD_FIRMWARE_BINARY[50] = "Upload Firmware Binary (firmware_update.bin)";
     char LANG_GUI_FIRMWARE_UPDATE[50] = "Update";
     char LANG_GUI_USER_FLOW_TARGET_VALUE[50] = "User Flow Target Value";
     char LANG_GUI_USER_FLOW_TARGET_SAVE[50] = "Save";

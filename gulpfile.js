@@ -156,10 +156,6 @@ gulp.task('version', function() {
 
 	// console.log(json);
 
-
-
-
-
 	dest_file = 'esp32/DIY-Flow-Bench/release/' + json.RELEASE + '_' + new_build_number + '_index.html';
 
 	// fs.copyFile('esp32/DIY-Flow-Bench/data/index.html', dest_file, (err) => {

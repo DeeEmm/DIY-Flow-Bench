@@ -29,8 +29,11 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+
+2412100102      - Updated PINS files
+2412100094      - #281 Pitot GUi fixes
 2412100089      - Align GUI build # with Code build #
-2412100088      - Integrate compile into gulp tasks
+2412100088      - Integrate GUI Version into gulp tasks
 2412100087      - Moved voltage trim outside of validation test
 2412100084      - Fixed JSON to Vector conversion
                 - Added verbose print mode
