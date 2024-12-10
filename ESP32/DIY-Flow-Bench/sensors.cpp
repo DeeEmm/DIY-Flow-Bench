@@ -893,12 +893,12 @@ double Sensors::getPitotVolts() {
 		switch (config.PITOT_SRC_TYPE) 	{
 
 		case ADS1115 : {
-			sensorVolts = _hardware.getADCVolts(config.PDIFF_ADC_CHANNEL);
+			sensorVolts = _hardware.getADCVolts(config.PITOT_ADC_CHANNEL);
 			break;
 		}
 
 		case LINEAR_ANALOG : {
-			long pDiffRaw = analogRead(pins.DIFF_PRESSURE_PIN);
+			long pDiffRaw = analogRead(pins.PITOT_PIN);
 			sensorVolts = pDiffRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
 			break;
 		}
