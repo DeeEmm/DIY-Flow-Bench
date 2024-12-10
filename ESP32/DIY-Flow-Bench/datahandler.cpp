@@ -1167,7 +1167,7 @@ String DataHandler::getDataJSON()
   // Pitot
   dataJson["PITOT"] = sensorVal.PitotVelocity;
   // dataJson["PITOT_DELTA"] = fabs(round(sensorVal.PitotDelta));
-  dataJson["PITOT_DELTA"] = round(sensorVal.PitotH2O);
+  dataJson["PITOT_DELTA"] = (sensorVal.PitotH2O);
   
   if (calVal.pitot_cal_offset == 0) {
     dataJson["PITOT_COLOUR"] = GUI_COLOUR_UNSET;
