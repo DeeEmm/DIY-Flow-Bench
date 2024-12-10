@@ -48,6 +48,7 @@ class Webserver {
 		void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 		static void processUpdate(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final);
 		static void parseConfigurationForm(AsyncWebServerRequest *request);
+		static void checkUpdate(AsyncWebServerRequest *request);
 		static void parseCalibrationForm(AsyncWebServerRequest *request);
 		static void parseOrificeForm(AsyncWebServerRequest *request);
 
@@ -72,9 +73,9 @@ class Webserver {
 		
 		void begin();
 		void sendWebSocketMessage(String jsonValues);
-		void parseConfigSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configData);
-		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfig ();
-		void createConfigFile ();
+		void parseBenchSettings(StaticJsonDocument<CONFIG_JSON_SIZE> configData);
+		StaticJsonDocument<CONFIG_JSON_SIZE> loadSettings ();
+		void createSettingsFile ();
 		String getValveDataJSON();
 		
 		StaticJsonDocument<1024> getSDFile(String filename);
@@ -98,7 +99,7 @@ class Webserver {
 		static String processLandingPageTemplate(const String& var);
 
 		static void toggleFlowDiffTile (); 
-		static void processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
+		static void fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 
 
 

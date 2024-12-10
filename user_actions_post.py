@@ -1,7 +1,13 @@
-Import("env")
+import json
+import sys
 import os
+import datetime
 import re
 import shutil
+from SCons.Script import Import
+
+Import("env")
+
 
 # Source - https://github.com/platformio/platform-espressif32/issues/1078
 # Also ...
@@ -17,7 +23,7 @@ def extract_release():
     config_path = env.subst("$PROJECT_DIR/ESP32/DIY-Flow-Bench/version.json")
     with open(config_path, "r") as file:
         content = file.read()
-        match = re.search(r'"RELEASE" :\s+"(.+)"', content)
+        match = re.search(r'"RELEASE":\s+"(.+)"', content)
         if match:
             return match.group(1)
         else:
@@ -28,31 +34,64 @@ def extract_build():
     config_path = env.subst("$PROJECT_DIR/ESP32/DIY-Flow-Bench/version.json")
     with open(config_path, "r") as file:
         content = file.read()
-        match = re.search(r'"BUILD_NUMBER" :\s+"(.+)"', content)
+        match = re.search(r'"BUILD_NUMBER":\s+"(.+)"', content)
+        print(match)
         if match:
             return match.group(1)
         else:
             return None
         
+        
 
-def extract_gui_build():
+def extract_json_val(jsonKey):
     config_path = env.subst("$PROJECT_DIR/ESP32/DIY-Flow-Bench/version.json")
     with open(config_path, "r") as file:
         content = file.read()
-        match = re.search(r'"GUI_BUILD_NUMBER" :\s+"(.+)"', content)
+        pattern = r'"' + jsonKey + '":\s+"(.+)"'
+        match = re.search(pattern, content)
+        # print(match)
         if match:
             return match.group(1)
         else:
             return None
-        
 
-def merge_bin(source, target, env):
 
+
+# DEPRECATED 
+# def delete_files_in_directory(directory_path):
+#    try:
+#      files = os.listdir(directory_path)
+#      for file in files:
+#        file_path = os.path.join(directory_path, file)
+#        if os.path.isfile(file_path):
+#          os.remove(file_path)
+#      print("All files deleted successfully.")
+#    except OSError:
+#      print("Error occurred while deleting files.")
+
+
+# DEPRECATED - Search for wildcard filenames  
+# def del_wildcard(wildcard):
+#    try:
+#      print(wildcard)
+#      files = os.listdir(wildcard)
+#      for file in files:
+#        file_path = os.path.join(wildcard, file)
+#        if os.path.isfile(file_path):
+#         index = file.find(wildcard)
+#         if index > -1:
+#            os.remove(file_path)
+#      print(file_path + "deleted successfully.")
+#    except OSError:
+#      print("Error occurred while deleting files.")
+
+     
+
+
+def after_build(source, target, env):
+    
+    print("Post-Build tasks")
     print("Creating merged binary...")
-
-    gui_build = extract_gui_build()
-    build = extract_build()
-    release = extract_release()
 
     release_path = env.subst("$PROJECT_DIR/ESP32/DIY-Flow-Bench/release/")
     project_path = env.subst("$PROJECT_DIR/ESP32/DIY-Flow-Bench/")
@@ -60,11 +99,17 @@ def merge_bin(source, target, env):
     partitions_path = ".pio/build/esp32dev/partitions.bin"
     firmware_path = ".pio/build/esp32dev/firmware.bin"
 
+    build = extract_json_val("BUILD_NUMBER")
+    release = extract_json_val("RELEASE")
+
     merged_file = os.path.join(release_path, f"{release}_{build}_install.bin")
     update_file = os.path.join(release_path, f"{release}_{build}_update.bin")
 
-    GUI_file = os.path.join(project_path, f"data/index.html")
-    GUI_release = os.path.join(release_path, f"{release}_{gui_build}_index.html")
+    releases_directory =  os.path.join(project_path, f"release/")
+    data_directory =  os.path.join(project_path, f"data/")
+
+    release = extract_json_val("RELEASE")
+    print(release)
 
     # Run esptool to merge images into a single binary
     env.Execute(
@@ -86,14 +131,12 @@ def merge_bin(source, target, env):
                 "0x10000",
                 firmware_path
             ]
-            # + flash_images
         )
     )
 
     # env.Execute(f'esptool.py --chip ESP32 merge_bin -o "%s" % {merged_file} --flash_mode dio --flash_size 4MB 0x1000 {bootloader_path} 0x8000 {partitions_path} 0x10000 {firmware_path}')
 
+    # Create the update.bin file
     shutil.copy(".pio/build/esp32dev/firmware.bin", update_file)
-    shutil.copy(GUI_file, GUI_release)
 
-# Add a post action that runs esptoolpy to merge available flash images
-env.AddPostAction(APP_BIN , merge_bin)
+env.AddPostAction(APP_BIN , after_build)

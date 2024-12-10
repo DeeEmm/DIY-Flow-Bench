@@ -27,6 +27,7 @@
 #define ARDUINOJSON_ENABLE_STD_STRING 1 // allow support for std::string
 #define PINSFILE 1
 #define MAFFILE 2
+#define INDEXFILE 3
 
 
 /***********************************************************
@@ -87,15 +88,24 @@
 /***********************************************************
  * Sensor types
  ***/
-#define NOT_USED 1
+#define SENSOR_DISABLED 1
 #define REF_PRESS_AS_BARO 2
 #define FIXED_VALUE 3
 #define MPXV7007 4
 #define MPX4250 5
 #define MPXV7007DP 6
-#define SPARKFUN_BME280 7
+#define BOSCH_BME280 7
 #define MPX4115 8
 #define SIMPLE_TEMP_DHT11 9
+#define ADS1015 10
+#define ADS1115 11
+#define LINEAR_ANALOG 12
+#define MPXV7025 13
+#define XGZP6899A007KPDPN 14
+#define XGZP6899A010KPDPN 15
+#define M5STACK_TubePressure 16
+#define BOSCH_BME680 17
+
 
 /***********************************************************
  * Flow Differential types

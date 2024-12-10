@@ -47,26 +47,25 @@
 #include "datahandler.h"
 #include "constants.h"
 #include "system.h"
-#include "configuration.h"
 #include "structs.h"
 
-#include "mafData/maf.h"
-#include "hardware.h" // bench type config needed here
+#include "hardware.h" 
 #include "sensors.h"
 #include "calculations.h"
-#include "webserver.h" // config loaded here
+#include "webserver.h" 
 #include "messages.h"
 #include "API.h"
 #include "Wire.h"
 
 
 // Initiate Structs
-ConfigSettings config;
+BenchSettings settings;
 DeviceStatus status;
 SensorData sensorVal;
 ValveLiftData valveData;
 Language language;
 CalibrationData calVal;
+Configuration config;
 Pins pins;
 
 // Initiate Classes
@@ -87,9 +86,9 @@ TaskHandle_t enviroDataTask = NULL;
 char charDataJSON[256];
 String jsonString;
 
-#ifdef SWIRL_IS_ENABLED
-  MD_REncoder Encoder = MD_REncoder(SWIRL_ENCODER_PIN_A, SWIRL_ENCODER_PIN_B);
-#endif
+
+
+
 /***********************************************************
  * @brief TASK: Get bench sensor data (ADS1115 - MAF/RefP/DiffP/Pitot)
  * @param i2c_task_mutex Semaphore handshake with TASKpushData / TASKgetEnviroData
@@ -101,7 +100,8 @@ void TASKgetSensorData( void * parameter ){
   extern struct DeviceStatus status;
   extern struct SensorData sensorVal;
   extern struct CalibrationData calVal;
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
+  extern struct Configuration config;
   
   Sensors _sensors;
 
@@ -112,28 +112,28 @@ void TASKgetSensorData( void * parameter ){
     if (millis() > status.adcPollTimer){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
-        status.adcPollTimer = millis() + ADC_SCAN_DELAY_MS; // Only reset timer when task executes
+        status.adcPollTimer = millis() + config.ADC_SCAN_DELAY_MS; // Only reset timer when task executes
 
         // Get flow data
         // Bench is MAF type...
-        if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())){
-          #ifdef MAF_IS_ENABLED
-          sensorVal.FlowKGH = _sensors.getMafFlow();
-          sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
-          #endif
+        if (strstr(String(settings.bench_type).c_str(), String("MAF").c_str())){
+          if (config.MAF_SRC_TYPE != SENSOR_DISABLED) {
+            sensorVal.FlowKGH = _sensors.getMafFlow();
+            sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
+          }
 
         // Bench is ORIFICE type...
-        } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())){
+        } else if (strstr(String(settings.bench_type).c_str(), String("ORIFICE").c_str())){
           sensorVal.FlowCFMraw = _sensors.getDifferentialFlow();
 
 
         // Bench is VENTURI type...
-        } else if (strstr(String(config.bench_type).c_str(), String("VENTURI").c_str())){
+        } else if (strstr(String(settings.bench_type).c_str(), String("VENTURI").c_str())){
 
           //TODO
 
         // Bench is PITOT type...
-        } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())){
+        } else if (strstr(String(settings.bench_type).c_str(), String("PITOT").c_str())){
 
           //TODO
 
@@ -151,14 +151,14 @@ void TASKgetSensorData( void * parameter ){
         // Apply Data filters...
 
         // Rolling Median
-        if (strstr(String(config.data_filter_type).c_str(), String("MEDIAN").c_str())){
+        if (strstr(String(settings.data_filter_type).c_str(), String("MEDIAN").c_str())){
  
           sensorVal.AverageCFM += ( sensorVal.FlowCFM - sensorVal.AverageCFM ) * 0.1f; // rough running average.
           sensorVal.MedianCFM += copysign( sensorVal.AverageCFM * 0.01, sensorVal.FlowCFM - sensorVal.MedianCFM );
           sensorVal.FlowCFM = sensorVal.MedianCFM;
 
         //TODO - Cyclic average
-        } else if (strstr(String(config.data_filter_type).c_str(), String("AVERAGE").c_str())){
+        } else if (strstr(String(settings.data_filter_type).c_str(), String("AVERAGE").c_str())){
 
           // create array / stack of 'Cyclical Average Buffer' length
           // push value to stack - repeat this for size of stack 
@@ -171,7 +171,7 @@ void TASKgetSensorData( void * parameter ){
 
           
         //TODO - Mode
-        } else if (strstr(String(config.data_filter_type).c_str(), String("MODE").c_str())){
+        } else if (strstr(String(settings.data_filter_type).c_str(), String("MODE").c_str())){
 
           // return most common value over x number of cycles (requested by @black-top)
 
@@ -179,7 +179,7 @@ void TASKgetSensorData( void * parameter ){
 
 
         // convert to standard flow
-        sensorVal.FlowSCFM = _calculations.convertToSCFM(sensorVal.FlowCFM, config.standardReference);
+        sensorVal.FlowSCFM = _calculations.convertToSCFM(sensorVal.FlowCFM, settings.standardReference);
 
 
         // Create Flow differential values
@@ -203,40 +203,39 @@ void TASKgetSensorData( void * parameter ){
         default:
           break;
         }
-        
-        
-        #ifdef PREF_IS_ENABLED 
-        sensorVal.PRefKPA = _sensors.getPRefValue();
-        sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
-        if (config.std_adj_flow == 1) {
-          sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, config.adj_flow_depression, sensorVal.FlowSCFM);
-        } else {
-          sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, config.adj_flow_depression, sensorVal.FlowCFM);
-        }
-        sensorVal.FlowADJSCFM = _calculations.convertToSCFM(sensorVal.FlowADJ, config.standardReference );
-        #endif
-
-        #ifdef PDIFF_IS_ENABLED
-        sensorVal.PDiffKPA = _sensors.getPDiffValue();
-        sensorVal.PDiffH2O = _calculations.convertPressure(sensorVal.PDiffKPA, INH2O) - calVal.pdiff_cal_offset;
-        #endif
-
-        #ifdef PITOT_IS_ENABLED
-        sensorVal.PitotKPA = _sensors.getPitotValue() - calVal.pitot_cal_offset;
-        sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O) ;
-        sensorVal.PitotVelocity = _sensors.getPitotVelocity();
-        #endif
-
-        #ifdef SWIRL_IS_ENABLED
-          uint8_t Swirl = Encoder.read();
-
-          if (Swirl == DIR_CW) {
-            sensorVal.Swirl = Encoder.speed();
+          
+        if (config.PREF_SENSOR_TYPE != SENSOR_DISABLED) {
+          sensorVal.PRefKPA = _sensors.getPRefValue();
+          sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
+          if (settings.std_adj_flow == 1) {
+            sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, settings.adj_flow_depression, sensorVal.FlowSCFM);
           } else {
-            sensorVal.Swirl = Encoder.speed() * -1;
+            sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, settings.adj_flow_depression, sensorVal.FlowCFM);
           }
+          sensorVal.FlowADJSCFM = _calculations.convertToSCFM(sensorVal.FlowADJ, settings.standardReference );
+        }
 
-        #endif
+        if (config.PDIFF_SENSOR_TYPE != SENSOR_DISABLED) {
+          sensorVal.PDiffKPA = _sensors.getPDiffValue();
+          sensorVal.PDiffH2O = _calculations.convertPressure(sensorVal.PDiffKPA, INH2O) - calVal.pdiff_cal_offset;
+        }
+
+        if (config.PITOT_SENSOR_TYPE != SENSOR_DISABLED) {
+          sensorVal.PitotKPA = _sensors.getPitotValue() - calVal.pitot_cal_offset;
+          sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O) ;
+          sensorVal.PitotVelocity = _sensors.getPitotVelocity();
+        }
+
+        if (config.SWIRL_IS_ENABLED) {
+          // TODO #227
+            // uint8_t Swirl = Encoder.read();
+
+            // if (Swirl == DIR_CW) {
+            //   sensorVal.Swirl = Encoder.speed();
+            // } else {
+            //   sensorVal.Swirl = Encoder.speed() * -1;
+            // }
+        }
 
 
 
@@ -260,13 +259,15 @@ void TASKgetEnviroData( void * parameter ){
 
   extern struct DeviceStatus status;
   extern struct SensorData sensorVal;
+  extern struct Configuration config;
+
   Calculations _calculations;
 
   for( ;; ) {
     if (millis() > status.bmePollTimer){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
-        status.bmePollTimer = millis() + BME280_SCAN_DELAY_MS; // Only reset timer when task executes
+        status.bmePollTimer = millis() + config.BME280_SCAN_DELAY_MS; // Only reset timer when task executes
         
         sensorVal.TempDegC = _sensors.getTempValue();
 
@@ -300,6 +301,11 @@ void TASKgetEnviroData( void * parameter ){
 void setup(void) {
 
   extern struct Pins pins;
+  extern struct Configuration config;
+
+  #ifdef VERBOSE
+    settings.verbose_print_mode = true; 
+  #endif
 
   // Initialise Data environment
   _data.begin();
@@ -307,6 +313,7 @@ void setup(void) {
   // REVIEW
   // set message queue length
   xQueueCreate( 256, 2048);
+  // xQueueCreate( 1280, 8192);
     
   _hardware.begin();
 
@@ -319,21 +326,22 @@ void setup(void) {
   // Set up semaphore handshaking
   i2c_task_mutex = xSemaphoreCreateMutex();
 
-  #ifdef WEBSERVER_ENABLED // Compile time directive used for testing
-  _webserver.begin();
+  #ifdef WEBSERVER_ENABLED  // Compile time directive used for testing
+    _webserver.begin();
   #endif
 
-  #ifdef ADC_IS_ENABLED // Compile time directive used for testing
-  xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENSOR_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
-  #endif
+  if (config.ADC_TYPE != SENSOR_DISABLED) { 
+    xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENSOR_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
+  }
 
-  #ifdef BME280_IS_ENABLED // Compile time directive used for testing
-  xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
-  #endif
+  if (config.BME280_IS_ENABLED) { 
+    xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
+  }
 
-  #ifdef SWIRL_IS_ENABLED
-  Encoder.begin();
-  #endif
+  if (config.SWIRL_IS_ENABLED){
+    // TODO #227
+    // MD_REncoder Encoder = MD_REncoder(SWIRL_ENCODER_PIN_A, SWIRL_ENCODER_PIN_B);
+  }
 
 }
 
@@ -350,7 +358,7 @@ void setup(void) {
 void loop () {
   
   // Process API comms
-  if (config.api_enabled) {        
+  if (settings.api_enabled) {        
     if (millis() > status.apiPollTimer) {
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
         status.apiPollTimer = millis() + API_SCAN_DELAY_MS; 
@@ -369,21 +377,21 @@ void loop () {
   // _hardware.setBleedValveRef();
   
   #ifdef WEBSERVER_ENABLED
-  if (millis() > status.browserUpdateTimer) {        
-      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE){ // Check if semaphore available
-      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
-        status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes
-        
-        // Push data to client using Server Side Events (SSE)
-        jsonString = _data.getDataJSON();
-        _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
+    if (millis() > status.browserUpdateTimer) {        
+        // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE){ // Check if semaphore available
+        if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
+          status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes
+          
+          // Push data to client using Server Side Events (SSE)
+          jsonString = _data.getDataJSON();
+          _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
 
-        xSemaphoreGive(i2c_task_mutex); // Release semaphore
-      }
-  }
+          xSemaphoreGive(i2c_task_mutex); // Release semaphore
+        }
+    }
   #endif
 
-  if(status.shouldReboot){
+  if (status.shouldReboot) {
     _message.serialPrintf("Rebooting...");
     delay(100);
     ESP.restart();

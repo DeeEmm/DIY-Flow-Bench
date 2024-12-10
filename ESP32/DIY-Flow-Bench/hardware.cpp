@@ -22,7 +22,6 @@
 #include <ArduinoJson.h>
 
 #include "system.h"
-#include "configuration.h"
 #include "constants.h"
 #include "structs.h"
 #include "datahandler.h"
@@ -34,20 +33,20 @@
 #include "messages.h"
 #include "system.h"
 
-
-#ifdef ADC_IS_ENABLED
 #include <ADS1115_lite.h>
-ADS1115_lite adc(ADC_I2C_ADDR);
-#endif
 
 
+extern struct Configuration config;
+
+ADS1115_lite adc(config.ADC_I2C_ADDR);
 
 
 /***********************************************************
  * @brief CONSTRUCTOR
  ***/
 Hardware::Hardware() {
-  
+
+
 }
 
 
@@ -66,163 +65,152 @@ void Hardware::initaliseIO () {
 
   extern struct Pins pins;
   extern struct DeviceStatus status;
+  extern struct Configuration config;
 
   _message.serialPrintf("Initialising I/O \n");   
 
-
+  // if (config.ADC_TYPE != SENSOR_DISABLED){
+  //   ADS1115_lite adc(config.ADC_I2C_ADDR);
+  // }
 
   // Set Inputs
   if (pins.VCC_3V3_PIN < 99 ) {
-    _message.serialPrintf("Input VCC_3V3_PIN: %d\n", pins.VCC_3V3_PIN );
+    _message.verbosePrintf("Input VCC_3V3_PIN: %d\n", pins.VCC_3V3_PIN );
     pinMode(pins.VCC_3V3_PIN, INPUT);   
   }
   if (pins.VCC_5V_PIN < 99) {
-    _message.serialPrintf("Input VCC_5V_PIN: %d\n", pins.VCC_5V_PIN );  
+    _message.verbosePrintf("Input VCC_5V_PIN: %d\n", pins.VCC_5V_PIN );  
     pinMode(pins.VCC_5V_PIN, INPUT);
   }  
   if (pins.SPEED_SENSOR_PIN < 99 ) {
-    _message.serialPrintf("Input SPEED_SENSOR_PIN: %d\n", pins.SPEED_SENSOR_PIN );
+    _message.verbosePrintf("Input SPEED_SENSOR_PIN: %d\n", pins.SPEED_SENSOR_PIN );
     pinMode(pins.SPEED_SENSOR_PIN, INPUT);   
   }
   if (pins.ORIFICE_BCD_BIT1_PIN < 99 ) {
-    _message.serialPrintf("Input ORIFICE_BCD_BIT1_PIN: %d\n", pins.ORIFICE_BCD_BIT1_PIN );
+    _message.verbosePrintf("Input ORIFICE_BCD_BIT1_PIN: %d\n", pins.ORIFICE_BCD_BIT1_PIN );
     pinMode(pins.ORIFICE_BCD_BIT1_PIN, INPUT);   
   }
   if (pins.ORIFICE_BCD_BIT2_PIN < 99 ) {
-    _message.serialPrintf("Input ORIFICE_BCD_BIT2_PIN: %d\n", pins.ORIFICE_BCD_BIT2_PIN );
+    _message.verbosePrintf("Input ORIFICE_BCD_BIT2_PIN: %d\n", pins.ORIFICE_BCD_BIT2_PIN );
     pinMode(pins.ORIFICE_BCD_BIT2_PIN, INPUT);   
   }
   if (pins.ORIFICE_BCD_BIT3_PIN < 99 ) {
     pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
-    _message.serialPrintf("Input ORIFICE_BCD_BIT3_PIN: %d\n", pins.ORIFICE_BCD_BIT3_PIN );
+    _message.verbosePrintf("Input ORIFICE_BCD_BIT3_PIN: %d\n", pins.ORIFICE_BCD_BIT3_PIN );
     pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
   }
-  #ifdef MAF_SRC_IS_PIN
-  if ((pins.MAF_PIN < 99)  ) {
-    _message.serialPrintf("Input MAF_PIN: %d\n", pins.MAF_PIN );
+  if (config.MAF_SRC_TYPE == LINEAR_ANALOG && pins.MAF_PIN < 99) {
+    _message.verbosePrintf("Input MAF_PIN: %d\n", pins.MAF_PIN );
     pinMode(pins.MAF_PIN, INPUT);   
   }
-  #endif
-  #ifdef PREF_SRC_PIN
-  if (pins.REF_PRESSURE_PIN < 99 ) {
-    _message.serialPrintf("Input REF_PRESSURE_PIN: %d\n", pins.REF_PRESSURE_PIN );
+  if (config.PREF_SENSOR_TYPE == LINEAR_ANALOG && pins.REF_PRESSURE_PIN < 99){
+    _message.verbosePrintf("Input REF_PRESSURE_PIN: %d\n", pins.REF_PRESSURE_PIN );
     pinMode(pins.REF_PRESSURE_PIN, INPUT);   
   }
-  #endif
-  #ifdef PDIFF_SRC_IS_PIN
-  if (pins.DIFF_PRESSURE_PIN < 99 ) {
-    _message.serialPrintf("Input DIFF_PRESSURE_PIN: %d\n", pins.DIFF_PRESSURE_PIN );
+  if (config.PDIFF_SENSOR_TYPE == LINEAR_ANALOG && pins.DIFF_PRESSURE_PIN < 99) {
+    _message.verbosePrintf("Input DIFF_PRESSURE_PIN: %d\n", pins.DIFF_PRESSURE_PIN );
     pinMode(pins.DIFF_PRESSURE_PIN, INPUT);   
   }
-  #endif
-  #ifdef PITOT_SRC_IS_PIN
-  if (pins.PITOT_PIN < 99 ) {
-    _message.serialPrintf("Input PITOT_PIN: %d\n", pins.PITOT_PIN );
+  if (config.PITOT_SENSOR_TYPE  == LINEAR_ANALOG && pins.PITOT_PIN < 99) {
+    _message.verbosePrintf("Input PITOT_PIN: %d\n", pins.PITOT_PIN );
     pinMode(pins.PITOT_PIN, INPUT);   
   }
-  #endif
-  #ifdef TEMP_SENSOR_TYPE_LINEAR_ANALOG
-  if (pins.TEMPERATURE_PIN < 99 ) {
-    _message.serialPrintf("Input TEMPERATURE_PIN: %d\n", pins.TEMPERATURE_PIN );
+  if (config.TEMP_SENSOR_TYPE == LINEAR_ANALOG && pins.TEMPERATURE_PIN < 99) {
+    _message.verbosePrintf("Input TEMPERATURE_PIN: %d\n", pins.TEMPERATURE_PIN );
     pinMode(pins.TEMPERATURE_PIN, INPUT);   
   }
-  #endif
-  #ifdef RELH_SENSOR_TYPE_LINEAR_ANALOG
-  if (pins.HUMIDITY_PIN < 99 ) {
-    _message.serialPrintf("Input HUMIDITY_PIN: %d\n", pins.HUMIDITY_PIN );
+  if (config.RELH_SENSOR_TYPE == LINEAR_ANALOG && pins.HUMIDITY_PIN < 99 ){
+    _message.verbosePrintf("Input HUMIDITY_PIN: %d\n", pins.HUMIDITY_PIN );
     pinMode(pins.HUMIDITY_PIN, INPUT);   
   }
-  #endif
-  #ifdef BARO_SENSOR_TYPE_LINEAR_ANALOG
-  if (pins.REF_BARO_PIN < 99 ) {
-    _message.serialPrintf("Input REF_BARO_PIN: %d\n", pins.REF_BARO_PIN );
+  if (config.BARO_SENSOR_TYPE == LINEAR_ANALOG && pins.REF_BARO_PIN < 99 ) {
+    _message.verbosePrintf("Input REF_BARO_PIN: %d\n", pins.REF_BARO_PIN );
     pinMode(pins.REF_BARO_PIN, INPUT);     
   }
-  #endif
   // if (pins.SERIAL0_RX_PIN < 99 ) {
-  //   _message.serialPrintf("Input SERIAL0_RX_PIN: %d\n", pins.SERIAL0_RX_PIN );
+  //   _message.verbosePrintf("Input SERIAL0_RX_PIN: %d\n", pins.SERIAL0_RX_PIN );
   //   pinMode(pins.SERIAL0_RX_PIN, INPUT);   
   // }
   // if (pins.SERIAL2_RX_PIN < 99 ) {
-  //   _message.serialPrintf("Input SERIAL2_RX_PIN: %d\n", pins.SERIAL2_RX_PIN );
+  //   _message.verbosePrintf("Input SERIAL2_RX_PIN: %d\n", pins.SERIAL2_RX_PIN );
   //   pinMode(pins.SERIAL2_RX_PIN, INPUT);   
   // }
    if (pins.SDA_PIN < 99 ) {
-    _message.serialPrintf("Input SDA_PIN: %d\n", pins.SDA_PIN );
+    _message.verbosePrintf("Input SDA_PIN: %d\n", pins.SDA_PIN );
     pinMode(pins.SDA_PIN, INPUT);   
   }
   if (pins.SCL_PIN < 99 ) {
-    _message.serialPrintf("Input SCL_PIN: %d\n", pins.SCL_PIN );
+    _message.verbosePrintf("Input SCL_PIN: %d\n", pins.SCL_PIN );
     pinMode(pins.SCL_PIN, INPUT);   
   }
-  #ifdef SD_CARD_IS_ENABLED
-  i  if (pins.SD_CS_PIN < 99 ) {
-    _message.serialPrintf("Input SD_CS_PIN: %d\n", pins.SD_CS_PIN );
-    pinMode(pins.SD_CS_PIN, INPUT);     
+  if (config.SD_CARD_IS_ENABLED) {
+    // if (pins.SD_CS_PIN < 99 ) {
+    //   _message.verbosePrintf("Input SD_CS_PIN: %d\n", pins.SD_CS_PIN );
+    //   pinMode(pins.SD_CS_PIN, INPUT);     
+    // }
+    // if (pins.SD_MISO_PIN < 99 ) {
+    //   _message.verbosePrintf("Input SD_MISO_PIN: %d\n", pins.SD_MISO_PIN );
+    //   pinMode(pins.SD_MISO_PIN, INPUT);   
+    // }
+    // if (pins.SD_SCK_PIN < 99 ) {
+    //   _message.verbosePrintf("Input SD_SCK_PIN: %d\n", pins.SD_SCK_PIN );
+    //   pinMode(pins.SD_SCK_PIN, INPUT);   
+    // }
   }
-  if (pins.SD_MISO_PIN < 99 ) {
-    _message.serialPrintf("Input SD_MISO_PIN: %d\n", pins.SD_MISO_PIN );
-    pinMode(pins.SD_MISO_PIN, INPUT);   
-  }
-  if (pins.SD_SCK_PIN < 99 ) {
-    _message.serialPrintf("Input SD_SCK_PIN: %d\n", pins.SD_SCK_PIN );
-    pinMode(pins.SD_SCK_PIN, INPUT);   
-  }
-  #endif
   // if (pins.WEMOS_SPARE_PIN_1 >= 0 ) {
-  //   _message.serialPrintf("Input WEMOS_SPARE_PIN_1: %d\n", pins.WEMOS_SPARE_PIN_1 );
+  //   _message.verbosePrintf("Input WEMOS_SPARE_PIN_1: %d\n", pins.WEMOS_SPARE_PIN_1 );
   //   pinMode(pins.WEMOS_SPARE_PIN_1, INPUT);   
   // }
 
   // // Set Outputs
   if (pins.VAC_BANK_1_PIN < 99 ) {
-    _message.serialPrintf("Output VAC_BANK_1_PIN: %d\n", pins.VAC_BANK_1_PIN );
+    _message.verbosePrintf("Output VAC_BANK_1_PIN: %d\n", pins.VAC_BANK_1_PIN );
     pinMode(pins.VAC_BANK_1_PIN, OUTPUT);
   }
   if (pins.VAC_BANK_2_PIN < 99 ) {
-    _message.serialPrintf("Output VAC_BANK_2_PIN: %d\n", pins.VAC_BANK_2_PIN );
+    _message.verbosePrintf("Output VAC_BANK_2_PIN: %d\n", pins.VAC_BANK_2_PIN );
     pinMode(pins.VAC_BANK_2_PIN, OUTPUT);
   }
   if (pins.VAC_BANK_3_PIN < 99 ) {
-    _message.serialPrintf("Output VAC_BANK_3_PIN: %d\n", pins.VAC_BANK_3_PIN );
+    _message.verbosePrintf("Output VAC_BANK_3_PIN: %d\n", pins.VAC_BANK_3_PIN );
     pinMode(pins.VAC_BANK_3_PIN, OUTPUT);
   }
   if (pins.VAC_SPEED_PIN < 99 ) {
-    _message.serialPrintf("Output VAC_SPEED_PIN: %d\n", pins.VAC_SPEED_PIN );
+    _message.verbosePrintf("Output VAC_SPEED_PIN: %d\n", pins.VAC_SPEED_PIN );
     pinMode(pins.VAC_SPEED_PIN, OUTPUT);
   }
   if (pins.VAC_BLEED_VALVE_PIN < 99 ) {
-    _message.serialPrintf("Output VAC_BLEED_VALVE_PIN: %d\n", pins.VAC_BLEED_VALVE_PIN );
+    _message.verbosePrintf("Output VAC_BLEED_VALVE_PIN: %d\n", pins.VAC_BLEED_VALVE_PIN );
     pinMode(pins.VAC_BLEED_VALVE_PIN, OUTPUT);
   }
   if (pins.AVO_STEP_PIN < 99 ) {
-    _message.serialPrintf("Output AVO_STEP_PIN: %d\n", pins.AVO_STEP_PIN );
+    _message.verbosePrintf("Output AVO_STEP_PIN: %d\n", pins.AVO_STEP_PIN );
     pinMode(pins.AVO_STEP_PIN, OUTPUT);
   }
   if (pins.AVO_DIR_PIN < 99 ) {
-    _message.serialPrintf("Output AVO_DIR_PIN: %d\n", pins.AVO_DIR_PIN );
+    _message.verbosePrintf("Output AVO_DIR_PIN: %d\n", pins.AVO_DIR_PIN );
     pinMode(pins.AVO_DIR_PIN, OUTPUT);
   }
   if (pins.FLOW_VALVE_STEP_PIN < 99 ) {
-    _message.serialPrintf("Output FLOW_VALVE_STEP_PIN: %d\n", pins.FLOW_VALVE_STEP_PIN );
+    _message.verbosePrintf("Output FLOW_VALVE_STEP_PIN: %d\n", pins.FLOW_VALVE_STEP_PIN );
     pinMode(pins.FLOW_VALVE_STEP_PIN, OUTPUT);
   }
   if (pins.FLOW_VALVE_DIR_PIN < 99 ) {
-    _message.serialPrintf("Output FLOW_VALVE_DIR_PIN: %d\n", pins.FLOW_VALVE_DIR_PIN );
+    _message.verbosePrintf("Output FLOW_VALVE_DIR_PIN: %d\n", pins.FLOW_VALVE_DIR_PIN );
     pinMode(pins.FLOW_VALVE_DIR_PIN, OUTPUT);
   }
-  #ifdef SD_CARD_IS_ENABLED
-  if (pins.SD_MOSI_PIN < 99 ) {
-    _message.serialPrintf("Output SD_MOSI_PIN: %d\n", pins.SD_MOSI_PIN );
-    pinMode(pins.SD_MOSI_PIN, OUTPUT);
+  if (config.SD_CARD_IS_ENABLED) {
+    // if (pins.SD_MOSI_PIN < 99 ) {
+    //   _message.verbosePrintf("Output SD_MOSI_PIN: %d\n", pins.SD_MOSI_PIN );
+    //   pinMode(pins.SD_MOSI_PIN, OUTPUT);
+    // }
   }
-  #endif
   // if (pins.SERIAL0_TX_PIN < 99 ) {
-  //   _message.serialPrintf("Output SERIAL0_TX_PIN: %d\n", pins.SERIAL0_TX_PIN );
+  //   _message.verbosePrintf("Output SERIAL0_TX_PIN: %d\n", pins.SERIAL0_TX_PIN );
   //   pinMode(pins.SERIAL0_TX_PIN, OUTPUT);
   // }
   // if (pins.SERIAL2_TX_PIN < 99 ) {
-  //   _message.serialPrintf("Output SERIAL2_TX_PIN: %d\n", pins.SERIAL2_TX_PIN );
+  //   _message.verbosePrintf("Output SERIAL2_TX_PIN: %d\n", pins.SERIAL2_TX_PIN );
   //   pinMode(pins.SERIAL2_TX_PIN, OUTPUT);
   // }
 
@@ -239,26 +227,29 @@ void Hardware::initaliseIO () {
  **/
 void Hardware::begin () {
 
+  extern struct Configuration config;
+
+  Hardware _hardware;
   Messages _message;
 
   _message.serialPrintf("Initialising Hardware \n");
 
   this->getI2CList(); // Scan and list I2C devices to serial monitor
 
-  #ifdef ADC_IS_ENABLED
-  _message.serialPrintf("Initialising ADS1115 \n");
+  if (config.ADC_TYPE != SENSOR_DISABLED) {
+    _message.serialPrintf("Initialising ADS1115 \n");
 
-  adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
-  adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
-  // adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
-  
-  if (!adc.testConnection()) {
-    _message.serialPrintf("ADS1115 Connection failed");
-		while(1); //Freeze
-	} else {
-		_message.serialPrintf("ADS1115 Initialised\n");
+    adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
+    adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
+    // adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
+    
+    if (!adc.testConnection()) {
+      _message.serialPrintf("ADS1115 Connection failed");
+      while(1); //Freeze
+    } else {
+      _message.serialPrintf("ADS1115 Initialised\n");
+    }
   }
-  #endif
 
   _message.serialPrintf("Hardware Initialised \n");
 
@@ -308,37 +299,39 @@ void Hardware::getI2CList() {
  ***/
 int32_t Hardware::getADCRawData(int channel) {
 
+  extern struct Configuration config;
+
   int32_t rawADCval = 0;
 
-  #ifdef ADC_IS_ENABLED
+  if (config.ADC_TYPE != SENSOR_DISABLED){
 
-  if (channel > 3) {
-    return 0;
+    if (channel > 3) {
+      return 0;
+    }
+
+    switch (channel) // MUX - Multiplex channel
+    {
+      case (0):
+          adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_0); // 0x4000
+      break;
+
+      case (1):
+          adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_1); // 0x5000
+      break;
+
+      case (2):
+          adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_2); // 0x6000
+      break;
+
+      case (3):
+          adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_3); // 0x7000
+      break;
+    }
+    
+    adc.triggerConversion(); // Start a conversion. This immediately returns
+    rawADCval = adc.getConversion(); // This polls the ADS1115 and wait for conversion to finish, THEN returns the value
+
   }
-
-  switch (channel) // MUX - Multiplex channel
-  {
-    case (0):
-        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_0); // 0x4000
-    break;
-
-    case (1):
-        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_1); // 0x5000
-    break;
-
-    case (2):
-        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_2); // 0x6000
-    break;
-
-    case (3):
-        adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_3); // 0x7000
-    break;
-  }
-  
-  adc.triggerConversion(); // Start a conversion. This immediately returns
-  rawADCval = adc.getConversion(); // This polls the ADS1115 and wait for conversion to finish, THEN returns the value
-
-  #endif
 
   return rawADCval;
 
@@ -355,23 +348,32 @@ int32_t Hardware::getADCRawData(int channel) {
  ***/
  double Hardware::getADCVolts(int channel) {
 
+  extern struct Configuration config;
+  
   double volts;
 
   int rawADCval = getADCRawData(channel);
-  
-  #if defined ADC_TYPE_ADS1115 && defined ADC_IS_ENABLED 
-    
-    volts = rawADCval * ADC_GAIN / ADC_RANGE; 
-  
-  #elif defined ADC_TYPE_ADS1015 && defined ADC_IS_ENABLED 
 
-    volts = rawADCval * ADC_GAIN / 2047.00F; 
+  switch (config.ADC_TYPE) {
+
+    case SENSOR_DISABLED:
+      return 1.00F;
+    break;
+
+    case ADS1115:
+      volts = rawADCval * config.ADC_GAIN / config.ADC_RANGE;
+    break;
+
+    case ADS1015:
+      volts = rawADCval * config.ADC_GAIN / 2047.00F; 
+    break;
+
+    default:
+      return 1.00F;
+    break;
+
+  }
   
-  #else
-
-    return 1.00F;
-
-  #endif
   
   return volts;
 }
@@ -389,17 +391,20 @@ int32_t Hardware::getADCRawData(int channel) {
  ***/
 double Hardware::get5vSupplyVolts() {   
 
+  // TODO wifi / AC2 issue - https://github.com/espressif/esp-idf/issues/3714
+
   extern struct Pins pins;
-  extern struct ConfigSettings config;
+  extern struct Configuration config;
 
+  double vcc5vSupplyVolts = 5.0;
 
-  #ifdef USE_FIXED_5V_VALUE
-    return 5.0; 
-  #else
+  if (config.USE_FIXED_5V_VALUE == true) {
+    return vcc5vSupplyVolts; 
+  } else {
     long rawVoltageValue = analogRead(pins.VCC_5V_PIN);  
-    double vcc5vSupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
+    vcc5vSupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
     return vcc5vSupplyVolts + config.VCC_5V_TRIMPOT;
-  #endif
+  }
 }
 
 
@@ -412,18 +417,20 @@ double Hardware::get5vSupplyVolts() {
  * @note Use a 0.1uf cap on input to help filter noise
  * @note ESP32 has 12 bit ADC (0-3300mv = 0-4095)
  ***/
-double Hardware::get3v3SupplyVolts() {   
+double Hardware::get3v3SupplyVolts() {    
 
-  #ifdef VCC_3V3_PIN  
-  long rawVoltageValue = analogRead(VCC_3V3_PIN);  
-  double vcc3v3SupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
-  #endif
+  extern struct Pins pins; 
+  extern struct Configuration config;
 
-  #ifdef USE_FIXED_3_3V_VALUE
-    return 3.3; 
-  #else
-    return vcc3v3SupplyVolts + VCC_3V3_TRIMPOT;
-  #endif
+  double vcc3v3SupplyVolts = 3.3;
+
+  if (config.USE_FIXED_3_3V_VALUE) {
+    return vcc3v3SupplyVolts; 
+  } else {
+    long rawVoltageValue = analogRead(pins.VCC_3V3_PIN );  
+    vcc3v3SupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
+    return vcc3v3SupplyVolts + config.VCC_3V3_TRIMPOT;
+  }
 }
 
 
@@ -441,7 +448,7 @@ bool Hardware::benchIsRunning() {
   Calculations _calculations;
   Sensors _sensors;
   
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   extern struct Language language;
   extern struct SensorData sensorVal;
 
@@ -455,7 +462,7 @@ bool Hardware::benchIsRunning() {
   // comvert negative value into posotive
   refPressure = fabs(refPressure); 
 
-  if ((refPressure > config.min_bench_pressure))
+  if ((refPressure > settings.min_bench_pressure))
   {
 	  _message.Handler(language.LANG_BENCH_RUNNING);
 	  return true;
@@ -476,8 +483,9 @@ void Hardware::checkRefPressure() {
   Calculations _calculations;
 
   extern struct SensorData sensorVal;
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   extern struct Language language;
+  extern struct Configuration config;
   
   double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
     
@@ -485,7 +493,7 @@ void Hardware::checkRefPressure() {
   // Check that pressure does not fall below limit set by MIN_TEST_PRESSURE_PERCENTAGE when bench is running
   // note alarm commented out in alarm function as 'nag' can get quite annoying
   // Is this a redundant check? Maybe a different alert would be more appropriate
-  if ((refPressure < (config.cal_ref_press * (MIN_TEST_PRESSURE_PERCENTAGE / 100))) && (Hardware::benchIsRunning()))
+  if ((refPressure < (settings.cal_ref_press * (config.MIN_TEST_PRESSURE_PERCENTAGE / 100))) && (Hardware::benchIsRunning()))
   {
     _message.Handler(language.LANG_REF_PRESS_LOW);
   }

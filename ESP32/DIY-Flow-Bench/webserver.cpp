@@ -25,7 +25,7 @@
 
 #include "datahandler.h"
 #include "system.h"
-#include "configuration.h"
+
 #include "constants.h"
 #include "structs.h"
 #include "comms.h"
@@ -51,11 +51,12 @@ using namespace std;
 
 // RTC_DATA_ATTR int bootCount; // flash mem
 
-const char LANDING_PAGE[] PROGMEM = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/api/file/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~PINS_STATUS~</p> <!--<p>~SETTINGS_STATUS~</p>--> <br> <form method='POST' action='/api/file/upload' enctype='multipart/form-data'> <div class=\"input_container\"> <input type=\"file\" name=\"upload\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
+// DEPRECATED
+// const char LANDING_PAGE[] PROGMEM = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/api/file/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~CONFIGURATION_STATUS~</p> <p>~PINS_STATUS~</p> <p>~MAF_STATUS~</p> <br> <form method='POST' action='/api/file/upload' enctype='multipart/form-data'> <div class=\"input_container\"> <input type=\"file\" name=\"upload\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
 
 void Webserver::begin()
 {
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   extern struct Language language;
   extern struct DeviceStatus status;
 
@@ -91,28 +92,28 @@ void Webserver::begin()
       Messages _message;
       _message.Handler(language.LANG_DEBUG_MODE);
       _message.debugPrintf("Debug Mode On\n");
-      config.debug_mode = true;
+      settings.debug_mode = true;
       request->send(200, "text/html", "{\"debug\":\"on\"}"); });
 
   server->on("/api/debug/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       _message.Handler(language.LANG_BLANK);
       _message.debugPrintf("Debug Mode Off\n");
-      config.debug_mode = false;
+      settings.debug_mode = false;
       request->send(200, "text/html", "{\"debug\":\"off\"}"); });
 
   server->on("/api/dev/on", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
       _message.Handler(language.LANG_DEV_MODE);
       _message.debugPrintf("Developer Mode On\n");
-      config.dev_mode = true;
+      settings.dev_mode = true;
       request->send(200, "text/html", "{\"dev\":\"on\"}"); });
 
   server->on("/api/dev/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       _message.Handler(language.LANG_BLANK);
       _message.debugPrintf("Developer Mode Off\n");
-      config.dev_mode = false;
+      settings.dev_mode = false;
       request->send(200, "text/html", "{\"dev\":\"off\"}"); });
 
   server->on("/api/clear-message", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -171,10 +172,10 @@ void Webserver::begin()
   server->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
       Messages _message;
       _message.debugPrintf("/api/file/upload \n");
-      request->send(200);
+      // request->send(200);
       // request->redirect("/?view=upload"); 
       },
-      processUpload);
+      fileUpload);
 
   // Download request handler
   server->on("/api/file/download", HTTP_GET, [](AsyncWebServerRequest *request){              
@@ -238,8 +239,13 @@ void Webserver::begin()
         } 
         if (_data.checkSubstring(fileToDelete.c_str(), status.pinsFilename.c_str())) status.pinsLoaded = false;
         if (_data.checkSubstring(fileToDelete.c_str(), status.mafFilename.c_str())) status.mafLoaded = false;
-        if (fileToDelete == "/index.html"){
-          request->redirect("/");
+        if (_data.checkSubstring(fileToDelete.c_str(), status.indexFilename.c_str())) status.GUIexists = false;
+        // if (fileToDelete == "/index.html"){
+        // If we delete a system file, send user back to boot loop to upload missing file
+        if (fileToDelete == status.indexFilename || fileToDelete == status.pinsFilename || fileToDelete == status.mafFilename){
+          request->send_P(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
+          _data.bootLoop();
+          // request->redirect("/");
         } else {
           request->redirect("/?view=upload");
         }
@@ -327,19 +333,28 @@ void Webserver::begin()
   // Index page request handler
   server->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
       extern struct DeviceStatus status;
-      if ((SPIFFS.exists("/index.html")) && ((status.pinsLoaded == true))) {
-        request->send(SPIFFS, "/index.html", "text/html", false, processTemplate);
+      if ((SPIFFS.exists(status.indexFilename)) && ((status.pinsLoaded == true))) {
+        request->send(SPIFFS, status.indexFilename, "text/html", false, processTemplate);
        } else {
-        request->send_P(200, "text/html", LANDING_PAGE, processLandingPageTemplate); 
+          DataHandler _data;
+          // request->send_P(200, "text/html", LANDING_PAGE, processLandingPageTemplate); 
+          // TEST Lets reboot the ESP32 here and manage file upload in the bootloop
+          // ESP.restart(); 
+          // request->redirect("/");
+          // We should only be here if the index page is missing so lets redirect to the boot loop          
+          request->send_P(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
+          _data.bootLoop();
        }
       });
 
-  server->onFileUpload(processUpload);
+  server->onFileUpload(fileUpload);
   server->addHandler(events);
   server->begin();
 
   _message.Handler(language.LANG_SERVER_RUNNING);
   _message.serialPrintf("Server Running \n");
+
+  status.webserverIsRunning = true;
 }
 
 
@@ -350,7 +365,7 @@ void Webserver::begin()
  * @brief Process File Upload
  * @note Redirects browser back to Upload modal unless upload is index file
  ***/
-void Webserver::processUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
+void Webserver::fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
 
   Messages _message;
@@ -362,6 +377,8 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 
   bool upload_error = false;
   int file_size = 0;
+
+  redirectURL = "/";
 
   if (!filename.startsWith("/")){
     filename = "/" + filename;
@@ -390,19 +407,30 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
     }
   } 
 
-  // Set redirect to file Upload modal unless uploading the index file
-  if (filename == String("/index.html.gz") || (filename == String("/index.html")) || (filename == String(status.pinsFilename)))  {
-    redirectURL = "/";
-  }  else  {
-    redirectURL = "/?view=upload";
-  }
 
   if (final)  {
     _message.debugPrintf("Upload Complete: %s, %u bytes\n", filename.c_str(), file_size);
     request->_tempFile.close();
 
-    if (_data.checkUserFile(PINSFILE)) status.pinsLoaded = true;
-    if (_data.checkUserFile(MAFFILE)) status.mafLoaded = true;  
+    if (_data.checkUserFile(PINSFILE)){
+      _data.loadPinsData();
+      status.pinsLoaded = true;
+      redirectURL = "/";
+      // redirectURL = "/?view=upload";
+    } 
+    if (_data.checkUserFile(MAFFILE)) {
+      _data.loadMAFData();
+      status.mafLoaded = true;  
+      redirectURL = "/";
+      // redirectURL = "/?view=upload";
+    }
+    if (_data.checkUserFile(INDEXFILE)) {
+      status.GUIexists = true;  
+      redirectURL = "/";
+    }
+
+    // TEST - tying to get rid of 500 error after upload but before page refresh
+    delay(2000);
 
     request->redirect(redirectURL);
   }
@@ -417,7 +445,7 @@ void Webserver::processUpload(AsyncWebServerRequest *request, String filename, s
 /***********************************************************
  * @brief parseConfigurationForm
  * @details Parses calibration form post vars and stores into global struct
- * @details Saves configuration data to config.json file
+ * @details Saves  data to settings.json file
  * @note Creates file if it does not exist
  * @note Redirects browser to file list
  * 
@@ -430,7 +458,7 @@ void Webserver::parseConfigurationForm(AsyncWebServerRequest *request)
   DataHandler _data;
 
   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   String jsonString;
   
   int params = request->params();
@@ -444,53 +472,53 @@ void Webserver::parseConfigurationForm(AsyncWebServerRequest *request)
   }
 
   // Update Config Vars
-  strcpy(config.wifi_ssid, configData["CONF_WIFI_SSID"]);
-  strcpy(config.wifi_pswd, configData["CONF_WIFI_PSWD"]);
-  strcpy(config.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
-  strcpy(config.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
-  strcpy(config.hostname, configData["CONF_HOSTNAME"]);
-  config.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
-  config.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
-  config.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
-  config.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
-  config.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
-  strcpy(config.data_filter_type, configData["DATA_FILTER_TYPE"]);
-  strcpy(config.rounding_type, configData["ROUNDING_TYPE"]);
-  config.flow_decimal_length = configData["FLOW_DECIMAL_LENGTH"].as<int>();
-  config.gen_decimal_length = configData["GEN_DECIMAL_LENGTH"].as<int>();
-  config.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
-  config.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
-  strcpy(config.api_delim, configData["CONF_API_DELIM"]);
-  config.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
-  config.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
-  config.adj_flow_depression = configData["ADJ_FLOW_DEPRESSION"].as<int>();
-  config.standardReference = configData["STANDARD_REFERENCE"].as<int>();
-  config.std_adj_flow = configData["STD_ADJ_FLOW"].as<int>();
-  config.dataGraphMax = configData["DATAGRAPH_MAX"].as<int>();
-  strcpy(config.temp_unit, configData["TEMP_UNIT"]);
-  config.valveLiftInterval = configData["VALVE_LIFT_INTERVAL"].as<double>();
-  strcpy(config.bench_type, configData["BENCH_TYPE"]);
-  config.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
-  config.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
-  config.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
-  config.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
-  config.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
-  config.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
-  config.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
-  config.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
-  config.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
-  config.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
-  config.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
-  config.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
-  config.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
-  config.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
+  strcpy(settings.wifi_ssid, configData["CONF_WIFI_SSID"]);
+  strcpy(settings.wifi_pswd, configData["CONF_WIFI_PSWD"]);
+  strcpy(settings.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
+  strcpy(settings.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
+  strcpy(settings.hostname, configData["CONF_HOSTNAME"]);
+  settings.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
+  settings.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
+  settings.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
+  settings.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
+  settings.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
+  strcpy(settings.data_filter_type, configData["DATA_FILTER_TYPE"]);
+  strcpy(settings.rounding_type, configData["ROUNDING_TYPE"]);
+  settings.flow_decimal_length = configData["FLOW_DECIMAL_LENGTH"].as<int>();
+  settings.gen_decimal_length = configData["GEN_DECIMAL_LENGTH"].as<int>();
+  settings.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
+  settings.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
+  strcpy(settings.api_delim, configData["CONF_API_DELIM"]);
+  settings.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
+  settings.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
+  settings.adj_flow_depression = configData["ADJ_FLOW_DEPRESSION"].as<int>();
+  settings.standardReference = configData["STANDARD_REFERENCE"].as<int>();
+  settings.std_adj_flow = configData["STD_ADJ_FLOW"].as<int>();
+  settings.dataGraphMax = configData["DATAGRAPH_MAX"].as<int>();
+  strcpy(settings.temp_unit, configData["TEMP_UNIT"]);
+  settings.valveLiftInterval = configData["VALVE_LIFT_INTERVAL"].as<double>();
+  strcpy(settings.bench_type, configData["BENCH_TYPE"]);
+  settings.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
+  settings.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
+  settings.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
+  settings.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
+  settings.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
+  settings.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
+  settings.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
+  settings.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
+  settings.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
+  settings.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
+  settings.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
+  settings.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
+  settings.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
+  settings.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
 
   // save settings to config file
   serializeJsonPretty(configData, jsonString);
-  if (SPIFFS.exists("/config.json"))  {
-    SPIFFS.remove("/config.json");
+  if (SPIFFS.exists("/settings.json"))  {
+    SPIFFS.remove("/settings.json");
   }
-  _data.writeJSONFile(jsonString, "/config.json", CONFIG_JSON_SIZE);
+  _data.writeJSONFile(jsonString, "/settings.json", CONFIG_JSON_SIZE);
 
   _message.debugPrintf("Configuration Saved \n");
 
@@ -650,8 +678,7 @@ void Webserver::toggleFlowDiffTile () {
  * @details captures lift data to working memory
  * 
  ***/
-void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
-{
+void Webserver::parseLiftDataForm(AsyncWebServerRequest *request){
 
   Messages _message;
   DataHandler _data;
@@ -660,7 +687,7 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
   StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
   extern struct SensorData sensorVal;
   extern struct ValveLiftData valveData;
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   
   String jsonString;
   String liftPoint;
@@ -670,22 +697,31 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
   const char* PARAM_INPUT = "lift-data";
   double flowValue;
 
-  _message.debugPrintf("Saving Lift Data...\n");
+  _message.debugPrintf("Saving Lift Data....\n");
+
+  // TEST - Print POST vars to serial
+  // for(int i=0;i<params;i++){
+  //   AsyncWebParameter* p = request->getParam(i);
+  //   if(p->isFile()){ //p->isPost() is also true
+  //     Serial.printf("FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
+  //   } else if(p->isPost()){
+  //     Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+  //   } else {
+  //     Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
+  //   }
+  // }
 
   // Convert POST vars to JSON 
   for(int i=0;i<params;i++){
     AsyncWebParameter* p = request->getParam(i);
-
         // get selected radio button and store it (radio button example from https://www.electrorules.com/esp32-web-server-control-stepper-motor-html-form/)
         if (p->name() == PARAM_INPUT) {
           liftPoint = p->value();
         }
-
   }
 
-
   // Get flow value based on capture Datatype
-  switch (config.data_capture_datatype) {
+  switch (settings.data_capture_datatype) {
 
     case ACFM:
       flowValue = sensorVal.FlowCFM;
@@ -709,9 +745,8 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
         
   }
 
-
   // Update lift point data
-  switchval = strtol(liftPoint.c_str(), &end, 10); // convert std::str to int
+  switchval = stoi(liftPoint.c_str()); // convert std::str to int
 
   switch (switchval) {
 
@@ -784,8 +819,8 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request)
   }
   _data.writeJSONFile(jsonString, "/liftdata.json", LIFT_DATA_JSON_SIZE);
 
-  request->redirect("/");
-
+  // request->redirect("/");
+  request->send(200);
 
 }
 
@@ -868,7 +903,7 @@ String Webserver::processTemplate(const String &var)
 {
 
   extern struct DeviceStatus status;
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   extern struct CalibrationData calVal;
   extern struct Language language;
 
@@ -994,22 +1029,25 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_CAPTURE_DATATYPE") return language.LANG_GUI_CAPTURE_DATATYPE;
   if (var == "MAF_FLOW_UNIT") {
 
-      if (status.mafUnits == KG_H) {
-        return "kg/h";
-      } else {
-        return "mg/s";
-      }
+  	const auto unitKG_H = std::string("KG_H");
+	  const auto mafUnit = std::string(status.mafUnits);
+	  bool mafUnitIsKG_H = mafUnit.find(unitKG_H) != string::npos;
+
+    if (mafUnitIsKG_H) {
+      return "kg/h";
+    } else {
+      return "mg/s";
+    }
   }
 
-
   // Bench definitions for system status pane 
-  if (strstr(config.bench_type, "MAF")!=NULL) {
+  if (strstr(settings.bench_type, "MAF")!=NULL) {
     status.benchType = "MAF Style";
-  } else if (strstr(config.bench_type, "ORIFICE")!=NULL) {
+  } else if (strstr(settings.bench_type, "ORIFICE")!=NULL) {
     status.benchType = "Orifice Style";
-  } else if (strstr(config.bench_type, "VENTURI")!=NULL) {
+  } else if (strstr(settings.bench_type, "VENTURI")!=NULL) {
     status.benchType = "Venturi Style";
-  } else if (strstr(config.bench_type, "PITOT")!=NULL) {
+  } else if (strstr(settings.bench_type, "PITOT")!=NULL) {
     status.benchType = "Pitot Style";
   }
 
@@ -1070,10 +1108,10 @@ String Webserver::processTemplate(const String &var)
   }
 
   //Datagraph Max Val selected item
-  if (var == "DATAGRAPH_MAX_0" && config.dataGraphMax == 0) return String("selected");
-  if (var == "DATAGRAPH_MAX_1" && config.dataGraphMax == 1) return String("selected");
-  if (var == "DATAGRAPH_MAX_2" && config.dataGraphMax == 2) return String("selected");
-  if (var == "DATAGRAPH_MAX_3" && config.dataGraphMax == 3) return String("selected");
+  if (var == "DATAGRAPH_MAX_0" && settings.dataGraphMax == 0) return String("selected");
+  if (var == "DATAGRAPH_MAX_1" && settings.dataGraphMax == 1) return String("selected");
+  if (var == "DATAGRAPH_MAX_2" && settings.dataGraphMax == 2) return String("selected");
+  if (var == "DATAGRAPH_MAX_3" && settings.dataGraphMax == 3) return String("selected");
 
 
   // Datagraph Stuff
@@ -1083,7 +1121,11 @@ String Webserver::processTemplate(const String &var)
   double scaleFactor = 0.0;
 
   // very rough cfm calculation from max mafdata (approx half of KG/h rate)
-  if (status.mafUnits == MG_S) {
+	const auto unitMG_S = std::string("MG_S");
+	const auto mafUnit = std::string(status.mafUnits);
+	bool mafUnitIsMG_S = mafUnit.find(unitMG_S) != string::npos;
+
+	if (mafUnitIsMG_S) {
     maxcfm = (0.0036 * status.mafDataValMax) / 2; 
   } else {
     maxcfm = status.mafDataValMax / 2;
@@ -1092,13 +1134,13 @@ String Webserver::processTemplate(const String &var)
   // Determine data graph flow axis scale
   // NOTE: currently 1000cfm is the largest flow that the graph will display. 
   // We could change scaling to be realtive to SVG height (surface currently fixed at 500)
-  if ((maxcfm < 500) || (config.dataGraphMax == 1)) {
+  if ((maxcfm < 500) || (settings.dataGraphMax == 1)) {
     maxval = 250;
     scaleFactor = 2;
-  } else if ((maxcfm > 250 && maxcfm < 500) || (config.dataGraphMax == 2)) {
+  } else if ((maxcfm > 250 && maxcfm < 500) || (settings.dataGraphMax == 2)) {
     maxval = 500;
     scaleFactor = 1;
-  } else if ((maxcfm > 500)  || (config.dataGraphMax == 3)  || (config.dataGraphMax == 0)){
+  } else if ((maxcfm > 500)  || (settings.dataGraphMax == 3)  || (settings.dataGraphMax == 0)){
     maxval = 1000; 
     scaleFactor = 0.5;
   }
@@ -1134,10 +1176,10 @@ String Webserver::processTemplate(const String &var)
 
 
   // Lift Profile
-  if (floor(config.valveLiftInterval) == config.valveLiftInterval) {
+  if (floor(settings.valveLiftInterval) == settings.valveLiftInterval) {
 
     // it's an integer so lets truncate fractional part
-    int liftInterval = config.valveLiftInterval;
+    int liftInterval = settings.valveLiftInterval;
     if (var == "lift1") return String(1 * liftInterval);
     if (var == "lift2") return String(2 * liftInterval);
     if (var == "lift3") return String(3 * liftInterval);
@@ -1153,18 +1195,18 @@ String Webserver::processTemplate(const String &var)
 
   } else {
     // Display the double
-    if (var == "lift1") return String(1 * config.valveLiftInterval);
-    if (var == "lift2") return String(2 * config.valveLiftInterval);
-    if (var == "lift3") return String(3 * config.valveLiftInterval);
-    if (var == "lift4") return String(4 * config.valveLiftInterval);
-    if (var == "lift5") return String(5 * config.valveLiftInterval);
-    if (var == "lift6") return String(6 * config.valveLiftInterval);
-    if (var == "lift7") return String(7 * config.valveLiftInterval);
-    if (var == "lift8") return String(8 * config.valveLiftInterval);
-    if (var == "lift9") return String(9 * config.valveLiftInterval);
-    if (var == "lift10") return String(10 * config.valveLiftInterval);
-    if (var == "lift11") return String(11 * config.valveLiftInterval);
-    if (var == "lift12") return String(12 * config.valveLiftInterval);
+    if (var == "lift1") return String(1 * settings.valveLiftInterval);
+    if (var == "lift2") return String(2 * settings.valveLiftInterval);
+    if (var == "lift3") return String(3 * settings.valveLiftInterval);
+    if (var == "lift4") return String(4 * settings.valveLiftInterval);
+    if (var == "lift5") return String(5 * settings.valveLiftInterval);
+    if (var == "lift6") return String(6 * settings.valveLiftInterval);
+    if (var == "lift7") return String(7 * settings.valveLiftInterval);
+    if (var == "lift8") return String(8 * settings.valveLiftInterval);
+    if (var == "lift9") return String(9 * settings.valveLiftInterval);
+    if (var == "lift10") return String(10 * settings.valveLiftInterval);
+    if (var == "lift11") return String(11 * settings.valveLiftInterval);
+    if (var == "lift12") return String(12 * settings.valveLiftInterval);
   }
 
 
@@ -1209,18 +1251,18 @@ String Webserver::processTemplate(const String &var)
 
 
   // Orifice plates
-  if (var == "ORIFICE1_FLOW_RATE") return String(config.orificeOneFlow);
-  if (var == "ORIFICE1_TEST_PRESSURE") return String(config.orificeOneDepression);
-  if (var == "ORIFICE2_FLOW_RATE") return String(config.orificeTwoFlow);
-  if (var == "ORIFICE2_TEST_PRESSURE") return String(config.orificeTwoDepression);
-  if (var == "ORIFICE3_FLOW_RATE") return String(config.orificeThreeFlow);
-  if (var == "ORIFICE3_TEST_PRESSURE") return String(config.orificeThreeDepression);
-  if (var == "ORIFICE4_FLOW_RATE") return String(config.orificeFourFlow);
-  if (var == "ORIFICE4_TEST_PRESSURE") return String(config.orificeFourDepression);
-  if (var == "ORIFICE5_FLOW_RATE") return String(config.orificeFiveFlow);
-  if (var == "ORIFICE5_TEST_PRESSURE") return String(config.orificeFiveDepression);
-  if (var == "ORIFICE6_FLOW_RATE") return String(config.orificeSixFlow);
-  if (var == "ORIFICE6_TEST_PRESSURE") return String(config.orificeSixDepression);
+  if (var == "ORIFICE1_FLOW_RATE") return String(settings.orificeOneFlow);
+  if (var == "ORIFICE1_TEST_PRESSURE") return String(settings.orificeOneDepression);
+  if (var == "ORIFICE2_FLOW_RATE") return String(settings.orificeTwoFlow);
+  if (var == "ORIFICE2_TEST_PRESSURE") return String(settings.orificeTwoDepression);
+  if (var == "ORIFICE3_FLOW_RATE") return String(settings.orificeThreeFlow);
+  if (var == "ORIFICE3_TEST_PRESSURE") return String(settings.orificeThreeDepression);
+  if (var == "ORIFICE4_FLOW_RATE") return String(settings.orificeFourFlow);
+  if (var == "ORIFICE4_TEST_PRESSURE") return String(settings.orificeFourDepression);
+  if (var == "ORIFICE5_FLOW_RATE") return String(settings.orificeFiveFlow);
+  if (var == "ORIFICE5_TEST_PRESSURE") return String(settings.orificeFiveDepression);
+  if (var == "ORIFICE6_FLOW_RATE") return String(settings.orificeSixFlow);
+  if (var == "ORIFICE6_TEST_PRESSURE") return String(settings.orificeSixDepression);
 
   // Current orifice data
   if (var == "ACTIVE_ORIFICE") return String(status.activeOrifice);
@@ -1229,54 +1271,54 @@ String Webserver::processTemplate(const String &var)
 
 
    // Wifi Settings
-  if (var == "CONF_WIFI_SSID") return String(config.wifi_ssid);
-  if (var == "CONF_WIFI_PSWD") return String(config.wifi_pswd);
-  if (var == "CONF_WIFI_AP_SSID") return String(config.wifi_ap_ssid);
-  if (var == "CONF_WIFI_AP_PSWD") return String(config.wifi_ap_pswd);
-  if (var == "CONF_HOSTNAME") return String(config.hostname);
-  if (var == "CONF_WIFI_TIMEOUT") return String(config.wifi_timeout);
+  if (var == "CONF_WIFI_SSID") return String(settings.wifi_ssid);
+  if (var == "CONF_WIFI_PSWD") return String(settings.wifi_pswd);
+  if (var == "CONF_WIFI_AP_SSID") return String(settings.wifi_ap_ssid);
+  if (var == "CONF_WIFI_AP_PSWD") return String(settings.wifi_ap_pswd);
+  if (var == "CONF_HOSTNAME") return String(settings.hostname);
+  if (var == "CONF_WIFI_TIMEOUT") return String(settings.wifi_timeout);
 
   // API Settings
-  if (var == "CONF_API_DELIM") return String(config.api_delim);
-  if (var == "CONF_SERIAL_BAUD_RATE") return String(config.serial_baud_rate);
+  if (var == "CONF_API_DELIM") return String(settings.api_delim);
+  if (var == "CONF_SERIAL_BAUD_RATE") return String(settings.serial_baud_rate);
 
   // Update javascript template vars
-  if (var == "FLOW_DECIMAL_LENGTH") return String(config.flow_decimal_length);
-  if (var == "GEN_DECIMAL_LENGTH") return String(config.gen_decimal_length);
+  if (var == "FLOW_DECIMAL_LENGTH") return String(settings.flow_decimal_length);
+  if (var == "GEN_DECIMAL_LENGTH") return String(settings.gen_decimal_length);
 
   // Rounding type
   if (var == "ROUNDING_TYPE_DROPDOWN"){
-    if (strstr(String(config.rounding_type).c_str(), String("NONE").c_str())){
+    if (strstr(String(settings.rounding_type).c_str(), String("NONE").c_str())){
       return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE' selected>No Rounding</option><option value='INTEGER'>Integer</option><option value='HALF'>Half</option></select>");
-    } else if (strstr(String(config.rounding_type).c_str(), String("INTEGER").c_str())) {
+    } else if (strstr(String(settings.rounding_type).c_str(), String("INTEGER").c_str())) {
       return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>No Rounding</option><option value='INTEGER' selected>Integer</option><option value='HALF'>Half</option></select>");
-    } else if (strstr(String(config.rounding_type).c_str(), String("HALF").c_str())){
+    } else if (strstr(String(settings.rounding_type).c_str(), String("HALF").c_str())){
       return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>No Rounding</option><option value='INTEGER'>Integer</option><option value='HALF' selected>Half</option></select>");
     }
   }
 
 
   if (var == "STD_ADJ_FLOW" ) {
-    if (config.std_adj_flow == 1) {
+    if (settings.std_adj_flow == 1) {
       return String("Checked");
     }
   }
 
-  if (var == "AFLOW_UNITS" && config.std_adj_flow == 0) return String("ACFM");
-  if (var == "AFLOW_UNITS" && config.std_adj_flow == 1) return String("SCFM");
+  if (var == "AFLOW_UNITS" && settings.std_adj_flow == 0) return String("ACFM");
+  if (var == "AFLOW_UNITS" && settings.std_adj_flow == 1) return String("SCFM");
   
 
   // Reference standard type dropdown selected item
-  if (var == "STD_REF_1" && config.standardReference == 1) return String("selected");
-  if (var == "STD_REF_2" && config.standardReference == 2) return String("selected");
-  if (var == "STD_REF_3" && config.standardReference == 3) return String("selected");
-  if (var == "STD_REF_4" && config.standardReference == 4) return String("selected");
-  if (var == "STD_REF_5" && config.standardReference == 5) return String("selected");
+  if (var == "STD_REF_1" && settings.standardReference == 1) return String("selected");
+  if (var == "STD_REF_2" && settings.standardReference == 2) return String("selected");
+  if (var == "STD_REF_3" && settings.standardReference == 3) return String("selected");
+  if (var == "STD_REF_4" && settings.standardReference == 4) return String("selected");
+  if (var == "STD_REF_5" && settings.standardReference == 5) return String("selected");
 
 
   if (var == "STD_REF"  || var == "STANDARD_FLOW") {
     // Standard reference
-    switch (config.standardReference) {
+    switch (settings.standardReference) {
 
       case ISO_1585:
         return String("ISO-1585");
@@ -1302,54 +1344,54 @@ String Webserver::processTemplate(const String &var)
 
   // Flow Decimal type
   if (var == "FLOW_DECIMAL_LENGTH_DROPDOWN"){
-    if (strstr(String(config.flow_decimal_length).c_str(), String("0").c_str())){
+    if (strstr(String(settings.flow_decimal_length).c_str(), String("0").c_str())){
       return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0' selected>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
-    } else if (strstr(String(config.flow_decimal_length).c_str(), String("1").c_str())) {
+    } else if (strstr(String(settings.flow_decimal_length).c_str(), String("1").c_str())) {
       return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0'>1 Whole</option><option value='1' selected>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
-    } else if (strstr(String(config.flow_decimal_length).c_str(), String("2").c_str())){
+    } else if (strstr(String(settings.flow_decimal_length).c_str(), String("2").c_str())){
       return String( "<select name='FLOW_DECIMAL_LENGTH' class='config-select'><option value='0'>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2' selected>0.01 Hundredths </option></select>");
     }
   }
 
   // General Decimal type
   if (var == "GEN_DECIMAL_LENGTH_DROPDOWN"){
-    if (strstr(String(config.gen_decimal_length).c_str(), String("0").c_str())){
+    if (strstr(String(settings.gen_decimal_length).c_str(), String("0").c_str())){
       return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0' selected>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
-    } else if (strstr(String(config.gen_decimal_length).c_str(), String("1").c_str())) {
+    } else if (strstr(String(settings.gen_decimal_length).c_str(), String("1").c_str())) {
       return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0>1 Whole</option><option value='1' selected>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
-    } else if (strstr(String(config.gen_decimal_length).c_str(), String("2").c_str())){
+    } else if (strstr(String(settings.gen_decimal_length).c_str(), String("2").c_str())){
       return String( "<select name='GEN_DECIMAL_LENGTH' class='config-select'><option value='0'>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2' selected>0.01 Hundredths </option></select>");
     }
   }
 
   // Data Filter type
   if (var == "DATA_FILTER_TYPE_DROPDOWN"){
-    if (strstr(String(config.data_filter_type).c_str(), String("NONE").c_str())){
+    if (strstr(String(settings.data_filter_type).c_str(), String("NONE").c_str())){
       return String( "<select name='DATA_FILTER_TYPE' class='config-select'><option value='NONE' selected>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE'>Mode</option></select>");
-    } else if (strstr(String(config.data_filter_type).c_str(), String("MEDIAN").c_str())) {
+    } else if (strstr(String(settings.data_filter_type).c_str(), String("MEDIAN").c_str())) {
       return String( "<select name='DATA_FILTER_TYPE' class='config-select'><option value='NONE' >None</option><option value='MEDIAN' selected>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE'>Mode</option></select>");
-    } else if (strstr(String(config.data_filter_type).c_str(), String("AVERAGE").c_str())){
+    } else if (strstr(String(settings.data_filter_type).c_str(), String("AVERAGE").c_str())){
       return String( "<select name='DATA_FILTER_TYPE' class='config-select'><option value='NONE'>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE' selected>Cyclic Average </option><option value='MODE'>Mode</option></select>");
-    } else if (strstr(String(config.data_filter_type).c_str(), String("MODE").c_str())) {
+    } else if (strstr(String(settings.data_filter_type).c_str(), String("MODE").c_str())) {
       return String( "<select name='DATA_FILTER_TYPE' class='config-select'><option value='NONE'>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE' selected>Mode</option></select>");
     }
   }
 
   // Data Filter Settings
-  if (var == "CONF_MIN_FLOW_RATE") return String(config.min_flow_rate);
-  if (var == "CONF_MIN_BENCH_PRESSURE") return String(config.min_bench_pressure);
-  if (var == "CONF_MAF_MIN_VOLTS") return String(config.maf_min_volts);
-  if (var == "CONF_CYCLIC_AVERAGE_BUFFER") return String(config.cyc_av_buffer);
+  if (var == "CONF_MIN_FLOW_RATE") return String(settings.min_flow_rate);
+  if (var == "CONF_MIN_BENCH_PRESSURE") return String(settings.min_bench_pressure);
+  if (var == "CONF_MAF_MIN_VOLTS") return String(settings.maf_min_volts);
+  if (var == "CONF_CYCLIC_AVERAGE_BUFFER") return String(settings.cyc_av_buffer);
 
   // Bench Settings
-  if (var == "CONF_MAF_HOUSING_DIAMETER") return String(config.maf_housing_diameter);
-  if (var == "CONF_REFRESH_RATE") return String(config.refresh_rate);
-  if (var == "ADJ_FLOW_DEPRESSION") return String(config.adj_flow_depression);
-  if (var == "TEMP_UNIT") return String(config.temp_unit);
+  if (var == "CONF_MAF_HOUSING_DIAMETER") return String(settings.maf_housing_diameter);
+  if (var == "CONF_REFRESH_RATE") return String(settings.refresh_rate);
+  if (var == "ADJ_FLOW_DEPRESSION") return String(settings.adj_flow_depression);
+  if (var == "TEMP_UNIT") return String(settings.temp_unit);
   
   // Temperature
   if (var == "TEMPERATURE_DROPDOWN"){
-    if (strstr(String(config.temp_unit).c_str(), String("Celcius").c_str())){
+    if (strstr(String(settings.temp_unit).c_str(), String("Celcius").c_str())){
       return String( "<select name='TEMP_UNIT' class='config-select' id='TEMP_UNIT'><option value='Celcius' selected>Celcius </option><option value='Farenheit'>Farenheit </option></select>");
     } else {
       return String("<select name='TEMP_UNIT' class='config-select' id='TEMP_UNIT'><option value='Celcius'>Celcius </option><option value='Farenheit' selected>Farenheit </option></select>");
@@ -1357,24 +1399,24 @@ String Webserver::processTemplate(const String &var)
   }
 
   // Lift
-  if (var == "VALVE_LIFT_INTERVAL") return String(config.valveLiftInterval);
+  if (var == "VALVE_LIFT_INTERVAL") return String(settings.valveLiftInterval);
 
   // Bench type
   if (var == "BENCH_TYPE_DROPDOWN"){
-    if (strstr(String(config.bench_type).c_str(), String("MAF").c_str())){
+    if (strstr(String(settings.bench_type).c_str(), String("MAF").c_str())){
       return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF' selected>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
-    } else if (strstr(String(config.bench_type).c_str(), String("ORIFICE").c_str())) {
+    } else if (strstr(String(settings.bench_type).c_str(), String("ORIFICE").c_str())) {
       return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF'>MAF Style</option><option value='ORIFICE' selected>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
-    } else if (strstr(String(config.bench_type).c_str(), String("VENTURI").c_str())){
+    } else if (strstr(String(settings.bench_type).c_str(), String("VENTURI").c_str())){
       return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF'>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI' selected>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
-    } else if (strstr(String(config.bench_type).c_str(), String("PITOT").c_str())) {
+    } else if (strstr(String(settings.bench_type).c_str(), String("PITOT").c_str())) {
       return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF'>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT' selected>Pitot Style</option></select>");
     }
   }
  
   // Calibration Settings
-  if (var == "CONF_CAL_FLOW_RATE") return String(config.cal_flow_rate);
-  if (var == "CONF_CAL_REF_PRESS") return String(config.cal_ref_press);
+  if (var == "CONF_CAL_FLOW_RATE") return String(settings.cal_flow_rate);
+  if (var == "CONF_CAL_REF_PRESS") return String(settings.cal_ref_press);
 
   // Calibration Data
   if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
@@ -1423,24 +1465,25 @@ String Webserver::processLandingPageTemplate(const String &var) {
   extern struct DeviceStatus status;
 
   if (var == "INDEX_STATUS") {
-    if (!SPIFFS.exists("/index.html")) return String("index.html");
+    if (status.GUIexists == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/release/' target='_BLANK'>index.html</a>");    
+    // if (!SPIFFS.exists(status.indexFilename)) return String("index.html");
   }  
   
-  if (var == "SETTINGS_STATUS") {
-    if (!SPIFFS.exists("/settings.json")) return String("settings.json");
-  }
+  // if (var == "SETTINGS_STATUS") {
+  //   if (!SPIFFS.exists("/settings.json")) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/release/' target='_BLANK'>settings.json</a>");
+  // }
 
   if (var == "PINS_STATUS" ) {
-    if (status.pinsLoaded == false) return String("PINS_***.json");    
+    if (status.pinsLoaded == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/pins/' target='_BLANK'>pins.json</a>");    
     // if (!SPIFFS.exists(status.pinsFilename)) return String("PINS_***.json");    
   }
 
   if (var == "MAF_STATUS" ) {
-    if (status.mafLoaded == false) return String("MAF_***.json");    
+    if (status.mafLoaded == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/mafData/' target='_BLANK'>maf.json</a>");    
   }
 
   if (var == "CONFIGURATION_STATUS") {
-    if (!SPIFFS.exists("/configuration.json")) return String("configuration.json");
+    if (!SPIFFS.exists("/configuration.json")) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/' target='_BLANK'>configuration.json</a>");
   }
 
   return "";
@@ -1485,7 +1528,7 @@ String Webserver::processLandingPageTemplate(const String &var) {
 
   Which means that we cannot hard code the Key values. We can however utilise the current interval value.
   However there is also the possibility that users may use different intervals on different projects.
-  Suspect easiest solution is to make valve interval editable via GUI config. This way users can change as needed.
+  Suspect easiest solution is to make valve interval editable via GUI settings. This way users can change as needed.
 
   Also need to determine if 10 data points is enough. Need to canvas Facebook group - Performance Trends use 12 points!
 

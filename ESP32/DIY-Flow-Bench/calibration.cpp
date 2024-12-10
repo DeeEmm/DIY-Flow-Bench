@@ -17,7 +17,6 @@
  * 
  ***/
 
-#include "configuration.h"
 #include "constants.h"
 #include "structs.h"
 #include "datahandler.h"
@@ -29,7 +28,6 @@
 #include "calculations.h"
 #include "messages.h"
 #include "webserver.h"
-// // #include LANGUAGE_FILE
 
 
 Calibration::Calibration () {
@@ -49,7 +47,7 @@ Calibration::Calibration () {
 ***/
 bool Calibration::setFlowOffset() {
 
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   extern struct CalibrationData calVal;
   extern struct Language language;
   extern struct SensorData sensorVal;
@@ -59,7 +57,7 @@ bool Calibration::setFlowOffset() {
   Messages _message;
  
   // update config var
-  calVal.flow_offset = sensorVal.FlowCFM - config.cal_flow_rate;
+  calVal.flow_offset = sensorVal.FlowCFM - settings.cal_flow_rate;
   
   _message.debugPrintf("Calibration::setFlowOffset $ \n", calVal.flow_offset);
 
@@ -209,7 +207,7 @@ double Calibration::getLeakOffsetReverse() {
 ***/
 bool Calibration::setPdiffCalOffset() {
 
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   extern struct CalibrationData calVal;
   extern struct Language language;
   extern struct SensorData sensorVal;
@@ -268,7 +266,7 @@ double Calibration::getPdiffCalOffset() {
 ***/
 bool Calibration::setPitotCalOffset() {
 
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   extern struct CalibrationData calVal;
   extern struct Language language;
   extern struct SensorData sensorVal;
@@ -340,8 +338,8 @@ void Calibration::saveCalibrationData() {
   calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
   calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
   calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
-  calData["PDIFF_CAL_OFFSET"] = calVal.pitot_cal_offset;
-  calData["PITOT_CAL_OFFSET"] = calVal.pdiff_cal_offset;
+  calData["PDIFF_CAL_OFFSET"] = calVal.pdiff_cal_offset;
+  calData["PITOT_CAL_OFFSET"] = calVal.pitot_cal_offset;
 
   _message.Handler(language.LANG_SAVING_CALIBRATION);
   
@@ -366,7 +364,7 @@ void Calibration::saveCalibrationData() {
 
 
 
-// TODO if calibration flow is substantially less than calibrated orifice flow then vac source not enough do we need to test for this?????????
+// TODO #77 if calibration flow is substantially less than calibrated orifice flow then vac source not enough do we need to test for this?????????
 
 
 

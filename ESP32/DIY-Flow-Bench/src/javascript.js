@@ -50,8 +50,9 @@ if (!!window.EventSource) {
         try {
           if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
           // We've got a string...
-            if (key === 'PITOT_COLOUR' || key === 'PDIFF_COLOUR' ){
+            if (key === 'PITOT_COLOUR' || key === 'PDIFF_COLOUR' ) {
             } else {
+              // it' a template variable
               document.getElementById(key).innerHTML = myObj[key];
             }
  
@@ -60,7 +61,7 @@ if (!!window.EventSource) {
            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'SFLOW' || key === 'FDIFF') {
               // HACK: template vars - replaced before page load
               document.getElementById(key).innerHTML = myObj[key].toFixed(~FLOW_DECIMAL_LENGTH~);  
-            } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
+            } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'PITOT_DELTA' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
               document.getElementById(key).innerHTML = myObj[key].toFixed(~GEN_DECIMAL_LENGTH~); 
             //} else if (key === '') {
             } else {
@@ -69,8 +70,8 @@ if (!!window.EventSource) {
           }
         } catch (error) {
           console.log('Missing or incorrect JSON data');
-          console.log(error);
-          console.log(key);
+          console.log(" error: " + error + " key: " + key );
+          // console.log(key);
         }
       } 
 
@@ -134,7 +135,7 @@ function onFileUpload(event) {
   const {file} = this.state;
   const data = new FormData;
   data.append('data', file);
-  fetch('/upload', {
+  fetch('/api/file/upload', {
       method: 'POST',
       body: data
   })
@@ -300,10 +301,26 @@ function initialiseButtons() {
     document.getElementById('file-data-download').click();
   });
 
-  document.getElementById('capture-graph-data-button').addEventListener('click', function(){
+  document.getElementById('export-graph-image-button').addEventListener('click', function(){
     // initiate datagraph image download from browser
-    exportSVGAsPNG();
+    exportSVGAsImage();
   });
+
+
+  document.getElementById('capture-lift-data-button').addEventListener('click', function(){
+    console.log('Capture Lift Data');
+    let formData = new FormData(document.forms.lift_data_form);
+    xhr.open('POST', '/api/saveliftdata');
+    xhr.send(formData)
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        console.log('Lift data saved');
+        // update datagraph
+      }
+
+    };
+  });
+  
 
   document.getElementById('STATUS_MESSAGE').addEventListener('dblclick', function(){
     document.getElementById('calibrationModal').style.display='block';
@@ -407,23 +424,23 @@ function initialiseButtons() {
     xhr.send();
   });
 
-  
+
 
   document.getElementById('on-button').addEventListener('click', function(){
     console.log('Bench On');
     xhr.open('GET', '/api/bench/on');
-    xhr.onload = function() {
-      if (xhr.status === 200) window.location.href = '/';
-    };
+    // xhr.onload = function() {
+    //   if (xhr.status === 200) window.location.href = '/';
+    // };
     xhr.send();
   });
 
   document.getElementById('off-button').addEventListener('click', function(){
     console.log('Bench Off');
     xhr.open('GET', '/api/bench/off');
-    xhr.onload = function() {
-      if (xhr.status === 200) window.location.href = '/';
-    };
+    // xhr.onload = function() {
+    //   if (xhr.status === 200) window.location.href = '/';
+    // };
     xhr.send();
   });
 
@@ -602,10 +619,10 @@ document.addEventListener("keydown", ({key}) => {
 
 
 /***********************************************************
-* Export Data Graph as PNG Image
+* Export Data Graph as PNG Image (temp change to jpg)
 * Source: https://takuti.me/note/javascript-save-svg-as-image/
 ***/
-function exportSVGAsPNG() {
+function exportSVGAsImage() {
 
   const svg = document.querySelector('svg');
 
@@ -629,15 +646,17 @@ function exportSVGAsPNG() {
     canvas.height = 750;
 
     const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
     context.drawImage(img, 0, 0, canvas.width, canvas.height);
 
     URL.revokeObjectURL(url);
 
     // trigger a synthetic download operation with a temporary link
     const a = document.createElement('a');
-    a.download = 'LiftGraph.png';
     document.body.appendChild(a);
-    a.href = canvas.toDataURL('image/jpeg');
+    a.download = 'LiftGraph.png';
+    // a.href = canvas.toDataURL('image/jpeg');
+    a.href = canvas.toDataURL();
     a.click();
     a.remove();
 

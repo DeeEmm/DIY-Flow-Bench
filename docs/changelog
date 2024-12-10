@@ -29,10 +29,55 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2412100102      - Updated PINS files
+2412100094      - #281 Pitot GUi fixes
+2412100089      - Align GUI build # with Code build #
+2412100088      - Integrate GUI Version into gulp tasks
+2412100087      - Moved voltage trim outside of validation test
+2412100084      - Fixed JSON to Vector conversion
+                - Added verbose print mode
+2412090117      - Fixed GUI info for MAF sensor type
+2412090109      - Fixed sensor_src type
+2412090065      - Fixed XHR form submission
 2412090001      - #277 Temperature correction for ISO 5011
+2412080010      - GUI fixed version increment in GUI info
+2412080005      - Test build target for pre user actions
+2412060066      - Reformat JSON Data in API
+2412060044      - Updated Serial API responses (inc boot loop)
+2412060001      - Update boot loop file prompts to link to Github
+2412050201      - Convert MAF JSON to vector of vectors
+                - Change key>val longs to u_ints
+2412050090      - Recalculated JSON memory allocation
+                - Increased LOOP_STACK_SIZE
+                - Added MAF / config JSON file dumps to API
+2412050001      - Update build number format [2 to 4 digit]
+                - Auto build number update
+24120401        - Utilise api/file/upload path for all uploads
+                - Remove redirect from valve lift capture (change to XHR)
+                - Updated gulp to auto version GUI html file
+24120302        - #273 Remove redirect from bench on/off
+                - Utilise boot loop for runtime file handling
+24120301        - Update index.html
+                - Change I2C addressing to decimal
+24120205        - Update MAF.json handling
+                - Address issue with loading configuration.json
+24120204        - Update GUI file load management
+24120203        - Update sensor type handling
+24120202        - Update sensor enable handling
+24120201        - MAF data file json format
+24120102        - Fixed compile error
+24120101        - Tidied up status definitions in sensors.begin
+24113002        - Removed precompile macros assoc/w configuration.h
+24113001        - #205 Post compile configuration refactor
+24112901        - Pitot Tile not displaying correct value for ∆P
+                - Correction in calibaration.cpp for calData pdiff and pitot.
+                - API Corrections
+                - Added merge-firmware.py
+                - Capitalised DOCS + CHANGELOG directories
+                - Change datagraph image download to JPG
 24112701        - Create firmware binaries
-24112504        - Datagraph image format (jpg)
 24112601        - #213 Revert change to allow -ve delta / velocity
+24112504        - Datagraph image format (jpg)
 24112503        - #213 Pitot offset error
 24112502        - #157 Updated datagraph settings
                 - Capture radio retains selection
