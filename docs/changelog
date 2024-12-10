@@ -29,6 +29,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2412100089      - Align GUI build # with Code build #
+2412100088      - Integrate compile into gulp tasks
 2412100087      - Moved voltage trim outside of validation test
 2412100084      - Fixed JSON to Vector conversion
                 - Added verbose print mode
@@ -51,7 +53,7 @@ Build #         - Description of Change
 24120401        - Utilise api/file/upload path for all uploads
                 - Remove redirect from valve lift capture (change to XHR)
                 - Updated gulp to auto version GUI html file
-24120302        - Remove redirect from bench on/off
+24120302        - #273 Remove redirect from bench on/off
                 - Utilise boot loop for runtime file handling
 24120301        - Update index.html
                 - Change I2C addressing to decimal
