@@ -462,6 +462,10 @@ flowTargetValInput {
   padding: 6px 6px;
 }
 
+#capture-lift-data-button:active {
+  background-color: #44b113;
+}
+
 .input_container {
   border: 1px solid #e5e5e5;
 }

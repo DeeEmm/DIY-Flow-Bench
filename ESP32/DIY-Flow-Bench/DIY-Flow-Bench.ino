@@ -303,6 +303,10 @@ void setup(void) {
   extern struct Pins pins;
   extern struct Configuration config;
 
+  #ifdef VERBOSE
+    settings.verbose_print_mode = true; 
+  #endif
+
   // Initialise Data environment
   _data.begin();
 

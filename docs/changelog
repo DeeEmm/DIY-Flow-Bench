@@ -29,6 +29,9 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2412100087      - Moved voltage trim outside of validation test
+2412100084      - Fixed JSON to Vector conversion
+                - Added verbose print mode
 2412090117      - Fixed GUI info for MAF sensor type
 2412090109      - Fixed sensor_src type
 2412090065      - Fixed XHR form submission

@@ -61,7 +61,7 @@ using namespace std;
 // https://arduinojson.org/v6/assistant
 #define DATA_JSON_SIZE 768
 #define SETTINGS_JSON_SIZE 2048 
-#define LANGUAGE_JSON_SIZE 8192 // TODO this could be an issue
+#define LANGUAGE_JSON_SIZE 8192 // TODO Need to test language override (mem size could be an issue)
 #define CONFIG_JSON_SIZE 2600  
 #define CAL_DATA_JSON_SIZE 348
 #define LIFT_DATA_JSON_SIZE 384

@@ -56,6 +56,7 @@ struct BenchSettings {
   bool debug_mode = false;                        // Global debug print override
   bool dev_mode = false;                          // Developer mode
   bool status_print_mode = false;                 // Stream status data to serial
+  bool verbose_print_mode = false;                // Stream verbose data to serial
   bool api_enabled = true;                        // Can disable serial API if required
   char bench_type[8] = "MAF";                     // Default bench type
   int maf_housing_diameter = 0;                   // MAF Housing diameter

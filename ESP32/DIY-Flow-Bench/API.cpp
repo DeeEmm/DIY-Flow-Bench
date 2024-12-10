@@ -180,6 +180,8 @@ void API::ParseMessage(char apiMessage) {
   $ : Reset WiFi
   @ : Stream Status
   ! : Debug Mode
+  + : Verbose Mode
+  = : Status Mode
   < : Last Error
   ============================== 
   )";
@@ -208,6 +210,8 @@ void API::ParseMessage(char apiMessage) {
   $ : Reset WiFi
   @ : Stream Status
   ! : Debug Mode
+  + : Verbose Mode
+  = : Status Mode
   < : Last Error
   ============================== 
   )";
@@ -555,13 +559,33 @@ void API::ParseMessage(char apiMessage) {
         }
       break;
 
-      case '!': // Debug Mode (enable verbose debug messages)
+      case '!': // Debug Mode
         if (settings.debug_mode == true){
           settings.debug_mode = false;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "!%s%s", settings.api_delim, "Debug Mode Off" ); 
         } else {
           settings.debug_mode = true;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "!%s%s", settings.api_delim, "Debug Mode On" ); 
+        }
+      break;
+      
+      case '+': // Verbose Print Mode 
+        if (settings.verbose_print_mode == true){
+          settings.verbose_print_mode = false;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "!%s%s", settings.api_delim, "Verbose Print Mode Off" ); 
+        } else {
+          settings.verbose_print_mode = true;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "!%s%s", settings.api_delim, "Verbose Print Mode On" ); 
+        }
+      break;
+      
+      case '=': // Status Print Mode 
+        if (settings.status_print_mode == true){
+          settings.status_print_mode = false;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "!%s%s", settings.api_delim, "Status Print Mode Off" ); 
+        } else {
+          settings.status_print_mode = true;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "!%s%s", settings.api_delim, "Status Print Mode On" ); 
         }
       break;
       

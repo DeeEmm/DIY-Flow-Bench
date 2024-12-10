@@ -72,44 +72,57 @@ void Sensors::begin () {
 	// Initialise  MAF data
 	if (config.MAF_SRC_TYPE != SENSOR_DISABLED){	
 
-			// get size of the MAF datatable 
-			status.mafDataTableRows = status.mafJsonObject.size() -1;
+		_message.verbosePrintf("Initialising MAF Data \n");
+	
+		// get size of the MAF datatable (num rows)
+		status.mafDataTableRows = status.mafJsonObject.size();
 
-			u_int rowNum = 0;
-			u_int key;
-			u_int value;
+		_message.verbosePrintf("status.mafDataTableRows: %i\n", status.mafDataTableRows);
 
-			// Get JSON Object iterator
-			JsonObject::iterator it = status.mafJsonObject.begin();
+		// print key:value pairs from mafJsonObject
+		_message.verbosePrintf("key:value pairs from mafJsonObject\n");
+		for (JsonPair kv : status.mafJsonObject) {
+			_message.verbosePrintf("JSON key: %s", kv.key().c_str());
+			_message.verbosePrintf(" value: %s\n",kv.value().as<std::string>().c_str()); 
+		}
 
-			// Walk through JSON object to populate vectors
-			for (u_int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { 
+		u_int rowNum = 0;
+		u_int key;
+		u_int value;
 
-				key = stoi(it->key().c_str());
-				value = stoi(it->value().as<std::string>());
+		// Get JSON Object iterator
+		JsonObject::iterator it = status.mafJsonObject.begin();
 
-				// TEST
-				// _message.serialPrintf(" rowNum: %i\n", rowNum);
-				// _message.serialPrintf(" maf key: %i\n", key);
-				// _message.serialPrintf(" maf value: %i\n", value);
+		// Walk through JSON object to populate vectors
+		for (u_int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { 
 
-				status.mafLookupTable.push_back( { key , value } );
+			key = stoi(it->key().c_str());
+			value = stoi(it->value().as<std::string>());
 
-				rowNum += 1;
-				it += 1;
 
-				status.mafDataKeyMax = key;
-				status.mafDataValMax = value;
-				
-			}
+			_message.verbosePrintf("Vector rowNum: %i", rowNum);
+			_message.verbosePrintf(" key: %i", key);
+			_message.verbosePrintf(" value: %i\n", value);
 
-			// get highest MAF input value from data table
-			// status.mafDataValMax = status.mafLookupTable[status.mafDataTableRows][1];
-			// status.mafDataKeyMax = status.mafLookupTable[status.mafDataTableRows][0];
+			status.mafLookupTable.push_back( { key , value } );
 
-			// TEST
-			// _message.serialPrintf(" status.mafDataValMax: %lu\n", status.mafDataValMax);
-			// _message.serialPrintf(" status.mafDataKeyMax: %lu\n", status.mafDataKeyMax);
+			it += 1;
+
+			status.mafDataKeyMax = key;
+			status.mafDataValMax = value;
+			
+		}
+
+		// get highest MAF input value from data table
+		// status.mafDataValMax = status.mafLookupTable[status.mafDataTableRows][1];
+		// status.mafDataKeyMax = status.mafLookupTable[status.mafDataTableRows][0];
+
+		_message.verbosePrintf("status.mafDataValMax: %lu\n", status.mafDataValMax);
+		_message.verbosePrintf("status.mafDataKeyMax: %lu\n", status.mafDataKeyMax);
+
+
+
+
 
 	}
 
@@ -340,7 +353,6 @@ long Sensors::getMafRaw() {
 			break;
 		}
 
-
 		case ADS1115:{
 			sensorVal.MafRAW = _hardware.getADCRawData(config.MAF_ADC_CHANNEL);
 			break;
@@ -397,11 +409,12 @@ double Sensors::getMafVolts() {
 		}
 	}
 
-	
+	// Trim value	
+	sensorVolts += config.MAF_MV_TRIMPOT;
+
 	// Lets make sure we have a valid value to return
 	if (sensorVolts > 0) {
-		sensorVolts += config.MAF_MV_TRIMPOT;
-		return sensorVolts;
+		return sensorVolts; 
 	} else {
 		return 0.0;
 	}	
@@ -441,13 +454,10 @@ double Sensors::getMafFlow(int units) {
 
 // message.serialPrintf("MAF TEST VAL: %li ", status.mafDataKeyMax);
 
-	// scale sensor reading to data table size using map function (0-5v : 0-keymax)
-	// NOTE Discrepency with MAP calculated value
-	// u_int refValue =  map(this->getMafVolts(), 0, _hardware.get5vSupplyVolts(), 0, status.mafDataKeyMax ); 
-	// u_int refValue =  map(this->getMafVolts(), 0, 5, 0, status.mafDataKeyMax); 
-	u_int refValue = (status.mafDataKeyMax / _hardware.get5vSupplyVolts()) * this->getMafVolts();
+	// u_int refValue = (status.mafDataKeyMax / _hardware.get5vSupplyVolts()) * this->getMafVolts();
+	u_int refValue = (status.mafDataKeyMax / 5) * this->getMafVolts();
 
-// message.serialPrintf("MAF REF VAL: %l ", refValue);
+// message.serialPrintf("MAF REF VAL: %i Max Val : %i\n", refValue, status.mafDataKeyMax);
 
 	for (int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { // iterate the data table comparing the Lookup Value to the refValue for each row
 
@@ -663,9 +673,12 @@ double Sensors::getPRefVolts() {
 		}
 	} 
 
+
+	// Trim value
+	sensorVolts += config.PREF_MV_TRIMPOT;
+
 	// Lets make sure we have a valid value to return
 	if (sensorVolts > 0.0) { 
-		sensorVolts += config.PREF_MV_TRIMPOT;
 		return sensorVolts;
 	} else { 
 		return 0.0;
@@ -731,8 +744,10 @@ double Sensors::getPRefValue() {
 		break;
 	}
 
-	// Lets make sure we have a valid value to return
+	// Flip negative values
 	double pRefComp = fabs(sensorVal);
+
+	// Lets make sure we have a valid value to return
 	if (pRefComp > settings.min_bench_pressure) {
 		return sensorVal;
 	} else { 
@@ -779,9 +794,11 @@ double Sensors::getPDiffVolts() {
 	} 
 
 
+	// Trim vlaue
+	sensorVolts += config.PDIFF_MV_TRIMPOT;
+
 	// Lets make sure we have a valid value to return
 	if (sensorVolts > 0) {
-		sensorVolts += config.PDIFF_MV_TRIMPOT;
 		return sensorVolts;
 	} else {
 		return 0;
@@ -845,8 +862,10 @@ double Sensors::getPDiffValue() {
 			break;
 		}
 
-	// Lets make sure we have a valid value to return - check it is above minimum threshold
+	// Flip negative values
 	double pDiffComp = fabs(sensorVal);
+
+	// Lets make sure we have a valid value to return - check it is above minimum threshold
 	if (pDiffComp > settings.min_bench_pressure) { 
 		return sensorVal;
 	} else { 
@@ -893,9 +912,12 @@ double Sensors::getPitotVolts() {
 	} 
 
 	
+
+	// Trim value
+	sensorVolts += config.PITOT_MV_TRIMPOT;
+	
 	// Lets make sure we have a valid value to return
 	if (sensorVolts > 0) {
-		sensorVolts += config.PITOT_MV_TRIMPOT;
 		return sensorVolts;
 	} else {
 		return 0.0;
@@ -970,8 +992,10 @@ double Sensors::getPitotValue() {
 	}
 
 
+	// Flip negative values
+	double pitotComp = fabs(sensorVal); 
+
 	// Lets make sure we have a valid value to return - check it is above minimum threshold
-	double pitotComp = fabs(sensorVal);
 	if (pitotComp > settings.min_bench_pressure) { 
 		return pitotComp;
 	} else { 
@@ -1090,8 +1114,9 @@ double Sensors::getTempValue() {
 
 	}
 
-	// if (config.TEMP_FINE_ADJUST != 0) refTempDegC += config.TEMP_FINE_ADJUST;
+	// Trim value
 	refTempDegC += config.TEMP_FINE_ADJUST;
+
 	return refTempDegC;
 }
 
@@ -1162,12 +1187,9 @@ double Sensors::getBaroValue() {
 		}
 	}
 
-	// Truncate to 2 decimal places
-	// int value = baroPressureKpa * 100 + .5;
-    // return (double)value / 100;
-
-	// if (config.BARO_FINE_ADJUST != 0) baroPressureKpa += config.BARO_FINE_ADJUST;
+	// Trim Value
 	baroPressureHpa += config.BARO_FINE_ADJUST;
+
 	return baroPressureHpa;
 
 }
@@ -1236,9 +1258,9 @@ double Sensors::getRelHValue() {
 
 	}
 
-
-	// if (config.RELH_FINE_ADJUST != 0) relativeHumidity += config.RELH_FINE_ADJUST;
+	// Trim Value
 	relativeHumidity += config.RELH_FINE_ADJUST;
+
 	return relativeHumidity;
 	
 }

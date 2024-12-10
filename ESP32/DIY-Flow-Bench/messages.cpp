@@ -85,8 +85,7 @@ void Messages::Handler(const String langPhrase) {
 
 /***********************************************************
 * @brief serialPrintf
-* @details Always prints to serial port
-* 
+* @note Always prints to serial port
 * @note Encapsulates vsnprintf method and uses standard c++ xxprintf formatting
 *
 * Based on...
@@ -119,8 +118,7 @@ size_t Messages::serialPrintf(const std::string format, ...) {
 
 /***********************************************************
 * @brief blobPrintf
-* @details Prints blob to serial port
-* 
+* @note Prints blob to serial port
 * @note Follows same formatting as serialPrintf
 */
 size_t Messages::blobPrintf(std::string format, ...) {
@@ -141,9 +139,64 @@ size_t Messages::blobPrintf(std::string format, ...) {
 
 
 /***********************************************************
+* @brief debugPrintf
+* @note Prints to serial port if debug_mode enabled
+* @note Follows same formatting as serialPrintf
+*/
+size_t Messages::debugPrintf(const std::string format, ...) {
+
+	#ifdef SERIAL0_ENABLED
+	
+		extern struct BenchSettings settings;
+	
+		if (settings.debug_mode) {
+			char buf[API_STATUS_LENGTH];
+			va_list ap;
+			va_start(ap, format);
+			vsnprintf(buf, sizeof(buf), format.c_str(), ap);
+			va_end(ap);
+			return(Serial.write(buf));
+		} else {
+			return 0;
+		}
+	#else	
+		return 0;	
+	#endif
+}
+
+
+
+/***********************************************************
+* @brief verbosePrintf
+* @note Prints to serial port if verbose_print_mode enabled
+* @note Follows same formatting as serialPrintf
+*/
+size_t Messages::verbosePrintf(const std::string format, ...) {
+
+	#ifdef SERIAL0_ENABLED
+	
+		extern struct BenchSettings settings;
+	
+		if (settings.verbose_print_mode) {
+			char buf[API_STATUS_LENGTH];
+			va_list ap;
+			va_start(ap, format);
+			vsnprintf(buf, sizeof(buf), format.c_str(), ap);
+			va_end(ap);
+			return(Serial.write(buf));
+		} else {
+			return 0;
+		}
+	#else	
+		return 0;	
+	#endif
+}
+
+
+
+/***********************************************************
 * @brief statusPrintf
-* @details Prints to serial port if status_print_mode enabled
-* 
+* @note Prints to serial port if status_print_mode enabled
 * @note Follows same formatting as serialPrintf
 */
 size_t Messages::statusPrintf(const std::string format, ...) {
@@ -168,31 +221,4 @@ size_t Messages::statusPrintf(const std::string format, ...) {
 }
 
 
-
-/***********************************************************
-* @brief debugPrintf
-* @details Prints to serial port if debug_mode enabled
-* 
-* @note Follows same formatting as serialPrintf
-*/
-size_t Messages::debugPrintf(const std::string format, ...) {
-
-	#ifdef SERIAL0_ENABLED
-	
-		extern struct BenchSettings settings;
-	
-		if (settings.debug_mode) {
-			char buf[API_STATUS_LENGTH];
-			va_list ap;
-			va_start(ap, format);
-			vsnprintf(buf, sizeof(buf), format.c_str(), ap);
-			va_end(ap);
-			return(Serial.write(buf));
-		} else {
-			return 0;
-		}
-	#else	
-		return 0;	
-	#endif
-}
 
