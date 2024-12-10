@@ -29,7 +29,6 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-
 2412100102      - Updated PINS files
 2412100094      - #281 Pitot GUi fixes
 2412100089      - Align GUI build # with Code build #
