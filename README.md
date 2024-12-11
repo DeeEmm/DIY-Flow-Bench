@@ -10,10 +10,15 @@
 General Version V2.0-RC.X
 
 
-[Download the latest official release](https://github.com/DeeEmm/DIY-Flow-Bench/releases)
+[Download the latest official stable release](https://github.com/DeeEmm/DIY-Flow-Bench/releases)
 
+[Download current development version](https://github.com/DeeEmm/DIY-Flow-Bench/tree/DEV)
 
-NOTE: This project is still in active development and is currently at Release Candidate stage. We are working towards a stable software and hardware release. 
+NOTE: This project is still in active development and is currently at Release Candidate stage. The codebase is stable and functional and we are working towards a final software and hardware release "Version 2".
+
+It should be noted that the development [DEV] branch contains all current changes and is the most up to date but may contain unvalidated changes.
+
+The [Master] branch is level with the current stable release but will always be behind the [DEV] branch.
 
 If you are interested in contributing with testing please head over to our [discussion forums](https://github.com/DeeEmm/DIY-Flow-Bench/discussions) or [Discord](https://discord.gg/eAbktJj) channel.
 
@@ -72,9 +77,15 @@ The DIYFB system can be used on any flow bench and makes an ideal retrofit for o
 
 ## Development Info
 
-This branch contains the current release candidate and is based on the ESP32 port of the original project.
+The [MASTER branch](https://github.com/DeeEmm/DIY-Flow-Bench/tree/master) contains the current release. 
 
-After unit and peer testing is concluded and all bugs are resolved, this version will become the official DIYFB V2 release.
+
+The [DEV branch](https://github.com/DeeEmm/DIY-Flow-Bench/tree/DEV) contains the most up to date code, but may still be undergoing testing and development. Generally the code is stable, but may include unvalidated changes.
+
+As changes are validated, the DEV branch is pushed to master and new releases are created from master.
+
+
+## Reporting Issues
 
 If you use this code and have found issues or have comments relating to the release, please raise an issue in the bugtracker, comment in the support thread for the current version or hit us up at our Discord channel.
 
@@ -92,6 +103,8 @@ Documentation is provided for installation, configuration and use in the [WIKI](
 If you get stuck, feel free to create a [discussion](https://github.com/DeeEmm/DIY-Flow-Bench/discussions/) in the support forum, or see if anyone is available over on the [Discord](https://discord.gg/eAbktJj) channel.
 
 If you find a bug, or have a feature request, please [raise an issue](https://github.com/DeeEmm/DIY-Flow-Bench/issues)
+
+**PLEASE NOTE that support is NOT provided via Facebook.**
 
 
 ## License

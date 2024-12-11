@@ -487,7 +487,7 @@ input[type=file]::file-selector-button:hover {
 }
 
 /* The Close Button */
-.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton, closeUpdateModalButton, closeFlowTargetModalButton {
+.closeDataModalButton, .closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton, closeUpdateModalButton, closeFlowTargetModalButton {
   color: #aaa;
   float: right;
   font-size: 22px;
@@ -501,6 +501,8 @@ input[type=file]::file-selector-button:hover {
 .closeFlowTargetModalButton:focus,
 .closeUpdateModalButton:hover, 
 .closeUpdateModalButton:focus,
+.closeDataModalButton:hover, 
+.closeDataModalButton:focus,
 .closeFileModalButton:hover, 
 .closeFileModalButton:focus,
 .closeInfoModalButton:hover,

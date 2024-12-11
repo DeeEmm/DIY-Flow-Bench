@@ -69,62 +69,61 @@ void Sensors::begin () {
 	extern struct Pins pins;
 	extern int mafOutputType;
 	
+	// DEPRECATED - Moved into DataHandler::loadMAFData() build 2412110057
+
 	// Initialise  MAF data
-	if (config.MAF_SRC_TYPE != SENSOR_DISABLED){	
-
-		_message.verbosePrintf("Initialising MAF Data \n");
+	// if (config.MAF_SRC_TYPE != SENSOR_DISABLED){	
 	
-		// get size of the MAF datatable (num rows)
-		status.mafDataTableRows = status.mafJsonObject.size();
+	// 	_message.verbosePrintf("Initialising MAF Data \n");
+	
+	// 	// get size of the MAF datatable (num rows)
+	// 	status.mafDataTableRows = status.mafJsonObject.size();
 
-		_message.verbosePrintf("status.mafDataTableRows: %i\n", status.mafDataTableRows);
+	// 	_message.verbosePrintf("status.mafDataTableRows: %i\n", status.mafDataTableRows);
 
-		// print key:value pairs from mafJsonObject
-		_message.verbosePrintf("key:value pairs from mafJsonObject\n");
-		for (JsonPair kv : status.mafJsonObject) {
-			_message.verbosePrintf("JSON key: %s", kv.key().c_str());
-			_message.verbosePrintf(" value: %s\n",kv.value().as<std::string>().c_str()); 
-		}
+	// 	// print key:value pairs from mafJsonObject
+	// 	_message.verbosePrintf("key:value pairs from mafJsonObject\n");
+	// 	for (JsonPair kv : status.mafJsonObject) {
+	// 		_message.verbosePrintf("JSON key: %s", kv.key().c_str());
+	// 		_message.verbosePrintf(" value: %s\n",kv.value().as<std::string>().c_str()); 
+	// 	}
 
-		u_int rowNum = 0;
-		u_int key;
-		u_int value;
+	// 	u_int rowNum = 0;
+	// 	u_int key;
+	// 	u_int value;
 
-		// Get JSON Object iterator
-		JsonObject::iterator it = status.mafJsonObject.begin();
+	// 	// Get JSON Object iterator
+	// 	JsonObject::iterator it = status.mafJsonObject.begin();
 
-		// Walk through JSON object to populate vectors
-		for (u_int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { 
+	// 	// Walk through JSON object to populate vectors
+	// 	for (u_int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { 
 
-			key = stoi(it->key().c_str());
-			value = stoi(it->value().as<std::string>());
+	// 		key = stoi(it->key().c_str());
+	// 		value = stoi(it->value().as<std::string>());
 
 
-			_message.verbosePrintf("Vector rowNum: %i", rowNum);
-			_message.verbosePrintf(" key: %i", key);
-			_message.verbosePrintf(" value: %i\n", value);
+	// 		_message.verbosePrintf("Vector rowNum: %i", rowNum);
+	// 		_message.verbosePrintf(" key: %i", key);
+	// 		_message.verbosePrintf(" value: %i\n", value);
 
-			status.mafLookupTable.push_back( { key , value } );
+	// 		status.mafLookupTable.push_back( { key , value } );
 
-			it += 1;
+	// 		it += 1;
 
-			status.mafDataKeyMax = key;
-			status.mafDataValMax = value;
+	// 		status.mafDataKeyMax = key;
+	// 		status.mafDataValMax = value;
 			
-		}
+	// 	}
 
-		// get highest MAF input value from data table
-		// status.mafDataValMax = status.mafLookupTable[status.mafDataTableRows][1];
-		// status.mafDataKeyMax = status.mafLookupTable[status.mafDataTableRows][0];
+	// 	// get highest MAF input value from data table
+	// 	// status.mafDataValMax = status.mafLookupTable[status.mafDataTableRows][1];
+	// 	// status.mafDataKeyMax = status.mafLookupTable[status.mafDataTableRows][0];
 
-		_message.verbosePrintf("status.mafDataValMax: %lu\n", status.mafDataValMax);
-		_message.verbosePrintf("status.mafDataKeyMax: %lu\n", status.mafDataKeyMax);
-
-
+	// 	_message.verbosePrintf("status.mafDataValMax: %lu\n", status.mafDataValMax);
+	// 	_message.verbosePrintf("status.mafDataKeyMax: %lu\n", status.mafDataKeyMax);
 
 
-
-	}
+	// }
 
 
 

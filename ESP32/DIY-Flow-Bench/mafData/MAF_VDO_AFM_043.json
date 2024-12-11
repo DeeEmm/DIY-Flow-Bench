@@ -1,5 +1,6 @@
 {
     "sensor_type" : "VDO_AFM_043",
+    "forum_link" : "",
     "output_type" : "frequency", 
     "maf_units" : "MG_S",
     "maf_scaling" : 0.01,   

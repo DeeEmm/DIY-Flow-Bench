@@ -1079,6 +1079,7 @@ String Webserver::processTemplate(const String &var)
 
   // Sensor Values
   if (var == "MAF_SENSOR") return String(status.mafSensor);
+  if (var == "MAF_LINK") return String(status.mafLink);
   if (var == "PREF_SENSOR") return String(status.prefSensor);
   if (var == "TEMP_SENSOR") return String(status.tempSensor);
   if (var == "RELH_SENSOR") return String(status.relhSensor);

@@ -19,6 +19,7 @@ function pad(num, size) {
     return s.substring(s.length-size);
 }
 
+
 gulp.task('css', function(done){    
 	return gulp.src('esp32/DIY-Flow-Bench/src/style.css')       
 	.pipe(cssnano())       
@@ -27,12 +28,14 @@ gulp.task('css', function(done){
 	done(); 
 });	
 
+
 gulp.task('js', function(done){    
 	return gulp.src('esp32/DIY-Flow-Bench/src/javascript.js')          
 	// .pipe(terser())       
 	.pipe(gulp.dest('esp32/DIY-Flow-Bench/build'))
 	done(); 
 });
+
 
 gulp.task('cssmax', function(done){    
 	return gulp.src('esp32/DIY-Flow-Bench/src/style.css')       
@@ -42,11 +45,13 @@ gulp.task('cssmax', function(done){
 	done(); 
 });	
 
+
 gulp.task('jsmax', function(done){    
 	return gulp.src('esp32/DIY-Flow-Bench/src/javascript.js')             
 	.pipe(gulp.dest('esp32/DIY-Flow-Bench/build'))
 	done(); 
 });
+
 
 // gulp.task('html', function(done) {
 // 	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
@@ -55,10 +60,12 @@ gulp.task('jsmax', function(done){
 // 		done();
 // 	});
 	
+
 gulp.task('clean', function () {
 	return gulp.src('esp32/DIY-Flow-Bench/build/*', {read: false})
 	.pipe(clean());
 });
+
 
 gulp.task('compress+gzip', function(done) {
 	gulp.src('esp32/DIY-Flow-Bench/build/index.html')
@@ -67,12 +74,14 @@ gulp.task('compress+gzip', function(done) {
 	done();
 });
 
+
 gulp.task('compress', function(done) {
 	gulp.src('esp32/DIY-Flow-Bench/build/index.html')
 	//.pipe(gzip())
 	.pipe(gulp.dest('esp32/DIY-Flow-Bench/data'))
 	done();
 });
+
 
 gulp.task('html', function() {
 	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
@@ -89,6 +98,7 @@ gulp.task('html', function() {
 	.pipe(htmlmin({ collapseWhitespace: true }))
 	.pipe(gulp.dest('esp32/DIY-Flow-Bench/build'));
 });	
+
 
 gulp.task('htmlmax', function() {
 	return gulp.src('esp32/DIY-Flow-Bench/src/index.html')
@@ -110,7 +120,6 @@ gulp.task('htmlmax', function() {
 
 
 gulp.task('version', function() {
-
 
 	// get release info from version.json
 	gui_build_num = json.GUI_BUILD_NUMBER;

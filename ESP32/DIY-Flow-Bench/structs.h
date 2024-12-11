@@ -251,7 +251,7 @@ struct DeviceStatus {
   int mafDiameter = 0;
   char mafSensorType[30];
   char mafOutputType[10];
-  JsonObject mafJsonObject;
+  char mafLink[100];
   std::vector<std::vector<u_int>> mafLookupTable;  
 };
 
