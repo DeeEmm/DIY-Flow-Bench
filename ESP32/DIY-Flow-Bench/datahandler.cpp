@@ -495,6 +495,7 @@ void DataHandler::createCalibrationFile () {
 /***********************************************************
  * @brief loadJSONFile
  * @details Loads JSON data from file
+ * @note uses MAF_JSON_SIZE - largest possible file size
  ***/
 StaticJsonDocument<JSON_FILE_SIZE> DataHandler::loadJSONFile(String filename) {
 
@@ -769,12 +770,13 @@ void DataHandler::loadMAFData () {
   extern struct DeviceStatus status;
 
   StaticJsonDocument<MAF_JSON_SIZE> mafData;
+  JsonObject mafJsonObject = mafData.to<JsonObject>();
 
   _message.serialPrintf("Loading MAF Data \n");
 
-  if (SPIFFS.exists(status.mafFilename))  {
-    mafData = _data.loadJSONFile(status.mafFilename);
-  }
+  // read JSON data direct from stream
+  File jsonFile = SPIFFS.open(status.mafFilename, FILE_READ);
+  deserializeJson(mafData, jsonFile);
 
   if (mafData.overflowed() == true) {
     _message.serialPrintf("MAF Data file - JsonDocument::overflowed()");
@@ -790,17 +792,16 @@ void DataHandler::loadMAFData () {
   status.mafScaling = mafData["maf_scaling"]; 
   status.mafDiameter = mafData["maf_diameter"]; 
 
-  // Load MAF lookup table into JSON object
-  // NOTE lets keep this var local so that we can free up the memory
-  JsonObject mafJsonObject = mafData["maf_lookup_table"];
-  // JsonObject mafJsonObject = mafData.to<JsonObject>();
-
+  // Load MAF lookup table into JSON object 
+  mafJsonObject = mafData["maf_lookup_table"]; 
 
   // Prints MAF data to serial
-  for (JsonPair kv : mafJsonObject) {
-    _message.verbosePrintf("JSON key: %s", kv.key().c_str());
-    _message.verbosePrintf(" value: %s\n",kv.value().as<std::string>().c_str()); 
-  }
+  #ifdef VERBOSE_MAF
+    for (JsonPair kv : mafJsonObject) {
+      _message.verbosePrintf("JSON key: %s", kv.key().c_str());
+      _message.verbosePrintf(" value: %s\n",kv.value().as<std::string>().c_str()); 
+    }
+  #endif
 
   // Print size of MAF data to serial
   _message.serialPrintf("MAF Data Memory Usage: %u \n", mafData.memoryUsage()); 
@@ -824,10 +825,11 @@ void DataHandler::loadMAFData () {
     key = stoi(it->key().c_str());
     value = stoi(it->value().as<std::string>());
 
-
-    _message.verbosePrintf("Vector rowNum: %i", rowNum);
-    _message.verbosePrintf(" key: %i", key);
-    _message.verbosePrintf(" value: %i\n", value);
+    #ifdef VERBOSE_MAF
+      _message.verbosePrintf("Vector rowNum: %i", rowNum);
+      _message.verbosePrintf(" key: %i", key);
+      _message.verbosePrintf(" value: %i\n", value);
+    #endif
 
     status.mafLookupTable.push_back( { key , value } );
 
@@ -840,7 +842,6 @@ void DataHandler::loadMAFData () {
 
   _message.verbosePrintf("MAF Data Val Max: %lu\n", status.mafDataValMax);
   _message.verbosePrintf("MAF Data Key Max: %lu\n", status.mafDataKeyMax);
-
 
 }
 
