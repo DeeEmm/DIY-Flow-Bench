@@ -495,8 +495,9 @@ void DataHandler::createCalibrationFile () {
 /***********************************************************
  * @brief loadJSONFile
  * @details Loads JSON data from file
+ * @note uses MAF_JSON_SIZE - largest possible file size
  ***/
-StaticJsonDocument<JSON_FILE_SIZE> DataHandler::loadJSONFile(String filename) {
+StaticJsonDocument<MAF_JSON_SIZE> DataHandler::loadJSONFile(String filename) {
 
   Messages _message;
 
@@ -504,7 +505,7 @@ StaticJsonDocument<JSON_FILE_SIZE> DataHandler::loadJSONFile(String filename) {
 
   // Allocate the memory pool on the stack.
   // Use arduinojson.org/assistant to compute the capacity.
-  StaticJsonDocument <JSON_FILE_SIZE> jsonData;
+  StaticJsonDocument <MAF_JSON_SIZE> jsonData;
 
   if (SPIFFS.exists(filename))  {
     File jsonFile = SPIFFS.open(filename, FILE_READ);
@@ -514,7 +515,7 @@ StaticJsonDocument<JSON_FILE_SIZE> DataHandler::loadJSONFile(String filename) {
       _message.statusPrintf("Failed to open file for reading \n");
     }    else    {
       size_t size = jsonFile.size();
-      if (size > JSON_FILE_SIZE)    {
+      if (size > MAF_JSON_SIZE)    {
           _message.statusPrintf("File too large \n");
       }
 
@@ -769,6 +770,7 @@ void DataHandler::loadMAFData () {
   extern struct DeviceStatus status;
 
   StaticJsonDocument<MAF_JSON_SIZE> mafData;
+  JsonObject mafJsonObject = mafData.to<JsonObject>();
 
   _message.serialPrintf("Loading MAF Data \n");
 
@@ -790,17 +792,16 @@ void DataHandler::loadMAFData () {
   status.mafScaling = mafData["maf_scaling"]; 
   status.mafDiameter = mafData["maf_diameter"]; 
 
-  // Load MAF lookup table into JSON object
-  // NOTE lets keep this var local so that we can free up the memory
-  JsonObject mafJsonObject = mafData["maf_lookup_table"];
-  // JsonObject mafJsonObject = mafData.to<JsonObject>();
-
+  // Load MAF lookup table into JSON object 
+  mafJsonObject = mafData["maf_lookup_table"]; 
 
   // Prints MAF data to serial
-  for (JsonPair kv : mafJsonObject) {
-    _message.verbosePrintf("JSON key: %s", kv.key().c_str());
-    _message.verbosePrintf(" value: %s\n",kv.value().as<std::string>().c_str()); 
-  }
+  #ifdef VERBOSE_MAF
+    for (JsonPair kv : mafJsonObject) {
+      _message.verbosePrintf("JSON key: %s", kv.key().c_str());
+      _message.verbosePrintf(" value: %s\n",kv.value().as<std::string>().c_str()); 
+    }
+  #endif
 
   // Print size of MAF data to serial
   _message.serialPrintf("MAF Data Memory Usage: %u \n", mafData.memoryUsage()); 
@@ -824,10 +825,11 @@ void DataHandler::loadMAFData () {
     key = stoi(it->key().c_str());
     value = stoi(it->value().as<std::string>());
 
-
-    _message.verbosePrintf("Vector rowNum: %i", rowNum);
-    _message.verbosePrintf(" key: %i", key);
-    _message.verbosePrintf(" value: %i\n", value);
+    #ifdef VERBOSE_MAF
+      _message.verbosePrintf("Vector rowNum: %i", rowNum);
+      _message.verbosePrintf(" key: %i", key);
+      _message.verbosePrintf(" value: %i\n", value);
+    #endif
 
     status.mafLookupTable.push_back( { key , value } );
 

@@ -29,6 +29,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2412110103      - #285 increase template size in DataHandler::loadJSONFile
+2412110079      - Fixed MAF file layouts
 2412110068      - Moved MAF initalisation into DataHandler
 2412110030      - SFLOW value missing when < 0
                 - Linked MAF info to forum thread

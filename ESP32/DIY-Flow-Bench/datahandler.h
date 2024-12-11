@@ -64,7 +64,7 @@ class DataHandler {
 		void writeJSONFile(String data, String filename, int dataSize);
 		void createLiftDataFile();
 		void createCalibrationFile ();
-		StaticJsonDocument<JSON_FILE_SIZE> loadJSONFile(String filename);
+		StaticJsonDocument<MAF_JSON_SIZE> loadJSONFile(String filename); // DEPRECATED JSON_FILE_SIZE (too small - MAF file is largest possibility)
 		void beginSerial(void);
 		void loadMAFData();
 		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfiguration();
