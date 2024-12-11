@@ -497,7 +497,7 @@ void DataHandler::createCalibrationFile () {
  * @details Loads JSON data from file
  * @note uses MAF_JSON_SIZE - largest possible file size
  ***/
-StaticJsonDocument<MAF_JSON_SIZE> DataHandler::loadJSONFile(String filename) {
+StaticJsonDocument<JSON_FILE_SIZE> DataHandler::loadJSONFile(String filename) {
 
   Messages _message;
 
@@ -505,7 +505,7 @@ StaticJsonDocument<MAF_JSON_SIZE> DataHandler::loadJSONFile(String filename) {
 
   // Allocate the memory pool on the stack.
   // Use arduinojson.org/assistant to compute the capacity.
-  StaticJsonDocument <MAF_JSON_SIZE> jsonData;
+  StaticJsonDocument <JSON_FILE_SIZE> jsonData;
 
   if (SPIFFS.exists(filename))  {
     File jsonFile = SPIFFS.open(filename, FILE_READ);
@@ -515,7 +515,7 @@ StaticJsonDocument<MAF_JSON_SIZE> DataHandler::loadJSONFile(String filename) {
       _message.statusPrintf("Failed to open file for reading \n");
     }    else    {
       size_t size = jsonFile.size();
-      if (size > MAF_JSON_SIZE)    {
+      if (size > JSON_FILE_SIZE)    {
           _message.statusPrintf("File too large \n");
       }
 
@@ -774,9 +774,9 @@ void DataHandler::loadMAFData () {
 
   _message.serialPrintf("Loading MAF Data \n");
 
-  if (SPIFFS.exists(status.mafFilename))  {
-    mafData = _data.loadJSONFile(status.mafFilename);
-  }
+  // read JSON data direct from stream
+  File jsonFile = SPIFFS.open(status.mafFilename, FILE_READ);
+  deserializeJson(mafData, jsonFile);
 
   if (mafData.overflowed() == true) {
     _message.serialPrintf("MAF Data file - JsonDocument::overflowed()");
@@ -842,7 +842,6 @@ void DataHandler::loadMAFData () {
 
   _message.verbosePrintf("MAF Data Val Max: %lu\n", status.mafDataValMax);
   _message.verbosePrintf("MAF Data Key Max: %lu\n", status.mafDataKeyMax);
-
 
 }
 
