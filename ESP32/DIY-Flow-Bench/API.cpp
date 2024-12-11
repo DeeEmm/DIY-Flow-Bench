@@ -342,7 +342,7 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponseBlob, API_BLOB_LENGTH, "C%s%s", settings.api_delim, charDataJSON);
       break;
       
-      case 'K': // MAF Data Key Value 
+      case 'K': // MAF Data Key Value A
           if (status.doBootLoop) break;
           // refValue =  map(_sensors.getMafVolts(), 0, 5, 0, status.mafDataKeyMax); 
           refValue = (status.mafDataKeyMax / 5) * _sensors.getMafVolts();
@@ -372,11 +372,14 @@ void API::ParseMessage(char apiMessage) {
             if (SPIFFS.exists(status.mafFilename))  {
               mafJSON = _data.loadJSONFile(status.mafFilename);
             }
-            serializeJsonPretty(mafJSON, Serial);
-            snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", ""); // send an empty string to prevent Invalid Response
+            if (mafJSON.overflowed() == true) {
+              _message.serialPrintf("MAF Data file - JsonDocument::overflowed()");
+            } else {
+              serializeJsonPretty(mafJSON, Serial);
+            }
+            snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
       break; }
-     
-      
+           
       case 'N': // Hostname
           snprintf(apiResponse, API_RESPONSE_LENGTH, "N%s%s", settings.api_delim, settings.hostname);
       break;
@@ -432,6 +435,7 @@ void API::ParseMessage(char apiMessage) {
           _message.serialPrintf("boardType = %s\n", status.boardType);
           _message.serialPrintf("benchType = %s\n", status.benchType);
           _message.serialPrintf("mafSensor = %s\n", status.mafSensor);
+          _message.serialPrintf("mafLink = %s \n", status.mafLink);
           _message.serialPrintf("prefSensor = %s\n", status.prefSensor);
           _message.serialPrintf("pdiffSensor = %s\n", status.pdiffSensor);
           _message.serialPrintf("tempSensor = %s\n", status.tempSensor);
@@ -474,7 +478,7 @@ void API::ParseMessage(char apiMessage) {
           _message.serialPrintf("mafDiameter  =  %i\n", status.mafDiameter);
           _message.serialPrintf("mafSensorType=  %s\n", status.mafSensorType);
           _message.serialPrintf("mafOutputType =  %s\n", status.mafOutputType);
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "t%s", ""); // send an empty string to prevent Invalid Response
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
       break;}
       
       case 't': // Get measured Temperature in Fahrenheit 'F.123.45\r\n'

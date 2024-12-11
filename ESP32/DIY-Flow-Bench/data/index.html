@@ -493,7 +493,7 @@ input[type=file]::file-selector-button:hover {
 }
 
 /* The Close Button */
-.closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton, closeUpdateModalButton, closeFlowTargetModalButton {
+.closeDataModalButton, .closeInfoModalButton, .closeFileModalButton, .closeCaptureLiftDataModalButton, .closeSaveGraphDataModalButton, .closeLoadGraphDataModalButton, .closeExportGraphDataModalButton, .closeCalibrationModalButton, closeUpdateModalButton, closeFlowTargetModalButton {
   color: #aaa;
   float: right;
   font-size: 22px;
@@ -507,6 +507,8 @@ input[type=file]::file-selector-button:hover {
 .closeFlowTargetModalButton:focus,
 .closeUpdateModalButton:hover, 
 .closeUpdateModalButton:focus,
+.closeDataModalButton:hover, 
+.closeDataModalButton:focus,
 .closeFileModalButton:hover, 
 .closeFileModalButton:focus,
 .closeInfoModalButton:hover,
@@ -930,7 +932,7 @@ svg .dataCircle:hover {
             <!-- <div class="config-row"><label class="config-label">Boot Time:  </label><span class="config-value" id="BOOT_TIME">~BOOT_TIME~</span></div> -->
             <h4>~LANG_GUI_SENSOR_CONFIG~</h4>
             <hr>
-            <div class="config-row"><label class="config-label">~LANG_GUI_MAF_DATA_FILE~:  </label><span class="config-value" id="MAF_SENSOR">~MAF_SENSOR~</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_MAF_DATA_FILE~:  </label><span class="config-value" id="MAF_SENSOR"><a href="~MAF_LINK~" target="new">~MAF_SENSOR~</a></span></div>
             <div class="config-row"><label class="config-label">~LANG_GUI_REF_PRESSURE_SENSOR~:  </label><span class="config-value" id="PREF_SENSOR">~PREF_SENSOR~</span></div>
             <div class="config-row"><label class="config-label">~LANG_GUI_TEMP_SENSOR~:  </label><span class="config-value" id="TEMP_SENSOR">~TEMP_SENSOR~</span></div>
             <div class="config-row"><label class="config-label">~LANG_GUI_HUMIDITY_SENSOR~:  </label><span class="config-value" id="RELH_SENSOR">~RELH_SENSOR~</span></div>
@@ -1369,12 +1371,14 @@ var captureLiftDataModal = document.getElementById("captureLiftDataModal");
 var loadGraphDataModal = document.getElementById("loadGraphDataModal");
 var saveGraphDataModal = document.getElementById("saveGraphDataModal");
 var calibrationModal = document.getElementById("calibrationModal");
+var dataModal = document.getElementById("dataModal");
 var updateModal = document.getElementById("updateModal");
 var flowTargetModal = document.getElementById("flowTargetModal");
 
 
 var closeFlowTargetModalButton = document.getElementsByClassName("closeFlowTargetModalButton")[0];
 var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
+var closeDataModalButton = document.getElementsByClassName("closeDataModalButton")[0];
 var closeFileModalButton = document.getElementsByClassName("closeFileModalButton")[0];
 var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton")[0];
 var closeCaptureLiftDataModalButton = document.getElementsByClassName("closeCaptureLiftDataModalButton")[0];
@@ -1516,7 +1520,11 @@ function onLoad(event) {
     case "config":
       document.getElementById("load-config-button").click();
     break;
-      
+
+    case "data":
+      document.getElementById('dataModal').style.display='block';
+    break;
+
     
   }
 
@@ -1896,6 +1904,13 @@ closeInfoModalButton.onclick = function() {
   infoModal.style.display = "none";
 }
 
+/***********************************************************
+* Close data modal dialog
+***/
+closeDataModalButton.onclick = function() {
+  dataModal.style.display = "none";
+}
+
 
 /***********************************************************
 * Close Capture Data modal dialog
@@ -1933,13 +1948,14 @@ closeFlowTargetModalButton.onclick = function() {
 * Close modal dialogs on lose focus
 ***/
 window.onclick = function(event) {
-  if (event.target == fileModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal || event.target == calibrationModal || event.target == updateModal || event.target == flowTargetModal  ){
+  if (event.target == fileModal || event.target == dataModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal || event.target == calibrationModal || event.target == updateModal || event.target == flowTargetModal  ){
     fileModal.style.display = "none";
     infoModal.style.display = "none";
     captureLiftDataModal.style.display = "none";
     loadGraphDataModal.style.display = "none";
     saveGraphDataModal.style.display = "none";
     calibrationModal.style.display = "none";
+    dataModal.style.display = "none";
     updateModal.style.display = "none";
     flowTargetModal.style.display = "none";
   }
@@ -1957,6 +1973,7 @@ document.addEventListener("keydown", ({key}) => {
     loadGraphDataModal.style.display = "none";
     saveGraphDataModal.style.display = "none";
     calibrationModal.style.display = "none";
+    dataModal.style.display = "none";
     updateModal.style.display = "none";
     flowTargetModal.style.display = "none";
   }
@@ -2003,7 +2020,6 @@ function exportSVGAsImage() {
     a.download = 'LiftGraph.png';
     // a.href = canvas.toDataURL('image/jpeg');
     a.href = canvas.toDataURL();
-
     a.click();
     a.remove();
 

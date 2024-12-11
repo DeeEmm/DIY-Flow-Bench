@@ -30,6 +30,7 @@
 #include <SD.h>
 #include <Update.h>
 #include <SPIFFS.h>
+
 #include <ArduinoJson.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -769,22 +770,78 @@ void DataHandler::loadMAFData () {
 
   StaticJsonDocument<MAF_JSON_SIZE> mafData;
 
-  // mafData = _data.loadJSONFile(status.mafFilename);
+  _message.serialPrintf("Loading MAF Data \n");
 
-  mafData = _data.loadJSONFile(status.mafFilename);
+  if (SPIFFS.exists(status.mafFilename))  {
+    mafData = _data.loadJSONFile(status.mafFilename);
+  }
 
-  strcpy(status.mafSensorType, mafData["sensor_type"]); // "ACDELCO_92281162"
-  strcpy(status.mafOutputType, mafData["output_type"]); // "voltage / frequency"
-  strcpy(status.mafUnits, mafData["maf_units"]); // "KG_H / MG_S"
-  status.mafScaling = mafData["maf_scaling"]; // 0.1 / 0.01 / 0.001
-  status.mafDiameter = mafData["maf_diameter"]; // 94 (mm)
+  if (mafData.overflowed() == true) {
+    _message.serialPrintf("MAF Data file - JsonDocument::overflowed()");
+  } else {
+    // serializeJsonPretty(mafData, Serial);
+  }
+
+  // populate global structs
+  strcpy(status.mafSensorType, mafData["sensor_type"]); 
+  strcpy(status.mafLink, mafData["forum_link"]); 
+  strcpy(status.mafOutputType, mafData["output_type"]); 
+  strcpy(status.mafUnits, mafData["maf_units"]);
+  status.mafScaling = mafData["maf_scaling"]; 
+  status.mafDiameter = mafData["maf_diameter"]; 
 
   // Load MAF lookup table into JSON object
-  status.mafJsonObject = mafData["maf_lookup_table"];
+  // NOTE lets keep this var local so that we can free up the memory
+  JsonObject mafJsonObject = mafData["maf_lookup_table"];
+  // JsonObject mafJsonObject = mafData.to<JsonObject>();
+
+
+  // Prints MAF data to serial
+  for (JsonPair kv : mafJsonObject) {
+    _message.verbosePrintf("JSON key: %s", kv.key().c_str());
+    _message.verbosePrintf(" value: %s\n",kv.value().as<std::string>().c_str()); 
+  }
 
   // Print size of MAF data to serial
-  _message.serialPrintf("MAF Data size: %u \n", mafData.memoryUsage()); 
-  _message.serialPrintf("MAF Data JSON Object size: %u \n", status.mafJsonObject.memoryUsage()); 
+  _message.serialPrintf("MAF Data Memory Usage: %u \n", mafData.memoryUsage()); 
+  _message.serialPrintf("MAF Data JSON Object Memory Usage: %u \n", mafJsonObject.memoryUsage()); 
+
+  // get size of the MAF datatable (num rows)
+  status.mafDataTableRows = mafJsonObject.size();
+  _message.verbosePrintf("status.mafDataTableRows: %i\n", status.mafDataTableRows);
+
+
+  u_int rowNum = 0;
+  u_int key;
+  u_int value;
+
+  // Get JSON Object iterator
+  JsonObject::iterator it = mafJsonObject.begin();
+
+  // Walk through JSON object to populate vectors
+  for (u_int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { 
+
+    key = stoi(it->key().c_str());
+    value = stoi(it->value().as<std::string>());
+
+
+    _message.verbosePrintf("Vector rowNum: %i", rowNum);
+    _message.verbosePrintf(" key: %i", key);
+    _message.verbosePrintf(" value: %i\n", value);
+
+    status.mafLookupTable.push_back( { key , value } );
+
+    it += 1;
+
+    status.mafDataKeyMax = key;
+    status.mafDataValMax = value;
+    
+  }
+
+  _message.verbosePrintf("MAF Data Val Max: %lu\n", status.mafDataValMax);
+  _message.verbosePrintf("MAF Data Key Max: %lu\n", status.mafDataKeyMax);
+
+
 }
 
 
@@ -1109,6 +1166,7 @@ String DataHandler::getDataJSON()
     dataJson["FLOW"] = 0.0;
     dataJson["MFLOW"] = 0.0;
     dataJson["AFLOW"] = 0.0;
+    dataJson["SFLOW"] = 0.0;
   }
 
 

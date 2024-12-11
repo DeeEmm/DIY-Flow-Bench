@@ -65,7 +65,7 @@ using namespace std;
 #define CONFIG_JSON_SIZE 2600  
 #define CAL_DATA_JSON_SIZE 348
 #define LIFT_DATA_JSON_SIZE 384
-#define MAF_JSON_SIZE 6000 // 6k for Bosch file 25k for Delphi 
+#define MAF_JSON_SIZE 28000 // 6k for Bosch file 25k for Delphi 
 #define JSON_FILE_SIZE 6000 // 2800
 
 // Loop Delays

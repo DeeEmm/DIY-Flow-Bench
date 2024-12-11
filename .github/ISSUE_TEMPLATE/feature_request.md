@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: "[FEATURE REQUEST]"
+title: "[FEATURE]"
 labels: enhancement
 assignees: ''
 
@@ -11,10 +11,10 @@ assignees: ''
 - RELEASE (e.g. V.2.0-RC.4) 
 - BUILD_NUMBER (e.g. Build 31012301)
 
-NOTE: Both can be found in configuration.h or by pressing the 'Info' button on the configuration page in the GUI
+NOTE: Both can be found in version.json or by pressing the 'Info' button on the configuration page in the GUI
 
 **Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. e.g. I'm always frustrated when [...]
+A clear and concise description of what the problem is.
 
 **Describe the solution you'd like**
 A clear and concise description of what you want to happen.

@@ -23,12 +23,14 @@ var captureLiftDataModal = document.getElementById("captureLiftDataModal");
 var loadGraphDataModal = document.getElementById("loadGraphDataModal");
 var saveGraphDataModal = document.getElementById("saveGraphDataModal");
 var calibrationModal = document.getElementById("calibrationModal");
+var dataModal = document.getElementById("dataModal");
 var updateModal = document.getElementById("updateModal");
 var flowTargetModal = document.getElementById("flowTargetModal");
 
 
 var closeFlowTargetModalButton = document.getElementsByClassName("closeFlowTargetModalButton")[0];
 var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
+var closeDataModalButton = document.getElementsByClassName("closeDataModalButton")[0];
 var closeFileModalButton = document.getElementsByClassName("closeFileModalButton")[0];
 var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton")[0];
 var closeCaptureLiftDataModalButton = document.getElementsByClassName("closeCaptureLiftDataModalButton")[0];
@@ -170,7 +172,11 @@ function onLoad(event) {
     case "config":
       document.getElementById("load-config-button").click();
     break;
-      
+
+    case "data":
+      document.getElementById('dataModal').style.display='block';
+    break;
+
     
   }
 
@@ -550,6 +556,13 @@ closeInfoModalButton.onclick = function() {
   infoModal.style.display = "none";
 }
 
+/***********************************************************
+* Close data modal dialog
+***/
+closeDataModalButton.onclick = function() {
+  dataModal.style.display = "none";
+}
+
 
 /***********************************************************
 * Close Capture Data modal dialog
@@ -587,13 +600,14 @@ closeFlowTargetModalButton.onclick = function() {
 * Close modal dialogs on lose focus
 ***/
 window.onclick = function(event) {
-  if (event.target == fileModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal || event.target == calibrationModal || event.target == updateModal || event.target == flowTargetModal  ){
+  if (event.target == fileModal || event.target == dataModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal || event.target == calibrationModal || event.target == updateModal || event.target == flowTargetModal  ){
     fileModal.style.display = "none";
     infoModal.style.display = "none";
     captureLiftDataModal.style.display = "none";
     loadGraphDataModal.style.display = "none";
     saveGraphDataModal.style.display = "none";
     calibrationModal.style.display = "none";
+    dataModal.style.display = "none";
     updateModal.style.display = "none";
     flowTargetModal.style.display = "none";
   }
@@ -611,6 +625,7 @@ document.addEventListener("keydown", ({key}) => {
     loadGraphDataModal.style.display = "none";
     saveGraphDataModal.style.display = "none";
     calibrationModal.style.display = "none";
+    dataModal.style.display = "none";
     updateModal.style.display = "none";
     flowTargetModal.style.display = "none";
   }

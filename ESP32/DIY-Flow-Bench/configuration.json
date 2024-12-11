@@ -12,7 +12,7 @@
     "BME280_I2C_ADDR" : 118,
     "BME280_SCAN_DELAY_MS" :  1000,
     
-    "BME680_IS_ENABLED" : true,
+    "BME680_IS_ENABLED" : false,
     "BME680_I2C_ADDR" : 118,
     "BME680_SCAN_DELAY_MS" :  1000,
     
