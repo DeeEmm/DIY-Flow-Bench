@@ -57,35 +57,7 @@ def extract_json_val(jsonKey):
 
 
 
-# DEPRECATED 
-# def delete_files_in_directory(directory_path):
-#    try:
-#      files = os.listdir(directory_path)
-#      for file in files:
-#        file_path = os.path.join(directory_path, file)
-#        if os.path.isfile(file_path):
-#          os.remove(file_path)
-#      print("All files deleted successfully.")
-#    except OSError:
-#      print("Error occurred while deleting files.")
-
-
-# DEPRECATED - Search for wildcard filenames  
-# def del_wildcard(wildcard):
-#    try:
-#      print(wildcard)
-#      files = os.listdir(wildcard)
-#      for file in files:
-#        file_path = os.path.join(wildcard, file)
-#        if os.path.isfile(file_path):
-#         index = file.find(wildcard)
-#         if index > -1:
-#            os.remove(file_path)
-#      print(file_path + "deleted successfully.")
-#    except OSError:
-#      print("Error occurred while deleting files.")
-
-     
+    
 
 
 def after_build(source, target, env):
