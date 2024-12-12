@@ -69,75 +69,7 @@ void Sensors::begin () {
 	extern struct Pins pins;
 	extern int mafOutputType;
 	
-	// DEPRECATED - Moved into DataHandler::loadMAFData() build 2412110057
-
-	// Initialise  MAF data
-	// if (config.MAF_SRC_TYPE != SENSOR_DISABLED){	
 	
-	// 	_message.verbosePrintf("Initialising MAF Data \n");
-	
-	// 	// get size of the MAF datatable (num rows)
-	// 	status.mafDataTableRows = status.mafJsonObject.size();
-
-	// 	_message.verbosePrintf("status.mafDataTableRows: %i\n", status.mafDataTableRows);
-
-	// 	// print key:value pairs from mafJsonObject
-	// 	_message.verbosePrintf("key:value pairs from mafJsonObject\n");
-	// 	for (JsonPair kv : status.mafJsonObject) {
-	// 		_message.verbosePrintf("JSON key: %s", kv.key().c_str());
-	// 		_message.verbosePrintf(" value: %s\n",kv.value().as<std::string>().c_str()); 
-	// 	}
-
-	// 	u_int rowNum = 0;
-	// 	u_int key;
-	// 	u_int value;
-
-	// 	// Get JSON Object iterator
-	// 	JsonObject::iterator it = status.mafJsonObject.begin();
-
-	// 	// Walk through JSON object to populate vectors
-	// 	for (u_int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { 
-
-	// 		key = stoi(it->key().c_str());
-	// 		value = stoi(it->value().as<std::string>());
-
-
-	// 		_message.verbosePrintf("Vector rowNum: %i", rowNum);
-	// 		_message.verbosePrintf(" key: %i", key);
-	// 		_message.verbosePrintf(" value: %i\n", value);
-
-	// 		status.mafLookupTable.push_back( { key , value } );
-
-	// 		it += 1;
-
-	// 		status.mafDataKeyMax = key;
-	// 		status.mafDataValMax = value;
-			
-	// 	}
-
-	// 	// get highest MAF input value from data table
-	// 	// status.mafDataValMax = status.mafLookupTable[status.mafDataTableRows][1];
-	// 	// status.mafDataKeyMax = status.mafLookupTable[status.mafDataTableRows][0];
-
-	// 	_message.verbosePrintf("status.mafDataValMax: %lu\n", status.mafDataValMax);
-	// 	_message.verbosePrintf("status.mafDataKeyMax: %lu\n", status.mafDataKeyMax);
-
-
-	// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	//initialise BME280
 	if (config.BME280_IS_ENABLED) {
 
@@ -396,7 +328,7 @@ double Sensors::getMafVolts() {
 
 		case LINEAR_ANALOG: {
 			long mafRaw = analogRead(pins.MAF_PIN);
-			sensorVolts = mafRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
+			sensorVolts = static_cast<double>(mafRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}
 
@@ -437,7 +369,7 @@ double Sensors::getMafFlow(int units) {
 	extern struct BenchSettings settings;
 
 	Hardware _hardware;
-	Messages message;
+	Messages _message;
 
 	double flowRateCFM = 0.0;
 	double flowRateMGS = 0.0;
@@ -660,7 +592,7 @@ double Sensors::getPRefVolts() {
 
 		case LINEAR_ANALOG : {
 			long refPressRaw = analogRead(pins.REF_PRESSURE_PIN);
-			sensorVolts = refPressRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
+			sensorVolts = static_cast<double>(refPressRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}
 
@@ -780,7 +712,7 @@ double Sensors::getPDiffVolts() {
 
 		case LINEAR_ANALOG : {
 			long pDiffRaw = analogRead(pins.DIFF_PRESSURE_PIN);
-			sensorVolts = pDiffRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
+			sensorVolts = static_cast<double>(pDiffRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}
 
@@ -898,7 +830,7 @@ double Sensors::getPitotVolts() {
 
 		case LINEAR_ANALOG : {
 			long pDiffRaw = analogRead(pins.PITOT_PIN);
-			sensorVolts = pDiffRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
+			sensorVolts = static_cast<double>(pDiffRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}
 

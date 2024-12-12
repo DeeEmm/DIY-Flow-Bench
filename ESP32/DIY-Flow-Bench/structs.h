@@ -278,7 +278,7 @@ struct SensorData {
   double TempDegC = 0.0;
   double TempDegF = 0.0;
   double RelH = 0.0;
-  long BaroPA = 0;
+  double BaroPA = 0;
   double BaroKPA = 0.0;
   double BaroHPA = 0.0;
   double PRefKPA = 0.0;

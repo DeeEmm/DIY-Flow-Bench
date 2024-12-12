@@ -383,7 +383,7 @@ void loop () {
           status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes
           
           // Push data to client using Server Side Events (SSE)
-          jsonString = _data.getDataJSON();
+          jsonString = _data.buildSSEJsonData();
           _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
 
           xSemaphoreGive(i2c_task_mutex); // Release semaphore

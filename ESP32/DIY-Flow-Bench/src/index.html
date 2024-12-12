@@ -106,6 +106,43 @@
       </div>        
     </div>
 
+    <!--Serial modal-->
+    <div id="serialModal" class="modal">
+      <div class="modal-content serialModal">
+        <span class="closeSerialModalButton">&times;</span>
+        <div class="align-center">
+          <div class="serialModalData">
+            
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Fastest Serial terminal in your browser for Chrome.</title>
+            <meta name="Description" content="Set your baud speed and hit connect.
+            A serial terminal that runs with out any plugins in chrome.">
+
+            <button onclick="connectSerial()">Connect</button>
+            <button onclick="serialResultsDiv.innerHTML = '';">Clear</button>
+
+            <br>
+            <input type="text" id="lineToSend" style="width:calc(100% - 165px)">
+            <button onclick="sendSerialLine()" style="width:45px">Send</button>
+            <button onclick="sendCharacterNumber()" style="width:100px">Send Char</button>
+            <br>
+
+            <input type="checkbox" id="addLine" onclick="localStorage.addLine = this.checked;" checked>
+            <label for="addLine">send with /r/n</label>
+
+            <input type="checkbox" id="echoOn" onclick="localStorage.echoOn = this.checked;" checked>
+            <label for="echoOn">echo</label>
+
+
+            <br>
+            <div id="serialResults">
+            </div>
+
+          </div>     
+        </div>
+      </div>        
+    </div>
+
     <!-- Load Data Modal -->
     <div id="loadGraphDataModal" class="modal">
       <div class="modal-content">

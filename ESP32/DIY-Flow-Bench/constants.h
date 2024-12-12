@@ -28,6 +28,7 @@
 #define PINSFILE 1
 #define MAFFILE 2
 #define INDEXFILE 3
+#define CONFIGFILE 4
 
 
 /***********************************************************

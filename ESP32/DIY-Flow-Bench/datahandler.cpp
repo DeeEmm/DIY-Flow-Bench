@@ -286,10 +286,12 @@ bool DataHandler::checkUserFile(int filetype) {
     File root = FILESYSTEM.open("/");
     File file = root.openNextFile();
 
+    std::string matchCONFIG = "config";
     std::string matchPINS = "PINS";
     std::string matchMAF = "MAF";
     std::string matchINDEX = "index";
     std::string spiffsFile;
+    std::string configFile;
     std::string pinsFile;
     std::string mafFile;
     std::string indexFile;
@@ -298,12 +300,22 @@ bool DataHandler::checkUserFile(int filetype) {
     while (file)  {
       spiffsFile = file.name();
 
+      if (checkSubstring(spiffsFile.c_str(), matchCONFIG.c_str()) && (filetype == CONFIGFILE)) {
+        // CONFIG_*******.json file found
+        pinsFile = "/" + spiffsFile;
+        _message.serialPrintf("CONFIG file Found: %s\n", configFile.c_str() );  
+        status.pinsFilename = configFile.c_str();        
+        loadConfiguration();
+        status.configLoaded = true;
+        return true;
+      }   
+      
       if (checkSubstring(spiffsFile.c_str(), matchPINS.c_str()) && (filetype == PINSFILE)) {
         // PINS_*******.json file found
         pinsFile = "/" + spiffsFile;
         _message.serialPrintf("PINS file Found: %s\n", pinsFile.c_str() );  
         status.pinsFilename = pinsFile.c_str();        
-        _data.loadPinsData();
+        loadPinsData();
         status.pinsLoaded = true;
         return true;
       }   
@@ -797,10 +809,12 @@ void DataHandler::loadMAFData () {
 
 
   // Prints MAF data to serial
-  for (JsonPair kv : mafJsonObject) {
-    _message.verbosePrintf("JSON key: %s", kv.key().c_str());
-    _message.verbosePrintf(" value: %s\n",kv.value().as<std::string>().c_str()); 
-  }
+  #ifdef VERBOSE_MAF
+    for (JsonPair kv : mafJsonObject) {
+      _message.verbosePrintf("JSON key: %s", kv.key().c_str());
+      _message.verbosePrintf(" value: %s\n",kv.value().as<std::string>().c_str()); 
+    }
+  #endif
 
   // Print size of MAF data to serial
   _message.serialPrintf("MAF Data Memory Usage: %u \n", mafData.memoryUsage()); 
@@ -824,11 +838,11 @@ void DataHandler::loadMAFData () {
     key = stoi(it->key().c_str());
     value = stoi(it->value().as<std::string>());
 
-
-    _message.verbosePrintf("Vector rowNum: %i", rowNum);
-    _message.verbosePrintf(" key: %i", key);
-    _message.verbosePrintf(" value: %i\n", value);
-
+    #ifdef VERBOSE_MAF
+      _message.verbosePrintf("Vector rowNum: %i", rowNum);
+      _message.verbosePrintf(" key: %i", key);
+      _message.verbosePrintf(" value: %i\n", value);
+    #endif
     status.mafLookupTable.push_back( { key , value } );
 
     it += 1;
@@ -1114,10 +1128,10 @@ String DataHandler::getFileListJSON()
 
 
 /***********************************************************
- * @brief getDataJSON
+ * @brief buildSSEJsonData
  * @details Package up current bench data into JSON string
  ***/
-String DataHandler::getDataJSON()
+String DataHandler::buildSSEJsonData()
 {
 
   extern struct DeviceStatus status;
@@ -1440,7 +1454,7 @@ void DataHandler::bootLoop()
         }
 
         // This is the escape function. When all files are present and loaded we can leave the loop
-        if ((status.pinsLoaded == true) && (status.mafLoaded == true) && (status.GUIexists == true) && (SPIFFS.exists("/configuration.json"))){
+        if ((status.configLoaded == true) && (status.pinsLoaded == true) && (status.mafLoaded == true) && (status.GUIexists == true) ){
           status.doBootLoop = false; 
           break;
         } 
