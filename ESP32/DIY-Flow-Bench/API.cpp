@@ -272,7 +272,7 @@ void API::ParseMessage(char apiMessage) {
             configurationJSON = _data.loadJSONFile("/configuration.json");
           }
           serializeJsonPretty(configurationJSON, Serial);
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "t%s", ""); // send an empty string to prevent Invalid Response
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
       break; }
 
       case 'D': // Differential Pressure value

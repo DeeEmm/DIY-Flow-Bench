@@ -507,6 +507,7 @@ void DataHandler::createCalibrationFile () {
 /***********************************************************
  * @brief loadJSONFile
  * @details Loads JSON data from file
+ * @note uses MAF_JSON_SIZE - largest possible file size
  ***/
 StaticJsonDocument<JSON_FILE_SIZE> DataHandler::loadJSONFile(String filename) {
 
@@ -781,12 +782,13 @@ void DataHandler::loadMAFData () {
   extern struct DeviceStatus status;
 
   StaticJsonDocument<MAF_JSON_SIZE> mafData;
+  JsonObject mafJsonObject = mafData.to<JsonObject>();
 
   _message.serialPrintf("Loading MAF Data \n");
 
-  if (SPIFFS.exists(status.mafFilename))  {
-    mafData = _data.loadJSONFile(status.mafFilename);
-  }
+  // read JSON data direct from stream
+  File jsonFile = SPIFFS.open(status.mafFilename, FILE_READ);
+  deserializeJson(mafData, jsonFile);
 
   if (mafData.overflowed() == true) {
     _message.serialPrintf("MAF Data file - JsonDocument::overflowed()");
@@ -802,11 +804,8 @@ void DataHandler::loadMAFData () {
   status.mafScaling = mafData["maf_scaling"]; 
   status.mafDiameter = mafData["maf_diameter"]; 
 
-  // Load MAF lookup table into JSON object
-  // NOTE lets keep this var local so that we can free up the memory
-  JsonObject mafJsonObject = mafData["maf_lookup_table"];
-  // JsonObject mafJsonObject = mafData.to<JsonObject>();
-
+  // Load MAF lookup table into JSON object 
+  mafJsonObject = mafData["maf_lookup_table"]; 
 
   // Prints MAF data to serial
   #ifdef VERBOSE_MAF
@@ -843,6 +842,7 @@ void DataHandler::loadMAFData () {
       _message.verbosePrintf(" key: %i", key);
       _message.verbosePrintf(" value: %i\n", value);
     #endif
+
     status.mafLookupTable.push_back( { key , value } );
 
     it += 1;
@@ -854,7 +854,6 @@ void DataHandler::loadMAFData () {
 
   _message.verbosePrintf("MAF Data Val Max: %lu\n", status.mafDataValMax);
   _message.verbosePrintf("MAF Data Key Max: %lu\n", status.mafDataKeyMax);
-
 
 }
 

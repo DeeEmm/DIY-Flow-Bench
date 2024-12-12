@@ -424,17 +424,17 @@ double Sensors::getMafFlow(int units) {
 	// Scale lookup value
 	lookupValue *= status.mafScaling; 
 
-	const auto unitMG_S = std::string("MG_S");
+
+	// Convert Mass
 	const auto mafUnit = std::string(status.mafUnits);
-
-	bool mafUnitIsMG_S = mafUnit.find(unitMG_S) != string::npos;
-
-	if (mafUnitIsMG_S) {
-	// if (status.mafUnits == MG_S) {
+	if (mafUnit.find("MG_S") != string::npos) {
+		// mafUnits is MG_S
 		flowRateKGH = lookupValue * 0.0036F;
 
-	} else { // mafUnits is KG/H
+	} else {
+		// mafUnits is KG/H
 		flowRateKGH = lookupValue;
+
 	}
 
 	// Now that we have a converted flow value we can translate it for different housing diameters
