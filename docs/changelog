@@ -30,6 +30,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 Build #         - Description of Change
 
 
+2412130015      - Fixed Issue with pre-compile tasks deleting release
 2412120051      - #288 Updated Analog calcs to cast to double
 2412120016      - Changed ADS1115 to 8 SPS
                 - #288 removed struct from ADC calc

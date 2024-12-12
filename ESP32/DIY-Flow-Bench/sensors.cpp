@@ -375,20 +375,18 @@ double Sensors::getMafFlow(int units) {
 	double flowRateMGS = 0.0;
 	double flowRateKGH = 0.0;
 	double lookupValue = 0.0;
-	double transposedflowRateKGH = 0.0;
 	double oldMafArea = 0.0;
 	double newMafArea = 0.0;
 	double velocity1 = 0.0;
 	double velocity2 = 0.0;
 	double mafVelocity = 0.0;
+	double transposedflowRateKGH = 0.0;
 
+	// message.serialPrintf("MAF TEST VAL: %li ", status.mafDataKeyMax);
 
-// message.serialPrintf("MAF TEST VAL: %li ", status.mafDataKeyMax);
+	u_int refValue = (static_cast<double>(status.mafDataKeyMax) / _hardware.get5vSupplyVolts()) * this->getMafVolts();
 
-	// u_int refValue = (status.mafDataKeyMax / _hardware.get5vSupplyVolts()) * this->getMafVolts();
-	u_int refValue = (status.mafDataKeyMax / 5) * this->getMafVolts();
-
-// message.serialPrintf("MAF REF VAL: %i Max Val : %i\n", refValue, status.mafDataKeyMax);
+	// message.serialPrintf("MAF REF VAL: %i Max Val : %i\n", refValue, status.mafDataKeyMax);
 
 	for (int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { // iterate the data table comparing the Lookup Value to the refValue for each row
 
@@ -396,24 +394,24 @@ double Sensors::getMafFlow(int units) {
 		u_int Val = status.mafLookupTable[rowNum][1]; // Flow Value for this row (y2)
 
 		// Did we get a match??
-		if (refValue == Key) { // Great!!! we've got the exact key value
+		if (refValue == Key) { // <--Great!!! we've got the exact key value
 
-			lookupValue = Val; // lets use the associated lookup value
+			lookupValue = static_cast<double>(Val); // lets use the associated lookup value
 			sensorVal.MafLookup = Val;
 			break;
 
-		} else if (Key > refValue && rowNum > 0) { // The value is somewhere between this and the previous key value so let's use linear interpolation to calculate the actual value: 
+		} else if (Key > refValue && rowNum > 0) { // <-- The value is somewhere between this and the previous key value so let's use linear interpolation to calculate the actual value: 
 
-			u_int KeyPrev = status.mafLookupTable[rowNum - 1][0]; // Key value for the previous row (x1)
-			u_int ValPrev = status.mafLookupTable[rowNum - 1][1]; // Flow value for the previous row (y1)
+			u_int KeyPrev = static_cast<u_int>(status.mafLookupTable[rowNum - 1][0]); // Key value for the previous row (x1)
+			u_int ValPrev = static_cast<u_int>(status.mafLookupTable[rowNum - 1][1]); // Flow value for the previous row (y1)
 
 			// Linear interpolation y = y1 + (x-x1)((y2-y1)/(x2-x1)) where x1+y1 are coord1 and x2_y2 are coord2
-			lookupValue = ValPrev + (refValue - KeyPrev)*((Val-ValPrev)/(Key-KeyPrev));
+			lookupValue = ValPrev + static_cast<double>(refValue - KeyPrev)*((Val-ValPrev)/(Key-KeyPrev));
 			sensorVal.MafLookup = lookupValue;
 			break;   
 
-		} else if (rowNum == status.mafDataTableRows && refValue > Key) { //we're at the largest value, this must be it
-			lookupValue = Val; // lets use the associated lookup value
+		} else if (rowNum == status.mafDataTableRows && refValue > Key) { // <-- We're at the largest value, this must be it
+			lookupValue = static_cast<double>(Val); // lets use the associated lookup value
 			sensorVal.MafLookup = Val;
 			// TODO status message MAX FLOW
 			break;
@@ -424,17 +422,16 @@ double Sensors::getMafFlow(int units) {
 	// Scale lookup value
 	lookupValue *= status.mafScaling; 
 
-
 	// Convert Mass
 	const auto mafUnit = std::string(status.mafUnits);
 	if (mafUnit.find("MG_S") != string::npos) {
+		
 		// mafUnits is MG_S
 		flowRateKGH = lookupValue * 0.0036F;
 
 	} else {
 		// mafUnits is KG/H
 		flowRateKGH = lookupValue;
-
 	}
 
 	// Now that we have a converted flow value we can translate it for different housing diameters
@@ -444,7 +441,7 @@ double Sensors::getMafFlow(int units) {
 		// NOTE this transfer function is actually for volumetric flow (m3/s) but we can assume that the mass to volumetric conversion is ratiometric at any given instant in time.
 		// This is because any environmental influences apply equally to both parts of the equation and cancel each other out. 
 		// So we can reduce the mass flow conversion to the same simple ratio that we use for volumetric flow. 
-		// In short, the relationship between flow and pipe area applies equally to both mass flow and volumetric flow for a given instant in time.
+		// In short, the relationship between flow and pipe area applies equally to both mass flow and volumetric flow for any given instant in time.
 
 		// Q = V*A
 		// V = Q/A
@@ -454,9 +451,9 @@ double Sensors::getMafFlow(int units) {
 		// where Q = volumetric flow (m3/s) | A = area(m2) | V = velocity
 		
 		// Calculate original MAF area
-		oldMafArea = (PI * pow((status.mafDiameter / 2), 2)) / 1000000;
+		oldMafArea = (PI * pow((static_cast<double>(status.mafDiameter) / 2.0F), 2.00F)) / 1000000.00F;
 		// Calculate new MAF area
-		newMafArea = (PI * pow((settings.maf_housing_diameter / 2), 2)) / 1000000;
+		newMafArea = (PI * pow((static_cast<double>(settings.maf_housing_diameter) / 2.00F), 2.00F)) / 1000000.00F;
 
 		// scale the result with the new pipe area and convert back to mass flow
 		transposedflowRateKGH = (flowRateKGH / oldMafArea) * newMafArea;
@@ -471,7 +468,6 @@ double Sensors::getMafFlow(int units) {
 		// lets send the standard MAF data
 		return flowRateKGH;
 	}
-
 
 }
 

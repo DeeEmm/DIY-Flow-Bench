@@ -116,7 +116,7 @@ gulp.task('htmlmax', function() {
 	
 
 
-gulp.task('version', function() {
+gulp.task('version', async function() {
 
 	// get release info from version.json
 	gui_build_num = json.GUI_BUILD_NUMBER;
@@ -125,8 +125,13 @@ gulp.task('version', function() {
 
 	old_file = 'esp32/DIY-Flow-Bench/release/' + json.RELEASE + '_' + json.GUI_BUILD_NUMBER + '_index.html'
 
-	// lets delete the old file
-	fs.unlinkSync(old_file);
+	fs.access(old_file, fs.constants.F_OK, (err) => {
+		if (err) {
+			console.error("Unable to delete " + old_file);
+		} else {
+			fs.unlinkSync(old_file);
+		}
+	});
 
 	// get current datetime
 	const dtnow = new Date();
@@ -140,7 +145,7 @@ gulp.task('version', function() {
 	bn_date = build_num[4] + build_num[5]
 	bn_inc = build_num.slice(-4);
 
-	console.log("yr: " + bn_year +  " mth: " + bn_month + " dte: " + bn_date + " inc: " + bn_inc);
+	// console.log("yr: " + bn_year +  " mth: " + bn_month + " dte: " + bn_date + " inc: " + bn_inc);
 
 	//  check build date incremental count
 	if (bn_year == year && bn_month == month && bn_date == date) {
@@ -176,7 +181,7 @@ gulp.task('version', function() {
 
 	fs.writeFile(dest_file, result, 'utf8', function (err) {
 		if (err) return console.log(err);
-	});
+		});
 	});
 
 });
