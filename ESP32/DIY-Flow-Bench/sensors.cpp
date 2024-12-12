@@ -328,7 +328,7 @@ double Sensors::getMafVolts() {
 
 		case LINEAR_ANALOG: {
 			long mafRaw = analogRead(pins.MAF_PIN);
-			sensorVolts = mafRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
+			sensorVolts = static_cast<double>(mafRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}
 
@@ -592,7 +592,7 @@ double Sensors::getPRefVolts() {
 
 		case LINEAR_ANALOG : {
 			long refPressRaw = analogRead(pins.REF_PRESSURE_PIN);
-			sensorVolts = refPressRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
+			sensorVolts = static_cast<double>(refPressRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}
 
@@ -712,7 +712,7 @@ double Sensors::getPDiffVolts() {
 
 		case LINEAR_ANALOG : {
 			long pDiffRaw = analogRead(pins.DIFF_PRESSURE_PIN);
-			sensorVolts = pDiffRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
+			sensorVolts = static_cast<double>(pDiffRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}
 
@@ -830,7 +830,7 @@ double Sensors::getPitotVolts() {
 
 		case LINEAR_ANALOG : {
 			long pDiffRaw = analogRead(pins.PITOT_PIN);
-			sensorVolts = pDiffRaw * (_hardware.get3v3SupplyVolts() / 4095.0);
+			sensorVolts = static_cast<double>(pDiffRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}
 

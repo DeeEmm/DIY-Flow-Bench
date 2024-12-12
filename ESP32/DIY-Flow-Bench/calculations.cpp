@@ -417,7 +417,7 @@ double Calculations::calculateAirDensity(double TempC, double refPressurePascals
 /***********************************************************
  * @brief Convert flow to standard CFM (SCFM)
  * @note Translates current flow to standardised flow based on international standards
- * @note Default standard for project is ISO 1585 - Automotive engine testing
+ * @note Default standard for project is ISO 5011
  ***/
 
 double Calculations::convertToSCFM(double flowCFM, int standard) {
@@ -463,10 +463,10 @@ double Calculations::convertToSCFM(double flowCFM, int standard) {
       rhStd = 0;
     break;
 
-    default: // ISO_1585
-      tStd = 25;
-      pStd = 100;
-      rhStd = 0;
+    default: // ISO_5011
+      tStd = 20;
+      pStd = 100.3;
+      rhStd = 50;
     break;
 
   }

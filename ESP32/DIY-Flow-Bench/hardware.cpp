@@ -240,8 +240,8 @@ void Hardware::begin () {
     _message.serialPrintf("Initialising ADS1115 \n");
 
     adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
-    adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
-    // adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 128 SPS, or every 7.8ms  (default)
+    // adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate - 128 SPS
+    adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 8 SPS
     
     if (!adc.testConnection()) {
       _message.serialPrintf("ADS1115 Connection failed");
@@ -345,6 +345,8 @@ int32_t Hardware::getADCRawData(int channel) {
  * @param channel ADC channel (0-3)
  * @note 1115: 16 bits less sign bit = 15 bits mantissa = 32767 | 6.144v = max voltage (gain) of ADC | 187.5 uV / LSB
  * @note 1015: 12 bits less sign bit = 11 bit mantissa = 2047 | 6.144v = max voltage (gain) of ADC
+ * int ADC_RANGE = 32767;
+ * double ADC_GAIN = 6.144;
  ***/
  double Hardware::getADCVolts(int channel) {
 
@@ -361,11 +363,13 @@ int32_t Hardware::getADCRawData(int channel) {
     break;
 
     case ADS1115:
-      volts = rawADCval * 6.144 / 32767;
+      // volts = rawADCval * config.ADC_GAIN / config.ADC_RANGE;
+      volts = rawADCval * 6.144F / 32767;
     break;
 
     case ADS1015:
-      volts = rawADCval * 6.144 / 2047.00F; 
+      // volts = rawADCval * config.ADC_GAIN / 2047.00F; 
+      volts = rawADCval * 32767 / 2047.00F; 
     break;
 
     default:
@@ -396,13 +400,13 @@ double Hardware::get5vSupplyVolts() {
   extern struct Pins pins;
   extern struct Configuration config;
 
-  double vcc5vSupplyVolts = 5.0;
+  double vcc5vSupplyVolts = 5.0F;
 
   if (config.USE_FIXED_5V_VALUE == true) {
     return vcc5vSupplyVolts; 
   } else {
     long rawVoltageValue = analogRead(pins.VCC_5V_PIN);  
-    vcc5vSupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
+    vcc5vSupplyVolts = (2 * static_cast<double>(rawVoltageValue) * 0.805860805860806F) ;
     return vcc5vSupplyVolts + config.VCC_5V_TRIMPOT;
   }
 }
@@ -422,13 +426,13 @@ double Hardware::get3v3SupplyVolts() {
   extern struct Pins pins; 
   extern struct Configuration config;
 
-  double vcc3v3SupplyVolts = 3.3;
+  double vcc3v3SupplyVolts = 3.3F;
 
   if (config.USE_FIXED_3_3V_VALUE) {
     return vcc3v3SupplyVolts; 
   } else {
     long rawVoltageValue = analogRead(pins.VCC_3V3_PIN );  
-    vcc3v3SupplyVolts = (2 * rawVoltageValue * 0.805860805860806) ;
+    vcc3v3SupplyVolts = (2 * static_cast<double>(rawVoltageValue) * 0.805860805860806F) ;
     return vcc3v3SupplyVolts + config.VCC_3V3_TRIMPOT;
   }
 }

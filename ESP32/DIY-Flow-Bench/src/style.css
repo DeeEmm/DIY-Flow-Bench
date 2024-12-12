@@ -444,6 +444,10 @@ flowTargetValInput {
   width:400px;
 }
 
+.serialModal {
+  height: 600px;
+}
+
 @media screen and (max-width: 800px) {
   .modal-content {
       width: 100vw;

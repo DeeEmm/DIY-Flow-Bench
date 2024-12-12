@@ -286,10 +286,12 @@ bool DataHandler::checkUserFile(int filetype) {
     File root = FILESYSTEM.open("/");
     File file = root.openNextFile();
 
+    std::string matchCONFIG = "config";
     std::string matchPINS = "PINS";
     std::string matchMAF = "MAF";
     std::string matchINDEX = "index";
     std::string spiffsFile;
+    std::string configFile;
     std::string pinsFile;
     std::string mafFile;
     std::string indexFile;
@@ -298,12 +300,22 @@ bool DataHandler::checkUserFile(int filetype) {
     while (file)  {
       spiffsFile = file.name();
 
+      if (checkSubstring(spiffsFile.c_str(), matchCONFIG.c_str()) && (filetype == CONFIGFILE)) {
+        // CONFIG_*******.json file found
+        pinsFile = "/" + spiffsFile;
+        _message.serialPrintf("CONFIG file Found: %s\n", configFile.c_str() );  
+        status.pinsFilename = configFile.c_str();        
+        loadConfiguration();
+        status.configLoaded = true;
+        return true;
+      }   
+      
       if (checkSubstring(spiffsFile.c_str(), matchPINS.c_str()) && (filetype == PINSFILE)) {
         // PINS_*******.json file found
         pinsFile = "/" + spiffsFile;
         _message.serialPrintf("PINS file Found: %s\n", pinsFile.c_str() );  
         status.pinsFilename = pinsFile.c_str();        
-        _data.loadPinsData();
+        loadPinsData();
         status.pinsLoaded = true;
         return true;
       }   
@@ -1115,10 +1127,10 @@ String DataHandler::getFileListJSON()
 
 
 /***********************************************************
- * @brief getDataJSON
+ * @brief buildSSEJsonData
  * @details Package up current bench data into JSON string
  ***/
-String DataHandler::getDataJSON()
+String DataHandler::buildSSEJsonData()
 {
 
   extern struct DeviceStatus status;
@@ -1441,7 +1453,7 @@ void DataHandler::bootLoop()
         }
 
         // This is the escape function. When all files are present and loaded we can leave the loop
-        if ((status.pinsLoaded == true) && (status.mafLoaded == true) && (status.GUIexists == true) && (SPIFFS.exists("/configuration.json"))){
+        if ((status.configLoaded == true) && (status.pinsLoaded == true) && (status.mafLoaded == true) && (status.GUIexists == true) ){
           status.doBootLoop = false; 
           break;
         } 

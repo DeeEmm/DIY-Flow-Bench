@@ -328,7 +328,7 @@ void API::ParseMessage(char apiMessage) {
       case 'J':{ // JSON Data
           if (status.doBootLoop) break;
           StaticJsonDocument <DATA_JSON_SIZE> jsondoc;
-          jsonString = _data.getDataJSON();
+          jsonString = _data.buildSSEJsonData();
           deserializeJson(jsondoc, jsonString);
           serializeJsonPretty(jsondoc, Serial);
           // snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", settings.api_delim, String(jsonString).c_str());
@@ -464,7 +464,7 @@ void API::ParseMessage(char apiMessage) {
           _message.serialPrintf("pinsLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
           _message.serialPrintf("mafLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
           _message.serialPrintf("configLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
-          _message.serialPrintf("GUIexists  =  %s", status.activeOrifice);
+          _message.serialPrintf("GUIexists  =  %s", status.GUIexists);
           _message.serialPrintf("pinsFilename =  %s\n", status.pinsFilename);
           _message.serialPrintf("mafFilename =  %s\n", status.mafFilename);
           _message.serialPrintf("indexFilename =  %s\n", status.indexFilename);

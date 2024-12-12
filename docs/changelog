@@ -30,6 +30,10 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 Build #         - Description of Change
 
 
+2412120051      - #288 Updated Analog calcs to cast to double
+2412120016      - Changed ADS1115 to 8 SPS
+                - #288 removed struct from ADC calc
+                - Renames buildSSEJsonData to buildSSEJsonData
 2412120002      - #288 fixed 60mv sensor deviation
 2412110117      - Refactored MAF JSON code handling
                 - Removed MAF initialisation from sensors.begin()      
@@ -419,7 +423,7 @@ Build #         - Description of Change
                 - Updated BOM in docs folder
 21090101        - Added support for 1015 / 1115 ADC for MAF / PRef / PDiff / Pitot
 21082503        - #87 Wifi client network
-                - Corrected millivolt calc in Webserver::getDataJSON
+                - Corrected millivolt calc in Webserver::buildSSEJsonData
 21082502        - Reviewed Status and error messages
                 - Changed release version to V2
                 - Package up for Release Candidate 1

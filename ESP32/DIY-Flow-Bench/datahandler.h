@@ -73,7 +73,7 @@ class DataHandler {
 		static void clearLiftDataFile(AsyncWebServerRequest *request);
 		StaticJsonDocument<1024> loadCalibrationData ();
 		void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
-		String getDataJSON();
+		String buildSSEJsonData();
 		static void fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 		void bootLoop();
 		String getRemote(const char* serverName);

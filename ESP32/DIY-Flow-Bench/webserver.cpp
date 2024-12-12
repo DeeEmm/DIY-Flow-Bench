@@ -289,7 +289,7 @@ void Webserver::begin()
   // Send JSON Data
   server->on("/api/json", HTTP_GET, [](AsyncWebServerRequest *request){
     DataHandler _data;
-    request->send(200, "text/html", String(_data.getDataJSON()).c_str());
+    request->send(200, "text/html", String(_data.buildSSEJsonData()).c_str());
   });
 
 
@@ -412,6 +412,12 @@ void Webserver::fileUpload(AsyncWebServerRequest *request, String filename, size
     _message.debugPrintf("Upload Complete: %s, %u bytes\n", filename.c_str(), file_size);
     request->_tempFile.close();
 
+    if (_data.checkUserFile(CONFIGFILE)){
+      _data.loadConfiguration();
+      status.configLoaded = true;
+      redirectURL = "/";
+      // redirectURL = "/?view=upload";
+    } 
     if (_data.checkUserFile(PINSFILE)){
       _data.loadPinsData();
       status.pinsLoaded = true;

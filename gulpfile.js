@@ -116,9 +116,6 @@ gulp.task('htmlmax', function() {
 	
 
 
-
-
-
 gulp.task('version', function() {
 
 	// get release info from version.json
