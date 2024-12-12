@@ -361,11 +361,11 @@ int32_t Hardware::getADCRawData(int channel) {
     break;
 
     case ADS1115:
-      volts = rawADCval * config.ADC_GAIN / config.ADC_RANGE;
+      volts = rawADCval * 6.144 / 32767;
     break;
 
     case ADS1015:
-      volts = rawADCval * config.ADC_GAIN / 2047.00F; 
+      volts = rawADCval * 6.144 / 2047.00F; 
     break;
 
     default:
