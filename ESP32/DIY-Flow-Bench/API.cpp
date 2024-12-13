@@ -464,7 +464,7 @@ void API::ParseMessage(char apiMessage) {
           _message.serialPrintf("pinsLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
           _message.serialPrintf("mafLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
           _message.serialPrintf("configLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
-          _message.serialPrintf("GUIexists  =  %s", status.GUIexists);
+          _message.serialPrintf("GUIexists  =  %s", status.GUIexists ? "true" : "false");
           _message.serialPrintf("pinsFilename =  %s\n", status.pinsFilename);
           _message.serialPrintf("mafFilename =  %s\n", status.mafFilename);
           _message.serialPrintf("indexFilename =  %s\n", status.indexFilename);

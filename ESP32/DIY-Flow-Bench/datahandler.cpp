@@ -1161,18 +1161,30 @@ String DataHandler::buildSSEJsonData()
         dataJson["MFLOW"] = sensorVal.FlowKGH;
         dataJson["AFLOW"] = sensorVal.FlowADJ;
         dataJson["SFLOW"] = sensorVal.FlowSCFM;
+        dataJson["MAF_VOLTS"] = sensorVal.MafVolts;
+        dataJson["PREF_VOLTS"] = sensorVal.PRefVolts;
+        dataJson["PDIFF_VOLTS"] = sensorVal.PDiffVolts;
+        dataJson["PITOT_VOLTS"] = sensorVal.PitotVolts;
     // Round to whole value    
     } else if (strstr(String(settings.rounding_type).c_str(), String("INTEGER").c_str())) {
         dataJson["FLOW"] = round(sensorVal.FlowCFM);
         dataJson["MFLOW"] = round(sensorVal.FlowKGH);
         dataJson["AFLOW"] = round(sensorVal.FlowADJ);
         dataJson["SFLOW"] = round(sensorVal.FlowSCFM);
+        dataJson["MAF_VOLTS"] = sensorVal.MafVolts;
+        dataJson["PREF_VOLTS"] = sensorVal.PRefVolts;
+        dataJson["PDIFF_VOLTS"] = sensorVal.PDiffVolts;
+        dataJson["PITOT_VOLTS"] = sensorVal.PitotVolts;
     // Round to half (nearest 0.5)
     } else if (strstr(String(settings.rounding_type).c_str(), String("HALF").c_str())) {
         dataJson["FLOW"] = round(sensorVal.FlowCFM * 2.0 ) / 2.0;
         dataJson["MFLOW"] = round(sensorVal.FlowKGH * 2.0) / 2.0;
         dataJson["AFLOW"] = round(sensorVal.FlowADJ * 2.0) / 2.0;
         dataJson["SFLOW"] = round(sensorVal.FlowSCFM * 2.0) / 2.0;
+        dataJson["PREF_VOLTS"] = sensorVal.PRefVolts;
+        dataJson["MAF_VOLTS"] = sensorVal.MafVolts;
+        dataJson["PDIFF_VOLTS"] = sensorVal.PDiffVolts;
+        dataJson["PITOT_VOLTS"] = sensorVal.PitotVolts;
     }
 
   }  else  {
@@ -1180,7 +1192,13 @@ String DataHandler::buildSSEJsonData()
     dataJson["MFLOW"] = 0.0;
     dataJson["AFLOW"] = 0.0;
     dataJson["SFLOW"] = 0.0;
+    dataJson["MAF_VOLTS"] = 0.0;
+    dataJson["PREF_VOLTS"] = 0.0;
+    dataJson["PDIFF_VOLTS"] = 0.0;
+    dataJson["PITOT_VOLTS"] = 0.0;
   }
+
+
 
 
   // Flow depression value for AFLOW units
@@ -1464,7 +1482,11 @@ void DataHandler::bootLoop()
     } while (status.doBootLoop == true);
 
     // Lets load 
-
+    if (!status.configLoaded == true) _data.loadConfiguration();
+    
+    if (!status.pinsLoaded == true) _data.loadPinsData();
+    
+    if (!status.mafLoaded == true) _data.loadMAFData();
 
     // if the weberver is already running skip sever reset
     if (!status.webserverIsRunning) {
@@ -1474,6 +1496,4 @@ void DataHandler::bootLoop()
     }
 
 }
-
-
 

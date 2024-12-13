@@ -274,7 +274,7 @@ struct SensorData {
   double FlowSCFM = 0.0;
   double FlowADJ = 0.0;
   double FlowADJSCFM = 0.0;
-  double MafMv = 0.0;
+  double MafVolts = 0.0;
   double TempDegC = 0.0;
   double TempDegF = 0.0;
   double RelH = 0.0;
@@ -282,14 +282,14 @@ struct SensorData {
   double BaroKPA = 0.0;
   double BaroHPA = 0.0;
   double PRefKPA = 0.0;
-  double PRefMv = 0.0;
+  double PRefVolts = 0.0;
   double PRefH2O = 0.0;
   double PDiffKPA = 0.0;
   double PDiffH2O = 0.0;
-  double PDiffMv = 0.0;
+  double PDiffVolts = 0.0;
   double PitotKPA = 0.0;
   double PitotH2O = 0.0;
-  double PitotMv = 0.0;
+  double PitotVolts = 0.0;
   double PitotDelta = 0.0;
   double PitotVelocity = 0.0;
   double Swirl = 0.0;
@@ -525,6 +525,10 @@ struct Language {
     char LANG_GUI_OVERWRITE[50] = "Overwrite";  
     char LANG_GUI_DATA_CAPTURE_SETTINGS[50] = "Data Capture Settings";
     char LANG_GUI_CAPTURE_DATATYPE[50] = "Datatype";
+    char LANG_GUI_MAF_VOLTS[50] = "MAF Volts";
+    char LANG_GUI_PREF_VOLTS[50] = "pRef Volts";
+    char LANG_GUI_PDIFF_VOLTS[50] = "pDiff Volts";
+    char LANG_GUI_PITOT_VOLTS[50] = "Pitot Volts";
     
 
 

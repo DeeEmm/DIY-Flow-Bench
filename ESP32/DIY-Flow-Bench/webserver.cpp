@@ -413,15 +413,15 @@ void Webserver::fileUpload(AsyncWebServerRequest *request, String filename, size
     request->_tempFile.close();
 
     if (_data.checkUserFile(CONFIGFILE)){
-      _data.loadConfiguration();
+      // _data.loadConfiguration();
       status.configLoaded = true;
     } 
     if (_data.checkUserFile(PINSFILE)){
-      _data.loadPinsData();
+      // _data.loadPinsData();
       status.pinsLoaded = true;
     } 
     if (_data.checkUserFile(MAFFILE)) {
-      _data.loadMAFData();
+      // _data.loadMAFData();
       status.mafLoaded = true;  
     }
     if (_data.checkUserFile(INDEXFILE)) {
@@ -1023,6 +1023,12 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_OVERWRITE") return language.LANG_GUI_OVERWRITE;
   if (var == "LANG_GUI_DATA_CAPTURE_SETTINGS") return language.LANG_GUI_DATA_CAPTURE_SETTINGS;
   if (var == "LANG_GUI_CAPTURE_DATATYPE") return language.LANG_GUI_CAPTURE_DATATYPE;
+  if (var == "LANG_GUI_MAF_VOLTS") return language.LANG_GUI_MAF_VOLTS;
+  if (var == "LANG_GUI_PREF_VOLTS") return language.LANG_GUI_PREF_VOLTS;
+  if (var == "LANG_GUI_PDIFF_VOLTS") return language.LANG_GUI_PDIFF_VOLTS;
+  if (var == "LANG_GUI_PITOT_VOLTS") return language.LANG_GUI_PITOT_VOLTS;
+
+  
   if (var == "MAF_FLOW_UNIT") {
 
   	const auto unitKG_H = std::string("KG_H");
