@@ -41,7 +41,7 @@
 #include <Arduino.h>
 #include "freertos/semphr.h"
 #include "esp_task_wdt.h"
-#include <MD_REncoder.h>
+// #include <MD_REncoder.h>
 #include <math.h>
 
 #include "datahandler.h"
