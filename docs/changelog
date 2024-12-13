@@ -29,6 +29,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2412140026      - Basic Data Modal Added (WIP)
+2412140001      - #236 Added Sensor_MV to json data
 2412130038      - #288 Sensor status info incorrect
 2412130037      - Changed pre:user_actions
 2412130025      - #292 Changed Webserver::fileUpload 'final' code

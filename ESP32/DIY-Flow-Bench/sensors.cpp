@@ -367,6 +367,7 @@ double Sensors::getMafFlow(int units) {
 	extern struct DeviceStatus status;
 	extern struct SensorData sensorVal;
 	extern struct BenchSettings settings;
+	extern struct SensorData sensorVal;
 
 	Hardware _hardware;
 	Messages _message;
@@ -384,7 +385,9 @@ double Sensors::getMafFlow(int units) {
 
 	// message.serialPrintf("MAF TEST VAL: %li ", status.mafDataKeyMax);
 
-	u_int refValue = (static_cast<double>(status.mafDataKeyMax) / _hardware.get5vSupplyVolts()) * this->getMafVolts();
+	sensorVal.MafVolts = this->getMafVolts();
+
+	u_int refValue = (static_cast<double>(status.mafDataKeyMax) / _hardware.get5vSupplyVolts()) * sensorVal.MafVolts;
 
 	// message.serialPrintf("MAF REF VAL: %i Max Val : %i\n", refValue, status.mafDataKeyMax);
 
@@ -576,6 +579,7 @@ double Sensors::getPRefVolts() {
 
 	extern struct Configuration config;
 	extern struct Pins pins;
+	extern struct SensorData sensorVal;
 
 	double sensorVolts = 0.0;
 
@@ -626,57 +630,58 @@ double Sensors::getPRefValue() {
 
 	Hardware _hardware;
 	Messages _message;
+
 	extern struct BenchSettings settings;
 	extern struct Configuration config;
+	extern struct SensorData sensorVal;
 
-	double sensorVal = 0.0;
-	// double sensorVolts = this->getPRefVolts();
-	double sensorVolts = getPRefVolts();
+	double returnVal = 0.0;
+	sensorVal.PRefVolts = getPRefVolts();
 
 	switch (config.PREF_SENSOR_TYPE)  {
 
 		case LINEAR_ANALOG: 	
-				sensorVal = sensorVolts * config.PREF_ANALOG_SCALE;
+				returnVal = sensorVal.PRefVolts * config.PREF_ANALOG_SCALE;
 		break;
 
 		case MPXV7007:
 			// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
-			sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+			returnVal = ((sensorVal.PRefVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
 		break;
 
 		case MPXV7025:
 			// Vout = Vcc x (0.018 x P + 0.5)
 			// P = ((Vout / Vcc) - 0.5 ) / 0.018 )
-			sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+			returnVal = ((sensorVal.PRefVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
 		break;
 
 		case XGZP6899A007KPDPN :
 			// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
-			sensorVal = sensorVolts * 3.5 - 8.75;
+			returnVal = sensorVal.PRefVolts * 3.5 - 8.75;
 
 		case XGZP6899A010KPDPN:
 			// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
-			sensorVal = sensorVolts * 5 - 12.5;
+			returnVal = sensorVal.PRefVolts * 5 - 12.5;
 		break;
 
 		case M5STACK_TubePressure:
 			//P: Actual test pressure value, unit (Kpa)
 			//Vout: sensor voltage output value
 			//P = (Vout-0.1)/3.0*300.0-100.0
-			sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;	
+			returnVal = (sensorVal.PRefVolts-0.1)/3.0*300.0-100.0;	
 		break;
 
 		default:
-			sensorVal = config.FIXED_REF_PRESS_VALUE;
+			returnVal = config.FIXED_REF_PRESS_VALUE;
 		break;
 	}
 
 	// Flip negative values
-	double pRefComp = fabs(sensorVal);
+	double pRefComp = fabs(returnVal);
 
 	// Lets make sure we have a valid value to return
 	if (pRefComp > settings.min_bench_pressure) {
-		return sensorVal;
+		return returnVal;
 	} else { 
 		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in display)
 	}
@@ -745,56 +750,57 @@ double Sensors::getPDiffValue() {
 
 	extern struct BenchSettings settings; 
 	extern struct Configuration config;
+	extern struct SensorData sensorVal;
 
 	Hardware _hardware;
 
-	double sensorVal = 0.0;
-	double sensorVolts = this->getPDiffVolts();
+	double returnVal = 0.0;
+	sensorVal.PDiffVolts = this->getPDiffVolts();
 
 	switch (config.PDIFF_SENSOR_TYPE)  {
 
 			case LINEAR_ANALOG: 	
-					sensorVal = this->getPRefVolts() * config.PDIFF_ANALOG_SCALE;
+					returnVal = sensorVal.PDiffVolts * config.PDIFF_ANALOG_SCALE;
 			break;
 
 			case MPXV7007:
 				// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
-				sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+				returnVal = ((sensorVal.PDiffVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
 			break;
 
 			case MPXV7025:
 				// Vout = Vcc x (0.018 x P + 0.5)
 				// P = ((Vout / Vcc) - 0.5 ) / 0.018 )
-				sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+				returnVal = ((sensorVal.PDiffVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
 			break;
 
 			case XGZP6899A007KPDPN:
 				// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
-				sensorVal = sensorVolts * 3.5 - 8.75;
+				returnVal = sensorVal.PDiffVolts * 3.5 - 8.75;
 
 			case XGZP6899A010KPDPN:
 				// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
-				sensorVal = sensorVolts * 5 - 12.5;
+				returnVal = sensorVal.PDiffVolts * 5 - 12.5;
 			break;
 
 			case M5STACK_TubePressure:
 				//P: Actual test pressure value, unit (Kpa)
 				//Vout: sensor voltage output value
 				//P = (Vout-0.1)/3.0*300.0-100.0
-				sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;	
+				returnVal = (sensorVal.PDiffVolts-0.1)/3.0*300.0-100.0;	
 			break;
 
 			default:
-				sensorVal = config.FIXED_DIFF_PRESS_VALUE;
+				returnVal = config.FIXED_DIFF_PRESS_VALUE;
 			break;
 		}
 
 	// Flip negative values
-	double pDiffComp = fabs(sensorVal);
+	double pDiffComp = fabs(returnVal);
 
 	// Lets make sure we have a valid value to return - check it is above minimum threshold
 	if (pDiffComp > settings.min_bench_pressure) { 
-		return sensorVal;
+		return returnVal;
 	} else { 
 		return 0.0001; // return small non zero value to prevent divide by zero errors (will be truncated to zero in display)
 	}	
@@ -867,60 +873,61 @@ double Sensors::getPitotValue() {
 	extern struct BenchSettings settings;
 	extern struct CalibrationData calVal;
 	extern struct Configuration config;
+	extern struct SensorData sensorVal;
 
 	Calculations _calculations;
 	Hardware _hardware;
 
 	double pitotPressure = 0.0;
-	double sensorVolts = this->getPitotVolts();
 	double airDensity = 0.0;
 	double airVelocity = 0.0;
 	double totalPressure = 0.0;
 	double staticPressure = 0.0;	
+	sensorVal.PitotVolts = this->getPitotVolts();
 
-	double sensorVal = 0.0;
+	double returnVal = 0.0;
 
 	switch (config.PITOT_SENSOR_TYPE)  {
 
 		case LINEAR_ANALOG: 	
-				sensorVal = this->getPitotVolts() * config.PITOT_ANALOG_SCALE;
+				returnVal = sensorVal.PitotVolts * config.PITOT_ANALOG_SCALE;
 		break;
 
 		case MPXV7007:
 			// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
-			sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+			returnVal = ((sensorVal.PitotVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
 		break;
 
 		case MPXV7025:
 			// Vout = Vcc x (0.018 x P + 0.5)
 			// P = ((Vout / Vcc) - 0.5 ) / 0.018 )
-			sensorVal = ((sensorVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+			returnVal = ((sensorVal.PitotVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
 		break;
 
 		case XGZP6899A007KPDPN:
 			// Linear response. Range = 0.5 ~ 4.5 = -7 ~ 7kPa
-			sensorVal = sensorVolts * 3.5 - 8.75;
+			returnVal = sensorVal.PitotVolts * 3.5 - 8.75;
 
 		case XGZP6899A010KPDPN:
 			// Linear response. Range = 0.5 ~ 4.5 = -10 ~ 10kPa
-			sensorVal = sensorVolts * 5 - 12.5;
+			returnVal = sensorVal.PitotVolts * 5 - 12.5;
 		break;
 
 		case M5STACK_TubePressure:
 			//P: Actual test pressure value, unit (Kpa)
 			//Vout: sensor voltage output value
 			//P = (Vout-0.1)/3.0*300.0-100.0
-			sensorVal = (sensorVolts-0.1)/3.0*300.0-100.0;	
+			returnVal = (sensorVal.PitotVolts-0.1)/3.0*300.0-100.0;	
 		break;
 
 		default:
-			sensorVal = config.FIXED_DIFF_PRESS_VALUE;
+			returnVal = config.FIXED_DIFF_PRESS_VALUE;
 		break;
 	}
 
 
 	// Flip negative values
-	double pitotComp = fabs(sensorVal); 
+	double pitotComp = fabs(returnVal); 
 
 	// Lets make sure we have a valid value to return - check it is above minimum threshold
 	if (pitotComp > settings.min_bench_pressure) { 
