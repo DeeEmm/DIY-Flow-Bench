@@ -448,6 +448,15 @@ flowTargetValInput {
   height: 600px;
 }
 
+.dataModal {
+  display:block !important;
+  font-size: 12px;
+}
+
+.dataValue {
+	
+}
+
 @media screen and (max-width: 800px) {
   .modal-content {
       width: 100vw;

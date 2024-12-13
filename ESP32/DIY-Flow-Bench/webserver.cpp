@@ -30,7 +30,7 @@
 #include "structs.h"
 #include "comms.h"
 
-#include <AsyncTCP.h>
+// #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
@@ -415,28 +415,18 @@ void Webserver::fileUpload(AsyncWebServerRequest *request, String filename, size
     if (_data.checkUserFile(CONFIGFILE)){
       _data.loadConfiguration();
       status.configLoaded = true;
-      redirectURL = "/";
-      // redirectURL = "/?view=upload";
     } 
     if (_data.checkUserFile(PINSFILE)){
       _data.loadPinsData();
       status.pinsLoaded = true;
-      redirectURL = "/";
-      // redirectURL = "/?view=upload";
     } 
     if (_data.checkUserFile(MAFFILE)) {
       _data.loadMAFData();
       status.mafLoaded = true;  
-      redirectURL = "/";
-      // redirectURL = "/?view=upload";
     }
     if (_data.checkUserFile(INDEXFILE)) {
       status.GUIexists = true;  
-      redirectURL = "/";
     }
-
-    // TEST - tying to get rid of 500 error after upload but before page refresh
-    delay(2000);
 
     request->redirect(redirectURL);
   }
