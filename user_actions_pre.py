@@ -9,6 +9,9 @@ from SCons.Script import Import
 Import("env")
 
 
+INO_FILE = ".pio/build/esp32dev/src/API.cpp.o"
+
+
 # Check build 
 def is_pio_build():
     from SCons.Script import DefaultEnvironment
@@ -98,5 +101,4 @@ def before_build(source, target, env):
         return 0
 
 
-# env.AddPreAction(".pio/build/esp32dev/system.c.o", before_build)
-before_build
+env.AddPreAction(INO_FILE, before_build)
