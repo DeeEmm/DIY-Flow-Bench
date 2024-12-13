@@ -150,7 +150,7 @@ void Sensors::begin () {
 	status.relhSensor = getSensorType(config.RELH_SENSOR_TYPE);
 	status.prefSensor = getSensorType(config.PREF_SENSOR_TYPE);
 	status.pdiffSensor = getSensorType(config.PDIFF_SENSOR_TYPE);
-	status.pitotSensor = getSensorType(config.PREF_SENSOR_TYPE);
+	status.pitotSensor = getSensorType(config.PITOT_SENSOR_TYPE);
 
 	// END System status definitions
 
