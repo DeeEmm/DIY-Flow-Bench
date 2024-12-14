@@ -52,7 +52,8 @@
 #include "hardware.h" 
 #include "sensors.h"
 #include "calculations.h"
-#include "webserver.h" 
+#include "webserver.h"
+#include "public_html.h" 
 #include "messages.h"
 #include "API.h"
 #include "Wire.h"
@@ -76,6 +77,7 @@ Hardware _hardware;
 Messages _message;
 Sensors _sensors;
 Webserver _webserver;
+PublicHTML _public_html;
 
 // Set up semaphore signalling between tasks
 SemaphoreHandle_t i2c_task_mutex;
@@ -312,9 +314,9 @@ void setup(void) {
 
   // REVIEW
   // set message queue length
-  // xQueueCreate( 1, 1);
+  // xQueueCreate( 8, 1024);
   // xQueueCreate( 256, 2048);
-  xQueueCreate( 512, 4096);
+  // xQueueCreate( 1024, 4096);
     
   _hardware.begin();
 
@@ -332,11 +334,13 @@ void setup(void) {
   #endif
 
   if (config.ADC_TYPE != SENSOR_DISABLED) { 
-    xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENSOR_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
+    // xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENSOR_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
+    xTaskCreate(TASKgetSensorData, "GET_SENSOR_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask); 
   }
 
   if (config.BME280_IS_ENABLED) { 
-    xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
+    // xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
+    xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask); 
   }
 
   if (config.SWIRL_IS_ENABLED){

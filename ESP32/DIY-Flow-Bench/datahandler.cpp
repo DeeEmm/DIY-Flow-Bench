@@ -101,11 +101,22 @@ void DataHandler::begin() {
     this->loadLiftData();
     this->loadCalibrationData();
 
-    // Check if config files exists. If not send to boot loop until it is uploaded
-    if (SPIFFS.exists("/configuration.json")) {
-      this->loadConfiguration();
+    // // Check if config files exists. If not send to boot loop until it is uploaded
+    // if (SPIFFS.exists("/configuration.json")) {
+    //   this->loadConfiguration();
+    // } else {
+    //   status.doBootLoop = true;
+    // }
+
+    // Check for CONFIG file
+    if (checkUserFile(CONFIGFILE)) {
+      if (!SPIFFS.exists(status.pinsFilename)) {
+          status.doBootLoop = true;
+          _message.serialPrintf("!! CONFIG file not found !!\n");  
+      }
     } else {
-      status.doBootLoop = true;
+          status.doBootLoop = true;
+          _message.serialPrintf("!! CONFIG file not found !!\n");  
     }
 
     // Check for PINS file
@@ -119,23 +130,18 @@ void DataHandler::begin() {
           _message.serialPrintf("!! PINS file not found !!\n");  
     }
 
-    if (checkUserFile(INDEXFILE)) {
-      if (!SPIFFS.exists(status.indexFilename)) {
-          status.doBootLoop = true;
-          _message.serialPrintf("!! index.html file not found !!\n");  
-      }
-    } else {
-          status.doBootLoop = true;
-          _message.serialPrintf("!! index.html file not found !!\n");  
-    }
+    // // Check for INDEX file
+    // if (checkUserFile(INDEXFILE)) {
+    //   if (!SPIFFS.exists(status.indexFilename)) {
+    //       status.doBootLoop = true;
+    //       _message.serialPrintf("!! INDEX file not found !!\n");  
+    //   }
+    // } else {
+    //       status.doBootLoop = true;
+    //       _message.serialPrintf("!! INDEX file not found !!\n");  
+    // }
     
-        // Check for MAF file
-    // TODO - Only if MAF is enabled !!!!!
-    // NOTE cannot determine MAF data until config is loaded.
-    // Probably need to force a reboot after config is uploaded
-    // to force reload of config then MAF
-    // or we can just expect that the MAF file is missing and 
-    // send user to upload screen as we do with index.html
+    // Check for MAF file
     if (checkUserFile(MAFFILE)) {
       if (!SPIFFS.exists(status.mafFilename)) {
           status.doBootLoop = true;
@@ -146,23 +152,22 @@ void DataHandler::begin() {
           _message.serialPrintf("!! MAF file not found !!\n");  
     }
 
-
     // Initialise WiFi
     _comms.initaliseWifi();
 
-    // Error Handler - critical files are missing !!
-    // Manage on-boarding (index and config file uploading)
-    // BootLoop method traps program pointer within loop until files are uplaoded
+    // BootLoop method traps program pointer within loop until files are uploaded
     if (status.doBootLoop == true) bootLoop();
+
+    // Load MAF / CONFIG / PINS files
+    if (status.configLoaded == true) _data.loadConfiguration();
+    if (status.pinsLoaded == true) _data.loadPinsData();
+    if (status.mafLoaded == true) _data.loadMAFData();
     
     _hardware.initaliseIO();
 
     // Start Wire (I2C)
     Wire.begin (pins.SDA_PIN, pins.SCL_PIN); 
     Wire.setClock(100000);
-    // Wire.setClock(300000); // ok for wemos D1
-    // Wire.setClock(400000);
-
 
     // TODO Initialise SD card
     if (config.SD_CARD_IS_ENABLED) {
@@ -300,44 +305,44 @@ bool DataHandler::checkUserFile(int filetype) {
     while (file)  {
       spiffsFile = file.name();
 
+      // Check config file
       if (checkSubstring(spiffsFile.c_str(), matchCONFIG.c_str()) && (filetype == CONFIGFILE)) {
-        // CONFIG_*******.json file found
-        pinsFile = "/" + spiffsFile;
+        configFile = "/" + spiffsFile;
         _message.serialPrintf("CONFIG file Found: %s\n", configFile.c_str() );  
         status.pinsFilename = configFile.c_str();        
-        loadConfiguration();
+        // loadConfiguration();
         status.configLoaded = true;
         return true;
       }   
-      
+
+      // Check PINS file      
       if (checkSubstring(spiffsFile.c_str(), matchPINS.c_str()) && (filetype == PINSFILE)) {
-        // PINS_*******.json file found
         pinsFile = "/" + spiffsFile;
         _message.serialPrintf("PINS file Found: %s\n", pinsFile.c_str() );  
         status.pinsFilename = pinsFile.c_str();        
-        loadPinsData();
+        // loadPinsData();
         status.pinsLoaded = true;
         return true;
       }   
       
+      // Check MAF file
       if (checkSubstring(spiffsFile.c_str(), matchMAF.c_str()) && (filetype == MAFFILE)) {
-        // MAF_********.json file found
         mafFile = "/" + spiffsFile;
         _message.serialPrintf("MAF file Found: %s\n", mafFile.c_str() );  
         status.mafFilename = mafFile.c_str();
-        loadMAFData();
+        // loadMAFData();
         status.mafLoaded = true;
         return true;
       }
       
-      if (checkSubstring(spiffsFile.c_str(), matchINDEX.c_str()) && (filetype == INDEXFILE)) {
-        // index.html file found
-        indexFile = "/" + spiffsFile;
-        _message.serialPrintf("Index file Found: %s\n", indexFile.c_str() );  
-        status.indexFilename = indexFile.c_str();
-        status.GUIexists = true;
-        return true;
-      }
+      // // Check index file
+      // if (checkSubstring(spiffsFile.c_str(), matchINDEX.c_str()) && (filetype == INDEXFILE)) {
+      //   indexFile = "/" + spiffsFile;
+      //   _message.serialPrintf("Index file Found: %s\n", indexFile.c_str() );  
+      //   status.indexFilename = indexFile.c_str();
+      //   status.GUIexists = true;
+      //   return true;
+      // }
 
       file = root.openNextFile();
     }
@@ -592,6 +597,7 @@ void DataHandler::beginSerial(void) {
 StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
 
   extern struct Configuration config;
+  extern struct DeviceStatus status;
 
   StaticJsonDocument<CONFIG_JSON_SIZE> configurationJSON;
 
@@ -680,6 +686,7 @@ StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
     
     // config.PLACEHOLDER = configurationJSON["PLACEHOLDER"])
 
+    status.configLoaded = true;
 
   } else {
     _message.serialPrintf("Configuration file not found \n");
@@ -854,6 +861,8 @@ void DataHandler::loadMAFData () {
 
   _message.verbosePrintf("MAF Data Val Max: %lu\n", status.mafDataValMax);
   _message.verbosePrintf("MAF Data Key Max: %lu\n", status.mafDataKeyMax);
+
+  status.mafLoaded = true;
 
 }
 
@@ -1052,6 +1061,8 @@ void DataHandler::loadPinsData () {
   pinsFileData = _data.loadJSONFile(status.pinsFilename);
 
   parsePinsData(pinsFileData);
+
+  status.pinsLoaded = true;
 
 
   // TEST - save pins data to file
@@ -1471,20 +1482,38 @@ void DataHandler::bootLoop()
         }
 
         // This is the escape function. When all files are present and loaded we can leave the loop
-        if ((status.configLoaded == true) && (status.pinsLoaded == true) && (status.mafLoaded == true) && (status.GUIexists == true) ){
+        // if ((status.configLoaded == true) && (status.pinsLoaded == true) && (status.mafLoaded == true) && (status.GUIexists == true) ){
+        if ((status.configLoaded == true) && (status.pinsLoaded == true) && (status.mafLoaded == true)) {
           status.doBootLoop = false; 
           break;
         } 
         // if (status.pinsFilename.isEmpty();
 
-        vTaskDelay( 1 );
+        
+        if (!status.configLoaded) {
+          if (checkUserFile(CONFIGFILE) ) status.configLoaded = true ;
+        }
+
+        if (!status.pinsLoaded) {
+         if (checkUserFile(PINSFILE) ) status.pinsLoaded = true ;
+        }
+
+        if (!status.mafLoaded) {
+          if (checkUserFile(MAFFILE) ) status.mafLoaded = true ;
+        }
+
+        if (status.doBootLoop == false) {
+          break;
+        }
+
+        // if (!status.GUIexists) {
+        //   if (checkUserFile(INDEXFILE) ) status.GUIexists = true ;
+        // }
+
+        vTaskDelay( 1000 );
     
     } while (status.doBootLoop == true);
 
-    // Lets load 
-    if (!status.configLoaded == true) _data.loadConfiguration();
-    if (!status.pinsLoaded == true) _data.loadPinsData();
-    if (!status.mafLoaded == true) _data.loadMAFData();
 
     // if the weberver is already running skip sever reset
     if (!status.webserverIsRunning) {

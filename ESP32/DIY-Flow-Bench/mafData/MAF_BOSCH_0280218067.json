@@ -1,6 +1,7 @@
 {
     "sensor_type" : "BOSCH_0280218067",
     "forum_link" : "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/138",
+    "comments" : "",
     "output_type" : "voltage",
     "maf_units" : "KG_H",
     "maf_scaling" : 0.1,  
