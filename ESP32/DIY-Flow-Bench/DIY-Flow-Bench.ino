@@ -312,9 +312,9 @@ void setup(void) {
 
   // REVIEW
   // set message queue length
-  xQueueCreate( 1, 1);
+  // xQueueCreate( 1, 1);
   // xQueueCreate( 256, 2048);
-  // xQueueCreate( 1280, 8192);
+  xQueueCreate( 512, 4096);
     
   _hardware.begin();
 

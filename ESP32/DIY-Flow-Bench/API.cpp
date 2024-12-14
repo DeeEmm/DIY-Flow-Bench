@@ -523,6 +523,11 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack Free Memory EnviroTask=%d / SensorTask=%d ", settings.api_delim , uxTaskGetStackHighWaterMark(enviroDataTask), uxTaskGetStackHighWaterMark(sensorDataTask)); 
       break;
       
+      case 'x': // Print xTask memory usage (Stack high water mark) to serial monitor 
+          snprintf(apiResponse, API_RESPONSE_LENGTH,"x%sFree Heap=%u / Max Allocated Heap=%u ", settings.api_delim , ESP.getFreeHeap(), ESP.getMaxAllocHeap()); 
+      break;
+
+      
       case '@': // Status Print Mode (Stream status messages to serial)
           if (status.doBootLoop) break;
           if (settings.status_print_mode == true){

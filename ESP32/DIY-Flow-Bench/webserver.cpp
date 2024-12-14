@@ -171,7 +171,7 @@ void Webserver::begin()
   // Upload request handler
   server->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
       Messages _message;
-      _message.debugPrintf("/api/file/upload \n");
+      // _message.debugPrintf("/api/file/upload \n");
       // request->send(200);
       // request->redirect("/?view=upload"); 
       },
@@ -380,9 +380,7 @@ void Webserver::fileUpload(AsyncWebServerRequest *request, String filename, size
 
   redirectURL = "/";
 
-  if (!filename.startsWith("/")){
-    filename = "/" + filename;
-  }
+  if (!filename.startsWith("/")) filename = "/" + filename;
 
   uint32_t freespace = SPIFFS.totalBytes() - SPIFFS.usedBytes();
 
@@ -400,7 +398,6 @@ void Webserver::fileUpload(AsyncWebServerRequest *request, String filename, size
       _message.debugPrintf("Upload failed, no Space: %s \n", freespace);
       upload_error = true;
     }    else    {
-      _message.Handler(language.LANG_FILE_UPLOADED);
       _message.debugPrintf("Writing file: '%s' index=%u len=%u \n", filename.c_str(), index, len);
       // stream the incoming chunk to the opened file
       request->_tempFile.write(data, len);
@@ -411,25 +408,24 @@ void Webserver::fileUpload(AsyncWebServerRequest *request, String filename, size
   if (final)  {
     _message.debugPrintf("Upload Complete: %s, %u bytes\n", filename.c_str(), file_size);
     request->_tempFile.close();
-
-    if (_data.checkUserFile(CONFIGFILE)){
-      // _data.loadConfiguration();
-      status.configLoaded = true;
-    } 
-    if (_data.checkUserFile(PINSFILE)){
-      // _data.loadPinsData();
-      status.pinsLoaded = true;
-    } 
-    if (_data.checkUserFile(MAFFILE)) {
-      // _data.loadMAFData();
-      status.mafLoaded = true;  
-    }
-    if (_data.checkUserFile(INDEXFILE)) {
-      status.GUIexists = true;  
-    }
-
-    request->redirect(redirectURL);
   }
+
+
+  if (!filename.startsWith("/MAF")) status.mafLoaded = true;
+  if (!filename.startsWith("/configuration")) status.configLoaded = true;
+  if (!filename.startsWith("/PINS")) status.pinsLoaded = true;
+  if (!filename.startsWith("/V{RELEASE}")) status.GUIexists = true;
+
+
+  // if (_data.checkUserFile(CONFIGFILE)) status.configLoaded = true;
+  // if (_data.checkUserFile(PINSFILE)) status.pinsLoaded = true;
+  // if (_data.checkUserFile(MAFFILE)) status.mafLoaded = true; 
+  // if (_data.checkUserFile(INDEXFILE)) status.GUIexists = true;  
+  
+  // _message.Handler(language.LANG_FILE_UPLOADED);
+
+  request->redirect(redirectURL);
+  
 }
 
 

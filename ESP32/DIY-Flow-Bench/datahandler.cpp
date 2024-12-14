@@ -1483,9 +1483,7 @@ void DataHandler::bootLoop()
 
     // Lets load 
     if (!status.configLoaded == true) _data.loadConfiguration();
-    
     if (!status.pinsLoaded == true) _data.loadPinsData();
-    
     if (!status.mafLoaded == true) _data.loadMAFData();
 
     // if the weberver is already running skip sever reset
