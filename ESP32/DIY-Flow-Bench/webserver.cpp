@@ -73,6 +73,7 @@ void Webserver::begin()
   PublicHTML _public_html;
 
   // API request handlers [JSON confirmation response]
+
   server->on("/api/bench/on", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Hardware _hardware;
@@ -178,12 +179,6 @@ void Webserver::begin()
       },
       fileUpload);
 
-  // Basic Upload Page (in case of file error)
-  server->on("/upload", HTTP_GET, [](AsyncWebServerRequest *request) {
-      request->send(200, "text/html", "<form method='POST' action='/api/file/upload' enctype='multipart/form-data'><input type='file' name='upload'><input type='submit' value='Upload'></form>");
-      },
-      fileUpload);
-
   // Download request handler
   server->on("/api/file/download", HTTP_GET, [](AsyncWebServerRequest *request){              
       Messages _message;
@@ -191,12 +186,6 @@ void Webserver::begin()
       downloadFilename.remove(0,18); // Strip the file path (first 18 chars)
       _message.debugPrintf("Request Download File: %s \n", downloadFilename);
       request->send(SPIFFS, downloadFilename, String(), true); });
-
-  // Simple Firmware Update Form
-  server->on("/update", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
-    request->send(200, "text/html", "<form method='POST' action='/api/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>");
-  });
 
   // Firmware update handler
   server->on("/api/update", HTTP_POST, [](AsyncWebServerRequest *request){
@@ -324,56 +313,77 @@ void Webserver::begin()
     _data.clearLiftDataFile;
   });  
 
+
+
+
+  // HTML server responses
+
   // index.html
   server->rewrite("/index.html", "/");
 
-  // Style sheet request handler
-  // server->on("/style.css", HTTP_ANY, [](AsyncWebServerRequest *request){ request->send(SPIFFS, "/style.css", "text/css"); });
-  // server->on("/style.css", HTTP_ANY, [](AsyncWebServerRequest *request){ request->send(200, "text/css", _public_html.css); });
-  server->on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
-    PublicHTML _public_html;
-    request->send(200, "text/css", _public_html.css().c_str()); 
+  // Basic Upload Page (in case of file error - does not require working GUI)
+  server->on("/upload", HTTP_GET, [](AsyncWebServerRequest *request) {
+      request->send(200, "text/html", "<form method='POST' action='/api/file/upload' enctype='multipart/form-data'><input type='file' name='upload'><input type='submit' value='Upload'></form>");
+      },
+      fileUpload);
+
+  // Simple Firmware Update Form - does not require working GUI)
+  server->on("/update", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
+    request->send(200, "text/html", "<form method='POST' action='/api/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>");
   });
 
-  // Javascript file request handler
-  // server->on("/javascript.js", HTTP_ANY, [](AsyncWebServerRequest *request){ request->send(SPIFFS, "/javascript.js", "text/javascript"); });
-  // server->on("/javascript.js", HTTP_ANY, [](AsyncWebServerRequest *request){ request->send(200, "text/javascript", _public_html.javascript()); });
-  server->on("/javascript.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    PublicHTML _public_html;
-    request->send(200, "text/javascript", _public_html.javascript().c_str());
-  });
-
-  // server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-  //   PublicHTML _public_html;
-  //   request->send(200, "text/javascript", _public_html.index());
-  // });
-
-  // Favicon rquest handler (icon hex dump is in constants.h)
+  // Favicon request handler (icon hex dump is in constants.h)
   server->on("/favicon.ico", HTTP_ANY, [](AsyncWebServerRequest *request){
     AsyncWebServerResponse *response = request->beginResponse_P(200, "image/x-icon", favicon_ico_gz, favicon_ico_gz_len);
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   });
-  
-  // Index page request handler
-  server->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
-      // extern struct DeviceStatus status;
-      // if ((SPIFFS.exists(status.indexFilename)) && ((status.pinsLoaded == true))) {
+
+  // CSS request handler
+  server->on("/style.css", HTTP_ANY, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
-      //   Webserver _webserver;
-      //   // request->send(SPIFFS, status.indexFilename, "text/html", false, processTemplate);
-        request->send_P(200, "text/html", _public_html.index().c_str());
-      //  } else {
-      //     DataHandler _data;
-      //     // request->send_P(200, "text/html", LANDING_PAGE, processLandingPageTemplate); 
-      //     // TEST Lets reboot the ESP32 here and manage file upload in the bootloop
-      //     // ESP.restart(); 
-      //     // request->redirect("/");
-      //     // We should only be here if the index page is missing so lets redirect to the boot loop          
-      //     request->send_P(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
-      //     _data.bootLoop();
-      //  }
+        AsyncResponseStream *response = request->beginResponseStream("text/css");
+        response->print(_public_html.css().c_str());
+        request->send(response);
       });
+
+  // Javascript.js request handler
+  server->on("/main.js", HTTP_ANY, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        AsyncResponseStream *response = request->beginResponseStream("text/javascript");
+        response->print(_public_html.mainJs().c_str());
+        request->send(response);
+      });
+
+  // Javascript.js request handler
+  server->on("/index.js", HTTP_ANY, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        AsyncResponseStream *response = request->beginResponseStream("text/javascript");
+        response->print(_public_html.indexJs().c_str());
+        request->send(response);
+      });
+  
+  // Settings page request handler
+  server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        request->send_P(200, "text/html", _public_html.settings().c_str(), processTemplate); 
+      });
+
+  // Data page request handler
+  server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        request->send_P(200, "text/html", _public_html.data().c_str(), processTemplate); 
+      });
+
+  // Index page request handler
+  server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        request->send_P(200, "text/html", _public_html.index().c_str(), processTemplate); 
+      });
+
+
+
 
   server->onFileUpload(fileUpload);
   server->addHandler(events);

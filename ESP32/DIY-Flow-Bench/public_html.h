@@ -12,8 +12,13 @@ class PublicHTML {
 
 	public:
 
+        String header();
+        String footer();
         String index();
-		String javascript();
+        String data();
+        String settings();
+		String mainJs();
+		String indexJs();
  		String css();
 
 

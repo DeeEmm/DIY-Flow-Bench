@@ -1,545 +1,617 @@
 
-
 #include "public_html.h"
 
 
+
 /***********************************************************
- * @brief Get HTML
+ * @brief Header
+ *
+ *
+ *
+ ***/
+String PublicHTML::header() {
+
+    String header PROGMEM = R"HEADER('
+<!DOCTYPE HTML>
+<html lang="en">
+	<HEAD>
+      <title>DIY Flow Bench</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" type="text/css" href="style.css">
+      <link rel="stylesheet" type="text/javascript" href="cookies.js">
+	</HEAD>
+	<BODY>
+
+    <input type="hidden" id="ACTIVE_ORIFICE" value=""></input>
+    <input type="hidden" id="BENCH_TYPE" value=""></input>
+
+    <!-- Main page code -->
+    <div class="headerbar">
+        <h1><a href="/" id="PAGE_TITLE" alt="DIY Flow Bench">DIY Flow Bench</a></h1>
+    </div>
+
+    <!-- Navbar-->
+    <button class="tablink" onclick="location.href = '/';" id="load-dashboard-button">~LANG_GUI_DASHBOARD~</button>
+    <button class="tablink" onclick="location.href = 'data';" id="load-datalog-button">~LANG_GUI_DATA~</button>
+    <button class="tablink" onclick="location.href = 'settings';" id="load-config-button">~LANG_GUI_CONFIG~</button>
+    )HEADER";
+
+return header;
+}
+
+
+
+
+
+/***********************************************************
+ * @brief Footer
+ *
+ *
+ *
+ ***/
+String PublicHTML::footer() {
+
+    String footer PROGMEM = R"FOOTER(
+  <script type="text/javascript" src="main.js"></script>
+
+  <!-- Footer -->
+  <div id="footer"><a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a></div>
+  </BODY>
+</HTML>
+    )FOOTER";
+
+return footer;
+}
+
+
+
+
+
+
+
+
+
+/***********************************************************
+ * @brief Index
+ *
+ *
  *
  ***/
 String PublicHTML::index() {
 
-    String index_html PROGMEM = R"HTML('
-    <!DOCTYPE HTML>
-    <html lang="en">
-        <HEAD>
-        <title>DIY Flow Bench</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" type="text/css" href="/style.css">
-        </HEAD>
-        <BODY>
+    const char index_html[] PROGMEM = R"HTML('
+<!DOCTYPE HTML>
+<html lang="en">
+	<HEAD>
+      <title>DIY Flow Bench</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" type="text/css" href="style.css">
+      <link rel="stylesheet" type="text/javascript" href="cookies.js">
+	</HEAD>
+	<BODY>
 
-        <input type="hidden" id="ACTIVE_ORIFICE" value=""></input>
-        <input type="hidden" id="BENCH_TYPE" value=""></input>
-        
-        <!-- Save Data Modal -->
-        <div id="captureLiftDataModal" class="modal">
-        <div class="modal-content">
-            <span class="closeCaptureLiftDataModalButton">&times;</span>
-            <h3>~LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE~</h3>
-            <hr>
-            <div class="align-center" >
-            <form method="POST" class="lift_data_form" name="lift_data_form" enctype="multipart/form-data">
-                <label>~LANG_GUI_LIFT_VALUE~</label>
-                <br>
-                <div class="switch-field">
-                    <input type="radio" id="lift-one" name="lift-data" value="1"/>
-                    <label for="lift-one">~lift1~</label>
-                    <input type="radio" id="lift-two" name="lift-data" value="2" />
-                    <label for="lift-two">~lift2~</label>
-                    <input type="radio" id="lift-three" name="lift-data" value="3"/>
-                    <label for="lift-three">~lift3~</label>
-                    <input type="radio" id="lift-four" name="lift-data" value="4" />
-                    <label for="lift-four">~lift4~</label>
-                    <input type="radio" id="lift-five" name="lift-data" value="5" />
-                    <label for="lift-five">~lift5~</label>
-                    <input type="radio" id="lift-six" name="lift-data" value="6" />
-                    <label for="lift-six">~lift6~</label>
-                    <input type="radio" id="lift-seven" name="lift-data" value="7" />
-                    <label for="lift-seven">~lift7~</label>
-                    <input type="radio" id="lift-eight" name="lift-data" value="8" />
-                    <label for="lift-eight">~lift8~</label>
-                    <input type="radio" id="lift-nine" name="lift-data" value="9" />
-                    <label for="lift-nine">~lift9~</label>
-                    <input type="radio" id="lift-ten" name="lift-data" value="10" />
-                    <label for="lift-ten">~lift10~</label>
-                    <input type="radio" id="lift-eleven" name="lift-data" value="11" />
-                    <label for="lift-eleven">~lift11~</label>
-                    <input type="radio" id="lift-twelve" name="lift-data" value="12" />
-                    <label for="lift-twelve">~lift12~</label>
-                </div>
-                <input class="button submit-button" type="button" id="capture-lift-data-button" value="~LANG_GUI_LIFT_CAPTURE~"/>
-            </form>
+  <input type="hidden" id="ACTIVE_ORIFICE" value=""></input>
+  <input type="hidden" id="BENCH_TYPE" value=""></input>
+
+  <!-- Main page code -->
+  <div class="headerbar">
+      <h1><a href="/" id="PAGE_TITLE" alt="DIY Flow Bench">DIY Flow Bench</a></h1>
+  </div>
+
+  <!-- Navbar-->
+  <button class="tablink" onclick="location.href = '/';" id="load-dashboard-button">~LANG_GUI_DASHBOARD~</button>
+  <button class="tablink" onclick="location.href = 'data';" id="load-datalog-button">~LANG_GUI_DATA~</button>
+  <button class="tablink" onclick="location.href = 'settings';" id="load-config-button">~LANG_GUI_CONFIG~</button>
+
+
+  <!-- Save Data Modal -->
+  <div id="captureLiftDataModal" class="modal">
+    <div class="modal-content">
+      <span class="closeCaptureLiftDataModalButton">&times;</span>
+      <h3>~LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE~</h3>
+      <hr>
+      <div class="align-center" >
+        <form method="POST" class="lift_data_form" name="lift_data_form" enctype="multipart/form-data">
+          <label>~LANG_GUI_LIFT_VALUE~</label>
+          <br>
+            <div class="switch-field">
+              <input type="radio" id="lift-one" name="lift-data" value="1"/>
+              <label for="lift-one">~lift1~</label>
+              <input type="radio" id="lift-two" name="lift-data" value="2" />
+              <label for="lift-two">~lift2~</label>
+              <input type="radio" id="lift-three" name="lift-data" value="3"/>
+              <label for="lift-three">~lift3~</label>
+              <input type="radio" id="lift-four" name="lift-data" value="4" />
+              <label for="lift-four">~lift4~</label>
+              <input type="radio" id="lift-five" name="lift-data" value="5" />
+              <label for="lift-five">~lift5~</label>
+              <input type="radio" id="lift-six" name="lift-data" value="6" />
+              <label for="lift-six">~lift6~</label>
+              <input type="radio" id="lift-seven" name="lift-data" value="7" />
+              <label for="lift-seven">~lift7~</label>
+              <input type="radio" id="lift-eight" name="lift-data" value="8" />
+              <label for="lift-eight">~lift8~</label>
+              <input type="radio" id="lift-nine" name="lift-data" value="9" />
+              <label for="lift-nine">~lift9~</label>
+              <input type="radio" id="lift-ten" name="lift-data" value="10" />
+              <label for="lift-ten">~lift10~</label>
+              <input type="radio" id="lift-eleven" name="lift-data" value="11" />
+              <label for="lift-eleven">~lift11~</label>
+              <input type="radio" id="lift-twelve" name="lift-data" value="12" />
+              <label for="lift-twelve">~lift12~</label>
             </div>
-            <div class="clear-both">&nbsp;</div>
-        </div>        
+          <input class="button submit-button" type="button" id="capture-lift-data-button" value="~LANG_GUI_LIFT_CAPTURE~"/>
+        </form>
+      </div>
+      <div class="clear-both">&nbsp;</div>
+    </div>        
+  </div>
+
+  <!--Flow Target modal-->
+  <div id="flowTargetModal" class="modal">
+    <div class="modal-content flowTargetModal">
+      <span class="closeFlowTargetModalButton">&times;</span>
+      <div class="align-center">
+        <form method="POST" action="/api/saveflowtarget" enctype="multipart/form-data">
+          <label>~LANG_GUI_USER_FLOW_TARGET_VALUE~</label>
+            <input id="flowTargetValInput" type="text" name="USER_OFFSET" value="~USER_OFFSET~"/>
+            <input class="button submit-button" type="submit" value="~LANG_GUI_USER_FLOW_TARGET_SAVE~"/>
+          </form>
+      </div>
+    </div>        
+  </div>
+
+  <!--Calibration modal-->
+  <div id="calibrationModal" class="modal">
+    <div class="modal-content calibrationModal">
+      <span class="closeCalibrationModalButton">&times;</span>
+      <div class="align-center">
+        <button id="calibrate-button" class="button">~LANG_GUI_CAL_FLOW_OFFSET~</button>
+        <button id="leak-cal-button" class="button">~LANG_GUI_CAL_LEAK_TEST~</button>
+      </div>
+    </div>        
+  </div>
+
+  <!-- Load Data Modal -->
+  <div id="loadGraphDataModal" class="modal">
+    <div class="modal-content">
+      <span class="closeLoadGraphDataModalButton">&times;</span>
+      <h3>~LANG_GUI_LOAD_LIFT_PROFILE~</h3>
+      <hr>
+      <br>
+      <div class="float-right">
+        <form method="POST" action="/api/viewdata" enctype="multipart/form-data">
+          <input class="button file-submit-button" type="submit" value="~LANG_GUI_LOAD_LIFT_PROFILE_LOAD~"/>
+        </form>
+      </div>
+      <div class="clear-both">&nbsp;</div>
+    </div>        
+  </div>
+
+  <!-- Save Data Modal -->
+  <div id="saveGraphDataModal" class="modal">
+    <div class="modal-content">
+      <span class="closeSaveGraphDataModalButton">&times;</span>
+      <h3>~LANG_GUI_SAVE_LIFT_DATA~</h3>
+      <hr>
+      <br>
+      <div class="float-right">
+        <form method="POST" action="/api/savedata" enctype="multipart/form-data">
+          <label class="config-label">~LANG_GUI_SAVE_GRAPH_FILENAME~:</label>&nbsp;<input type="text" value="~FileName~">
+          <input class="button file-submit-button" type="submit" value="Load"/>
+        </form>
+      </div>
+      <div class="clear-both">&nbsp;</div>
+    </div>        
+  </div>
+
+  <div id="tabcontainer">
+  <!-- Main Tab-->
+  <div id="dashboard" class="tabcontent tabcontentMain">        
+    <div class="content">
+      <div class="tile-grid">
+        <div class="tile tile-pref" id="tile-pref">
+          <p class="tile-title" id="tile-pref-title">~LANG_GUI_PREF~</p>
+          <p><span class="tile-value" id="PREF">&nbsp;</span></p>
+          <p class="units">inH2O</p>
+        </div>
+        <div class="tile tile-pdiff" id="tile-pdiff">
+          <p class="tile-title" id="tile-pdiff-title">~LANG_GUI_PDIFF~</p>
+          <p><span class="differential-tile-value" id="PDIFF">&nbsp;</span></p>
+          <p class="units">inH2O</p>
+        </div>
+        <div class="tile tile-flow" id="flow-tile">
+          <p class="tile-title" id="flow-tile-title">~LANG_GUI_FLOW~</p>
+          <p><span class="tile-value" id="FLOW">&nbsp;</span></p>
+          <p class="units">ACFM</p>
+        </div>
+        <div class="tile tile-aflow" id="aflow-tile">
+          <p class="tile-title" id="aflow-tile-title">~LANG_GUI_AFLOW~</p>
+          <p><span class="tile-value" id="AFLOW">&nbsp;</span></p>
+          <p class="units">~AFLOW_UNITS~&nbsp;&commat;&nbsp;<span id="PADJUST">28</span>&nbsp;inH2O</p>
+        </div>
+        <div class="tile tile-sflow" id="sflow-tile">
+          <p class="tile-title" id="sflow-tile-title">~LANG_GUI_SFLOW~</p>
+          <p><span class="tile-value" id="SFLOW">&nbsp;</span></p>
+          <p class="units">SCFM:&nbsp;<span id="STD_REF">~STD_REF~</span></p>
+        </div>
+        <div class="tile tile-flow" id="maf-tile">
+          <p class="tile-title" id="maf-tile-title">~LANG_GUI_MFLOW~</p>
+          <p><span class="tile-value" id="MFLOW">&nbsp;</span></p>
+          <p class="units">KGH</p>
+        </div>
+        <div class="tile tile-pitot" id="tile-pitot">
+          <p class="tile-title" id="tile-pitot-title">~LANG_GUI_PITOT~</p>
+          <p><span class="pitot-tile-value" id="PITOT">&nbsp;</span></p>
+          <p class="units">m/sec &Delta; <span id="PITOT_DELTA">~PITOT_DELTA~</span>&nbsp;inH2O</p>
+        </div>
+        <div class="tile tile-swirl" id="tile-swirl">
+          <p class="tile-title" id="tile-swirl-title">~LANG_GUI_SWIRL~</p>
+          <p><span class="tile-value" id="SWIRL">&nbsp;</span></p>
+          <p class="units">rpm</p>
+        </div>
+        <div class="tile tile-fdiff" id="tile-fdiff">
+          <p class="tile-title"  id="tile-fdiff-title">~LANG_GUI_FLOW_DIFF~</p>
+          <p><span class="tile-value flowTargetVal" id="FDIFF">&nbsp;</span></p>
+          <p class="units"><span id="FDIFFTYPEDESC">~FDIFFTYPEDESC~</span></p>
+        </div>
+        <div class="tile tile-temp" id="tile-temp">
+          <p class="tile-title" id="tile-temp-title">~LANG_GUI_TEMP~</p>
+          <p><span class="tile-value" id="TEMP">&nbsp;</span></p>
+          <p class="units">~TEMP_UNIT~</p>
+        </div>
+        <div class="tile tile-baro" id="tile-baro">
+          <p class="tile-title" id="tile-baro-title">~LANG_GUI_BARO~</p>
+          <p><span class="tile-value" id="BARO">&nbsp;</span></p>
+          <p class="units">millibar (hPa)</p>
+        </div>
+        <div class="tile tile-relh" id="tile-relh">
+          <p class="tile-title"id="tile-relh-title">~LANG_GUI_HUMIDITY~</p>
+          <p><span class="tile-value" id="RELH">&nbsp;</span></p>
+          <p class="units">&percnt;RelH</p>
+        </div>
+      </div>  
+    </div>          
+    <div class="align-center">
+      <div class="status_message"><span id="STATUS_MESSAGE">~STATUS_MESSAGE~</span></div>                        
+      <div class="hidden_div">
+        <br>Ref Pressure mV: <span id="PREF_MV">&nbsp;</span>
+        <br>MAF mV: <span id="MAF_MV">&nbsp;</span>
+        <br>Pitot mV: <span id="PITOT_MV">&nbsp;</span>
+      </div>   
+      
+      <form method="POST" id="orificeRadio" style="display: none;">
+        <div class="switch-field">
+          <input type="radio" id="orifice1" name="radioOrifice" value="1" ~ORIFICE1_CHECKED~ onchange="orificeChange(this);"/>
+          <label for="orifice1">1</label>
+          <input type="radio" id="orifice2" name="radioOrifice" value="2" ~ORIFICE2_CHECKED~ onchange="orificeChange(this);"/>
+          <label for="orifice2">2</label>
+          <input type="radio" id="orifice3" name="radioOrifice" value="3" ~ORIFICE3_CHECKED~ onchange="orificeChange(this);"/>
+          <label for="orifice3">3</label>
+          <input type="radio" id="orifice4" name="radioOrifice" value="4" ~ORIFICE4_CHECKED~ onchange="orificeChange(this);"/>
+          <label for="orifice4">4</label>
+          <input type="radio" id="orifice5" name="radioOrifice" value="5" ~ORIFICE5_CHECKED~ onchange="orificeChange(this);"/>
+          <label for="orifice5">5</label>
+          <input type="radio" id="orifice6" name="radioOrifice" value="6" ~ORIFICE6_CHECKED~ onchange="orificeChange(this);"/>
+          <label for="orifice6">6</label>
+        </div>
+        <div id="orifice-data">Calibrated Flow Rate: <span id="ORIFICE_MAX_FLOW">~ORIFICE_MAX_FLOW~</span>cfm @ <span id="ORIFICE_CALIBRATED_DEPRESSION">~ORIFICE_CALIBRATED_DEPRESSION~</span> inH2O"</div>
+      </form>
+        
+      <button id="on-button" class="control-button">~LANG_GUI_START~</button>
+      <button id="off-button" class="control-button">~LANG_GUI_STOP~</button>
+      <button id="clear-message-button" class="control-button">~LANG_GUI_CLEAR_ALARM~</button>
+      <br>
+      <button id="show-capture-modal-button" class="control-button">~LANG_GUI_CAPTURE~</button>
+
+    </div>     
+  </div>
+
+  <script type="text/javascript" src="index.js"></script>
+
+  <script type="text/javascript" src="main.js"></script>
+
+  <!-- Footer -->
+  <div id="footer"><a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a></div>
+  </BODY>
+</HTML>
+
+)HTML";
+
+return  index_html;
+}
+
+
+
+
+
+
+
+
+/***********************************************************
+ * @brief Data
+ *
+ *
+ *
+ ***/
+String PublicHTML::data() {
+
+    String data PROGMEM = R"DATA('
+
+    <!-- Datalog tab -->
+    <div id="datalog" class="tabcontent tabcontentData">
+
+        <!-- lift graph -->
+        <!-- NOTE: Inline styling is required for SVG Download-->
+        <div class="graph-container">        
+          <svg class="graph" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="dataGraph" style="background-color: #fff; padding-top: 100px;">
+          
+            <!--Grid-->
+            <g class="grid x-grid" id="xGrid" style="stroke: grey; stroke-dasharray: 1 2; stroke-width: 1;">
+              <line x1="100" x2="100" y1="0" y2="510"></line>
+              <line x1="150" x2="150" y1="0" y2="510"></line>
+              <line x1="200" x2="200" y1="0" y2="510"></line>
+              <line x1="250" x2="250" y1="0" y2="510"></line>
+              <line x1="300" x2="300" y1="0" y2="510"></line>
+              <line x1="350" x2="350" y1="0" y2="510"></line>
+              <line x1="400" x2="400" y1="0" y2="510"></line>
+              <line x1="450" x2="450" y1="0" y2="510"></line>
+              <line x1="500" x2="500" y1="0" y2="510"></line>
+              <line x1="550" x2="550" y1="0" y2="510"></line>
+              <line x1="600" x2="600" y1="0" y2="510"></line>
+              <line x1="650" x2="650" y1="0" y2="510"></line>
+              <line x1="700" x2="700" y1="0" y2="510"></line>
+            </g>
+
+            <g class="grid y-grid" id="yGrid" style="stroke: grey; stroke-dasharray: 1 2; stroke-width: 1;">
+              <line x1="90" x2="700" y1="0" y2="0"></line>
+              <line x1="90" x2="700" y1="50" y2="50"></line>
+              <line x1="90" x2="700" y1="100" y2="100"></line>
+              <line x1="90" x2="700" y1="150" y2="150"></line>
+              <line x1="90" x2="700" y1="200" y2="200"></line>
+              <line x1="90" x2="700" y1="250" y2="250"></line>
+              <line x1="90" x2="700" y1="300" y2="300"></line>
+              <line x1="90" x2="700" y1="350" y2="350"></line>
+              <line x1="90" x2="700" y1="400" y2="400"></line>
+              <line x1="90" x2="700" y1="450" y2="450"></line>
+              <line x1="90" x2="700" y1="500" y2="500"></line>
+            </g>
+
+            <!--Grid Labels-->
+            <g class="labels x-labels">
+              <text x="100" y="550">Lift:</text>
+              <text x="150" y="550">~lift1~</text>
+              <text x="200" y="550">~lift2~</text>
+              <text x="250" y="550">~lift3~</text>
+              <text x="300" y="550">~lift4~</text>
+              <text x="350" y="550">~lift5~</text>
+              <text x="400" y="550">~lift6~</text>
+              <text x="450" y="550">~lift7~</text>
+              <text x="500" y="550">~lift8~</text>
+              <text x="550" y="550">~lift9~</text>
+              <text x="600" y="550">~lift10~</text>
+              <text x="650" y="550">~lift11~</text>
+              <text x="700" y="550">~lift12~</text>
+          </g>
+          
+          <g class="labels y-labels">
+            <text x="80" y="10">~flow10~</text>
+            <text x="80" y="60">~flow9~</text>
+            <text x="80" y="110">~flow8~</text>
+            <text x="80" y="160">~flow7~</text>
+            <text x="80" y="210">~flow6~</text>
+            <text x="80" y="260">~flow5~</text>
+            <text x="80" y="310">~flow4~</text>
+            <text x="80" y="360">~flow3~</text>
+            <text x="80" y="410">~flow2~</text>
+            <text x="80" y="460">~flow1~</text>
+            <text x="80" y="510">Flow (cfm)</text>
+          </g>
+
+            <!--Graph Key-->
+            <g class="labels key-labels">
+              <!--
+              <text x="625" y="25" id="default-key-text">Current Data</text>
+              <line x1="550" y1="20" x2="620" y2="20"  id="default-key" style="stroke:#000;stroke-width:1;stroke-dasharray:4,1;opacity:0.5;" /> 
+              
+              <line x1="550" y1="35" x2="620" y2="35"  style="stroke:#f50808;stroke-width:2;opacity:0.5;" /> 
+              <text x="625" y="40">Exhaust</text>
+              -->
+            </g>
+
+            <!--Data Points - css classes to display value on hover - NOTE text value is displayed above dataPoint-->
+            <!--
+            <g class="first_set points" data-setname="Our first data set" id="dataPlot">
+              <circle class="dataCircle" cx="150" cy="340" data-value="7.2" r="4"></circle><text class="dataValue hide" x="150" y="310">7.2</text>
+              <circle class="dataCircle" cx="200" cy="315" data-value="8.1" r="4"></circle><text class="dataValue hide" x="200" y="285">4.2</text>
+              <circle class="dataCircle" cx="250" cy="301" data-value="7.7" r="4"></circle><text class="dataValue hide" x="250" y="271">5.2</text> 
+              <circle class="dataCircle" cx="300" cy="280" data-value="6.8" r="4"></circle><text class="dataValue hide" x="300" y="270">23.2</text>
+              <circle class="dataCircle" cx="350" cy="249" data-value="6.7" r="4"></circle><text class="dataValue hide" x="350" y="239">32</text>  
+              <circle class="dataCircle" cx="400" cy="245" data-value="5.7" r="4"></circle><text class="dataValue hide" x="400" y="235">7.2</text> 
+              <circle class="dataCircle" cx="450" cy="242" data-value="6.7" r="4"></circle><text class="dataValue hide" x="450" y="232">8.2</text> 
+              <circle class="dataCircle" cx="500" cy="238" data-value="6.8" r="4"></circle><text class="dataValue hide" x="500" y="228">752</text> 
+              <circle class="dataCircle" cx="550" cy="230" data-value="4.7" r="4"></circle><text class="dataValue hide" x="550" y="220">22</text>  
+              <circle class="dataCircle" cx="600" cy="222" data-value="5.7" r="4"></circle><text class="dataValue hide" x="600" y="212">7</text>   
+              <circle class="dataCircle" cx="650" cy="220" data-value="2.7" r="4"></circle><text class="dataValue hide" x="650" y="210">7542</text>
+              <circle class="dataCircle" cx="700" cy="218" data-value="6.9" r="4"></circle><text class="dataValue hide" x="700" y="208">42</text>  
+            </g>
+            -->
+
+            <!--Hard coded Graph Line Data-->
+            <g class="surfaces" id="lineData">
+                <!--Line data-->
+                <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1"
+                points="100,500 150,~LINE_DATA1~ 200,~LINE_DATA2~ 250,~LINE_DATA3~ 300,~LINE_DATA4~ 350,~LINE_DATA5~ 400,~LINE_DATA6~ 450,~LINE_DATA7~ 500,~LINE_DATA8~ 550,~LINE_DATA9~ 600,~LINE_DATA10~ 650,~LINE_DATA11~ 700,~LINE_DATA12~"/>
+
+            </g>
+            
+            <use class="grid double" xlink:href="#xGrid" ></use>
+            <use class="grid double" xlink:href="#yGrid" ></use>
+            
+          </svg>
+
+
+          <!-- ARRAY TO SVG - Appends data to graph container -->
+
+          <!-- <coords-svg stroke="gold" stroke-dasharray="4, 1" coords="[[100,330],[ 150,332],[ 200,332],[ 250,335],[ 300,275],[ 350,281],[ 400,250],[ 450,241],[ 500,251],[ 550,133],[ 600,199],[ 650,172],[ 700,177]]"></coords-svg> -->
+          <!-- <coords-svg stroke="green" coords="[[2, 15],[57, 58],[5, 57]]"></coords-svg> -->
+
+          <!-- Converts custom <coord-svg> elements into valid polyline and appends to dataPlot. Next stage is to use JSON -->
+          <!-- <script>
+            customElements.define("coords-svg", class extends HTMLElement{
+              connectedCallback(){
+                let arr = JSON.parse(this.getAttribute("coords"));
+                let dPath = arr.flat().join(" ");
+                let stroke = this.getAttribute("stroke");
+                this.style.display = "inline-block";
+                
+                var svgNS = "http://www.w3.org/2000/svg";
+                let polyline = document.createElementNS(svgNS, "polyline");
+                polyline.classList.add("dataLine");
+
+                polyline.setAttribute("points", dPath);
+                polyline.setAttribute("stroke", stroke);
+                polyline.setAttribute("stroke-width", 1);
+                polyline.setAttribute("fill", "none");
+
+                document.getElementById("dataPlot").appendChild(polyline);
+              }
+            });
+          </script> -->
+         
+          <!-- ARRAY TO SVG -->
+
+        </div>  
+    
+        <!-- end lift graph -->
+
+
+        <div class="align-center">
+          <br>
+          <button id="clear-graph-data-button" class="control-button">~LANG_GUI_CLEAR~</button> 
+          <button id="export-graph-data-button" class="control-button">~LANG_GUI_EXPORT~</button> 
+          <button id="export-graph-image-button" class="control-button">~LANG_GUI_IMAGE~</button> 
+          <!-- Export button fires javascript function to click link below forcing the download-->
+          <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
         </div>
 
-        <!--Update modal-->
-        <div id="updateModal" class="modal">
+    </div>
+
+)DATA";
+
+return data;
+}
+
+
+
+
+
+
+
+
+
+
+/***********************************************************
+ * @brief Settings
+ *
+ *
+ *
+ ***/
+String PublicHTML::settings() {
+
+    String settings PROGMEM = R"SETTINGS('
+
+    <!-- File Manager Modal -->
+    <div id="fileModal" class="modal">
+        <div class="modal-content">
+          <span class="closeFileModalButton">&times;</span>
+          <h3>~LANG_GUI_FILE_MANAGER~</h3>
+          <div id="file_list">~FILE_LIST~</div>
+          <br>
+          <hr>
+          <br>
+          <div class="float-right">
+            <form method="POST" action="/api/file/upload" enctype="multipart/form-data">
+              <div class="input_container">
+                <input type="file" name="upload" id="fileUpload">
+                <input type='submit' value='~LANG_GUI_FILEMANAGER_UPLOAD~' class="button file-submit-button">
+              </div>
+            </form>
+          </div>
+          <div class="clear-both">&nbsp;</div>
+        </div>        
+      </div>
+  
+      <!-- Info Modal -->
+      <div id="infoModal" class="modal">
+        <div class="info-modal-content row">
+          <span class="closeInfoModalButton">&times;</span>
+          <div class="row info-modal">
+              <div class="column">
+              <h4>~LANG_GUI_FIRMWARE~</h4>
+              <hr>
+              <div class="config-row"><label class="config-label">~LANG_GUI_VERSION~: </label><span class="config-value" id="RELEASE">~RELEASE~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_BUILD~:  </label><span class="config-value" id="BUILD_NUMBER">~BUILD_NUMBER~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_GUI~: </label><span class="config-value" id="VERSION">@@version@@</span></div>
+              <h4>~LANG_GUI_STORAGE~</h4>
+              <hr>
+              <div class="config-row"><label class="config-label">~LANG_GUI_MEM_SIZE~:  </label><span class="config-value" id="SPIFFS_MEM_SIZE">~SPIFFS_MEM_SIZE~</span> (bytes)</div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_MEM_USED~:  </label><span class="config-value" id="SPIFFS_MEM_USED">~SPIFFS_MEM_USED~</span> (bytes)</div>
+              <h4>~LANG_GUI_NETWORK~</h4>
+              <hr>
+              <div class="config-row"><label class="config-label">~LANG_GUI_IP_ADDRESS~:  </label><span class="config-value" id="LOCAL_IP_ADDRESS">~LOCAL_IP_ADDRESS~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_HOSTNAME~:  </label><span class="config-value" id="HOSTNAME">http://~HOSTNAME~.local</span></div>
+            </div>
+            <div class="column">
+              <!-- <div class="config-row"><label class="config-label">Uptime:  </label><span class="config-value" id="UPTIME">~UPTIME~</span></div> -->
+              <h4>~LANG_GUI_HARDWARE_CONFIG~</h4>
+              <hr>
+              <div class="config-row"><label class="config-label">~LANG_GUI_BENCH_TYPE~:  </label><span class="config-value" id="BENCH_TYPE">~BENCH_TYPE~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_BOARD_TYPE~:  </label><span class="config-value" id="BOARD_TYPE">~BOARD_TYPE~</span></div>
+              <!-- <div class="config-row"><label class="config-label">Boot Time:  </label><span class="config-value" id="BOOT_TIME">~BOOT_TIME~</span></div> -->
+              <h4>~LANG_GUI_SENSOR_CONFIG~</h4>
+              <hr>
+              <div class="config-row"><label class="config-label">~LANG_GUI_MAF_DATA_FILE~:  </label><span class="config-value" id="MAF_SENSOR"><a href="~MAF_LINK~" target="new">~MAF_SENSOR~</a></span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_REF_PRESSURE_SENSOR~:  </label><span class="config-value" id="PREF_SENSOR">~PREF_SENSOR~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_TEMP_SENSOR~:  </label><span class="config-value" id="TEMP_SENSOR">~TEMP_SENSOR~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_HUMIDITY_SENSOR~:  </label><span class="config-value" id="RELH_SENSOR">~RELH_SENSOR~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_BARO_SENSOR~:  </label><span class="config-value" id="BARO_SENSOR">~BARO_SENSOR~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_PITOT_SENSOR~:  </label><span class="config-value" id="PITOT_SENSOR">~PITOT_SENSOR~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_DIFFERENTIAL_SENSOR~:  </label><span class="config-value" id="PDIFF_SENSOR">~PDIFF_SENSOR~</span></div>
+              </div>
+            </div>
+        </div>        
+      </div>
+        
+  
+    <!--Update modal-->
+    <div id="updateModal" class="modal">
         <div class="modal-content updateModal">
-            <span class="closeUpdateModalButton">&times;</span>
-            <div class="align-center">
+          <span class="closeUpdateModalButton">&times;</span>
+          <div class="align-center">
             <h3>~LANG_GUI_UPLOAD_FIRMWARE_BINARY~</h3>
             <hr>
             <br>
-            <form method="POST" action="/api/update" enctype="multipart/form-data">
-                <div class="input_container">
+            <form method='POST' action='/api/update' enctype='multipart/form-data'>
+              <div class="input_container">
                 <input type="file" name="update" id="fileUpload">
-                <input type="submit" value="~LANG_GUI_FIRMWARE_UPDATE~" class="button file-submit-button">
-                </div>
+                <input type='submit' value='~LANG_GUI_FIRMWARE_UPDATE~' class="button file-submit-button">
+              </div>
             </form>
-            </div>
+          </div>
         </div>        
-        </div>
-
-        <!--Flow Target modal-->
-        <div id="flowTargetModal" class="modal">
-        <div class="modal-content flowTargetModal">
-            <span class="closeFlowTargetModalButton">&times;</span>
-            <div class="align-center">
-            <form method="POST" action="/api/saveflowtarget" enctype="multipart/form-data">
-                <label>~LANG_GUI_USER_FLOW_TARGET_VALUE~</label>
-                <input id="flowTargetValInput" type="text" name="USER_OFFSET" value="~USER_OFFSET~"/>
-                <input class="button submit-button" type="submit" value="~LANG_GUI_USER_FLOW_TARGET_SAVE~"/>
-                </form>
-            </div>
-        </div>        
-        </div>
-
-        <!--Calibration modal-->
-        <div id="calibrationModal" class="modal">
-        <div class="modal-content calibrationModal">
-            <span class="closeCalibrationModalButton">&times;</span>
-            <div class="align-center">
-            <button id="calibrate-button" class="button">~LANG_GUI_CAL_FLOW_OFFSET~</button>
-            <button id="leak-cal-button" class="button">~LANG_GUI_CAL_LEAK_TEST~</button>
-            </div>
-        </div>        
-        </div>
-
-        <!--Data Display modal-->
-        <div id="dataModal" class="modal">
-        <div class="modal-content dataModal">
-            <span class="closeDataModalButton">&times;</span>
-            <div class="align-center">
-            <p><span class="data-title">~LANG_GUI_MAF_VOLTS~</span>&nbsp;<span class="data-value maf_volts" id="MAF_VOLTS">&nbsp;</span></p>
-            <p><span class="data-title">~LANG_GUI_PREF_VOLTS~</span>&nbsp;<span class="data-value maf_volts" id="PREF_VOLTS">&nbsp;</span></p>
-            <p><span class="data-title">~LANG_GUI_PDIFF_VOLTS~</span>&nbsp;<span class="data-value maf_volts" id="PDIFF_VOLTS">&nbsp;</span></p>
-            <p><span class="data-title">~LANG_GUI_PITOT_VOLTS~</span>&nbsp;<span class="data-value maf_volts" id="PITOT_VOLTS">&nbsp;</span></p>
-            </div>
-        </div>        
-        </div>
-
-        <!--Serial modal-->
-        <!--
-        <div id="serialModal" class="modal">
-        <div class="modal-content serialModal">
-            <span class="closeSerialModalButton">&times;</span>
-            <div class="align-center">
-            <div class="serialModalData">
-                
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Fastest Serial terminal in your browser for Chrome.</title>
-                <meta name="Description" content="Set your baud speed and hit connect.
-                A serial terminal that runs with out any plugins in chrome.">
-
-                <button onclick="connectSerial()">Connect</button>
-                <button onclick="serialResultsDiv.innerHTML = "";">Clear</button>
-
-                <br>
-                <input type="text" id="lineToSend" style="width:calc(100% - 165px)">
-                <button onclick="sendSerialLine()" style="width:45px">Send</button>
-                <button onclick="sendCharacterNumber()" style="width:100px">Send Char</button>
-                <br>
-
-                <input type="checkbox" id="addLine" onclick="localStorage.addLine = this.checked;" checked>
-                <label for="addLine">send with /r/n</label>
-
-                <input type="checkbox" id="echoOn" onclick="localStorage.echoOn = this.checked;" checked>
-                <label for="echoOn">echo</label>
-
-
-                <br>
-                <div id="serialResults">
-                </div>
-
-            </div>     
-            </div>
-        </div>        
-        </div>
-    -->
-
-        <!-- Load Data Modal -->
-        <div id="loadGraphDataModal" class="modal">
-        <div class="modal-content">
-            <span class="closeLoadGraphDataModalButton">&times;</span>
-            <h3>~LANG_GUI_LOAD_LIFT_PROFILE~</h3>
-            <hr>
-            <br>
-            <div class="float-right">
-            <form method="POST" action="/api/viewdata" enctype="multipart/form-data">
-                <input class="button file-submit-button" type="submit" value="~LANG_GUI_LOAD_LIFT_PROFILE_LOAD~"/>
-            </form>
-            </div>
-            <div class="clear-both">&nbsp;</div>
-        </div>        
-        </div>
-
-
-        <!-- Save Data Modal -->
-        <div id="saveGraphDataModal" class="modal">
-        <div class="modal-content">
-            <span class="closeSaveGraphDataModalButton">&times;</span>
-            <h3>~LANG_GUI_SAVE_LIFT_DATA~</h3>
-            <hr>
-            <br>
-            <div class="float-right">
-            <form method="POST" action="/api/savedata" enctype="multipart/form-data">
-                <label class="config-label">~LANG_GUI_SAVE_GRAPH_FILENAME~:</label>&nbsp;<input type="text" value="~FileName~">
-                <input class="button file-submit-button" type="submit" value="Load"/>
-            </form>
-            </div>
-            <div class="clear-both">&nbsp;</div>
-        </div>        
-        </div>
+      </div>
 
 
 
-        <!-- File Manager Modal -->
-        <div id="fileModal" class="modal">
-        <div class="modal-content">
-            <span class="closeFileModalButton">&times;</span>
-            <h3>~LANG_GUI_FILE_MANAGER~</h3>
-            <div id="file_list">~FILE_LIST~</div>
-            <br>
-            <hr>
-            <br>
-            <div class="float-right">
-            <form method="POST" action="/api/file/upload" enctype="multipart/form-data">
-                <div class="input_container">
-                <input type="file" name="upload" id="fileUpload">
-                <input type="submit" value="~LANG_GUI_FILEMANAGER_UPLOAD~" class="button file-submit-button">
-                </div>
-            </form>
-            </div>
-            <div class="clear-both">&nbsp;</div>
-        </div>        
-        </div>
-
-        <!-- Info Modal -->
-        <div id="infoModal" class="modal">
-        <div class="info-modal-content row">
-            <span class="closeInfoModalButton">&times;</span>
-            <div class="row info-modal">
-                <div class="column">
-                <h4>~LANG_GUI_FIRMWARE~</h4>
-                <hr>
-                <div class="config-row"><label class="config-label">~LANG_GUI_VERSION~: </label><span class="config-value" id="RELEASE">~RELEASE~</span></div>
-                <div class="config-row"><label class="config-label">~LANG_GUI_BUILD~:  </label><span class="config-value" id="BUILD_NUMBER">~BUILD_NUMBER~</span></div>
-                <div class="config-row"><label class="config-label">~LANG_GUI_GUI~: </label><span class="config-value" id="VERSION">@@version@@</span></div>
-                <h4>~LANG_GUI_STORAGE~</h4>
-                <hr>
-                <div class="config-row"><label class="config-label">~LANG_GUI_MEM_SIZE~:  </label><span class="config-value" id="SPIFFS_MEM_SIZE">~SPIFFS_MEM_SIZE~</span> (bytes)</div>
-                <div class="config-row"><label class="config-label">~LANG_GUI_MEM_USED~:  </label><span class="config-value" id="SPIFFS_MEM_USED">~SPIFFS_MEM_USED~</span> (bytes)</div>
-                <h4>~LANG_GUI_NETWORK~</h4>
-                <hr>
-                <div class="config-row"><label class="config-label">~LANG_GUI_IP_ADDRESS~:  </label><span class="config-value" id="LOCAL_IP_ADDRESS">~LOCAL_IP_ADDRESS~</span></div>
-                <div class="config-row"><label class="config-label">~LANG_GUI_HOSTNAME~:  </label><span class="config-value" id="HOSTNAME">http://~HOSTNAME~.local</span></div>
-            </div>
-            <div class="column">
-                <!-- <div class="config-row"><label class="config-label">Uptime:  </label><span class="config-value" id="UPTIME">~UPTIME~</span></div> -->
-                <h4>~LANG_GUI_HARDWARE_CONFIG~</h4>
-                <hr>
-                <div class="config-row"><label class="config-label">~LANG_GUI_BENCH_TYPE~:  </label><span class="config-value" id="BENCH_TYPE">~BENCH_TYPE~</span></div>
-                <div class="config-row"><label class="config-label">~LANG_GUI_BOARD_TYPE~:  </label><span class="config-value" id="BOARD_TYPE">~BOARD_TYPE~</span></div>
-                <!-- <div class="config-row"><label class="config-label">Boot Time:  </label><span class="config-value" id="BOOT_TIME">~BOOT_TIME~</span></div> -->
-                <h4>~LANG_GUI_SENSOR_CONFIG~</h4>
-                <hr>
-                <div class="config-row"><label class="config-label">~LANG_GUI_MAF_DATA_FILE~:  </label><span class="config-value" id="MAF_SENSOR"><a href="~MAF_LINK~" target="new">~MAF_SENSOR~</a></span></div>
-                <div class="config-row"><label class="config-label">~LANG_GUI_REF_PRESSURE_SENSOR~:  </label><span class="config-value" id="PREF_SENSOR">~PREF_SENSOR~</span></div>
-                <div class="config-row"><label class="config-label">~LANG_GUI_TEMP_SENSOR~:  </label><span class="config-value" id="TEMP_SENSOR">~TEMP_SENSOR~</span></div>
-                <div class="config-row"><label class="config-label">~LANG_GUI_HUMIDITY_SENSOR~:  </label><span class="config-value" id="RELH_SENSOR">~RELH_SENSOR~</span></div>
-                <div class="config-row"><label class="config-label">~LANG_GUI_BARO_SENSOR~:  </label><span class="config-value" id="BARO_SENSOR">~BARO_SENSOR~</span></div>
-                <div class="config-row"><label class="config-label">~LANG_GUI_PITOT_SENSOR~:  </label><span class="config-value" id="PITOT_SENSOR">~PITOT_SENSOR~</span></div>
-                <div class="config-row"><label class="config-label">~LANG_GUI_DIFFERENTIAL_SENSOR~:  </label><span class="config-value" id="PDIFF_SENSOR">~PDIFF_SENSOR~</span></div>
-                </div>
-            </div>
-        </div>        
-        </div>
-        
 
 
-        <!-- main page code -->
-        <div class="headerbar">
-            <h1><a href="/" id="PAGE_TITLE" alt="DIY Flow Bench">DIY Flow Bench</a></h1>
-        </div>
-
-        <!-- Navbar-->
-        <button class="tablink" onclick="openTab("dashboard", this)" id="load-dashboard-button">~LANG_GUI_DASHBOARD~</button>
-        <button class="tablink" onclick="openTab("datalog", this)" id="load-datalog-button">~LANG_GUI_DATA~</button>
-        <button class="tablink" onclick="openTab("configuration", this)" id="load-config-button">~LANG_GUI_CONFIG~</button>
-
-        <div id="tabcontainer">
-        <!-- Main Tab-->
-        <div id="dashboard" class="tabcontent tabcontentMain">        
-        <div class="content">
-            <div class="tile-grid">
-            <div class="tile tile-pref" id="tile-pref">
-                <p class="tile-title" id="tile-pref-title">~LANG_GUI_PREF~</p>
-                <p><span class="tile-value" id="PREF">&nbsp;</span></p>
-                <p class="units">inH2O</p>
-            </div>
-            <div class="tile tile-pdiff" id="tile-pdiff">
-                <p class="tile-title" id="tile-pdiff-title">~LANG_GUI_PDIFF~</p>
-                <p><span class="differential-tile-value" id="PDIFF">&nbsp;</span></p>
-                <p class="units">inH2O</p>
-            </div>
-            <div class="tile tile-flow" id="flow-tile">
-                <p class="tile-title" id="flow-tile-title">~LANG_GUI_FLOW~</p>
-                <p><span class="tile-value" id="FLOW">&nbsp;</span></p>
-                <p class="units">ACFM</p>
-            </div>
-            <div class="tile tile-aflow" id="aflow-tile">
-                <p class="tile-title" id="aflow-tile-title">~LANG_GUI_AFLOW~</p>
-                <p><span class="tile-value" id="AFLOW">&nbsp;</span></p>
-                <p class="units">~AFLOW_UNITS~&nbsp;&commat;&nbsp;<span id="PADJUST">28</span>&nbsp;inH2O</p>
-            </div>
-            <div class="tile tile-sflow" id="sflow-tile">
-                <p class="tile-title" id="sflow-tile-title">~LANG_GUI_SFLOW~</p>
-                <p><span class="tile-value" id="SFLOW">&nbsp;</span></p>
-                <p class="units">SCFM:&nbsp;<span id="STD_REF">~STD_REF~</span></p>
-            </div>
-            <div class="tile tile-flow" id="maf-tile">
-                <p class="tile-title" id="maf-tile-title">~LANG_GUI_MFLOW~</p>
-                <p><span class="tile-value" id="MFLOW">&nbsp;</span></p>
-                <p class="units">KGH</p>
-            </div>
-            <div class="tile tile-pitot" id="tile-pitot">
-                <p class="tile-title" id="tile-pitot-title">~LANG_GUI_PITOT~</p>
-                <p><span class="pitot-tile-value" id="PITOT">&nbsp;</span></p>
-                <p class="units">m/sec &Delta; <span id="PITOT_DELTA">~PITOT_DELTA~</span>&nbsp;inH2O</p>
-            </div>
-            <div class="tile tile-swirl" id="tile-swirl">
-                <p class="tile-title" id="tile-swirl-title">~LANG_GUI_SWIRL~</p>
-                <p><span class="tile-value" id="SWIRL">&nbsp;</span></p>
-                <p class="units">rpm</p>
-            </div>
-            <div class="tile tile-fdiff" id="tile-fdiff">
-                <p class="tile-title"  id="tile-fdiff-title">~LANG_GUI_FLOW_DIFF~</p>
-                <p><span class="tile-value flowTargetVal" id="FDIFF">&nbsp;</span></p>
-                <p class="units"><span id="FDIFFTYPEDESC">~FDIFFTYPEDESC~</span></p>
-            </div>
-            <div class="tile tile-temp" id="tile-temp">
-                <p class="tile-title" id="tile-temp-title">~LANG_GUI_TEMP~</p>
-                <p><span class="tile-value" id="TEMP">&nbsp;</span></p>
-                <p class="units">~TEMP_UNIT~</p>
-            </div>
-            <div class="tile tile-baro" id="tile-baro">
-                <p class="tile-title" id="tile-baro-title">~LANG_GUI_BARO~</p>
-                <p><span class="tile-value" id="BARO">&nbsp;</span></p>
-                <p class="units">millibar (hPa)</p>
-            </div>
-            <div class="tile tile-relh" id="tile-relh">
-                <p class="tile-title"id="tile-relh-title">~LANG_GUI_HUMIDITY~</p>
-                <p><span class="tile-value" id="RELH">&nbsp;</span></p>
-                <p class="units">&percnt;RelH</p>
-            </div>
-            </div>  
-        </div>          
-        <div class="align-center">
-            <div class="status_message"><span id="STATUS_MESSAGE">~STATUS_MESSAGE~</span></div>                        
-            <div class="hidden_div">
-            <br>Ref Pressure mV: <span id="PREF_MV">&nbsp;</span>
-            <br>MAF mV: <span id="MAF_MV">&nbsp;</span>
-            <br>Pitot mV: <span id="PITOT_MV">&nbsp;</span>
-            </div>   
-            
-            <form method="POST" id="orificeRadio" style="display: none;">
-            <div class="switch-field">
-                <input type="radio" id="orifice1" name="radioOrifice" value="1" ~ORIFICE1_CHECKED~ onchange="orificeChange(this);"/>
-                <label for="orifice1">1</label>
-                <input type="radio" id="orifice2" name="radioOrifice" value="2" ~ORIFICE2_CHECKED~ onchange="orificeChange(this);"/>
-                <label for="orifice2">2</label>
-                <input type="radio" id="orifice3" name="radioOrifice" value="3" ~ORIFICE3_CHECKED~ onchange="orificeChange(this);"/>
-                <label for="orifice3">3</label>
-                <input type="radio" id="orifice4" name="radioOrifice" value="4" ~ORIFICE4_CHECKED~ onchange="orificeChange(this);"/>
-                <label for="orifice4">4</label>
-                <input type="radio" id="orifice5" name="radioOrifice" value="5" ~ORIFICE5_CHECKED~ onchange="orificeChange(this);"/>
-                <label for="orifice5">5</label>
-                <input type="radio" id="orifice6" name="radioOrifice" value="6" ~ORIFICE6_CHECKED~ onchange="orificeChange(this);"/>
-                <label for="orifice6">6</label>
-            </div>
-            <div id="orifice-data">Calibrated Flow Rate: <span id="ORIFICE_MAX_FLOW">~ORIFICE_MAX_FLOW~</span>cfm @ <span id="ORIFICE_CALIBRATED_DEPRESSION">~ORIFICE_CALIBRATED_DEPRESSION~</span> inH2O"</div>
-            </form>
-            
-            <button id="on-button" class="control-button">~LANG_GUI_START~</button>
-            <button id="off-button" class="control-button">~LANG_GUI_STOP~</button>
-            <button id="clear-message-button" class="control-button">~LANG_GUI_CLEAR_ALARM~</button>
-            <br>
-            <button id="show-capture-modal-button" class="control-button">~LANG_GUI_CAPTURE~</button>
-
-
-        </div>
-                    
-        </div>
-
-        
-        <!-- Datalog tab -->
-        <div id="datalog" class="tabcontent tabcontentData">
-
-            <!-- lift graph -->
-            <!-- NOTE: Inline styling is required for SVG Download-->
-            <div class="graph-container">        
-            <svg class="graph" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="dataGraph" style="background-color: #fff; padding-top: 100px;">
-            
-                <!--Grid-->
-                <g class="grid x-grid" id="xGrid" style="stroke: grey; stroke-dasharray: 1 2; stroke-width: 1;">
-                <line x1="100" x2="100" y1="0" y2="510"></line>
-                <line x1="150" x2="150" y1="0" y2="510"></line>
-                <line x1="200" x2="200" y1="0" y2="510"></line>
-                <line x1="250" x2="250" y1="0" y2="510"></line>
-                <line x1="300" x2="300" y1="0" y2="510"></line>
-                <line x1="350" x2="350" y1="0" y2="510"></line>
-                <line x1="400" x2="400" y1="0" y2="510"></line>
-                <line x1="450" x2="450" y1="0" y2="510"></line>
-                <line x1="500" x2="500" y1="0" y2="510"></line>
-                <line x1="550" x2="550" y1="0" y2="510"></line>
-                <line x1="600" x2="600" y1="0" y2="510"></line>
-                <line x1="650" x2="650" y1="0" y2="510"></line>
-                <line x1="700" x2="700" y1="0" y2="510"></line>
-                </g>
-
-                <g class="grid y-grid" id="yGrid" style="stroke: grey; stroke-dasharray: 1 2; stroke-width: 1;">
-                <line x1="90" x2="700" y1="0" y2="0"></line>
-                <line x1="90" x2="700" y1="50" y2="50"></line>
-                <line x1="90" x2="700" y1="100" y2="100"></line>
-                <line x1="90" x2="700" y1="150" y2="150"></line>
-                <line x1="90" x2="700" y1="200" y2="200"></line>
-                <line x1="90" x2="700" y1="250" y2="250"></line>
-                <line x1="90" x2="700" y1="300" y2="300"></line>
-                <line x1="90" x2="700" y1="350" y2="350"></line>
-                <line x1="90" x2="700" y1="400" y2="400"></line>
-                <line x1="90" x2="700" y1="450" y2="450"></line>
-                <line x1="90" x2="700" y1="500" y2="500"></line>
-                </g>
-
-                <!--Grid Labels-->
-                <g class="labels x-labels">
-                <text x="100" y="550">Lift:</text>
-                <text x="150" y="550">~lift1~</text>
-                <text x="200" y="550">~lift2~</text>
-                <text x="250" y="550">~lift3~</text>
-                <text x="300" y="550">~lift4~</text>
-                <text x="350" y="550">~lift5~</text>
-                <text x="400" y="550">~lift6~</text>
-                <text x="450" y="550">~lift7~</text>
-                <text x="500" y="550">~lift8~</text>
-                <text x="550" y="550">~lift9~</text>
-                <text x="600" y="550">~lift10~</text>
-                <text x="650" y="550">~lift11~</text>
-                <text x="700" y="550">~lift12~</text>
-            </g>
-            
-            <g class="labels y-labels">
-                <text x="80" y="10">~flow10~</text>
-                <text x="80" y="60">~flow9~</text>
-                <text x="80" y="110">~flow8~</text>
-                <text x="80" y="160">~flow7~</text>
-                <text x="80" y="210">~flow6~</text>
-                <text x="80" y="260">~flow5~</text>
-                <text x="80" y="310">~flow4~</text>
-                <text x="80" y="360">~flow3~</text>
-                <text x="80" y="410">~flow2~</text>
-                <text x="80" y="460">~flow1~</text>
-                <text x="80" y="510">Flow (cfm)</text>
-            </g>
-
-                <!--Graph Key-->
-                <g class="labels key-labels">
-                <!--
-                <text x="625" y="25" id="default-key-text">Current Data</text>
-                <line x1="550" y1="20" x2="620" y2="20"  id="default-key" style="stroke:#000;stroke-width:1;stroke-dasharray:4,1;opacity:0.5;" /> 
-                
-                <line x1="550" y1="35" x2="620" y2="35"  style="stroke:#f50808;stroke-width:2;opacity:0.5;" /> 
-                <text x="625" y="40">Exhaust</text>
-                -->
-                </g>
-
-                <!--Data Points - css classes to display value on hover - NOTE text value is displayed above dataPoint-->
-                <!--
-                <g class="first_set points" data-setname="Our first data set" id="dataPlot">
-                <circle class="dataCircle" cx="150" cy="340" data-value="7.2" r="4"></circle><text class="dataValue hide" x="150" y="310">7.2</text>
-                <circle class="dataCircle" cx="200" cy="315" data-value="8.1" r="4"></circle><text class="dataValue hide" x="200" y="285">4.2</text>
-                <circle class="dataCircle" cx="250" cy="301" data-value="7.7" r="4"></circle><text class="dataValue hide" x="250" y="271">5.2</text> 
-                <circle class="dataCircle" cx="300" cy="280" data-value="6.8" r="4"></circle><text class="dataValue hide" x="300" y="270">23.2</text>
-                <circle class="dataCircle" cx="350" cy="249" data-value="6.7" r="4"></circle><text class="dataValue hide" x="350" y="239">32</text>  
-                <circle class="dataCircle" cx="400" cy="245" data-value="5.7" r="4"></circle><text class="dataValue hide" x="400" y="235">7.2</text> 
-                <circle class="dataCircle" cx="450" cy="242" data-value="6.7" r="4"></circle><text class="dataValue hide" x="450" y="232">8.2</text> 
-                <circle class="dataCircle" cx="500" cy="238" data-value="6.8" r="4"></circle><text class="dataValue hide" x="500" y="228">752</text> 
-                <circle class="dataCircle" cx="550" cy="230" data-value="4.7" r="4"></circle><text class="dataValue hide" x="550" y="220">22</text>  
-                <circle class="dataCircle" cx="600" cy="222" data-value="5.7" r="4"></circle><text class="dataValue hide" x="600" y="212">7</text>   
-                <circle class="dataCircle" cx="650" cy="220" data-value="2.7" r="4"></circle><text class="dataValue hide" x="650" y="210">7542</text>
-                <circle class="dataCircle" cx="700" cy="218" data-value="6.9" r="4"></circle><text class="dataValue hide" x="700" y="208">42</text>  
-                </g>
-                -->
-
-                <!--Hard coded Graph Line Data-->
-                <g class="surfaces" id="lineData">
-                    <!--Line data-->
-                    <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1"
-                    points="100,500 150,~LINE_DATA1~ 200,~LINE_DATA2~ 250,~LINE_DATA3~ 300,~LINE_DATA4~ 350,~LINE_DATA5~ 400,~LINE_DATA6~ 450,~LINE_DATA7~ 500,~LINE_DATA8~ 550,~LINE_DATA9~ 600,~LINE_DATA10~ 650,~LINE_DATA11~ 700,~LINE_DATA12~"/>
-
-                </g>
-                
-                <use class="grid double" xlink:href="#xGrid" ></use>
-                <use class="grid double" xlink:href="#yGrid" ></use>
-                
-            </svg>
-
-
-            <!-- ARRAY TO SVG - Appends data to graph container -->
-
-            <!-- <coords-svg stroke="gold" stroke-dasharray="4, 1" coords="[[100,330],[ 150,332],[ 200,332],[ 250,335],[ 300,275],[ 350,281],[ 400,250],[ 450,241],[ 500,251],[ 550,133],[ 600,199],[ 650,172],[ 700,177]]"></coords-svg> -->
-            <!-- <coords-svg stroke="green" coords="[[2, 15],[57, 58],[5, 57]]"></coords-svg> -->
-
-            <!-- Converts custom <coord-svg> elements into valid polyline and appends to dataPlot. Next stage is to use JSON -->
-            <!-- <script>
-                customElements.define("coords-svg", class extends HTMLElement{
-                connectedCallback(){
-                    let arr = JSON.parse(this.getAttribute("coords"));
-                    let dPath = arr.flat().join(" ");
-                    let stroke = this.getAttribute("stroke");
-                    this.style.display = "inline-block";
-                    
-                    var svgNS = "http://www.w3.org/2000/svg";
-                    let polyline = document.createElementNS(svgNS, "polyline");
-                    polyline.classList.add("dataLine");
-
-                    polyline.setAttribute("points", dPath);
-                    polyline.setAttribute("stroke", stroke);
-                    polyline.setAttribute("stroke-width", 1);
-                    polyline.setAttribute("fill", "none");
-
-                    document.getElementById("dataPlot").appendChild(polyline);
-                }
-                });
-            </script> -->
-            
-            <!-- ARRAY TO SVG -->
-
-            </div>  
-        
-            <!-- end lift graph -->
-
-
-            <div class="align-center">
-            <br>
-            <button id="clear-graph-data-button" class="control-button">~LANG_GUI_CLEAR~</button> 
-            <button id="export-graph-data-button" class="control-button">~LANG_GUI_EXPORT~</button> 
-            <button id="export-graph-image-button" class="control-button">~LANG_GUI_IMAGE~</button> 
-            <!-- Export button fires javascript function to click link below forcing the download-->
-            <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
-            </div>
-
-        </div>
-
-        <!-- configuration tab -->
-        <div id="configuration" class="tabcontent tabcontentConfig">
+    <!-- configuration tab -->
+    <div id="configuration" class="tabcontent tabcontentConfig">
         <div class="config-panel">
-            <p style="text-align:center"><button id="file-manager-button" class="button">Files</button> <button id="info-button" class="button">Info</button> <button id="support-button" class="button" onclick="window.open("https://github.com/DeeEmm/DIY-Flow-Bench/wiki","_blank")">Support</button> <button id="restart-button" class="button" >Reboot</button> <button id="update-button" class="button">Update</button></p>       
-            <br>
-            <form method="POST" action="/api/saveconfig">
+          <p style="text-align:center"><button id="file-manager-button" class="button">Files</button> <button id="info-button" class="button">Info</button> <button id="support-button" class="button" onclick="window.open('https://github.com/DeeEmm/DIY-Flow-Bench/wiki','_blank')">Support</button> <button id="restart-button" class="button" >Reboot</button> <button id="update-button" class="button">Update</button></p>       
+          <br>
+          <form method="POST" action="/api/saveconfig">
             <h2>~LANG_GUI_SYS_SETTINGS~</h2>
             <h3>~LANG_GUI_WIFI_INFO~</h3>        
             <div class="config-row tooltip"><label class="config-label">~LANG_GUI_WIFI_SSID~:</label>&nbsp;<input type="text" id="CONF_WIFI_SSID"  name="CONF_WIFI_SSID" value="~CONF_WIFI_SSID~" class="config-text" ><span class="tooltiptext">The name of your WiFi network</span></div>
@@ -558,16 +630,16 @@ String PublicHTML::index() {
             <br>
             <h3>~LANG_GUI_RESOLUTION_AND_ACCURACY~</h3>
             <div class="config-row tooltip"><label class="config-label">~LANG_GUI_GEN_DECIMAL_ACCURACY~:</label>
-                <span>~GEN_DECIMAL_LENGTH_DROPDOWN~</span>
-                <span class="tooltiptext">Number of decimal places used in UI</span>
+              <span>~GEN_DECIMAL_LENGTH_DROPDOWN~</span>
+              <span class="tooltiptext">Number of decimal places used in UI</span>
             </div>
             <div class="config-row tooltip"><label class="config-label">~LANG_GUI_FLOW_DECIMAL_ROUNDING~:</label>
-                <span>~FLOW_DECIMAL_LENGTH_DROPDOWN~</span>
-                <span class="tooltiptext">Number of decimal places used in UI for flow values</span>
+              <span>~FLOW_DECIMAL_LENGTH_DROPDOWN~</span>
+              <span class="tooltiptext">Number of decimal places used in UI for flow values</span>
             </div>
             <div class="config-row tooltip"><label class="config-label">~LANG_GUI_FLOW_VALUE_ROUNDING~:</label>
-                <span>~ROUNDING_TYPE_DROPDOWN~</span>
-                <span class="tooltiptext">Rounding used in flow calculations</span>
+              <span>~ROUNDING_TYPE_DROPDOWN~</span>
+              <span class="tooltiptext">Rounding used in flow calculations</span>
             </div>
             <br>
             <h3>~LANG_GUI_DATA_FILTERS~</h3>
@@ -580,37 +652,37 @@ String PublicHTML::index() {
             <h3>~LANG_GUI_CONVERSION_SETTINGS~</h3>
             <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ADJ_FLOW_DEPRESSION~:</label>&nbsp;<input type="text" id="ADJ_FLOW_DEPRESSION" name="ADJ_FLOW_DEPRESSION" value="~ADJ_FLOW_DEPRESSION~" class="config-text"><span class="tooltiptext">Bench depression used for adjusted flow calcs</span></div>
             <div class="config-row tooltip"><label class="config-label">~LANG_GUI_STANDARD_REF_CONDITIONS~:</label>
-                <select name="STANDARD_REFERENCE" class="config-select">
-                <option value="1" ~STD_REF_1~>ISO 5011 (20&degC(68&degF) 1atm(101.3kPa) 50%RH)</option>
-                <option value="2" ~STD_REF_2~>ISO 1585 (25&degC(68&degF) 100kPa  0%RH)</option>
-                <option value="3" ~STD_REF_3~>ISA (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
-                <option value="4" ~STD_REF_4~>ISO 13443 (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
-                <option value="5" ~STD_REF_5~>ISO 2533 (15&degC(59&degF) 1atm(101.325kPa)  0% RH)</option>
-                <!--<option value="6">NIST / EPA (20&degC(68&degF) 1atm(101.325kPa)  --RH(unspecified))</option>-->
-                </select>
-                <span class="tooltiptext">Standardised Temp, baro and humidity conditions.</span>
+              <select name='STANDARD_REFERENCE' class='config-select'>
+                <option value='1' ~STD_REF_1~>ISO 5011 (20&degC(68&degF) 1atm(101.3kPa) 50%RH)</option>
+                <option value='2' ~STD_REF_2~>ISO 1585 (25&degC(68&degF) 100kPa  0%RH)</option>
+                <option value='3' ~STD_REF_3~>ISA (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
+                <option value='4' ~STD_REF_4~>ISO 13443 (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
+                <option value='5' ~STD_REF_5~>ISO 2533 (15&degC(59&degF) 1atm(101.325kPa)  0% RH)</option>
+                <!--<option value='6'>NIST / EPA (20&degC(68&degF) 1atm(101.325kPa)  --RH(unspecified))</option>-->
+              </select>
+              <span class="tooltiptext">Standardised Temp, baro and humidity conditions.</span>
             </div>
             <div class="config-row tooltip"><label class="config-label">~LANG_GUI_STANDARDISED_ADJ_FLOW~:</label>&nbsp;<input type="checkbox" id="STD_ADJ_FLOW" name="STD_ADJ_FLOW" value="1" ~STD_ADJ_FLOW~ class="config-text"><span class="tooltiptext">Adjusted flow uses SCFM</span></div>
             <br>
             <h3>~LANG_GUI_DATA_CAPTURE_SETTINGS~</h3>
             <div class="config-row tooltip"><label class="config-label">~LANG_GUI_CAPTURE_DATATYPE~:</label>
-                <select name="DATA_COLLECTION_STANDARD" class="config-select">
-                <option value="1" ~CAP_MODE_1~>Flow (ACFM)</option>
-                <option value="1" ~CAP_MODE_2~>Standard Flow (ACFM - ~STANDARD_FLOW~)</option>
-                <option value="2" ~CAP_MODE_3~>Adjusted Flow (ACFM @ ~ADJ_FLOW_DEPRESSION~ in/H2O)</option>
-                <option value="3" ~CAP_MODE_4~>Adjusted Standard Flow (ACFM - ~STANDARD_FLOW~ @ ~ADJ_FLOW_DEPRESSION~ in/H2O)</option>
-                <option value="4" ~CAP_MODE_5~>MAF Flow (~MAF_FLOW_UNIT~)</option>
-                </select>
-                <span class="tooltiptext">Default data type for data capture.</span>
+              <select name='DATA_COLLECTION_STANDARD' class='config-select'>
+                <option value='1' ~CAP_MODE_1~>Flow (ACFM)</option>
+                <option value='1' ~CAP_MODE_2~>Standard Flow (ACFM - ~STANDARD_FLOW~)</option>
+                <option value='2' ~CAP_MODE_3~>Adjusted Flow (ACFM @ ~ADJ_FLOW_DEPRESSION~ in/H2O)</option>
+                <option value='3' ~CAP_MODE_4~>Adjusted Standard Flow (ACFM - ~STANDARD_FLOW~ @ ~ADJ_FLOW_DEPRESSION~ in/H2O)</option>
+                <option value='4' ~CAP_MODE_5~>MAF Flow (~MAF_FLOW_UNIT~)</option>
+              </select>
+              <span class="tooltiptext">Default data type for data capture.</span>
             </div>
             <div class="config-row tooltip"><label class="config-label">~LANG_GUI_DATA_GRAPH_MAX_VALUE~:</label>
-                <select name="DATAGRAPH_MAX" class="config-select">
-                <option value="0" ~DATAGRAPH_MAX_0~>~LANG_GUI_AUTO~</option>
-                <option value="1" ~DATAGRAPH_MAX_1~>250 cfm</option>
-                <option value="2" ~DATAGRAPH_MAX_2~>500 cfm</option>
-                <option value="3" ~DATAGRAPH_MAX_3~>1000 cfm</option>
-                </select>
-                <span class="tooltiptext">Set max scaling for Data Graph.</span>
+              <select name='DATAGRAPH_MAX' class='config-select'>
+                <option value='0' ~DATAGRAPH_MAX_0~>~LANG_GUI_AUTO~</option>
+                <option value='1' ~DATAGRAPH_MAX_1~>250 cfm</option>
+                <option value='2' ~DATAGRAPH_MAX_2~>500 cfm</option>
+                <option value='3' ~DATAGRAPH_MAX_3~>1000 cfm</option>
+              </select>
+              <span class="tooltiptext">Set max scaling for Data Graph.</span>
             </div>
             <br>
             <h3>~LANG_GUI_CAL_ORIFICE_SETTINGS~</h3>
@@ -618,20 +690,20 @@ String PublicHTML::index() {
             <div class="config-row tooltip"><label class="config-label">~LANG_GUI_CAL_ORIFICE_TEST_PRESS~:</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="~CONF_CAL_REF_PRESS~" class="config-text"><span class="tooltiptext">Reference depression of calibration orifice in in/wg</span></div>
             <br>
             <div id="orificeData">
-                <h3>~LANG_GUI_ORIFICE_DATA~</h3>
-                <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE1_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE1_FLOW_RATE" name="ORIFICE1_FLOW_RATE" value="~ORIFICE1_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #1 in cfm</span></div>
-                <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE1_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE1_TEST_PRESSURE" name="ORIFICE1_TEST_PRESSURE" value="~ORIFICE1_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #1 in in/wg</span></div>
-                <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE2_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE2_FLOW_RATE" name="ORIFICE2_FLOW_RATE" value="~ORIFICE2_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #2 in cfm</span></div>
-                <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE2_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE2_TEST_PRESSURE" name="ORIFICE2_TEST_PRESSURE" value="~ORIFICE2_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #2 in in/wg</span></div>
-                <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE3_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE3_FLOW_RATE" name="ORIFICE3_FLOW_RATE" value="~ORIFICE3_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #3 in cfm</span></div>
-                <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE3_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE3_TEST_PRESSURE" name="ORIFICE3_TEST_PRESSURE" value="~ORIFICE3_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #3 in in/wg</span></div>
-                <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE4_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE4_FLOW_RATE" name="ORIFICE4_FLOW_RATE" value="~ORIFICE4_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #4 in cfm</span></div>
-                <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE4_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE4_TEST_PRESSURE" name="ORIFICE4_TEST_PRESSURE" value="~ORIFICE4_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #4 in in/wg</span></div>
-                <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE5_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE5_FLOW_RATE" name="ORIFICE5_FLOW_RATE" value="~ORIFICE5_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #5 in cfm</span></div>
-                <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE5_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE5_TEST_PRESSURE" name="ORIFICE5_TEST_PRESSURE" value="~ORIFICE5_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #5 in in/wg</span></div>
-                <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE6_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE6_FLOW_RATE" name="ORIFICE6_FLOW_RATE" value="~ORIFICE6_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #6 in cfm</span></div>
-                <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE6_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE6_TEST_PRESSURE" name="ORIFICE6_TEST_PRESSURE" value="~ORIFICE6_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #6 in in/wg</span></div>
-                <br>
+              <h3>~LANG_GUI_ORIFICE_DATA~</h3>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE1_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE1_FLOW_RATE" name="ORIFICE1_FLOW_RATE" value="~ORIFICE1_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #1 in cfm</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE1_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE1_TEST_PRESSURE" name="ORIFICE1_TEST_PRESSURE" value="~ORIFICE1_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #1 in in/wg</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE2_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE2_FLOW_RATE" name="ORIFICE2_FLOW_RATE" value="~ORIFICE2_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #2 in cfm</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE2_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE2_TEST_PRESSURE" name="ORIFICE2_TEST_PRESSURE" value="~ORIFICE2_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #2 in in/wg</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE3_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE3_FLOW_RATE" name="ORIFICE3_FLOW_RATE" value="~ORIFICE3_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #3 in cfm</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE3_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE3_TEST_PRESSURE" name="ORIFICE3_TEST_PRESSURE" value="~ORIFICE3_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #3 in in/wg</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE4_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE4_FLOW_RATE" name="ORIFICE4_FLOW_RATE" value="~ORIFICE4_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #4 in cfm</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE4_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE4_TEST_PRESSURE" name="ORIFICE4_TEST_PRESSURE" value="~ORIFICE4_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #4 in in/wg</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE5_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE5_FLOW_RATE" name="ORIFICE5_FLOW_RATE" value="~ORIFICE5_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #5 in cfm</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE5_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE5_TEST_PRESSURE" name="ORIFICE5_TEST_PRESSURE" value="~ORIFICE5_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #5 in in/wg</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE6_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE6_FLOW_RATE" name="ORIFICE6_FLOW_RATE" value="~ORIFICE6_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #6 in cfm</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE6_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE6_TEST_PRESSURE" name="ORIFICE6_TEST_PRESSURE" value="~ORIFICE6_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #6 in in/wg</span></div>
+              <br>
             </div>
             <br>
             <h3>~LANG_GUI_API_SETTINGS~</h3>
@@ -640,10 +712,10 @@ String PublicHTML::index() {
             <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
             <br>
             <br>
-            </form>
-            <br>
-            <br>
-            <form method="POST" action="/api/savecalibration">
+          </form>
+          <br>
+          <br>
+          <form method="POST" action="/api/savecalibration">
             <h2>~LANG_GUI_CALIBRATION_DATA~</h2>
             <div class="config-row tooltip"><label class="config-label">~LANG_GUI_CAL_OFFSET~:</label>&nbsp;<input type="text" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
             <div class="config-row tooltip"><label class="config-label">~LANG_GUI_LEAK_TEST_BASELINE~:</label>&nbsp;<input  type="text" id="LEAK_CAL_BASELINE" name="LEAK_CAL_BASELINE" value="~LEAK_CAL_BASELINE~" class="config-text"><span class="tooltiptext">Baseline Offset</span></div>
@@ -652,598 +724,483 @@ String PublicHTML::index() {
             <div class="config-row tooltip"><label class="config-label">~LANG_GUI_LEAK_TEST_OFFSET_REV~:</label>&nbsp;<input type="text" id="LEAK_CAL_OFFSET_REV" name="LEAK_CAL_OFFSET_REV" value="~LEAK_CAL_OFFSET_REV~" class="config-text"><span class="tooltiptext">Measured leak test value (Reverse Flow)</span></div>
             <br>
             <div class="float-right"><input id="save-config-button" type="submit" class="button" value="~LANG_GUI_OVERWRITE~"></div>
-            </form>
+          </form>
         </div>                    
-        </div>
+      </div>
     </div>
+  
+  
+)SETTINGS";
 
-    <!-- Footer -->
-    <div id="footer"><a href="https://diyflowbench.com" target="new">DIYFlowBench.com</a></div>
-    <script src="/javascript.js"></script>
-    </BODY>
-    </HTML>
-)HTML";
-
-return index_html;
+return settings;
 }
+
+
+
+
+
+
+
+
+/***********************************************************
+ * @brief Get Main Javscript
+ *
+ *
+ *
+ ***/
+
+String PublicHTML::mainJs() {
+
+  String mainJs PROGMEM = R"MAINJS(
+
+var updateSSE = true;
+var activeOrifice;
+var runOnce = false;
+
+window.addEventListener('load', onLoad);
+
+var captureLiftDataModal = document.getElementById("captureLiftDataModal");
+var calibrationModal = document.getElementById("calibrationModal");
+var flowTargetModal = document.getElementById("flowTargetModal");
+
+var closeFlowTargetModalButton = document.getElementsByClassName("closeFlowTargetModalButton")[0];
+var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
+var closeCaptureLiftDataModalButton = document.getElementsByClassName("closeCaptureLiftDataModalButton")[0];
+var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
+
+// Set up Server Side Events (SSE)
+if (!!window.EventSource) {
+  var source = new EventSource('/events');
+
+  source.addEventListener('JSON_DATA', function(e) {
+    var myObj = JSON.parse(e.data);
+
+    if (updateSSE === true){
+
+      for (key in myObj) {
+        try {
+          if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
+          // We've got a string...
+            if (key === 'PITOT_COLOUR' || key === 'PDIFF_COLOUR' ) {
+            } else {
+              // it' a template variable
+              document.getElementById(key).innerHTML = myObj[key];
+            }
+ 
+          } else {
+           // we've not got a string... 
+           if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'SFLOW' || key === 'FDIFF') {
+              // HACK: template vars - replaced before page load
+              // document.getElementById(key).innerHTML = myObj[key].toFixed(~FLOW_DECIMAL_LENGTH~);  
+              document.getElementById(key).innerHTML = myObj[key].toFixed(2);  
+            } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'PITOT_DELTA' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
+              // document.getElementById(key).innerHTML = myObj[key].toFixed(~GEN_DECIMAL_LENGTH~); 
+              document.getElementById(key).innerHTML = myObj[key].toFixed(2); 
+            //} else if (key === '') {
+            } else {
+              document.getElementById(key).innerHTML = myObj[key];
+            }
+          }
+        } catch (error) {
+          console.log('Missing or incorrect JSON data');
+          console.log(" error: " + error + " key: " + key );
+          // console.log(key);
+        }
+      } 
+
+      // get bench type and set up GUI accoordingly
+      var benchType = myObj["BENCH_TYPE"];
+
+      // get active orifice and set up GUI accoordingly
+      activeOrifice = myObj["ACTIVE_ORIFICE"];
+      if (runOnce == false ){
+        radioButton = document.getElementById("orifice" + activeOrifice);
+        radioButton.checked = true;
+      }
+
+      switch (benchType) {
+    
+        case "MAF":
+          document.getElementById('orificeData').style.display='none';
+          document.getElementById('orificeRadio').style.display='none';
+        break;
+    
+        case "ORIFICE":
+          document.getElementById('orificeData').style.display='block';
+          document.getElementById('orificeRadio').style.display='block';
+        break;
+          
+        case "VENTURI":
+          document.getElementById('orificeData').style.display='block';
+        break;
+          
+        case "PITOT":
+          document.getElementById('orificeData').style.display='block';
+        break;
+          
+      }
+
+      // Get data filter type
+      var dataFilterType = myObj["DATA_FILTER_TYPE"];
+
+      // Get Pitot Tile status colours
+      var pitotTileColour = myObj["PITOT_COLOUR"];
+      document.getElementById('PITOT').style.color=pitotTileColour;
+
+      // Get pDiff tile tatus colours
+      var pDiffTileColour = myObj["PDIFF_COLOUR"];
+      document.getElementById('PDIFF').style.color=pDiffTileColour;
+    }
+
+  }, false);
+
+}
+
+function setCookie(name,value,days) {
+  var expires = "";
+  if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + (days*24*60*60*1000));
+      expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+}
+
+function getCookie(name) {
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(';');
+  for(var i=0;i < ca.length;i++) {
+      var c = ca[i];
+      while (c.charAt(0)==' ') c = c.substring(1,c.length);
+      if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+  }
+  return null;
+}
+
+// https://github.com/Autodrop3d/serialTerminal.com
+function changeCookieValue(cookieName, newValue) {
+  document.cookie = 
+      `${cookieName}=${newValue}; 
+          expires=Thu, 5 March 2030 12:00:00 UTC; path=/`;
+}
+
+  )MAINJS";
+
+  return mainJs;
+
+}
+
+
+
+
+
 
 
 
 /***********************************************************
  * @brief Get Javscript
  *
+ *
+ *
  ***/
 
-String PublicHTML::javascript() {
+String PublicHTML::indexJs() {
 
-  String javascript PROGMEM = R"JAVASCRIPT(
-  /***********************************************************
-  * javascript.js
-  *
-  * Browser control code for DIY-Flow-bench project: diyflowbench.com
-  * Handles data transmission and display update tasks
-  * Provides UI control to browser
-  *
-  ***/
-
-  var leakCalVal;
-  var flowCalVal;
-  var leakCalTolerance;
-  var leakTestThreshold;
-  var updateSSE = true;
-  var active_orifice;
-  var runOnce = false;
-
-  window.addEventListener("load", onLoad);
-
-  var fileModal = document.getElementById("fileModal");
-  var infoModal = document.getElementById("infoModal");
-  var captureLiftDataModal = document.getElementById("captureLiftDataModal");
-  var loadGraphDataModal = document.getElementById("loadGraphDataModal");
-  var saveGraphDataModal = document.getElementById("saveGraphDataModal");
-  var calibrationModal = document.getElementById("calibrationModal");
-  var dataModal = document.getElementById("dataModal");
-  var serialModal = document.getElementById("serialModal");
-  var updateModal = document.getElementById("updateModal");
-  var flowTargetModal = document.getElementById("flowTargetModal");
-
-
-  var closeFlowTargetModalButton = document.getElementsByClassName("closeFlowTargetModalButton")[0];
-  var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
-  var closeDataModalButton = document.getElementsByClassName("closeDataModalButton")[0];
-  var closeSerialModalButton = document.getElementsByClassName("closeSerialModalButton")[0];
-  var closeFileModalButton = document.getElementsByClassName("closeFileModalButton")[0];
-  var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton")[0];
-  var closeCaptureLiftDataModalButton = document.getElementsByClassName("closeCaptureLiftDataModalButton")[0];
-  var closeLoadGraphDataModalButton = document.getElementsByClassName("closeLoadGraphDataModalButton")[0];
-  var closeSaveGraphDataModalButton = document.getElementsByClassName("closeSaveGraphDataModalButton")[0];
-  var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
-  var closeUpdateModalButton = document.getElementsByClassName("closeUpdateModalButton")[0];
-
-  // Set up Server Side Events (SSE)
-  if (!!window.EventSource) {
-    var source = new EventSource("/events");
-
-    source.addEventListener("JSON_DATA", function(e) {
-      var myObj = JSON.parse(e.data);
-
-      if (updateSSE === true){
-
-        for (key in myObj) {
-          try {
-            if (typeof myObj[key] === "string" || myObj[key] instanceof String) {
-            // We"ve got a string...
-              if (key === "PITOT_COLOUR" || key === "PDIFF_COLOUR" ) {
-              } else {
-                // it" a template variable
-                document.getElementById(key).innerHTML = myObj[key];
-              }
-  
-            } else {
-            // we"ve not got a string... 
-            if (key === "FLOW" || key === "AFLOW" || key === "MFLOW" || key === "SFLOW" || key === "FDIFF") {
-                // HACK: template vars - replaced before page load
-                document.getElementById(key).innerHTML = myObj[key].toFixed(~FLOW_DECIMAL_LENGTH~);  
-              } else if (key === "PREF" || key === "PDIFF" || key === "PITOT" || key === "PITOT_DELTA" || key === "SWIRL" || key === "TEMP" || key === "BARO" || key === "RELH") {
-                document.getElementById(key).innerHTML = myObj[key].toFixed(~GEN_DECIMAL_LENGTH~); 
-              //} else if (key === "") {
-              } else {
-                document.getElementById(key).innerHTML = myObj[key];
-              }
-            }
-          } catch (error) {
-            console.log("Missing or incorrect JSON data");
-            console.log(" error: " + error + " key: " + key );
-            // console.log(key);
-          }
-        } 
-
-        // get bench type and set up GUI accoordingly
-        var benchType = myObj["BENCH_TYPE"];
-
-        // get active orifice and set up GUI accoordingly
-        active_orifice = myObj["ACTIVE_ORIFICE"];
-        if (runOnce == false ){
-          radioButton = document.getElementById("orifice" + active_orifice);
-          radioButton.checked = true;
-        }
-
-        switch (benchType) {
-      
-          case "MAF":
-            document.getElementById("orificeData").style.display="none";
-            document.getElementById("orificeRadio").style.display="none";
-          break;
-      
-          case "ORIFICE":
-            document.getElementById("orificeData").style.display="block";
-            document.getElementById("orificeRadio").style.display="block";
-          break;
-            
-          case "VENTURI":
-            document.getElementById("orificeData").style.display="block";
-          break;
-            
-          case "PITOT":
-            document.getElementById("orificeData").style.display="block";
-          break;
-            
-        }
-
-        // Get data filter type
-        var dataFilterType = myObj["DATA_FILTER_TYPE"];
-
-        // Get Pitot Tile status colours
-        var pitotTileColour = myObj["PITOT_COLOUR"];
-        document.getElementById("PITOT").style.color=pitotTileColour;
-
-        // Get pDiff tile tatus colours
-        var pDiffTileColour = myObj["PDIFF_COLOUR"];
-        document.getElementById("PDIFF").style.color=pDiffTileColour;
-      }
-
-    }, false);
-
-
-
-  }
-
-
-
-  /***********************************************************
-  * onFileUpload event handler
-  ***/
-  function onFileUpload(event) {
-    this.setState({file: event.target.files[0]});
-    const {file} = this.state;
-    const data = new FormData;
-    data.append("data", file);
-    fetch("/api/file/upload", {
-        method: "POST",
-        body: data
-    })
-        .catch(e => {
-            console.log("Request failed", e);
-        });
-  }
-
-
-
-  /***********************************************************
-  * onLoad event handler
-  ***/
-  function onLoad(event) {
+  String indexJs PROGMEM = R"INDEXJS(
+/***********************************************************
+* onLoad event handler
+***/
+function onLoad(event) {
 
     initialiseButtons();
-    const urlParams = new URLSearchParams(window.location.search);
-    const view = urlParams.get("view");  
-    
-    switch (view) {
-    
-      case "upload":
-        document.getElementById("load-config-button").click();
-        document.getElementById("fileModal").style.display="block";
-      break;
-
-      case "graph":
-        document.getElementById("load-datalog-button").click();
-        document.getElementById("datalog").style.display="block";
-      break;
-        
-      case "config":
-        document.getElementById("load-config-button").click();
-      break;
-
-      case "data":
-        document.getElementById("dataModal").style.display="block";
-      break;
-
-      
-    }
-
+   
     // Set tile status on page reload from cookie data
-    var tileStatus = getCookie("pressure-tile");
+    var tileStatus = getCookie('pressure-tile');
     
     switch (tileStatus) {
-
+  
       case "pdiff":
-        document.getElementById("tile-pref").style.display="none";
-        document.getElementById("tile-pdiff").style.display="block";
+        document.getElementById('tile-pref').style.display='none';
+        document.getElementById('tile-pdiff').style.display='block';
       break;
-
+  
       case "pref":
-        document.getElementById("tile-pref").style.display="block";
-        document.getElementById("tile-pdiff").style.display="none";
+        document.getElementById('tile-pref').style.display='block';
+        document.getElementById('tile-pdiff').style.display='none';
       break;
-
+  
     }
-
-    var tileStatus = getCookie("flow-tile");
-
+  
+    var tileStatus = getCookie('flow-tile');
+  
     switch (tileStatus){
-
+  
       case "flow":
-        document.getElementById("flow-tile").style.display="block";
-        document.getElementById("aflow-tile").style.display="none";
-        document.getElementById("sflow-tile").style.display="none";
-        document.getElementById("maf-tile").style.display="none";
+        document.getElementById('flow-tile').style.display='block';
+        document.getElementById('aflow-tile').style.display='none';
+        document.getElementById('sflow-tile').style.display='none';
+        document.getElementById('maf-tile').style.display='none';
       break;
-
+  
       case "aflow":
-        document.getElementById("flow-tile").style.display="none";
-        document.getElementById("aflow-tile").style.display="block";
-        document.getElementById("sflow-tile").style.display="none";
-        document.getElementById("maf-tile").style.display="none";
+        document.getElementById('flow-tile').style.display='none';
+        document.getElementById('aflow-tile').style.display='block';
+        document.getElementById('sflow-tile').style.display='none';
+        document.getElementById('maf-tile').style.display='none';
       break;
-
+  
       case "sflow":
-        document.getElementById("flow-tile").style.display="none";
-        document.getElementById("aflow-tile").style.display="none";
-        document.getElementById("sflow-tile").style.display="block";
-        document.getElementById("maf-tile").style.display="none";
+        document.getElementById('flow-tile').style.display='none';
+        document.getElementById('aflow-tile').style.display='none';
+        document.getElementById('sflow-tile').style.display='block';
+        document.getElementById('maf-tile').style.display='none';
       break;
-
+  
       case "maf":
-        document.getElementById("flow-tile").style.display="none";
-        document.getElementById("aflow-tile").style.display="none";
-        document.getElementById("sflow-tile").style.display="none";
-        document.getElementById("maf-tile").style.display="block";
+        document.getElementById('flow-tile').style.display='none';
+        document.getElementById('aflow-tile').style.display='none';
+        document.getElementById('sflow-tile').style.display='none';
+        document.getElementById('maf-tile').style.display='block';
       break;
-
+  
     }
-
-
-    var tileStatus = getCookie("tool-tile");
-
+  
+    var tileStatus = getCookie('tool-tile');
+  
     switch (tileStatus){
-
+  
       case "pitot":
-        document.getElementById("tile-pitot").style.display="block";
-        document.getElementById("tile-swirl").style.display="none";
-        document.getElementById("tile-fdiff").style.display="none";
+        document.getElementById('tile-pitot').style.display='block';
+        document.getElementById('tile-swirl').style.display='none';
+        document.getElementById('tile-fdiff').style.display='none';
       break;
-
+  
       case "swirl":
-        document.getElementById("tile-pitot").style.display="none";
-        document.getElementById("tile-swirl").style.display="block";
-        document.getElementById("tile-fdiff").style.display="none";
+        document.getElementById('tile-pitot').style.display='none';
+        document.getElementById('tile-swirl').style.display='block';
+        document.getElementById('tile-fdiff').style.display='none';
       break;
-
+  
       case "fdiff":
-        document.getElementById("tile-pitot").style.display="none";
-        document.getElementById("tile-swirl").style.display="none";
-        document.getElementById("tile-fdiff").style.display="block";
+        document.getElementById('tile-pitot').style.display='none';
+        document.getElementById('tile-swirl').style.display='none';
+        document.getElementById('tile-fdiff').style.display='block';
       break;
     
     }
-
-    console.log("Page Loaded");
+  
+    console.log('Page Loaded');
     
   }
-
-
-
-  /***********************************************************
-  * Initialise buttons
-  ***/
-  function initialiseButtons() {
-    
+  
+/***********************************************************
+* Initialise buttons
+***/
+function initialiseButtons() {
+  
     var xhr = new XMLHttpRequest();
-
-    document.getElementById("show-capture-modal-button").addEventListener("click", function(){
-      document.getElementById("captureLiftDataModal").style.display="block";
+  
+    document.getElementById('show-capture-modal-button').addEventListener('click', function(){
+      document.getElementById('captureLiftDataModal').style.display='block';
     });
-
-    document.getElementById("FDIFF").addEventListener("click", function(){
-      document.getElementById("flowTargetModal").style.display="block";
+  
+    document.getElementById('FDIFF').addEventListener('click', function(){
+      document.getElementById('flowTargetModal').style.display='block';
     });
-
-    document.getElementById("clear-graph-data-button").addEventListener("click", function(){
-          
-      // clear data points from graph
-      // var p = document.getElementById("dataPlot");
-      // var child = p.lastElementChild; 
-      // while (child) {
-      //     p.removeChild(child);
-      //     child = p.lastElementChild;
-      // }
-      // clear line data from graph
-      var l = document.getElementById("lineData");
-      var child = l.lastElementChild; 
-      while (child) {
-          l.removeChild(child);
-          child = l.lastElementChild;
-      }
-
-      xhr.open("POST", "/api/clearLiftData");
-      xhr.onload = function() {
-        if (xhr.status === 200) window.location.href = "/?view=graph";
-      };
-      xhr.send();
-
-    });
-    
-    document.getElementById("export-graph-data-button").addEventListener("click", function(){
-      // initiate JSON Data download from browser
-      document.getElementById("file-data-download").click();
-    });
-
-    document.getElementById("export-graph-image-button").addEventListener("click", function(){
-      // initiate datagraph image download from browser
-      exportSVGAsImage();
-    });
-
-
-    document.getElementById("capture-lift-data-button").addEventListener("click", function(){
-      console.log("Capture Lift Data");
+  
+    document.getElementById('capture-lift-data-button').addEventListener('click', function(){
+      console.log('Capture Lift Data');
       let formData = new FormData(document.forms.lift_data_form);
-      xhr.open("POST", "/api/saveliftdata");
+      xhr.open('POST', '/api/saveliftdata');
       xhr.send(formData)
       xhr.onload = function() {
         if (xhr.status === 200) {
-          console.log("Lift data saved");
+          console.log('Lift data saved');
           // update datagraph
         }
-
+  
       };
     });
-    
-
-    document.getElementById("STATUS_MESSAGE").addEventListener("dblclick", function(){
-      document.getElementById("calibrationModal").style.display="block";
-    });
-
-    document.getElementById("file-manager-button").addEventListener("click", function(){
-      document.getElementById("fileModal").style.display="block";
-    });
-
-    document.getElementById("info-button").addEventListener("click", function(){
-      document.getElementById("infoModal").style.display="block";
-    });
-
-    document.getElementById("update-button").addEventListener("click", function(){
-      document.getElementById("updateModal").style.display="block";
+  
+    document.getElementById('STATUS_MESSAGE').addEventListener('dblclick', function(){
+      document.getElementById('calibrationModal').style.display='block';
     });
 
     // Pressure tile
-    document.getElementById("tile-pref-title").addEventListener("click", function(){
-      document.getElementById("tile-pref").style.display="none";
-      document.getElementById("tile-pdiff").style.display="block";
+    document.getElementById('tile-pref-title').addEventListener('click', function(){
+      document.getElementById('tile-pref').style.display='none';
+      document.getElementById('tile-pdiff').style.display='block';
       setCookie("pressure-tile","pdiff","365")    
     });
-
-    document.getElementById("tile-pdiff-title").addEventListener("click", function(){
-      document.getElementById("tile-pdiff").style.display="none";
-      document.getElementById("tile-pref").style.display="block";
+  
+    document.getElementById('tile-pdiff-title').addEventListener('click', function(){
+      document.getElementById('tile-pdiff').style.display='none';
+      document.getElementById('tile-pref').style.display='block';
       setCookie("pressure-tile","pref","365")
     });
-
+  
     // flow tile
-    document.getElementById("flow-tile-title").addEventListener("click", function(){
-      document.getElementById("flow-tile").style.display="none";
-      document.getElementById("aflow-tile").style.display="block";
+    document.getElementById('flow-tile-title').addEventListener('click', function(){
+      document.getElementById('flow-tile').style.display='none';
+      document.getElementById('aflow-tile').style.display='block';
       setCookie("flow-tile","aflow","365")    
     });
-
-    document.getElementById("aflow-tile-title").addEventListener("click", function(){
-      document.getElementById("aflow-tile").style.display="none";
-      document.getElementById("sflow-tile").style.display="block";
+  
+    document.getElementById('aflow-tile-title').addEventListener('click', function(){
+      document.getElementById('aflow-tile').style.display='none';
+      document.getElementById('sflow-tile').style.display='block';
       setCookie("flow-tile","sflow","365")    
     });
-
-    document.getElementById("sflow-tile-title").addEventListener("click", function(){
-      document.getElementById("sflow-tile").style.display="none";
-      document.getElementById("maf-tile").style.display="block";
+  
+    document.getElementById('sflow-tile-title').addEventListener('click', function(){
+      document.getElementById('sflow-tile').style.display='none';
+      document.getElementById('maf-tile').style.display='block';
       setCookie("flow-tile","maf","365")    
     });
-
-    document.getElementById("maf-tile-title").addEventListener("click", function(){
-      document.getElementById("maf-tile").style.display="none";
-      document.getElementById("flow-tile").style.display="block";
+  
+    document.getElementById('maf-tile-title').addEventListener('click', function(){
+      document.getElementById('maf-tile').style.display='none';
+      document.getElementById('flow-tile').style.display='block';
       setCookie("flow-tile","flow","365")    
     });
-
+  
     // Tool tile
-    document.getElementById("tile-pitot-title").addEventListener("click", function(){
-      document.getElementById("tile-pitot").style.display="none";
-      document.getElementById("tile-swirl").style.display="block";
+    document.getElementById('tile-pitot-title').addEventListener('click', function(){
+      document.getElementById('tile-pitot').style.display='none';
+      document.getElementById('tile-swirl').style.display='block';
       setCookie("tool-tile","swirl","365")    
     });
-
-    document.getElementById("tile-swirl-title").addEventListener("click", function(){
-      document.getElementById("tile-swirl").style.display="none";
-      document.getElementById("tile-fdiff").style.display="block";
+  
+    document.getElementById('tile-swirl-title').addEventListener('click', function(){
+      document.getElementById('tile-swirl').style.display='none';
+      document.getElementById('tile-fdiff').style.display='block';
       setCookie("tool-tile","fdiff","365")    
     });
-
-    document.getElementById("tile-fdiff-title").addEventListener("click", function(){
-      document.getElementById("tile-fdiff").style.display="none";
-      document.getElementById("tile-pitot").style.display="block";
+  
+    document.getElementById('tile-fdiff-title').addEventListener('click', function(){
+      document.getElementById('tile-fdiff').style.display='none';
+      document.getElementById('tile-pitot').style.display='block';
       setCookie("tool-tile","pitot","365")    
     });
-
-
-    document.getElementById("FDIFFTYPEDESC").addEventListener("click", function(){
-      console.log("Toggle Flow Diff");
-      xhr.open("GET", "/api/fdiff/toggle");
+  
+    document.getElementById('FDIFFTYPEDESC').addEventListener('click', function(){
+      console.log('Toggle Flow Diff');
+      xhr.open('GET', '/api/fdiff/toggle');
       // xhr.onload = function() {
-      //   if (xhr.status === 200) window.location.href = "/";
+      //   if (xhr.status === 200) window.location.href = '/';
       // };
       xhr.send();
     });
-
-    document.getElementById("PDIFF").addEventListener("click", function(){
-      console.log("Zero pDiff Value");
-      xhr.open("GET", "/api/pdiff/zero");
+  
+    document.getElementById('PDIFF').addEventListener('click', function(){
+      console.log('Zero pDiff Value');
+      xhr.open('GET', '/api/pdiff/zero');
       // xhr.onload = function() {
-      //   if (xhr.status === 200) window.location.href = "/";
+      //   if (xhr.status === 200) window.location.href = '/';
       // };
       xhr.send();
     });
-
-    
-    document.getElementById("PITOT").addEventListener("click", function(){
-      console.log("Zero Pitot Value");
-      xhr.open("GET", "/api/pitot/zero");
+  
+    document.getElementById('PITOT').addEventListener('click', function(){
+      console.log('Zero Pitot Value');
+      xhr.open('GET', '/api/pitot/zero');
       // xhr.onload = function() {
-      //   if (xhr.status === 200) window.location.href = "/";
+      //   if (xhr.status === 200) window.location.href = '/';
       // };
       xhr.send();
     });
-
-
-
-    document.getElementById("on-button").addEventListener("click", function(){
-      console.log("Bench On");
-      xhr.open("GET", "/api/bench/on");
+  
+    document.getElementById('on-button').addEventListener('click', function(){
+      console.log('Bench On');
+      xhr.open('GET', '/api/bench/on');
       // xhr.onload = function() {
-      //   if (xhr.status === 200) window.location.href = "/";
+      //   if (xhr.status === 200) window.location.href = '/';
       // };
       xhr.send();
     });
-
-    document.getElementById("off-button").addEventListener("click", function(){
-      console.log("Bench Off");
-      xhr.open("GET", "/api/bench/off");
+  
+    document.getElementById('off-button').addEventListener('click', function(){
+      console.log('Bench Off');
+      xhr.open('GET', '/api/bench/off');
       // xhr.onload = function() {
-      //   if (xhr.status === 200) window.location.href = "/";
+      //   if (xhr.status === 200) window.location.href = '/';
       // };
       xhr.send();
     });
-
-    document.getElementById("calibrate-button").addEventListener("click", function(){
-      console.log("Calibrate FLow Offset");
-      xhr.open("GET", "/api/bench/calibrate");
+  
+    document.getElementById('calibrate-button').addEventListener('click', function(){
+      console.log('Calibrate FLow Offset');
+      xhr.open('GET', '/api/bench/calibrate');
       xhr.onload = function() {
-        if (xhr.status === 200) window.location.href = "/?view=config";
+        if (xhr.status === 200) window.location.href = '/?view=config';
       };
       xhr.send();
     });
-
-    document.getElementById("leak-cal-button").addEventListener("click", function(){
-      console.log("Leak Test Calibration");
-      xhr.open("GET", "/api/bench/leakcal");
+  
+    document.getElementById('leak-cal-button').addEventListener('click', function(){
+      console.log('Leak Test Calibration');
+      xhr.open('GET', '/api/bench/leakcal');
       xhr.onload = function() {
-        if (xhr.status === 200) window.location.href = "/?view=config";
+        if (xhr.status === 200) window.location.href = '/?view=config';
       };
       xhr.send();
     });
-
-    document.getElementById("clear-message-button").addEventListener("click", function(){
-      console.log("Clear Message");
-      xhr.open("GET", "/api/clear-message");
+  
+    document.getElementById('clear-message-button').addEventListener('click', function(){
+      console.log('Clear Message');
+      xhr.open('GET', '/api/clear-message');
       xhr.onload = function() {
-        if (xhr.status === 200) window.location.href = "/";
+        if (xhr.status === 200) window.location.href = '/';
       };
       xhr.send();
     });
-
-    document.getElementById("restart-button").addEventListener("click", function(){
-      console.log("System Reboot");
-      xhr.open("GET", "/api/bench/reboot");
-      xhr.onload = function() {
-        if (xhr.status === 200) window.location.href = "/";
-      };
-      xhr.send();
-    });
-
-
-
+  
   }
-
-
+  
   /***********************************************************
-  * Update selected orifice when orifice-radio button change
-  ***/
-  function orificeChange(src) {
-    
+* Update selected orifice when orifice-radio button change
+***/
+function orificeChange(src) {
+  
     var xhr = new XMLHttpRequest();
-
-    console.log("Orifice " + src.value + " Selected");
-
-    xhr.open("GET", "/api/orifice-change?orifice=" + src.value);
+  
+    console.log('Orifice ' + src.value + ' Selected');
+  
+    xhr.open('GET', '/api/orifice-change?orifice=' + src.value);
     xhr.onload = function() {
-  //    if (xhr.status === 200) window.location.href = "/";
+  //    if (xhr.status === 200) window.location.href = '/';
     };
     xhr.send();
     }
-
-
-
-
-  /***********************************************************
-  * Page tab control
-  ***/
-  function openTab(tabName, elmnt) {
-    var i, tabcontent, tablinks;
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = "none";
-    }
-    document.getElementById(tabName).style.display = "block";
-    // Pause SSE update when on data tab
-    if (tabName === "datalog") {
-      updateSSE = false;
-    } else {
-      updateSSE = true;
+  
+/***********************************************************
+* Close modal dialogs on lose focus
+***/
+window.onclick = function(event) {
+    if (event.target == captureLiftDataModal || event.target == calibrationModal || event.target == flowTargetModal  ){
+      captureLiftDataModal.style.display = "none";
+      calibrationModal.style.display = "none";
+      flowTargetModal.style.display = "none";
     }
   }
-
+  
   /***********************************************************
-  * Close update modal dialog
+  * Close modal dialogs on esc button
   ***/
-  closeUpdateModalButton.onclick = function() {
-    updateModal.style.display = "none";
-  }
+  document.addEventListener("keydown", ({key}) => {
+    if (key === "Escape") {
+      captureLiftDataModal.style.display = "none";
+      calibrationModal.style.display = "none";
+      flowTargetModal.style.display = "none";
+    }
+  })
 
-  /***********************************************************
+    /***********************************************************
   * Close calibration modal dialog
   ***/
   closeCalibrationModalButton.onclick = function() {
     calibrationModal.style.display = "none";
   }
-
-  /***********************************************************
-  * Close file modal dialog
-  ***/
-  closeFileModalButton.onclick = function() {
-    fileModal.style.display = "none";
-  }
-
-  /***********************************************************
-  * Close info modal dialog
-  ***/
-  closeInfoModalButton.onclick = function() {
-    infoModal.style.display = "none";
-  }
-
-  /***********************************************************
-  * Close data modal dialog
-  ***/
-  closeDataModalButton.onclick = function() {
-    dataModal.style.display = "none";
-  }
-
 
   /***********************************************************
   * Close Capture Data modal dialog
@@ -1252,244 +1209,34 @@ String PublicHTML::javascript() {
     captureLiftDataModal.style.display = "none";
   }
 
-
-  /***********************************************************
-  * Close Load Data modal dialog
-  ***/
-  closeLoadGraphDataModalButton.onclick = function() {
-    loadGraphDataModal.style.display = "none";
-  }
-
-
-  /***********************************************************
-  * Close Save Data modal dialog
-  ***/
-  closeSaveGraphDataModalButton.onclick = function() {
-    saveGraphDataModal.style.display = "none";
-  }
-
   /***********************************************************
   * Close Flow Target Data modal dialog
   ***/
   closeFlowTargetModalButton.onclick = function() {
     flowTargetModal.style.display = "none";
   }
+  )INDEXJS";
 
-
-
-  /***********************************************************
-  * Close modal dialogs on lose focus
-  ***/
-  window.onclick = function(event) {
-    if (event.target == fileModal || event.target == dataModal || event.target == serialModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal || event.target == calibrationModal || event.target == updateModal || event.target == flowTargetModal  ){
-      fileModal.style.display = "none";
-      infoModal.style.display = "none";
-      captureLiftDataModal.style.display = "none";
-      loadGraphDataModal.style.display = "none";
-      saveGraphDataModal.style.display = "none";
-      calibrationModal.style.display = "none";
-      dataModal.style.display = "none";
-      serialModal.style.display = "none";
-      updateModal.style.display = "none";
-      flowTargetModal.style.display = "none";
-    }
-  }
-
-
-  /***********************************************************
-  * Close modal dialogs on esc button
-  ***/
-  document.addEventListener("keydown", ({key}) => {
-    if (key === "Escape") {
-      fileModal.style.display = "none";
-      infoModal.style.display = "none";
-      captureLiftDataModal.style.display = "none";
-      loadGraphDataModal.style.display = "none";
-      saveGraphDataModal.style.display = "none";
-      calibrationModal.style.display = "none";
-      dataModal.style.display = "none";
-      serialModal.style.display = "none";
-      updateModal.style.display = "none";
-      flowTargetModal.style.display = "none";
-    }
-  })
-
-
-
-  /***********************************************************
-  * Export Data Graph as PNG Image (temp change to jpg)
-  * Source: https://takuti.me/note/javascript-save-svg-as-image/
-  ***/
-  function exportSVGAsImage() {
-
-    const svg = document.querySelector("svg");
-
-    const data = (new XMLSerializer()).serializeToString(svg);
-    const svgBlob = new Blob([data], {
-        type: "image/svg+xml;charset=utf-8"
-    });
-
-    // convert the blob object to a dedicated URL
-    const url = URL.createObjectURL(svgBlob);
-
-    // load the SVG blob to a fresh image object
-    const img = new Image();
-    img.addEventListener("load", () => {
-      
-      // draw the image on an ad-hoc canvas
-      const bbox = svg.getBBox();
-
-      const canvas = document.createElement("canvas");
-      canvas.width = 800;
-      canvas.height = 750;
-
-      const context = canvas.getContext("2d");
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-      URL.revokeObjectURL(url);
-
-      // trigger a synthetic download operation with a temporary link
-      const a = document.createElement("a");
-      document.body.appendChild(a);
-      a.download = "LiftGraph.png";
-      // a.href = canvas.toDataURL("image/jpeg");
-      a.href = canvas.toDataURL();
-      a.click();
-      a.remove();
-
-    });
-    img.src = url;
-
-  }
-
-
-  // three cookies to remamber state of top three tiles - pressure / flow / tools
-
-  // http://www.quirksmode.org/js/cookies.html
-  // setCookie("ppkcookie","testcookie",7);
-
-  // var x = getCookie("ppkcookie");
-  // if (x) {
-  //     [do something with x]
-  // }
-  function setCookie(name,value,days) {
-    var expires = "";
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime() + (days*24*60*60*1000));
-        expires = "; expires=" + date.toUTCString();
-    }
-    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
-  }
-
-
-  function getCookie(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(";");
-    for(var i=0;i < ca.length;i++) {
-        var c = ca[i];
-        while (c.charAt(0)==" ") c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-    }
-    return null;
-  }
-
-  // https://github.com/Autodrop3d/serialTerminal.com
-  function changeCookieValue(cookieName, newValue) {
-    document.cookie = 
-        `${cookieName}=${newValue}; 
-            expires=Thu, 5 March 2030 12:00:00 UTC; path=/`;
-  }
-
-  // Serial monitor modal
-  // https://developer.chrome.com/docs/capabilities/serial
-  // var port, textEncoder, writableStreamClosed, writer;
-  // async function connectSerial() {
-
-
-  //     try {
-        
-  //         // Prompt user to select any serial port.
-  //         const port = await navigator.serial.requestPort();
-  //         // const port = await navigator.serial.getPort()
-  //         await port.open({ baudRate: 115200 });
-
-  //         textEncoder = new TextEncoderStream();
-  //         writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
-
-  //         writer = textEncoder.writable.getWriter();
-  //         listenToPort();
-  //     } catch {
-  //         alert("Serial Connection Failed");
-  //     }
-  // }
-  // async function sendCharacterNumber() {
-  //     document.getElementById("lineToSend").value = String.fromCharCode(document.getElementById("lineToSend").value);
-  // }
-  // async function sendSerialLine() {
-  //     dataToSend = document.getElementById("lineToSend").value;
-  //     if (document.getElementById("addLine").checked == true) dataToSend = dataToSend + "\r\n";
-  //     if (document.getElementById("echoOn").checked == true) appendToTerminal("> " + dataToSend);
-  //     await writer.write(dataToSend);
-  // }
-  // async function listenToPort() {
-  //     const textDecoder = new TextDecoderStream();
-  //     const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
-  //     const reader = textDecoder.readable.getReader();
-  //     // Listen to data coming from the serial device.
-  //     while (true) {
-  //         const { value, done } = await reader.read();
-  //         if (done) {
-  //             // Allow the serial port to be closed later.
-  //             reader.releaseLock();
-  //             break;
-  //         }
-  //         // value is a string.
-  //         appendToTerminal(value);
-  //     }
-  // }
-  // const serialResultsDiv = document.getElementById("serialResults");
-  // async function appendToTerminal(newStuff) {
-  //     serialResultsDiv.innerHTML += newStuff;
-  //     if (serialResultsDiv.innerHTML.length > 3000) serialResultsDiv.innerHTML = serialResultsDiv.innerHTML.slice(serialResultsDiv.innerHTML.length - 3000);
-
-  //     //scroll down to bottom of div
-  //     serialResultsDiv.scrollTop = serialResultsDiv.scrollHeight;
-  // }
-  // document.getElementById("lineToSend").addEventListener("keyup", async function (event) {
-  //     if (event.keyCode === 13) {
-  //         sendSerialLine();
-  //     }
-  // })
-  // document.getElementById("baud").value = (localStorage.baud == undefined ? 115200 : localStorage.baud);
-  // document.getElementById("addLine").checked = (localStorage.addLine == "false" ? false : true);
-  // document.getElementById("echoOn").checked = (localStorage.echoOn == "false" ? false : true);
-
-
-  // // CODELAB: Add feature detection here.
-  // const notSupported = document.getElementById("notSupported");
-  // notSupported.classList.toggle("hidden", "serial" in navigator);
-  )JAVASCRIPT";
-
-  return javascript;
+  return indexJs;
 
 }
 
 
+
+
+
+
+
 /***********************************************************
  * @brief Get CSS
+ *
+ *
  *
  ***/
 String PublicHTML::css () {
 
 
   String css PROGMEM = R"CSS(
-  /***********************************************************
-  * DIY-Flow-Bench style.css
-  * CSS code for DIY-Flow-bench project: diyflowbench.com
-  ***/
-
 
   /* Set height of body and the document to 100 percent of viewport height to enable "full page tabs" */
   body, html {
@@ -1727,6 +1474,7 @@ String PublicHTML::css () {
   }
 
   #footer {
+    margin-top:30px;
     clear:both;
     text-align: center;
   }
