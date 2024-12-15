@@ -617,7 +617,7 @@ function exportSVGAsPNG() {
   // convert the blob object to a dedicated URL
   const url = URL.createObjectURL(svgBlob);
 
-  // load the SVG blob to a flesh image object
+  // load the SVG blob to a fresh image object
   const img = new Image();
   img.addEventListener('load', () => {
     
@@ -637,7 +637,7 @@ function exportSVGAsPNG() {
     const a = document.createElement('a');
     a.download = 'LiftGraph.png';
     document.body.appendChild(a);
-    a.href = canvas.toDataURL();
+    a.href = canvas.toDataURL('image/jpeg');
     a.click();
     a.remove();
 
