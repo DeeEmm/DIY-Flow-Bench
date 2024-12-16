@@ -43,8 +43,10 @@
 #include "messages.h"
 #include "calculations.h"
 
-
 #include <sstream>
+
+#include "public_html.h"
+
 using namespace std;
 
 #define U_PART U_SPIFFS
@@ -68,8 +70,10 @@ void Webserver::begin()
   Messages _message;
   Calibration _calibration;
   DataHandler _data;
+  PublicHTML _public_html;
 
   // API request handlers [JSON confirmation response]
+
   server->on("/api/bench/on", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Hardware _hardware;
@@ -170,8 +174,6 @@ void Webserver::begin()
 
   // Upload request handler
   server->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
-      Messages _message;
-      _message.debugPrintf("/api/file/upload \n");
       // request->send(200);
       // request->redirect("/?view=upload"); 
       },
@@ -184,11 +186,6 @@ void Webserver::begin()
       downloadFilename.remove(0,18); // Strip the file path (first 18 chars)
       _message.debugPrintf("Request Download File: %s \n", downloadFilename);
       request->send(SPIFFS, downloadFilename, String(), true); });
-
-  // Simple Firmware Update Form
-  server->on("/api/update", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/html", "<form method='POST' action='/api/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>");
-  });
 
   // Firmware update handler
   server->on("/api/update", HTTP_POST, [](AsyncWebServerRequest *request){
@@ -206,12 +203,14 @@ void Webserver::begin()
         Update.printError(Serial);
       }
     }
+
     if(!Update.hasError()){
       if(Update.write(data, len) != len){
         _message.debugPrintf("Write error: \n");
         Update.printError(Serial);
       }
     }
+
     if(final){
       if(Update.end(true)){
         Serial.printf("Update Success: %uB\n", index+len);
@@ -239,7 +238,7 @@ void Webserver::begin()
         } 
         if (_data.checkSubstring(fileToDelete.c_str(), status.pinsFilename.c_str())) status.pinsLoaded = false;
         if (_data.checkSubstring(fileToDelete.c_str(), status.mafFilename.c_str())) status.mafLoaded = false;
-        if (_data.checkSubstring(fileToDelete.c_str(), status.indexFilename.c_str())) status.GUIexists = false;
+        // if (_data.checkSubstring(fileToDelete.c_str(), status.indexFilename.c_str())) status.GUIexists = false;
         // if (fileToDelete == "/index.html"){
         // If we delete a system file, send user back to boot loop to upload missing file
         if (fileToDelete == status.indexFilename || fileToDelete == status.pinsFilename || fileToDelete == status.mafFilename){
@@ -314,38 +313,77 @@ void Webserver::begin()
     _data.clearLiftDataFile;
   });  
 
+
+
+
+  // HTML server responses
+
   // index.html
   server->rewrite("/index.html", "/");
 
-  // Style sheet request handler
-  server->on("/style.css", HTTP_ANY, [](AsyncWebServerRequest *request){ request->send(SPIFFS, "/style.css", "text/css"); });
+  // Basic Upload Page (in case of file error - does not require working GUI)
+  server->on("/upload", HTTP_GET, [](AsyncWebServerRequest *request) {
+      request->send(200, "text/html", "<form method='POST' action='/api/file/upload' enctype='multipart/form-data'><input type='file' name='upload'><input type='submit' value='Upload'></form>");
+      },
+      fileUpload);
 
-  // Javascript file request handler
-  server->on("/javascript.js", HTTP_ANY, [](AsyncWebServerRequest *request){ request->send(SPIFFS, "/javascript.js", "text/javascript"); });
+  // Simple Firmware Update Form - does not require working GUI)
+  server->on("/update", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
+    request->send(200, "text/html", "<form method='POST' action='/api/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>");
+  });
 
-  // Favicon rquest handler (icon hex dump is in constants.h)
+  // Favicon request handler (icon hex dump is in constants.h)
   server->on("/favicon.ico", HTTP_ANY, [](AsyncWebServerRequest *request){
     AsyncWebServerResponse *response = request->beginResponse_P(200, "image/x-icon", favicon_ico_gz, favicon_ico_gz_len);
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   });
-  
-  // Index page request handler
-  server->on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
-      extern struct DeviceStatus status;
-      if ((SPIFFS.exists(status.indexFilename)) && ((status.pinsLoaded == true))) {
-        request->send(SPIFFS, status.indexFilename, "text/html", false, processTemplate);
-       } else {
-          DataHandler _data;
-          // request->send_P(200, "text/html", LANDING_PAGE, processLandingPageTemplate); 
-          // TEST Lets reboot the ESP32 here and manage file upload in the bootloop
-          // ESP.restart(); 
-          // request->redirect("/");
-          // We should only be here if the index page is missing so lets redirect to the boot loop          
-          request->send_P(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
-          _data.bootLoop();
-       }
+
+  // CSS request handler
+  server->on("/style.css", HTTP_ANY, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        AsyncResponseStream *response = request->beginResponseStream("text/css");
+        response->print(_public_html.css().c_str());
+        request->send(response);
       });
+
+  // Javascript.js request handler
+  server->on("/main.js", HTTP_ANY, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        AsyncResponseStream *response = request->beginResponseStream("text/javascript");
+        response->print(_public_html.mainJs().c_str());
+        request->send(response);
+      });
+
+  // Javascript.js request handler
+  server->on("/index.js", HTTP_ANY, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        AsyncResponseStream *response = request->beginResponseStream("text/javascript");
+        response->print(_public_html.indexJs().c_str());
+        request->send(response);
+      });
+  
+  // Settings page request handler
+  server->on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        request->send_P(200, "text/html", _public_html.settings().c_str(), processTemplate); 
+      });
+
+  // Data page request handler
+  server->on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        request->send_P(200, "text/html", _public_html.data().c_str(), processTemplate); 
+      });
+
+  // Index page request handler
+  server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        request->send_P(200, "text/html", _public_html.index().c_str(), processTemplate); 
+      });
+
+
+
 
   server->onFileUpload(fileUpload);
   server->addHandler(events);
@@ -378,17 +416,13 @@ void Webserver::fileUpload(AsyncWebServerRequest *request, String filename, size
   bool upload_error = false;
   int file_size = 0;
 
-  redirectURL = "/";
-
-  if (!filename.startsWith("/")){
-    filename = "/" + filename;
-  }
+  if (!filename.startsWith("/")) filename = "/" + filename;
 
   uint32_t freespace = SPIFFS.totalBytes() - SPIFFS.usedBytes();
 
 //  if (!index && !upload_error)  {
   if (!index)  {
-    _message.debugPrintf("UploadStart: %s \n", filename.c_str());
+    // _message.debugPrintf("UploadStart: %s \n", filename.c_str());
     // open the file on first call and store the file handle in the request object
     request->_tempFile = SPIFFS.open(filename, "w");
   }
@@ -396,40 +430,31 @@ void Webserver::fileUpload(AsyncWebServerRequest *request, String filename, size
   if (len)  {
     file_size += len;
     if (file_size > freespace)    {
-      _message.Handler(language.LANG_UPLOAD_FAILED_NO_SPACE);
+      // _message.Handler(language.LANG_UPLOAD_FAILED_NO_SPACE);
       _message.debugPrintf("Upload failed, no Space: %s \n", freespace);
       upload_error = true;
     }    else    {
-      _message.Handler(language.LANG_FILE_UPLOADED);
-      _message.debugPrintf("Writing file: '%s' index=%u len=%u \n", filename.c_str(), index, len);
+      // _message.debugPrintf("Writing file: '%s' index=%u len=%u \n", filename.c_str(), index, len);
       // stream the incoming chunk to the opened file
       request->_tempFile.write(data, len);
     }
   } 
 
-
   if (final)  {
-    _message.debugPrintf("Upload Complete: %s, %u bytes\n", filename.c_str(), file_size);
+    // _message.debugPrintf("Upload Complete: %s, %u bytes\n", filename.c_str(), file_size);
     request->_tempFile.close();
-
-    if (_data.checkUserFile(CONFIGFILE)){
-      // _data.loadConfiguration();
-      status.configLoaded = true;
-    } 
-    if (_data.checkUserFile(PINSFILE)){
-      // _data.loadPinsData();
-      status.pinsLoaded = true;
-    } 
-    if (_data.checkUserFile(MAFFILE)) {
-      // _data.loadMAFData();
-      status.mafLoaded = true;  
-    }
-    if (_data.checkUserFile(INDEXFILE)) {
-      status.GUIexists = true;  
-    }
-
-    request->redirect(redirectURL);
   }
+
+
+  // if (!filename.startsWith("/MAF")) status.mafLoaded = true;
+  // if (!filename.startsWith("/configuration")) status.configLoaded = true;
+  // if (!filename.startsWith("/PINS")) status.pinsLoaded = true;
+  // if (!filename.startsWith("/V{RELEASE}")) status.GUIexists = true;
+  
+  // _message.Handler(language.LANG_FILE_UPLOADED);
+
+  request->redirect("/");
+  
 }
 
 
@@ -908,11 +933,11 @@ String Webserver::processTemplate(const String &var)
   // Translate GUI
   // Note language struct is overwritten when language.json file is present
   if (var == "LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE") return language.LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE;
-  if (var == "LANG_GUI_LIFT_VALUE") return language.LANG_GUI_LIFT_VALUE;
+  if (var == "LANG_GUI_LIFT_VAL") return language.LANG_GUI_LIFT_VAL;
   if (var == "LANG_GUI_LIFT_CAPTURE") return language.LANG_GUI_LIFT_CAPTURE;
   if (var == "LANG_GUI_UPLOAD_FIRMWARE_BINARY") return language.LANG_GUI_UPLOAD_FIRMWARE_BINARY;
   if (var == "LANG_GUI_FIRMWARE_UPDATE") return language.LANG_GUI_FIRMWARE_UPDATE;
-  if (var == "LANG_GUI_USER_FLOW_TARGET_VALUE") return language.LANG_GUI_USER_FLOW_TARGET_VALUE;
+  if (var == "LANG_GUI_USER_FLOW_TARGET_VAL") return language.LANG_GUI_USER_FLOW_TARGET_VAL;
   if (var == "LANG_GUI_USER_FLOW_TARGET_SAVE") return language.LANG_GUI_USER_FLOW_TARGET_SAVE;
   if (var == "LANG_GUI_CAL_FLOW_OFFSET") return language.LANG_GUI_CAL_FLOW_OFFSET;
   if (var == "LANG_GUI_CAL_LEAK_TEST") return language.LANG_GUI_CAL_LEAK_TEST;
@@ -935,7 +960,7 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_HARDWARE_CONFIG") return language.LANG_GUI_HARDWARE_CONFIG;
   if (var == "LANG_GUI_BENCH_TYPE") return language.LANG_GUI_BENCH_TYPE;
   if (var == "LANG_GUI_BOARD_TYPE") return language.LANG_GUI_BOARD_TYPE;
-  if (var == "LANG_GUI_SENSOR_CONFIG") return language.LANG_GUI_SENSOR_CONFIG;
+  if (var == "LANG_GUI_SENS_CONFIG") return language.LANG_GUI_SENS_CONFIG;
   if (var == "LANG_GUI_MAF_DATA_FILE") return language.LANG_GUI_MAF_DATA_FILE;
   if (var == "LANG_GUI_REF_PRESSURE_SENSOR") return language.LANG_GUI_REF_PRESSURE_SENSOR;
   if (var == "LANG_GUI_TEMP_SENSOR") return language.LANG_GUI_TEMP_SENSOR;
@@ -979,10 +1004,10 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_REFRESH_RATE") return language.LANG_GUI_REFRESH_RATE;
   if (var == "LANG_GUI_TEMPERATURE_UNIT") return language.LANG_GUI_TEMPERATURE_UNIT;
   if (var == "LANG_GUI_VALVE_LIFT_INTERVAL") return language.LANG_GUI_VALVE_LIFT_INTERVAL;
-  if (var == "LANG_GUI_DATA_GRAPH_MAX_VALUE") return language.LANG_GUI_DATA_GRAPH_MAX_VALUE;
+  if (var == "LANG_GUI_DATA_GRAPH_MAX_VAL") return language.LANG_GUI_DATA_GRAPH_MAX_VAL;
   if (var == "LANG_GUI_AUTO") return language.LANG_GUI_AUTO;
   if (var == "LANG_GUI_RESOLUTION_AND_ACCURACY") return language.LANG_GUI_RESOLUTION_AND_ACCURACY;
-  if (var == "LANG_GUI_FLOW_VALUE_ROUNDING") return language.LANG_GUI_FLOW_VALUE_ROUNDING;
+  if (var == "LANG_GUI_FLOW_VAL_ROUNDING") return language.LANG_GUI_FLOW_VAL_ROUNDING;
   if (var == "LANG_GUI_FLOW_DECIMAL_ROUNDING") return language.LANG_GUI_FLOW_DECIMAL_ROUNDING;
   if (var == "LANG_GUI_GEN_DECIMAL_ACCURACY") return language.LANG_GUI_GEN_DECIMAL_ACCURACY;
   if (var == "LANG_GUI_DATA_FILTERS") return language.LANG_GUI_DATA_FILTERS;
@@ -1467,10 +1492,10 @@ String Webserver::processLandingPageTemplate(const String &var) {
 
   extern struct DeviceStatus status;
 
-  if (var == "INDEX_STATUS") {
-    if (status.GUIexists == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/release/' target='_BLANK'>index.html</a>");    
-    // if (!SPIFFS.exists(status.indexFilename)) return String("index.html");
-  }  
+  // if (var == "INDEX_STATUS") {
+  //   if (status.GUIexists == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/release/' target='_BLANK'>index.html</a>");    
+  //   // if (!SPIFFS.exists(status.indexFilename)) return String("index.html");
+  // }  
   
   // if (var == "SETTINGS_STATUS") {
   //   if (!SPIFFS.exists("/settings.json")) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/release/' target='_BLANK'>settings.json</a>");

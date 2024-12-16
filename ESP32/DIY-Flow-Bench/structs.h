@@ -98,77 +98,78 @@ struct BenchSettings {
  * Configuration Data
  ***/
 struct Configuration {
-  bool SD_CARD_IS_ENABLED = false;
-  int MIN_TEST_PRESSURE_PERCENTAGE = 80;
-  double PIPE_RADIUS_IN_FEET = 0.328084;
+  bool SD_ENABLED = false;
+  int MIN_PRESS_PCNT = 80;
+  double PIPE_RAD_FT = 0.328084;
 
-  double VCC_3V3_TRIMPOT = 0.0;
-  double VCC_5V_TRIMPOT = 0.0;
-  bool USE_FIXED_3_3V_VALUE = false;
-  bool USE_FIXED_5V_VALUE = false;
+  double VCC_3V3_TRIM = 0.0;
+  double VCC_5V_TRIM = 0.0;
+  bool FIXED_3_3V_VAL = true;
+  bool FIXED_5V_VAL = true;
 
-  bool BME280_IS_ENABLED = true;
+  bool BME280_ENABLED = true;
   int BME280_I2C_ADDR = 118;
-  int BME280_SCAN_DELAY_MS =  1000;
+  int BME280_SCAN_MS =  1000;
 
-  bool BME680_IS_ENABLED = true;
-  int BME680_I2C_ADDR = 118;
-  int BME680_SCAN_DELAY_MS =  1000;
+  bool BME680_ENABLED = true;
+  int BME680_I2C_ADDR = 119;
+  int BME680_SCAN_MS =  1000;
 
   int ADC_TYPE = 11;
-  int ADC_I2C_ADDR = 0x48; 
-  int ADC_SCAN_DELAY_MS = 250;
+  int ADC_I2C_ADDR = 72; 
+  int ADC_SCAN_DELAY = 250;
   int ADC_MAX_RETRIES = 10;
   int ADC_RANGE = 32767;
   double ADC_GAIN = 6.144;
 
   int MAF_SRC_TYPE = 11;
-  const char MAF_SENSOR_TYPE[35] = "Not Set";
-  double MAF_MV_TRIMPOT = 0.0;
-  int MAF_ADC_CHANNEL = 0;
+  String MAF_SENS_TYPE = "Not Set";
+  // const char MAF_SENS_TYPE[35] = "Not Set";
+  double MAF_MV_TRIM = 0.0;
+  int MAF_ADC_CHAN = 0;
 
-  int PREF_SENSOR_TYPE = 4;
+  int PREF_SENS_TYPE = 4;
   int PREF_SRC_TYPE = 11;
-  int FIXED_REF_PRESS_VALUE = 1;
-  double PREF_MV_TRIMPOT =  0.0;
-  double PREF_ANALOG_SCALE =  1.0;
-  int PREF_ADC_CHANNEL = 1;
+  int FIXED_PREF_VAL = 1;
+  double PREF_MV_TRIM =  0.0;
+  double PREF_ALOG_SCALE =  1.0;
+  int PREF_ADC_CHAN = 1;
 
-  int PDIFF_SENSOR_TYPE = 4; 
+  int PDIFF_SENS_TYPE = 4; 
   int PDIFF_SRC_TYPE = 11;
-  int FIXED_DIFF_PRESS_VALUE = 1;
-  double PDIFF_MV_TRIMPOT = 0.0;
-  double PDIFF_ANALOG_SCALE = 1.0;
-  int PDIFF_ADC_CHANNEL = 2;
+  int FIXED_PDIFF_VAL = 1;
+  double PDIFF_MV_TRIM = 0.0;
+  double PDIFF_SCALE = 1.0;
+  int PDIFF_ADC_CHAN = 2;
   
-  int PITOT_SENSOR_TYPE = SENSOR_DISABLED;
+  int PITOT_SENS_TYPE = SENSOR_DISABLED;
   int PITOT_SRC_TYPE = 11;
-  double PITOT_MV_TRIMPOT = 0.0;
-  double PITOT_ANALOG_SCALE = 1.0;
-  int PITOT_ADC_CHANNEL = 3;
+  double PITOT_MV_TRIM = 0.0;
+  double PITOT_SCALE = 1.0;
+  int PITOT_ADC_CHAN = 3;
 
-  int BARO_SENSOR_TYPE = BOSCH_BME280; //7
-  double FIXED_BARO_VALUE = 101.3529;
-  double BARO_ANALOG_SCALE = 1.0;  
-  double startupBaroScalingFactor = 1.0;
-  double startupBaroScalingOffset = 100;
-  double BARO_MV_TRIMPOT = 0.0;
-  double BARO_FINE_ADJUST = 0.0;
-  double SEALEVELPRESSURE_HPA = 1016.90;
-  int BARO_ADC_CHANNEL = 4;
+  int BARO_SENS_TYPE = BOSCH_BME280; //7
+  double FIXED_BARO_VAL = 101.3529;
+  double BARO_ALOG_SCALE = 1.0;  
+  double BARO_SCALE = 1.0;
+  double BARO_OFFSET = 0.0;
+  double BARO_MV_TRIM = 0.0;
+  double BARO_FINE_TUNE = 0.0;
+  double SEALEVEL_PRESS = 1016.90;
+  int BARO_ADC_CHAN = 4;
 
-  int TEMP_SENSOR_TYPE = BOSCH_BME280; //7
-  double FIXED_TEMP_VALUE = 21.0;
-  double TEMP_ANALOG_SCALE = 1.0;
-  double TEMP_MV_TRIMPOT = 0.0;
-  double TEMP_FINE_ADJUST = 0.0;
+  int TEMP_SENS_TYPE = BOSCH_BME280; //7
+  double FIXED_TEMP_VAL = 21.0;
+  double TEMP_ALOG_SCALE = 1.0;
+  double TEMP_MV_TRIM = 0.0;
+  double TEMP_FINE_TUNE = 0.0;
 
-  int RELH_SENSOR_TYPE = BOSCH_BME280; //7
-  double FIXED_RELH_VALUE = 36.0;
-  double RELH_ANALOG_SCALE = 1.0;
-  double RELH_MV_TRIMPOT = 0.0;
-  double RELH_FINE_ADJUST = 0.0;
-  bool SWIRL_IS_ENABLED = false;
+  int RELH_SENS_TYPE = BOSCH_BME280; //7
+  double FIXED_RELH_VAL = 36.0;
+  double RELH_ALOG_SCALE = 1.0;
+  double RELH_MV_TRIM = 0.0;
+  double RELH_FINE_TUNE = 0.0;
+  bool SWIRL_ENABLED = false;
 };
 
 
@@ -337,7 +338,7 @@ struct Pins {
   int FLOW_VALVE_DIR_PIN = 99;
   int VCC_3V3_PIN = 99;
   int VCC_5V_PIN = 99;
-  int SPEED_SENSOR_PIN = 99;
+  int SPEED_SENS_PIN = 99;
   int SWIRL_ENCODER_PIN_A = 99;
   int SWIRL_ENCODER_PIN_B = 99;
   int ORIFICE_BCD_BIT1_PIN = 99;
@@ -373,11 +374,11 @@ struct Pins {
 struct Language {
     char LANG_INDEX_HTML[2500] = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/api/file/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~CONFIGURATION_STATUS~</p> <p>~PINS_STATUS~</p> <p>~MAF_STATUS~</p> <br> <form method=\"POST\" action='/api/file/upload' enctype=\"multipart/form-data\"> <div class=\"input_container\"> <input type=\"file\" name=\"file\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
     char LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE[50] = "Select lift value before capture";
-    char LANG_GUI_LIFT_VALUE[50] = "Lift Value";
+    char LANG_GUI_LIFT_VAL[50] = "Lift Value";
     char LANG_GUI_LIFT_CAPTURE[50] = "Capture";
     char LANG_GUI_UPLOAD_FIRMWARE_BINARY[50] = "Upload Firmware Binary (firmware_update.bin)";
     char LANG_GUI_FIRMWARE_UPDATE[50] = "Update";
-    char LANG_GUI_USER_FLOW_TARGET_VALUE[50] = "User Flow Target Value";
+    char LANG_GUI_USER_FLOW_TARGET_VAL[50] = "User Flow Target Value";
     char LANG_GUI_USER_FLOW_TARGET_SAVE[50] = "Save";
     char LANG_GUI_CAL_FLOW_OFFSET[50] = "Calibrate Flow Offset";
     char LANG_GUI_CAL_LEAK_TEST[50] = "Calibrate Leak Test";
@@ -400,7 +401,7 @@ struct Language {
     char LANG_GUI_BENCH_TYPE[50] = "Bench Type";
     char LANG_GUI_BOARD_TYPE[50] = "Board Type";
     char LANG_GUI_AUTO[50] = "Auto";
-    char LANG_GUI_SENSOR_CONFIG[50] = "Sensor Configuration";
+    char LANG_GUI_SENS_CONFIG[50] = "Sensor Configuration";
     char LANG_GUI_MAF_DATA_FILE[50] = "MAF Data File";
     char LANG_GUI_REF_PRESSURE_SENSOR[50] = "Reference Pressure Sensor";
     char LANG_GUI_TEMP_SENSOR[50] = "Temperature Sensor";
@@ -426,14 +427,14 @@ struct Language {
     char LANG_BME280_READ_FAIL[50] = "BME280 Read fail";
     char LANG_LOW_FLOW_CAL_VAL[50] = "Low Cal Value: ";
     char LANG_HIGH_FLOW_CAL_VAL[50] = "High Cal Value: ";
-    char LANG_REF_PRESS_VALUE[50] = "Ref Press Val: ";
+    char LANG_REF_PRESS_VAL[50] = "Ref Press Val: ";
     char LANG_NOT_ENABLED[50] = "Not Enabled";
     char LANG_START_REF_PRESSURE[50] = "Using Startup Ref Pressure";
-    char LANG_FIXED_VALUE[50] = "Fixed value: ";
+    char LANG_FIXED_VAL[50] = "Fixed value: ";
     char LANG_CALIBRATING[50] = "Calibrating FLow Offset...";
     char LANG_LEAK_CALIBRATING[50] = "Calibrating Leak Test...";
-    char LANG_CAL_OFFET_VALUE[50] = "Cal Value: ";
-    char LANG_LEAK_CAL_VALUE[50] = "Leak Cal Value: ";
+    char LANG_CAL_OFFSET_VAL[50] = "Cal Value: ";
+    char LANG_LEAK_CAL_VAL[50] = "Leak Cal Value: ";
     char LANG_RUN_BENCH_TO_CALIBRATE[50] = "Bench must be running to calibrate";
     char LANG_BENCH_RUNNING[50] = "Bench running";
     char LANG_BENCH_STOPPED[50] = "Bench stopped";
@@ -482,9 +483,9 @@ struct Language {
     char LANG_GUI_REFRESH_RATE[50] = "GUI Refresh Rate (ms):";
     char LANG_GUI_TEMPERATURE_UNIT[50] = "Temperature Unit (&degC / &degF):";
     char LANG_GUI_VALVE_LIFT_INTERVAL[50] = "Valve Lift Interval (mm / inch):";
-    char LANG_GUI_DATA_GRAPH_MAX_VALUE[50] = "Data Graph Max Value:";
+    char LANG_GUI_DATA_GRAPH_MAX_VAL[50] = "Data Graph Max Value:";
     char LANG_GUI_RESOLUTION_AND_ACCURACY[50] = "Resolution and Accuracy";
-    char LANG_GUI_FLOW_VALUE_ROUNDING[50] = "Flow Value Rounding";
+    char LANG_GUI_FLOW_VAL_ROUNDING[50] = "Flow Value Rounding";
     char LANG_GUI_FLOW_DECIMAL_ROUNDING[50] = "Flow Decimal Accuracy";
     char LANG_GUI_GEN_DECIMAL_ACCURACY[50] = "General Decimal Accuracy";
     char LANG_GUI_DATA_FILTERS[50] = "Data Filters";

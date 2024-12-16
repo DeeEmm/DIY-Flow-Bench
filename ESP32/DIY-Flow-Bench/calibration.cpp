@@ -63,7 +63,7 @@ bool Calibration::setFlowOffset() {
 
   saveCalibrationData();    
 
-  // _message.Handler(language.LANG_CAL_OFFET_VALUE + calVal.flow_offset);
+  // _message.Handler(language.LANG_CAL_OFFSET_VAL + calVal.flow_offset);
   
   return true;
   
@@ -115,14 +115,14 @@ bool Calibration::setLeakOffset() {
   // De we have Pressure or Vacuum | Forwards or Reverse Flow?
   // if (_calculations.convertPressure(_sensors.getPRefValue(), INH2O) > 0) {
   //   calVal.leak_cal_offset_rev = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
-  //   _message.Handler(language.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset_rev);
+  //   _message.Handler(language.LANG_LEAK_CAL_VAL + calVal.leak_cal_offset_rev);
   // } else {
     // calVal.leak_cal_offset = _calculations.convertPressure(_sensors.getPRefValue(), INH2O);  
-    // _message.Handler(language.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
+    // _message.Handler(language.LANG_LEAK_CAL_VAL + calVal.leak_cal_offset);
   // }
 
     calVal.leak_cal_offset = sensorVal.FlowCFM;
-    // _message.Handler(language.LANG_LEAK_CAL_VALUE + calVal.leak_cal_offset);
+    // _message.Handler(language.LANG_LEAK_CAL_VAL + calVal.leak_cal_offset);
 
   saveCalibrationData();    
   
@@ -234,7 +234,7 @@ bool Calibration::setPdiffCalOffset() {
  
   saveCalibrationData();    
 
-  // _message.Handler(language.LANG_CAL_OFFET_VALUE + calVal.flow_offset);
+  // _message.Handler(language.LANG_CAL_OFFSET_VAL + calVal.flow_offset);
   
   return true;
   
@@ -289,7 +289,7 @@ bool Calibration::setPitotCalOffset() {
 
   saveCalibrationData();    
 
-  // _message.Handler(language.LANG_CAL_OFFET_VALUE + calVal.flow_offset);
+  // _message.Handler(language.LANG_CAL_OFFSET_VAL + calVal.flow_offset);
   
   return true;
   

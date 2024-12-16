@@ -30,6 +30,7 @@
 #include <SD.h>
 #include <Update.h>
 #include <SPIFFS.h>
+#include <Preferences.h>
 
 #include <ArduinoJson.h>
 // #include <AsyncTCP.h>
@@ -57,6 +58,7 @@ void DataHandler::begin() {
     extern struct DeviceStatus status;
     extern struct Configuration config;
 
+    Preferences _preferences;
     Hardware _hardware;
     Pins pins;
     Messages _message;
@@ -67,6 +69,12 @@ void DataHandler::begin() {
     // StaticJsonDocument<1024> mafData;
 
     // Need to set up the data environment...
+
+    // Load configuration
+    this->initialiseConfig();
+    this->loadConfig();
+
+    _message.serialPrintf("_data: config.ADC_I2C_ADDR: %u \n", config.ADC_I2C_ADDR);
 
     // Start serial comms
     this->beginSerial(); 
@@ -101,12 +109,25 @@ void DataHandler::begin() {
     this->loadLiftData();
     this->loadCalibrationData();
 
-    // Check if config files exists. If not send to boot loop until it is uploaded
-    if (SPIFFS.exists("/configuration.json")) {
-      this->loadConfiguration();
-    } else {
-      status.doBootLoop = true;
-    }
+
+
+    // // Check if config files exists. If not send to boot loop until it is uploaded
+    // if (SPIFFS.exists("/configuration.json")) {
+    //   this->loadConfiguration();
+    // } else {
+    //   status.doBootLoop = true;
+    // }
+
+    // // Check for CONFIG file
+    // if (checkUserFile(CONFIGFILE)) {
+    //   if (!SPIFFS.exists(status.pinsFilename)) {
+    //       status.doBootLoop = true;
+    //       _message.serialPrintf("!! CONFIG file not found !!\n");  
+    //   }
+    // } else {
+    //       status.doBootLoop = true;
+    //       _message.serialPrintf("!! CONFIG file not found !!\n");  
+    // }
 
     // Check for PINS file
     if (checkUserFile(PINSFILE)) {
@@ -118,24 +139,8 @@ void DataHandler::begin() {
           status.doBootLoop = true;
           _message.serialPrintf("!! PINS file not found !!\n");  
     }
-
-    if (checkUserFile(INDEXFILE)) {
-      if (!SPIFFS.exists(status.indexFilename)) {
-          status.doBootLoop = true;
-          _message.serialPrintf("!! index.html file not found !!\n");  
-      }
-    } else {
-          status.doBootLoop = true;
-          _message.serialPrintf("!! index.html file not found !!\n");  
-    }
     
-        // Check for MAF file
-    // TODO - Only if MAF is enabled !!!!!
-    // NOTE cannot determine MAF data until config is loaded.
-    // Probably need to force a reboot after config is uploaded
-    // to force reload of config then MAF
-    // or we can just expect that the MAF file is missing and 
-    // send user to upload screen as we do with index.html
+    // Check for MAF file
     if (checkUserFile(MAFFILE)) {
       if (!SPIFFS.exists(status.mafFilename)) {
           status.doBootLoop = true;
@@ -146,26 +151,25 @@ void DataHandler::begin() {
           _message.serialPrintf("!! MAF file not found !!\n");  
     }
 
-
     // Initialise WiFi
     _comms.initaliseWifi();
 
-    // Error Handler - critical files are missing !!
-    // Manage on-boarding (index and config file uploading)
-    // BootLoop method traps program pointer within loop until files are uplaoded
+    // BootLoop method traps program pointer within loop until files are uploaded
     if (status.doBootLoop == true) bootLoop();
+
+    // Load MAF / CONFIG / PINS files
+    // if (status.configLoaded == true) _data.loadConfiguration();
+    if (status.pinsLoaded == true) _data.loadPinsData();
+    if (status.mafLoaded == true) _data.loadMAFData();
     
     _hardware.initaliseIO();
 
     // Start Wire (I2C)
     Wire.begin (pins.SDA_PIN, pins.SCL_PIN); 
     Wire.setClock(100000);
-    // Wire.setClock(300000); // ok for wemos D1
-    // Wire.setClock(400000);
-
 
     // TODO Initialise SD card
-    if (config.SD_CARD_IS_ENABLED) {
+    if (config.SD_ENABLED) {
 
     // test code from https://github.com/espressif/arduino-esp32/blob/master/libraries/SD/examples/SD_Test/SD_Test.ino
 
@@ -300,44 +304,44 @@ bool DataHandler::checkUserFile(int filetype) {
     while (file)  {
       spiffsFile = file.name();
 
+      // Check config file
       if (checkSubstring(spiffsFile.c_str(), matchCONFIG.c_str()) && (filetype == CONFIGFILE)) {
-        // CONFIG_*******.json file found
-        pinsFile = "/" + spiffsFile;
+        configFile = "/" + spiffsFile;
         _message.serialPrintf("CONFIG file Found: %s\n", configFile.c_str() );  
         status.pinsFilename = configFile.c_str();        
-        loadConfiguration();
+        // loadConfiguration();
         status.configLoaded = true;
         return true;
       }   
-      
+
+      // Check PINS file      
       if (checkSubstring(spiffsFile.c_str(), matchPINS.c_str()) && (filetype == PINSFILE)) {
-        // PINS_*******.json file found
         pinsFile = "/" + spiffsFile;
         _message.serialPrintf("PINS file Found: %s\n", pinsFile.c_str() );  
         status.pinsFilename = pinsFile.c_str();        
-        loadPinsData();
+        // loadPinsData();
         status.pinsLoaded = true;
         return true;
       }   
       
+      // Check MAF file
       if (checkSubstring(spiffsFile.c_str(), matchMAF.c_str()) && (filetype == MAFFILE)) {
-        // MAF_********.json file found
         mafFile = "/" + spiffsFile;
         _message.serialPrintf("MAF file Found: %s\n", mafFile.c_str() );  
         status.mafFilename = mafFile.c_str();
-        loadMAFData();
+        // loadMAFData();
         status.mafLoaded = true;
         return true;
       }
       
-      if (checkSubstring(spiffsFile.c_str(), matchINDEX.c_str()) && (filetype == INDEXFILE)) {
-        // index.html file found
-        indexFile = "/" + spiffsFile;
-        _message.serialPrintf("Index file Found: %s\n", indexFile.c_str() );  
-        status.indexFilename = indexFile.c_str();
-        status.GUIexists = true;
-        return true;
-      }
+      // // Check index file
+      // if (checkSubstring(spiffsFile.c_str(), matchINDEX.c_str()) && (filetype == INDEXFILE)) {
+      //   indexFile = "/" + spiffsFile;
+      //   _message.serialPrintf("Index file Found: %s\n", indexFile.c_str() );  
+      //   status.indexFilename = indexFile.c_str();
+      //   status.GUIexists = true;
+      //   return true;
+      // }
 
       file = root.openNextFile();
     }
@@ -578,116 +582,314 @@ void DataHandler::beginSerial(void) {
 
 
 
+/***********************************************************
+* @brief loadConfiguration
+* @details read settings from ESP32 NVM and loads into global struct
+* @note Replaces pre-compile macros in original config.h file
+* @note Preferences Kay can not exceed 15 chars long
+***/ 
+void DataHandler::loadConfig () {
 
+  extern struct Configuration config;
 
+  Messages _message;
+  Preferences _preferences;
 
+  _message.serialPrintf("Loading Configuration \n");    
+  
+  _preferences.begin("config", false);
+
+  config.SD_ENABLED = _preferences.getBool("SD_ENABLED", false);
+  config.MIN_PRESS_PCNT = _preferences.getInt("MIN_PRESS_PCNT", 80);
+  config.PIPE_RAD_FT = _preferences.getDouble("PIPE_RAD_FT", 0.328084);
+
+  config.VCC_3V3_TRIM = _preferences.getDouble("VCC_3V3_TRIM", 0.0);
+  config.VCC_5V_TRIM = _preferences.getDouble("VCC_5V_TRIM", 0.0);
+  config.FIXED_3_3V_VAL = _preferences.getBool("FIXED_3_3V_VAL", true);
+  config.FIXED_5V_VAL = _preferences.getBool("FIXED_5V_VAL", true);
+
+  config.BME280_ENABLED = _preferences.getBool("BME280_ENABLED", true);
+  config.BME280_I2C_ADDR = _preferences.getInt("BME280_I2C_ADDR", 118);
+  config.BME280_SCAN_MS = _preferences.getInt("BME280_SCAN_MS", 1000);
+
+  config.BME680_ENABLED = _preferences.getBool("BME680_ENABLED", false);
+  config.BME680_I2C_ADDR = _preferences.getInt("BME680_I2C_ADDR", 119);
+  config.BME680_SCAN_MS = _preferences.getInt("BME680_SCAN_MS", 1000);
+
+  config.ADC_TYPE = _preferences.getInt("ADC_TYPE", 11);
+  config.ADC_I2C_ADDR = _preferences.getInt("ADC_I2C_ADDR", 72);
+  config.ADC_SCAN_DELAY = _preferences.getInt("ADC_SCAN_DELAY", 1000);
+  config.ADC_MAX_RETRIES  = _preferences.getInt("ADC_MAX_RETRIES", 10);
+  config.ADC_RANGE = _preferences.getInt("ADC_RANGE", 32767);
+  config.ADC_GAIN = _preferences.getDouble("ADC_GAIN", 6.144);
+
+  _message.serialPrintf("loadconfig: config.ADC_I2C_ADDR: %u \n", config.ADC_I2C_ADDR);
+
+  config.MAF_SRC_TYPE = _preferences.getInt("MAF_SRC_TYPE", 11);
+  config.MAF_SENS_TYPE = _preferences.getString("MAF_SENS_TYPE", "not set");
+  config.MAF_MV_TRIM = _preferences.getDouble("MAF_MV_TRIM", 0.0);
+  config.MAF_ADC_CHAN = _preferences.getInt("MAF_ADC_CHAN", 0);
+
+  config.PREF_SENS_TYPE = _preferences.getInt("PREF_SENS_TYPE", 4);
+  config.PREF_SRC_TYPE = _preferences.getInt("PREF_SRC_TYPE", 11);
+  config.FIXED_PREF_VAL = _preferences.getInt("FIXED_PREF_VAL", 1);
+  config.PREF_MV_TRIM = _preferences.getDouble("PREF_MV_TRIM", 0.0);
+  config.PREF_ALOG_SCALE = _preferences.getDouble("PREF_ALOG_SCALE", 1.0);
+  config.PREF_ADC_CHAN = _preferences.getInt("PREF_ADC_CHAN", 1);
+
+  config.PDIFF_SENS_TYPE = _preferences.getInt("PDIFF_SENS_TYPE", 4);
+  config.PDIFF_SRC_TYPE = _preferences.getInt("PDIFF_SRC_TYPE", 11);
+  config.FIXED_PDIFF_VAL = _preferences.getInt("FIXED_PDIFF_VAL", 1);
+  config.PDIFF_MV_TRIM = _preferences.getDouble("PDIFF_MV_TRIM", 0.0);
+  config.PDIFF_SCALE = _preferences.getDouble("PDIFF_SCALE", 1.0);
+  config.PDIFF_ADC_CHAN = _preferences.getInt("PDIFF_ADC_CHAN", 2);
+ 
+  config.PITOT_SENS_TYPE = _preferences.getInt("PITOT_SENS_TYPE", SENSOR_DISABLED);
+  config.PITOT_SRC_TYPE = _preferences.getInt("PITOT_SRC_TYPE", 11);
+  config.PITOT_MV_TRIM = _preferences.getDouble("PITOT_MV_TRIM", 0.0);
+  config.PITOT_SCALE = _preferences.getDouble("PITOT_SCALE", 1.0);
+  config.PITOT_ADC_CHAN = _preferences.getInt("PITOT_ADC_CHAN", 3);
+
+  config.BARO_SENS_TYPE = _preferences.getInt("BARO_SENS_TYPE", BOSCH_BME280);
+  config.FIXED_BARO_VAL = _preferences.getDouble("FIXED_BARO_VAL", 101.3529);
+  config.BARO_ALOG_SCALE =_preferences.getDouble("BARO_ALOG_SCALE", 1.0);
+  config.BARO_MV_TRIM = _preferences.getDouble("BARO_MV_TRIM", 1.0);
+  config.BARO_FINE_TUNE = _preferences.getDouble("BARO_FINE_TUNE", 1.0);
+  config.BARO_SCALE = _preferences.getDouble("BARO_SCALE", 100);
+  config.BARO_OFFSET = _preferences.getDouble("BARO_OFFSET", 100);
+  config.SEALEVEL_PRESS = _preferences.getDouble("SEALEVEL_PRESS", 1016.90);
+  config.BARO_ADC_CHAN = _preferences.getInt("BARO_ADC_CHAN", 4);
+
+  config.TEMP_SENS_TYPE = _preferences.getInt("TEMP_SENS_TYPE", BOSCH_BME280);
+  config.FIXED_TEMP_VAL = _preferences.getDouble("FIXED_TEMP_VAL", 21.0);
+  config.TEMP_ALOG_SCALE = _preferences.getDouble("TEMP_ALOG_SCALE", 1.0);
+  config.TEMP_MV_TRIM = _preferences.getDouble("TEMP_MV_TRIM", 0.0);
+  config.TEMP_FINE_TUNE = _preferences.getDouble("TEMP_FINE_TUNE", 0.0);
+
+  config.RELH_SENS_TYPE = _preferences.getInt("RELH_SENS_TYPE", BOSCH_BME280);
+  config.FIXED_RELH_VAL = _preferences.getDouble("FIXED_RELH_VAL", 36.0);
+  config.RELH_ALOG_SCALE = _preferences.getDouble("RELH_ALOG_SCALE", 1.0);
+  config.RELH_MV_TRIM = _preferences.getDouble("RELH_MV_TRIM", 0.0);
+  config.RELH_FINE_TUNE = _preferences.getDouble("RELH_FINE_TUNE", 0.0);
+  config.SWIRL_ENABLED = _preferences.getBool("SWIRL_ENABLED", false);
+
+  _preferences.end();
+}
 
 
 
 /***********************************************************
 * @brief loadConfiguration
-* @details read settings from config.json file and loads into global struct
-* @note Repalces original config.h file
+* @details Read settings from NVM and load into global structs
+* @note Replaces pre-compile macros in original config.h file
+* @note Preferences Key can not exceed 15 chars long
 ***/ 
-StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
+void DataHandler::initialiseConfig () {
 
   extern struct Configuration config;
 
-  StaticJsonDocument<CONFIG_JSON_SIZE> configurationJSON;
-
   Messages _message;
+  Preferences _preferences;
 
-  _message.serialPrintf("Loading Configuration \n");     
+  _message.serialPrintf("Initialising Configuration \n");    
 
-  if (SPIFFS.exists("/configuration.json"))  {
+  _preferences.begin("config", false);
 
-    configurationJSON = loadJSONFile("/configuration.json");
+  // _preferences.clear();
 
-    // TEST print configuration.json
-    // serializeJsonPretty(configurationJSON, Serial);
+  // _preferences.remove("ADC_I2C_ADDR");
+  _preferences.remove("FIXED_5V_VAL");
+  _preferences.remove("FIXED_3_3V_VAL");
 
-    // strcpy(config.wifi_ssid, configurationJSON["CONF_WIFI_SSID"]);
-    // strcpy(config.wifi_pswd, configurationJSON["CONF_WIFI_PSWD"]);
-    // config.orificeSixDepression = configurationJSON["ORIFICE6_TEST_PRESSURE"].as<double>();
+  if (!_preferences.isKey("SD_ENABLED")) _preferences.putBool("SD_ENABLED", false);
+  if (!_preferences.isKey("MIN_PRESS_PCNT")) _preferences.putInt("MIN_PRESS_PCNT", 80);
+  if (!_preferences.isKey("PIPE_RAD_FT")) _preferences.putDouble("PIPE_RAD_FT", 0.328084);
 
-    config.SD_CARD_IS_ENABLED = configurationJSON["SD_CARD_IS_ENABLED"].as<bool>();
-    config.MIN_TEST_PRESSURE_PERCENTAGE = configurationJSON["MIN_TEST_PRESSURE_PERCENTAGE"].as<int>();
-    config.PIPE_RADIUS_IN_FEET = configurationJSON["PIPE_RADIUS_IN_FEET"].as<int>();
+  if (!_preferences.isKey("VCC_3V3_TRIM")) _preferences.putDouble("VCC_3V3_TRIM", 0.0);
+  if (!_preferences.isKey("VCC_5V_TRIM")) _preferences.putDouble("VCC_5V_TRIM", 0.0);
+  if (!_preferences.isKey("FIXED_3_3V_VAL")) _preferences.putBool("FIXED_3_3V_VAL", true);
+  if (!_preferences.isKey("FIXED_5V_VAL")) _preferences.putBool("FIXED_5V_VAL", true);
 
-    config.VCC_3V3_TRIMPOT = configurationJSON["VCC_3V3_TRIMPOT"].as<int>();
-    config.VCC_5V_TRIMPOT = configurationJSON["VCC_5V_TRIMPOT"].as<int>();
-    config.USE_FIXED_3_3V_VALUE =  configurationJSON["USE_FIXED_3_3V_VALUE"].as<bool>();
-    config.USE_FIXED_5V_VALUE = configurationJSON["USE_FIXED_5V_VALUE"].as<bool>();
+  if (!_preferences.isKey("BME280_ENABLED")) _preferences.putBool("BME280_ENABLED", true);
+  if (!_preferences.isKey("BME280_I2C_ADDR")) _preferences.putInt("BME280_I2C_ADDR", 118);
+  if (!_preferences.isKey("BME280_SCAN_MS")) _preferences.putInt("BME280_SCAN_MS", 1000);
 
-    config.BME280_IS_ENABLED = configurationJSON["BME280_IS_ENABLED"].as<bool>();
-    config.BME280_I2C_ADDR = configurationJSON["BME280_I2C_ADDR"];
-    config.BME280_SCAN_DELAY_MS =  configurationJSON["BME280_SCAN_DELAY_MS"].as<int>();
-
-    config.BME680_IS_ENABLED = configurationJSON["BME680_IS_ENABLED"].as<bool>();
-    config.BME680_I2C_ADDR = configurationJSON["BME680_I2C_ADDR"];
-    config.BME680_SCAN_DELAY_MS =  configurationJSON["BME680_SCAN_DELAY_MS"].as<int>();
-
-    config.ADC_TYPE =  configurationJSON["ADC_TYPE"].as<int>();
-    config.ADC_I2C_ADDR = configurationJSON["ADC_I2C_ADDR"].as<int>();
-    config.ADC_SCAN_DELAY_MS = configurationJSON["ADC_SCAN_DELAY_MS"].as<bool>();
-    config.ADC_MAX_RETRIES  =  configurationJSON["ADC_MAX_RETRIES"].as<int>();
-    config.ADC_MAX_RETRIES = configurationJSON["ADC_MAX_RETRIES"].as<int>();
-    config.ADC_RANGE = configurationJSON["ADC_RANGE"].as<int>();
-    config.ADC_GAIN = configurationJSON["ADC_GAIN"].as<int>();
-    
-    config.MAF_SRC_TYPE =  configurationJSON["MAF_SRC_TYPE"].as<int>();
-    config.MAF_MV_TRIMPOT = configurationJSON["MAF_MV_TRIMPOT"].as<int>();
-    config.MAF_ADC_CHANNEL = configurationJSON["MAF_ADC_CHANNEL"].as<int>();
-
-    config.PREF_SENSOR_TYPE = configurationJSON["PREF_SENSOR_TYPE"].as<int>();
-    config.FIXED_REF_PRESS_VALUE = configurationJSON["FIXED_REF_PRESS_VALUE"].as<bool>();
-    config.PREF_MV_TRIMPOT = configurationJSON["PREF_MV_TRIMPOT"].as<int>();
-    config.PREF_ANALOG_SCALE = configurationJSON["PREF_ANALOG_SCALE"].as<double>();
-    config.PREF_ADC_CHANNEL = configurationJSON["PREF_ADC_CHANNEL"].as<int>();
-
-    config.PDIFF_SENSOR_TYPE = configurationJSON["PDIFF_SENSOR_TYPE"].as<int>();
-    config.FIXED_DIFF_PRESS_VALUE = configurationJSON["FIXED_DIFF_PRESS_VALUE"].as<int>();
-    config.PDIFF_MV_TRIMPOT = configurationJSON["PDIFF_MV_TRIMPOT"].as<int>();
-    config.PDIFF_ANALOG_SCALE = configurationJSON["PDIFF_ANALOG_SCALE"].as<double>();
-    config.PDIFF_ADC_CHANNEL = configurationJSON["PDIFF_ADC_CHANNEL"].as<int>();
-
-    config.PITOT_SENSOR_TYPE =  configurationJSON["PITOT_SENSOR_TYPE"].as<int>();
-    config.PITOT_MV_TRIMPOT = configurationJSON["PITOT_MV_TRIMPOT"].as<int>();
-    config.PITOT_ANALOG_SCALE = configurationJSON["PITOT_ANALOG_SCALE"].as<double>();
-    config.PITOT_ADC_CHANNEL = configurationJSON["PITOT_ADC_CHANNEL"].as<int>();
-
-    config.BARO_SENSOR_TYPE = configurationJSON["BARO_SENSOR_TYPE"];
-    config.FIXED_BARO_VALUE = configurationJSON["FIXED_BARO_VALUE"].as<double>();
-    config.BARO_ANALOG_SCALE = configurationJSON["BARO_ANALOG_SCALE"].as<double>();
-    config.BARO_MV_TRIMPOT = configurationJSON["BARO_MV_TRIMPOT"].as<int>();
-    config.BARO_FINE_ADJUST = configurationJSON["BARO_FINE_ADJUST"].as<double>();
-    config.startupBaroScalingFactor = configurationJSON["startupBaroScalingFactor"].as<double>();
-    config.startupBaroScalingOffset = configurationJSON["startupBaroScalingOffset"].as<double>();
-    config.SEALEVELPRESSURE_HPA = configurationJSON["SEALEVELPRESSURE_HPA"].as<double>();
-
-    config.TEMP_SENSOR_TYPE = configurationJSON["TEMP_SENSOR_TYPE"];
-    config.FIXED_TEMP_VALUE = configurationJSON["FIXED_TEMP_VALUE"].as<double>();
-    config.TEMP_ANALOG_SCALE = configurationJSON["TEMP_ANALOG_SCALE"].as<double>();
-    config.TEMP_MV_TRIMPOT = configurationJSON["TEMP_MV_TRIMPOT"].as<int>();
-    config.TEMP_FINE_ADJUST = configurationJSON["TEMP_FINE_ADJUST"].as<double>();
-
-    config.RELH_SENSOR_TYPE = int(configurationJSON["RELH_SENSOR_TYPE"]);
-    config.FIXED_RELH_VALUE = configurationJSON["FIXED_RELH_VALUE"].as<double>();
-    config.RELH_ANALOG_SCALE = configurationJSON["RELH_ANALOG_SCALE"].as<double>();
-    config.RELH_FINE_ADJUST = configurationJSON["RELH_FINE_ADJUST"].as<double>();
-
-    config.SWIRL_IS_ENABLED = configurationJSON["SWIRL_IS_ENABLED"].as<bool>();
-    
-    // config.PLACEHOLDER = configurationJSON["PLACEHOLDER"])
+  if (!_preferences.isKey("BME680_ENABLED")) _preferences.putBool("BME680_ENABLED", true);
+  if (!_preferences.isKey("BME680_I2C_ADDR")) _preferences.putInt("BME680_I2C_ADDR", 119);
+  if (!_preferences.isKey("BME680_SCAN_MS")) _preferences.putInt("BME680_SCAN_MS", 1000);
 
 
-  } else {
-    _message.serialPrintf("Configuration file not found \n");
-  }
-  
-  return configurationJSON;  
+  if (!_preferences.isKey("ADC_TYPE")) _preferences.putInt("ADC_TYPE", 11);
+  if (!_preferences.isKey("ADC_I2C_ADDR")) _preferences.putInt("ADC_I2C_ADDR", 72);
+  if (!_preferences.isKey("ADC_SCAN_DELAY")) _preferences.putInt("ADC_SCAN_DELAY", 1000);
+  if (!_preferences.isKey("ADC_MAX_RETRIES")) _preferences.putInt("ADC_MAX_RETRIES", 10);
+  if (!_preferences.isKey("ADC_RANGE")) _preferences.putInt("ADC_RANGE", 32767);
+  if (!_preferences.isKey("ADC_GAIN")) _preferences.putDouble("ADC_GAIN", 6.144);
+
+  if (!_preferences.isKey("MAF_SRC_TYPE")) _preferences.putInt("MAF_SRC_TYPE", 11);
+  if (!_preferences.isKey("MAF_SENS_TYPE")) _preferences.putString("MAF_SENS_TYPE", "Not Set");
+  if (!_preferences.isKey("MAF_MV_TRIM")) _preferences.putDouble("MAF_MV_TRIM", 0.0);
+  if (!_preferences.isKey("MAF_ADC_CHAN")) _preferences.putInt("MAF_ADC_CHAN", 0);
+
+  if (!_preferences.isKey("PREF_SENS_TYPE")) _preferences.putInt("PREF_SENS_TYPE", 4);
+  if (!_preferences.isKey("PREF_SRC_TYPE")) _preferences.putInt("PREF_SRC_TYPE", 11);
+  if (!_preferences.isKey("FIXED_PREF_VAL")) _preferences.putInt("FIXED_PREF_VAL", 1);
+  if (!_preferences.isKey("PREF_MV_TRIM")) _preferences.putDouble("PREF_MV_TRIM", 0.0);
+  if (!_preferences.isKey("PREF_ALOG_SCALE")) _preferences.putDouble("PREF_ALOG_SCALE", 0.0);
+  if (!_preferences.isKey("PREF_ADC_CHAN")) _preferences.putInt("PREF_ADC_CHAN", 1);
+
+  if (!_preferences.isKey("PDIFF_SENS_TYPE")) _preferences.putInt("PDIFF_SENS_TYPE", 4);
+  if (!_preferences.isKey("PDIFF_SRC_TYPE")) _preferences.putInt("PDIFF_SRC_TYPE", 11);
+  if (!_preferences.isKey("FIXED_PDIFF_VAL")) _preferences.putInt("FIXED_PDIFF_VAL", 1);
+  if (!_preferences.isKey("PDIFF_MV_TRIM")) _preferences.putDouble("PDIFF_MV_TRIM", 0.0);
+  if (!_preferences.isKey("PDIFF_SCALE")) _preferences.putDouble("PDIFF_SCALE", 0.0);
+  if (!_preferences.isKey("PDIFF_ADC_CHAN")) _preferences.putInt("PDIFF_ADC_CHAN", 1);
+
+  if (!_preferences.isKey("PITOT_SENS_TYPE")) _preferences.putInt("PITOT_SENS_TYPE", 4);
+  if (!_preferences.isKey("PITOT_SRC_TYPE")) _preferences.putInt("PITOT_SRC_TYPE", 11);
+  if (!_preferences.isKey("PITOT_MV_TRIM")) _preferences.putDouble("PITOT_MV_TRIM", 0.0);
+  if (!_preferences.isKey("PITOT_SCALE")) _preferences.putDouble("PITOT_SCALE", 0.0);
+  if (!_preferences.isKey("PITOT_ADC_CHAN")) _preferences.putInt("PITOT_ADC_CHAN", 1);
+
+  if (!_preferences.isKey("BARO_SENS_TYPE")) _preferences.putInt("BARO_SENS_TYPE", BOSCH_BME280);
+  if (!_preferences.isKey("FIXED_BARO_VAL")) _preferences.putDouble("FIXED_BARO_VAL", 101.3529);
+  if (!_preferences.isKey("BARO_ALOG_SCALE")) _preferences.putDouble("BARO_ALOG_SCALE", 1.0);
+  if (!_preferences.isKey("BARO_MV_TRIM")) _preferences.putDouble("BARO_MV_TRIM", 1.0);
+  if (!_preferences.isKey("BARO_FINE_TUNE")) _preferences.putDouble("BARO_FINE_TUNE", 1.0);
+  if (!_preferences.isKey("BARO_SCALE")) _preferences.putDouble("BARO_SCALE", 1.0);
+  if (!_preferences.isKey("BARO_OFFSET")) _preferences.putDouble("BARO_OFFSET", 1.0);
+  if (!_preferences.isKey("SEALEVEL_PRESS")) _preferences.putDouble("SEALEVEL_PRESS", 0.0);
+  if (!_preferences.isKey("BARO_ADC_CHAN")) _preferences.putInt("BARO_ADC_CHAN", 4);
+
+  if (!_preferences.isKey("TEMP_SENS_TYPE")) _preferences.putInt("TEMP_SENS_TYPE", BOSCH_BME280);
+  if (!_preferences.isKey("FIXED_TEMP_VAL")) _preferences.putDouble("FIXED_TEMP_VAL", 21.0);
+  if (!_preferences.isKey("TEMP_ALOG_SCALE")) _preferences.putDouble("TEMP_ALOG_SCALE", 1.0);
+  if (!_preferences.isKey("TEMP_MV_TRIM")) _preferences.putDouble("TEMP_MV_TRIM", 1.0);
+  if (!_preferences.isKey("TEMP_FINE_TUNE")) _preferences.putDouble("TEMP_FINE_TUNE", 1.0);
+
+  if (!_preferences.isKey("RELH_SENS_TYPE")) _preferences.putInt("RELH_SENS_TYPE", BOSCH_BME280);
+  if (!_preferences.isKey("FIXED_RELH_VAL")) _preferences.putDouble("FIXED_RELH_VAL", 36.0);
+  if (!_preferences.isKey("RELH_ALOG_SCALE")) _preferences.putDouble("RELH_ALOG_SCALE", 1.0);
+  if (!_preferences.isKey("RELH_MV_TRIM")) _preferences.putDouble("RELH_MV_TRIM", 1.0);
+  if (!_preferences.isKey("RELH_FINE_TUNE")) _preferences.putDouble("RELH_FINE_TUNE", 1.0);
+  if (!_preferences.isKey("SWIRL_ENABLED")) _preferences.putBool("SWIRL_ENABLED", false);
+
+  _preferences.end();
 
 }
+
+
+
+
+
+
+
+// /***********************************************************
+// * @brief loadConfiguration
+// * @details read settings from config.json file and loads into global struct
+// * @note Repalces original config.h file
+// ***/ 
+// StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
+
+//   extern struct Configuration config;
+//   extern struct DeviceStatus status;
+
+//   StaticJsonDocument<CONFIG_JSON_SIZE> configurationJSON;
+
+//   Messages _message;
+
+//   _message.serialPrintf("Loading Configuration \n");     
+
+//   if (SPIFFS.exists("/configuration.json"))  {
+
+//     configurationJSON = loadJSONFile("/configuration.json");
+
+//     // TEST print configuration.json
+//     // serializeJsonPretty(configurationJSON, Serial);
+
+//     // strcpy(config.wifi_ssid, configurationJSON["CONF_WIFI_SSID"]);
+//     // strcpy(config.wifi_pswd, configurationJSON["CONF_WIFI_PSWD"]);
+//     // config.orificeSixDepression = configurationJSON["ORIFICE6_TEST_PRESSURE"].as<double>();
+
+//     config.SD_ENABLED = configurationJSON["SD_ENABLED"].as<bool>();
+//     config.MIN_PRESS_PCNT = configurationJSON["MIN_PRESS_PCNT"].as<int>();
+//     config.PIPE_RAD_FT = configurationJSON["PIPE_RAD_FT"].as<int>();
+
+//     config.VCC_3V3_TRIM = configurationJSON["VCC_3V3_TRIM"].as<int>();
+//     config.VCC_5V_TRIM = configurationJSON["VCC_5V_TRIM"].as<int>();
+//     config.FIXED_3_3V_VAL =  configurationJSON["FIXED_3_3V_VAL"].as<bool>();
+//     config.FIXED_5V_VAL = configurationJSON["FIXED_5V_VAL"].as<bool>();
+
+//     config.BME280_ENABLED = configurationJSON["BME280_ENABLED"].as<bool>();
+//     config.BME280_I2C_ADDR = configurationJSON["BME280_I2C_ADDR"];
+//     config.BME280_SCAN_MS =  configurationJSON["BME280_SCAN_MS"].as<int>();
+
+//     config.BME680_ENABLED = configurationJSON["BME680_ENABLED"].as<bool>();
+//     config.BME680_I2C_ADDR = configurationJSON["BME680_I2C_ADDR"];
+//     config.BME680_SCAN_MS =  configurationJSON["BME680_SCAN_MS"].as<int>();
+
+//     config.ADC_TYPE =  configurationJSON["ADC_TYPE"].as<int>();
+//     config.ADC_I2C_ADDR = configurationJSON["ADC_I2C_ADDR"].as<int>();
+//     config.ADC_SCAN_DELAY = configurationJSON["ADC_SCAN_DELAY"].as<bool>();
+//     config.ADC_MAX_RETRIES  =  configurationJSON["ADC_MAX_RETRIES"].as<int>();
+//     config.ADC_MAX_RETRIES = configurationJSON["ADC_MAX_RETRIES"].as<int>();
+//     config.ADC_RANGE = configurationJSON["ADC_RANGE"].as<int>();
+//     config.ADC_GAIN = configurationJSON["ADC_GAIN"].as<int>();
+    
+//     config.MAF_SRC_TYPE =  configurationJSON["MAF_SRC_TYPE"].as<int>();
+//     config.MAF_MV_TRIM = configurationJSON["MAF_MV_TRIM"].as<int>();
+//     config.MAF_ADC_CHAN = configurationJSON["MAF_ADC_CHAN"].as<int>();
+
+//     config.PREF_SENS_TYPE = configurationJSON["PREF_SENS_TYPE"].as<int>();
+//     config.FIXED_PREF_VAL = configurationJSON["FIXED_PREF_VAL"].as<bool>();
+//     config.PREF_MV_TRIM = configurationJSON["PREF_MV_TRIM"].as<int>();
+//     config.PREF_ALOG_SCALE = configurationJSON["PREF_ALOG_SCALE"].as<double>();
+//     config.PREF_ADC_CHAN = configurationJSON["PREF_ADC_CHAN"].as<int>();
+
+//     config.PDIFF_SENS_TYPE = configurationJSON["PDIFF_SENS_TYPE"].as<int>();
+//     config.FIXED_PDIFF_VAL = configurationJSON["FIXED_PDIFF_VAL"].as<int>();
+//     config.PDIFF_MV_TRIM = configurationJSON["PDIFF_MV_TRIM"].as<int>();
+//     config.PDIFF_SCALE = configurationJSON["PDIFF_SCALE"].as<double>();
+//     config.PDIFF_ADC_CHAN = configurationJSON["PDIFF_ADC_CHAN"].as<int>();
+
+//     config.PITOT_SENS_TYPE =  configurationJSON["PITOT_SENS_TYPE"].as<int>();
+//     config.PITOT_MV_TRIM = configurationJSON["PITOT_MV_TRIM"].as<int>();
+//     config.PITOT_SCALE = configurationJSON["PITOT_SCALE"].as<double>();
+//     config.PITOT_ADC_CHAN = configurationJSON["PITOT_ADC_CHAN"].as<int>();
+
+//     config.BARO_SENS_TYPE = configurationJSON["BARO_SENS_TYPE"];
+//     config.FIXED_BARO_VAL = configurationJSON["FIXED_BARO_VAL"].as<double>();
+//     config.BARO_ALOG_SCALE = configurationJSON["BARO_ALOG_SCALE"].as<double>();
+//     config.BARO_MV_TRIM = configurationJSON["BARO_MV_TRIM"].as<int>();
+//     config.BARO_FINE_TUNE = configurationJSON["BARO_FINE_TUNE"].as<double>();
+//     config.BARO_SCALE = configurationJSON["BARO_SCALE"].as<double>();
+//     config.BARO_OFFSET = configurationJSON["BARO_OFFSET"].as<double>();
+//     config.SEALEVEL_PRESS = configurationJSON["SEALEVEL_PRESS"].as<double>();
+
+//     config.TEMP_SENS_TYPE = configurationJSON["TEMP_SENS_TYPE"];
+//     config.FIXED_TEMP_VAL = configurationJSON["FIXED_TEMP_VAL"].as<double>();
+//     config.TEMP_ALOG_SCALE = configurationJSON["TEMP_ALOG_SCALE"].as<double>();
+//     config.TEMP_MV_TRIM = configurationJSON["TEMP_MV_TRIM"].as<int>();
+//     config.TEMP_FINE_TUNE = configurationJSON["TEMP_FINE_TUNE"].as<double>();
+
+//     config.RELH_SENS_TYPE = int(configurationJSON["RELH_SENS_TYPE"]);
+//     config.FIXED_RELH_VAL = configurationJSON["FIXED_RELH_VAL"].as<double>();
+//     config.RELH_ALOG_SCALE = configurationJSON["RELH_ALOG_SCALE"].as<double>();
+//     config.RELH_FINE_TUNE = configurationJSON["RELH_FINE_TUNE"].as<double>();
+
+//     config.SWIRL_ENABLED = configurationJSON["SWIRL_ENABLED"].as<bool>();
+    
+//     // config.PLACEHOLDER = configurationJSON["PLACEHOLDER"])
+
+//     status.configLoaded = true;
+
+//   } else {
+//     _message.serialPrintf("Configuration file not found \n");
+//   }
+  
+//   return configurationJSON;  
+
+// }
 
 
 
@@ -855,6 +1057,8 @@ void DataHandler::loadMAFData () {
   _message.verbosePrintf("MAF Data Val Max: %lu\n", status.mafDataValMax);
   _message.verbosePrintf("MAF Data Key Max: %lu\n", status.mafDataKeyMax);
 
+  status.mafLoaded = true;
+
 }
 
 
@@ -995,7 +1199,7 @@ void DataHandler::parsePinsData(StaticJsonDocument<1024> pinData) {
   // Store input pin values in struct
   pins.VCC_3V3_PIN = pinData["VCC_3V3_PIN"].as<int>();
   pins.VCC_5V_PIN = pinData["VCC_5V_PIN"].as<int>();
-  pins.SPEED_SENSOR_PIN = pinData["SPEED_SENSOR_PIN"].as<int>();
+  pins.SPEED_SENS_PIN = pinData["SPEED_SENS_PIN"].as<int>();
   pins.ORIFICE_BCD_BIT1_PIN = pinData["ORIFICE_BCD_BIT1_PIN"].as<int>();
   pins.ORIFICE_BCD_BIT2_PIN = pinData["ORIFICE_BCD_BIT2_PIN"].as<int>();
   pins.ORIFICE_BCD_BIT3_PIN = pinData["ORIFICE_BCD_BIT3_PIN"].as<int>();
@@ -1052,6 +1256,8 @@ void DataHandler::loadPinsData () {
   pinsFileData = _data.loadJSONFile(status.pinsFilename);
 
   parsePinsData(pinsFileData);
+
+  status.pinsLoaded = true;
 
 
   // TEST - save pins data to file
@@ -1471,22 +1677,38 @@ void DataHandler::bootLoop()
         }
 
         // This is the escape function. When all files are present and loaded we can leave the loop
-        if ((status.configLoaded == true) && (status.pinsLoaded == true) && (status.mafLoaded == true) && (status.GUIexists == true) ){
+        // if ((status.configLoaded == true) && (status.pinsLoaded == true) && (status.mafLoaded == true) && (status.GUIexists == true) ){
+        if ((status.configLoaded == true) && (status.pinsLoaded == true) && (status.mafLoaded == true)) {
           status.doBootLoop = false; 
           break;
         } 
         // if (status.pinsFilename.isEmpty();
 
-        vTaskDelay( 1 );
+        
+        if (!status.configLoaded) {
+          if (checkUserFile(CONFIGFILE) ) status.configLoaded = true ;
+        }
+
+        if (!status.pinsLoaded) {
+         if (checkUserFile(PINSFILE) ) status.pinsLoaded = true ;
+        }
+
+        if (!status.mafLoaded) {
+          if (checkUserFile(MAFFILE) ) status.mafLoaded = true ;
+        }
+
+        if (status.doBootLoop == false) {
+          break;
+        }
+
+        // if (!status.GUIexists) {
+        //   if (checkUserFile(INDEXFILE) ) status.GUIexists = true ;
+        // }
+
+        vTaskDelay( 1000 );
     
     } while (status.doBootLoop == true);
 
-    // Lets load 
-    if (!status.configLoaded == true) _data.loadConfiguration();
-    
-    if (!status.pinsLoaded == true) _data.loadPinsData();
-    
-    if (!status.mafLoaded == true) _data.loadMAFData();
 
     // if the weberver is already running skip sever reset
     if (!status.webserverIsRunning) {

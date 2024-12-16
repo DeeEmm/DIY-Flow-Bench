@@ -1,6 +1,7 @@
 {
     "sensor_type" : "ACDELCO_92281162",
     "forum_link" : "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/142",
+    "comments" : "",
     "output_type" : "voltage",
     "maf_units" : "MG_S",
     "maf_scaling" : 0.1,

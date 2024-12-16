@@ -71,13 +71,13 @@ void Sensors::begin () {
 	
 	
 	//initialise BME280
-	if (config.BME280_IS_ENABLED) {
+	if (config.BME280_ENABLED) {
 
 		// uint8_t I2CAddress = (unsigned int)config.BME280_I2C_ADDR;
 
-		_message.serialPrintf("Initialising BME280: %u\n", config.BME280_I2C_ADDR);	
+		_message.serialPrintf("Initialising BME280: ( Address: %u )\n", config.BME280_I2C_ADDR);	
 		
-		if (_BME280Sensor.beginI2C(config.BME280_I2C_ADDR) == false) {
+		if (_BME280Sensor.beginI2C((int)config.BME280_I2C_ADDR) == false) {
 			_message.serialPrintf("BME sensor did not respond. \n");
 			_message.serialPrintf("Please check wiring and I2C address\n");
 			_message.serialPrintf("BME I2C address %s set in configuration.h. \n", config.BME280_I2C_ADDR);
@@ -97,15 +97,15 @@ void Sensors::begin () {
 
 
 	//initialise BME680
-	if (config.BME680_IS_ENABLED) {
+	if (config.BME680_ENABLED) {
 
 		// TODO #233
 		// BME680_Class _BME680Sensor;
 	
-		// _message.serialPrintf("Initialising BME680 \n");	
+		// _message.serialPrintf("Initialising BME680: ( Address: %u )\n", config.BME680_I2C_ADDR);	
 
-		// // while (!_BME680Sensor.begin(I2C_STANDARD_MODE, onfig.BME680_I2C_ADDR)) { 
-		// while (!_BME680Sensor.begin(I2C_STANDARD_MODE, onfig.BME680_I2C_ADDR)) { 
+		// // while (!_BME680Sensor.begin(I2C_STANDARD_MODE, (int)config.BME680_I2C_ADDR)) { 
+		// while (!_BME680Sensor.begin(I2C_STANDARD_MODE, (int)config.BME680_I2C_ADDR)) { 
 		// 	_message.serialPrintf("-  Unable to find BME680. Trying again in 5 seconds.\n");
 		// 	delay(5000);
 		// }  
@@ -145,12 +145,12 @@ void Sensors::begin () {
 
 	// Set status values for GUI
 	status.mafSensor = status.mafSensorType;
-	status.baroSensor = getSensorType(config.BARO_SENSOR_TYPE);
-	status.tempSensor  = getSensorType(config.TEMP_SENSOR_TYPE);
-	status.relhSensor = getSensorType(config.RELH_SENSOR_TYPE);
-	status.prefSensor = getSensorType(config.PREF_SENSOR_TYPE);
-	status.pdiffSensor = getSensorType(config.PDIFF_SENSOR_TYPE);
-	status.pitotSensor = getSensorType(config.PITOT_SENSOR_TYPE);
+	status.baroSensor = getSensorType(config.BARO_SENS_TYPE);
+	status.tempSensor  = getSensorType(config.TEMP_SENS_TYPE);
+	status.relhSensor = getSensorType(config.RELH_SENS_TYPE);
+	status.prefSensor = getSensorType(config.PREF_SENS_TYPE);
+	status.pdiffSensor = getSensorType(config.PDIFF_SENS_TYPE);
+	status.pitotSensor = getSensorType(config.PITOT_SENS_TYPE);
 
 	// END System status definitions
 
@@ -211,7 +211,7 @@ String Sensors::getSensorType(int sensorType) {
 			sensorDescription = "DHT11";
 			break;
 		}
-		case FIXED_VALUE: {
+		case FIXED_VAL: {
 			sensorDescription = "Fixed Value";
 			break;
 		}		
@@ -285,7 +285,7 @@ long Sensors::getMafRaw() {
 		}
 
 		case ADS1115:{
-			sensorVal.MafRAW = _hardware.getADCRawData(config.MAF_ADC_CHANNEL);
+			sensorVal.MafRAW = _hardware.getADCRawData(config.MAF_ADC_CHAN);
 			break;
 		}
 
@@ -322,7 +322,7 @@ double Sensors::getMafVolts() {
 	switch (config.MAF_SRC_TYPE) {
 
 		case ADS1115:{
-			sensorVolts = _hardware.getADCVolts(config.MAF_ADC_CHANNEL);
+			sensorVolts = _hardware.getADCVolts(config.MAF_ADC_CHAN);
 			break;
 		}
 
@@ -341,7 +341,7 @@ double Sensors::getMafVolts() {
 	}
 
 	// Trim value	
-	sensorVolts += config.MAF_MV_TRIMPOT;
+	sensorVolts += config.MAF_MV_TRIM;
 
 	// Lets make sure we have a valid value to return
 	if (sensorVolts > 0) {
@@ -586,7 +586,7 @@ double Sensors::getPRefVolts() {
 	switch (config.PREF_SRC_TYPE) 	{
 
 		case ADS1115 : {
-			sensorVolts = _hardware.getADCVolts(config.PREF_ADC_CHANNEL);
+			sensorVolts = _hardware.getADCVolts(config.PREF_ADC_CHAN);
 			break;
 		}
 
@@ -606,7 +606,7 @@ double Sensors::getPRefVolts() {
 
 
 	// Trim value
-	sensorVolts += config.PREF_MV_TRIMPOT;
+	sensorVolts += config.PREF_MV_TRIM;
 
 	// Lets make sure we have a valid value to return
 	if (sensorVolts > 0.0) { 
@@ -638,10 +638,10 @@ double Sensors::getPRefValue() {
 	double returnVal = 0.0;
 	sensorVal.PRefVolts = getPRefVolts();
 
-	switch (config.PREF_SENSOR_TYPE)  {
+	switch (config.PREF_SENS_TYPE)  {
 
 		case LINEAR_ANALOG: 	
-				returnVal = sensorVal.PRefVolts * config.PREF_ANALOG_SCALE;
+				returnVal = sensorVal.PRefVolts * config.PREF_ALOG_SCALE;
 		break;
 
 		case MPXV7007:
@@ -672,7 +672,7 @@ double Sensors::getPRefValue() {
 		break;
 
 		default:
-			returnVal = config.FIXED_REF_PRESS_VALUE;
+			returnVal = config.FIXED_PREF_VAL;
 		break;
 	}
 
@@ -707,7 +707,7 @@ double Sensors::getPDiffVolts() {
 	switch (config.PDIFF_SRC_TYPE) 	{
 
 		case ADS1115 : {
-			sensorVolts = _hardware.getADCVolts(config.PDIFF_ADC_CHANNEL);
+			sensorVolts = _hardware.getADCVolts(config.PDIFF_ADC_CHAN);
 			break;
 		}
 
@@ -727,7 +727,7 @@ double Sensors::getPDiffVolts() {
 
 
 	// Trim vlaue
-	sensorVolts += config.PDIFF_MV_TRIMPOT;
+	sensorVolts += config.PDIFF_MV_TRIM;
 
 	// Lets make sure we have a valid value to return
 	if (sensorVolts > 0) {
@@ -757,10 +757,10 @@ double Sensors::getPDiffValue() {
 	double returnVal = 0.0;
 	sensorVal.PDiffVolts = this->getPDiffVolts();
 
-	switch (config.PDIFF_SENSOR_TYPE)  {
+	switch (config.PDIFF_SENS_TYPE)  {
 
 			case LINEAR_ANALOG: 	
-					returnVal = sensorVal.PDiffVolts * config.PDIFF_ANALOG_SCALE;
+					returnVal = sensorVal.PDiffVolts * config.PDIFF_SCALE;
 			break;
 
 			case MPXV7007:
@@ -791,7 +791,7 @@ double Sensors::getPDiffValue() {
 			break;
 
 			default:
-				returnVal = config.FIXED_DIFF_PRESS_VALUE;
+				returnVal = config.FIXED_PDIFF_VAL;
 			break;
 		}
 
@@ -826,7 +826,7 @@ double Sensors::getPitotVolts() {
 		switch (config.PITOT_SRC_TYPE) 	{
 
 		case ADS1115 : {
-			sensorVolts = _hardware.getADCVolts(config.PITOT_ADC_CHANNEL);
+			sensorVolts = _hardware.getADCVolts(config.PITOT_ADC_CHAN);
 			break;
 		}
 
@@ -847,7 +847,7 @@ double Sensors::getPitotVolts() {
 	
 
 	// Trim value
-	sensorVolts += config.PITOT_MV_TRIMPOT;
+	sensorVolts += config.PITOT_MV_TRIM;
 	
 	// Lets make sure we have a valid value to return
 	if (sensorVolts > 0) {
@@ -887,10 +887,10 @@ double Sensors::getPitotValue() {
 
 	double returnVal = 0.0;
 
-	switch (config.PITOT_SENSOR_TYPE)  {
+	switch (config.PITOT_SENS_TYPE)  {
 
 		case LINEAR_ANALOG: 	
-				returnVal = sensorVal.PitotVolts * config.PITOT_ANALOG_SCALE;
+				returnVal = sensorVal.PitotVolts * config.PITOT_SCALE;
 		break;
 
 		case MPXV7007:
@@ -921,7 +921,7 @@ double Sensors::getPitotValue() {
 		break;
 
 		default:
-			returnVal = config.FIXED_DIFF_PRESS_VALUE;
+			returnVal = config.FIXED_PDIFF_VAL;
 		break;
 	}
 
@@ -1005,14 +1005,14 @@ double Sensors::getTempValue() {
 	int32_t  unusedRH, unusedBaro, unusedGas;
 	
 
-	switch (config.TEMP_SENSOR_TYPE) {
+	switch (config.TEMP_SENS_TYPE) {
 
 		case LINEAR_ANALOG: {
 			long rawTempValue = analogRead(pins.TEMPERATURE_PIN);	
 			double tempVolts = rawTempValue * (_hardware.get3v3SupplyVolts() / 4095.0);	
-			tempVolts += config.TEMP_MV_TRIMPOT;		
-			refTempDegC = tempVolts * config.TEMP_ANALOG_SCALE;
-			refTempDegC +=  config.TEMP_FINE_ADJUST;
+			tempVolts += config.TEMP_MV_TRIM;		
+			refTempDegC = tempVolts * config.TEMP_ALOG_SCALE;
+			refTempDegC +=  config.TEMP_FINE_TUNE;
 			break;
 		}
 
@@ -1037,19 +1037,19 @@ double Sensors::getTempValue() {
 			// } else {
 			// refTempDegC = refTemp;
 			// }	
-			// refTempDegC +=  TEMP_FINE_ADJUST;
+			// refTempDegC +=  TEMP_FINE_TUNE;
 			break;
 		}
 
 		default: {
-			refTempDegC = config.FIXED_TEMP_VALUE;
+			refTempDegC = config.FIXED_TEMP_VAL;
 			break;
 		}
 
 	}
 
 	// Trim value
-	refTempDegC += config.TEMP_FINE_ADJUST;
+	refTempDegC += config.TEMP_FINE_TUNE;
 
 	return refTempDegC;
 }
@@ -1077,22 +1077,22 @@ double Sensors::getBaroValue() {
 	int32_t  unusedGas;   
 
 
-	switch (config.BARO_SENSOR_TYPE) {
+	switch (config.BARO_SENS_TYPE) {
 
 		case LINEAR_ANALOG: {
 			long rawBaroValue = analogRead(pins.REF_BARO_PIN);
 			double baroVolts = rawBaroValue * (_hardware.get3v3SupplyVolts() / 4095.0);
-			baroVolts += config.BARO_MV_TRIMPOT;		
-			baroPressureHpa = baroVolts * config.BARO_ANALOG_SCALE;
-			baroPressureHpa += config.BARO_FINE_ADJUST;
+			baroVolts += config.BARO_MV_TRIM;		
+			baroPressureHpa = baroVolts * config.BARO_ALOG_SCALE;
+			baroPressureHpa += config.BARO_FINE_TUNE;
 			break;
 		}
 
 		case MPX4115: {
 			// Datasheet - https://html.alldatasheet.es/html-pdf/5178/MOTOROLA/MPX4115/258/1/MPX4115.html
 			// Vout = VS (P x 0.009 – 0.095) --- Where VS = Supply Voltage (Formula from Datasheet)
-			baroPressureHpa = map(_hardware.getADCRawData(config.BARO_ADC_CHANNEL), 0, 4095, 15000, 115000);
-			baroPressureHpa += config.BARO_FINE_ADJUST;
+			baroPressureHpa = map(_hardware.getADCRawData(config.BARO_ADC_CHAN), 0, 4095, 15000, 115000);
+			baroPressureHpa += config.BARO_FINE_TUNE;
 			break;
 		}
 
@@ -1111,18 +1111,18 @@ double Sensors::getBaroValue() {
 			// No baro sensor defined so use value grabbed at startup from reference pressure sensor
 			// NOTE will only work for absolute style pressure sensor like the MPX4250
 			baroPressureKpa = startupBaroPressure; 
-			baroPressureKpa += config.BARO_FINE_ADJUST;
+			baroPressureKpa += config.BARO_FINE_TUNE;
 			break;
 		}
 
 		default: {
-			baroPressureKpa = config.FIXED_BARO_VALUE;
+			baroPressureKpa = config.FIXED_BARO_VAL;
 			break;
 		}
 	}
 
 	// Trim Value
-	baroPressureHpa += config.BARO_FINE_ADJUST;
+	baroPressureHpa += config.BARO_FINE_TUNE;
 
 	return baroPressureHpa;
 
@@ -1149,14 +1149,14 @@ double Sensors::getRelHValue() {
 	int32_t  unusedBaro;   
 	int32_t  unusedGas;   		
 
-	switch (config.RELH_SENSOR_TYPE){
+	switch (config.RELH_SENS_TYPE){
 
 		case LINEAR_ANALOG: {
 			long rawRelhValue = analogRead(pins.HUMIDITY_PIN);
 			double relhVolts = rawRelhValue * (_hardware.get3v3SupplyVolts() / 4095.0);
-			relhVolts += config.RELH_MV_TRIMPOT;		
-			relativeHumidity = relhVolts * config.RELH_ANALOG_SCALE;
-			relativeHumidity += config.RELH_FINE_ADJUST;
+			relhVolts += config.RELH_MV_TRIM;		
+			relativeHumidity = relhVolts * config.RELH_ALOG_SCALE;
+			relativeHumidity += config.RELH_FINE_TUNE;
 			break;
 		}
 
@@ -1169,7 +1169,7 @@ double Sensors::getRelHValue() {
 			// } else {
 			// relativeHumidity = refRelh;
 			// }
-			// relativeHumidity + config.RELH_FINE_ADJUST;
+			// relativeHumidity + config.RELH_FINE_TUNE;
 			break;
 		}
 
@@ -1185,7 +1185,7 @@ double Sensors::getRelHValue() {
 		}
 
 		default: {
-			relativeHumidity = config.FIXED_RELH_VALUE; // (36%)
+			relativeHumidity = config.FIXED_RELH_VAL; // (36%)
 			break;
 		}
 
@@ -1193,7 +1193,7 @@ double Sensors::getRelHValue() {
 	}
 
 	// Trim Value
-	relativeHumidity += config.RELH_FINE_ADJUST;
+	relativeHumidity += config.RELH_FINE_TUNE;
 
 	return relativeHumidity;
 	

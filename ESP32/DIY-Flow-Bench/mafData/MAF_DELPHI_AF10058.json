@@ -1,6 +1,7 @@
 {
     "sensor_type" : "DELPHI_AF10058",
     "forum_link" : "",
+    "comments" : "",
     "output_type" : "voltage",
     "maf_units" : "MG_S",
     "maf_scaling" : 0.1, 
@@ -20,7 +21,6 @@
         "11" : 214,
         "12" : 218,
         "13" : 223,
-        "14" : 227,
         "15" : 231,
         "16" : 235,
         "17" : 239,

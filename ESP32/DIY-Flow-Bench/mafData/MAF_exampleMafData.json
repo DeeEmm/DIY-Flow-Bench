@@ -23,6 +23,7 @@
 {
     "sensor_type" : "ACDELCO_92281162", // max 30 chars
     "forum_link" : "",
+    "comments" : "",
     "output_type" : "voltage", // voltage or frequency
     "maf_units" : "KG_H", // KG_H or MG_S
     "maf_scaling" : 0.1, // Scaling factor for value

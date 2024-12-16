@@ -20,13 +20,13 @@
 #include <Arduino.h>
 
 #include <ArduinoJson.h>
+#include <Wire.h>
 
 #include "system.h"
 #include "constants.h"
 #include "structs.h"
 #include "datahandler.h"
 
-#include <Wire.h>
 #include "hardware.h"
 #include "sensors.h"
 #include "calculations.h"
@@ -35,10 +35,7 @@
 
 #include <ADS1115_lite.h>
 
-
-extern struct Configuration config;
-
-ADS1115_lite adc(config.ADC_I2C_ADDR);
+ADS1115_lite adc;
 
 
 /***********************************************************
@@ -48,6 +45,50 @@ Hardware::Hardware() {
 
 
 }
+
+
+
+/***********************************************************
+ * @name begin
+ * @brief Hardware initialisation and set up
+ * 
+ **/
+void Hardware::begin () {
+
+  extern struct Configuration config;
+
+  Hardware _hardware;
+  Messages _message;
+
+  // adc = ADS1115_lite(config.ADC_I2C_ADDR);
+
+  _message.serialPrintf("Initialising Hardware \n");
+
+  ADS1115_lite adc(config.ADC_I2C_ADDR);
+
+
+  this->getI2CList(); // Scan and print I2C device list to serial monitor
+
+  if (config.ADC_TYPE != SENSOR_DISABLED) {
+
+    _message.serialPrintf("Initialising ADS1115 ( Address: %u ) \n", config.ADC_I2C_ADDR);
+
+    adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
+    adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 8 SPS
+    
+    if (!adc.testConnection()) {
+      _message.serialPrintf("ADS1115 Connection failed");
+      while(1); // Freeze
+    } else {
+      _message.serialPrintf("ADS1115 Initialised\n");
+    }
+  }
+
+  _message.serialPrintf("Hardware Initialised \n");
+
+}
+
+
 
 
 
@@ -82,9 +123,9 @@ void Hardware::initaliseIO () {
     _message.verbosePrintf("Input VCC_5V_PIN: %d\n", pins.VCC_5V_PIN );  
     pinMode(pins.VCC_5V_PIN, INPUT);
   }  
-  if (pins.SPEED_SENSOR_PIN < 99 ) {
-    _message.verbosePrintf("Input SPEED_SENSOR_PIN: %d\n", pins.SPEED_SENSOR_PIN );
-    pinMode(pins.SPEED_SENSOR_PIN, INPUT);   
+  if (pins.SPEED_SENS_PIN < 99 ) {
+    _message.verbosePrintf("Input SPEED_SENS_PIN: %d\n", pins.SPEED_SENS_PIN );
+    pinMode(pins.SPEED_SENS_PIN, INPUT);   
   }
   if (pins.ORIFICE_BCD_BIT1_PIN < 99 ) {
     _message.verbosePrintf("Input ORIFICE_BCD_BIT1_PIN: %d\n", pins.ORIFICE_BCD_BIT1_PIN );
@@ -103,27 +144,27 @@ void Hardware::initaliseIO () {
     _message.verbosePrintf("Input MAF_PIN: %d\n", pins.MAF_PIN );
     pinMode(pins.MAF_PIN, INPUT);   
   }
-  if (config.PREF_SENSOR_TYPE == LINEAR_ANALOG && pins.REF_PRESSURE_PIN < 99){
+  if (config.PREF_SENS_TYPE == LINEAR_ANALOG && pins.REF_PRESSURE_PIN < 99){
     _message.verbosePrintf("Input REF_PRESSURE_PIN: %d\n", pins.REF_PRESSURE_PIN );
     pinMode(pins.REF_PRESSURE_PIN, INPUT);   
   }
-  if (config.PDIFF_SENSOR_TYPE == LINEAR_ANALOG && pins.DIFF_PRESSURE_PIN < 99) {
+  if (config.PDIFF_SENS_TYPE == LINEAR_ANALOG && pins.DIFF_PRESSURE_PIN < 99) {
     _message.verbosePrintf("Input DIFF_PRESSURE_PIN: %d\n", pins.DIFF_PRESSURE_PIN );
     pinMode(pins.DIFF_PRESSURE_PIN, INPUT);   
   }
-  if (config.PITOT_SENSOR_TYPE  == LINEAR_ANALOG && pins.PITOT_PIN < 99) {
+  if (config.PITOT_SENS_TYPE  == LINEAR_ANALOG && pins.PITOT_PIN < 99) {
     _message.verbosePrintf("Input PITOT_PIN: %d\n", pins.PITOT_PIN );
     pinMode(pins.PITOT_PIN, INPUT);   
   }
-  if (config.TEMP_SENSOR_TYPE == LINEAR_ANALOG && pins.TEMPERATURE_PIN < 99) {
+  if (config.TEMP_SENS_TYPE == LINEAR_ANALOG && pins.TEMPERATURE_PIN < 99) {
     _message.verbosePrintf("Input TEMPERATURE_PIN: %d\n", pins.TEMPERATURE_PIN );
     pinMode(pins.TEMPERATURE_PIN, INPUT);   
   }
-  if (config.RELH_SENSOR_TYPE == LINEAR_ANALOG && pins.HUMIDITY_PIN < 99 ){
+  if (config.RELH_SENS_TYPE == LINEAR_ANALOG && pins.HUMIDITY_PIN < 99 ){
     _message.verbosePrintf("Input HUMIDITY_PIN: %d\n", pins.HUMIDITY_PIN );
     pinMode(pins.HUMIDITY_PIN, INPUT);   
   }
-  if (config.BARO_SENSOR_TYPE == LINEAR_ANALOG && pins.REF_BARO_PIN < 99 ) {
+  if (config.BARO_SENS_TYPE == LINEAR_ANALOG && pins.REF_BARO_PIN < 99 ) {
     _message.verbosePrintf("Input REF_BARO_PIN: %d\n", pins.REF_BARO_PIN );
     pinMode(pins.REF_BARO_PIN, INPUT);     
   }
@@ -143,7 +184,7 @@ void Hardware::initaliseIO () {
     _message.verbosePrintf("Input SCL_PIN: %d\n", pins.SCL_PIN );
     pinMode(pins.SCL_PIN, INPUT);   
   }
-  if (config.SD_CARD_IS_ENABLED) {
+  if (config.SD_ENABLED) {
     // if (pins.SD_CS_PIN < 99 ) {
     //   _message.verbosePrintf("Input SD_CS_PIN: %d\n", pins.SD_CS_PIN );
     //   pinMode(pins.SD_CS_PIN, INPUT);     
@@ -199,7 +240,7 @@ void Hardware::initaliseIO () {
     _message.verbosePrintf("Output FLOW_VALVE_DIR_PIN: %d\n", pins.FLOW_VALVE_DIR_PIN );
     pinMode(pins.FLOW_VALVE_DIR_PIN, OUTPUT);
   }
-  if (config.SD_CARD_IS_ENABLED) {
+  if (config.SD_ENABLED) {
     // if (pins.SD_MOSI_PIN < 99 ) {
     //   _message.verbosePrintf("Output SD_MOSI_PIN: %d\n", pins.SD_MOSI_PIN );
     //   pinMode(pins.SD_MOSI_PIN, OUTPUT);
@@ -218,42 +259,6 @@ void Hardware::initaliseIO () {
 
 }
 
-
-
-/***********************************************************
- * @name begin
- * @brief Hardware initialisation and set up
- * 
- **/
-void Hardware::begin () {
-
-  extern struct Configuration config;
-
-  Hardware _hardware;
-  Messages _message;
-
-  _message.serialPrintf("Initialising Hardware \n");
-
-  this->getI2CList(); // Scan and list I2C devices to serial monitor
-
-  if (config.ADC_TYPE != SENSOR_DISABLED) {
-    _message.serialPrintf("Initialising ADS1115 \n");
-
-    adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
-    // adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate - 128 SPS
-    adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 8 SPS
-    
-    if (!adc.testConnection()) {
-      _message.serialPrintf("ADS1115 Connection failed");
-      while(1); //Freeze
-    } else {
-      _message.serialPrintf("ADS1115 Initialised\n");
-    }
-  }
-
-  _message.serialPrintf("Hardware Initialised \n");
-
-}
 
 
 
@@ -402,12 +407,12 @@ double Hardware::get5vSupplyVolts() {
 
   double vcc5vSupplyVolts = 5.0F;
 
-  if (config.USE_FIXED_5V_VALUE == true) {
+  if (config.FIXED_5V_VAL == true) {
     return vcc5vSupplyVolts; 
   } else {
     long rawVoltageValue = analogRead(pins.VCC_5V_PIN);  
     vcc5vSupplyVolts = (2 * static_cast<double>(rawVoltageValue) * 0.805860805860806F) ;
-    return vcc5vSupplyVolts + config.VCC_5V_TRIMPOT;
+    return vcc5vSupplyVolts + config.VCC_5V_TRIM;
   }
 }
 
@@ -428,12 +433,12 @@ double Hardware::get3v3SupplyVolts() {
 
   double vcc3v3SupplyVolts = 3.3F;
 
-  if (config.USE_FIXED_3_3V_VALUE) {
+  if (config.FIXED_3_3V_VAL) {
     return vcc3v3SupplyVolts; 
   } else {
     long rawVoltageValue = analogRead(pins.VCC_3V3_PIN );  
     vcc3v3SupplyVolts = (2 * static_cast<double>(rawVoltageValue) * 0.805860805860806F) ;
-    return vcc3v3SupplyVolts + config.VCC_3V3_TRIMPOT;
+    return vcc3v3SupplyVolts + config.VCC_3V3_TRIM;
   }
 }
 
@@ -494,10 +499,10 @@ void Hardware::checkRefPressure() {
   double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
     
   // REVIEW  - Ref pressure check
-  // Check that pressure does not fall below limit set by MIN_TEST_PRESSURE_PERCENTAGE when bench is running
+  // Check that pressure does not fall below limit set by MIN_PRESS_PCNT when bench is running
   // note alarm commented out in alarm function as 'nag' can get quite annoying
   // Is this a redundant check? Maybe a different alert would be more appropriate
-  if ((refPressure < (settings.cal_ref_press * (config.MIN_TEST_PRESSURE_PERCENTAGE / 100))) && (Hardware::benchIsRunning()))
+  if ((refPressure < (settings.cal_ref_press * (config.MIN_PRESS_PCNT / 100))) && (Hardware::benchIsRunning()))
   {
     _message.Handler(language.LANG_REF_PRESS_LOW);
   }

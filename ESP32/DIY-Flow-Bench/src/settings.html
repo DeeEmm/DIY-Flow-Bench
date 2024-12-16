@@ -1,0 +1,210 @@
+
+    <!-- File Manager Modal -->
+    <div id="fileModal" class="modal">
+        <div class="modal-content">
+          <span class="closeFileModalButton">&times;</span>
+          <h3>~LANG_GUI_FILE_MANAGER~</h3>
+          <div id="file_list">~FILE_LIST~</div>
+          <br>
+          <hr>
+          <br>
+          <div class="float-right">
+            <form method="POST" action="/api/file/upload" enctype="multipart/form-data">
+              <div class="input_container">
+                <input type="file" name="upload" id="fileUpload">
+                <input type='submit' value='~LANG_GUI_FILEMANAGER_UPLOAD~' class="button file-submit-button">
+              </div>
+            </form>
+          </div>
+          <div class="clear-both">&nbsp;</div>
+        </div>        
+      </div>
+  
+      <!-- Info Modal -->
+      <div id="infoModal" class="modal">
+        <div class="info-modal-content row">
+          <span class="closeInfoModalButton">&times;</span>
+          <div class="row info-modal">
+              <div class="column">
+              <h4>~LANG_GUI_FIRMWARE~</h4>
+              <hr>
+              <div class="config-row"><label class="config-label">~LANG_GUI_VERSION~: </label><span class="config-value" id="RELEASE">~RELEASE~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_BUILD~:  </label><span class="config-value" id="BUILD_NUMBER">~BUILD_NUMBER~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_GUI~: </label><span class="config-value" id="VERSION">@@version@@</span></div>
+              <h4>~LANG_GUI_STORAGE~</h4>
+              <hr>
+              <div class="config-row"><label class="config-label">~LANG_GUI_MEM_SIZE~:  </label><span class="config-value" id="SPIFFS_MEM_SIZE">~SPIFFS_MEM_SIZE~</span> (bytes)</div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_MEM_USED~:  </label><span class="config-value" id="SPIFFS_MEM_USED">~SPIFFS_MEM_USED~</span> (bytes)</div>
+              <h4>~LANG_GUI_NETWORK~</h4>
+              <hr>
+              <div class="config-row"><label class="config-label">~LANG_GUI_IP_ADDRESS~:  </label><span class="config-value" id="LOCAL_IP_ADDRESS">~LOCAL_IP_ADDRESS~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_HOSTNAME~:  </label><span class="config-value" id="HOSTNAME">http://~HOSTNAME~.local</span></div>
+            </div>
+            <div class="column">
+              <!-- <div class="config-row"><label class="config-label">Uptime:  </label><span class="config-value" id="UPTIME">~UPTIME~</span></div> -->
+              <h4>~LANG_GUI_HARDWARE_CONFIG~</h4>
+              <hr>
+              <div class="config-row"><label class="config-label">~LANG_GUI_BENCH_TYPE~:  </label><span class="config-value" id="BENCH_TYPE">~BENCH_TYPE~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_BOARD_TYPE~:  </label><span class="config-value" id="BOARD_TYPE">~BOARD_TYPE~</span></div>
+              <!-- <div class="config-row"><label class="config-label">Boot Time:  </label><span class="config-value" id="BOOT_TIME">~BOOT_TIME~</span></div> -->
+              <h4>~LANG_GUI_SENS_CONFIG~</h4>
+              <hr>
+              <div class="config-row"><label class="config-label">~LANG_GUI_MAF_DATA_FILE~:  </label><span class="config-value" id="MAF_SENSOR"><a href="~MAF_LINK~" target="new">~MAF_SENSOR~</a></span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_REF_PRESSURE_SENSOR~:  </label><span class="config-value" id="PREF_SENSOR">~PREF_SENSOR~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_TEMP_SENSOR~:  </label><span class="config-value" id="TEMP_SENSOR">~TEMP_SENSOR~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_HUMIDITY_SENSOR~:  </label><span class="config-value" id="RELH_SENSOR">~RELH_SENSOR~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_BARO_SENSOR~:  </label><span class="config-value" id="BARO_SENSOR">~BARO_SENSOR~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_PITOT_SENSOR~:  </label><span class="config-value" id="PITOT_SENSOR">~PITOT_SENSOR~</span></div>
+              <div class="config-row"><label class="config-label">~LANG_GUI_DIFFERENTIAL_SENSOR~:  </label><span class="config-value" id="PDIFF_SENSOR">~PDIFF_SENSOR~</span></div>
+              </div>
+            </div>
+        </div>        
+      </div>
+        
+  
+    <!--Update modal-->
+    <div id="updateModal" class="modal">
+        <div class="modal-content updateModal">
+          <span class="closeUpdateModalButton">&times;</span>
+          <div class="align-center">
+            <h3>~LANG_GUI_UPLOAD_FIRMWARE_BINARY~</h3>
+            <hr>
+            <br>
+            <form method='POST' action='/api/update' enctype='multipart/form-data'>
+              <div class="input_container">
+                <input type="file" name="update" id="fileUpload">
+                <input type='submit' value='~LANG_GUI_FIRMWARE_UPDATE~' class="button file-submit-button">
+              </div>
+            </form>
+          </div>
+        </div>        
+      </div>
+
+
+
+
+
+    <!-- configuration tab -->
+    <div id="configuration" class="tabcontent tabcontentConfig">
+        <div class="config-panel">
+          <p style="text-align:center"><button id="file-manager-button" class="button">Files</button> <button id="info-button" class="button">Info</button> <button id="support-button" class="button" onclick="window.open('https://github.com/DeeEmm/DIY-Flow-Bench/wiki','_blank')">Support</button> <button id="restart-button" class="button" >Reboot</button> <button id="update-button" class="button">Update</button></p>       
+          <br>
+          <form method="POST" action="/api/saveconfig">
+            <h2>~LANG_GUI_SYS_SETTINGS~</h2>
+            <h3>~LANG_GUI_WIFI_INFO~</h3>        
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_WIFI_SSID~:</label>&nbsp;<input type="text" id="CONF_WIFI_SSID"  name="CONF_WIFI_SSID" value="~CONF_WIFI_SSID~" class="config-text" ><span class="tooltiptext">The name of your WiFi network</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_WIFI_PASS~:</label>&nbsp;<input type="text" id="CONF_WIFI_PSWD" name="CONF_WIFI_PSWD" value="~CONF_WIFI_PSWD~" class="config-text"><span class="tooltiptext">Your WiFi Password</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_WIFI_AP_SSID~:</label>&nbsp;<input type="text" id="CONF_WIFI_AP_SSID" name="CONF_WIFI_AP_SSID" value="~CONF_WIFI_AP_SSID~" class="config-text" ><span class="tooltiptext">Access-Point name for direct WiFi connection</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_WIFI_AP_PASS~:</label>&nbsp;<input type="text" id="CONF_WIFI_AP_PSWD" name="CONF_WIFI_AP_PSWD" value="~CONF_WIFI_AP_PSWD~" class="config-text"><span class="tooltiptext">Access-Point password</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_HOSTNAME~:</label>&nbsp;<input type="text" id="CONF_HOSTNAME" name="CONF_HOSTNAME" value="~CONF_HOSTNAME~" class="config-text"><span class="tooltiptext">DNS Hostname (used for connecting via URL e.g. http://diyfb.local)</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_WIFI_TIMEOUT~:</label>&nbsp;<input type="text" id="CONF_WIFI_TIMEOUT" name="CONF_WIFI_TIMEOUT" value="~CONF_WIFI_TIMEOUT~" class="config-text"><span class="tooltiptext">Number of milliseconds before WiFi retries connection</span></div>
+            <br>
+            <h3>~LANG_GUI_GENERAL_SETTINGS~</h3>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_BENCH_TYPE~:</label><span>~BENCH_TYPE_DROPDOWN~</span><span class="tooltiptext">Select bench type</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_MAF_HOUSING_DIAMETER~:</label>&nbsp;<input type="text" id="CONF_MAF_HOUSING_DIAMETER" name="CONF_MAF_HOUSING_DIAMETER" value="~CONF_MAF_HOUSING_DIAMETER~" class="config-text"><span class="tooltiptext">Diameter of MAF Housing. (Leave as zero to use standard housing diameter)</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_REFRESH_RATE~:</label>&nbsp;<input type="text" id="CONF_REFRESH_RATE" name="CONF_REFRESH_RATE" value="~CONF_REFRESH_RATE~" class="config-text"><span class="tooltiptext">Screen refresh rate in milliseconds</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_TEMPERATURE_UNIT~:</label><span>~TEMPERATURE_DROPDOWN~</span><span class="tooltiptext">Display unit of temperature</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_VALVE_LIFT_INTERVAL~:</label>&nbsp;<input type="text" id="VALVE_LIFT_INTERVAL" name="VALVE_LIFT_INTERVAL" value="~VALVE_LIFT_INTERVAL~" class="config-text"><span class="tooltiptext">Distance between valve lift data points</span></div>
+            <br>
+            <h3>~LANG_GUI_RESOLUTION_AND_ACCURACY~</h3>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_GEN_DECIMAL_ACCURACY~:</label>
+              <span>~GEN_DECIMAL_LENGTH_DROPDOWN~</span>
+              <span class="tooltiptext">Number of decimal places used in UI</span>
+            </div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_FLOW_DECIMAL_ROUNDING~:</label>
+              <span>~FLOW_DECIMAL_LENGTH_DROPDOWN~</span>
+              <span class="tooltiptext">Number of decimal places used in UI for flow values</span>
+            </div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_FLOW_VAL_ROUNDING~:</label>
+              <span>~ROUNDING_TYPE_DROPDOWN~</span>
+              <span class="tooltiptext">Rounding used in flow calculations</span>
+            </div>
+            <br>
+            <h3>~LANG_GUI_DATA_FILTERS~</h3>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_DATA_FILTER_TYPE~:</label><span>~DATA_FILTER_TYPE_DROPDOWN~</span><span class="tooltiptext">Select data filter type</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_MIN_FLOW_RATE~:</label>&nbsp;<input type="text" id="CONF_MIN_FLOW_RATE" name="CONF_MIN_FLOW_RATE" value="~CONF_MIN_FLOW_RATE~" class="config-text"><span class="tooltiptext">Used to filter out non-zero flow values when bench is not running </span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_MIN_BENCH_PRESSURE~:</label>&nbsp;<input type="text" id="CONF_MIN_BENCH_PRESSURE" name="CONF_MIN_BENCH_PRESSURE" value="~CONF_MIN_BENCH_PRESSURE~" class="config-text"><span class="tooltiptext">Minimum reference pressure that bench is considered running</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_MAF_MIN_VOLTS~:</label>&nbsp;<input type="text" id="CONF_MAF_MIN_VOLTS" name="CONF_MAF_MIN_VOLTS" value="~CONF_MAF_MIN_VOLTS~" class="config-text"><span class="tooltiptext">Minimum MAF voltage that bench is considered running</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_CYCLIC_AVERAGE_BUFFER~:</label>&nbsp;<input type="text" id="CONF_CYCLIC_AVERAGE_BUFFER" name="CONF_CYCLIC_AVERAGE_BUFFER" value="~CONF_CYCLIC_AVERAGE_BUFFER~" class="config-text"><span class="tooltiptext">Mean buffer size - Used for smoothing results.</span></div>
+            <br>
+            <h3>~LANG_GUI_CONVERSION_SETTINGS~</h3>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ADJ_FLOW_DEPRESSION~:</label>&nbsp;<input type="text" id="ADJ_FLOW_DEPRESSION" name="ADJ_FLOW_DEPRESSION" value="~ADJ_FLOW_DEPRESSION~" class="config-text"><span class="tooltiptext">Bench depression used for adjusted flow calcs</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_STANDARD_REF_CONDITIONS~:</label>
+              <select name='STANDARD_REFERENCE' class='config-select'>
+                <option value='1' ~STD_REF_1~>ISO 5011 (20&degC(68&degF) 1atm(101.3kPa) 50%RH)</option>
+                <option value='2' ~STD_REF_2~>ISO 1585 (25&degC(68&degF) 100kPa  0%RH)</option>
+                <option value='3' ~STD_REF_3~>ISA (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
+                <option value='4' ~STD_REF_4~>ISO 13443 (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
+                <option value='5' ~STD_REF_5~>ISO 2533 (15&degC(59&degF) 1atm(101.325kPa)  0% RH)</option>
+                <!--<option value='6'>NIST / EPA (20&degC(68&degF) 1atm(101.325kPa)  --RH(unspecified))</option>-->
+              </select>
+              <span class="tooltiptext">Standardised Temp, baro and humidity conditions.</span>
+            </div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_STANDARDISED_ADJ_FLOW~:</label>&nbsp;<input type="checkbox" id="STD_ADJ_FLOW" name="STD_ADJ_FLOW" value="1" ~STD_ADJ_FLOW~ class="config-text"><span class="tooltiptext">Adjusted flow uses SCFM</span></div>
+            <br>
+            <h3>~LANG_GUI_DATA_CAPTURE_SETTINGS~</h3>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_CAPTURE_DATATYPE~:</label>
+              <select name='DATA_COLLECTION_STANDARD' class='config-select'>
+                <option value='1' ~CAP_MODE_1~>Flow (ACFM)</option>
+                <option value='1' ~CAP_MODE_2~>Standard Flow (ACFM - ~STANDARD_FLOW~)</option>
+                <option value='2' ~CAP_MODE_3~>Adjusted Flow (ACFM @ ~ADJ_FLOW_DEPRESSION~ in/H2O)</option>
+                <option value='3' ~CAP_MODE_4~>Adjusted Standard Flow (ACFM - ~STANDARD_FLOW~ @ ~ADJ_FLOW_DEPRESSION~ in/H2O)</option>
+                <option value='4' ~CAP_MODE_5~>MAF Flow (~MAF_FLOW_UNIT~)</option>
+              </select>
+              <span class="tooltiptext">Default data type for data capture.</span>
+            </div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_DATA_GRAPH_MAX_VAL~:</label>
+              <select name='DATAGRAPH_MAX' class='config-select'>
+                <option value='0' ~DATAGRAPH_MAX_0~>~LANG_GUI_AUTO~</option>
+                <option value='1' ~DATAGRAPH_MAX_1~>250 cfm</option>
+                <option value='2' ~DATAGRAPH_MAX_2~>500 cfm</option>
+                <option value='3' ~DATAGRAPH_MAX_3~>1000 cfm</option>
+              </select>
+              <span class="tooltiptext">Set max scaling for Data Graph.</span>
+            </div>
+            <br>
+            <h3>~LANG_GUI_CAL_ORIFICE_SETTINGS~</h3>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_CAL_ORIFICE_FLOW_RATE~:</label>&nbsp;<input type="text" id="CONF_CAL_FLOW_RATE" name="CONF_CAL_FLOW_RATE" value="~CONF_CAL_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of calibration orifice in cfm</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_CAL_ORIFICE_TEST_PRESS~:</label>&nbsp;<input type="text" id="CONF_CAL_REF_PRESS" name="CONF_CAL_REF_PRESS" value="~CONF_CAL_REF_PRESS~" class="config-text"><span class="tooltiptext">Reference depression of calibration orifice in in/wg</span></div>
+            <br>
+            <div id="orificeData">
+              <h3>~LANG_GUI_ORIFICE_DATA~</h3>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE1_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE1_FLOW_RATE" name="ORIFICE1_FLOW_RATE" value="~ORIFICE1_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #1 in cfm</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE1_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE1_TEST_PRESSURE" name="ORIFICE1_TEST_PRESSURE" value="~ORIFICE1_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #1 in in/wg</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE2_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE2_FLOW_RATE" name="ORIFICE2_FLOW_RATE" value="~ORIFICE2_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #2 in cfm</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE2_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE2_TEST_PRESSURE" name="ORIFICE2_TEST_PRESSURE" value="~ORIFICE2_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #2 in in/wg</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE3_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE3_FLOW_RATE" name="ORIFICE3_FLOW_RATE" value="~ORIFICE3_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #3 in cfm</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE3_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE3_TEST_PRESSURE" name="ORIFICE3_TEST_PRESSURE" value="~ORIFICE3_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #3 in in/wg</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE4_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE4_FLOW_RATE" name="ORIFICE4_FLOW_RATE" value="~ORIFICE4_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #4 in cfm</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE4_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE4_TEST_PRESSURE" name="ORIFICE4_TEST_PRESSURE" value="~ORIFICE4_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #4 in in/wg</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE5_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE5_FLOW_RATE" name="ORIFICE5_FLOW_RATE" value="~ORIFICE5_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #5 in cfm</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE5_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE5_TEST_PRESSURE" name="ORIFICE5_TEST_PRESSURE" value="~ORIFICE5_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #5 in in/wg</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE6_FLOW~:</label>&nbsp;<input type="text" id="ORIFICE6_FLOW_RATE" name="ORIFICE6_FLOW_RATE" value="~ORIFICE6_FLOW_RATE~" class="config-text"><span class="tooltiptext">Flow rate of orifice #6 in cfm</span></div>
+              <div class="config-row tooltip"><label class="config-label">~LANG_GUI_ORIFICE6_PRESSURE~:</label>&nbsp;<input type="text" id="ORIFICE6_TEST_PRESSURE" name="ORIFICE6_TEST_PRESSURE" value="~ORIFICE6_TEST_PRESSURE~" class="config-text"><span class="tooltiptext">Test Pressure for orifice #6 in in/wg</span></div>
+              <br>
+            </div>
+            <br>
+            <h3>~LANG_GUI_API_SETTINGS~</h3>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_API_DELIMITER~:</label>&nbsp;<input type="text" id="CONF_API_DELIM" name="CONF_API_DELIM" value="~CONF_API_DELIM~" class="config-text"><span class="tooltiptext">Character used to delimit API / Serial data </span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_SERIAL_BAUD_RATE~:</label>&nbsp;<input type="text" id="CONF_SERIAL_BAUD_RATE" name="CONF_SERIAL_BAUD_RATE" value="~CONF_SERIAL_BAUD_RATE~" class="config-text"><span class="tooltiptext">Baud rate for serial communication</span></div>
+            <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
+            <br>
+            <br>
+          </form>
+          <br>
+          <br>
+          <form method="POST" action="/api/savecalibration">
+            <h2>~LANG_GUI_CALIBRATION_DATA~</h2>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_CAL_OFFSET~:</label>&nbsp;<input type="text" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" class="config-text"><span class="tooltiptext">Measured calibration offset</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_LEAK_TEST_BASELINE~:</label>&nbsp;<input  type="text" id="LEAK_CAL_BASELINE" name="LEAK_CAL_BASELINE" value="~LEAK_CAL_BASELINE~" class="config-text"><span class="tooltiptext">Baseline Offset</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_LEAK_TEST_OFFSET~:</label>&nbsp;<input  type="text" id="LEAK_CAL_OFFSET" name="LEAK_CAL_OFFSET" value="~LEAK_CAL_OFFSET~" class="config-text"><span class="tooltiptext">Measured leak test value</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_LEAK_TEST_BASELINE_REV~:</label>&nbsp;<input  type="text" id="LEAK_CAL_BASELINE_REV" name="LEAK_CAL_BASELINE_REV" value="~LEAK_CAL_BASELINE_REV~" class="config-text"><span class="tooltiptext">Baseline Offset (Reverse Flow)</span></div>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_LEAK_TEST_OFFSET_REV~:</label>&nbsp;<input type="text" id="LEAK_CAL_OFFSET_REV" name="LEAK_CAL_OFFSET_REV" value="~LEAK_CAL_OFFSET_REV~" class="config-text"><span class="tooltiptext">Measured leak test value (Reverse Flow)</span></div>
+            <br>
+            <div class="float-right"><input id="save-config-button" type="submit" class="button" value="~LANG_GUI_OVERWRITE~"></div>
+          </form>
+        </div>                    
+      </div>
+    </div>
+  
+  

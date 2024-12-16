@@ -57,8 +57,6 @@ using namespace std;
 #define ENVIRO_TASK_MEM_STACK 2000 // Free 640
 
 // JSON memory allocation
-// Use ArduinJSON memory assistant to determine size requirements
-// https://arduinojson.org/v6/assistant
 #define DATA_JSON_SIZE 768
 #define SETTINGS_JSON_SIZE 2048 
 #define LANGUAGE_JSON_SIZE 8192 // TODO Need to test language override (mem size could be an issue)
@@ -67,6 +65,8 @@ using namespace std;
 #define LIFT_DATA_JSON_SIZE 384
 #define MAF_JSON_SIZE 28000 // 6k for Bosch file 25k for Delphi 
 #define JSON_FILE_SIZE 6000 // 2800
+// NOTE: Use ArduinJSON memory assistant to determine size requirements
+// https://arduinojson.org/v6/assistant
 
 // Loop Delays
 #define VTASK_DELAY_ADC 500

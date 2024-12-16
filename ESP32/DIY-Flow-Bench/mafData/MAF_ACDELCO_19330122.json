@@ -1,6 +1,7 @@
 {
     "sensor_type" : "ACDELCO_19330122",
 	"forum_link" : "",
+    "comments" : "",
     "output_type" : "frequency",
     "maf_units" : "MG_S",
     "maf_scaling" : 0.01, 

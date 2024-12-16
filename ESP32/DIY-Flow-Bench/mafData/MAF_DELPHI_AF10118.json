@@ -1,6 +1,7 @@
 {
     "sensor_type" : "DELPHI_AF10118",
     "forum_link" : "",
+    "comments" : "",
     "output_type" : "voltage",
     "maf_units" : "KG_H",
     "maf_scaling" : 0.001, 

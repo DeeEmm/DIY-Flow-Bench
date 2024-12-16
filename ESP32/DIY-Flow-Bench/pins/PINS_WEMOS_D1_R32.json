@@ -11,7 +11,7 @@
     "FLOW_VALVE_DIR_PIN" : 4,
     "VCC_3V3_PIN" : 99,
     "VCC_5V_PIN" : 2,
-    "SPEED_SENSOR_PIN" : 15,
+    "SPEED_SENS_PIN" : 15,
     "SWIRL_ENCODER_PIN_A" : 99,
     "SWIRL_ENCODER_PIN_B" : 99,
     "ORIFICE_BCD_BIT1_PIN" : 34,
