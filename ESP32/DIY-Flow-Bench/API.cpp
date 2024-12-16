@@ -244,20 +244,20 @@ void API::ParseMessage(char apiMessage) {
       case 'A': // Report ADC voltage values
           if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "A%s%f%s%f%s%f%s%f", 
-          settings.api_delim, _hardware.getADCVolts(config.MAF_ADC_CHANNEL), 
-          settings.api_delim, _hardware.getADCVolts(config.PREF_ADC_CHANNEL), 
-          settings.api_delim, _hardware.getADCVolts(config.PDIFF_ADC_CHANNEL), 
-          settings.api_delim, _hardware.getADCVolts(config.PITOT_ADC_CHANNEL)); 
+          settings.api_delim, _hardware.getADCVolts(config.MAF_ADC_CHAN), 
+          settings.api_delim, _hardware.getADCVolts(config.PREF_ADC_CHAN), 
+          settings.api_delim, _hardware.getADCVolts(config.PDIFF_ADC_CHAN), 
+          settings.api_delim, _hardware.getADCVolts(config.PITOT_ADC_CHAN)); 
      break;
 
 
       case 'a': // Report Raw ADC values
           if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "a%s%u%s%u%s%u%s%u", 
-          settings.api_delim, _hardware.getADCRawData(config.MAF_ADC_CHANNEL), 
-          settings.api_delim, _hardware.getADCRawData(config.PREF_ADC_CHANNEL), 
-          settings.api_delim, _hardware.getADCRawData(config.PDIFF_ADC_CHANNEL), 
-          settings.api_delim, _hardware.getADCRawData(config.PITOT_ADC_CHANNEL)); 
+          settings.api_delim, _hardware.getADCRawData(config.MAF_ADC_CHAN), 
+          settings.api_delim, _hardware.getADCRawData(config.PREF_ADC_CHAN), 
+          settings.api_delim, _hardware.getADCRawData(config.PDIFF_ADC_CHAN), 
+          settings.api_delim, _hardware.getADCRawData(config.PITOT_ADC_CHAN)); 
      break;
 
 

@@ -43,6 +43,7 @@
 #include "esp_task_wdt.h"
 // #include <MD_REncoder.h>
 #include <math.h>
+#include <Preferences.h>
 
 #include "datahandler.h"
 #include "constants.h"
@@ -70,6 +71,7 @@ Configuration config;
 Pins pins;
 
 // Initiate Classes
+Preferences _preferences;
 DataHandler _data;
 API _api;
 Calculations _calculations;
@@ -114,7 +116,7 @@ void TASKgetSensorData( void * parameter ){
     if (millis() > status.adcPollTimer){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
-        status.adcPollTimer = millis() + config.ADC_SCAN_DELAY_MS; // Only reset timer when task executes
+        status.adcPollTimer = millis() + config.ADC_SCAN_DELAY; // Only reset timer when task executes
 
         // Get flow data
         // Bench is MAF type...
@@ -206,7 +208,7 @@ void TASKgetSensorData( void * parameter ){
           break;
         }
           
-        if (config.PREF_SENSOR_TYPE != SENSOR_DISABLED) {
+        if (config.PREF_SENS_TYPE != SENSOR_DISABLED) {
           sensorVal.PRefKPA = _sensors.getPRefValue();
           sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
           if (settings.std_adj_flow == 1) {
@@ -217,18 +219,18 @@ void TASKgetSensorData( void * parameter ){
           sensorVal.FlowADJSCFM = _calculations.convertToSCFM(sensorVal.FlowADJ, settings.standardReference );
         }
 
-        if (config.PDIFF_SENSOR_TYPE != SENSOR_DISABLED) {
+        if (config.PDIFF_SENS_TYPE != SENSOR_DISABLED) {
           sensorVal.PDiffKPA = _sensors.getPDiffValue();
           sensorVal.PDiffH2O = _calculations.convertPressure(sensorVal.PDiffKPA, INH2O) - calVal.pdiff_cal_offset;
         }
 
-        if (config.PITOT_SENSOR_TYPE != SENSOR_DISABLED) {
+        if (config.PITOT_SENS_TYPE != SENSOR_DISABLED) {
           sensorVal.PitotKPA = _sensors.getPitotValue() - calVal.pitot_cal_offset;
           sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O) ;
           sensorVal.PitotVelocity = _sensors.getPitotVelocity();
         }
 
-        if (config.SWIRL_IS_ENABLED) {
+        if (config.SWIRL_ENABLED) {
           // TODO #227
             // uint8_t Swirl = Encoder.read();
 
@@ -269,7 +271,7 @@ void TASKgetEnviroData( void * parameter ){
     if (millis() > status.bmePollTimer){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
-        status.bmePollTimer = millis() + config.BME280_SCAN_DELAY_MS; // Only reset timer when task executes
+        status.bmePollTimer = millis() + config.BME280_SCAN_MS; // Only reset timer when task executes
         
         sensorVal.TempDegC = _sensors.getTempValue();
 
@@ -309,17 +311,19 @@ void setup(void) {
     settings.verbose_print_mode = true; 
   #endif
 
-  // Initialise Data environment
-  _data.begin();
-
   // REVIEW
   // set message queue length
   // xQueueCreate( 8, 1024);
   // xQueueCreate( 256, 2048);
   // xQueueCreate( 1024, 4096);
     
+  // Initialise Data environment
+  _data.begin();
+  
+  // Initialise Hardware
   _hardware.begin();
 
+  // Initialise sensors
   _sensors.begin();
 
   // Confirm default core - NOTE: setup() and loop() are automatically created on default core 
@@ -334,16 +338,16 @@ void setup(void) {
   #endif
 
   if (config.ADC_TYPE != SENSOR_DISABLED) { 
-    // xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENSOR_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
-    xTaskCreate(TASKgetSensorData, "GET_SENSOR_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask); 
+    // xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
+    xTaskCreate(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask); 
   }
 
-  if (config.BME280_IS_ENABLED) { 
+  if (config.BME280_ENABLED) { 
     // xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
     xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask); 
   }
 
-  if (config.SWIRL_IS_ENABLED){
+  if (config.SWIRL_ENABLED){
     // TODO #227
     // MD_REncoder Encoder = MD_REncoder(SWIRL_ENCODER_PIN_A, SWIRL_ENCODER_PIN_B);
   }

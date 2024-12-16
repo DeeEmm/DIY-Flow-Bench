@@ -79,7 +79,7 @@
 
 #define  VOLTAGE 1
 #define  FREQUENCY 2
-#define  KEY_VALUE 1
+#define  KEY_VAL 1
 #define  RAW_ANALOG 2
 #define  KG_H 1
 #define  MG_S 2
@@ -91,7 +91,7 @@
  ***/
 #define SENSOR_DISABLED 1
 #define REF_PRESS_AS_BARO 2
-#define FIXED_VALUE 3
+#define FIXED_VAL 3
 #define MPXV7007 4
 #define MPX4250 5
 #define MPXV7007DP 6

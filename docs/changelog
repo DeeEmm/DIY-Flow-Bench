@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2412160014      - Move config into NVM
 2412150065      - Split HTML files to reduce transaction size
 2412150026      - Moved index.html / javascript and css into progmem
 2412140053      - Added heap memory to API

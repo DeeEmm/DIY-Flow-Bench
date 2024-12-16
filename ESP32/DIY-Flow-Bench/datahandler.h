@@ -67,6 +67,8 @@ class DataHandler {
 		StaticJsonDocument<JSON_FILE_SIZE> loadJSONFile(String filename); 
 		void beginSerial(void);
 		void loadMAFData();
+		void initialiseConfig();
+		void loadConfig();
 		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfiguration();
 		StaticJsonDocument<SETTINGS_JSON_SIZE> loadSettings ();
 		StaticJsonDocument<LIFT_DATA_JSON_SIZE> loadLiftData ();

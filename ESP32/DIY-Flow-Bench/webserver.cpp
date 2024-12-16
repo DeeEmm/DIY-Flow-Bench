@@ -365,13 +365,13 @@ void Webserver::begin()
       });
   
   // Settings page request handler
-  server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  server->on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         request->send_P(200, "text/html", _public_html.settings().c_str(), processTemplate); 
       });
 
   // Data page request handler
-  server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  server->on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         request->send_P(200, "text/html", _public_html.data().c_str(), processTemplate); 
       });
@@ -933,11 +933,11 @@ String Webserver::processTemplate(const String &var)
   // Translate GUI
   // Note language struct is overwritten when language.json file is present
   if (var == "LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE") return language.LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE;
-  if (var == "LANG_GUI_LIFT_VALUE") return language.LANG_GUI_LIFT_VALUE;
+  if (var == "LANG_GUI_LIFT_VAL") return language.LANG_GUI_LIFT_VAL;
   if (var == "LANG_GUI_LIFT_CAPTURE") return language.LANG_GUI_LIFT_CAPTURE;
   if (var == "LANG_GUI_UPLOAD_FIRMWARE_BINARY") return language.LANG_GUI_UPLOAD_FIRMWARE_BINARY;
   if (var == "LANG_GUI_FIRMWARE_UPDATE") return language.LANG_GUI_FIRMWARE_UPDATE;
-  if (var == "LANG_GUI_USER_FLOW_TARGET_VALUE") return language.LANG_GUI_USER_FLOW_TARGET_VALUE;
+  if (var == "LANG_GUI_USER_FLOW_TARGET_VAL") return language.LANG_GUI_USER_FLOW_TARGET_VAL;
   if (var == "LANG_GUI_USER_FLOW_TARGET_SAVE") return language.LANG_GUI_USER_FLOW_TARGET_SAVE;
   if (var == "LANG_GUI_CAL_FLOW_OFFSET") return language.LANG_GUI_CAL_FLOW_OFFSET;
   if (var == "LANG_GUI_CAL_LEAK_TEST") return language.LANG_GUI_CAL_LEAK_TEST;
@@ -960,7 +960,7 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_HARDWARE_CONFIG") return language.LANG_GUI_HARDWARE_CONFIG;
   if (var == "LANG_GUI_BENCH_TYPE") return language.LANG_GUI_BENCH_TYPE;
   if (var == "LANG_GUI_BOARD_TYPE") return language.LANG_GUI_BOARD_TYPE;
-  if (var == "LANG_GUI_SENSOR_CONFIG") return language.LANG_GUI_SENSOR_CONFIG;
+  if (var == "LANG_GUI_SENS_CONFIG") return language.LANG_GUI_SENS_CONFIG;
   if (var == "LANG_GUI_MAF_DATA_FILE") return language.LANG_GUI_MAF_DATA_FILE;
   if (var == "LANG_GUI_REF_PRESSURE_SENSOR") return language.LANG_GUI_REF_PRESSURE_SENSOR;
   if (var == "LANG_GUI_TEMP_SENSOR") return language.LANG_GUI_TEMP_SENSOR;
@@ -1004,10 +1004,10 @@ String Webserver::processTemplate(const String &var)
   if (var == "LANG_GUI_REFRESH_RATE") return language.LANG_GUI_REFRESH_RATE;
   if (var == "LANG_GUI_TEMPERATURE_UNIT") return language.LANG_GUI_TEMPERATURE_UNIT;
   if (var == "LANG_GUI_VALVE_LIFT_INTERVAL") return language.LANG_GUI_VALVE_LIFT_INTERVAL;
-  if (var == "LANG_GUI_DATA_GRAPH_MAX_VALUE") return language.LANG_GUI_DATA_GRAPH_MAX_VALUE;
+  if (var == "LANG_GUI_DATA_GRAPH_MAX_VAL") return language.LANG_GUI_DATA_GRAPH_MAX_VAL;
   if (var == "LANG_GUI_AUTO") return language.LANG_GUI_AUTO;
   if (var == "LANG_GUI_RESOLUTION_AND_ACCURACY") return language.LANG_GUI_RESOLUTION_AND_ACCURACY;
-  if (var == "LANG_GUI_FLOW_VALUE_ROUNDING") return language.LANG_GUI_FLOW_VALUE_ROUNDING;
+  if (var == "LANG_GUI_FLOW_VAL_ROUNDING") return language.LANG_GUI_FLOW_VAL_ROUNDING;
   if (var == "LANG_GUI_FLOW_DECIMAL_ROUNDING") return language.LANG_GUI_FLOW_DECIMAL_ROUNDING;
   if (var == "LANG_GUI_GEN_DECIMAL_ACCURACY") return language.LANG_GUI_GEN_DECIMAL_ACCURACY;
   if (var == "LANG_GUI_DATA_FILTERS") return language.LANG_GUI_DATA_FILTERS;

@@ -112,7 +112,7 @@ String PublicHTML::index() {
       <hr>
       <div class="align-center" >
         <form method="POST" class="lift_data_form" name="lift_data_form" enctype="multipart/form-data">
-          <label>~LANG_GUI_LIFT_VALUE~</label>
+          <label>~LANG_GUI_LIFT_VAL~</label>
           <br>
             <div class="switch-field">
               <input type="radio" id="lift-one" name="lift-data" value="1"/>
@@ -153,7 +153,7 @@ String PublicHTML::index() {
       <span class="closeFlowTargetModalButton">&times;</span>
       <div class="align-center">
         <form method="POST" action="/api/saveflowtarget" enctype="multipart/form-data">
-          <label>~LANG_GUI_USER_FLOW_TARGET_VALUE~</label>
+          <label>~LANG_GUI_USER_FLOW_TARGET_VAL~</label>
             <input id="flowTargetValInput" type="text" name="USER_OFFSET" value="~USER_OFFSET~"/>
             <input class="button submit-button" type="submit" value="~LANG_GUI_USER_FLOW_TARGET_SAVE~"/>
           </form>
@@ -569,7 +569,7 @@ String PublicHTML::settings() {
               <div class="config-row"><label class="config-label">~LANG_GUI_BENCH_TYPE~:  </label><span class="config-value" id="BENCH_TYPE">~BENCH_TYPE~</span></div>
               <div class="config-row"><label class="config-label">~LANG_GUI_BOARD_TYPE~:  </label><span class="config-value" id="BOARD_TYPE">~BOARD_TYPE~</span></div>
               <!-- <div class="config-row"><label class="config-label">Boot Time:  </label><span class="config-value" id="BOOT_TIME">~BOOT_TIME~</span></div> -->
-              <h4>~LANG_GUI_SENSOR_CONFIG~</h4>
+              <h4>~LANG_GUI_SENS_CONFIG~</h4>
               <hr>
               <div class="config-row"><label class="config-label">~LANG_GUI_MAF_DATA_FILE~:  </label><span class="config-value" id="MAF_SENSOR"><a href="~MAF_LINK~" target="new">~MAF_SENSOR~</a></span></div>
               <div class="config-row"><label class="config-label">~LANG_GUI_REF_PRESSURE_SENSOR~:  </label><span class="config-value" id="PREF_SENSOR">~PREF_SENSOR~</span></div>
@@ -637,7 +637,7 @@ String PublicHTML::settings() {
               <span>~FLOW_DECIMAL_LENGTH_DROPDOWN~</span>
               <span class="tooltiptext">Number of decimal places used in UI for flow values</span>
             </div>
-            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_FLOW_VALUE_ROUNDING~:</label>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_FLOW_VAL_ROUNDING~:</label>
               <span>~ROUNDING_TYPE_DROPDOWN~</span>
               <span class="tooltiptext">Rounding used in flow calculations</span>
             </div>
@@ -675,7 +675,7 @@ String PublicHTML::settings() {
               </select>
               <span class="tooltiptext">Default data type for data capture.</span>
             </div>
-            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_DATA_GRAPH_MAX_VALUE~:</label>
+            <div class="config-row tooltip"><label class="config-label">~LANG_GUI_DATA_GRAPH_MAX_VAL~:</label>
               <select name='DATAGRAPH_MAX' class='config-select'>
                 <option value='0' ~DATAGRAPH_MAX_0~>~LANG_GUI_AUTO~</option>
                 <option value='1' ~DATAGRAPH_MAX_1~>250 cfm</option>
