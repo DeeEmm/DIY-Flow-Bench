@@ -105,8 +105,11 @@ void DataHandler::begin() {
     if (!SPIFFS.exists("/cal.json")) createCalibrationFile();
 
     // load config / calibration / liftdata files
+    this->initialiseSettings();
     this->loadSettings();
+    
     this->loadLiftData();
+    
     this->loadCalibrationData();
 
 
@@ -369,44 +372,44 @@ void DataHandler::createSettingsFile() {
   _message.serialPrintf("Creating settings.json file... \n"); 
  
   configData["PAGE_TITLE"] = settings.pageTitle;
-  configData["CONF_WIFI_SSID"] = settings.wifi_ssid;
-  configData["CONF_WIFI_PSWD"] = settings.wifi_pswd;
-  configData["CONF_WIFI_AP_SSID"] = settings.wifi_ap_ssid;
-  configData["CONF_WIFI_AP_PSWD"] = settings.wifi_ap_pswd;
-  configData["CONF_HOSTNAME"] = settings.hostname;
-  configData["CONF_WIFI_TIMEOUT"] = settings.wifi_timeout;
-  configData["CONF_MAF_HOUSING_DIAMETER"] = settings.maf_housing_diameter;
-  configData["CONF_REFRESH_RATE"] = settings.refresh_rate;
-  configData["CONF_MIN_BENCH_PRESSURE"] = settings.min_bench_pressure;
-  configData["CONF_MIN_FLOW_RATE"] = settings.min_flow_rate;
-  configData["DATA_FILTER_TYPE"] = settings.data_filter_type;
+  configData["WIFI_SSID"] = settings.wifi_ssid;
+  configData["WIFI_PSWD"] = settings.wifi_pswd;
+  configData["WIFI_AP_SSID"] = settings.wifi_ap_ssid;
+  configData["WIFI_AP_PSWD"] = settings.wifi_ap_pswd;
+  configData["HOSTNAME"] = settings.hostname;
+  configData["WIFI_TIMEOUT"] = settings.wifi_timeout;
+  configData["MAF_HOUSING_DIA"] = settings.maf_housing_diameter;
+  configData["REFRESH_RATE"] = settings.refresh_rate;
+  configData["MIN_BENCH_PRESS"] = settings.min_bench_pressure;
+  configData["MIN_FLOW_RATE"] = settings.min_flow_rate;
+  configData["DATA_FILTER_TYP"] = settings.data_filter_type;
   configData["ROUNDING_TYPE"] = settings.rounding_type;
-  configData["FLOW_DECIMAL_LENGTH"] = settings.flow_decimal_length;
-  configData["GEN_DECIMAL_LENGTH"] = settings.gen_decimal_length;
-  configData["CONF_CYCLIC_AVERAGE_BUFFER"] = settings.cyc_av_buffer;
-  configData["CONF_MAF_MIN_VOLTS"] = settings.maf_min_volts;
-  configData["CONF_API_DELIM"] = settings.api_delim;
-  configData["CONF_SERIAL_BAUD_RATE"] = settings.serial_baud_rate;
-  configData["ADJ_FLOW_DEPRESSION"] = settings.adj_flow_depression;
-  configData["STANDARD_REFERENCE"] = settings.standardReference;
+  configData["FLOW_DECI_ACC"] = settings.flow_decimal_length;
+  configData["GEN_DECI_ACC"] = settings.gen_decimal_length;
+  configData["CYCLIC_AV_BUFF"] = settings.cyc_av_buffer;
+  configData["MAF_MIN_VOLTS"] = settings.maf_min_volts;
+  configData["API_DELIM"] = settings.api_delim;
+  configData["SERIAL_BAUD_RATE"] = settings.serial_baud_rate;
+  configData["ADJ_FLOW_DEP"] = settings.adj_flow_depression;
+  configData["STD_REF"] = settings.standardReference;
   configData["STD_ADJ_FLOW"] = settings.std_adj_flow;
   configData["DATAGRAPH_MAX"] = settings.dataGraphMax;
   configData["TEMP_UNIT"] = settings.temp_unit;
-  configData["VALVE_LIFT_INTERVAL"] = settings.valveLiftInterval;
-  configData["CONF_SHOW_ALARMS"] = settings.show_alarms;
+  configData["LIFT_INTERVAL"] = settings.valveLiftInterval;
+  configData["SHOW_ALARMS"] = settings.show_alarms;
   configData["BENCH_TYPE"] = settings.bench_type;
-  configData["CONF_CAL_FLOW_RATE"] = settings.cal_flow_rate;
-  configData["CONF_CAL_REF_PRESS"] = settings.cal_ref_press;
-  configData["ORIFICE1_FLOW_RATE"] = settings.orificeOneFlow;
-  configData["ORIFICE1_TEST_PRESSURE"] = settings.orificeOneDepression;
-  configData["ORIFICE2_FLOW_RATE"] = settings.orificeTwoFlow;
-  configData["ORIFICE2_TEST_PRESSURE"] = settings.orificeThreeDepression;
-  configData["ORIFICE3_FLOW_RATE"] = settings.orificeThreeFlow;
-  configData["ORIFICE4_FLOW_RATE"] = settings.orificeFourFlow;
-  configData["ORIFICE4_TEST_PRESSURE"] = settings.orificeFourDepression;
-  configData["ORIFICE5_FLOW_RATE"] = settings.orificeFiveFlow;
-  configData["ORIFICE5_TEST_PRESSURE"] = settings.orificeFiveDepression;
-  configData["ORIFICE6_FLOW_RATE"] = settings.orificeSixFlow;
+  configData["CAL_FLOW_RATE"] = settings.cal_flow_rate;
+  configData["CAL_REF_PRESS"] = settings.cal_ref_press;
+  configData["ORIFICE1_FLOW"] = settings.orificeOneFlow;
+  configData["ORIFICE1_PRESS"] = settings.orificeOneDepression;
+  configData["ORIFICE2_FLOW"] = settings.orificeTwoFlow;
+  configData["ORIFICE2_PRESS"] = settings.orificeThreeDepression;
+  configData["ORIFICE3_FLOW"] = settings.orificeThreeFlow;
+  configData["ORIFICE4_FLOW"] = settings.orificeFourFlow;
+  configData["ORIFICE4_PRESS"] = settings.orificeFourDepression;
+  configData["ORIFICE5_FLOW"] = settings.orificeFiveFlow;
+  configData["ORIFICE5_PRESS"] = settings.orificeFiveDepression;
+  configData["ORIFICE6_FLOW"] = settings.orificeSixFlow;
   configData["ORIFICE7_TEST_PRESSURE"] = settings.orificeSixDepression;
 
   serializeJsonPretty(configData, jsonString);
@@ -583,104 +586,8 @@ void DataHandler::beginSerial(void) {
 
 
 /***********************************************************
-* @brief loadConfiguration
-* @details read settings from ESP32 NVM and loads into global struct
-* @note Replaces pre-compile macros in original config.h file
-* @note Preferences Kay can not exceed 15 chars long
-***/ 
-void DataHandler::loadConfig () {
-
-  extern struct Configuration config;
-
-  Messages _message;
-  Preferences _preferences;
-
-  _message.serialPrintf("Loading Configuration \n");    
-  
-  _preferences.begin("config", false);
-
-  config.SD_ENABLED = _preferences.getBool("SD_ENABLED", false);
-  config.MIN_PRESS_PCNT = _preferences.getInt("MIN_PRESS_PCNT", 80);
-  config.PIPE_RAD_FT = _preferences.getDouble("PIPE_RAD_FT", 0.328084);
-
-  config.VCC_3V3_TRIM = _preferences.getDouble("VCC_3V3_TRIM", 0.0);
-  config.VCC_5V_TRIM = _preferences.getDouble("VCC_5V_TRIM", 0.0);
-  config.FIXED_3_3V_VAL = _preferences.getBool("FIXED_3_3V_VAL", true);
-  config.FIXED_5V_VAL = _preferences.getBool("FIXED_5V_VAL", true);
-
-  config.BME280_ENABLED = _preferences.getBool("BME280_ENABLED", true);
-  config.BME280_I2C_ADDR = _preferences.getInt("BME280_I2C_ADDR", 118);
-  config.BME280_SCAN_MS = _preferences.getInt("BME280_SCAN_MS", 1000);
-
-  config.BME680_ENABLED = _preferences.getBool("BME680_ENABLED", false);
-  config.BME680_I2C_ADDR = _preferences.getInt("BME680_I2C_ADDR", 119);
-  config.BME680_SCAN_MS = _preferences.getInt("BME680_SCAN_MS", 1000);
-
-  config.ADC_TYPE = _preferences.getInt("ADC_TYPE", 11);
-  config.ADC_I2C_ADDR = _preferences.getInt("ADC_I2C_ADDR", 72);
-  config.ADC_SCAN_DELAY = _preferences.getInt("ADC_SCAN_DELAY", 1000);
-  config.ADC_MAX_RETRIES  = _preferences.getInt("ADC_MAX_RETRIES", 10);
-  config.ADC_RANGE = _preferences.getInt("ADC_RANGE", 32767);
-  config.ADC_GAIN = _preferences.getDouble("ADC_GAIN", 6.144);
-
-  _message.serialPrintf("loadconfig: config.ADC_I2C_ADDR: %u \n", config.ADC_I2C_ADDR);
-
-  config.MAF_SRC_TYPE = _preferences.getInt("MAF_SRC_TYPE", 11);
-  config.MAF_SENS_TYPE = _preferences.getString("MAF_SENS_TYPE", "not set");
-  config.MAF_MV_TRIM = _preferences.getDouble("MAF_MV_TRIM", 0.0);
-  config.MAF_ADC_CHAN = _preferences.getInt("MAF_ADC_CHAN", 0);
-
-  config.PREF_SENS_TYPE = _preferences.getInt("PREF_SENS_TYPE", 4);
-  config.PREF_SRC_TYPE = _preferences.getInt("PREF_SRC_TYPE", 11);
-  config.FIXED_PREF_VAL = _preferences.getInt("FIXED_PREF_VAL", 1);
-  config.PREF_MV_TRIM = _preferences.getDouble("PREF_MV_TRIM", 0.0);
-  config.PREF_ALOG_SCALE = _preferences.getDouble("PREF_ALOG_SCALE", 1.0);
-  config.PREF_ADC_CHAN = _preferences.getInt("PREF_ADC_CHAN", 1);
-
-  config.PDIFF_SENS_TYPE = _preferences.getInt("PDIFF_SENS_TYPE", 4);
-  config.PDIFF_SRC_TYPE = _preferences.getInt("PDIFF_SRC_TYPE", 11);
-  config.FIXED_PDIFF_VAL = _preferences.getInt("FIXED_PDIFF_VAL", 1);
-  config.PDIFF_MV_TRIM = _preferences.getDouble("PDIFF_MV_TRIM", 0.0);
-  config.PDIFF_SCALE = _preferences.getDouble("PDIFF_SCALE", 1.0);
-  config.PDIFF_ADC_CHAN = _preferences.getInt("PDIFF_ADC_CHAN", 2);
- 
-  config.PITOT_SENS_TYPE = _preferences.getInt("PITOT_SENS_TYPE", SENSOR_DISABLED);
-  config.PITOT_SRC_TYPE = _preferences.getInt("PITOT_SRC_TYPE", 11);
-  config.PITOT_MV_TRIM = _preferences.getDouble("PITOT_MV_TRIM", 0.0);
-  config.PITOT_SCALE = _preferences.getDouble("PITOT_SCALE", 1.0);
-  config.PITOT_ADC_CHAN = _preferences.getInt("PITOT_ADC_CHAN", 3);
-
-  config.BARO_SENS_TYPE = _preferences.getInt("BARO_SENS_TYPE", BOSCH_BME280);
-  config.FIXED_BARO_VAL = _preferences.getDouble("FIXED_BARO_VAL", 101.3529);
-  config.BARO_ALOG_SCALE =_preferences.getDouble("BARO_ALOG_SCALE", 1.0);
-  config.BARO_MV_TRIM = _preferences.getDouble("BARO_MV_TRIM", 1.0);
-  config.BARO_FINE_TUNE = _preferences.getDouble("BARO_FINE_TUNE", 1.0);
-  config.BARO_SCALE = _preferences.getDouble("BARO_SCALE", 100);
-  config.BARO_OFFSET = _preferences.getDouble("BARO_OFFSET", 100);
-  config.SEALEVEL_PRESS = _preferences.getDouble("SEALEVEL_PRESS", 1016.90);
-  config.BARO_ADC_CHAN = _preferences.getInt("BARO_ADC_CHAN", 4);
-
-  config.TEMP_SENS_TYPE = _preferences.getInt("TEMP_SENS_TYPE", BOSCH_BME280);
-  config.FIXED_TEMP_VAL = _preferences.getDouble("FIXED_TEMP_VAL", 21.0);
-  config.TEMP_ALOG_SCALE = _preferences.getDouble("TEMP_ALOG_SCALE", 1.0);
-  config.TEMP_MV_TRIM = _preferences.getDouble("TEMP_MV_TRIM", 0.0);
-  config.TEMP_FINE_TUNE = _preferences.getDouble("TEMP_FINE_TUNE", 0.0);
-
-  config.RELH_SENS_TYPE = _preferences.getInt("RELH_SENS_TYPE", BOSCH_BME280);
-  config.FIXED_RELH_VAL = _preferences.getDouble("FIXED_RELH_VAL", 36.0);
-  config.RELH_ALOG_SCALE = _preferences.getDouble("RELH_ALOG_SCALE", 1.0);
-  config.RELH_MV_TRIM = _preferences.getDouble("RELH_MV_TRIM", 0.0);
-  config.RELH_FINE_TUNE = _preferences.getDouble("RELH_FINE_TUNE", 0.0);
-  config.SWIRL_ENABLED = _preferences.getBool("SWIRL_ENABLED", false);
-
-  _preferences.end();
-}
-
-
-
-/***********************************************************
-* @brief loadConfiguration
-* @details Read settings from NVM and load into global structs
+* @brief initaliseConfiguration
+* @details define settings in NVM
 * @note Replaces pre-compile macros in original config.h file
 * @note Preferences Key can not exceed 15 chars long
 ***/ 
@@ -691,15 +598,17 @@ void DataHandler::initialiseConfig () {
   Messages _message;
   Preferences _preferences;
 
-  _message.serialPrintf("Initialising Configuration \n");    
-
   _preferences.begin("config", false);
 
-  // _preferences.clear();
+  if (_preferences.isKey("SWIRL_ENABLED")) { // we've already initialised _preferences
+    _preferences.end();
+    return;
+  }
 
-  // _preferences.remove("ADC_I2C_ADDR");
-  _preferences.remove("FIXED_5V_VAL");
-  _preferences.remove("FIXED_3_3V_VAL");
+  _message.serialPrintf("Initialising Configuration \n");    
+
+  // _preferences.clear(); // completely remove namepace
+  // _preferences.remove("ADC_I2C_ADDR"); // remove individual key
 
   if (!_preferences.isKey("SD_ENABLED")) _preferences.putBool("SD_ENABLED", false);
   if (!_preferences.isKey("MIN_PRESS_PCNT")) _preferences.putInt("MIN_PRESS_PCNT", 80);
@@ -781,115 +690,174 @@ void DataHandler::initialiseConfig () {
 
 
 
+/***********************************************************
+* @brief loadConfiguration
+* @details read settings from ESP32 NVM and loads into global struct
+* @note Replaces pre-compile macros in original config.h file
+* @note Preferences Kay can not exceed 15 chars long
+***/ 
+void DataHandler::loadConfig () {
 
+  extern struct Configuration config;
 
+  Messages _message;
+  Preferences _preferences;
 
-// /***********************************************************
-// * @brief loadConfiguration
-// * @details read settings from config.json file and loads into global struct
-// * @note Repalces original config.h file
-// ***/ 
-// StaticJsonDocument<CONFIG_JSON_SIZE> DataHandler::loadConfiguration () {
-
-//   extern struct Configuration config;
-//   extern struct DeviceStatus status;
-
-//   StaticJsonDocument<CONFIG_JSON_SIZE> configurationJSON;
-
-//   Messages _message;
-
-//   _message.serialPrintf("Loading Configuration \n");     
-
-//   if (SPIFFS.exists("/configuration.json"))  {
-
-//     configurationJSON = loadJSONFile("/configuration.json");
-
-//     // TEST print configuration.json
-//     // serializeJsonPretty(configurationJSON, Serial);
-
-//     // strcpy(config.wifi_ssid, configurationJSON["CONF_WIFI_SSID"]);
-//     // strcpy(config.wifi_pswd, configurationJSON["CONF_WIFI_PSWD"]);
-//     // config.orificeSixDepression = configurationJSON["ORIFICE6_TEST_PRESSURE"].as<double>();
-
-//     config.SD_ENABLED = configurationJSON["SD_ENABLED"].as<bool>();
-//     config.MIN_PRESS_PCNT = configurationJSON["MIN_PRESS_PCNT"].as<int>();
-//     config.PIPE_RAD_FT = configurationJSON["PIPE_RAD_FT"].as<int>();
-
-//     config.VCC_3V3_TRIM = configurationJSON["VCC_3V3_TRIM"].as<int>();
-//     config.VCC_5V_TRIM = configurationJSON["VCC_5V_TRIM"].as<int>();
-//     config.FIXED_3_3V_VAL =  configurationJSON["FIXED_3_3V_VAL"].as<bool>();
-//     config.FIXED_5V_VAL = configurationJSON["FIXED_5V_VAL"].as<bool>();
-
-//     config.BME280_ENABLED = configurationJSON["BME280_ENABLED"].as<bool>();
-//     config.BME280_I2C_ADDR = configurationJSON["BME280_I2C_ADDR"];
-//     config.BME280_SCAN_MS =  configurationJSON["BME280_SCAN_MS"].as<int>();
-
-//     config.BME680_ENABLED = configurationJSON["BME680_ENABLED"].as<bool>();
-//     config.BME680_I2C_ADDR = configurationJSON["BME680_I2C_ADDR"];
-//     config.BME680_SCAN_MS =  configurationJSON["BME680_SCAN_MS"].as<int>();
-
-//     config.ADC_TYPE =  configurationJSON["ADC_TYPE"].as<int>();
-//     config.ADC_I2C_ADDR = configurationJSON["ADC_I2C_ADDR"].as<int>();
-//     config.ADC_SCAN_DELAY = configurationJSON["ADC_SCAN_DELAY"].as<bool>();
-//     config.ADC_MAX_RETRIES  =  configurationJSON["ADC_MAX_RETRIES"].as<int>();
-//     config.ADC_MAX_RETRIES = configurationJSON["ADC_MAX_RETRIES"].as<int>();
-//     config.ADC_RANGE = configurationJSON["ADC_RANGE"].as<int>();
-//     config.ADC_GAIN = configurationJSON["ADC_GAIN"].as<int>();
-    
-//     config.MAF_SRC_TYPE =  configurationJSON["MAF_SRC_TYPE"].as<int>();
-//     config.MAF_MV_TRIM = configurationJSON["MAF_MV_TRIM"].as<int>();
-//     config.MAF_ADC_CHAN = configurationJSON["MAF_ADC_CHAN"].as<int>();
-
-//     config.PREF_SENS_TYPE = configurationJSON["PREF_SENS_TYPE"].as<int>();
-//     config.FIXED_PREF_VAL = configurationJSON["FIXED_PREF_VAL"].as<bool>();
-//     config.PREF_MV_TRIM = configurationJSON["PREF_MV_TRIM"].as<int>();
-//     config.PREF_ALOG_SCALE = configurationJSON["PREF_ALOG_SCALE"].as<double>();
-//     config.PREF_ADC_CHAN = configurationJSON["PREF_ADC_CHAN"].as<int>();
-
-//     config.PDIFF_SENS_TYPE = configurationJSON["PDIFF_SENS_TYPE"].as<int>();
-//     config.FIXED_PDIFF_VAL = configurationJSON["FIXED_PDIFF_VAL"].as<int>();
-//     config.PDIFF_MV_TRIM = configurationJSON["PDIFF_MV_TRIM"].as<int>();
-//     config.PDIFF_SCALE = configurationJSON["PDIFF_SCALE"].as<double>();
-//     config.PDIFF_ADC_CHAN = configurationJSON["PDIFF_ADC_CHAN"].as<int>();
-
-//     config.PITOT_SENS_TYPE =  configurationJSON["PITOT_SENS_TYPE"].as<int>();
-//     config.PITOT_MV_TRIM = configurationJSON["PITOT_MV_TRIM"].as<int>();
-//     config.PITOT_SCALE = configurationJSON["PITOT_SCALE"].as<double>();
-//     config.PITOT_ADC_CHAN = configurationJSON["PITOT_ADC_CHAN"].as<int>();
-
-//     config.BARO_SENS_TYPE = configurationJSON["BARO_SENS_TYPE"];
-//     config.FIXED_BARO_VAL = configurationJSON["FIXED_BARO_VAL"].as<double>();
-//     config.BARO_ALOG_SCALE = configurationJSON["BARO_ALOG_SCALE"].as<double>();
-//     config.BARO_MV_TRIM = configurationJSON["BARO_MV_TRIM"].as<int>();
-//     config.BARO_FINE_TUNE = configurationJSON["BARO_FINE_TUNE"].as<double>();
-//     config.BARO_SCALE = configurationJSON["BARO_SCALE"].as<double>();
-//     config.BARO_OFFSET = configurationJSON["BARO_OFFSET"].as<double>();
-//     config.SEALEVEL_PRESS = configurationJSON["SEALEVEL_PRESS"].as<double>();
-
-//     config.TEMP_SENS_TYPE = configurationJSON["TEMP_SENS_TYPE"];
-//     config.FIXED_TEMP_VAL = configurationJSON["FIXED_TEMP_VAL"].as<double>();
-//     config.TEMP_ALOG_SCALE = configurationJSON["TEMP_ALOG_SCALE"].as<double>();
-//     config.TEMP_MV_TRIM = configurationJSON["TEMP_MV_TRIM"].as<int>();
-//     config.TEMP_FINE_TUNE = configurationJSON["TEMP_FINE_TUNE"].as<double>();
-
-//     config.RELH_SENS_TYPE = int(configurationJSON["RELH_SENS_TYPE"]);
-//     config.FIXED_RELH_VAL = configurationJSON["FIXED_RELH_VAL"].as<double>();
-//     config.RELH_ALOG_SCALE = configurationJSON["RELH_ALOG_SCALE"].as<double>();
-//     config.RELH_FINE_TUNE = configurationJSON["RELH_FINE_TUNE"].as<double>();
-
-//     config.SWIRL_ENABLED = configurationJSON["SWIRL_ENABLED"].as<bool>();
-    
-//     // config.PLACEHOLDER = configurationJSON["PLACEHOLDER"])
-
-//     status.configLoaded = true;
-
-//   } else {
-//     _message.serialPrintf("Configuration file not found \n");
-//   }
+  _message.serialPrintf("Loading Configuration \n");    
   
-//   return configurationJSON;  
+  _preferences.begin("config", false);
 
-// }
+  config.SD_ENABLED = _preferences.getBool("SD_ENABLED", false);
+  config.MIN_PRESS_PCNT = _preferences.getInt("MIN_PRESS_PCNT", 80);
+  config.PIPE_RAD_FT = _preferences.getDouble("PIPE_RAD_FT", 0.328084);
+
+  config.VCC_3V3_TRIM = _preferences.getDouble("VCC_3V3_TRIM", 0.0);
+  config.VCC_5V_TRIM = _preferences.getDouble("VCC_5V_TRIM", 0.0);
+  config.FIXED_3_3V_VAL = _preferences.getBool("FIXED_3_3V_VAL", true);
+  config.FIXED_5V_VAL = _preferences.getBool("FIXED_5V_VAL", true);
+
+  config.BME280_ENABLED = _preferences.getBool("BME280_ENABLED", true);
+  config.BME280_I2C_ADDR = _preferences.getInt("BME280_I2C_ADDR", 118);
+  config.BME280_SCAN_MS = _preferences.getInt("BME280_SCAN_MS", 1000);
+
+  config.BME680_ENABLED = _preferences.getBool("BME680_ENABLED", false);
+  config.BME680_I2C_ADDR = _preferences.getInt("BME680_I2C_ADDR", 119);
+  config.BME680_SCAN_MS = _preferences.getInt("BME680_SCAN_MS", 1000);
+
+  config.ADC_TYPE = _preferences.getInt("ADC_TYPE", 11);
+  config.ADC_I2C_ADDR = _preferences.getInt("ADC_I2C_ADDR", 72);
+  config.ADC_SCAN_DELAY = _preferences.getInt("ADC_SCAN_DELAY", 1000);
+  config.ADC_MAX_RETRIES  = _preferences.getInt("ADC_MAX_RETRIES", 10);
+  config.ADC_RANGE = _preferences.getInt("ADC_RANGE", 32767);
+  config.ADC_GAIN = _preferences.getDouble("ADC_GAIN", 6.144);
+
+  config.MAF_SRC_TYPE = _preferences.getInt("MAF_SRC_TYPE", 11);
+  config.MAF_SENS_TYPE = _preferences.getString("MAF_SENS_TYPE", "not set");
+  config.MAF_MV_TRIM = _preferences.getDouble("MAF_MV_TRIM", 0.0);
+  config.MAF_ADC_CHAN = _preferences.getInt("MAF_ADC_CHAN", 0);
+
+  config.PREF_SENS_TYPE = _preferences.getInt("PREF_SENS_TYPE", 4);
+  config.PREF_SRC_TYPE = _preferences.getInt("PREF_SRC_TYPE", 11);
+  config.FIXED_PREF_VAL = _preferences.getInt("FIXED_PREF_VAL", 1);
+  config.PREF_MV_TRIM = _preferences.getDouble("PREF_MV_TRIM", 0.0);
+  config.PREF_ALOG_SCALE = _preferences.getDouble("PREF_ALOG_SCALE", 1.0);
+  config.PREF_ADC_CHAN = _preferences.getInt("PREF_ADC_CHAN", 1);
+
+  config.PDIFF_SENS_TYPE = _preferences.getInt("PDIFF_SENS_TYPE", 4);
+  config.PDIFF_SRC_TYPE = _preferences.getInt("PDIFF_SRC_TYPE", 11);
+  config.FIXED_PDIFF_VAL = _preferences.getInt("FIXED_PDIFF_VAL", 1);
+  config.PDIFF_MV_TRIM = _preferences.getDouble("PDIFF_MV_TRIM", 0.0);
+  config.PDIFF_SCALE = _preferences.getDouble("PDIFF_SCALE", 1.0);
+  config.PDIFF_ADC_CHAN = _preferences.getInt("PDIFF_ADC_CHAN", 2);
+ 
+  config.PITOT_SENS_TYPE = _preferences.getInt("PITOT_SENS_TYPE", SENSOR_DISABLED);
+  config.PITOT_SRC_TYPE = _preferences.getInt("PITOT_SRC_TYPE", 11);
+  config.PITOT_MV_TRIM = _preferences.getDouble("PITOT_MV_TRIM", 0.0);
+  config.PITOT_SCALE = _preferences.getDouble("PITOT_SCALE", 1.0);
+  config.PITOT_ADC_CHAN = _preferences.getInt("PITOT_ADC_CHAN", 3);
+
+  config.BARO_SENS_TYPE = _preferences.getInt("BARO_SENS_TYPE", BOSCH_BME280);
+  config.FIXED_BARO_VAL = _preferences.getDouble("FIXED_BARO_VAL", 101.3529);
+  config.BARO_ALOG_SCALE =_preferences.getDouble("BARO_ALOG_SCALE", 1.0);
+  config.BARO_MV_TRIM = _preferences.getDouble("BARO_MV_TRIM", 1.0);
+  config.BARO_FINE_TUNE = _preferences.getDouble("BARO_FINE_TUNE", 1.0);
+  config.BARO_SCALE = _preferences.getDouble("BARO_SCALE", 100);
+  config.BARO_OFFSET = _preferences.getDouble("BARO_OFFSET", 100);
+  config.SEALEVEL_PRESS = _preferences.getDouble("SEALEVEL_PRESS", 1016.90);
+  config.BARO_ADC_CHAN = _preferences.getInt("BARO_ADC_CHAN", 4);
+
+  config.TEMP_SENS_TYPE = _preferences.getInt("TEMP_SENS_TYPE", BOSCH_BME280);
+  config.FIXED_TEMP_VAL = _preferences.getDouble("FIXED_TEMP_VAL", 21.0);
+  config.TEMP_ALOG_SCALE = _preferences.getDouble("TEMP_ALOG_SCALE", 1.0);
+  config.TEMP_MV_TRIM = _preferences.getDouble("TEMP_MV_TRIM", 0.0);
+  config.TEMP_FINE_TUNE = _preferences.getDouble("TEMP_FINE_TUNE", 0.0);
+
+  config.RELH_SENS_TYPE = _preferences.getInt("RELH_SENS_TYPE", BOSCH_BME280);
+  config.FIXED_RELH_VAL = _preferences.getDouble("FIXED_RELH_VAL", 36.0);
+  config.RELH_ALOG_SCALE = _preferences.getDouble("RELH_ALOG_SCALE", 1.0);
+  config.RELH_MV_TRIM = _preferences.getDouble("RELH_MV_TRIM", 0.0);
+  config.RELH_FINE_TUNE = _preferences.getDouble("RELH_FINE_TUNE", 0.0);
+  config.SWIRL_ENABLED = _preferences.getBool("SWIRL_ENABLED", false);
+
+  _preferences.end();
+}
+
+
+
+
+
+
+
+
+
+
+/***********************************************************
+* @brief initialiseSettings
+* @note Ket must be 15 chars or shorter.
+***/ 
+void DataHandler::initialiseSettings () {
+
+  extern struct BenchSettings settings;
+
+  DataHandler _data;
+  Messages _message;
+  Preferences _preferences;
+
+  _message.serialPrintf("Loading Bench Settings \n");    
+  
+  _preferences.begin("settings", false);
+
+  if (!_preferences.isKey("WIFI_SSID")) _preferences.putString("WIFI_SSID", "WIFI-SSID");
+  if (!_preferences.isKey("WIFI_PSWD")) _preferences.putString("WIFI_PSWD", static_cast<String>("PASSWORD"));
+  if (!_preferences.isKey("WIFI_AP_SSID")) _preferences.putString("WIFI_AP_SSID", static_cast<String>("DIYFB"));
+  if (!_preferences.isKey("WIFI_AP_PSWD")) _preferences.putString("WIFI_AP_PSWD", static_cast<String>("123456789"));
+  if (!_preferences.isKey("HOSTNAME")) _preferences.putString("HOSTNAME", static_cast<String>("diyfb"));
+
+  if (!_preferences.isKey("WIFI_TIMEOUT")) _preferences.putInt("WIFI_TIMEOUT", 4000);
+  if (!_preferences.isKey("MAF_HOUSING_DIA")) _preferences.putInt("MAF_HOUSING_DIA", 0);
+  if (!_preferences.isKey("REFRESH_RATE")) _preferences.putInt("REFRESH_RATE", 500);
+  if (!_preferences.isKey("MIN_BENCH_PRESS")) _preferences.putInt("MIN_BENCH_PRESS", 1);
+  if (!_preferences.isKey("MIN_FLOW_RATE")) _preferences.putInt("MIN_FLOW_RATE", 1);
+
+  if (!_preferences.isKey("DATA_FILTER_TYP")) _preferences.putString("DATA_FILTER_TYP", static_cast<String>("NONE"));
+  if (!_preferences.isKey("ROUNDING_TYPE")) _preferences.putString("ROUNDING_TYPE", static_cast<String>("NONE"));
+
+  if (!_preferences.isKey("FLOW_DECI_ACC")) _preferences.putInt("FLOW_DECI_ACC", 1);
+  if (!_preferences.isKey("GEN_DECI_ACC")) _preferences.putInt("GEN_DECI_ACC", 2);
+  if (!_preferences.isKey("CYCLIC_AV_BUFF")) _preferences.putInt("CYCLIC_AV_BUFF", 5);
+  if (!_preferences.isKey("MAF_MIN_VOLTS")) _preferences.putInt("MAF_MIN_VOLTS", 1);
+
+  if (!_preferences.isKey("API_DELIM")) _preferences.putString("API_DELIM", ":");
+  if (!_preferences.isKey("SERIAL_BAUD_RATE")) _preferences.putInt("SERIAL_BAUD_RATE", 115200);
+  if (!_preferences.isKey("SHOW_ALARMS")) _preferences.putInt("SHOW_ALARMS", true);
+  if (!_preferences.isKey("ADJ_FLOW_DEP")) _preferences.putInt("ADJ_FLOW_DEP", 28);
+  if (!_preferences.isKey("STD_REF")) _preferences.putInt("STD_REF", 1);
+  if (!_preferences.isKey("STD_ADJ_FLOW")) _preferences.putInt("STD_ADJ_FLOW", 0);
+  if (!_preferences.isKey("DATAGRAPH_MAX")) _preferences.putInt("DATAGRAPH_MAX", 0);
+  if (!_preferences.isKey("MAF_MIN_VOLTS")) _preferences.putInt("MAF_MIN_VOLTS", 1);
+  if (!_preferences.isKey("TEMP_UNIT")) _preferences.putString("TEMP_UNIT", "Celcius");
+
+  if (!_preferences.isKey("LIFT_INTERVAL")) _preferences.putDouble("LIFT_INTERVAL", 1.5F);
+  if (!_preferences.isKey("BENCH_TYPE")) _preferences.putInt("BENCH_TYPE", MAF);
+  if (!_preferences.isKey("CAL_FLOW_RATE")) _preferences.putDouble("CAL_FLOW_RATE", 14.4F);
+  if (!_preferences.isKey("CAL_REF_PRESS")) _preferences.putDouble("CAL_REF_PRESS", 10.0F);
+  if (!_preferences.isKey("ORIFICE1_FLOW")) _preferences.putDouble("ORIFICE1_FLOW", 0.0F);
+  if (!_preferences.isKey("ORIFICE1_PRESS")) _preferences.putDouble("ORIFICE1_PRESS", 0.0F);
+  if (!_preferences.isKey("ORIFICE2_FLOW")) _preferences.putDouble("ORIFICE2_FLOW", 0.0F);
+  if (!_preferences.isKey("ORIFICE2_PRESS")) _preferences.putDouble("ORIFICE2_PRESS", 0.0F);
+  if (!_preferences.isKey("ORIFICE3_FLOW")) _preferences.putDouble("ORIFICE3_FLOW", 0.0F);
+  if (!_preferences.isKey("ORIFICE3_PRESS")) _preferences.putDouble("ORIFICE3_PRESS", 0.0F);
+  if (!_preferences.isKey("ORIFICE4_FLOW")) _preferences.putDouble("ORIFICE4_FLOW", 0.0F);
+  if (!_preferences.isKey("ORIFICE4_PRESS")) _preferences.putDouble("ORIFICE4_PRESS", 0.0F);
+  if (!_preferences.isKey("ORIFICE5_FLOW")) _preferences.putDouble("ORIFICE5_FLOW", 0.0F);
+  if (!_preferences.isKey("ORIFICE5_PRESS")) _preferences.putDouble("ORIFICE5_PRESS", 0.0F);
+  if (!_preferences.isKey("ORIFICE6_FLOW")) _preferences.putDouble("ORIFICE6_FLOW", 0.0F);
+  if (!_preferences.isKey("ORIFICE6_PRESS")) _preferences.putDouble("ORIFICE6_PRESS", 0.0F);
+
+  _preferences.end();
+
+}
+
 
 
 
@@ -904,68 +872,136 @@ void DataHandler::initialiseConfig () {
 * @brief loadSettings
 * @details read settings settings.json file and loads into global struct
 ***/ 
-StaticJsonDocument<SETTINGS_JSON_SIZE> DataHandler::loadSettings () {
+void DataHandler::loadSettings () {
 
   extern struct BenchSettings settings;
 
-  StaticJsonDocument<SETTINGS_JSON_SIZE> configData;
   DataHandler _data;
   Messages _message;
+  Preferences _preferences;
 
-  _message.serialPrintf("Loading Bench Settings \n");     
-
-  if (SPIFFS.exists("/settings.json"))  {
-
-    configData = _data.loadJSONFile("/settings.json");
-
-    strcpy(settings.wifi_ssid, configData["CONF_WIFI_SSID"]);
-    strcpy(settings.wifi_pswd, configData["CONF_WIFI_PSWD"]);
-    strcpy(settings.wifi_ap_ssid, configData["CONF_WIFI_AP_SSID"]);
-    strcpy(settings.wifi_ap_pswd,configData["CONF_WIFI_AP_PSWD"]);
-    strcpy(settings.hostname, configData["CONF_HOSTNAME"]);
-    settings.wifi_timeout = configData["CONF_WIFI_TIMEOUT"].as<int>();
-    settings.maf_housing_diameter = configData["CONF_MAF_HOUSING_DIAMETER"].as<int>();
-    settings.refresh_rate = configData["CONF_REFRESH_RATE"].as<int>();
-    settings.min_bench_pressure  = configData["CONF_MIN_BENCH_PRESSURE"].as<int>();
-    settings.min_flow_rate = configData["CONF_MIN_FLOW_RATE"].as<int>();
-    strcpy(settings.data_filter_type, configData["DATA_FILTER_TYPE"]);
-    strcpy(settings.rounding_type, configData["ROUNDING_TYPE"]);
-    settings.flow_decimal_length, configData["FLOW_DECIMAL_LENGTH"];
-    settings.gen_decimal_length, configData["GEN_DECIMAL_LENGTH"];
-    settings.cyc_av_buffer  = configData["CONF_CYCLIC_AVERAGE_BUFFER"].as<int>();
-    settings.maf_min_volts  = configData["CONF_MAF_MIN_VOLTS"].as<int>();
-    strcpy(settings.api_delim, configData["CONF_API_DELIM"]);
-    settings.serial_baud_rate = configData["CONF_SERIAL_BAUD_RATE"].as<long>();
-    settings.show_alarms = configData["CONF_SHOW_ALARMS"].as<bool>();
-    configData["ADJ_FLOW_DEPRESSION"] = settings.adj_flow_depression;
-    configData["STANDARD_REFERENCE"] = settings.standardReference;
-    configData["STD_ADJ_FLOW"] = settings.std_adj_flow;
-    configData["DATAGRAPH_MAX"] = settings.dataGraphMax;
-    configData["TEMP_UNIT"] = settings.temp_unit;
-    configData["VALVE_LIFT_INTERVAL"] = settings.valveLiftInterval;
-    strcpy(settings.bench_type, configData["BENCH_TYPE"]);
-    settings.cal_flow_rate = configData["CONF_CAL_FLOW_RATE"].as<double>();
-    settings.cal_ref_press = configData["CONF_CAL_REF_PRESS"].as<double>();
-    settings.orificeOneFlow = configData["ORIFICE1_FLOW_RATE"].as<double>();
-    settings.orificeOneDepression = configData["ORIFICE1_TEST_PRESSURE"].as<double>();
-    settings.orificeTwoFlow = configData["ORIFICE2_FLOW_RATE"].as<double>();
-    settings.orificeTwoDepression = configData["ORIFICE2_TEST_PRESSURE"].as<double>();
-    settings.orificeThreeFlow = configData["ORIFICE3_FLOW_RATE"].as<double>();
-    settings.orificeThreeDepression = configData["ORIFICE3_TEST_PRESSURE"].as<double>();
-    settings.orificeFourFlow = configData["ORIFICE4_FLOW_RATE"].as<double>();
-    settings.orificeFourDepression = configData["ORIFICE4_TEST_PRESSURE"].as<double>();
-    settings.orificeFiveFlow = configData["ORIFICE5_FLOW_RATE"].as<double>();
-    settings.orificeFiveDepression = configData["ORIFICE5_TEST_PRESSURE"].as<double>();
-    settings.orificeSixFlow = configData["ORIFICE6_FLOW_RATE"].as<double>();
-    settings.orificeSixDepression = configData["ORIFICE6_TEST_PRESSURE"].as<double>();
-
-  } else {
-    _message.serialPrintf("Bench Settings file not found \n");
-  }
+  _message.serialPrintf("Loading Configuration \n");    
   
-  return configData;  
+  _preferences.begin("settings", false);
+
+
+  // strcpy(_preferences.getString("WIFI_SSID", "WIFI-SSID" ).toCharArray(), settings.wifi_ssid);
+  settings.wifi_ssid = _preferences.getString("WIFI_SSID", "WIFI-SSID");
+  settings.wifi_pswd = _preferences.getString("WIFI_PSWD", "PASSWORD");
+  settings.wifi_ap_ssid = _preferences.getString("WIFI_AP_SSID", "DIYFB" );
+  settings.wifi_ap_pswd =_preferences.getString("WIFI_AP_PSWD", "123456789" );
+  settings.hostname = _preferences.getString("HOSTNAME", "diyfb" );
+  settings.wifi_timeout = _preferences.getInt("WIFI_TIMEOUT", 4000 );
+  settings.maf_housing_diameter = _preferences.getInt("MAF_HOUSING_DIA", 0 );
+  settings.refresh_rate = _preferences.getInt("REFRESH_RATE", 500 );
+  settings.min_bench_pressure  = _preferences.getInt("MIN_BENCH_PRESS", 1 );
+  settings.min_flow_rate = _preferences.getInt("MIN_FLOW_RATE", 1 );
+  settings.data_filter_type = _preferences.getString("DATA_FILTER_TYP", "NONE" );
+  settings.rounding_type = _preferences.getString("ROUNDING_TYPE", "NONE" );
+  settings.flow_decimal_length = _preferences.getInt("FLOW_DECI_ACC", 1 );
+  settings.gen_decimal_length = _preferences.getInt("GEN_DECI_ACC", 2 );
+  settings.cyc_av_buffer  = _preferences.getInt("CYCLIC_AV_BUFF", 5 );
+  settings.maf_min_volts  = _preferences.getInt("MAF_MIN_VOLTS", 0.1F );
+  settings.api_delim = _preferences.getString("API_DELIM", ":" );
+  settings.serial_baud_rate = _preferences.getInt("SERIAL_BAUD_RATE",  115200 );
+  settings.show_alarms = _preferences.getInt("SHOW_ALARMS",  true  );
+  settings.adj_flow_depression = _preferences.getInt("ADJ_FLOW_DEP",  28  );
+  settings.standardReference = _preferences.getInt("STD_REF", 1  );
+  settings.std_adj_flow = _preferences.getInt("STD_ADJ_FLOW",  0 );
+  settings.dataGraphMax = _preferences.getInt("DATAGRAPH_MAX", 0 );
+  settings.temp_unit = _preferences.getString("TEMP_UNIT", "Celcius" );
+  settings.valveLiftInterval = _preferences.getDouble("LIFT_INTERVAL", 1.5F  );
+  settings.bench_type = _preferences.getInt("BENCH_TYPE", MAF );
+  settings.cal_flow_rate = _preferences.getDouble("CAL_FLOW_RATE", 14.4F );
+  settings.cal_ref_press = _preferences.getDouble("CAL_REF_PRESS", 10.0F );
+  settings.orificeOneFlow = _preferences.getDouble("ORIFICE1_FLOW", 0.0F );
+  settings.orificeOneDepression = _preferences.getDouble("ORIFICE1_PRESS", 0.0F );
+  settings.orificeTwoFlow = _preferences.getDouble("ORIFICE2_FLOW", 0.0F );
+  settings.orificeTwoDepression = _preferences.getDouble("ORIFICE2_PRESS", 0.0F );
+  settings.orificeThreeFlow = _preferences.getDouble("ORIFICE3_FLOW", 0.0F );
+  settings.orificeThreeDepression = _preferences.getDouble("ORIFICE3_PRESS", 0.0F );
+  settings.orificeFourFlow = _preferences.getDouble("ORIFICE4_FLOW", 0.0F );
+  settings.orificeFourDepression = _preferences.getDouble("ORIFICE4_PRESS", 0.0F );
+  settings.orificeFiveFlow = _preferences.getDouble("ORIFICE5_FLOW", 0.0F );
+  settings.orificeFiveDepression = _preferences.getDouble("ORIFICE5_PRESS", 0.0F );
+  settings.orificeSixFlow = _preferences.getDouble("ORIFICE6_FLOW", 0.0F );
+  settings.orificeSixDepression = _preferences.getDouble("ORIFICE6_PRESS",  0.0F);
+
+  _preferences.end();
 
 }
+
+
+
+
+
+
+// /***********************************************************
+// * @brief loadSettings
+// * @details read settings settings.json file and loads into global struct
+// ***/ 
+// StaticJsonDocument<SETTINGS_JSON_SIZE> DataHandler::loadSettings () {
+
+//   extern struct BenchSettings settings;
+
+//   StaticJsonDocument<SETTINGS_JSON_SIZE> configData;
+//   DataHandler _data;
+//   Messages _message;
+
+//   _message.serialPrintf("Loading Bench Settings \n");     
+
+//   if (SPIFFS.exists("/settings.json"))  {
+
+//     configData = _data.loadJSONFile("/settings.json");
+
+//     strcpy(settings.wifi_ssid, configData["WIFI_SSID"]);
+//     strcpy(settings.wifi_pswd, configData["WIFI_PSWD"]);
+//     strcpy(settings.wifi_ap_ssid, configData["WIFI_AP_SSID"]);
+//     strcpy(settings.wifi_ap_pswd,configData["WIFI_AP_PSWD"]);
+//     strcpy(settings.hostname, configData["HOSTNAME"]);
+//     settings.wifi_timeout = configData["WIFI_TIMEOUT"].as<int>();
+//     settings.maf_housing_diameter = configData["MAF_HOUSING_DIA"].as<int>();
+//     settings.refresh_rate = configData["REFRESH_RATE"].as<int>();
+//     settings.min_bench_pressure  = configData["MIN_BENCH_PRESS"].as<int>();
+//     settings.min_flow_rate = configData["MIN_FLOW_RATE"].as<int>();
+//     strcpy(settings.data_filter_type, configData["DATA_FILTER_TYP"]);
+//     strcpy(settings.rounding_type, configData["ROUNDING_TYPE"]);
+//     settings.flow_decimal_length, configData["FLOW_DECI_ACC"];
+//     settings.gen_decimal_length, configData["GEN_DECI_ACC"];
+//     settings.cyc_av_buffer  = configData["CYCLIC_AV_BUFF"].as<int>();
+//     settings.maf_min_volts  = configData["MAF_MIN_VOLTS"].as<int>();
+//     strcpy(settings.api_delim, configData["API_DELIM"]);
+//     settings.serial_baud_rate = configData["SERIAL_BAUD_RATE"].as<long>();
+//     settings.show_alarms = configData["SHOW_ALARMS"].as<bool>();
+//     configData["ADJ_FLOW_DEP"] = settings.adj_flow_depression;
+//     configData["STD_REF"] = settings.standardReference;
+//     configData["STD_ADJ_FLOW"] = settings.std_adj_flow;
+//     configData["DATAGRAPH_MAX"] = settings.dataGraphMax;
+//     configData["TEMP_UNIT"] = settings.temp_unit;
+//     configData["LIFT_INTERVAL"] = settings.valveLiftInterval;
+//     strcpy(settings.bench_type, configData["BENCH_TYPE"]);
+//     settings.cal_flow_rate = configData["CAL_FLOW_RATE"].as<double>();
+//     settings.cal_ref_press = configData["CAL_REF_PRESS"].as<double>();
+//     settings.orificeOneFlow = configData["ORIFICE1_FLOW"].as<double>();
+//     settings.orificeOneDepression = configData["ORIFICE1_PRESS"].as<double>();
+//     settings.orificeTwoFlow = configData["ORIFICE2_FLOW"].as<double>();
+//     settings.orificeTwoDepression = configData["ORIFICE2_PRESS"].as<double>();
+//     settings.orificeThreeFlow = configData["ORIFICE3_FLOW"].as<double>();
+//     settings.orificeThreeDepression = configData["ORIFICE3_PRESS"].as<double>();
+//     settings.orificeFourFlow = configData["ORIFICE4_FLOW"].as<double>();
+//     settings.orificeFourDepression = configData["ORIFICE4_PRESS"].as<double>();
+//     settings.orificeFiveFlow = configData["ORIFICE5_FLOW"].as<double>();
+//     settings.orificeFiveDepression = configData["ORIFICE5_PRESS"].as<double>();
+//     settings.orificeSixFlow = configData["ORIFICE6_FLOW"].as<double>();
+//     settings.orificeSixDepression = configData["ORIFICE6_PRESS"].as<double>();
+
+//   } else {
+//     _message.serialPrintf("Bench Settings file not found \n");
+//   }
+  
+//   return configData;  
+
+// }
 
 
 
@@ -1362,7 +1398,7 @@ String DataHandler::buildSSEJsonData()
   if ((flowComp > settings.min_flow_rate) && (pRefComp > settings.min_bench_pressure))  {
 
     // Check if we need to round values
-     if (strstr(String(settings.rounding_type).c_str(), String("NONE").c_str())) {
+    if (settings.rounding_type.indexOf("NONE") > 0) {
         dataJson["FLOW"] = sensorVal.FlowCFM;
         dataJson["MFLOW"] = sensorVal.FlowKGH;
         dataJson["AFLOW"] = sensorVal.FlowADJ;
@@ -1372,7 +1408,7 @@ String DataHandler::buildSSEJsonData()
         dataJson["PDIFF_VOLTS"] = sensorVal.PDiffVolts;
         dataJson["PITOT_VOLTS"] = sensorVal.PitotVolts;
     // Round to whole value    
-    } else if (strstr(String(settings.rounding_type).c_str(), String("INTEGER").c_str())) {
+    } else if (settings.rounding_type.indexOf("INTEGER") > 0) {
         dataJson["FLOW"] = round(sensorVal.FlowCFM);
         dataJson["MFLOW"] = round(sensorVal.FlowKGH);
         dataJson["AFLOW"] = round(sensorVal.FlowADJ);
@@ -1382,7 +1418,7 @@ String DataHandler::buildSSEJsonData()
         dataJson["PDIFF_VOLTS"] = sensorVal.PDiffVolts;
         dataJson["PITOT_VOLTS"] = sensorVal.PitotVolts;
     // Round to half (nearest 0.5)
-    } else if (strstr(String(settings.rounding_type).c_str(), String("HALF").c_str())) {
+    } else if (settings.rounding_type.indexOf("HALF") > 0) {
         dataJson["FLOW"] = round(sensorVal.FlowCFM * 2.0 ) / 2.0;
         dataJson["MFLOW"] = round(sensorVal.FlowKGH * 2.0) / 2.0;
         dataJson["AFLOW"] = round(sensorVal.FlowADJ * 2.0) / 2.0;
@@ -1437,7 +1473,7 @@ String DataHandler::buildSSEJsonData()
 
 
   // Temperature deg C or F
-  if (strstr(String(settings.temp_unit).c_str(), String("Celcius").c_str())){
+  if (settings.temp_unit.indexOf("Celcius") > 0) {
     dataJson["TEMP"] = sensorVal.TempDegC;
   } else {
     dataJson["TEMP"] = sensorVal.TempDegF;
@@ -1445,13 +1481,13 @@ String DataHandler::buildSSEJsonData()
 
 
   // Bench Type for status pane
-  if (strstr(String(settings.bench_type).c_str(), String("MAF").c_str())) {
+  if (settings.bench_type.indexOf("MAF") > 0) {
     dataJson["BENCH_TYPE"] = "MAF";
-  } else if (strstr(String(settings.bench_type).c_str(), String("ORIFICE").c_str())) {
+  } else if (settings.bench_type.indexOf("ORIFICE") > 0) {
     dataJson["BENCH_TYPE"] = "ORIFICE";
-  } else if (strstr(String(settings.bench_type).c_str(), String("VENTURI").c_str())) {
+  } else if (settings.bench_type.indexOf("VENTURI") > 0) {
     dataJson["BENCH_TYPE"] = "VENTURI";
-  } else if (strstr(String(settings.bench_type).c_str(), String("PITOT").c_str())) {
+  } else if (settings.bench_type.indexOf("PITOT") > 0) {
     dataJson["BENCH_TYPE"] = "PITOT";
   }
 

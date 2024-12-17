@@ -120,24 +120,24 @@ void TASKgetSensorData( void * parameter ){
 
         // Get flow data
         // Bench is MAF type...
-        if (strstr(String(settings.bench_type).c_str(), String("MAF").c_str())){
+        if (settings.bench_type.indexOf("MAF") > 0) {
           if (config.MAF_SRC_TYPE != SENSOR_DISABLED) {
             sensorVal.FlowKGH = _sensors.getMafFlow();
             sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
           }
 
         // Bench is ORIFICE type...
-        } else if (strstr(String(settings.bench_type).c_str(), String("ORIFICE").c_str())){
+        } else if (settings.bench_type.indexOf("ORIFICE") > 0) {
           sensorVal.FlowCFMraw = _sensors.getDifferentialFlow();
 
 
         // Bench is VENTURI type...
-        } else if (strstr(String(settings.bench_type).c_str(), String("VENTURI").c_str())){
+        } else if (settings.bench_type.indexOf("VENTURI") > 0) {
 
           //TODO
 
         // Bench is PITOT type...
-        } else if (strstr(String(settings.bench_type).c_str(), String("PITOT").c_str())){
+        } else if (settings.bench_type.indexOf("PITOT") > 0) {
 
           //TODO
 
@@ -155,14 +155,14 @@ void TASKgetSensorData( void * parameter ){
         // Apply Data filters...
 
         // Rolling Median
-        if (strstr(String(settings.data_filter_type).c_str(), String("MEDIAN").c_str())){
+        if (settings.data_filter_type.indexOf("MEDIAN") > 0) {
  
           sensorVal.AverageCFM += ( sensorVal.FlowCFM - sensorVal.AverageCFM ) * 0.1f; // rough running average.
           sensorVal.MedianCFM += copysign( sensorVal.AverageCFM * 0.01, sensorVal.FlowCFM - sensorVal.MedianCFM );
           sensorVal.FlowCFM = sensorVal.MedianCFM;
 
         //TODO - Cyclic average
-        } else if (strstr(String(settings.data_filter_type).c_str(), String("AVERAGE").c_str())){
+        } else if (settings.data_filter_type.indexOf("AVERAGE") > 0) {
 
           // create array / stack of 'Cyclical Average Buffer' length
           // push value to stack - repeat this for size of stack 
@@ -175,7 +175,7 @@ void TASKgetSensorData( void * parameter ){
 
           
         //TODO - Mode
-        } else if (strstr(String(settings.data_filter_type).c_str(), String("MODE").c_str())){
+        } else if (settings.data_filter_type.indexOf("MODE") > 0) {
 
           // return most common value over x number of cycles (requested by @black-top)
 

@@ -52,7 +52,8 @@ void Comms::initaliseWifi() {
   DataHandler _data;
 
   // if WiFi password is unedited or blank force AP mode
-  if ((strstr(String(settings.wifi_pswd).c_str(), String("PASSWORD").c_str())) || (String(settings.wifi_pswd).c_str() == "")) {
+  if (settings.wifi_pswd.indexOf("PASSWORD") > 0 || settings.wifi_pswd == "" ) {
+
     settings.ap_mode = true;
   } 
   
@@ -103,14 +104,16 @@ void Comms::initaliseWifi() {
 
     _message.serialPrintf("Creating WiFi Access Point:  %s  \n", settings.wifi_ap_ssid); // NOTE: Default AP SSID / PW = DIYFB / 123456789
     WiFi.mode(WIFI_AP);
-    WiFi.softAP(settings.wifi_ap_ssid, settings.wifi_ap_pswd);
+    std::string ap_SSID = settings.wifi_ap_ssid.c_str();
+    std::string ap_PSWD = settings.wifi_ap_pswd.c_str();
+    WiFi.softAP(ap_SSID.c_str(), ap_PSWD.c_str());
     status.local_ip_address = WiFi.softAPIP().toString().c_str();
     _message.serialPrintf("Access Point IP address: %s \n", WiFi.softAPIP().toString().c_str());
     status.apMode = true;
   }
 
   // Set up Multicast DNS
-  if (!MDNS.begin(settings.hostname))  {
+  if (!MDNS.begin(settings.hostname.c_str()))  {
     _message.serialPrintf("Error starting mDNS \n");
   }  else  {
     status.hostname = settings.hostname;
@@ -178,9 +181,12 @@ int Comms::getWifiConnection(){
   uint8_t wifiConnectionAttempt = 1;
   uint8_t wifiConnectionStatus;
 
+  std::string wifi_SSID = settings.wifi_ap_ssid.c_str();
+  std::string wifi_PSWD = settings.wifi_ap_pswd.c_str();
+
   for(;;) {
           
-    WiFi.begin(settings.wifi_ssid, settings.wifi_pswd); 
+    WiFi.begin(wifi_SSID.c_str(), wifi_PSWD.c_str()); 
     wifiConnectionStatus = WiFi.waitForConnectResult(settings.wifi_timeout);
     if (wifiConnectionStatus == WL_CONNECTED || wifiConnectionAttempt > settings.wifi_retries){
       break;

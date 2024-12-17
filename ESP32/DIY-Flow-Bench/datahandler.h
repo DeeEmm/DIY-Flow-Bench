@@ -69,8 +69,8 @@ class DataHandler {
 		void loadMAFData();
 		void initialiseConfig();
 		void loadConfig();
-		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfiguration();
-		StaticJsonDocument<SETTINGS_JSON_SIZE> loadSettings ();
+		void initialiseSettings ();
+		void loadSettings ();
 		StaticJsonDocument<LIFT_DATA_JSON_SIZE> loadLiftData ();
 		static void clearLiftDataFile(AsyncWebServerRequest *request);
 		StaticJsonDocument<1024> loadCalibrationData ();

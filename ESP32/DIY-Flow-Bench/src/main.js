@@ -60,9 +60,9 @@ if (!!window.EventSource) {
            // we've not got a string... 
            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'SFLOW' || key === 'FDIFF') {
               // HACK: template vars - replaced before page load
-              document.getElementById(key).innerHTML = myObj[key].toFixed(~FLOW_DECIMAL_LENGTH~);  
+              document.getElementById(key).innerHTML = myObj[key].toFixed(~FLOW_DECI_ACC~);  
             } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'PITOT_DELTA' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
-              document.getElementById(key).innerHTML = myObj[key].toFixed(~GEN_DECIMAL_LENGTH~); 
+              document.getElementById(key).innerHTML = myObj[key].toFixed(~GEN_DECI_ACC~); 
             //} else if (key === '') {
             } else {
               document.getElementById(key).innerHTML = myObj[key];
@@ -108,7 +108,7 @@ if (!!window.EventSource) {
       }
 
       // Get data filter type
-      var dataFilterType = myObj["DATA_FILTER_TYPE"];
+      var dataFilterType = myObj["DATA_FILTER_TYP"];
 
       // Get Pitot Tile status colours
       var pitotTileColour = myObj["PITOT_COLOUR"];
