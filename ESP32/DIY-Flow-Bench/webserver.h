@@ -49,7 +49,7 @@ class Webserver {
 		static void processUpdate(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final);
 		// static void parseConfigurationForm(AsyncWebServerRequest *request);
 		static void checkUpdate(AsyncWebServerRequest *request);
-		static void parseCalibrationForm(AsyncWebServerRequest *request);
+		static void saveCalibrationForm(AsyncWebServerRequest *request);
 		static void parseOrificeForm(AsyncWebServerRequest *request);
 
 		static void saveConfigurationForm(AsyncWebServerRequest *request);

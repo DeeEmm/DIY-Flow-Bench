@@ -300,7 +300,7 @@ void Webserver::begin()
   server->on("/api/saveconfig", HTTP_POST, saveConfigurationForm);
 
   // Parse Calibration Form
-  server->on("/api/savecalibration", HTTP_POST, parseCalibrationForm);
+  server->on("/api/savecalibration", HTTP_POST, saveCalibrationForm);
 
   // Parse Lift Data Form
   server->on("/api/saveliftdata", HTTP_POST, parseLiftDataForm);
@@ -462,21 +462,18 @@ void Webserver::fileUpload(AsyncWebServerRequest *request, String filename, size
 
 
 /***********************************************************
- * @brief parseConfigurationForm
- * @details Parses calibration form post vars and stores into global struct
- * @details Saves data to settings.json file
- * @note Creates file if it does not exist
- * @note Redirects browser to file list
- * 
+ * @brief saveConfigurationForm
+ * @details Parses calibration form post vars and stores into NVM memory
+ * @note Loads data into structs
  ***/
 void Webserver::saveConfigurationForm(AsyncWebServerRequest *request)
 {
 
   Messages _message;
   DataHandler _data;
-  Preferences _preferences;
+  Preferences _config_pref;
 
-  _preferences.begin("settings", false);
+  _config_pref.begin("settings", false);
 
   int params = request->params();
 
@@ -485,10 +482,10 @@ void Webserver::saveConfigurationForm(AsyncWebServerRequest *request)
   // Update Config Vars
   for(int i=0;i<params;i++){
     AsyncWebParameter* p = request->getParam(i);
-      _preferences.putString(p->name().c_str(), p->value().c_str());
+      _config_pref.putString(p->name().c_str(), p->value().c_str());
   }
 
-  _preferences.end();
+  _config_pref.end();
   _data.loadConfig();
   request->redirect("/");
 }
@@ -507,16 +504,14 @@ void Webserver::saveConfigurationForm(AsyncWebServerRequest *request)
  * @note duplicates _calibration.saveCalibrationData whjich is unable to be called from server->on directive
  * 
  ***/
-void Webserver::parseCalibrationForm(AsyncWebServerRequest *request)
+void Webserver::saveCalibrationForm(AsyncWebServerRequest *request)
 {
 
   Calibration _calibrate;
   Messages _message;
-  // Webserver _webserver;
+  Preferences _cal_pref;
 
-  StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
   extern struct CalibrationData calVal;
-  // String jsonString;
 
   int params = request->params();
 
@@ -525,22 +520,11 @@ void Webserver::parseCalibrationForm(AsyncWebServerRequest *request)
   // Convert POST vars to JSON 
   for(int i=0;i<params;i++){
     AsyncWebParameter* p = request->getParam(i);
-      calData[p->name().c_str()] = p->value().c_str();
+    _cal_pref.putString(p->name().c_str(), p->value().c_str());
   }
 
-  // Update global Config Vars
-  calVal.flow_offset = calData["FLOW_OFFSET"].as<double>();
-  calVal.user_offset = calData["USER_OFFSET"].as<double>();
-  calVal.leak_cal_offset = calData["LEAK_CAL_OFFSET"].as<double>();
-  calVal.leak_cal_offset_rev = calData["LEAK_CAL_OFFSET_REV"].as<double>();
-  calVal.leak_cal_baseline= calData["LEAK_CAL_BASELINE"].as<double>();
-  calVal.leak_cal_baseline_rev = calData["LEAK_CAL_BASELINE_REV"].as<double>();
-
-  _message.debugPrintf("Calibration form post vars parsed \n");
-
-  _calibrate.saveCalibrationData();
-
-  // request->redirect("/?view=config");
+  _cal_pref.end();
+  _calibrate.loadCalibrationData();
   request->redirect("/");
 
 }

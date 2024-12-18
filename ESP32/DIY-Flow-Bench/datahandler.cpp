@@ -58,7 +58,7 @@ void DataHandler::begin() {
     extern struct DeviceStatus status;
     extern struct Configuration config;
 
-    Preferences _preferences;
+    Preferences _config_pref;
     Hardware _hardware;
     Pins pins;
     Messages _message;
@@ -596,94 +596,94 @@ void DataHandler::initialiseConfig () {
   extern struct Configuration config;
 
   Messages _message;
-  Preferences _preferences;
+  Preferences _config_pref;
 
-  _preferences.begin("config", false);
+  _config_pref.begin("config", false);
 
-  if (_preferences.isKey("SWIRL_ENABLED")) { // we've already initialised _preferences
-    _preferences.end();
+  if (_config_pref.isKey("SWIRL_ENABLED")) { // we've already initialised _config_pref
+    _config_pref.end();
     return;
   }
 
   _message.serialPrintf("Initialising Configuration \n");    
 
-  // _preferences.clear(); // completely remove namepace
-  // _preferences.remove("ADC_I2C_ADDR"); // remove individual key
+  // _config_pref.clear(); // completely remove namepace
+  // _config_pref.remove("ADC_I2C_ADDR"); // remove individual key
 
-  if (!_preferences.isKey("SD_ENABLED")) _preferences.putBool("SD_ENABLED", false);
-  if (!_preferences.isKey("MIN_PRESS_PCNT")) _preferences.putInt("MIN_PRESS_PCNT", 80);
-  if (!_preferences.isKey("PIPE_RAD_FT")) _preferences.putDouble("PIPE_RAD_FT", 0.328084);
+  if (!_config_pref.isKey("SD_ENABLED")) _config_pref.putBool("SD_ENABLED", false);
+  if (!_config_pref.isKey("MIN_PRESS_PCNT")) _config_pref.putInt("MIN_PRESS_PCNT", 80);
+  if (!_config_pref.isKey("PIPE_RAD_FT")) _config_pref.putDouble("PIPE_RAD_FT", 0.328084);
 
-  if (!_preferences.isKey("VCC_3V3_TRIM")) _preferences.putDouble("VCC_3V3_TRIM", 0.0);
-  if (!_preferences.isKey("VCC_5V_TRIM")) _preferences.putDouble("VCC_5V_TRIM", 0.0);
-  if (!_preferences.isKey("FIXED_3_3V_VAL")) _preferences.putBool("FIXED_3_3V_VAL", true);
-  if (!_preferences.isKey("FIXED_5V_VAL")) _preferences.putBool("FIXED_5V_VAL", true);
+  if (!_config_pref.isKey("VCC_3V3_TRIM")) _config_pref.putDouble("VCC_3V3_TRIM", 0.0);
+  if (!_config_pref.isKey("VCC_5V_TRIM")) _config_pref.putDouble("VCC_5V_TRIM", 0.0);
+  if (!_config_pref.isKey("FIXED_3_3V_VAL")) _config_pref.putBool("FIXED_3_3V_VAL", true);
+  if (!_config_pref.isKey("FIXED_5V_VAL")) _config_pref.putBool("FIXED_5V_VAL", true);
 
-  if (!_preferences.isKey("BME280_ENABLED")) _preferences.putBool("BME280_ENABLED", true);
-  if (!_preferences.isKey("BME280_I2C_ADDR")) _preferences.putInt("BME280_I2C_ADDR", 118);
-  if (!_preferences.isKey("BME280_SCAN_MS")) _preferences.putInt("BME280_SCAN_MS", 1000);
+  if (!_config_pref.isKey("BME280_ENABLED")) _config_pref.putBool("BME280_ENABLED", true);
+  if (!_config_pref.isKey("BME280_I2C_ADDR")) _config_pref.putInt("BME280_I2C_ADDR", 118);
+  if (!_config_pref.isKey("BME280_SCAN_MS")) _config_pref.putInt("BME280_SCAN_MS", 1000);
 
-  if (!_preferences.isKey("BME680_ENABLED")) _preferences.putBool("BME680_ENABLED", true);
-  if (!_preferences.isKey("BME680_I2C_ADDR")) _preferences.putInt("BME680_I2C_ADDR", 119);
-  if (!_preferences.isKey("BME680_SCAN_MS")) _preferences.putInt("BME680_SCAN_MS", 1000);
+  if (!_config_pref.isKey("BME680_ENABLED")) _config_pref.putBool("BME680_ENABLED", true);
+  if (!_config_pref.isKey("BME680_I2C_ADDR")) _config_pref.putInt("BME680_I2C_ADDR", 119);
+  if (!_config_pref.isKey("BME680_SCAN_MS")) _config_pref.putInt("BME680_SCAN_MS", 1000);
 
 
-  if (!_preferences.isKey("ADC_TYPE")) _preferences.putInt("ADC_TYPE", 11);
-  if (!_preferences.isKey("ADC_I2C_ADDR")) _preferences.putInt("ADC_I2C_ADDR", 72);
-  if (!_preferences.isKey("ADC_SCAN_DELAY")) _preferences.putInt("ADC_SCAN_DELAY", 1000);
-  if (!_preferences.isKey("ADC_MAX_RETRIES")) _preferences.putInt("ADC_MAX_RETRIES", 10);
-  if (!_preferences.isKey("ADC_RANGE")) _preferences.putInt("ADC_RANGE", 32767);
-  if (!_preferences.isKey("ADC_GAIN")) _preferences.putDouble("ADC_GAIN", 6.144);
+  if (!_config_pref.isKey("ADC_TYPE")) _config_pref.putInt("ADC_TYPE", 11);
+  if (!_config_pref.isKey("ADC_I2C_ADDR")) _config_pref.putInt("ADC_I2C_ADDR", 72);
+  if (!_config_pref.isKey("ADC_SCAN_DELAY")) _config_pref.putInt("ADC_SCAN_DELAY", 1000);
+  if (!_config_pref.isKey("ADC_MAX_RETRIES")) _config_pref.putInt("ADC_MAX_RETRIES", 10);
+  if (!_config_pref.isKey("ADC_RANGE")) _config_pref.putInt("ADC_RANGE", 32767);
+  if (!_config_pref.isKey("ADC_GAIN")) _config_pref.putDouble("ADC_GAIN", 6.144);
 
-  if (!_preferences.isKey("MAF_SRC_TYPE")) _preferences.putInt("MAF_SRC_TYPE", 11);
-  if (!_preferences.isKey("MAF_SENS_TYPE")) _preferences.putString("MAF_SENS_TYPE", "Not Set");
-  if (!_preferences.isKey("MAF_MV_TRIM")) _preferences.putDouble("MAF_MV_TRIM", 0.0);
-  if (!_preferences.isKey("MAF_ADC_CHAN")) _preferences.putInt("MAF_ADC_CHAN", 0);
+  if (!_config_pref.isKey("MAF_SRC_TYPE")) _config_pref.putInt("MAF_SRC_TYPE", 11);
+  if (!_config_pref.isKey("MAF_SENS_TYPE")) _config_pref.putString("MAF_SENS_TYPE", "Not Set");
+  if (!_config_pref.isKey("MAF_MV_TRIM")) _config_pref.putDouble("MAF_MV_TRIM", 0.0);
+  if (!_config_pref.isKey("MAF_ADC_CHAN")) _config_pref.putInt("MAF_ADC_CHAN", 0);
 
-  if (!_preferences.isKey("PREF_SENS_TYPE")) _preferences.putInt("PREF_SENS_TYPE", 4);
-  if (!_preferences.isKey("PREF_SRC_TYPE")) _preferences.putInt("PREF_SRC_TYPE", 11);
-  if (!_preferences.isKey("FIXED_PREF_VAL")) _preferences.putInt("FIXED_PREF_VAL", 1);
-  if (!_preferences.isKey("PREF_MV_TRIM")) _preferences.putDouble("PREF_MV_TRIM", 0.0);
-  if (!_preferences.isKey("PREF_ALOG_SCALE")) _preferences.putDouble("PREF_ALOG_SCALE", 0.0);
-  if (!_preferences.isKey("PREF_ADC_CHAN")) _preferences.putInt("PREF_ADC_CHAN", 1);
+  if (!_config_pref.isKey("PREF_SENS_TYPE")) _config_pref.putInt("PREF_SENS_TYPE", 4);
+  if (!_config_pref.isKey("PREF_SRC_TYPE")) _config_pref.putInt("PREF_SRC_TYPE", 11);
+  if (!_config_pref.isKey("FIXED_PREF_VAL")) _config_pref.putInt("FIXED_PREF_VAL", 1);
+  if (!_config_pref.isKey("PREF_MV_TRIM")) _config_pref.putDouble("PREF_MV_TRIM", 0.0);
+  if (!_config_pref.isKey("PREF_ALOG_SCALE")) _config_pref.putDouble("PREF_ALOG_SCALE", 0.0);
+  if (!_config_pref.isKey("PREF_ADC_CHAN")) _config_pref.putInt("PREF_ADC_CHAN", 1);
 
-  if (!_preferences.isKey("PDIFF_SENS_TYPE")) _preferences.putInt("PDIFF_SENS_TYPE", 4);
-  if (!_preferences.isKey("PDIFF_SRC_TYPE")) _preferences.putInt("PDIFF_SRC_TYPE", 11);
-  if (!_preferences.isKey("FIXED_PDIFF_VAL")) _preferences.putInt("FIXED_PDIFF_VAL", 1);
-  if (!_preferences.isKey("PDIFF_MV_TRIM")) _preferences.putDouble("PDIFF_MV_TRIM", 0.0);
-  if (!_preferences.isKey("PDIFF_SCALE")) _preferences.putDouble("PDIFF_SCALE", 0.0);
-  if (!_preferences.isKey("PDIFF_ADC_CHAN")) _preferences.putInt("PDIFF_ADC_CHAN", 1);
+  if (!_config_pref.isKey("PDIFF_SENS_TYPE")) _config_pref.putInt("PDIFF_SENS_TYPE", 4);
+  if (!_config_pref.isKey("PDIFF_SRC_TYPE")) _config_pref.putInt("PDIFF_SRC_TYPE", 11);
+  if (!_config_pref.isKey("FIXED_PDIFF_VAL")) _config_pref.putInt("FIXED_PDIFF_VAL", 1);
+  if (!_config_pref.isKey("PDIFF_MV_TRIM")) _config_pref.putDouble("PDIFF_MV_TRIM", 0.0);
+  if (!_config_pref.isKey("PDIFF_SCALE")) _config_pref.putDouble("PDIFF_SCALE", 0.0);
+  if (!_config_pref.isKey("PDIFF_ADC_CHAN")) _config_pref.putInt("PDIFF_ADC_CHAN", 1);
 
-  if (!_preferences.isKey("PITOT_SENS_TYPE")) _preferences.putInt("PITOT_SENS_TYPE", 4);
-  if (!_preferences.isKey("PITOT_SRC_TYPE")) _preferences.putInt("PITOT_SRC_TYPE", 11);
-  if (!_preferences.isKey("PITOT_MV_TRIM")) _preferences.putDouble("PITOT_MV_TRIM", 0.0);
-  if (!_preferences.isKey("PITOT_SCALE")) _preferences.putDouble("PITOT_SCALE", 0.0);
-  if (!_preferences.isKey("PITOT_ADC_CHAN")) _preferences.putInt("PITOT_ADC_CHAN", 1);
+  if (!_config_pref.isKey("PITOT_SENS_TYPE")) _config_pref.putInt("PITOT_SENS_TYPE", 4);
+  if (!_config_pref.isKey("PITOT_SRC_TYPE")) _config_pref.putInt("PITOT_SRC_TYPE", 11);
+  if (!_config_pref.isKey("PITOT_MV_TRIM")) _config_pref.putDouble("PITOT_MV_TRIM", 0.0);
+  if (!_config_pref.isKey("PITOT_SCALE")) _config_pref.putDouble("PITOT_SCALE", 0.0);
+  if (!_config_pref.isKey("PITOT_ADC_CHAN")) _config_pref.putInt("PITOT_ADC_CHAN", 1);
 
-  if (!_preferences.isKey("BARO_SENS_TYPE")) _preferences.putInt("BARO_SENS_TYPE", BOSCH_BME280);
-  if (!_preferences.isKey("FIXED_BARO_VAL")) _preferences.putDouble("FIXED_BARO_VAL", 101.3529);
-  if (!_preferences.isKey("BARO_ALOG_SCALE")) _preferences.putDouble("BARO_ALOG_SCALE", 1.0);
-  if (!_preferences.isKey("BARO_MV_TRIM")) _preferences.putDouble("BARO_MV_TRIM", 1.0);
-  if (!_preferences.isKey("BARO_FINE_TUNE")) _preferences.putDouble("BARO_FINE_TUNE", 1.0);
-  if (!_preferences.isKey("BARO_SCALE")) _preferences.putDouble("BARO_SCALE", 1.0);
-  if (!_preferences.isKey("BARO_OFFSET")) _preferences.putDouble("BARO_OFFSET", 1.0);
-  if (!_preferences.isKey("SEALEVEL_PRESS")) _preferences.putDouble("SEALEVEL_PRESS", 0.0);
-  if (!_preferences.isKey("BARO_ADC_CHAN")) _preferences.putInt("BARO_ADC_CHAN", 4);
+  if (!_config_pref.isKey("BARO_SENS_TYPE")) _config_pref.putInt("BARO_SENS_TYPE", BOSCH_BME280);
+  if (!_config_pref.isKey("FIXED_BARO_VAL")) _config_pref.putDouble("FIXED_BARO_VAL", 101.3529);
+  if (!_config_pref.isKey("BARO_ALOG_SCALE")) _config_pref.putDouble("BARO_ALOG_SCALE", 1.0);
+  if (!_config_pref.isKey("BARO_MV_TRIM")) _config_pref.putDouble("BARO_MV_TRIM", 1.0);
+  if (!_config_pref.isKey("BARO_FINE_TUNE")) _config_pref.putDouble("BARO_FINE_TUNE", 1.0);
+  if (!_config_pref.isKey("BARO_SCALE")) _config_pref.putDouble("BARO_SCALE", 1.0);
+  if (!_config_pref.isKey("BARO_OFFSET")) _config_pref.putDouble("BARO_OFFSET", 1.0);
+  if (!_config_pref.isKey("SEALEVEL_PRESS")) _config_pref.putDouble("SEALEVEL_PRESS", 0.0);
+  if (!_config_pref.isKey("BARO_ADC_CHAN")) _config_pref.putInt("BARO_ADC_CHAN", 4);
 
-  if (!_preferences.isKey("TEMP_SENS_TYPE")) _preferences.putInt("TEMP_SENS_TYPE", BOSCH_BME280);
-  if (!_preferences.isKey("FIXED_TEMP_VAL")) _preferences.putDouble("FIXED_TEMP_VAL", 21.0);
-  if (!_preferences.isKey("TEMP_ALOG_SCALE")) _preferences.putDouble("TEMP_ALOG_SCALE", 1.0);
-  if (!_preferences.isKey("TEMP_MV_TRIM")) _preferences.putDouble("TEMP_MV_TRIM", 1.0);
-  if (!_preferences.isKey("TEMP_FINE_TUNE")) _preferences.putDouble("TEMP_FINE_TUNE", 1.0);
+  if (!_config_pref.isKey("TEMP_SENS_TYPE")) _config_pref.putInt("TEMP_SENS_TYPE", BOSCH_BME280);
+  if (!_config_pref.isKey("FIXED_TEMP_VAL")) _config_pref.putDouble("FIXED_TEMP_VAL", 21.0);
+  if (!_config_pref.isKey("TEMP_ALOG_SCALE")) _config_pref.putDouble("TEMP_ALOG_SCALE", 1.0);
+  if (!_config_pref.isKey("TEMP_MV_TRIM")) _config_pref.putDouble("TEMP_MV_TRIM", 1.0);
+  if (!_config_pref.isKey("TEMP_FINE_TUNE")) _config_pref.putDouble("TEMP_FINE_TUNE", 1.0);
 
-  if (!_preferences.isKey("RELH_SENS_TYPE")) _preferences.putInt("RELH_SENS_TYPE", BOSCH_BME280);
-  if (!_preferences.isKey("FIXED_RELH_VAL")) _preferences.putDouble("FIXED_RELH_VAL", 36.0);
-  if (!_preferences.isKey("RELH_ALOG_SCALE")) _preferences.putDouble("RELH_ALOG_SCALE", 1.0);
-  if (!_preferences.isKey("RELH_MV_TRIM")) _preferences.putDouble("RELH_MV_TRIM", 1.0);
-  if (!_preferences.isKey("RELH_FINE_TUNE")) _preferences.putDouble("RELH_FINE_TUNE", 1.0);
-  if (!_preferences.isKey("SWIRL_ENABLED")) _preferences.putBool("SWIRL_ENABLED", false);
+  if (!_config_pref.isKey("RELH_SENS_TYPE")) _config_pref.putInt("RELH_SENS_TYPE", BOSCH_BME280);
+  if (!_config_pref.isKey("FIXED_RELH_VAL")) _config_pref.putDouble("FIXED_RELH_VAL", 36.0);
+  if (!_config_pref.isKey("RELH_ALOG_SCALE")) _config_pref.putDouble("RELH_ALOG_SCALE", 1.0);
+  if (!_config_pref.isKey("RELH_MV_TRIM")) _config_pref.putDouble("RELH_MV_TRIM", 1.0);
+  if (!_config_pref.isKey("RELH_FINE_TUNE")) _config_pref.putDouble("RELH_FINE_TUNE", 1.0);
+  if (!_config_pref.isKey("SWIRL_ENABLED")) _config_pref.putBool("SWIRL_ENABLED", false);
 
-  _preferences.end();
+  _config_pref.end();
 
 }
 
@@ -701,85 +701,85 @@ void DataHandler::loadConfig () {
   extern struct Configuration config;
 
   Messages _message;
-  Preferences _preferences;
+  Preferences _config_pref;
 
   _message.serialPrintf("Loading Configuration \n");    
   
-  _preferences.begin("config", false);
+  _config_pref.begin("config", false);
 
-  config.SD_ENABLED = _preferences.getBool("SD_ENABLED", false);
-  config.MIN_PRESS_PCNT = _preferences.getInt("MIN_PRESS_PCNT", 80);
-  config.PIPE_RAD_FT = _preferences.getDouble("PIPE_RAD_FT", 0.328084);
+  config.SD_ENABLED = _config_pref.getBool("SD_ENABLED", false);
+  config.MIN_PRESS_PCNT = _config_pref.getInt("MIN_PRESS_PCNT", 80);
+  config.PIPE_RAD_FT = _config_pref.getDouble("PIPE_RAD_FT", 0.328084);
 
-  config.VCC_3V3_TRIM = _preferences.getDouble("VCC_3V3_TRIM", 0.0);
-  config.VCC_5V_TRIM = _preferences.getDouble("VCC_5V_TRIM", 0.0);
-  config.FIXED_3_3V_VAL = _preferences.getBool("FIXED_3_3V_VAL", true);
-  config.FIXED_5V_VAL = _preferences.getBool("FIXED_5V_VAL", true);
+  config.VCC_3V3_TRIM = _config_pref.getDouble("VCC_3V3_TRIM", 0.0);
+  config.VCC_5V_TRIM = _config_pref.getDouble("VCC_5V_TRIM", 0.0);
+  config.FIXED_3_3V_VAL = _config_pref.getBool("FIXED_3_3V_VAL", true);
+  config.FIXED_5V_VAL = _config_pref.getBool("FIXED_5V_VAL", true);
 
-  config.BME280_ENABLED = _preferences.getBool("BME280_ENABLED", true);
-  config.BME280_I2C_ADDR = _preferences.getInt("BME280_I2C_ADDR", 118);
-  config.BME280_SCAN_MS = _preferences.getInt("BME280_SCAN_MS", 1000);
+  config.BME280_ENABLED = _config_pref.getBool("BME280_ENABLED", true);
+  config.BME280_I2C_ADDR = _config_pref.getInt("BME280_I2C_ADDR", 118);
+  config.BME280_SCAN_MS = _config_pref.getInt("BME280_SCAN_MS", 1000);
 
-  config.BME680_ENABLED = _preferences.getBool("BME680_ENABLED", false);
-  config.BME680_I2C_ADDR = _preferences.getInt("BME680_I2C_ADDR", 119);
-  config.BME680_SCAN_MS = _preferences.getInt("BME680_SCAN_MS", 1000);
+  config.BME680_ENABLED = _config_pref.getBool("BME680_ENABLED", false);
+  config.BME680_I2C_ADDR = _config_pref.getInt("BME680_I2C_ADDR", 119);
+  config.BME680_SCAN_MS = _config_pref.getInt("BME680_SCAN_MS", 1000);
 
-  config.ADC_TYPE = _preferences.getInt("ADC_TYPE", 11);
-  config.ADC_I2C_ADDR = _preferences.getInt("ADC_I2C_ADDR", 72);
-  config.ADC_SCAN_DELAY = _preferences.getInt("ADC_SCAN_DELAY", 1000);
-  config.ADC_MAX_RETRIES  = _preferences.getInt("ADC_MAX_RETRIES", 10);
-  config.ADC_RANGE = _preferences.getInt("ADC_RANGE", 32767);
-  config.ADC_GAIN = _preferences.getDouble("ADC_GAIN", 6.144);
+  config.ADC_TYPE = _config_pref.getInt("ADC_TYPE", 11);
+  config.ADC_I2C_ADDR = _config_pref.getInt("ADC_I2C_ADDR", 72);
+  config.ADC_SCAN_DELAY = _config_pref.getInt("ADC_SCAN_DELAY", 1000);
+  config.ADC_MAX_RETRIES  = _config_pref.getInt("ADC_MAX_RETRIES", 10);
+  config.ADC_RANGE = _config_pref.getInt("ADC_RANGE", 32767);
+  config.ADC_GAIN = _config_pref.getDouble("ADC_GAIN", 6.144);
 
-  config.MAF_SRC_TYPE = _preferences.getInt("MAF_SRC_TYPE", 11);
-  config.MAF_SENS_TYPE = _preferences.getString("MAF_SENS_TYPE", "not set");
-  config.MAF_MV_TRIM = _preferences.getDouble("MAF_MV_TRIM", 0.0);
-  config.MAF_ADC_CHAN = _preferences.getInt("MAF_ADC_CHAN", 0);
+  config.MAF_SRC_TYPE = _config_pref.getInt("MAF_SRC_TYPE", 11);
+  config.MAF_SENS_TYPE = _config_pref.getString("MAF_SENS_TYPE", "not set");
+  config.MAF_MV_TRIM = _config_pref.getDouble("MAF_MV_TRIM", 0.0);
+  config.MAF_ADC_CHAN = _config_pref.getInt("MAF_ADC_CHAN", 0);
 
-  config.PREF_SENS_TYPE = _preferences.getInt("PREF_SENS_TYPE", 4);
-  config.PREF_SRC_TYPE = _preferences.getInt("PREF_SRC_TYPE", 11);
-  config.FIXED_PREF_VAL = _preferences.getInt("FIXED_PREF_VAL", 1);
-  config.PREF_MV_TRIM = _preferences.getDouble("PREF_MV_TRIM", 0.0);
-  config.PREF_ALOG_SCALE = _preferences.getDouble("PREF_ALOG_SCALE", 1.0);
-  config.PREF_ADC_CHAN = _preferences.getInt("PREF_ADC_CHAN", 1);
+  config.PREF_SENS_TYPE = _config_pref.getInt("PREF_SENS_TYPE", 4);
+  config.PREF_SRC_TYPE = _config_pref.getInt("PREF_SRC_TYPE", 11);
+  config.FIXED_PREF_VAL = _config_pref.getInt("FIXED_PREF_VAL", 1);
+  config.PREF_MV_TRIM = _config_pref.getDouble("PREF_MV_TRIM", 0.0);
+  config.PREF_ALOG_SCALE = _config_pref.getDouble("PREF_ALOG_SCALE", 1.0);
+  config.PREF_ADC_CHAN = _config_pref.getInt("PREF_ADC_CHAN", 1);
 
-  config.PDIFF_SENS_TYPE = _preferences.getInt("PDIFF_SENS_TYPE", 4);
-  config.PDIFF_SRC_TYPE = _preferences.getInt("PDIFF_SRC_TYPE", 11);
-  config.FIXED_PDIFF_VAL = _preferences.getInt("FIXED_PDIFF_VAL", 1);
-  config.PDIFF_MV_TRIM = _preferences.getDouble("PDIFF_MV_TRIM", 0.0);
-  config.PDIFF_SCALE = _preferences.getDouble("PDIFF_SCALE", 1.0);
-  config.PDIFF_ADC_CHAN = _preferences.getInt("PDIFF_ADC_CHAN", 2);
+  config.PDIFF_SENS_TYPE = _config_pref.getInt("PDIFF_SENS_TYPE", 4);
+  config.PDIFF_SRC_TYPE = _config_pref.getInt("PDIFF_SRC_TYPE", 11);
+  config.FIXED_PDIFF_VAL = _config_pref.getInt("FIXED_PDIFF_VAL", 1);
+  config.PDIFF_MV_TRIM = _config_pref.getDouble("PDIFF_MV_TRIM", 0.0);
+  config.PDIFF_SCALE = _config_pref.getDouble("PDIFF_SCALE", 1.0);
+  config.PDIFF_ADC_CHAN = _config_pref.getInt("PDIFF_ADC_CHAN", 2);
  
-  config.PITOT_SENS_TYPE = _preferences.getInt("PITOT_SENS_TYPE", SENSOR_DISABLED);
-  config.PITOT_SRC_TYPE = _preferences.getInt("PITOT_SRC_TYPE", 11);
-  config.PITOT_MV_TRIM = _preferences.getDouble("PITOT_MV_TRIM", 0.0);
-  config.PITOT_SCALE = _preferences.getDouble("PITOT_SCALE", 1.0);
-  config.PITOT_ADC_CHAN = _preferences.getInt("PITOT_ADC_CHAN", 3);
+  config.PITOT_SENS_TYPE = _config_pref.getInt("PITOT_SENS_TYPE", SENSOR_DISABLED);
+  config.PITOT_SRC_TYPE = _config_pref.getInt("PITOT_SRC_TYPE", 11);
+  config.PITOT_MV_TRIM = _config_pref.getDouble("PITOT_MV_TRIM", 0.0);
+  config.PITOT_SCALE = _config_pref.getDouble("PITOT_SCALE", 1.0);
+  config.PITOT_ADC_CHAN = _config_pref.getInt("PITOT_ADC_CHAN", 3);
 
-  config.BARO_SENS_TYPE = _preferences.getInt("BARO_SENS_TYPE", BOSCH_BME280);
-  config.FIXED_BARO_VAL = _preferences.getDouble("FIXED_BARO_VAL", 101.3529);
-  config.BARO_ALOG_SCALE =_preferences.getDouble("BARO_ALOG_SCALE", 1.0);
-  config.BARO_MV_TRIM = _preferences.getDouble("BARO_MV_TRIM", 1.0);
-  config.BARO_FINE_TUNE = _preferences.getDouble("BARO_FINE_TUNE", 1.0);
-  config.BARO_SCALE = _preferences.getDouble("BARO_SCALE", 100);
-  config.BARO_OFFSET = _preferences.getDouble("BARO_OFFSET", 100);
-  config.SEALEVEL_PRESS = _preferences.getDouble("SEALEVEL_PRESS", 1016.90);
-  config.BARO_ADC_CHAN = _preferences.getInt("BARO_ADC_CHAN", 4);
+  config.BARO_SENS_TYPE = _config_pref.getInt("BARO_SENS_TYPE", BOSCH_BME280);
+  config.FIXED_BARO_VAL = _config_pref.getDouble("FIXED_BARO_VAL", 101.3529);
+  config.BARO_ALOG_SCALE =_config_pref.getDouble("BARO_ALOG_SCALE", 1.0);
+  config.BARO_MV_TRIM = _config_pref.getDouble("BARO_MV_TRIM", 1.0);
+  config.BARO_FINE_TUNE = _config_pref.getDouble("BARO_FINE_TUNE", 1.0);
+  config.BARO_SCALE = _config_pref.getDouble("BARO_SCALE", 100);
+  config.BARO_OFFSET = _config_pref.getDouble("BARO_OFFSET", 100);
+  config.SEALEVEL_PRESS = _config_pref.getDouble("SEALEVEL_PRESS", 1016.90);
+  config.BARO_ADC_CHAN = _config_pref.getInt("BARO_ADC_CHAN", 4);
 
-  config.TEMP_SENS_TYPE = _preferences.getInt("TEMP_SENS_TYPE", BOSCH_BME280);
-  config.FIXED_TEMP_VAL = _preferences.getDouble("FIXED_TEMP_VAL", 21.0);
-  config.TEMP_ALOG_SCALE = _preferences.getDouble("TEMP_ALOG_SCALE", 1.0);
-  config.TEMP_MV_TRIM = _preferences.getDouble("TEMP_MV_TRIM", 0.0);
-  config.TEMP_FINE_TUNE = _preferences.getDouble("TEMP_FINE_TUNE", 0.0);
+  config.TEMP_SENS_TYPE = _config_pref.getInt("TEMP_SENS_TYPE", BOSCH_BME280);
+  config.FIXED_TEMP_VAL = _config_pref.getDouble("FIXED_TEMP_VAL", 21.0);
+  config.TEMP_ALOG_SCALE = _config_pref.getDouble("TEMP_ALOG_SCALE", 1.0);
+  config.TEMP_MV_TRIM = _config_pref.getDouble("TEMP_MV_TRIM", 0.0);
+  config.TEMP_FINE_TUNE = _config_pref.getDouble("TEMP_FINE_TUNE", 0.0);
 
-  config.RELH_SENS_TYPE = _preferences.getInt("RELH_SENS_TYPE", BOSCH_BME280);
-  config.FIXED_RELH_VAL = _preferences.getDouble("FIXED_RELH_VAL", 36.0);
-  config.RELH_ALOG_SCALE = _preferences.getDouble("RELH_ALOG_SCALE", 1.0);
-  config.RELH_MV_TRIM = _preferences.getDouble("RELH_MV_TRIM", 0.0);
-  config.RELH_FINE_TUNE = _preferences.getDouble("RELH_FINE_TUNE", 0.0);
-  config.SWIRL_ENABLED = _preferences.getBool("SWIRL_ENABLED", false);
+  config.RELH_SENS_TYPE = _config_pref.getInt("RELH_SENS_TYPE", BOSCH_BME280);
+  config.FIXED_RELH_VAL = _config_pref.getDouble("FIXED_RELH_VAL", 36.0);
+  config.RELH_ALOG_SCALE = _config_pref.getDouble("RELH_ALOG_SCALE", 1.0);
+  config.RELH_MV_TRIM = _config_pref.getDouble("RELH_MV_TRIM", 0.0);
+  config.RELH_FINE_TUNE = _config_pref.getDouble("RELH_FINE_TUNE", 0.0);
+  config.SWIRL_ENABLED = _config_pref.getBool("SWIRL_ENABLED", false);
 
-  _preferences.end();
+  _config_pref.end();
 }
 
 
@@ -793,7 +793,8 @@ void DataHandler::loadConfig () {
 
 /***********************************************************
 * @brief initialiseSettings
-* @note Ket must be 15 chars or shorter.
+* @note - Initialise settings in NVM if they do not exist
+* @note Key must be 15 chars or shorter.
 ***/ 
 void DataHandler::initialiseSettings () {
 
@@ -801,60 +802,60 @@ void DataHandler::initialiseSettings () {
 
   DataHandler _data;
   Messages _message;
-  Preferences _preferences;
+  Preferences _config_pref;
 
   _message.serialPrintf("Loading Bench Settings \n");    
   
-  _preferences.begin("settings", false);
+  _config_pref.begin("settings", false);
 
-  if (!_preferences.isKey("WIFI_SSID")) _preferences.putString("WIFI_SSID", "WIFI-SSID");
-  if (!_preferences.isKey("WIFI_PSWD")) _preferences.putString("WIFI_PSWD", static_cast<String>("PASSWORD"));
-  if (!_preferences.isKey("WIFI_AP_SSID")) _preferences.putString("WIFI_AP_SSID", static_cast<String>("DIYFB"));
-  if (!_preferences.isKey("WIFI_AP_PSWD")) _preferences.putString("WIFI_AP_PSWD", static_cast<String>("123456789"));
-  if (!_preferences.isKey("HOSTNAME")) _preferences.putString("HOSTNAME", static_cast<String>("diyfb"));
+  if (!_config_pref.isKey("WIFI_SSID")) _config_pref.putString("WIFI_SSID", "WIFI-SSID");
+  if (!_config_pref.isKey("WIFI_PSWD")) _config_pref.putString("WIFI_PSWD", static_cast<String>("PASSWORD"));
+  if (!_config_pref.isKey("WIFI_AP_SSID")) _config_pref.putString("WIFI_AP_SSID", static_cast<String>("DIYFB"));
+  if (!_config_pref.isKey("WIFI_AP_PSWD")) _config_pref.putString("WIFI_AP_PSWD", static_cast<String>("123456789"));
+  if (!_config_pref.isKey("HOSTNAME")) _config_pref.putString("HOSTNAME", static_cast<String>("diyfb"));
 
-  if (!_preferences.isKey("WIFI_TIMEOUT")) _preferences.putInt("WIFI_TIMEOUT", 4000);
-  if (!_preferences.isKey("MAF_HOUSING_DIA")) _preferences.putInt("MAF_HOUSING_DIA", 0);
-  if (!_preferences.isKey("REFRESH_RATE")) _preferences.putInt("REFRESH_RATE", 500);
-  if (!_preferences.isKey("MIN_BENCH_PRESS")) _preferences.putInt("MIN_BENCH_PRESS", 1);
-  if (!_preferences.isKey("MIN_FLOW_RATE")) _preferences.putInt("MIN_FLOW_RATE", 1);
+  if (!_config_pref.isKey("WIFI_TIMEOUT")) _config_pref.putInt("WIFI_TIMEOUT", 4000);
+  if (!_config_pref.isKey("MAF_HOUSING_DIA")) _config_pref.putInt("MAF_HOUSING_DIA", 0);
+  if (!_config_pref.isKey("REFRESH_RATE")) _config_pref.putInt("REFRESH_RATE", 500);
+  if (!_config_pref.isKey("MIN_BENCH_PRESS")) _config_pref.putInt("MIN_BENCH_PRESS", 1);
+  if (!_config_pref.isKey("MIN_FLOW_RATE")) _config_pref.putInt("MIN_FLOW_RATE", 1);
 
-  if (!_preferences.isKey("DATA_FILTER_TYP")) _preferences.putString("DATA_FILTER_TYP", static_cast<String>("NONE"));
-  if (!_preferences.isKey("ROUNDING_TYPE")) _preferences.putString("ROUNDING_TYPE", static_cast<String>("NONE"));
+  if (!_config_pref.isKey("DATA_FILTER_TYP")) _config_pref.putString("DATA_FILTER_TYP", static_cast<String>("NONE"));
+  if (!_config_pref.isKey("ROUNDING_TYPE")) _config_pref.putString("ROUNDING_TYPE", static_cast<String>("NONE"));
 
-  if (!_preferences.isKey("FLOW_DECI_ACC")) _preferences.putInt("FLOW_DECI_ACC", 1);
-  if (!_preferences.isKey("GEN_DECI_ACC")) _preferences.putInt("GEN_DECI_ACC", 2);
-  if (!_preferences.isKey("CYCLIC_AV_BUFF")) _preferences.putInt("CYCLIC_AV_BUFF", 5);
-  if (!_preferences.isKey("MAF_MIN_VOLTS")) _preferences.putInt("MAF_MIN_VOLTS", 1);
+  if (!_config_pref.isKey("FLOW_DECI_ACC")) _config_pref.putInt("FLOW_DECI_ACC", 1);
+  if (!_config_pref.isKey("GEN_DECI_ACC")) _config_pref.putInt("GEN_DECI_ACC", 2);
+  if (!_config_pref.isKey("CYCLIC_AV_BUFF")) _config_pref.putInt("CYCLIC_AV_BUFF", 5);
+  if (!_config_pref.isKey("MAF_MIN_VOLTS")) _config_pref.putInt("MAF_MIN_VOLTS", 1);
 
-  if (!_preferences.isKey("API_DELIM")) _preferences.putString("API_DELIM", ":");
-  if (!_preferences.isKey("SERIAL_BAUD_RATE")) _preferences.putInt("SERIAL_BAUD_RATE", 115200);
-  if (!_preferences.isKey("SHOW_ALARMS")) _preferences.putInt("SHOW_ALARMS", true);
-  if (!_preferences.isKey("ADJ_FLOW_DEP")) _preferences.putInt("ADJ_FLOW_DEP", 28);
-  if (!_preferences.isKey("STD_REF")) _preferences.putInt("STD_REF", 1);
-  if (!_preferences.isKey("STD_ADJ_FLOW")) _preferences.putInt("STD_ADJ_FLOW", 0);
-  if (!_preferences.isKey("DATAGRAPH_MAX")) _preferences.putInt("DATAGRAPH_MAX", 0);
-  if (!_preferences.isKey("MAF_MIN_VOLTS")) _preferences.putInt("MAF_MIN_VOLTS", 1);
-  if (!_preferences.isKey("TEMP_UNIT")) _preferences.putString("TEMP_UNIT", "Celcius");
+  if (!_config_pref.isKey("API_DELIM")) _config_pref.putString("API_DELIM", ":");
+  if (!_config_pref.isKey("SERIAL_BAUD_RATE")) _config_pref.putInt("SERIAL_BAUD_RATE", 115200);
+  if (!_config_pref.isKey("SHOW_ALARMS")) _config_pref.putInt("SHOW_ALARMS", true);
+  if (!_config_pref.isKey("ADJ_FLOW_DEP")) _config_pref.putInt("ADJ_FLOW_DEP", 28);
+  if (!_config_pref.isKey("STD_REF")) _config_pref.putInt("STD_REF", 1);
+  if (!_config_pref.isKey("STD_ADJ_FLOW")) _config_pref.putInt("STD_ADJ_FLOW", 0);
+  if (!_config_pref.isKey("DATAGRAPH_MAX")) _config_pref.putInt("DATAGRAPH_MAX", 0);
+  if (!_config_pref.isKey("MAF_MIN_VOLTS")) _config_pref.putInt("MAF_MIN_VOLTS", 1);
+  if (!_config_pref.isKey("TEMP_UNIT")) _config_pref.putString("TEMP_UNIT", "Celcius");
 
-  if (!_preferences.isKey("LIFT_INTERVAL")) _preferences.putDouble("LIFT_INTERVAL", 1.5F);
-  if (!_preferences.isKey("BENCH_TYPE")) _preferences.putInt("BENCH_TYPE", MAF);
-  if (!_preferences.isKey("CAL_FLOW_RATE")) _preferences.putDouble("CAL_FLOW_RATE", 14.4F);
-  if (!_preferences.isKey("CAL_REF_PRESS")) _preferences.putDouble("CAL_REF_PRESS", 10.0F);
-  if (!_preferences.isKey("ORIFICE1_FLOW")) _preferences.putDouble("ORIFICE1_FLOW", 0.0F);
-  if (!_preferences.isKey("ORIFICE1_PRESS")) _preferences.putDouble("ORIFICE1_PRESS", 0.0F);
-  if (!_preferences.isKey("ORIFICE2_FLOW")) _preferences.putDouble("ORIFICE2_FLOW", 0.0F);
-  if (!_preferences.isKey("ORIFICE2_PRESS")) _preferences.putDouble("ORIFICE2_PRESS", 0.0F);
-  if (!_preferences.isKey("ORIFICE3_FLOW")) _preferences.putDouble("ORIFICE3_FLOW", 0.0F);
-  if (!_preferences.isKey("ORIFICE3_PRESS")) _preferences.putDouble("ORIFICE3_PRESS", 0.0F);
-  if (!_preferences.isKey("ORIFICE4_FLOW")) _preferences.putDouble("ORIFICE4_FLOW", 0.0F);
-  if (!_preferences.isKey("ORIFICE4_PRESS")) _preferences.putDouble("ORIFICE4_PRESS", 0.0F);
-  if (!_preferences.isKey("ORIFICE5_FLOW")) _preferences.putDouble("ORIFICE5_FLOW", 0.0F);
-  if (!_preferences.isKey("ORIFICE5_PRESS")) _preferences.putDouble("ORIFICE5_PRESS", 0.0F);
-  if (!_preferences.isKey("ORIFICE6_FLOW")) _preferences.putDouble("ORIFICE6_FLOW", 0.0F);
-  if (!_preferences.isKey("ORIFICE6_PRESS")) _preferences.putDouble("ORIFICE6_PRESS", 0.0F);
+  if (!_config_pref.isKey("LIFT_INTERVAL")) _config_pref.putDouble("LIFT_INTERVAL", 1.5F);
+  if (!_config_pref.isKey("BENCH_TYPE")) _config_pref.putInt("BENCH_TYPE", MAF);
+  if (!_config_pref.isKey("CAL_FLOW_RATE")) _config_pref.putDouble("CAL_FLOW_RATE", 14.4F);
+  if (!_config_pref.isKey("CAL_REF_PRESS")) _config_pref.putDouble("CAL_REF_PRESS", 10.0F);
+  if (!_config_pref.isKey("ORIFICE1_FLOW")) _config_pref.putDouble("ORIFICE1_FLOW", 0.0F);
+  if (!_config_pref.isKey("ORIFICE1_PRESS")) _config_pref.putDouble("ORIFICE1_PRESS", 0.0F);
+  if (!_config_pref.isKey("ORIFICE2_FLOW")) _config_pref.putDouble("ORIFICE2_FLOW", 0.0F);
+  if (!_config_pref.isKey("ORIFICE2_PRESS")) _config_pref.putDouble("ORIFICE2_PRESS", 0.0F);
+  if (!_config_pref.isKey("ORIFICE3_FLOW")) _config_pref.putDouble("ORIFICE3_FLOW", 0.0F);
+  if (!_config_pref.isKey("ORIFICE3_PRESS")) _config_pref.putDouble("ORIFICE3_PRESS", 0.0F);
+  if (!_config_pref.isKey("ORIFICE4_FLOW")) _config_pref.putDouble("ORIFICE4_FLOW", 0.0F);
+  if (!_config_pref.isKey("ORIFICE4_PRESS")) _config_pref.putDouble("ORIFICE4_PRESS", 0.0F);
+  if (!_config_pref.isKey("ORIFICE5_FLOW")) _config_pref.putDouble("ORIFICE5_FLOW", 0.0F);
+  if (!_config_pref.isKey("ORIFICE5_PRESS")) _config_pref.putDouble("ORIFICE5_PRESS", 0.0F);
+  if (!_config_pref.isKey("ORIFICE6_FLOW")) _config_pref.putDouble("ORIFICE6_FLOW", 0.0F);
+  if (!_config_pref.isKey("ORIFICE6_PRESS")) _config_pref.putDouble("ORIFICE6_PRESS", 0.0F);
 
-  _preferences.end();
+  _config_pref.end();
 
 }
 
@@ -878,56 +879,56 @@ void DataHandler::loadSettings () {
 
   DataHandler _data;
   Messages _message;
-  Preferences _preferences;
+  Preferences _config_pref;
 
   _message.serialPrintf("Loading Configuration \n");    
   
-  _preferences.begin("settings", false);
+  _config_pref.begin("settings", false);
 
 
-  // strcpy(_preferences.getString("WIFI_SSID", "WIFI-SSID" ).toCharArray(), settings.wifi_ssid);
-  settings.wifi_ssid = _preferences.getString("WIFI_SSID", "WIFI-SSID");
-  settings.wifi_pswd = _preferences.getString("WIFI_PSWD", "PASSWORD");
-  settings.wifi_ap_ssid = _preferences.getString("WIFI_AP_SSID", "DIYFB" );
-  settings.wifi_ap_pswd =_preferences.getString("WIFI_AP_PSWD", "123456789" );
-  settings.hostname = _preferences.getString("HOSTNAME", "diyfb" );
-  settings.wifi_timeout = _preferences.getInt("WIFI_TIMEOUT", 4000 );
-  settings.maf_housing_diameter = _preferences.getInt("MAF_HOUSING_DIA", 0 );
-  settings.refresh_rate = _preferences.getInt("REFRESH_RATE", 500 );
-  settings.min_bench_pressure  = _preferences.getInt("MIN_BENCH_PRESS", 1 );
-  settings.min_flow_rate = _preferences.getInt("MIN_FLOW_RATE", 1 );
-  settings.data_filter_type = _preferences.getString("DATA_FILTER_TYP", "NONE" );
-  settings.rounding_type = _preferences.getString("ROUNDING_TYPE", "NONE" );
-  settings.flow_decimal_length = _preferences.getInt("FLOW_DECI_ACC", 1 );
-  settings.gen_decimal_length = _preferences.getInt("GEN_DECI_ACC", 2 );
-  settings.cyc_av_buffer  = _preferences.getInt("CYCLIC_AV_BUFF", 5 );
-  settings.maf_min_volts  = _preferences.getInt("MAF_MIN_VOLTS", 0.1F );
-  settings.api_delim = _preferences.getString("API_DELIM", ":" );
-  settings.serial_baud_rate = _preferences.getInt("SERIAL_BAUD_RATE",  115200 );
-  settings.show_alarms = _preferences.getInt("SHOW_ALARMS",  true  );
-  settings.adj_flow_depression = _preferences.getInt("ADJ_FLOW_DEP",  28  );
-  settings.standardReference = _preferences.getInt("STD_REF", 1  );
-  settings.std_adj_flow = _preferences.getInt("STD_ADJ_FLOW",  0 );
-  settings.dataGraphMax = _preferences.getInt("DATAGRAPH_MAX", 0 );
-  settings.temp_unit = _preferences.getString("TEMP_UNIT", "Celcius" );
-  settings.valveLiftInterval = _preferences.getDouble("LIFT_INTERVAL", 1.5F  );
-  settings.bench_type = _preferences.getInt("BENCH_TYPE", MAF );
-  settings.cal_flow_rate = _preferences.getDouble("CAL_FLOW_RATE", 14.4F );
-  settings.cal_ref_press = _preferences.getDouble("CAL_REF_PRESS", 10.0F );
-  settings.orificeOneFlow = _preferences.getDouble("ORIFICE1_FLOW", 0.0F );
-  settings.orificeOneDepression = _preferences.getDouble("ORIFICE1_PRESS", 0.0F );
-  settings.orificeTwoFlow = _preferences.getDouble("ORIFICE2_FLOW", 0.0F );
-  settings.orificeTwoDepression = _preferences.getDouble("ORIFICE2_PRESS", 0.0F );
-  settings.orificeThreeFlow = _preferences.getDouble("ORIFICE3_FLOW", 0.0F );
-  settings.orificeThreeDepression = _preferences.getDouble("ORIFICE3_PRESS", 0.0F );
-  settings.orificeFourFlow = _preferences.getDouble("ORIFICE4_FLOW", 0.0F );
-  settings.orificeFourDepression = _preferences.getDouble("ORIFICE4_PRESS", 0.0F );
-  settings.orificeFiveFlow = _preferences.getDouble("ORIFICE5_FLOW", 0.0F );
-  settings.orificeFiveDepression = _preferences.getDouble("ORIFICE5_PRESS", 0.0F );
-  settings.orificeSixFlow = _preferences.getDouble("ORIFICE6_FLOW", 0.0F );
-  settings.orificeSixDepression = _preferences.getDouble("ORIFICE6_PRESS",  0.0F);
+  // strcpy(_config_pref.getString("WIFI_SSID", "WIFI-SSID" ).toCharArray(), settings.wifi_ssid);
+  settings.wifi_ssid = _config_pref.getString("WIFI_SSID", "WIFI-SSID");
+  settings.wifi_pswd = _config_pref.getString("WIFI_PSWD", "PASSWORD");
+  settings.wifi_ap_ssid = _config_pref.getString("WIFI_AP_SSID", "DIYFB" );
+  settings.wifi_ap_pswd =_config_pref.getString("WIFI_AP_PSWD", "123456789" );
+  settings.hostname = _config_pref.getString("HOSTNAME", "diyfb" );
+  settings.wifi_timeout = _config_pref.getInt("WIFI_TIMEOUT", 4000 );
+  settings.maf_housing_diameter = _config_pref.getInt("MAF_HOUSING_DIA", 0 );
+  settings.refresh_rate = _config_pref.getInt("REFRESH_RATE", 500 );
+  settings.min_bench_pressure  = _config_pref.getInt("MIN_BENCH_PRESS", 1 );
+  settings.min_flow_rate = _config_pref.getInt("MIN_FLOW_RATE", 1 );
+  settings.data_filter_type = _config_pref.getString("DATA_FILTER_TYP", "NONE" );
+  settings.rounding_type = _config_pref.getString("ROUNDING_TYPE", "NONE" );
+  settings.flow_decimal_length = _config_pref.getInt("FLOW_DECI_ACC", 1 );
+  settings.gen_decimal_length = _config_pref.getInt("GEN_DECI_ACC", 2 );
+  settings.cyc_av_buffer  = _config_pref.getInt("CYCLIC_AV_BUFF", 5 );
+  settings.maf_min_volts  = _config_pref.getInt("MAF_MIN_VOLTS", 0.1F );
+  settings.api_delim = _config_pref.getString("API_DELIM", ":" );
+  settings.serial_baud_rate = _config_pref.getInt("SERIAL_BAUD_RATE",  115200 );
+  settings.show_alarms = _config_pref.getInt("SHOW_ALARMS",  true  );
+  settings.adj_flow_depression = _config_pref.getInt("ADJ_FLOW_DEP",  28  );
+  settings.standardReference = _config_pref.getInt("STD_REF", 1  );
+  settings.std_adj_flow = _config_pref.getInt("STD_ADJ_FLOW",  0 );
+  settings.dataGraphMax = _config_pref.getInt("DATAGRAPH_MAX", 0 );
+  settings.temp_unit = _config_pref.getString("TEMP_UNIT", "Celcius" );
+  settings.valveLiftInterval = _config_pref.getDouble("LIFT_INTERVAL", 1.5F  );
+  settings.bench_type = _config_pref.getInt("BENCH_TYPE", MAF );
+  settings.cal_flow_rate = _config_pref.getDouble("CAL_FLOW_RATE", 14.4F );
+  settings.cal_ref_press = _config_pref.getDouble("CAL_REF_PRESS", 10.0F );
+  settings.orificeOneFlow = _config_pref.getDouble("ORIFICE1_FLOW", 0.0F );
+  settings.orificeOneDepression = _config_pref.getDouble("ORIFICE1_PRESS", 0.0F );
+  settings.orificeTwoFlow = _config_pref.getDouble("ORIFICE2_FLOW", 0.0F );
+  settings.orificeTwoDepression = _config_pref.getDouble("ORIFICE2_PRESS", 0.0F );
+  settings.orificeThreeFlow = _config_pref.getDouble("ORIFICE3_FLOW", 0.0F );
+  settings.orificeThreeDepression = _config_pref.getDouble("ORIFICE3_PRESS", 0.0F );
+  settings.orificeFourFlow = _config_pref.getDouble("ORIFICE4_FLOW", 0.0F );
+  settings.orificeFourDepression = _config_pref.getDouble("ORIFICE4_PRESS", 0.0F );
+  settings.orificeFiveFlow = _config_pref.getDouble("ORIFICE5_FLOW", 0.0F );
+  settings.orificeFiveDepression = _config_pref.getDouble("ORIFICE5_PRESS", 0.0F );
+  settings.orificeSixFlow = _config_pref.getDouble("ORIFICE6_FLOW", 0.0F );
+  settings.orificeSixDepression = _config_pref.getDouble("ORIFICE6_PRESS",  0.0F);
 
-  _preferences.end();
+  _config_pref.end();
 
 }
 

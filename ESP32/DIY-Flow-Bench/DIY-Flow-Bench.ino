@@ -71,7 +71,7 @@ Configuration config;
 Pins pins;
 
 // Initiate Classes
-Preferences _preferences;
+Preferences _config_pref;
 DataHandler _data;
 API _api;
 Calculations _calculations;
