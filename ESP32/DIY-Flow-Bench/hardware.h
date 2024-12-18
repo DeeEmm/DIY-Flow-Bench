@@ -38,7 +38,8 @@ class Hardware {
 		void begin ();
 		void getI2CList();
 		void getI2CDeviceList();
-		void initaliseIO ();
+		void loadPinsData ();
+		void initialisePins ();
 		
 		int32_t getADCRawData(int channel);
 		double get3v3SupplyVolts();

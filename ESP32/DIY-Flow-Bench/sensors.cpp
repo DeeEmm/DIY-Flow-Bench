@@ -591,7 +591,7 @@ double Sensors::getPRefVolts() {
 		}
 
 		case LINEAR_ANALOG : {
-			long refPressRaw = analogRead(pins.REF_PRESSURE_PIN);
+			long refPressRaw = analogRead(pins.PREF_PIN);
 			sensorVolts = static_cast<double>(refPressRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}
@@ -712,7 +712,7 @@ double Sensors::getPDiffVolts() {
 		}
 
 		case LINEAR_ANALOG : {
-			long pDiffRaw = analogRead(pins.DIFF_PRESSURE_PIN);
+			long pDiffRaw = analogRead(pins.PDIFF_PIN);
 			sensorVolts = static_cast<double>(pDiffRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}

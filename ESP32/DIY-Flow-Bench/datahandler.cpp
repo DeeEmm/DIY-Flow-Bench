@@ -48,6 +48,7 @@
 #include "calculations.h"
 #include "comms.h"
 #include "webserver.h"
+#include "calibration.h"
 #include "API.h"
 
 
@@ -64,11 +65,11 @@ void DataHandler::begin() {
     Messages _message;
     Comms _comms;
     DataHandler _data;
+    Calibration _calibration;
 
     StaticJsonDocument<1024> pinData;
-    // StaticJsonDocument<1024> mafData;
 
-    // Need to set up the data environment...
+    // Set up the data environment...
 
     // Load configuration
     this->initialiseConfig();
@@ -80,12 +81,12 @@ void DataHandler::begin() {
     this->beginSerial(); 
 
     _message.serialPrintf("\r\nDIY Flow Bench\n");                                         
-    // Note RELEASE and BUILD_NUMBER are defined at compile time within extra_scripts directive in user_actions_pre.py 
+    // NOTE: RELEASE and BUILD_NUMBER are defined at compile time within extra_scripts directive in user_actions_pre.py 
     _message.serialPrintf("DIYFB Version: %s \nBuild: %s \n", RELEASE, BUILD_NUMBER);                                         
     _message.serialPrintf("For help please visit the WIKI:\n");                                         
     _message.serialPrintf("https://github.com/DeeEmm/DIY-Flow-Bench/wiki\n");                                         
 
-    // initialise SPIFFS Filesystem
+    // Initialise SPIFFS Filesystem
     _message.serialPrintf("Initialising File System \n"); 
     if (SPIFFS.begin()) {
     } else {
@@ -99,18 +100,15 @@ void DataHandler::begin() {
         #endif
     }
 
-    // Check if settings / calibration / liftdata json files exist. If not create them.
-    if (!SPIFFS.exists("/settings.json")) createSettingsFile();
-    if (!SPIFFS.exists("/liftdata.json")) createLiftDataFile();
-    if (!SPIFFS.exists("/cal.json")) createCalibrationFile();
-
-    // load config / calibration / liftdata files
+    // Load settings / calibration / liftdata files
     this->initialiseSettings();
     this->loadSettings();
     
+    this->initialiseLiftData();
     this->loadLiftData();
     
-    this->loadCalibrationData();
+    _calibration.initialiseCalibrationData();
+    _calibration.loadCalibrationData();
 
 
 
@@ -162,10 +160,10 @@ void DataHandler::begin() {
 
     // Load MAF / CONFIG / PINS files
     // if (status.configLoaded == true) _data.loadConfiguration();
-    if (status.pinsLoaded == true) _data.loadPinsData();
+    if (status.pinsLoaded == true) _hardware.loadPinsData();
     if (status.mafLoaded == true) _data.loadMAFData();
     
-    _hardware.initaliseIO();
+    _hardware.initialisePins();
 
     // Start Wire (I2C)
     Wire.begin (pins.SDA_PIN, pins.SCL_PIN); 
@@ -357,65 +355,65 @@ bool DataHandler::checkUserFile(int filetype) {
 
 
 
-/***********************************************************
-* @brief createConfig
-* @details Create basic minimum configuration json file
-* @note Called from DataHandler::begin() if settings.json not found
-***/
-void DataHandler::createSettingsFile() {
+// /***********************************************************
+// * @brief createConfig
+// * @details Create basic minimum configuration json file
+// * @note Called from DataHandler::begin() if settings.json not found
+// ***/
+// void DataHandler::createSettingsFile() {
 
-  extern struct BenchSettings settings;
-  Messages _message;
-  String jsonString;  
-  StaticJsonDocument<CONFIG_JSON_SIZE> configData;
+//   extern struct BenchSettings settings;
+//   Messages _message;
+//   String jsonString;  
+//   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
 
-  _message.serialPrintf("Creating settings.json file... \n"); 
+//   _message.serialPrintf("Creating settings.json file... \n"); 
  
-  configData["PAGE_TITLE"] = settings.pageTitle;
-  configData["WIFI_SSID"] = settings.wifi_ssid;
-  configData["WIFI_PSWD"] = settings.wifi_pswd;
-  configData["WIFI_AP_SSID"] = settings.wifi_ap_ssid;
-  configData["WIFI_AP_PSWD"] = settings.wifi_ap_pswd;
-  configData["HOSTNAME"] = settings.hostname;
-  configData["WIFI_TIMEOUT"] = settings.wifi_timeout;
-  configData["MAF_HOUSING_DIA"] = settings.maf_housing_diameter;
-  configData["REFRESH_RATE"] = settings.refresh_rate;
-  configData["MIN_BENCH_PRESS"] = settings.min_bench_pressure;
-  configData["MIN_FLOW_RATE"] = settings.min_flow_rate;
-  configData["DATA_FILTER_TYP"] = settings.data_filter_type;
-  configData["ROUNDING_TYPE"] = settings.rounding_type;
-  configData["FLOW_DECI_ACC"] = settings.flow_decimal_length;
-  configData["GEN_DECI_ACC"] = settings.gen_decimal_length;
-  configData["CYCLIC_AV_BUFF"] = settings.cyc_av_buffer;
-  configData["MAF_MIN_VOLTS"] = settings.maf_min_volts;
-  configData["API_DELIM"] = settings.api_delim;
-  configData["SERIAL_BAUD_RATE"] = settings.serial_baud_rate;
-  configData["ADJ_FLOW_DEP"] = settings.adj_flow_depression;
-  configData["STD_REF"] = settings.standardReference;
-  configData["STD_ADJ_FLOW"] = settings.std_adj_flow;
-  configData["DATAGRAPH_MAX"] = settings.dataGraphMax;
-  configData["TEMP_UNIT"] = settings.temp_unit;
-  configData["LIFT_INTERVAL"] = settings.valveLiftInterval;
-  configData["SHOW_ALARMS"] = settings.show_alarms;
-  configData["BENCH_TYPE"] = settings.bench_type;
-  configData["CAL_FLOW_RATE"] = settings.cal_flow_rate;
-  configData["CAL_REF_PRESS"] = settings.cal_ref_press;
-  configData["ORIFICE1_FLOW"] = settings.orificeOneFlow;
-  configData["ORIFICE1_PRESS"] = settings.orificeOneDepression;
-  configData["ORIFICE2_FLOW"] = settings.orificeTwoFlow;
-  configData["ORIFICE2_PRESS"] = settings.orificeThreeDepression;
-  configData["ORIFICE3_FLOW"] = settings.orificeThreeFlow;
-  configData["ORIFICE4_FLOW"] = settings.orificeFourFlow;
-  configData["ORIFICE4_PRESS"] = settings.orificeFourDepression;
-  configData["ORIFICE5_FLOW"] = settings.orificeFiveFlow;
-  configData["ORIFICE5_PRESS"] = settings.orificeFiveDepression;
-  configData["ORIFICE6_FLOW"] = settings.orificeSixFlow;
-  configData["ORIFICE7_TEST_PRESSURE"] = settings.orificeSixDepression;
+//   configData["PAGE_TITLE"] = settings.pageTitle;
+//   configData["WIFI_SSID"] = settings.wifi_ssid;
+//   configData["WIFI_PSWD"] = settings.wifi_pswd;
+//   configData["WIFI_AP_SSID"] = settings.wifi_ap_ssid;
+//   configData["WIFI_AP_PSWD"] = settings.wifi_ap_pswd;
+//   configData["HOSTNAME"] = settings.hostname;
+//   configData["WIFI_TIMEOUT"] = settings.wifi_timeout;
+//   configData["MAF_HOUSING_DIA"] = settings.maf_housing_diameter;
+//   configData["REFRESH_RATE"] = settings.refresh_rate;
+//   configData["MIN_BENCH_PRESS"] = settings.min_bench_pressure;
+//   configData["MIN_FLOW_RATE"] = settings.min_flow_rate;
+//   configData["DATA_FILTER_TYP"] = settings.data_filter_type;
+//   configData["ROUNDING_TYPE"] = settings.rounding_type;
+//   configData["FLOW_DECI_ACC"] = settings.flow_decimal_length;
+//   configData["GEN_DECI_ACC"] = settings.gen_decimal_length;
+//   configData["CYCLIC_AV_BUFF"] = settings.cyc_av_buffer;
+//   configData["MAF_MIN_VOLTS"] = settings.maf_min_volts;
+//   configData["API_DELIM"] = settings.api_delim;
+//   configData["SERIAL_BAUD_RATE"] = settings.serial_baud_rate;
+//   configData["ADJ_FLOW_DEP"] = settings.adj_flow_depression;
+//   configData["STD_REF"] = settings.standardReference;
+//   configData["STD_ADJ_FLOW"] = settings.std_adj_flow;
+//   configData["DATAGRAPH_MAX"] = settings.dataGraphMax;
+//   configData["TEMP_UNIT"] = settings.temp_unit;
+//   configData["LIFT_INTERVAL"] = settings.valveLiftInterval;
+//   configData["SHOW_ALARMS"] = settings.show_alarms;
+//   configData["BENCH_TYPE"] = settings.bench_type;
+//   configData["CAL_FLOW_RATE"] = settings.cal_flow_rate;
+//   configData["CAL_REF_PRESS"] = settings.cal_ref_press;
+//   configData["ORIFICE1_FLOW"] = settings.orificeOneFlow;
+//   configData["ORIFICE1_PRESS"] = settings.orificeOneDepression;
+//   configData["ORIFICE2_FLOW"] = settings.orificeTwoFlow;
+//   configData["ORIFICE2_PRESS"] = settings.orificeThreeDepression;
+//   configData["ORIFICE3_FLOW"] = settings.orificeThreeFlow;
+//   configData["ORIFICE4_FLOW"] = settings.orificeFourFlow;
+//   configData["ORIFICE4_PRESS"] = settings.orificeFourDepression;
+//   configData["ORIFICE5_FLOW"] = settings.orificeFiveFlow;
+//   configData["ORIFICE5_PRESS"] = settings.orificeFiveDepression;
+//   configData["ORIFICE6_FLOW"] = settings.orificeSixFlow;
+//   configData["ORIFICE7_TEST_PRESSURE"] = settings.orificeSixDepression;
 
-  serializeJsonPretty(configData, jsonString);
-  writeJSONFile(jsonString, "/settings.json", CONFIG_JSON_SIZE);
+//   serializeJsonPretty(configData, jsonString);
+//   writeJSONFile(jsonString, "/settings.json", CONFIG_JSON_SIZE);
 
-}
+// }
 
 
 
@@ -444,68 +442,68 @@ void DataHandler::writeJSONFile(String data, String filename, int dataSize){
 
 
 
-/***********************************************************
-* @brief createLiftDataFile
-* @details Create blank lift data json file
-* @note Called from DataHandler::begin() if liftdata.json not found
-***/
-void DataHandler::createLiftDataFile () {
+// /***********************************************************
+// * @brief createLiftDataFile
+// * @details Create blank lift data json file
+// * @note Called from DataHandler::begin() if liftdata.json not found
+// ***/
+// void DataHandler::createLiftDataFile () {
 
-  Messages _message;
-  String jsonString;  
-  StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
+//   Messages _message;
+//   String jsonString;  
+//   StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
 
-  _message.serialPrintf("Creating liftdata.json file... \n"); 
+//   _message.serialPrintf("Creating liftdata.json file... \n"); 
 
-  liftData["LIFTDATA1"] = 0.0;
-  liftData["LIFTDATA2"] = 0.0;
-  liftData["LIFTDATA3"] = 0.0;
-  liftData["LIFTDATA4"] = 0.0;
-  liftData["LIFTDATA5"] = 0.0;
-  liftData["LIFTDATA6"] = 0.0;
-  liftData["LIFTDATA7"] = 0.0;
-  liftData["LIFTDATA8"] = 0.0;
-  liftData["LIFTDATA9"] = 0.0;
-  liftData["LIFTDATA10"] = 0.0;
-  liftData["LIFTDATA11"] = 0.0;
-  liftData["LIFTDATA12"] = 0.0;
+//   liftData["LIFTDATA1"] = 0.0;
+//   liftData["LIFTDATA2"] = 0.0;
+//   liftData["LIFTDATA3"] = 0.0;
+//   liftData["LIFTDATA4"] = 0.0;
+//   liftData["LIFTDATA5"] = 0.0;
+//   liftData["LIFTDATA6"] = 0.0;
+//   liftData["LIFTDATA7"] = 0.0;
+//   liftData["LIFTDATA8"] = 0.0;
+//   liftData["LIFTDATA9"] = 0.0;
+//   liftData["LIFTDATA10"] = 0.0;
+//   liftData["LIFTDATA11"] = 0.0;
+//   liftData["LIFTDATA12"] = 0.0;
 
-  serializeJsonPretty(liftData, jsonString);
-  writeJSONFile(jsonString, "/liftdata.json", LIFT_DATA_JSON_SIZE);
+//   serializeJsonPretty(liftData, jsonString);
+//   writeJSONFile(jsonString, "/liftdata.json", LIFT_DATA_JSON_SIZE);
 
-}
-
-
+// }
 
 
-/***********************************************************
-* @brief createCalibration File
-* @details Create configuration json file
-* @note Called from DataHandler::begin() if cal.json not found
-***/
-void DataHandler::createCalibrationFile () {
 
-  extern struct CalibrationData calVal;
-  Messages _message;
-  String jsonString;
-  StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
+
+// /***********************************************************
+// * @brief createCalibration File
+// * @details Create configuration json file
+// * @note Called from DataHandler::begin() if cal.json not found
+// ***/
+// void DataHandler::createCalibrationFile () {
+
+//   extern struct CalibrationData calVal;
+//   Messages _message;
+//   String jsonString;
+//   StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
   
-  _message.debugPrintf("Creating cal.json file... \n"); 
+//   _message.debugPrintf("Creating cal.json file... \n"); 
   
-  calData["FLOW_OFFSET"] = calVal.flow_offset;
-  calData["USER_OFFSET"] = calVal.user_offset;
-  calData["LEAK_CAL_BASELINE"] = calVal.leak_cal_baseline;
-  calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
-  calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
-  calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
+//   calData["FLOW_OFFSET"] = calVal.flow_offset;
+//   calData["USER_OFFSET"] = calVal.user_offset;
+//   calData["LEAK_CAL_BASELINE"] = calVal.leak_cal_baseline;
+//   calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
+//   calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
+//   calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
 
-  serializeJsonPretty(calData, jsonString);
+//   serializeJsonPretty(calData, jsonString);
 
-  File outputFile = SPIFFS.open("/cal.json", FILE_WRITE);
-  serializeJsonPretty(calData, outputFile);
-  outputFile.close();
+//   File outputFile = SPIFFS.open("/cal.json", FILE_WRITE);
+//   serializeJsonPretty(calData, outputFile);
+//   outputFile.close();
   
-}
+// }
 
 
 
@@ -885,8 +883,6 @@ void DataHandler::loadSettings () {
   
   _config_pref.begin("settings", false);
 
-
-  // strcpy(_config_pref.getString("WIFI_SSID", "WIFI-SSID" ).toCharArray(), settings.wifi_ssid);
   settings.wifi_ssid = _config_pref.getString("WIFI_SSID", "WIFI-SSID");
   settings.wifi_pswd = _config_pref.getString("WIFI_PSWD", "PASSWORD");
   settings.wifi_ap_ssid = _config_pref.getString("WIFI_AP_SSID", "DIYFB" );
@@ -934,75 +930,6 @@ void DataHandler::loadSettings () {
 
 
 
-
-
-
-// /***********************************************************
-// * @brief loadSettings
-// * @details read settings settings.json file and loads into global struct
-// ***/ 
-// StaticJsonDocument<SETTINGS_JSON_SIZE> DataHandler::loadSettings () {
-
-//   extern struct BenchSettings settings;
-
-//   StaticJsonDocument<SETTINGS_JSON_SIZE> configData;
-//   DataHandler _data;
-//   Messages _message;
-
-//   _message.serialPrintf("Loading Bench Settings \n");     
-
-//   if (SPIFFS.exists("/settings.json"))  {
-
-//     configData = _data.loadJSONFile("/settings.json");
-
-//     strcpy(settings.wifi_ssid, configData["WIFI_SSID"]);
-//     strcpy(settings.wifi_pswd, configData["WIFI_PSWD"]);
-//     strcpy(settings.wifi_ap_ssid, configData["WIFI_AP_SSID"]);
-//     strcpy(settings.wifi_ap_pswd,configData["WIFI_AP_PSWD"]);
-//     strcpy(settings.hostname, configData["HOSTNAME"]);
-//     settings.wifi_timeout = configData["WIFI_TIMEOUT"].as<int>();
-//     settings.maf_housing_diameter = configData["MAF_HOUSING_DIA"].as<int>();
-//     settings.refresh_rate = configData["REFRESH_RATE"].as<int>();
-//     settings.min_bench_pressure  = configData["MIN_BENCH_PRESS"].as<int>();
-//     settings.min_flow_rate = configData["MIN_FLOW_RATE"].as<int>();
-//     strcpy(settings.data_filter_type, configData["DATA_FILTER_TYP"]);
-//     strcpy(settings.rounding_type, configData["ROUNDING_TYPE"]);
-//     settings.flow_decimal_length, configData["FLOW_DECI_ACC"];
-//     settings.gen_decimal_length, configData["GEN_DECI_ACC"];
-//     settings.cyc_av_buffer  = configData["CYCLIC_AV_BUFF"].as<int>();
-//     settings.maf_min_volts  = configData["MAF_MIN_VOLTS"].as<int>();
-//     strcpy(settings.api_delim, configData["API_DELIM"]);
-//     settings.serial_baud_rate = configData["SERIAL_BAUD_RATE"].as<long>();
-//     settings.show_alarms = configData["SHOW_ALARMS"].as<bool>();
-//     configData["ADJ_FLOW_DEP"] = settings.adj_flow_depression;
-//     configData["STD_REF"] = settings.standardReference;
-//     configData["STD_ADJ_FLOW"] = settings.std_adj_flow;
-//     configData["DATAGRAPH_MAX"] = settings.dataGraphMax;
-//     configData["TEMP_UNIT"] = settings.temp_unit;
-//     configData["LIFT_INTERVAL"] = settings.valveLiftInterval;
-//     strcpy(settings.bench_type, configData["BENCH_TYPE"]);
-//     settings.cal_flow_rate = configData["CAL_FLOW_RATE"].as<double>();
-//     settings.cal_ref_press = configData["CAL_REF_PRESS"].as<double>();
-//     settings.orificeOneFlow = configData["ORIFICE1_FLOW"].as<double>();
-//     settings.orificeOneDepression = configData["ORIFICE1_PRESS"].as<double>();
-//     settings.orificeTwoFlow = configData["ORIFICE2_FLOW"].as<double>();
-//     settings.orificeTwoDepression = configData["ORIFICE2_PRESS"].as<double>();
-//     settings.orificeThreeFlow = configData["ORIFICE3_FLOW"].as<double>();
-//     settings.orificeThreeDepression = configData["ORIFICE3_PRESS"].as<double>();
-//     settings.orificeFourFlow = configData["ORIFICE4_FLOW"].as<double>();
-//     settings.orificeFourDepression = configData["ORIFICE4_PRESS"].as<double>();
-//     settings.orificeFiveFlow = configData["ORIFICE5_FLOW"].as<double>();
-//     settings.orificeFiveDepression = configData["ORIFICE5_PRESS"].as<double>();
-//     settings.orificeSixFlow = configData["ORIFICE6_FLOW"].as<double>();
-//     settings.orificeSixDepression = configData["ORIFICE6_PRESS"].as<double>();
-
-//   } else {
-//     _message.serialPrintf("Bench Settings file not found \n");
-//   }
-  
-//   return configData;  
-
-// }
 
 
 
@@ -1103,40 +1030,75 @@ void DataHandler::loadMAFData () {
 
 
 /***********************************************************
+* @brief initialiseLiftData
+* @note - Initialise settings in NVM if they do not exist
+* @note Key must be 15 chars or shorter.
+***/ 
+void DataHandler::initialiseLiftData () {
+
+  extern struct BenchSettings settings;
+
+  DataHandler _data;
+  Messages _message;
+  Preferences _lift_data_pref;
+
+  _message.serialPrintf("Initialising Lift Data \n");    
+  
+  _lift_data_pref.begin("liftData", false);
+
+  if (!_lift_data_pref.isKey("LIFTDATA1")) _lift_data_pref.putDouble("LIFTDATA1", 0.0);
+  if (!_lift_data_pref.isKey("LIFTDATA2")) _lift_data_pref.putDouble("LIFTDATA2", 0.0);
+  if (!_lift_data_pref.isKey("LIFTDATA3")) _lift_data_pref.putDouble("LIFTDATA3", 0.0);
+  if (!_lift_data_pref.isKey("LIFTDATA4")) _lift_data_pref.putDouble("LIFTDATA4", 0.0);
+  if (!_lift_data_pref.isKey("LIFTDATA5")) _lift_data_pref.putDouble("LIFTDATA5", 0.0);
+  if (!_lift_data_pref.isKey("LIFTDATA6")) _lift_data_pref.putDouble("LIFTDATA6", 0.0);
+  if (!_lift_data_pref.isKey("LIFTDATA7")) _lift_data_pref.putDouble("LIFTDATA7", 0.0);
+  if (!_lift_data_pref.isKey("LIFTDATA8")) _lift_data_pref.putDouble("LIFTDATA8", 0.0);
+  if (!_lift_data_pref.isKey("LIFTDATA9")) _lift_data_pref.putDouble("LIFTDATA9", 0.0);
+  if (!_lift_data_pref.isKey("LIFTDATA10")) _lift_data_pref.putDouble("LIFTDATA10", 0.0);
+  if (!_lift_data_pref.isKey("LIFTDATA11")) _lift_data_pref.putDouble("LIFTDATA11", 0.0);
+  if (!_lift_data_pref.isKey("LIFTDATA12")) _lift_data_pref.putDouble("LIFTDATA12", 0.0);
+
+  _lift_data_pref.end();
+
+}
+
+
+
+
+
+
+/***********************************************************
 * @brief loadLiftDataFile
 * @details read lift data from liftdata.json file
 ***/ 
-StaticJsonDocument<LIFT_DATA_JSON_SIZE> DataHandler::loadLiftData () {
+void DataHandler::loadLiftData () {
 
   extern struct ValveLiftData valveData;
-  StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
+
   DataHandler _data;
   Messages _message;
+  Preferences _lift_data_pref;
 
   _message.serialPrintf("Loading Lift Data \n");     
 
-  if (SPIFFS.exists("/liftdata.json"))  {
-    
-    liftData = _data.loadJSONFile("/liftdata.json");
-    
-    valveData.LiftData1 = liftData["LIFTDATA1"].as<double>();
-    valveData.LiftData2 = liftData["LIFTDATA2"].as<double>();
-    valveData.LiftData3 = liftData["LIFTDATA3"].as<double>();
-    valveData.LiftData4 = liftData["LIFTDATA4"].as<double>();
-    valveData.LiftData5 = liftData["LIFTDATA5"].as<double>();
-    valveData.LiftData6 = liftData["LIFTDATA6"].as<double>();
-    valveData.LiftData7 = liftData["LIFTDATA7"].as<double>();
-    valveData.LiftData8 = liftData["LIFTDATA8"].as<double>();
-    valveData.LiftData9 = liftData["LIFTDATA9"].as<double>();
-    valveData.LiftData10 = liftData["LIFTDATA10"].as<double>();
-    valveData.LiftData11 = liftData["LIFTDATA11"].as<double>();
-    valveData.LiftData12 = liftData["LIFTDATA12"].as<double>();
 
-  } else {
-    _message.serialPrintf("LiftData file not found \n");
-  }
-  
-  return liftData;  
+  _lift_data_pref.begin("settings", false);
+
+  valveData.LiftData1 = _lift_data_pref.getDouble("LIFTDATA1", 0.0);
+  valveData.LiftData2 = _lift_data_pref.getDouble("LIFTDATA2", 0.0);
+  valveData.LiftData3 = _lift_data_pref.getDouble("LIFTDATA3", 0.0);
+  valveData.LiftData4 = _lift_data_pref.getDouble("LIFTDATA4", 0.0);
+  valveData.LiftData5 = _lift_data_pref.getDouble("LIFTDATA5", 0.0);
+  valveData.LiftData6 = _lift_data_pref.getDouble("LIFTDATA6", 0.0);
+  valveData.LiftData7 = _lift_data_pref.getDouble("LIFTDATA7", 0.0);
+  valveData.LiftData8 = _lift_data_pref.getDouble("LIFTDATA8", 0.0);
+  valveData.LiftData9 = _lift_data_pref.getDouble("LIFTDATA9", 0.0);
+  valveData.LiftData10 = _lift_data_pref.getDouble("LIFTDATA10", 0.0);
+  valveData.LiftData11 = _lift_data_pref.getDouble("LIFTDATA11", 0.0);
+  valveData.LiftData12 = _lift_data_pref.getDouble("LIFTDATA12", 0.0);
+
+  _lift_data_pref.end();
 
 }
 
@@ -1165,146 +1127,6 @@ void DataHandler::clearLiftDataFile(AsyncWebServerRequest *request){
 }
 
 
-
-
-
-
-
-/***********************************************************
-* @name loadCalibrationData
-* @brief Read calibration data from calibration.json file
-* @return calibrationData 
-***/
-StaticJsonDocument<1024> DataHandler::loadCalibrationData () {
-
-  DataHandler _data;
-  Messages _message;
-  _message.serialPrintf("Loading Calibration Data \n");     
-
-  StaticJsonDocument<1024> calibrationData;
-  calibrationData = _data.loadJSONFile("/cal.json");
-  parseCalibrationData(calibrationData);
-  return calibrationData;
-}
-
-
-
-
-
-
-/***********************************************************
-* @brief Parse Calibration Data
-* @param calibrationData JSON document containing calibration data
-***/
-void DataHandler::parseCalibrationData(StaticJsonDocument<1024> calData) {
-
-  extern struct CalibrationData calVal;
-
-  calVal.flow_offset = calData["FLOW_OFFSET"];
-  calVal.user_offset = calData["USER_OFFSET"];
-  calVal.leak_cal_baseline = calData["LEAK_CAL_BASELINE"];
-  calVal.leak_cal_baseline_rev = calData["LEAK_CAL_BASELINE_REV"];
-  calVal.leak_cal_offset = calData["LEAK_CAL_OFFSET"];
-  calVal.leak_cal_offset_rev = calData["LEAK_CAL_OFFSET_REV"];
-  calVal.pdiff_cal_offset = calData["PDIFF_CAL_OFFSET"];
-  calVal.pitot_cal_offset = calData["PITOT_CAL_OFFSET"];
-}
-
-
-
-
-
-
-
-/***********************************************************
-* @name ParsePinsData
-* @brief Updates pins struct from passed JSON data
-* @param pinsData JSON document containing pins data
-***/
-void DataHandler::parsePinsData(StaticJsonDocument<1024> pinData) {
-
-  extern struct CalibrationData calVal;
-  extern struct Pins pins;
-  extern struct DeviceStatus status;
-
-  Messages _message;
-
-  _message.serialPrintf("Parsing Pins Data \n");    
-
-  status.boardType = pinData["BOARD_TYPE"].as<String>();
-
-  // Store input pin values in struct
-  pins.VCC_3V3_PIN = pinData["VCC_3V3_PIN"].as<int>();
-  pins.VCC_5V_PIN = pinData["VCC_5V_PIN"].as<int>();
-  pins.SPEED_SENS_PIN = pinData["SPEED_SENS_PIN"].as<int>();
-  pins.ORIFICE_BCD_BIT1_PIN = pinData["ORIFICE_BCD_BIT1_PIN"].as<int>();
-  pins.ORIFICE_BCD_BIT2_PIN = pinData["ORIFICE_BCD_BIT2_PIN"].as<int>();
-  pins.ORIFICE_BCD_BIT3_PIN = pinData["ORIFICE_BCD_BIT3_PIN"].as<int>();
-  pins.MAF_PIN = pinData["MAF_PIN"].as<int>();
-  pins.REF_PRESSURE_PIN = pinData["PREF_PIN"].as<int>();
-  pins.DIFF_PRESSURE_PIN = pinData["PDIFF_PIN"].as<int>();
-  pins.PITOT_PIN = pinData["PITOT_PIN"].as<int>();
-  pins.TEMPERATURE_PIN = pinData["TEMPERATURE_PIN"].as<int>();
-  pins.HUMIDITY_PIN = pinData["HUMIDITY_PIN"].as<int>();
-  pins.REF_BARO_PIN = pinData["REF_BARO_PIN"].as<int>();
-  pins.SERIAL0_RX_PIN = pinData["SERIAL0_RX_PIN"].as<int>();
-  pins.SERIAL2_RX_PIN = pinData["SERIAL2_RX_PIN"].as<int>();
-  pins.SDA_PIN = pinData["SDA_PIN"].as<int>();
-  pins.SCL_PIN = pinData["SCL_PIN"].as<int>();
-  pins.SD_CS_PIN = pinData["SD_CS_PIN"].as<int>();
-  pins.SD_MISO_PIN = pinData["SD_MISO_PIN"].as<int>();
-  pins.SD_SCK_PIN = pinData["SD_SCK_PIN"].as<int>();
-  pins.WEMOS_SPARE_PIN_1 = pinData["WEMOS_SPARE_PIN_1"].as<int>();
-
-  // Store output pin values in struct
-  pins.VAC_BANK_1_PIN = pinData["VAC_BANK_1_PIN"].as<int>();
-  pins.VAC_BANK_2_PIN = pinData["VAC_BANK_2_PIN"].as<int>();
-  pins.VAC_BANK_3_PIN = pinData["VAC_BANK_3_PIN"].as<int>();
-  pins.VAC_SPEED_PIN = pinData["VAC_SPEED_PIN"].as<int>();
-  pins.VAC_BLEED_VALVE_PIN = pinData["VAC_BLEED_VALVE_PIN"].as<int>();
-  pins.AVO_STEP_PIN = pinData["AVO_STEP_PIN"].as<int>();
-  pins.AVO_DIR_PIN = pinData["AVO_DIR_PIN"].as<int>();
-  pins.FLOW_VALVE_STEP_PIN = pinData["FLOW_VALVE_STEP_PIN"].as<int>();
-  pins.FLOW_VALVE_DIR_PIN = pinData["FLOW_VALVE_DIR_PIN"].as<int>();
-  pins.SD_MOSI_PIN = pinData["SD_MOSI_PIN"].as<int>();
-  pins.SERIAL0_TX_PIN = pinData["SERIAL0_TX_PIN"].as<int>();
-  pins.SERIAL2_TX_PIN = pinData["SERIAL2_TX_PIN"].as<int>();
-}
-
-
-
-
-
-/***********************************************************
-* @name loadPinsData
-* @brief Read pins data from pins.json file
-* @return pinsData 
-***/
-void DataHandler::loadPinsData () {
-
-  DataHandler _data;
-  Messages _message;
-  Hardware _hardware;
-  extern struct DeviceStatus status;
-
-  _message.serialPrintf("Loading Pins Data \n");     
-
-  StaticJsonDocument<1024> pinsFileData;
-  pinsFileData = _data.loadJSONFile(status.pinsFilename);
-
-  parsePinsData(pinsFileData);
-
-  status.pinsLoaded = true;
-
-
-  // TEST - save pins data to file
-  // String output;
-  // serializeJson(pinsFileData, output);
-  // this->writeJSONFile(output,"/pintest.json", CONFIG_JSON_SIZE);
-  // TEST - print pins data to serial
-  // serializeJsonPretty(pinsFileData, Serial);
-
-}
 
 
 

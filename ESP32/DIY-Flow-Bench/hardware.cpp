@@ -21,6 +21,7 @@
 
 #include <ArduinoJson.h>
 #include <Wire.h>
+#include "Preferences.h"
 
 #include "system.h"
 #include "constants.h"
@@ -94,13 +95,81 @@ void Hardware::begin () {
 
 
 /***********************************************************
+* @name loadPinsData
+* @brief Read pins data from NVM
+***/
+void Hardware::loadPinsData () {
+
+  DataHandler _data;
+  Messages _message;
+  Hardware _hardware;
+  Preferences _pins_pref;
+
+  extern struct DeviceStatus status;
+  extern struct Pins pins;
+
+  _message.serialPrintf("Loading Pins Data \n");     
+
+  _pins_pref.begin("pins", false);
+
+  // Store input pin values in struct
+  pins.VCC_3V3_PIN = _pins_pref.getInt("VCC_5V_PIN", NULL);
+  pins.VCC_5V_PIN = _pins_pref.getInt("VCC_3V3_PIN", NULL);
+  pins.SPEED_SENS_PIN = _pins_pref.getInt("SPEED_SENS_PIN", NULL);
+  pins.ORIFICE_BCD_BIT1_PIN = _pins_pref.getInt("ORIFICE_BCD_BIT1_PIN", NULL);
+  pins.ORIFICE_BCD_BIT2_PIN = _pins_pref.getInt("ORIFICE_BCD_BIT2_PIN", NULL);
+  pins.ORIFICE_BCD_BIT3_PIN = _pins_pref.getInt("ORIFICE_BCD_BIT3_PIN", NULL);
+  pins.MAF_PIN = _pins_pref.getInt("MAF_PIN", NULL);
+  pins.PREF_PIN = _pins_pref.getInt("PREF_PIN", NULL);
+  pins.PDIFF_PIN = _pins_pref.getInt("PDIFF_PIN", NULL);
+  pins.PITOT_PIN = _pins_pref.getInt("PITOT_PIN", NULL);
+  pins.TEMPERATURE_PIN = _pins_pref.getInt("TEMPERATURE_PIN", NULL);
+  pins.HUMIDITY_PIN = _pins_pref.getInt("HUMIDITY_PIN", NULL);
+  pins.REF_BARO_PIN = _pins_pref.getInt("REF_BARO_PIN", NULL);
+  pins.SERIAL0_RX_PIN = _pins_pref.getInt("SERIAL0_RX_PIN", NULL);
+  pins.SERIAL2_RX_PIN = _pins_pref.getInt("SERIAL2_RX_PIN", NULL);
+  pins.SDA_PIN = _pins_pref.getInt("SDA_PIN", NULL);
+  pins.SCL_PIN = _pins_pref.getInt("SCL_PIN", NULL);
+  pins.SD_CS_PIN = _pins_pref.getInt("SD_CS_PIN", NULL);
+  pins.SD_MISO_PIN = _pins_pref.getInt("SD_MISO_PIN", NULL);
+  pins.SD_SCK_PIN = _pins_pref.getInt("SD_SCK_PIN", NULL);
+  pins.WEMOS_SPARE_PIN_1 = _pins_pref.getInt("WEMOS_SPARE_PIN_1", NULL);
+
+  // Store output pin values in struct
+  pins.VAC_BANK_1_PIN = _pins_pref.getInt("VAC_BANK_1_PIN", NULL);
+  pins.VAC_BANK_2_PIN = _pins_pref.getInt("VAC_BANK_2_PIN", NULL);
+  pins.VAC_BANK_3_PIN = _pins_pref.getInt("VAC_BANK_3_PIN", NULL);
+  pins.VAC_SPEED_PIN = _pins_pref.getInt("VAC_SPEED_PIN", NULL);
+  pins.VAC_BLEED_VALVE_PIN = _pins_pref.getInt("VAC_BLEED_VALVE_PIN", NULL);
+  pins.AVO_STEP_PIN = _pins_pref.getInt("AVO_STEP_PIN", NULL);
+  pins.AVO_DIR_PIN = _pins_pref.getInt("AVO_DIR_PIN", NULL);
+  pins.FLOW_VALVE_STEP_PIN = _pins_pref.getInt("FLOW_VALVE_STEP_PIN", NULL);
+  pins.FLOW_VALVE_DIR_PIN = _pins_pref.getInt("FLOW_VALVE_DIR_PIN", NULL);
+  pins.SD_MOSI_PIN = _pins_pref.getInt("SD_MOSI_PIN", NULL);
+  pins.SERIAL0_TX_PIN = _pins_pref.getInt("SERIAL0_TX_PIN", NULL);
+  pins.SERIAL2_TX_PIN = _pins_pref.getInt("SERIAL2_TX_PIN", NULL);
+
+  _pins_pref.end();
+
+  status.pinsLoaded = true;
+
+}
+
+
+
+
+
+
+
+
+/***********************************************************
  * @brief Configure pins
  * @note Conditional configuration based on board type and hardware
  * @details Initiates I/O from pin configuration in struct and reports to serial monitor
  * @details Messaging identifies I/O in event initialisation crash
  *
  ***/
-void Hardware::initaliseIO () {
+void Hardware::initialisePins () {
 
   Messages _message;
 
@@ -144,13 +213,13 @@ void Hardware::initaliseIO () {
     _message.verbosePrintf("Input MAF_PIN: %d\n", pins.MAF_PIN );
     pinMode(pins.MAF_PIN, INPUT);   
   }
-  if (config.PREF_SENS_TYPE == LINEAR_ANALOG && pins.REF_PRESSURE_PIN < 99){
-    _message.verbosePrintf("Input REF_PRESSURE_PIN: %d\n", pins.REF_PRESSURE_PIN );
-    pinMode(pins.REF_PRESSURE_PIN, INPUT);   
+  if (config.PREF_SENS_TYPE == LINEAR_ANALOG && pins.PREF_PIN < 99){
+    _message.verbosePrintf("Input PREF_PIN: %d\n", pins.PREF_PIN );
+    pinMode(pins.PREF_PIN, INPUT);   
   }
-  if (config.PDIFF_SENS_TYPE == LINEAR_ANALOG && pins.DIFF_PRESSURE_PIN < 99) {
-    _message.verbosePrintf("Input DIFF_PRESSURE_PIN: %d\n", pins.DIFF_PRESSURE_PIN );
-    pinMode(pins.DIFF_PRESSURE_PIN, INPUT);   
+  if (config.PDIFF_SENS_TYPE == LINEAR_ANALOG && pins.PDIFF_PIN < 99) {
+    _message.verbosePrintf("Input PDIFF_PIN: %d\n", pins.PDIFF_PIN );
+    pinMode(pins.PDIFF_PIN, INPUT);   
   }
   if (config.PITOT_SENS_TYPE  == LINEAR_ANALOG && pins.PITOT_PIN < 99) {
     _message.verbosePrintf("Input PITOT_PIN: %d\n", pins.PITOT_PIN );
@@ -258,6 +327,10 @@ void Hardware::initaliseIO () {
   _message.debugPrintf("I/O Initialised");
 
 }
+
+
+
+
 
 
 

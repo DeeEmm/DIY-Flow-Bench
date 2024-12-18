@@ -34,6 +34,7 @@ class Calibration {
 		double getLeakOffset();
 		double getLeakOffsetReverse();
 		void writeCalibrationFile(String data, String filename);
+		void initialiseCalibrationData();
 		void loadCalibrationData();
 		void saveCalibrationData();
 		void createCalibrationFile ();

@@ -751,27 +751,24 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request){
       break;
   }
 
-  liftData["LIFTDATA1"] = valveData.LiftData1;
-  liftData["LIFTDATA2"] = valveData.LiftData2;
-  liftData["LIFTDATA3"] = valveData.LiftData3;
-  liftData["LIFTDATA4"] = valveData.LiftData4;
-  liftData["LIFTDATA5"] = valveData.LiftData5;
-  liftData["LIFTDATA6"] = valveData.LiftData6;
-  liftData["LIFTDATA7"] = valveData.LiftData7;
-  liftData["LIFTDATA8"] = valveData.LiftData8;
-  liftData["LIFTDATA9"] = valveData.LiftData9;
-  liftData["LIFTDATA10"] = valveData.LiftData10;
-  liftData["LIFTDATA11"] = valveData.LiftData11;
-  liftData["LIFTDATA12"] = valveData.LiftData12;
-    
-  // save settings to liftdata file
-  serializeJsonPretty(liftData, jsonString);
-  if (SPIFFS.exists("/liftdata.json"))  {
-    SPIFFS.remove("/liftdata.json");
-  }
-  _data.writeJSONFile(jsonString, "/liftdata.json", LIFT_DATA_JSON_SIZE);
+  Preferences _lift_data_pref;
+  _lift_data_pref.begin("cal_pref", false);
 
-  // request->redirect("/");
+  _lift_data_pref.putDouble("LIFTDATA1", valveData.LiftData1);
+  _lift_data_pref.putDouble("LIFTDATA2", valveData.LiftData2);
+  _lift_data_pref.putDouble("LIFTDATA3", valveData.LiftData3);
+  _lift_data_pref.putDouble("LIFTDATA4", valveData.LiftData4);
+  _lift_data_pref.putDouble("LIFTDATA5", valveData.LiftData5);
+  _lift_data_pref.putDouble("LIFTDATA6", valveData.LiftData6);
+  _lift_data_pref.putDouble("LIFTDATA7", valveData.LiftData7);
+  _lift_data_pref.putDouble("LIFTDATA8", valveData.LiftData8);
+  _lift_data_pref.putDouble("LIFTDATA9", valveData.LiftData9);
+  _lift_data_pref.putDouble("LIFTDATA10", valveData.LiftData10);
+  _lift_data_pref.putDouble("LIFTDATA11", valveData.LiftData11);
+  _lift_data_pref.putDouble("LIFTDATA12", valveData.LiftData12);
+
+  _lift_data_pref.end();
+    
   request->send(200);
 
 }

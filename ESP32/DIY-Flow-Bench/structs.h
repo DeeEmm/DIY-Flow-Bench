@@ -345,8 +345,8 @@ struct Pins {
   int ORIFICE_BCD_BIT2_PIN = 99;
   int ORIFICE_BCD_BIT3_PIN = 99;
   int MAF_PIN = 99;
-  int REF_PRESSURE_PIN = 99;
-  int DIFF_PRESSURE_PIN = 99;
+  int PREF_PIN = 99;
+  int PDIFF_PIN = 99;
   int PITOT_PIN = 99;
   int TEMPERATURE_PIN = 99;
   int REF_BARO_PIN = 99;

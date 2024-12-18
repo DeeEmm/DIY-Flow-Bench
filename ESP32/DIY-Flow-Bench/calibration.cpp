@@ -106,7 +106,7 @@ bool Calibration::setLeakOffset() {
   extern struct SensorData sensorVal;
 
   // load current calibration data
-  _data.loadCalibrationData();
+  this->loadCalibrationData();
 
   _message.debugPrintf("Calibration::setLeakTest \n");
 
@@ -311,6 +311,37 @@ double Calibration::getPitotCalOffset() {
 
   return calVal.pdiff_cal_offset;
 
+}
+
+
+
+
+
+
+/***********************************************************
+* @brief initialiseLiftData
+* @note - Initialise settings in NVM if they do not exist
+* @note Key must be 15 chars or shorter.
+***/ 
+void Calibration::initialiseCalibrationData () {
+
+  Messages _message;
+  Preferences _cal_pref;
+
+  _message.serialPrintf("Loading Bench Settings \n");    
+  
+  _cal_pref.begin("settings", false);
+
+  if (!_cal_pref.isKey("FLOW_OFFSET")) _cal_pref.putDouble("FLOW_OFFSET", 0.0);
+  if (!_cal_pref.isKey("USER_OFFSET")) _cal_pref.putDouble("USER_OFFSET", 0.0);
+  if (!_cal_pref.isKey("LEAK_CAL_BASELINE")) _cal_pref.putDouble("LEAK_CAL_BASELINE", 0.0);
+  if (!_cal_pref.isKey("LEAK_CAL_BASELINE_REV")) _cal_pref.putDouble("LEAK_CAL_BASELINE_REV", 0.0);
+  if (!_cal_pref.isKey("LEAK_CAL_OFFSET")) _cal_pref.putDouble("LEAK_CAL_OFFSET", 0.0);
+  if (!_cal_pref.isKey("LEAK_CAL_OFFSET_REV")) _cal_pref.putDouble("LEAK_CAL_OFFSET_REV", 0.0);
+  if (!_cal_pref.isKey("PDIFF_CAL_OFFSET")) _cal_pref.putDouble("PDIFF_CAL_OFFSET", 0.0);
+  if (!_cal_pref.isKey("PITOT_CAL_OFFSET")) _cal_pref.putDouble("PITOT_CAL_OFFSET", 0.0);
+
+  _cal_pref.end();
 }
 
 

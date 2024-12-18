@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2412180019      - Moved Lift Data into NVM
 2412180014      - Moved calibration data in to NVM
 2412180009      - Renamed _preferences to _config_pref
 2412180008      - Moved Settings into NVM
