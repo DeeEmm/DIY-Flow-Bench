@@ -280,11 +280,6 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%u", settings.api_delim , _calculations.convertPressure(sensorVal.PDiffKPA, INH2O));
       break;      
 
-      // DEPRECATED 
-      // case 'd': // Differential pressure sensor voltage
-      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%u", settings.api_delim , sensorVal.PDiffMv);
-      // break;      
-
       case 'E': // Enum1 - Flow:Ref:Temp:Humidity:Baro
           if (status.doBootLoop) break;          
           snprintf(apiResponse, API_RESPONSE_LENGTH, "E%s%f%s%f%s%f%s%f%s%f", 
@@ -328,7 +323,7 @@ void API::ParseMessage(char apiMessage) {
       case 'J':{ // JSON Data
           if (status.doBootLoop) break;
           StaticJsonDocument <DATA_JSON_SIZE> jsondoc;
-          jsonString = _data.buildSSEJsonData();
+          jsonString = _data.buildIndexSSEJsonData();
           deserializeJson(jsondoc, jsonString);
           serializeJsonPretty(jsondoc, Serial);
           // snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", settings.api_delim, String(jsonString).c_str());
@@ -398,11 +393,6 @@ void API::ParseMessage(char apiMessage) {
           if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "P%s%f", settings.api_delim , _calculations.convertPressure(sensorVal.PitotKPA, INH2O));
       break;
-      
-      // DEPRECATED 
-      // case 'p': // Get Pitot sensor output voltage          
-      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "r%s%f", settings.api_delim , _sensors.getPitotVolts());
-      // break;   
 
       case 'Q': // mafdata max value
           if (status.doBootLoop) break;
@@ -418,11 +408,6 @@ void API::ParseMessage(char apiMessage) {
           if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "R%s%f", settings.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INH2O));
       break;
-      
-      // DEPRECATED 
-      // case 'r': // Get Reference Pressure sensor output voltage          
-      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "r%s%f", settings.api_delim , _sensors.getPRefVolts());
-      // break;      
       
       case 'S': { // Status  'S.123.45\r\n'
 

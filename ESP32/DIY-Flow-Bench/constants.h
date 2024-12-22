@@ -87,6 +87,19 @@
 
 
 /***********************************************************
+ * MAF Data Coefficients
+ ***/
+
+#define COEFF_0 0
+#define COEFF_1 1
+#define COEFF_2 2
+#define COEFF_3 3
+#define COEFF_4 4
+#define COEFF_5 5
+#define COEFF_6 6
+
+
+/***********************************************************
  * Sensor types
  ***/
 #define SENSOR_DISABLED 1
@@ -107,13 +120,22 @@
 #define M5STACK_TubePressure 16
 #define BOSCH_BME680 17
 
-
 /***********************************************************
  * Flow Differential types
  ***/
 #define USERTARGET 1
 #define BASELINE 2
 #define BASELINE_LEAK 3
+
+/***********************************************************
+ * Currnt GUI page
+ ***/
+#define INDEX_PAGE 1
+#define DATA_PAGE 2
+#define SETTINGS_PAGE 3
+#define CONFIG_PAGE 4
+#define PINS_PAGE 5
+
 
 /***********************************************************
  * International Standards

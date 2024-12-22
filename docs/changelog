@@ -29,6 +29,9 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2412220046      - Decompress stream direct to server response
+2412220036      - Compressed HTML in PROGMEM using miniz
+2412220001      - Changed MAF Data to polynomial calculation 
 2412180019      - Moved Lift Data into NVM
 2412180014      - Moved calibration data in to NVM
 2412180009      - Renamed _preferences to _config_pref
@@ -46,7 +49,7 @@ Build #         - Description of Change
 2412120051      - #288 Updated Analog calcs to cast to double
 2412120016      - Changed ADS1115 to 8 SPS
                 - #288 removed struct from ADC calc
-                - Renames buildSSEJsonData to buildSSEJsonData
+                - Renames buildIndexSSEJsonData to buildIndexSSEJsonData
 2412120002      - #288 fixed 60mv sensor deviation
 2412110117      - Refactored MAF JSON code handling
                 - Removed MAF initialisation from sensors.begin()      
@@ -272,7 +275,7 @@ Build #         - Description of Change
 23020901        - Display MAC Address
                 - Some improvements to WiFi
                 - Changed default STA Password
-23020801        - Substituted sensors->getMAFvolts for hardware->getADCvolts
+23020801        - Substituted sensors->getmafVolts for hardware->getADCvolts
 23020701        - Changed conversion from mass flow to volumetric
                 - Fixed syntax errors in MAF Data files
                 - Renamed main tasks for continuity
@@ -436,7 +439,7 @@ Build #         - Description of Change
                 - Updated BOM in docs folder
 21090101        - Added support for 1015 / 1115 ADC for MAF / PRef / PDiff / Pitot
 21082503        - #87 Wifi client network
-                - Corrected millivolt calc in Webserver::buildSSEJsonData
+                - Corrected millivolt calc in Webserver::buildIndexSSEJsonData
 21082502        - Reviewed Status and error messages
                 - Changed release version to V2
                 - Package up for Release Candidate 1

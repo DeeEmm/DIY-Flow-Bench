@@ -123,8 +123,7 @@ struct Configuration {
   double ADC_GAIN = 6.144;
 
   int MAF_SRC_TYPE = 11;
-  String MAF_SENS_TYPE = "Not Set";
-  // const char MAF_SENS_TYPE[35] = "Not Set";
+  int MAF_SENS_TYPE = 0;
   double MAF_MV_TRIM = 0.0;
   int MAF_ADC_CHAN = 0;
 
@@ -243,6 +242,7 @@ struct DeviceStatus {
   String mafFilename;
   String indexFilename;
   bool doBootLoop = false;
+  bool ioError = false;
   bool webserverIsRunning = false;
   int mafDataTableRows = 0;
   u_int mafDataValMax = 0;
@@ -254,6 +254,7 @@ struct DeviceStatus {
   char mafOutputType[10];
   char mafLink[100];
   std::vector<std::vector<u_int>> mafLookupTable;  
+  int GUIpage = 0;
 };
 
 
@@ -299,6 +300,7 @@ struct SensorData {
   char FDiffTypeDesc[32] = "BASELINE";
   int32_t test = 0;
 };
+
 
 
 
@@ -516,7 +518,7 @@ struct Language {
     char LANG_GUI_ORIFICE6_PRESSURE[50] = "Orifice #6 Test Pressure (in/H2O)";
     char LANG_GUI_API_SETTINGS[50] = "API Settings";
     char LANG_GUI_API_DELIMITER[50] = "API Delimiter";
-    char LANG_GUI_SERIAL_BAUD_RATE[50] = "Serial Baud Rate";
+    char LANG_GUI_SERIAL_BAUDRATE[50] = "Serial Baud Rate";
     char LANG_GUI_CALIBRATION_DATA[50] = "Calibration Data";
     char LANG_GUI_CAL_OFFSET[50] = "Calibration Offset (cfm)";
     char LANG_GUI_LEAK_TEST_BASELINE[50] = "Leak Test Baseline (cfm)";

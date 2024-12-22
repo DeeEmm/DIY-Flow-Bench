@@ -29,6 +29,7 @@
 #include "sensors.h"
 #include "messages.h"
 #include "driver/pcnt.h"
+#include "mafData.h"
 
 #define TINY_BME280_I2C
 #include "TinyBME280.h" 
@@ -368,9 +369,12 @@ double Sensors::getMafFlow(int units) {
 	extern struct SensorData sensorVal;
 	extern struct BenchSettings settings;
 	extern struct SensorData sensorVal;
+	extern struct Configuration config;
 
 	Hardware _hardware;
 	Messages _message;
+	Calculations _calculate;
+	MafData _maf(config.MAF_SRC_TYPE);
 
 	double flowRateCFM = 0.0;
 	double flowRateMGS = 0.0;
@@ -382,60 +386,37 @@ double Sensors::getMafFlow(int units) {
 	double velocity2 = 0.0;
 	double mafVelocity = 0.0;
 	double transposedflowRateKGH = 0.0;
+	u_int mafVolts = 0.0;
+	double MafFlow = 0.0f;
+    float vPower = 1.0f;
 
-	// message.serialPrintf("MAF TEST VAL: %li ", status.mafDataKeyMax);
 
+	// get MAF Coefficiants
+	float mafCoeff0 = _maf.getCoefficient(0);
+    float mafCoeff1 = _maf.getCoefficient(1);
+	float mafCoeff2 = _maf.getCoefficient(2);
+	float mafCoeff3 = _maf.getCoefficient(3);
+	float mafCoeff4 = _maf.getCoefficient(4);
+	float mafCoeff5 = _maf.getCoefficient(5);
+
+	// Get MAF Volts
 	sensorVal.MafVolts = this->getMafVolts();
 
-	u_int refValue = (static_cast<double>(status.mafDataKeyMax) / _hardware.get5vSupplyVolts()) * sensorVal.MafVolts;
+	// VCC deviation correction
+	mafVolts = (5.0f / _hardware.get5vSupplyVolts()) * sensorVal.MafVolts;
 
-	// message.serialPrintf("MAF REF VAL: %i Max Val : %i\n", refValue, status.mafDataKeyMax);
+	// 6th degree polynomial calculation (Coefficients stored in mafData class)
+	// flowRateKGH = mafCoeff0 + (mafCoeff1 * mafVolts) + (mafCoeff2 * pow(mafVolts, 2)) + (mafCoeff3 * pow(mafVolts, 3)) + (mafCoeff4 * pow(mafVolts, 4)) + (mafCoeff5 * pow(mafVolts, 5));
 
-	for (int rowNum = 0; rowNum < status.mafDataTableRows; rowNum++) { // iterate the data table comparing the Lookup Value to the refValue for each row
+	// Alternate method
+	// 6th degree polynomial calculation (Coefficients stored in mafData class)
+    for(int i = 0; i < 6; i++) {
+        flowRateKGH += _maf.getCoefficient(i) * vPower;
+        vPower *= mafVolts;
+    }
 
-		u_int Key = status.mafLookupTable[rowNum][0]; // Key Value for this row (x2)
-		u_int Val = status.mafLookupTable[rowNum][1]; // Flow Value for this row (y2)
 
-		// Did we get a match??
-		if (refValue == Key) { // <--Great!!! we've got the exact key value
 
-			lookupValue = static_cast<double>(Val); // lets use the associated lookup value
-			sensorVal.MafLookup = Val;
-			break;
-
-		} else if (Key > refValue && rowNum > 0) { // <-- The value is somewhere between this and the previous key value so let's use linear interpolation to calculate the actual value: 
-
-			u_int KeyPrev = static_cast<u_int>(status.mafLookupTable[rowNum - 1][0]); // Key value for the previous row (x1)
-			u_int ValPrev = static_cast<u_int>(status.mafLookupTable[rowNum - 1][1]); // Flow value for the previous row (y1)
-
-			// Linear interpolation y = y1 + (x-x1)((y2-y1)/(x2-x1)) where x1+y1 are coord1 and x2_y2 are coord2
-			lookupValue = ValPrev + static_cast<double>(refValue - KeyPrev)*((Val-ValPrev)/(Key-KeyPrev));
-			sensorVal.MafLookup = lookupValue;
-			break;   
-
-		} else if (rowNum == status.mafDataTableRows && refValue > Key) { // <-- We're at the largest value, this must be it
-			lookupValue = static_cast<double>(Val); // lets use the associated lookup value
-			sensorVal.MafLookup = Val;
-			// TODO status message MAX FLOW
-			break;
-		}
-
-	} 
-
-	// Scale lookup value
-	lookupValue *= status.mafScaling; 
-
-	// Convert Mass
-	const auto mafUnit = std::string(status.mafUnits);
-	if (mafUnit.find("MG_S") != string::npos) {
-		
-		// mafUnits is MG_S
-		flowRateKGH = lookupValue * 0.0036F;
-
-	} else {
-		// mafUnits is KG/H
-		flowRateKGH = lookupValue;
-	}
 
 	// Now that we have a converted flow value we can translate it for different housing diameters
 	if (settings.maf_housing_diameter > 0 && status.mafDiameter > 0 && settings.maf_housing_diameter != status.mafDiameter) { 

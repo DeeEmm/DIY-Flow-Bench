@@ -40,6 +40,7 @@ class Hardware {
 		void getI2CDeviceList();
 		void loadPinsData ();
 		void initialisePins ();
+		bool setPinMode ();
 		
 		int32_t getADCRawData(int channel);
 		double get3v3SupplyVolts();

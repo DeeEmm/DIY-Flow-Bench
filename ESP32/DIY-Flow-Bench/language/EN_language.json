@@ -108,7 +108,7 @@
    "LANG_GUI_ORIFICE6_PRESSURE" : "Orifice #6 Test Pressure (in/H2O)",
    "LANG_GUI_API_SETTINGS" : "API Settings",
    "LANG_GUI_API_DELIMITER" : "API Delimiter",
-   "LANG_GUI_SERIAL_BAUD_RATE" : "Serial Baud Rate",
+   "LANG_GUI_SERIAL_BAUDRATE" : "Serial Baud Rate",
    "LANG_GUI_CALIBRATION_DATA" : "Calibration Data",
    "LANG_GUI_CAL_OFFSET" : "Calibration Offset (cfm)",
    "LANG_GUI_LEAK_TEST_BASELINE" : "Leak Test Baseline (cfm)",

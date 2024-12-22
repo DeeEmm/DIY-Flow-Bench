@@ -52,8 +52,7 @@ void Comms::initaliseWifi() {
   DataHandler _data;
 
   // if WiFi password is unedited or blank force AP mode
-  if (settings.wifi_pswd.indexOf("PASSWORD") > 0 || settings.wifi_pswd == "" ) {
-
+  if (settings.wifi_pswd.indexOf("PASSWORD") > -1 || settings.wifi_pswd == "" ) {
     settings.ap_mode = true;
   } 
   

@@ -145,15 +145,6 @@ def merge_bin(source, target, env):
     # Create the update.bin file
     shutil.copy(".pio/build/esp32dev/firmware.bin", update_file)
 
-    # DEPRECATED - now in gulp.js
-    # create the index.html file from minified gulp file]
-    # shutil.copy(GUI_file, GUI_release)
-
-    # DEPRECATED - now in gulp.js
-    # Remove minified gulp file from data directory (prevents users using file without version name)
-    # try: os.remove(GUI_output_file)
-    # except FileNotFoundError: print(f"File '{GUI_output_file}' not found.")
-    # delete_files_in_directory(data_directory)
 
 # Add a post action that runs esptoolpy to merge available flash images
 env.AddPostAction(APP_BIN , merge_bin)

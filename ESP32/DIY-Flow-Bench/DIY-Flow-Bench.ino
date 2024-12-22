@@ -49,12 +49,13 @@
 #include "constants.h"
 #include "system.h"
 #include "structs.h"
+#include "mafdata.h"
 
 #include "hardware.h" 
 #include "sensors.h"
 #include "calculations.h"
 #include "webserver.h"
-#include "public_html.h" 
+#include "publichtml.h" 
 #include "messages.h"
 #include "API.h"
 #include "Wire.h"
@@ -71,7 +72,7 @@ Configuration config;
 Pins pins;
 
 // Initiate Classes
-Preferences _config_pref;
+// Preferences _config_pref;
 DataHandler _data;
 API _api;
 Calculations _calculations;
@@ -333,7 +334,7 @@ void setup(void) {
   // Set up semaphore handshaking
   i2c_task_mutex = xSemaphoreCreateMutex();
 
-  #ifdef WEBSERVER_ENABLED  // Compile time directive used for testing
+  #ifdef WEBSERVER_ENABLED  
     _webserver.begin();
   #endif
 
@@ -391,11 +392,22 @@ void loop () {
         if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
           status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes
           
-          // Push data to client using Server Side Events (SSE)
-          jsonString = _data.buildSSEJsonData();
-          _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
-
-          xSemaphoreGive(i2c_task_mutex); // Release semaphore
+          // Build Server Side Events (SSE) data
+          switch (status.GUIpage) {
+            case INDEX:{
+              jsonString = _data.buildIndexSSEJsonData();
+              break;
+            }
+            case DATA:{
+              jsonString = _data.buildMimicSSEJsonData();
+              break;
+            }
+          }
+          // Push SSE data to client
+          _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); 
+ 
+          // Release semaphore
+          xSemaphoreGive(i2c_task_mutex); 
         }
     }
   #endif

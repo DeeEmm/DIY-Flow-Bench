@@ -46,7 +46,7 @@
 
 #include <sstream>
 
-#include "public_html.h"
+#include "publichtml.h"
 
 using namespace std;
 
@@ -54,8 +54,6 @@ using namespace std;
 
 // RTC_DATA_ATTR int bootCount; // flash mem
 
-// DEPRECATED
-// const char LANDING_PAGE[] PROGMEM = "<!DOCTYPE HTML> <html lang='en'> <HEAD> <title>DIY Flow Bench</title> <meta name='viewport' content='width=device-width, initial-scale=1'> <script> function onFileUpload(event) { this.setState({ file: event.target.files[0] }); const { file } = this.state; const data = new FormData; data.append('data', file); fetch('/api/file/upload', { method: 'POST', body: data }).catch(e => { console.log('Request failed', e); }); } </script> <style> body, html { height: 100%; margin: 0; font-family: Arial; font-size: 22px } a:link { color: #0A1128; text-decoration: none } a:visited, a:active { color: #0A1128; text-decoration: none } a:hover { color: #666; text-decoration: none } .headerbar { overflow: hidden; background-color: #0A1128; text-align: center } .headerbar h1 a:link, .headerbar h1 a:active, .headerbar h1 a:visited, .headerbar h1 a:hover { color: white; text-decoration: none } .align-center { text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .button { display: inline-block; background-color: #008CBA; border: none; border-radius: 4px; color: white; padding: 12px 12px; text-decoration: none; font-size: 22px; margin: 2px; cursor: pointer; width: 150px } #footer { clear: both; text-align: center } .file-upload-button { padding: 12px 0px; text-align: center } .file-submit-button { padding: 12px 0px; text-align: center; font-size: 15px; padding: 6px 6px; } .input_container { border: 1px solid #e5e5e5; } input[type=file]::file-selector-button { background-color: #fff; color: #000; border: 0px; border-right: 1px solid #e5e5e5; padding: 10px 15px; margin-right: 20px; transition: .5s; } input[type=file]::file-selector-button:hover { background-color: #eee; border: 0px; border-right: 1px solid #e5e5e5; } </style> </HEAD> <BODY> <div class='headerbar'> <h1><a href='/'>DIY Flow Bench</a></h1> </div> <br> <div class='align-center'> <p>Welcome to the DIY Flow Bench. Thank you for supporting our project.</p> <p>Please upload the following files to get started.</p> <p>~INDEX_STATUS~</p> <p>~CONFIGURATION_STATUS~</p> <p>~PINS_STATUS~</p> <p>~MAF_STATUS~</p> <br> <form method='POST' action='/api/file/upload' enctype='multipart/form-data'> <div class=\"input_container\"> <input type=\"file\" name=\"upload\" id=\"fileUpload\"> <input type='submit' value='Upload' class=\"button file-submit-button\"> </div> </form> </div> <br> <div id='footer'><a href='https://diyflowbench.com' target='new'>DIYFlowBench.com</a></div> <br> </BODY> </HTML>";
 
 void Webserver::begin()
 {
@@ -289,7 +287,7 @@ void Webserver::begin()
   // Send JSON Data
   server->on("/api/json", HTTP_GET, [](AsyncWebServerRequest *request){
     DataHandler _data;
-    request->send(200, "text/html", String(_data.buildSSEJsonData()).c_str());
+    request->send(200, "text/html", String(_data.buildIndexSSEJsonData()).c_str());
   });
 
 
@@ -350,14 +348,6 @@ void Webserver::begin()
       });
 
   // Javascript.js request handler
-  server->on("/main.js", HTTP_ANY, [](AsyncWebServerRequest *request){
-        PublicHTML _public_html;
-        AsyncResponseStream *response = request->beginResponseStream("text/javascript");
-        response->print(_public_html.mainJs().c_str());
-        request->send(response);
-      });
-
-  // Javascript.js request handler
   server->on("/index.js", HTTP_ANY, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         AsyncResponseStream *response = request->beginResponseStream("text/javascript");
@@ -368,22 +358,44 @@ void Webserver::begin()
   // Settings page request handler
   server->on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
-        request->send_P(200, "text/html", _public_html.settings().c_str(), processTemplate); 
+        status.GUIpage = SETTINGS_PAGE;
+        request->send_P(200, "text/html", _public_html.settingsPage().c_str(), processTemplate); 
       });
 
   // Data page request handler
   server->on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
-        request->send_P(200, "text/html", _public_html.data().c_str(), processTemplate); 
+        status.GUIpage = DATA_PAGE;
+        request->send_P(200, "text/html", _public_html.dataPage().c_str(), processTemplate); 
       });
+
+  // Configuration page request handler
+  server->on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        status.GUIpage = CONFIG_PAGE;
+        request->send_P(200, "text/html", _public_html.configPage().c_str(), processTemplate); 
+      });
+
+  // Pins page request handler
+  server->on("/pins", HTTP_GET, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        status.GUIpage = PINS_PAGE;
+        request->send_P(200, "text/html", _public_html.pinsPage().c_str(), processTemplate); 
+      });
+
+  // // Index page request handler
+  // server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  //       PublicHTML _public_html;
+  //       request->send_P(200, "text/html", _public_html.indexPage().c_str(), processTemplate); 
+  //     });
+
 
   // Index page request handler
   server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
-        request->send_P(200, "text/html", _public_html.index().c_str(), processTemplate); 
+        status.GUIpage = INDEX_PAGE;
+        request->send_P(200, "text/html", _public_html.indexPage().c_str(),  processTemplate);
       });
-
-
 
 
   server->onFileUpload(fileUpload);
@@ -473,7 +485,7 @@ void Webserver::saveConfigurationForm(AsyncWebServerRequest *request)
   DataHandler _data;
   Preferences _config_pref;
 
-  _config_pref.begin("settings", false);
+  _config_pref.begin("config", false);
 
   int params = request->params();
 
@@ -512,6 +524,8 @@ void Webserver::saveCalibrationForm(AsyncWebServerRequest *request)
   Preferences _cal_pref;
 
   extern struct CalibrationData calVal;
+
+  _cal_pref.begin("calibration", false);
 
   int params = request->params();
 
@@ -566,10 +580,10 @@ void Webserver::parseUserFlowTargetForm(AsyncWebServerRequest *request)
   // Update global Config Vars
   calVal.user_offset = calData["USER_OFFSET"].as<double>();
   // calVal.flow_offset = calData["FLOW_OFFSET"].as<double>();
-  // calVal.leak_cal_offset = calData["LEAK_CAL_OFFSET"].as<double>();
-  // calVal.leak_cal_offset_rev = calData["LEAK_CAL_OFFSET_REV"].as<double>();
-  // calVal.leak_cal_baseline= calData["LEAK_CAL_BASELINE"].as<double>();
-  // calVal.leak_cal_baseline_rev = calData["LEAK_CAL_BASELINE_REV"].as<double>();
+  // calVal.leak_cal_offset = calData["LEAK_OFFSET"].as<double>();
+  // calVal.leak_cal_offset_rev = calData["LEAK_OFFSET_REV"].as<double>();
+  // calVal.leak_cal_baseline= calData["LEAK_BASE"].as<double>();
+  // calVal.leak_cal_baseline_rev = calData["LEAK_BASE_REV"].as<double>();
 
   _message.debugPrintf("sUer Flow Target Form Data parsed \n");
 
@@ -752,7 +766,7 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request){
   }
 
   Preferences _lift_data_pref;
-  _lift_data_pref.begin("cal_pref", false);
+  _lift_data_pref.begin("liftData", false);
 
   _lift_data_pref.putDouble("LIFTDATA1", valveData.LiftData1);
   _lift_data_pref.putDouble("LIFTDATA2", valveData.LiftData2);
@@ -965,7 +979,7 @@ String Webserver::processTemplate(const String &var) {
   if (var == "LANG_GUI_ORIFICE6_PRESSURE") return language.LANG_GUI_ORIFICE6_PRESSURE;
   if (var == "LANG_GUI_API_SETTINGS") return language.LANG_GUI_API_SETTINGS;
   if (var == "LANG_GUI_API_DELIMITER") return language.LANG_GUI_API_DELIMITER;
-  if (var == "LANG_GUI_SERIAL_BAUD_RATE") return language.LANG_GUI_SERIAL_BAUD_RATE;
+  if (var == "LANG_GUI_SERIAL_BAUDRATE") return language.LANG_GUI_SERIAL_BAUDRATE;
   if (var == "LANG_GUI_CALIBRATION_DATA") return language.LANG_GUI_CALIBRATION_DATA;
   if (var == "LANG_GUI_CAL_OFFSET") return language.LANG_GUI_CAL_OFFSET;
   if (var == "LANG_GUI_LEAK_TEST_BASELINE") return language.LANG_GUI_LEAK_TEST_BASELINE;
@@ -1222,7 +1236,7 @@ String Webserver::processTemplate(const String &var) {
 
   // API Settings
   if (var == "API_DELIM") return settings.api_delim;
-  if (var == "SERIAL_BAUD_RATE") return String(settings.serial_baud_rate);
+  if (var == "SERIAL_BAUDRATE") return String(settings.serial_baud_rate);
 
   // Update javascript template vars
   if (var == "FLOW_DECI_ACC") return String(settings.flow_decimal_length);
@@ -1363,10 +1377,10 @@ String Webserver::processTemplate(const String &var) {
   // Calibration Data
   if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
   if (var == "USER_OFFSET") return String(calVal.user_offset);
-  if (var == "LEAK_CAL_BASELINE") return String(calVal.leak_cal_baseline);
-  if (var == "LEAK_CAL_OFFSET") return String(calVal.leak_cal_offset);
-  if (var == "LEAK_CAL_BASELINE_REV") return String(calVal.leak_cal_baseline_rev);
-  if (var == "LEAK_CAL_OFFSET_REV") return String(calVal.leak_cal_offset_rev);
+  if (var == "LEAK_BASE") return String(calVal.leak_cal_baseline);
+  if (var == "LEAK_OFFSET") return String(calVal.leak_cal_offset);
+  if (var == "LEAK_BASE_REV") return String(calVal.leak_cal_baseline_rev);
+  if (var == "LEAK_OFFSET_REV") return String(calVal.leak_cal_offset_rev);
 
   // Generate file list HTML code
   if (var == "FILE_LIST"){

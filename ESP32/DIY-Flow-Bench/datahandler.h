@@ -67,6 +67,7 @@ class DataHandler {
 		StaticJsonDocument<JSON_FILE_SIZE> loadJSONFile(String filename); 
 		void beginSerial(void);
 		void loadMAFData();
+		void loadMAFCoefficients();
 		void initialiseConfig();
 		void loadConfig();
 		void initialiseSettings ();
@@ -74,7 +75,8 @@ class DataHandler {
 		void loadSettings ();
 		void loadLiftData ();
 		static void clearLiftDataFile(AsyncWebServerRequest *request);
-		String buildSSEJsonData();
+		String buildIndexSSEJsonData();
+		String buildMimicSSEJsonData();
 		static void fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 		void bootLoop();
 		String getRemote(const char* serverName);
