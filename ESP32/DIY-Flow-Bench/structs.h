@@ -399,7 +399,6 @@ struct Language {
     char LANG_GUI_STORAGE[50] = "Storage";
     char LANG_GUI_NETWORK[50] = "Network";
     char LANG_GUI_IP_ADDRESS[50] = "IP Address";
-    char LANG_GUI_HARDWARE_CONFIG[50] = "Hardware Configuration";
     char LANG_GUI_BENCH_TYPE[50] = "Bench Type";
     char LANG_GUI_BOARD_TYPE[50] = "Board Type";
     char LANG_GUI_AUTO[50] = "Auto";
@@ -468,7 +467,10 @@ struct Language {
     char LANG_GUI_CAPTURE[50] = "Capture";
     char LANG_GUI_DASHBOARD[50] = "Dashboard";
     char LANG_GUI_DATA[50] = "Data";
+    char LANG_GUI_HARDWARE_CONFIG[50] = "Hardware Configuration";
     char LANG_GUI_CONFIG[50] = "Configuration";
+    char LANG_GUI_SETTINGS[50] = "Settings";
+    char LANG_GUI_PINS[50] = "Pins";
     char LANG_GUI_CLEAR[50] = "Clear";
     char LANG_GUI_EXPORT[50] = "Export";
     char LANG_GUI_IMAGE[50] = "Image";

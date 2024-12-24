@@ -928,6 +928,8 @@ String Webserver::processTemplate(const String &var) {
   if (var == "LANG_GUI_DASHBOARD") return language.LANG_GUI_DASHBOARD;
   if (var == "LANG_GUI_DATA") return language.LANG_GUI_DATA;
   if (var == "LANG_GUI_CONFIG") return language.LANG_GUI_CONFIG;
+  if (var == "LANG_GUI_SETTINGS") return language.LANG_GUI_SETTINGS;
+  if (var == "LANG_GUI_PINS") return language.LANG_GUI_PINS;
   if (var == "LANG_GUI_CLEAR") return language.LANG_GUI_CLEAR;
   if (var == "LANG_GUI_EXPORT") return language.LANG_GUI_EXPORT;
   if (var == "LANG_GUI_IMAGE") return language.LANG_GUI_IMAGE;

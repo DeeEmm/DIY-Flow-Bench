@@ -394,11 +394,11 @@ void loop () {
           
           // Build Server Side Events (SSE) data
           switch (status.GUIpage) {
-            case INDEX:{
+            case INDEX_PAGE:{
               jsonString = _data.buildIndexSSEJsonData();
               break;
             }
-            case DATA:{
+            case DATA_PAGE:{
               jsonString = _data.buildMimicSSEJsonData();
               break;
             }

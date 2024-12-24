@@ -1213,11 +1213,10 @@ String DataHandler::buildIndexSSEJsonData()
 
 
 /***********************************************************
- * @brief buildIndexSSEJsonData
- * @details Package up index page data into JSON string
+ * @brief buildMimicSSEJsonData
+ * @details Package up mimic page data into JSON string
  ***/
-String DataHandler::buildMimicSSEJsonData()
-{
+String DataHandler::buildMimicSSEJsonData() {
 
   extern struct DeviceStatus status;
   extern struct BenchSettings settings;
@@ -1268,7 +1267,7 @@ String DataHandler::buildMimicSSEJsonData()
     dataJson["SFLOW"] = 0.0;
   }
 
-
+  return jsonString;
 }
 
 
@@ -1473,16 +1472,6 @@ void DataHandler::bootLoop()
                     _api.ParseMessage(status.serialData);
                 }
             }                            
-        }
-
-        // Check escape function. When all files are present and errors cleared we can leave the loop
-        if (status.mafLoaded == true) {
-          status.doBootLoop = false; 
-          break;
-        } 
-
-        if (!status.mafLoaded) {
-          if (checkUserFile(MAFFILE) ) status.mafLoaded = true ;
         }
 
         if (status.ioError) {

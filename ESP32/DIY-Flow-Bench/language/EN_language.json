@@ -57,6 +57,8 @@
    "LANG_GUI_DASHBOARD" : "Dashboard",
    "LANG_GUI_DATA" : "Data",
    "LANG_GUI_CONFIG" : "Configuration",
+   "LANG_GUI_SETTINGS" : "Settings",
+   "LANG_GUI_PINS" : "Pins",
    "LANG_GUI_CLEAR" : "Clear",
    "LANG_GUI_EXPORT" : "Export",
    "LANG_GUI_IMAGE" : "Image",

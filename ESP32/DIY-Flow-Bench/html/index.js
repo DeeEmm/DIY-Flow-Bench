@@ -39,7 +39,7 @@ var closeUpdateModalButton = document.getElementsByClassName("closeUpdateModalBu
 
 // Set up Server Side Events (SSE)
 if (!!window.EventSource) {
-  var source = new EventSource('/events/index');
+  var source = new EventSource('/events');
 
   source.addEventListener('JSON_DATA', function(e) {
     var myObj = JSON.parse(e.data);

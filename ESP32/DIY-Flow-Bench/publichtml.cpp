@@ -25,7 +25,7 @@
 
 #include "html_data.h"
 
-uint8_t decompBuffer[18000]; 
+uint8_t decompBuffer[20000]; 
 
 // Combine arrays
 uint8_t* combineArrays(const uint8_t* arr1, size_t len1, const uint8_t* arr2, size_t len2) {
@@ -125,25 +125,25 @@ String PublicHTML::indexPage() {
 String PublicHTML::settingsPage() {
     const uint8_t* arrays[] = {header_html, settings_html, footer_html};
     const size_t lengths[] = {header_html_len, settings_html_len, footer_html_len};
-    return decompressMultiple(arrays, lengths, 3);
+    return decompressMultipleToStream(arrays, lengths, 3);
 }
 
 String PublicHTML::dataPage() {
     const uint8_t* arrays[] = {header_html, data_html, footer_html};
     const size_t lengths[] = {header_html_len, data_html_len, footer_html_len};
-    return decompressMultiple(arrays, lengths, 3);
+    return decompressMultipleToStream(arrays, lengths, 3);
 }
 
 String PublicHTML::pinsPage() {
     const uint8_t* arrays[] = {header_html, pins_html, footer_html};
     const size_t lengths[] = {header_html_len, pins_html_len, footer_html_len};
-    return decompressMultiple(arrays, lengths, 3);
+    return decompressMultipleToStream(arrays, lengths, 3);
 }
 
 String PublicHTML::configPage() {
-    const uint8_t* arrays[] = {header_html, settings_html, footer_html};
-    const size_t lengths[] = {header_html_len, settings_html_len, footer_html_len};
-    return decompressMultiple(arrays, lengths, 3);
+    const uint8_t* arrays[] = {header_html, config_html, footer_html};
+    const size_t lengths[] = {header_html_len, config_html_len, footer_html_len};
+    return decompressMultipleToStream(arrays, lengths, 3);
 }
 
 

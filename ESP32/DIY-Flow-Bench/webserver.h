@@ -36,6 +36,7 @@ class Webserver {
 	friend class AsyncEventSource;
 	friend class ArduinoJSON;
 	
+	
 	protected:
 
 		void loop();
