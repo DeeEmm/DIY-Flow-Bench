@@ -27,7 +27,6 @@ var flowTargetModal = document.getElementById("flowTargetModal");
 
 var closeFlowTargetModalButton = document.getElementsByClassName("closeFlowTargetModalButton")[0];
 var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
-var closeDataModalButton = document.getElementsByClassName("closeDataModalButton")[0];
 var closeSerialModalButton = document.getElementsByClassName("closeSerialModalButton")[0];
 var closeFileModalButton = document.getElementsByClassName("closeFileModalButton")[0];
 var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton")[0];
@@ -474,13 +473,6 @@ window.onclick = function(event) {
     calibrationModal.style.display = "none";
   }
   
-  
-  /***********************************************************
-  * Close data modal dialog
-  ***/
-  closeDataModalButton.onclick = function() {
-    dataModal.style.display = "none";
-  }
   
   
   /***********************************************************

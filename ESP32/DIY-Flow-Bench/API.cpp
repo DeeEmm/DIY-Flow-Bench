@@ -34,6 +34,7 @@
 #include "webserver.h"
 #include "datahandler.h"
 #include "comms.h"
+#include <Preferences.h>
 
 extern struct BenchSettings settings;
 
@@ -113,6 +114,7 @@ void API::ParseMessage(char apiMessage) {
   Calibration _calibration;
   DataHandler _data;
   Comms _comms;
+  Preferences _settings_pref;
   
   extern TaskHandle_t sensorDataTask;
   extern TaskHandle_t enviroDataTask;
@@ -178,6 +180,7 @@ void API::ParseMessage(char apiMessage) {
   / : SPIFFS File List
   ~ : Restart ESP
   $ : Reset WiFi
+  % : Reset WiFi AP SSID & Password
   @ : Stream Status
   ! : Debug Mode
   + : Verbose Mode
@@ -208,6 +211,7 @@ void API::ParseMessage(char apiMessage) {
   / : SPIFFS File List
   ~ : Restart ESP
   $ : Reset WiFi
+  % : Reset WiFi AP SSID & Password
   @ : Stream Status
   ! : Debug Mode
   + : Verbose Mode
@@ -607,6 +611,14 @@ void API::ParseMessage(char apiMessage) {
           // settings.api_enabled = false;
           _comms.wifiReconnect();
           // settings.api_enabled = true;
+      break;
+
+      case '%': // Reset WiFi passwords
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", "Attempting to reset WiFi passwords");
+            _settings_pref.begin("settings", false);
+            _settings_pref.putString("WIFI_AP_SSID", static_cast<String>("DIYFB"));
+            _settings_pref.putString("WIFI_AP_PSWD", static_cast<String>("123456789"));
+            _settings_pref.end();
       break;
 
       case ' ': // <<<<(TEST [space] exclude from API listing)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 

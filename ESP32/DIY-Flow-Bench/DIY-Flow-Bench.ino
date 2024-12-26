@@ -115,98 +115,102 @@ void TASKgetSensorData( void * parameter ){
   for( ;; ) {
     // Check if semaphore available
     if (millis() > status.adcPollTimer){
-      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
+
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
+      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
         status.adcPollTimer = millis() + config.ADC_SCAN_DELAY; // Only reset timer when task executes
 
-        // Get flow data
-        // Bench is MAF type...
-        if (settings.bench_type.indexOf("MAF") > 0) {
-          if (config.MAF_SRC_TYPE != SENSOR_DISABLED) {
-            sensorVal.FlowKGH = _sensors.getMafFlow();
-            sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
-          }
 
-        // Bench is ORIFICE type...
-        } else if (settings.bench_type.indexOf("ORIFICE") > 0) {
-          sensorVal.FlowCFMraw = _sensors.getDifferentialFlow();
+        switch (settings.bench_type){
 
+          case MAF:
+            if (config.MAF_SRC_TYPE != SENSOR_DISABLED) {
+              sensorVal.FlowKGH = _sensors.getMafFlow();
+              sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
+            }
+          break;
 
-        // Bench is VENTURI type...
-        } else if (settings.bench_type.indexOf("VENTURI") > 0) {
+          case ORIFICE:
+            sensorVal.FlowCFMraw = _sensors.getDifferentialFlow();
+          break;
 
-          //TODO
+          case VENTURI:
+            //TODO
+          break;
 
-        // Bench is PITOT type...
-        } else if (settings.bench_type.indexOf("PITOT") > 0) {
+          case PITOT:
+            //TODO
+          break;
 
-          //TODO
-
-        // Error bench type unknown
-        } else {
-
-          //Do nothing?
+          default:
+            // Error bench type unknown
+            _message.debugPrintf("Unknown Bench Type\n");
+          break;
 
         }
 
         // Apply Flow calibration and leak offsets
         sensorVal.FlowCFM = sensorVal.FlowCFMraw  - calVal.leak_cal_baseline - calVal.leak_cal_offset  - calVal.flow_offset;
 
- 
         // Apply Data filters...
+        switch (settings.data_filter_type) {
 
-        // Rolling Median
-        if (settings.data_filter_type.indexOf("MEDIAN") > 0) {
- 
-          sensorVal.AverageCFM += ( sensorVal.FlowCFM - sensorVal.AverageCFM ) * 0.1f; // rough running average.
-          sensorVal.MedianCFM += copysign( sensorVal.AverageCFM * 0.01, sensorVal.FlowCFM - sensorVal.MedianCFM );
-          sensorVal.FlowCFM = sensorVal.MedianCFM;
+          case MEDIAN:
+            // Rolling Median      
+            sensorVal.AverageCFM += ( sensorVal.FlowCFM - sensorVal.AverageCFM ) * 0.1f; // rough running average.
+            sensorVal.MedianCFM += copysign( sensorVal.AverageCFM * 0.01, sensorVal.FlowCFM - sensorVal.MedianCFM );
+            sensorVal.FlowCFM = sensorVal.MedianCFM;
+          break;
 
-        //TODO - Cyclic average
-        } else if (settings.data_filter_type.indexOf("AVERAGE") > 0) {
+          case AVERAGE:
+            //TODO - Cyclic average
+            // create array / stack of 'Cyclical Average Buffer' length
+            // push value to stack - repeat this for size of stack 
+            
+            // calculate average of values on stack
+            // average results with current value - this is our displayed value
+            // push current (raw) value on to stack, remove oldest value
+            // repeat
+            sensorVal.FlowCFM = sensorVal.FlowCFM;
+          break;
 
-          // create array / stack of 'Cyclical Average Buffer' length
-          // push value to stack - repeat this for size of stack 
-          
-          // calculate average of values on stack
-          // average results with current value - this is our displayed value
-          // push current (raw) value on to stack, remove oldest value
-          // repeat
+          case MODE:
+            //TODO - Mode
+            // return most common value over x number of cycles (requested by @black-top)
+            sensorVal.FlowCFM = sensorVal.FlowCFM;
+          break;
 
-
-          
-        //TODO - Mode
-        } else if (settings.data_filter_type.indexOf("MODE") > 0) {
-
-          // return most common value over x number of cycles (requested by @black-top)
+          case NONE:
+          default:
+            // No filter
+            sensorVal.FlowCFM = sensorVal.FlowCFM;
+          break;
 
         }
-
 
         // convert to standard flow
         sensorVal.FlowSCFM = _calculations.convertToSCFM(sensorVal.FlowCFM, settings.standardReference);
 
-
         // Create Flow differential values
         switch (sensorVal.FDiffType) {
 
-        case USERTARGET:
-          sensorVal.FDiff = sensorVal.FlowCFM - calVal.user_offset;
-          strcpy(sensorVal.FDiffTypeDesc, "User Target (cfm)");
-          break;
+          case USERTARGET:
+            sensorVal.FDiff = sensorVal.FlowCFM - calVal.user_offset;
+            strcpy(sensorVal.FDiffTypeDesc, "User Target (cfm)");
+            break;
 
-        case BASELINE:
-          sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline;
-          strcpy(sensorVal.FDiffTypeDesc, "Baseline (cfm)");
-          break;
-        
-        case BASELINE_LEAK :
-          sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline - calVal.leak_cal_offset;
-          strcpy(sensorVal.FDiffTypeDesc, "Offset (cfm)");
-          break;
-                
-        default:
-          break;
+          case BASELINE:
+            sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline;
+            strcpy(sensorVal.FDiffTypeDesc, "Baseline (cfm)");
+            break;
+          
+          case BASELINE_LEAK :
+            sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline - calVal.leak_cal_offset;
+            strcpy(sensorVal.FDiffTypeDesc, "Offset (cfm)");
+            break;
+                  
+          default:
+            break;
         }
           
         if (config.PREF_SENS_TYPE != SENSOR_DISABLED) {
@@ -241,8 +245,6 @@ void TASKgetSensorData( void * parameter ){
             //   sensorVal.Swirl = Encoder.speed() * -1;
             // }
         }
-
-
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore        
       }   

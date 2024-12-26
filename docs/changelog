@@ -29,6 +29,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2412260034      - Simplified data filter / rounding code
+2412260018      - #303 Reset AP via API
 2412240028      - Added Pins and Config pages
 2412220046      - Decompress stream direct to server response
 2412220036      - Compressed HTML in PROGMEM using miniz

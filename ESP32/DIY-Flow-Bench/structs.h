@@ -43,10 +43,10 @@ struct BenchSettings {
   double maf_min_volts = 0.1;                     // Filter out results less than this
   int refresh_rate = 500;                         // Screen refresh rate in milliseconds (>180)
   int adj_flow_depression = 28;                   // Adjusted flow depression in inches of water
-  String rounding_type = "NONE";                // Rounding type 
+  int rounding_type = NONE;                       // Rounding type 
   int flow_decimal_length = 1;                    // Flow decimal number of places 
   int gen_decimal_length = 2;                     // General decimal number of places 
-  String data_filter_type = "NONE";             // Data filter type 
+  int data_filter_type = NONE;                    // Data filter type 
   int data_capture_datatype = 1;                  // Datacapture datatype
   int standardReference = 1;                      // Standard reference conditions (default ISO 1585)
   int std_adj_flow = 0;                           // Standardised adjusted flow
@@ -58,7 +58,7 @@ struct BenchSettings {
   bool status_print_mode = false;                 // Stream status data to serial
   bool verbose_print_mode = false;                // Stream verbose data to serial
   bool api_enabled = true;                        // Can disable serial API if required
-  String bench_type = "MAF";                     // Default bench type
+  int bench_type = MAF;                           // Default bench type
   int maf_housing_diameter = 0;                   // MAF Housing diameter
   int tatltuae = 42;
   int parsecs = 12;

@@ -153,7 +153,45 @@
 #define STD_ACFM 2
 #define ADJ_ACFM 3
 #define ADJ_STD_ACFM 4
-#define MAF 5
+#define RAW_MASS 5
+
+
+/***********************************************************
+ * Bench Types
+ ***/
+
+#define MAF 1
+#define ORIFICE 2
+#define VENTURI 3
+#define PITOT 4
+
+
+
+/***********************************************************
+ * Data Filter Types
+ ***/
+
+#define NONE 1
+#define MEDIAN 2
+#define AVERAGE 3
+#define MODE 4
+
+
+
+/***********************************************************
+ * Data Rounding Types
+ ***/
+#define INTEGER 2
+#define HALF 3
+
+
+/***********************************************************
+ * Decimal Accuracy
+ ***/
+#define TENTHS 2
+#define HUNDREDTHS 3
+#define THOUSANDTHS 4
+
 
 
 /***********************************************************

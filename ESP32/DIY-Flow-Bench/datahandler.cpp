@@ -762,6 +762,9 @@ void DataHandler::initialiseSettings () {
   
   _settings_pref.begin("settings", false);
 
+  // _settings_pref.remove("DATA_FILTER_TYP"); // remove individual key
+  // _settings_pref.remove("ROUNDING_TYPE"); // remove individual key
+
   if (!_settings_pref.isKey("WIFI_SSID")) _settings_pref.putString("WIFI_SSID", "WIFI-SSID");
   if (!_settings_pref.isKey("WIFI_PSWD")) _settings_pref.putString("WIFI_PSWD", static_cast<String>("PASSWORD"));
   if (!_settings_pref.isKey("WIFI_AP_SSID")) _settings_pref.putString("WIFI_AP_SSID", static_cast<String>("DIYFB"));
@@ -774,8 +777,8 @@ void DataHandler::initialiseSettings () {
   if (!_settings_pref.isKey("MIN_BENCH_PRESS")) _settings_pref.putInt("MIN_BENCH_PRESS", 1);
   if (!_settings_pref.isKey("MIN_FLOW_RATE")) _settings_pref.putInt("MIN_FLOW_RATE", 1);
 
-  if (!_settings_pref.isKey("DATA_FILTER_TYP")) _settings_pref.putString("DATA_FILTER_TYP", static_cast<String>("NONE"));
-  if (!_settings_pref.isKey("ROUNDING_TYPE")) _settings_pref.putString("ROUNDING_TYPE", static_cast<String>("NONE"));
+  if (!_settings_pref.isKey("DATA_FILTER_TYP")) _settings_pref.putInt("DATA_FILTER_TYP", NONE);
+  if (!_settings_pref.isKey("ROUNDING_TYPE")) _settings_pref.putInt("ROUNDING_TYPE", NONE);
 
   if (!_settings_pref.isKey("FLOW_DECI_ACC")) _settings_pref.putInt("FLOW_DECI_ACC", 1);
   if (!_settings_pref.isKey("GEN_DECI_ACC")) _settings_pref.putInt("GEN_DECI_ACC", 2);
@@ -849,8 +852,8 @@ void DataHandler::loadSettings () {
   settings.refresh_rate = _settings_pref.getInt("REFRESH_RATE", 500 );
   settings.min_bench_pressure  = _settings_pref.getInt("MIN_BENCH_PRESS", 1 );
   settings.min_flow_rate = _settings_pref.getInt("MIN_FLOW_RATE", 1 );
-  settings.data_filter_type = _settings_pref.getString("DATA_FILTER_TYP", "NONE" );
-  settings.rounding_type = _settings_pref.getString("ROUNDING_TYPE", "NONE" );
+  settings.data_filter_type = _settings_pref.getInt("DATA_FILTER_TYP", NONE );
+  settings.rounding_type = _settings_pref.getInt("ROUNDING_TYPE", NONE );
   settings.flow_decimal_length = _settings_pref.getInt("FLOW_DECI_ACC", 1 );
   settings.gen_decimal_length = _settings_pref.getInt("GEN_DECI_ACC", 2 );
   settings.cyc_av_buffer  = _settings_pref.getInt("CYCLIC_AV_BUFF", 5 );
@@ -1080,32 +1083,41 @@ String DataHandler::buildIndexSSEJsonData()
   // Flow Rate
   if ((flowComp > settings.min_flow_rate) && (pRefComp > settings.min_bench_pressure))  {
 
-    // Check if we need to round values
-    if (settings.rounding_type.indexOf("NONE") > 0) {
+    switch (settings.rounding_type) {
+      case NONE:
         dataJson["FLOW"] = sensorVal.FlowCFM;
         dataJson["MFLOW"] = sensorVal.FlowKGH;
         dataJson["AFLOW"] = sensorVal.FlowADJ;
         dataJson["SFLOW"] = sensorVal.FlowSCFM;
-    // Round to whole value    
-    } else if (settings.rounding_type.indexOf("INTEGER") > 0) {
+      break;
+
+      // Round to whole value 
+      case INTEGER:
         dataJson["FLOW"] = round(sensorVal.FlowCFM);
         dataJson["MFLOW"] = round(sensorVal.FlowKGH);
         dataJson["AFLOW"] = round(sensorVal.FlowADJ);
         dataJson["SFLOW"] = round(sensorVal.FlowSCFM);
-    // Round to half (nearest 0.5)
-    } else if (settings.rounding_type.indexOf("HALF") > 0) {
+      break;
+
+      // Round to half (nearest 0.5)
+      case HALF:
         dataJson["FLOW"] = round(sensorVal.FlowCFM * 2.0 ) / 2.0;
         dataJson["MFLOW"] = round(sensorVal.FlowKGH * 2.0) / 2.0;
         dataJson["AFLOW"] = round(sensorVal.FlowADJ * 2.0) / 2.0;
         dataJson["SFLOW"] = round(sensorVal.FlowSCFM * 2.0) / 2.0;
+      break;
+
+      default:
+        dataJson["FLOW"] = 0.0;
+        dataJson["MFLOW"] = 0.0;
+        dataJson["AFLOW"] = 0.0;
+        dataJson["SFLOW"] = 0.0;
+      break;
     }
 
-  }  else  {
-    dataJson["FLOW"] = 0.0;
-    dataJson["MFLOW"] = 0.0;
-    dataJson["AFLOW"] = 0.0;
-    dataJson["SFLOW"] = 0.0;
   }
+
+
 
 
   // Flow depression value for AFLOW units
@@ -1146,15 +1158,27 @@ String DataHandler::buildIndexSSEJsonData()
 
 
   // Bench Type for status pane
-  if (settings.bench_type.indexOf("MAF") > 0) {
-    dataJson["BENCH_TYPE"] = "MAF";
-  } else if (settings.bench_type.indexOf("ORIFICE") > 0) {
-    dataJson["BENCH_TYPE"] = "ORIFICE";
-  } else if (settings.bench_type.indexOf("VENTURI") > 0) {
-    dataJson["BENCH_TYPE"] = "VENTURI";
-  } else if (settings.bench_type.indexOf("PITOT") > 0) {
-    dataJson["BENCH_TYPE"] = "PITOT";
+  switch (settings.bench_type){
+
+    case MAF:
+      dataJson["BENCH_TYPE"] = "MAF";
+    break;
+
+    case ORIFICE:
+      dataJson["BENCH_TYPE"] = "ORIFICE";
+    break;
+
+    case VENTURI:
+      dataJson["BENCH_TYPE"] = "VENTURI";
+    break;
+
+    case PITOT:
+      dataJson["BENCH_TYPE"] = "PITOT";
+    break;
+
   }
+
+
 
 
   dataJson["BARO"] = sensorVal.BaroHPA; // GUI  displays mbar (hPa)
@@ -1240,32 +1264,40 @@ String DataHandler::buildMimicSSEJsonData() {
   // Flow Rate
   if ((flowComp > settings.min_flow_rate) && (pRefComp > settings.min_bench_pressure))  {
 
-    // Check if we need to round values
-    if (settings.rounding_type.indexOf("NONE") > 0) {
+    switch (settings.rounding_type) {
+      case NONE:
         dataJson["FLOW"] = sensorVal.FlowCFM;
         dataJson["MFLOW"] = sensorVal.FlowKGH;
         dataJson["AFLOW"] = sensorVal.FlowADJ;
         dataJson["SFLOW"] = sensorVal.FlowSCFM;
-    // Round to whole value    
-    } else if (settings.rounding_type.indexOf("INTEGER") > 0) {
+      break;
+
+      // Round to whole value 
+      case INTEGER:
         dataJson["FLOW"] = round(sensorVal.FlowCFM);
         dataJson["MFLOW"] = round(sensorVal.FlowKGH);
         dataJson["AFLOW"] = round(sensorVal.FlowADJ);
         dataJson["SFLOW"] = round(sensorVal.FlowSCFM);
-    // Round to half (nearest 0.5)
-    } else if (settings.rounding_type.indexOf("HALF") > 0) {
+      break;
+
+      // Round to half (nearest 0.5)
+      case HALF:
         dataJson["FLOW"] = round(sensorVal.FlowCFM * 2.0 ) / 2.0;
         dataJson["MFLOW"] = round(sensorVal.FlowKGH * 2.0) / 2.0;
         dataJson["AFLOW"] = round(sensorVal.FlowADJ * 2.0) / 2.0;
         dataJson["SFLOW"] = round(sensorVal.FlowSCFM * 2.0) / 2.0;
+      break;
+
+      default:
+        dataJson["FLOW"] = 0.0;
+        dataJson["MFLOW"] = 0.0;
+        dataJson["AFLOW"] = 0.0;
+        dataJson["SFLOW"] = 0.0;
+      break;
     }
 
-  }  else  {
-    dataJson["FLOW"] = 0.0;
-    dataJson["MFLOW"] = 0.0;
-    dataJson["AFLOW"] = 0.0;
-    dataJson["SFLOW"] = 0.0;
   }
+
 
   return jsonString;
 }

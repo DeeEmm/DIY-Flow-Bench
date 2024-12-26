@@ -705,7 +705,7 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request){
       flowValue = sensorVal.FlowADJSCFM;
     break;
     
-    case MAF:
+    case RAW_MASS:
       flowValue = sensorVal.FlowKGH;
     break;
         
@@ -1011,14 +1011,24 @@ String Webserver::processTemplate(const String &var) {
   }
 
   // Bench definitions for system status pane 
-  if (settings.bench_type.indexOf("MAF") > 0) {
-    status.benchType = "MAF Style";
-  } else if (settings.bench_type.indexOf("ORIFICE") > 0) {
-    status.benchType = "Orifice Style";
-  } else if (settings.bench_type.indexOf("VENTURI") > 0) {
-    status.benchType = "Venturi Style";
-  } else if (settings.bench_type.indexOf("PITOT") > 0) {
-    status.benchType = "Pitot Style";
+  switch (settings.bench_type){
+
+    case MAF:
+      status.benchType = "MAF Style";
+    break;
+
+    case ORIFICE:
+      status.benchType = "Orifice Style";
+    break;
+
+    case VENTURI:
+      status.benchType = "Venturi Style";
+    break;
+
+    case PITOT:
+      status.benchType = "Pitot Style";
+    break;
+
   }
 
 
@@ -1246,15 +1256,25 @@ String Webserver::processTemplate(const String &var) {
 
   // Rounding type
   if (var == "ROUNDING_TYPE_DROPDOWN"){
-    if (settings.rounding_type.indexOf("NONE") > 0) {
-      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE' selected>No Rounding</option><option value='INTEGER'>Integer</option><option value='HALF'>Half</option></select>");
-    } else if (settings.rounding_type.indexOf("INTEGER") > 0) {
-      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>No Rounding</option><option value='INTEGER' selected>Integer</option><option value='HALF'>Half</option></select>");
-    } else if (settings.rounding_type.indexOf("HALF") > 0) {
-      return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='NONE'>No Rounding</option><option value='INTEGER'>Integer</option><option value='HALF' selected>Half</option></select>");
+
+    switch (settings.rounding_type) {
+      case NONE:
+        return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='1' selected>No Rounding</option><option value='2'>Integer</option><option value='3'>Half</option></select>");
+      break;
+
+      case INTEGER:
+        return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='1'>No Rounding</option><option value='2' selected>Integer</option><option value='3'>Half</option></select>");
+      break;
+
+      case HALF:
+        return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='1'>No Rounding</option><option value='2'>Integer</option><option value='3' selected>Half</option></select>");
+      break;
+
+      default:
+        return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='1' selected>No Rounding</option><option value='2'>Integer</option><option value='3'>Half</option></select>");
+      break;
     }
   }
-
 
   if (var == "STD_ADJ_FLOW" ) {
     if (settings.std_adj_flow == 1) {
@@ -1316,7 +1336,7 @@ String Webserver::processTemplate(const String &var) {
     if (settings.gen_decimal_length == 0) {
       return String( "<select name='GEN_DECI_ACC' class='config-select'><option value='0' selected>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
     } else if (settings.flow_decimal_length == 1) {
-      return String( "<select name='GEN_DECI_ACC' class='config-select'><option value='0>1 Whole</option><option value='1' selected>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
+      return String( "<select name='GEN_DECI_ACC' class='config-select'><option value='0'>1 Whole</option><option value='1' selected>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
     } else if (settings.flow_decimal_length == 2) {
       return String( "<select name='GEN_DECI_ACC' class='config-select'><option value='0'>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2' selected>0.01 Hundredths </option></select>");
     }
@@ -1324,14 +1344,23 @@ String Webserver::processTemplate(const String &var) {
 
   // Data Filter type
   if (var == "DATA_FILTER_TYP_DROPDOWN"){
-    if (settings.data_filter_type.indexOf("NONE") > 0) {
-      return String( "<select name='DATA_FILTER_TYP' class='config-select'><option value='NONE' selected>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE'>Mode</option></select>");
-    } else if (settings.data_filter_type.indexOf("MEDIAN") > 0) {
-      return String( "<select name='DATA_FILTER_TYP' class='config-select'><option value='NONE' >None</option><option value='MEDIAN' selected>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE'>Mode</option></select>");
-    } else if (settings.data_filter_type.indexOf("AVERAGE") > 0) {
-      return String( "<select name='DATA_FILTER_TYP' class='config-select'><option value='NONE'>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE' selected>Cyclic Average </option><option value='MODE'>Mode</option></select>");
-    } else if (settings.data_filter_type.indexOf("MODE") > 0) {
-      return String( "<select name='DATA_FILTER_TYP' class='config-select'><option value='NONE'>None</option><option value='MEDIAN'>Rolling Median</option><option value='AVERAGE'>Cyclic Average </option><option value='MODE' selected>Mode</option></select>");
+    switch (settings.data_filter_type){
+      
+      case NONE:
+        return String( "<select name='DATA_FILTER_TYP' class='config-select'><option value='1' selected>None</option><option value='2'>Rolling Median</option><option value='3'>Cyclic Average </option><option value='4'>Mode</option></select>");
+      break;
+
+      case MEDIAN:
+        return String( "<select name='DATA_FILTER_TYP' class='config-select'><option value='1'>None</option><option value='2' selected>Rolling Median</option><option value='3'>Cyclic Average </option><option value='4'>Mode</option></select>");
+      break;
+
+      case AVERAGE:
+        return String( "<select name='DATA_FILTER_TYP' class='config-select'><option value='1'>None</option><option value='2'>Rolling Median</option><option value='3' selected>Cyclic Average </option><option value='4'>Mode</option></select>");
+      break;
+
+      case MODE:
+        return String( "<select name='DATA_FILTER_TYP' class='config-select'><option value='1'>None</option><option value='2'>Rolling Median</option><option value='3'>Cyclic Average </option><option value='4' selected>Mode</option></select>");
+      break;
     }
   }
 
@@ -1361,17 +1390,48 @@ String Webserver::processTemplate(const String &var) {
 
   // Bench type
   if (var == "BENCH_TYPE_DROPDOWN") {
-    if (settings.bench_type.indexOf("MAF") > 0) {
-      return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF' selected>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
-    } else if (settings.bench_type.indexOf("ORIFICE") > 0) {
-      return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF'>MAF Style</option><option value='ORIFICE' selected>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
-    } else if (settings.bench_type.indexOf("VENTURI") > 0) {
-      return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF'>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI' selected>Venturi Style </option><option value='PITOT'>Pitot Style</option></select>");
-    } else if (settings.bench_type.indexOf("PITOT") > 0) {
-      return String( "<select name='BENCH_TYPE' class='config-select'><option value='MAF'>MAF Style</option><option value='ORIFICE'>Orifice Style</option><option value='VENTURI'>Venturi Style </option><option value='PITOT' selected>Pitot Style</option></select>");
+    switch (settings.bench_type) {
+      case MAF:
+        return String( "<select name='BENCH_TYPE' class='config-select'><option value='1' selected>MAF Style</option><option value='2'>Orifice Style</option><option value='3'>Venturi Style </option><option value='4'>Pitot Style</option></select>");
+      break;
+
+      case ORIFICE:
+        return String( "<select name='BENCH_TYPE' class='config-select'><option value='1'>MAF Style</option><option value='2' selected>Orifice Style</option><option value='3'>Venturi Style </option><option value='4'>Pitot Style</option></select>");
+      break;
+
+      case VENTURI:
+        return String( "<select name='BENCH_TYPE' class='config-select'><option value='1'>MAF Style</option><option value='2'>Orifice Style</option><option value='3' selected>Venturi Style </option><option value='4'>Pitot Style</option></select>");
+      break;
+      
+      case PITOT:
+        return String( "<select name='BENCH_TYPE' class='config-select'><option value='1'>MAF Style</option><option value='2'>Orifice Style</option><option value='3'>Venturi Style </option><option value='4' selected>Pitot Style</option></select>");
+      break;
     }
   }
  
+
+  // Bench definitions for system status pane 
+  switch (settings.bench_type){
+
+    case MAF:
+      status.benchType = "MAF Style";
+    break;
+
+    case ORIFICE:
+      status.benchType = "Orifice Style";
+    break;
+
+    case VENTURI:
+      status.benchType = "Venturi Style";
+    break;
+
+    case PITOT:
+      status.benchType = "Pitot Style";
+    break;
+
+  }
+
+
   // Calibration Settings
   if (var == "CAL_FLOW_RATE") return String(settings.cal_flow_rate);
   if (var == "CAL_REF_PRESS") return String(settings.cal_ref_press);
