@@ -198,17 +198,17 @@ flowTargetValInput {
 
 
 .config-panel {
-  max-width: 650px;
+  max-width: 1200px;
   margin: auto auto;
 }
 
 .config-row {
-  margin-top: 5px;
-  margin-top: 5px;
+  /* margin-top: 5px; */
+  /* margin-top: 5px; */
 }
 
 .config-label {
-  padding-left: 5px;
+  /* padding-left: 5px; */
 }
 
 .config-value {
@@ -221,9 +221,14 @@ flowTargetValInput {
   float: right;
 }
 
+.config-text-long {
+  width: 130px !important;
+}
+
 .config-select {
-  width: 208px;
+  width: 82px;
   float: right;
+  height: 25px;
 }
 
 .units {
@@ -278,6 +283,7 @@ flowTargetValInput {
   margin: 2px;
   cursor: pointer;
   width: 150px;
+  height:50px;
 }
 
 .button-sml {
@@ -313,8 +319,13 @@ flowTargetValInput {
   background-color: #fa7b04;
 }
 
+#leak-cal-button {
+  height:100px;
+}
+
 #calibrate-button{
   background-color: #fa2e04;
+  height:100px;
 }
 
 #clear-message-button {
@@ -345,8 +356,10 @@ flowTargetValInput {
 
 
 .tooltip {
+  float:right;
+  margin-left:5px;
+  cursor: default;
   position: relative;
-  border-bottom: 1px dotted black;
 }
 
 .tooltip .tooltiptext {
@@ -356,11 +369,10 @@ flowTargetValInput {
   color: #fff;
   text-align: center;
   border-radius: 6px;
-  padding: 5px 5px;
+  padding: 0px 5px;
   position: absolute;
   z-index: 1;
-  left: -10px;
-  top: -5px;
+  left: -330px;
 }
 
 .tooltip .tooltiptext::after {
@@ -376,15 +388,18 @@ flowTargetValInput {
 
 .tooltip:hover .tooltiptext {
   visibility: visible;
+  cursor: default;
+  position:absolute;
 }
 
 /* Modal Dialogs */
 .modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
+  top:0px;
   z-index: 1; /* Sit on top */
   left: 0;
-  padding-top: 50px;
+  padding-top: 150px;
   width: 100vw; /* Full width */
   height: 100vh; /* Full height */
   overflow: auto; /* Enable scroll if needed */
@@ -399,7 +414,7 @@ flowTargetValInput {
   margin: 1px auto; /* 15pcnt from the top and centered */
   padding: 20px;
   border: 1px solid #888;
-   width: 850px; 
+  width: 850px; 
   border-radius: 5px;
   overflow-y:scroll;
 }
@@ -410,7 +425,7 @@ flowTargetValInput {
   padding: 20px;
   border: 1px solid #888;
   width: 850px; 
-  height:400px;
+  height:440px;
   border-radius: 5px;
   overflow-y:scroll;
 }
@@ -441,6 +456,7 @@ flowTargetValInput {
 
 .calibrationModal {
   width:400px;
+  height:150px;
 }
 
 .serialModal {
@@ -472,6 +488,15 @@ flowTargetValInput {
   text-align: center;
   font-size: 15px;
   padding: 6px 6px;
+}
+
+.submit-button {
+  padding: 12px 0px;
+  text-align: center;
+  font-size: 15px;
+  padding: 6px 6px;
+  background-color: #125ab1;
+  float: right;
 }
 
 #capture-lift-data-button:active {
@@ -767,6 +792,7 @@ svg .dataCircle:hover {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
     /* background: white; */
+    background-color: rgba(250, 250, 250, 0.5);
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -778,6 +804,10 @@ fieldset {
     /* padding: 15px; */
     margin: 0;
     background-color: white;
+    margin: 10px 0; 
+    padding: 15px; 
+    border: 1px solid #ccc;
+    font-size: 18px;
 }
 
 legend {
@@ -787,11 +817,12 @@ legend {
 }
 
 input[type="number"], input[type="text"] {
-    width: 80px;
+    width: 65px;
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     float:right;
+    height:10px;
 }
 
 input[type="checkbox"] {
@@ -805,3 +836,7 @@ input[type="checkbox"] {
     text-align: center;
     padding: 20px;
 }
+
+.pin-input { margin: 5px 0; display: flex; justify-content: space-between; align-items: center; }
+label { margin-right: 10px; }
+.submit-btn { margin-top: 20px; padding: 10px 20px; }

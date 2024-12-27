@@ -763,7 +763,7 @@ void DataHandler::initialiseSettings () {
   _settings_pref.begin("settings", false);
 
   // _settings_pref.remove("DATA_FILTER_TYP"); // remove individual key
-  // _settings_pref.remove("ROUNDING_TYPE"); // remove individual key
+  // _settings_pref.remove("TEMP_UNIT"); // remove individual key
 
   if (!_settings_pref.isKey("WIFI_SSID")) _settings_pref.putString("WIFI_SSID", "WIFI-SSID");
   if (!_settings_pref.isKey("WIFI_PSWD")) _settings_pref.putString("WIFI_PSWD", static_cast<String>("PASSWORD"));
@@ -793,7 +793,7 @@ void DataHandler::initialiseSettings () {
   if (!_settings_pref.isKey("STD_ADJ_FLOW")) _settings_pref.putInt("STD_ADJ_FLOW", 0);
   if (!_settings_pref.isKey("DATAGRAPH_MAX")) _settings_pref.putInt("DATAGRAPH_MAX", 0);
   if (!_settings_pref.isKey("MAF_MIN_VOLTS")) _settings_pref.putInt("MAF_MIN_VOLTS", 1);
-  if (!_settings_pref.isKey("TEMP_UNIT")) _settings_pref.putString("TEMP_UNIT", "Celcius");
+  if (!_settings_pref.isKey("TEMP_UNIT")) _settings_pref.putInt("TEMP_UNIT", CELCIUS);
 
   if (!_settings_pref.isKey("LIFT_INTERVAL")) _settings_pref.putDouble("LIFT_INTERVAL", 1.5F);
   if (!_settings_pref.isKey("BENCH_TYPE")) _settings_pref.putInt("BENCH_TYPE", MAF);
@@ -865,7 +865,7 @@ void DataHandler::loadSettings () {
   settings.standardReference = _settings_pref.getInt("STD_REF", 1  );
   settings.std_adj_flow = _settings_pref.getInt("STD_ADJ_FLOW",  0 );
   settings.dataGraphMax = _settings_pref.getInt("DATAGRAPH_MAX", 0 );
-  settings.temp_unit = _settings_pref.getString("TEMP_UNIT", "Celcius" );
+  settings.temp_unit = _settings_pref.getInt("TEMP_UNIT", CELCIUS );
   settings.valveLiftInterval = _settings_pref.getDouble("LIFT_INTERVAL", 1.5F  );
   settings.bench_type = _settings_pref.getInt("BENCH_TYPE", MAF );
   settings.cal_flow_rate = _settings_pref.getDouble("CAL_FLOW_RATE", 14.4F );
@@ -1113,8 +1113,15 @@ String DataHandler::buildIndexSSEJsonData()
         dataJson["AFLOW"] = 0.0;
         dataJson["SFLOW"] = 0.0;
       break;
-    }
 
+    } 
+
+  } else {
+
+    dataJson["FLOW"] = 0.0;
+    dataJson["MFLOW"] = 0.0;
+    dataJson["AFLOW"] = 0.0;
+    dataJson["SFLOW"] = 0.0;
   }
 
 
@@ -1150,7 +1157,7 @@ String DataHandler::buildIndexSSEJsonData()
 
 
   // Temperature deg C or F
-  if (settings.temp_unit.indexOf("Celcius") > 0) {
+  if (settings.temp_unit == CELCIUS) {
     dataJson["TEMP"] = sensorVal.TempDegC;
   } else {
     dataJson["TEMP"] = sensorVal.TempDegF;

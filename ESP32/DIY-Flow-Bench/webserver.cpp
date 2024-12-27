@@ -294,13 +294,16 @@ void Webserver::begin()
   // Save user Flow Diff target
   server->on("/api/saveflowtarget", HTTP_POST, parseUserFlowTargetForm);
   
-  // Parse Configuration Form
+  // Save Settings Form
+  server->on("/api/savesettings", HTTP_POST, saveSettingsForm);
+
+  // Save Configuration Form
   server->on("/api/saveconfig", HTTP_POST, saveConfigurationForm);
 
-  // Parse Calibration Form
+  // Save Calibration Form
   server->on("/api/savecalibration", HTTP_POST, saveCalibrationForm);
 
-  // Parse Lift Data Form
+  // Save Lift Data Form
   server->on("/api/saveliftdata", HTTP_POST, parseLiftDataForm);
 
   // Parse Orifice Form
@@ -352,6 +355,14 @@ void Webserver::begin()
         PublicHTML _public_html;
         AsyncResponseStream *response = request->beginResponseStream("text/javascript");
         response->print(_public_html.indexJs().c_str());
+        request->send(response);
+      });
+  
+  // Javascript.js request handler
+  server->on("/settings.js", HTTP_ANY, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        AsyncResponseStream *response = request->beginResponseStream("text/javascript");
+        response->print(_public_html.settingsJs().c_str());
         request->send(response);
       });
   
@@ -499,6 +510,38 @@ void Webserver::saveConfigurationForm(AsyncWebServerRequest *request)
 
   _config_pref.end();
   _data.loadConfig();
+  request->redirect("/");
+}
+
+
+
+
+/***********************************************************
+ * @brief saveSettingsForm
+ * @details Parses settings form post vars and stores into NVM memory
+ * @note Loads data into structs
+ ***/
+void Webserver::saveSettingsForm(AsyncWebServerRequest *request)
+{
+
+  Messages _message;
+  DataHandler _data;
+  Preferences _settings_pref;
+
+  _settings_pref.begin("settings", false);
+
+  int params = request->params();
+
+  _message.debugPrintf("Saving Settings... \n");
+
+  // Update Settings Vars
+  for(int i=0;i<params;i++){
+    AsyncWebParameter* p = request->getParam(i);
+      _settings_pref.putString(p->name().c_str(), p->value().c_str());
+  }
+
+  _settings_pref.end();
+  _data.loadSettings();
   request->redirect("/");
 }
 
@@ -1035,6 +1078,7 @@ String Webserver::processTemplate(const String &var) {
   // Config Info
   if (var == "RELEASE") return RELEASE;
   if (var == "BUILD_NUMBER") return BUILD_NUMBER;
+  if (var == "GUI_BUILD_NUMBER") return GUI_BUILD_NUMBER;
   if (var == "SPIFFS_MEM_SIZE") return String(status.spiffs_mem_size);
   if (var == "SPIFFS_MEM_USED") return String(status.spiffs_mem_used);
   if (var == "LOCAL_IP_ADDRESS") return String(status.local_ip_address);
@@ -1374,11 +1418,17 @@ String Webserver::processTemplate(const String &var) {
   if (var == "MAF_HOUSING_DIA") return String(settings.maf_housing_diameter);
   if (var == "REFRESH_RATE") return String(settings.refresh_rate);
   if (var == "ADJ_FLOW_DEP") return String(settings.adj_flow_depression);
-  if (var == "TEMP_UNIT") return String(settings.temp_unit);
-  
+  if (var == "TEMP_UNIT") {
+    if (settings.temp_unit == CELCIUS) {
+      return String("Celcius");
+    } else {
+      return String("Farenheit");
+    }
+  } 
+
   // Temperature
   if (var == "TEMPERATURE_DROPDOWN"){
-    if (settings.temp_unit.indexOf("Celcius") > 0) {
+    if (settings.temp_unit == CELCIUS) {
       return String( "<select name='TEMP_UNIT' class='config-select' id='TEMP_UNIT'><option value='Celcius' selected>Celcius </option><option value='Farenheit'>Farenheit </option></select>");
     } else {
       return String("<select name='TEMP_UNIT' class='config-select' id='TEMP_UNIT'><option value='Celcius'>Celcius </option><option value='Farenheit' selected>Farenheit </option></select>");

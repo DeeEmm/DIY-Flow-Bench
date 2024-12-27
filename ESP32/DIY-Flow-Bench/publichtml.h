@@ -25,4 +25,7 @@ public:
     String css();
     String mainJs();
     String indexJs();
+    String settingsJs();
+    String configJs();
+    String pinsJs();
 };

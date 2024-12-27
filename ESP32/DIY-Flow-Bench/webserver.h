@@ -54,6 +54,7 @@ class Webserver {
 		static void parseOrificeForm(AsyncWebServerRequest *request);
 
 		static void saveConfigurationForm(AsyncWebServerRequest *request);
+		static void saveSettingsForm(AsyncWebServerRequest *request);
 
 		int decodeMessageHeader (char *data);
 		static String processTemplate(const String& var);

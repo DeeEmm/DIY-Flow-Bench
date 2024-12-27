@@ -193,6 +193,12 @@
 #define THOUSANDTHS 4
 
 
+/***********************************************************
+ * Temperature
+ ***/
+#define CELCIUS 1
+#define FARENHEIT 2
+
 
 /***********************************************************
  * BME Registers

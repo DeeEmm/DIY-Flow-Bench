@@ -1,192 +1,188 @@
 
-    <title>Pin Configuration</title>
-    <style>
-        .pin-form { max-width: 800px; margin: 0 auto; padding: 20px; }
-        fieldset { margin: 10px 0; padding: 15px; border: 1px solid #ccc; }
-        .pin-input { margin: 5px 0; display: flex; justify-content: space-between; align-items: center; }
-        input[type="number"] { width: 80px; }
-        label { margin-right: 10px; }
-        .submit-btn { margin-top: 20px; padding: 10px 20px; }
-    </style>
-    <form class="pin-form" action="/api/pins/save" method="POST">
-        <div class="config-container">
-        <h2>Pin Configuration</h2>
-        <fieldset>
-            <legend>Vacuum Control</legend>
-            <div class="pin-input">
-                <label for="VAC_SPEED_PIN">VAC Speed Pin:</label>
-                <input type="number" id="VAC_SPEED_PIN" name="VAC_SPEED_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="VAC_BLEED_VALVE_PIN">VAC Bleed Valve Pin:</label>
-                <input type="number" id="VAC_BLEED_VALVE_PIN" name="VAC_BLEED_VALVE_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="VAC_BANK_1_PIN">VAC Bank 1 Pin:</label>
-                <input type="number" id="VAC_BANK_1_PIN" name="VAC_BANK_1_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="VAC_BANK_2_PIN">VAC Bank 2 Pin:</label>
-                <input type="number" id="VAC_BANK_2_PIN" name="VAC_BANK_2_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="VAC_BANK_3_PIN">VAC Bank 3 Pin:</label>
-                <input type="number" id="VAC_BANK_3_PIN" name="VAC_BANK_3_PIN" min="0" max="39" value="99">
-            </div>
-        </fieldset>
 
-        <fieldset>
-            <legend>Stepper Motors</legend>
-            <div class="pin-input">
-                <label for="AVO_STEP_PIN">AVO Step Pin:</label>
-                <input type="number" id="AVO_STEP_PIN" name="AVO_STEP_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="AVO_DIR_PIN">AVO Direction Pin:</label>
-                <input type="number" id="AVO_DIR_PIN" name="AVO_DIR_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="FLOW_VALVE_STEP_PIN">Flow Valve Step Pin:</label>
-                <input type="number" id="FLOW_VALVE_STEP_PIN" name="FLOW_VALVE_STEP_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="FLOW_VALVE_DIR_PIN">Flow Valve Direction Pin:</label>
-                <input type="number" id="FLOW_VALVE_DIR_PIN" name="FLOW_VALVE_DIR_PIN" min="0" max="39" value="99">
-            </div>
-        </fieldset>
+     <div id="pins">
+        <div class="config-panel">
+            <h2>Pin Configuration</h2>
+            <form class="pin-form" action="/api/pins/save" method="POST">
+                <div class="config-container">
+                    <fieldset>
+                        <legend>Vacuum Control</legend>
+                        <div class="pin-input">
+                            <label for="VAC_SPEED_PIN">VAC Speed Pin:</label>
+                            <input type="number" id="VAC_SPEED_PIN" name="VAC_SPEED_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="VAC_BLEED_VALVE_PIN">VAC Bleed Valve Pin:</label>
+                            <input type="number" id="VAC_BLEED_VALVE_PIN" name="VAC_BLEED_VALVE_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="VAC_BANK_1_PIN">VAC Bank 1 Pin:</label>
+                            <input type="number" id="VAC_BANK_1_PIN" name="VAC_BANK_1_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="VAC_BANK_2_PIN">VAC Bank 2 Pin:</label>
+                            <input type="number" id="VAC_BANK_2_PIN" name="VAC_BANK_2_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="VAC_BANK_3_PIN">VAC Bank 3 Pin:</label>
+                            <input type="number" id="VAC_BANK_3_PIN" name="VAC_BANK_3_PIN" min="0" max="39" value="99">
+                        </div>
+                    </fieldset>
 
-        <fieldset>
-            <legend>Power & Sensors</legend>
-            <div class="pin-input">
-                <label for="VCC_3V3_PIN">3.3V Reference Pin:</label>
-                <input type="number" id="VCC_3V3_PIN" name="VCC_3V3_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="VCC_5V_PIN">5V Reference Pin:</label>
-                <input type="number" id="VCC_5V_PIN" name="VCC_5V_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="SPEED_SENS_PIN">Speed Sensor Pin:</label>
-                <input type="number" id="SPEED_SENS_PIN" name="SPEED_SENS_PIN" min="0" max="39" value="99">
-            </div>
-        </fieldset>
+                    <fieldset>
+                        <legend>Stepper Motors</legend>
+                        <div class="pin-input">
+                            <label for="AVO_STEP_PIN">AVO Step Pin:</label>
+                            <input type="number" id="AVO_STEP_PIN" name="AVO_STEP_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="AVO_DIR_PIN">AVO Direction Pin:</label>
+                            <input type="number" id="AVO_DIR_PIN" name="AVO_DIR_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="FLOW_VALVE_STEP_PIN">Flow Valve Step Pin:</label>
+                            <input type="number" id="FLOW_VALVE_STEP_PIN" name="FLOW_VALVE_STEP_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="FLOW_VALVE_DIR_PIN">Flow Valve Direction Pin:</label>
+                            <input type="number" id="FLOW_VALVE_DIR_PIN" name="FLOW_VALVE_DIR_PIN" min="0" max="39" value="99">
+                        </div>
+                    </fieldset>
 
-        <fieldset>
-            <legend>Encoders & BCD</legend>
-            <div class="pin-input">
-                <label for="SWIRL_ENCODER_PIN_A">Swirl Encoder A Pin:</label>
-                <input type="number" id="SWIRL_ENCODER_PIN_A" name="SWIRL_ENCODER_PIN_A" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="SWIRL_ENCODER_PIN_B">Swirl Encoder B Pin:</label>
-                <input type="number" id="SWIRL_ENCODER_PIN_B" name="SWIRL_ENCODER_PIN_B" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="ORIFICE_BCD_BIT1_PIN">Orifice BCD Bit 1:</label>
-                <input type="number" id="ORIFICE_BCD_BIT1_PIN" name="ORIFICE_BCD_BIT1_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="ORIFICE_BCD_BIT2_PIN">Orifice BCD Bit 2:</label>
-                <input type="number" id="ORIFICE_BCD_BIT2_PIN" name="ORIFICE_BCD_BIT2_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="ORIFICE_BCD_BIT3_PIN">Orifice BCD Bit 3:</label>
-                <input type="number" id="ORIFICE_BCD_BIT3_PIN" name="ORIFICE_BCD_BIT3_PIN" min="0" max="39" value="99">
-            </div>
-        </fieldset>
+                    <fieldset>
+                        <legend>Power & Sensors</legend>
+                        <div class="pin-input">
+                            <label for="VCC_3V3_PIN">3.3V Reference Pin:</label>
+                            <input type="number" id="VCC_3V3_PIN" name="VCC_3V3_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="VCC_5V_PIN">5V Reference Pin:</label>
+                            <input type="number" id="VCC_5V_PIN" name="VCC_5V_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SPEED_SENS_PIN">Speed Sensor Pin:</label>
+                            <input type="number" id="SPEED_SENS_PIN" name="SPEED_SENS_PIN" min="0" max="39" value="99">
+                        </div>
+                    </fieldset>
 
-        <fieldset>
-            <legend>Sensor Inputs</legend>
-            <div class="pin-input">
-                <label for="MAF_PIN">MAF Pin:</label>
-                <input type="number" id="MAF_PIN" name="MAF_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="PREF_PIN">Pressure Reference Pin:</label>
-                <input type="number" id="PREF_PIN" name="PREF_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="PDIFF_PIN">Pressure Differential Pin:</label>
-                <input type="number" id="PDIFF_PIN" name="PDIFF_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="PITOT_PIN">Pitot Pin:</label>
-                <input type="number" id="PITOT_PIN" name="PITOT_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="TEMPERATURE_PIN">Temperature Pin:</label>
-                <input type="number" id="TEMPERATURE_PIN" name="TEMPERATURE_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="REF_BARO_PIN">Reference Barometer Pin:</label>
-                <input type="number" id="REF_BARO_PIN" name="REF_BARO_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="HUMIDITY_PIN">Humidity Pin:</label>
-                <input type="number" id="HUMIDITY_PIN" name="HUMIDITY_PIN" min="0" max="39" value="99">
-            </div>
-        </fieldset>
+                    <fieldset>
+                        <legend>Encoders & BCD</legend>
+                        <div class="pin-input">
+                            <label for="SWIRL_ENCODER_PIN_A">Swirl Encoder A Pin:</label>
+                            <input type="number" id="SWIRL_ENCODER_PIN_A" name="SWIRL_ENCODER_PIN_A" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SWIRL_ENCODER_PIN_B">Swirl Encoder B Pin:</label>
+                            <input type="number" id="SWIRL_ENCODER_PIN_B" name="SWIRL_ENCODER_PIN_B" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="ORIFICE_BCD_BIT1_PIN">Orifice BCD Bit 1:</label>
+                            <input type="number" id="ORIFICE_BCD_BIT1_PIN" name="ORIFICE_BCD_BIT1_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="ORIFICE_BCD_BIT2_PIN">Orifice BCD Bit 2:</label>
+                            <input type="number" id="ORIFICE_BCD_BIT2_PIN" name="ORIFICE_BCD_BIT2_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="ORIFICE_BCD_BIT3_PIN">Orifice BCD Bit 3:</label>
+                            <input type="number" id="ORIFICE_BCD_BIT3_PIN" name="ORIFICE_BCD_BIT3_PIN" min="0" max="39" value="99">
+                        </div>
+                    </fieldset>
 
-        <fieldset>
-            <legend>Communication</legend>
-            <div class="pin-input">
-                <label for="SERIAL0_TX_PIN">Serial0 TX Pin:</label>
-                <input type="number" id="SERIAL0_TX_PIN" name="SERIAL0_TX_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="SERIAL0_RX_PIN">Serial0 RX Pin:</label>
-                <input type="number" id="SERIAL0_RX_PIN" name="SERIAL0_RX_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="SERIAL2_TX_PIN">Serial2 TX Pin:</label>
-                <input type="number" id="SERIAL2_TX_PIN" name="SERIAL2_TX_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="SERIAL2_RX_PIN">Serial2 RX Pin:</label>
-                <input type="number" id="SERIAL2_RX_PIN" name="SERIAL2_RX_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="SDA_PIN">I2C SDA Pin:</label>
-                <input type="number" id="SDA_PIN" name="SDA_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="SCL_PIN">I2C SCL Pin:</label>
-                <input type="number" id="SCL_PIN" name="SCL_PIN" min="0" max="39" value="99">
-            </div>
-        </fieldset>
+                    <fieldset>
+                        <legend>Sensor Inputs</legend>
+                        <div class="pin-input">
+                            <label for="MAF_PIN">MAF Pin:</label>
+                            <input type="number" id="MAF_PIN" name="MAF_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="PREF_PIN">Pressure Reference Pin:</label>
+                            <input type="number" id="PREF_PIN" name="PREF_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="PDIFF_PIN">Pressure Differential Pin:</label>
+                            <input type="number" id="PDIFF_PIN" name="PDIFF_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="PITOT_PIN">Pitot Pin:</label>
+                            <input type="number" id="PITOT_PIN" name="PITOT_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="TEMPERATURE_PIN">Temperature Pin:</label>
+                            <input type="number" id="TEMPERATURE_PIN" name="TEMPERATURE_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="REF_BARO_PIN">Reference Barometer Pin:</label>
+                            <input type="number" id="REF_BARO_PIN" name="REF_BARO_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="HUMIDITY_PIN">Humidity Pin:</label>
+                            <input type="number" id="HUMIDITY_PIN" name="HUMIDITY_PIN" min="0" max="39" value="99">
+                        </div>
+                    </fieldset>
 
-        <fieldset>
-            <legend>SD Card</legend>
-            <div class="pin-input">
-                <label for="SD_CS_PIN">SD CS Pin:</label>
-                <input type="number" id="SD_CS_PIN" name="SD_CS_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="SD_MOSI_PIN">SD MOSI Pin:</label>
-                <input type="number" id="SD_MOSI_PIN" name="SD_MOSI_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="SD_MISO_PIN">SD MISO Pin:</label>
-                <input type="number" id="SD_MISO_PIN" name="SD_MISO_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="SD_SCK_PIN">SD SCK Pin:</label>
-                <input type="number" id="SD_SCK_PIN" name="SD_SCK_PIN" min="0" max="39" value="99">
-            </div>
-        </fieldset>
+                    <fieldset>
+                        <legend>Communication</legend>
+                        <div class="pin-input">
+                            <label for="SERIAL0_TX_PIN">Serial0 TX Pin:</label>
+                            <input type="number" id="SERIAL0_TX_PIN" name="SERIAL0_TX_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SERIAL0_RX_PIN">Serial0 RX Pin:</label>
+                            <input type="number" id="SERIAL0_RX_PIN" name="SERIAL0_RX_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SERIAL2_TX_PIN">Serial2 TX Pin:</label>
+                            <input type="number" id="SERIAL2_TX_PIN" name="SERIAL2_TX_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SERIAL2_RX_PIN">Serial2 RX Pin:</label>
+                            <input type="number" id="SERIAL2_RX_PIN" name="SERIAL2_RX_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SDA_PIN">I2C SDA Pin:</label>
+                            <input type="number" id="SDA_PIN" name="SDA_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SCL_PIN">I2C SCL Pin:</label>
+                            <input type="number" id="SCL_PIN" name="SCL_PIN" min="0" max="39" value="99">
+                        </div>
+                    </fieldset>
 
-        <fieldset>
-            <legend>Spare Pins</legend>
-            <div class="pin-input">
-                <label for="SPARE1_PIN">Spare 1 Pin:</label>
-                <input type="number" id="SPARE1_PIN" name="SPARE1_PIN" min="0" max="39" value="99">
-            </div>
-            <div class="pin-input">
-                <label for="SPARE2_PIN">Spare 2 Pin:</label>
-                <input type="number" id="SPARE2_PIN" name="SPARE2_PIN" min="0" max="39" value="99">
-            </div>
-        </fieldset>
+                    <fieldset>
+                        <legend>SD Card</legend>
+                        <div class="pin-input">
+                            <label for="SD_CS_PIN">SD CS Pin:</label>
+                            <input type="number" id="SD_CS_PIN" name="SD_CS_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SD_MOSI_PIN">SD MOSI Pin:</label>
+                            <input type="number" id="SD_MOSI_PIN" name="SD_MOSI_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SD_MISO_PIN">SD MISO Pin:</label>
+                            <input type="number" id="SD_MISO_PIN" name="SD_MISO_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SD_SCK_PIN">SD SCK Pin:</label>
+                            <input type="number" id="SD_SCK_PIN" name="SD_SCK_PIN" min="0" max="39" value="99">
+                        </div>
+                    </fieldset>
 
-        <button type="submit" class="submit-btn">Save Configuration</button>
+                    <fieldset>
+                        <legend>Spare Pins</legend>
+                        <div class="pin-input">
+                            <label for="SPARE1_PIN">Spare 1 Pin:</label>
+                            <input type="number" id="SPARE1_PIN" name="SPARE1_PIN" min="0" max="39" value="99">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SPARE2_PIN">Spare 2 Pin:</label>
+                            <input type="number" id="SPARE2_PIN" name="SPARE2_PIN" min="0" max="39" value="99">
+                        </div>
+                    </fieldset>
+
+                    <button type="submit" class="button">Save</button>
+                </div>
+            </form>
+        </div>
     </div>
-</form>

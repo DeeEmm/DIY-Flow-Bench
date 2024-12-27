@@ -442,9 +442,6 @@ double Sensors::getMafFlow(int units) {
 		// scale the result with the new pipe area and convert back to mass flow
 		transposedflowRateKGH = (flowRateKGH / oldMafArea) * newMafArea;
 
-		// Chat-GPT version		
-		// transposedflowRateKGH = flowRateKGH * (newMafArea / oldMafArea);
-
 		return transposedflowRateKGH;
 
 	} else { 

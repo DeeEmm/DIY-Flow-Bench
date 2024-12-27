@@ -99,6 +99,9 @@ using namespace std;
 #ifndef RELEASE 
 #error RELEASE UNDEFINED 
 #endif
+#ifndef GUI_BUILD_NUMBER
+#error GUI_BUILD_NUMBER UNDEFINED
+#endif
 #ifndef DEV_BRANCH
 #error DEV_BRANCH UNDEFINED
 #endif

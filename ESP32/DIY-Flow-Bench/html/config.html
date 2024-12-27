@@ -1,4 +1,6 @@
-    
+<div id="configuration">
+    <div class="config-panel">
+    <h2>Hardware Configuration</h2>
     <form id="configForm" action="/api/config/save" method="POST">
         <div class="config-container">
             <!-- System Settings -->
@@ -255,7 +257,7 @@
                     <input type="number" id="TEMP_SENS_TYPE" name="TEMP_SENS_TYPE" value="7">
                 </div>
                 <div class="input-group">
-                    <label for="FIXED_TEMP_VAL">Fixed Value (°C)</label>
+                    <label for="FIXED_TEMP_VAL">Fixed Value (&deg;C)</label>
                     <input type="number" id="FIXED_TEMP_VAL" name="FIXED_TEMP_VAL" step="0.1" value="21.0">
                 </div>
                 <div class="input-group">
@@ -305,7 +307,7 @@
                     <input type="checkbox" id="SWIRL_ENABLED" name="SWIRL_ENABLED">
                 </div>
             </fieldset>
-            <button type="submit" class="button">Save Configuration</button>
+            <button type="submit" class="button">Save</button>
         </div>
     </form>
 

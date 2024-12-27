@@ -120,7 +120,6 @@ void TASKgetSensorData( void * parameter ){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
         status.adcPollTimer = millis() + config.ADC_SCAN_DELAY; // Only reset timer when task executes
 
-
         switch (settings.bench_type){
 
           case MAF:

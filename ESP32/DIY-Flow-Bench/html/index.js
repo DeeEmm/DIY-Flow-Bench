@@ -28,13 +28,10 @@ var flowTargetModal = document.getElementById("flowTargetModal");
 var closeFlowTargetModalButton = document.getElementsByClassName("closeFlowTargetModalButton")[0];
 var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
 var closeSerialModalButton = document.getElementsByClassName("closeSerialModalButton")[0];
-var closeFileModalButton = document.getElementsByClassName("closeFileModalButton")[0];
-var closeInfoModalButton = document.getElementsByClassName("closeInfoModalButton")[0];
 var closeCaptureLiftDataModalButton = document.getElementsByClassName("closeCaptureLiftDataModalButton")[0];
 var closeLoadGraphDataModalButton = document.getElementsByClassName("closeLoadGraphDataModalButton")[0];
 var closeSaveGraphDataModalButton = document.getElementsByClassName("closeSaveGraphDataModalButton")[0];
 var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
-var closeUpdateModalButton = document.getElementsByClassName("closeUpdateModalButton")[0];
 
 // Set up Server Side Events (SSE)
 if (!!window.EventSource) {
@@ -87,12 +84,10 @@ if (!!window.EventSource) {
       switch (benchType) {
     
         case "MAF":
-          document.getElementById('orificeData').style.display='none';
           document.getElementById('orificeRadio').style.display='none';
         break;
     
         case "ORIFICE":
-          document.getElementById('orificeData').style.display='block';
           document.getElementById('orificeRadio').style.display='block';
         break;
           
