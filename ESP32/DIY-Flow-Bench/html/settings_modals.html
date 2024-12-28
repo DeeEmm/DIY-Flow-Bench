@@ -1,0 +1,81 @@
+<!-- File Manager Modal -->
+  <div id="fileModal" class="modal">
+      <div class="modal-content">
+        <span class="closeFileModalButton">&times;</span>
+        <h3>~LANG_GUI_FILE_MANAGER~</h3>
+        <div id="file_list">~FILE_LIST~</div>
+        <br>
+        <hr>
+        Total: ~SPIFFS_MEM_SIZE~ &nbsp;&nbsp;&nbsp;&nbsp; Used: ~SPIFFS_MEM_USED~
+        <hr>
+        <br>
+        <div class="float-right">
+          <form method="POST" action="/api/file/upload" enctype="multipart/form-data">
+            <div class="input_container">
+              <input type="file" name="upload" id="fileUpload">
+              <input type='submit' value='~LANG_GUI_FILEMANAGER_UPLOAD~' class="button file-submit-button">
+            </div>
+          </form>
+        </div>
+        <div class="clear-both">&nbsp;</div>
+      </div>        
+    </div>
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="modal">
+      <div class="info-modal-content row">
+        <span class="closeInfoModalButton">&times;</span>
+        <div class="row info-modal">
+            <div class="column">
+            <h4>~LANG_GUI_FIRMWARE~</h4>
+            <hr>
+            <div class="config-row"><label class="config-label">~LANG_GUI_VERSION~: </label><span class="config-value" id="RELEASE">~RELEASE~</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_BUILD~:  </label><span class="config-value" id="BUILD_NUMBER">~BUILD_NUMBER~</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_GUI~: </label><span class="config-value" id="VERSION">~GUI_BUILD_NUMBER~</span></div>
+            <h4>~LANG_GUI_STORAGE~</h4>
+            <hr>
+            <div class="config-row"><label class="config-label">~LANG_GUI_MEM_SIZE~:  </label><span class="config-value" id="SPIFFS_MEM_SIZE">~SPIFFS_MEM_SIZE~</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_MEM_USED~:  </label><span class="config-value" id="SPIFFS_MEM_USED">~SPIFFS_MEM_USED~</span></div>
+            <h4>~LANG_GUI_NETWORK~</h4>
+            <hr>
+            <div class="config-row"><label class="config-label">~LANG_GUI_IP_ADDRESS~:  </label><span class="config-value" id="LOCAL_IP_ADDRESS">~LOCAL_IP_ADDRESS~</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_HOSTNAME~:  </label><span class="config-value" id="sHOSTNAME">http://~sHOSTNAME~.local</span></div>
+          </div>
+          <div class="column">
+            <!-- <div class="config-row"><label class="config-label">Uptime:  </label><span class="config-value" id="UPTIME">~UPTIME~</span></div> -->
+            <h4>~LANG_GUI_HARDWARE_CONFIG~</h4>
+            <hr>
+            <div class="config-row"><label class="config-label">~LANG_GUI_BENCH_TYPE~:  </label><span class="config-value" id="iBENCH_TYPE">~iBENCH_TYPE~</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_BOARD_TYPE~:  </label><span class="config-value" id="BOARD_TYPE">~BOARD_TYPE~</span></div>
+            <!-- <div class="config-row"><label class="config-label">Boot Time:  </label><span class="config-value" id="BOOT_TIME">~BOOT_TIME~</span></div> -->
+            <h4>~LANG_GUI_SENS_CONFIG~</h4>
+            <hr>
+            <div class="config-row"><label class="config-label">~LANG_GUI_MAF_TYPE~:  </label><span class="config-value" id="MAF_SENSOR">~MAF_TYPE~<a href="~MAF_LINK~" target="new">&nbsp;&nbsp;&#9432;</a></span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_REF_PRESSURE_SENSOR~:  </label><span class="config-value" id="PREF_SENSOR">~PREF_SENSOR~</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_TEMP_SENSOR~:  </label><span class="config-value" id="TEMP_SENSOR">~TEMP_SENSOR~</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_HUMIDITY_SENSOR~:  </label><span class="config-value" id="RELH_SENSOR">~RELH_SENSOR~</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_BARO_SENSOR~:  </label><span class="config-value" id="BARO_SENSOR">~BARO_SENSOR~</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_PITOT_SENSOR~:  </label><span class="config-value" id="PITOT_SENSOR">~PITOT_SENSOR~</span></div>
+            <div class="config-row"><label class="config-label">~LANG_GUI_DIFFERENTIAL_SENSOR~:  </label><span class="config-value" id="PDIFF_SENSOR">~PDIFF_SENSOR~</span></div>
+            </div>
+          </div>
+      </div>        
+    </div>
+        
+    <!--Update modal-->
+    <div id="updateModal" class="modal">
+      <div class="modal-content updateModal">
+        <span class="closeUpdateModalButton">&times;</span>
+        <div class="align-center">
+          <h3>~LANG_GUI_UPLOAD_FIRMWARE_BINARY~</h3>
+          <hr>
+          <br>
+          <form method='POST' action='/api/update' enctype='multipart/form-data'>
+            <div class="input_container">
+              <input type="file" name="update" id="fileUpload">
+              <input type='submit' value='~LANG_GUI_FIRMWARE_UPDATE~' class="button file-submit-button">
+            </div>
+          </form>
+        </div>
+      </div>        
+    </div>

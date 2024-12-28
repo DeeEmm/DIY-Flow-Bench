@@ -425,7 +425,7 @@ flowTargetValInput {
   padding: 20px;
   border: 1px solid #888;
   width: 850px; 
-  height:440px;
+  height:460px;
   border-radius: 5px;
   overflow-y:scroll;
 }
@@ -814,6 +814,11 @@ legend {
     color: var(--primary-color);
     font-weight: bold;
     padding: 0 10px;
+}
+
+a.wiki-link, a.wiki-link:visited {
+    color: var(--primary-color);
+    text-decoration: none;
 }
 
 input[type="number"], input[type="text"] {

@@ -36,11 +36,35 @@ public:
         BOSCH_0280218067 = 1
     };
 
-    float mafCoeff[2][7] = {
+    enum MafOutputType {
+        Voltage = 0,
+        Frequency = 1
+    };
+
+    float mafCoeff[NUM_MAF_TYPES][NUM_COEFFICIENTS] = {
         {624.306263f, 25.418081f, 0.365468f, 0.002299f, 0.000003f, -0.000000f, 0.000000f}, // ACDELCO_92281162
         {817.925606f, -15.237634f, 0.091194f, -0.000073f, -0.000000f, 0.000000f, -0.000000f} // BOSCH_0280218067
     };
 
+
+    int mafDiameter[NUM_MAF_TYPES] = {94, 82}; // MAF diameter in mm
+
+    double mafScaling[NUM_MAF_TYPES] = {0.1f, 0.1f}; // MAF scaling factor
+
+    int mafOutputType[NUM_MAF_TYPES] = {Voltage, Voltage}; // MAF output type
+
+    int mafMaxKGH[NUM_MAF_TYPES] = {16077, 18055}; // MAF max value
+
+    String mafType[NUM_MAF_TYPES] = {
+        "ACDELCO 92281162",
+        "BOSCH 0280218067"
+    };
+
+    String mafLink[NUM_MAF_TYPES] = {
+        "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/142",
+        "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/138"
+    };
+  
     // MafData() : currentMafType(ACDELCO_92281162) {}
 
     // // Constructor with MafType parameter
@@ -73,6 +97,31 @@ public:
     MafType getCurrentType() const {
         return static_cast<MafType>(currentMafType);
     }
+
+    String getType() const {
+        return mafType[currentMafType];
+    }
+
+    double getScaling() const {
+        return mafScaling[currentMafType];
+    }
+
+    int getDiameter() const {
+        return mafDiameter[currentMafType];
+    }
+
+    int getOutputType() const {
+        return mafOutputType[currentMafType];
+    }
+
+    int getMaxKGH() const {
+        return mafMaxKGH[currentMafType];
+    }
+
+    String getMafLink() const {
+        return mafLink[currentMafType];
+    }
+
 };
 
 

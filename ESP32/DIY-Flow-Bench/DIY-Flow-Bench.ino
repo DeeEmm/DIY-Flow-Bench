@@ -118,12 +118,12 @@ void TASKgetSensorData( void * parameter ){
 
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
-        status.adcPollTimer = millis() + config.ADC_SCAN_DELAY; // Only reset timer when task executes
+        status.adcPollTimer = millis() + config.iADC_SCAN_DLY; // Only reset timer when task executes
 
         switch (settings.bench_type){
 
           case MAF:
-            if (config.MAF_SRC_TYPE != SENSOR_DISABLED) {
+            if (config.iMAF_SRC_TYPE != SENSOR_DISABLED) {
               sensorVal.FlowKGH = _sensors.getMafFlow();
               sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
             }
@@ -212,7 +212,7 @@ void TASKgetSensorData( void * parameter ){
             break;
         }
           
-        if (config.PREF_SENS_TYPE != SENSOR_DISABLED) {
+        if (config.iPREF_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PRefKPA = _sensors.getPRefValue();
           sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
           if (settings.std_adj_flow == 1) {
@@ -223,18 +223,18 @@ void TASKgetSensorData( void * parameter ){
           sensorVal.FlowADJSCFM = _calculations.convertToSCFM(sensorVal.FlowADJ, settings.standardReference );
         }
 
-        if (config.PDIFF_SENS_TYPE != SENSOR_DISABLED) {
+        if (config.iPDIFF_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PDiffKPA = _sensors.getPDiffValue();
           sensorVal.PDiffH2O = _calculations.convertPressure(sensorVal.PDiffKPA, INH2O) - calVal.pdiff_cal_offset;
         }
 
-        if (config.PITOT_SENS_TYPE != SENSOR_DISABLED) {
+        if (config.iPITOT_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PitotKPA = _sensors.getPitotValue() - calVal.pitot_cal_offset;
           sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O) ;
           sensorVal.PitotVelocity = _sensors.getPitotVelocity();
         }
 
-        if (config.SWIRL_ENABLED) {
+        if (config.bSWIRL_ENBLD) {
           // TODO #227
             // uint8_t Swirl = Encoder.read();
 
@@ -273,7 +273,7 @@ void TASKgetEnviroData( void * parameter ){
     if (millis() > status.bmePollTimer){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
-        status.bmePollTimer = millis() + config.BME280_SCAN_MS; // Only reset timer when task executes
+        status.bmePollTimer = millis() + config.iBME280_SCN_MS; // Only reset timer when task executes
         
         sensorVal.TempDegC = _sensors.getTempValue();
 
@@ -339,20 +339,20 @@ void setup(void) {
     _webserver.begin();
   #endif
 
-  if (config.ADC_TYPE != SENSOR_DISABLED) { 
-    // xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
-    xTaskCreate(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask); 
-  }
+  // xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
+  xTaskCreate(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask); 
 
-  if (config.BME280_ENABLED) { 
-    // xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
-    xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask); 
-  }
+  // xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
+  xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask); 
 
-  if (config.SWIRL_ENABLED){
+  if (config.bSWIRL_ENBLD){
     // TODO #227
     // MD_REncoder Encoder = MD_REncoder(SWIRL_ENCODER_PIN_A, SWIRL_ENCODER_PIN_B);
   }
+
+  // Report free stack and heap to serial monitor
+  _message.serialPrintf("Stack Free Memory: EnviroTask=%s / SensorTask=%s \n", _calculations.byteDecode(uxTaskGetStackHighWaterMark(enviroDataTask)), _calculations.byteDecode(uxTaskGetStackHighWaterMark(sensorDataTask))); 
+  _message.serialPrintf("Free Heap=%s / Max Allocated Heap=%s \n", _calculations.byteDecode(ESP.getFreeHeap()), _calculations.byteDecode(ESP.getMaxAllocHeap())); 
 
 }
 
@@ -388,7 +388,8 @@ void loop () {
   // _hardware.setBleedValveRef();
   
   #ifdef WEBSERVER_ENABLED
-    if (millis() > status.browserUpdateTimer) {        
+    if (millis() > status.browserUpdateTimer) {      
+
         // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE){ // Check if semaphore available
         if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
           status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes

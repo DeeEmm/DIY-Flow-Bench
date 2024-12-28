@@ -98,77 +98,77 @@ struct BenchSettings {
  * Configuration Data
  ***/
 struct Configuration {
-  bool SD_ENABLED = false;
-  int MIN_PRESS_PCNT = 80;
-  double PIPE_RAD_FT = 0.328084;
+  bool bSD_ENABLED = false;
+  int iMIN_PRESS_PCT = 80;
+  double dPIPE_RAD_FT = 0.328084;
 
-  double VCC_3V3_TRIM = 0.0;
-  double VCC_5V_TRIM = 0.0;
-  bool FIXED_3_3V_VAL = true;
-  bool FIXED_5V_VAL = true;
+  double dVCC_3V3_TRIM = 0.0;
+  double dVCC_5V_TRIM = 0.0;
+  bool bFIXED_3_3V = true;
+  bool bFIXED_5V = true;
 
-  bool BME280_ENABLED = true;
-  int BME280_I2C_ADDR = 118;
-  int BME280_SCAN_MS =  1000;
+  bool bBME280_ENBLD = true;
+  int iBME280_ADDR = 118;
+  int iBME280_SCN_MS =  1000;
 
-  bool BME680_ENABLED = true;
-  int BME680_I2C_ADDR = 119;
-  int BME680_SCAN_MS =  1000;
+  bool bBME680_ENBLD = true;
+  int iBME680_ADDR = 119;
+  int iBME680_SCN_MS =  1000;
 
-  int ADC_TYPE = 11;
-  int ADC_I2C_ADDR = 72; 
-  int ADC_SCAN_DELAY = 250;
-  int ADC_MAX_RETRIES = 10;
-  int ADC_RANGE = 32767;
-  double ADC_GAIN = 6.144;
+  int iADC_TYPE = 11;
+  int iADC_I2C_ADDR = 72; 
+  int iADC_SCAN_DLY = 250;
+  int iADC_MAX_RETRY = 10;
+  int iADC_RANGE = 32767;
+  double dADC_GAIN = 6.144;
 
-  int MAF_SRC_TYPE = 11;
-  int MAF_SENS_TYPE = 0;
-  double MAF_MV_TRIM = 0.0;
-  int MAF_ADC_CHAN = 0;
+  int iMAF_SRC_TYPE = 11;
+  int iMAF_SENS_TYPE = 0;
+  double dMAF_MV_TRIM = 0.0;
+  int iMAF_ADC_CHAN = 0;
 
-  int PREF_SENS_TYPE = 4;
-  int PREF_SRC_TYPE = 11;
-  int FIXED_PREF_VAL = 1;
-  double PREF_MV_TRIM =  0.0;
-  double PREF_ALOG_SCALE =  1.0;
-  int PREF_ADC_CHAN = 1;
+  int iPREF_SENS_TYP = 4;
+  int iPREF_SRC_TYP = 11;
+  int iFIXED_PREF_VAL = 1;
+  double dPREF_MV_TRIM =  0.0;
+  double dPREF_ALG_SCALE =  1.0;
+  int iPREF_ADC_CHAN = 1;
 
-  int PDIFF_SENS_TYPE = 4; 
-  int PDIFF_SRC_TYPE = 11;
-  int FIXED_PDIFF_VAL = 1;
-  double PDIFF_MV_TRIM = 0.0;
-  double PDIFF_SCALE = 1.0;
-  int PDIFF_ADC_CHAN = 2;
+  int iPDIFF_SENS_TYP = 4; 
+  int iPDIFF_SRC_TYP = 11;
+  int iFIXD_PDIFF_VAL = 1;
+  double dPDIFF_MV_TRIM = 0.0;
+  double dPDIFF_SCALE = 1.0;
+  int iPDIFF_ADC_CHAN = 2;
   
-  int PITOT_SENS_TYPE = SENSOR_DISABLED;
-  int PITOT_SRC_TYPE = 11;
-  double PITOT_MV_TRIM = 0.0;
-  double PITOT_SCALE = 1.0;
-  int PITOT_ADC_CHAN = 3;
+  int iPITOT_SENS_TYP = SENSOR_DISABLED;
+  int iPITOT_SRC_TYP = 11;
+  double dPITOT_MV_TRIM = 0.0;
+  double dPITOT_SCALE = 1.0;
+  int iPITOT_ADC_CHAN = 3;
 
-  int BARO_SENS_TYPE = BOSCH_BME280; //7
-  double FIXED_BARO_VAL = 101.3529;
-  double BARO_ALOG_SCALE = 1.0;  
-  double BARO_SCALE = 1.0;
-  double BARO_OFFSET = 0.0;
-  double BARO_MV_TRIM = 0.0;
-  double BARO_FINE_TUNE = 0.0;
-  double SEALEVEL_PRESS = 1016.90;
-  int BARO_ADC_CHAN = 4;
+  int iBARO_SENS_TYP = BOSCH_BME280; //7
+  double dFIXD_BARO_VAL = 101.3529;
+  double dBARO_ALG_SCALE = 1.0;  
+  double dBARO_SCALE = 1.0;
+  double dBARO_OFFSET = 0.0;
+  double dBARO_MV_TRIM = 0.0;
+  double dBARO_FINE_TUNE = 0.0;
+  double dSEALEVEL_PRESS = 1016.90;
+  int iBARO_ADC_CHAN = 4;
 
-  int TEMP_SENS_TYPE = BOSCH_BME280; //7
-  double FIXED_TEMP_VAL = 21.0;
-  double TEMP_ALOG_SCALE = 1.0;
-  double TEMP_MV_TRIM = 0.0;
-  double TEMP_FINE_TUNE = 0.0;
+  int iTEMP_SENS_TYPE = BOSCH_BME280; //7
+  double dFIXED_TEMP_VAL = 21.0;
+  double dTEMP_ALG_SCALE = 1.0;
+  double dTEMP_MV_TRIM = 0.0;
+  double dTEMP_FINE_TUNE = 0.0;
 
-  int RELH_SENS_TYPE = BOSCH_BME280; //7
-  double FIXED_RELH_VAL = 36.0;
-  double RELH_ALOG_SCALE = 1.0;
-  double RELH_MV_TRIM = 0.0;
-  double RELH_FINE_TUNE = 0.0;
-  bool SWIRL_ENABLED = false;
+  int iRELH_SENS_TYP = BOSCH_BME280; //7
+  double dFIXED_RELH_VAL = 36.0;
+  double dRELH_ALG_SCALE = 1.0;
+  double dRELH_MV_TRIM = 0.0;
+  double dRELH_FINE_TUNE = 0.0;
+  bool bSWIRL_ENBLD = false;
 };
 
 
@@ -483,19 +483,19 @@ struct Language {
     char LANG_GUI_HOSTNAME[50] = "WiFi Hostname";
     char LANG_GUI_WIFI_TIMEOUT[50] = "WiFi Timeout";
     char LANG_GUI_GENERAL_SETTINGS[50] = "Bench Settings";
-    char LANG_GUI_MAF_HOUSING_DIAMETER[50] = "MAF Diameter (mm)";
+    char LANG_GUI_MAF_DIAMETER[50] = "MAF Diameter (mm)";
     char LANG_GUI_REFRESH_RATE[50] = "GUI Refresh Rate (ms)";
     char LANG_GUI_TEMPERATURE_UNIT[50] = "Temp Unit (&degC / &degF)";
     char LANG_GUI_LIFT_INTERVAL[50] = "Lift Interval (mm / inch)";
     char LANG_GUI_DATA_GRAPH_MAX_VAL[50] = "Max Flow Value";
     char LANG_GUI_RESOLUTION_AND_ACCURACY[50] = "Resolution and Accuracy";
     char LANG_GUI_FLOW_VAL_ROUNDING[50] = "Flow Value Rounding";
-    char LANG_GUI_FLOW_DECIMAL_ROUNDING[50] = "Flow Accuracy";
+    char LANG_GUI_FLOW_DECIMAL_ACCURACY[50] = "Flow Accuracy";
     char LANG_GUI_GEN_DECIMAL_ACCURACY[50] = "General Accuracy";
     char LANG_GUI_DATA_FILTERS[50] = "Data Filters";
-    char LANG_GUI_DATA_FILTER_TYP[50] = "Data Filter Type";
+    char LANG_GUI_DATA_FLTR_TYP[50] = "Data Filter Type";
     char LANG_GUI_MIN_FLOW_RATE[50] = "Min Flow Rate (cfm)";
-    char LANG_GUI_MIN_BENCH_PRESSURE[50] = "Min Pressure (in/H2O)";
+    char LANG_GUI_MIN_PRESSUREURE[50] = "Min Pressure (in/H2O)";
     char LANG_GUI_MAF_MIN_VOLTS[50] = "MAF Min volts";
     char LANG_GUI_CYCLIC_AVERAGE_BUFFER[50] = "Cyclical Average Buffer";
     char LANG_GUI_CONVERSION_SETTINGS[50] = "Conversion Settings";
@@ -520,7 +520,7 @@ struct Language {
     char LANG_GUI_ORIFICE6_PRESSURE[50] = "Orifice #6 pRef (in/H2O)";
     char LANG_GUI_API_SETTINGS[50] = "API Settings";
     char LANG_GUI_API_DELIMITER[50] = "API Delimiter";
-    char LANG_GUI_SERIAL_BAUDRATE[50] = "Serial Baud Rate";
+    char LANG_GUI_SERIAL_BAUD[50] = "Serial Baud Rate";
     char LANG_GUI_CALIBRATION_DATA[50] = "Calibration Data";
     char LANG_GUI_CAL_OFFSET[50] = "Calibration Offset (cfm)";
     char LANG_GUI_LEAK_TEST_BASELINE[50] = "Leak Test Baseline (cfm)";
@@ -534,7 +534,7 @@ struct Language {
     char LANG_GUI_PREF_VOLTS[50] = "pRef Volts";
     char LANG_GUI_PDIFF_VOLTS[50] = "pDiff Volts";
     char LANG_GUI_PITOT_VOLTS[50] = "Pitot Volts";
-    
+    char LANG_GUI_MAF_TYPE[50] = "MAF Type";
 
 
 };

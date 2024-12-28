@@ -43,6 +43,7 @@
 #include "hardware.h"
 #include "messages.h"
 #include "calculations.h"
+#include "mafdata.h"
 
 #include <sstream>
 
@@ -505,7 +506,18 @@ void Webserver::saveConfigurationForm(AsyncWebServerRequest *request)
   // Update Config Vars
   for(int i=0;i<params;i++){
     AsyncWebParameter* p = request->getParam(i);
-      _config_pref.putString(p->name().c_str(), p->value().c_str());
+      if (p->name().startsWith("i")) {
+        _config_pref.putInt(p->name().c_str(), p->value().toInt());
+      } else if (p->name().startsWith("b")) {
+        _config_pref.putBool(p->name().c_str(), p->value().toInt());
+      } else if (p->name().startsWith("d")) {
+        _config_pref.putDouble(p->name().c_str(), p->value().toDouble());
+      } else if (p->name().startsWith("f")) {
+        _config_pref.putFloat(p->name().c_str(), p->value().toFloat());
+      } else if (p->name().startsWith("s")) {
+        _config_pref.putString(p->name().c_str(), p->value().c_str());
+      }
+      _message.verbosePrintf("Writing Configuration: Key: %s  Value: %s \n", p->name().c_str(), p->value().c_str());
   }
 
   _config_pref.end();
@@ -537,10 +549,23 @@ void Webserver::saveSettingsForm(AsyncWebServerRequest *request)
   // Update Settings Vars
   for(int i=0;i<params;i++){
     AsyncWebParameter* p = request->getParam(i);
-      _settings_pref.putString(p->name().c_str(), p->value().c_str());
+      if (p->name().startsWith("i")) {
+        _settings_pref.putInt(p->name().c_str(), p->value().toInt());
+      } else if (p->name().startsWith("b")) {
+        _settings_pref.putBool(p->name().c_str(), p->value().toInt());
+      } else if (p->name().startsWith("d")) {
+        _settings_pref.putDouble(p->name().c_str(), p->value().toDouble());
+      } else if (p->name().startsWith("f")) {
+        _settings_pref.putFloat(p->name().c_str(), p->value().toFloat());
+      } else if (p->name().startsWith("s")) {
+        _settings_pref.putString(p->name().c_str(), p->value().c_str());
+      }
+
+      _message.verbosePrintf("Writing Setting: Key: %s  Value: %s \n", p->name().c_str(), p->value().c_str());
   }
 
   _settings_pref.end();
+  delay(100); //TEST lets wait to allow things to happen
   _data.loadSettings();
   request->redirect("/");
 }
@@ -574,10 +599,9 @@ void Webserver::saveCalibrationForm(AsyncWebServerRequest *request)
 
   _message.debugPrintf("Parsing Calibration Form Data... \n");
 
-  // Convert POST vars to JSON 
   for(int i=0;i<params;i++){
     AsyncWebParameter* p = request->getParam(i);
-    _cal_pref.putString(p->name().c_str(), p->value().c_str());
+    _cal_pref.putDouble(p->name().c_str(), p->value().toDouble());
   }
 
   _cal_pref.end();
@@ -911,8 +935,14 @@ String Webserver::processTemplate(const String &var) {
   extern struct BenchSettings settings;
   extern struct CalibrationData calVal;
   extern struct Language language;
+  extern struct Configuration config;
+  extern struct ValveLiftData valveData;
 
+  Calculations _calculations;
   Messages _message;
+
+  MafData _maf(config.iMAF_SRC_TYPE);
+
 
   // Translate GUI
   // Note language struct is overwritten when language.json file is present
@@ -986,7 +1016,7 @@ String Webserver::processTemplate(const String &var) {
   if (var == "LANG_GUI_WIFI_TIMEOUT") return language.LANG_GUI_WIFI_TIMEOUT;
   if (var == "LANG_GUI_GENERAL_SETTINGS") return language.LANG_GUI_GENERAL_SETTINGS;
   if (var == "LANG_GUI_BENCH_TYPE") return language.LANG_GUI_BENCH_TYPE;
-  if (var == "LANG_GUI_MAF_HOUSING_DIAMETER") return language.LANG_GUI_MAF_HOUSING_DIAMETER;
+  if (var == "LANG_GUI_MAF_DIAMETER") return language.LANG_GUI_MAF_DIAMETER;
   if (var == "LANG_GUI_REFRESH_RATE") return language.LANG_GUI_REFRESH_RATE;
   if (var == "LANG_GUI_TEMPERATURE_UNIT") return language.LANG_GUI_TEMPERATURE_UNIT;
   if (var == "LANG_GUI_LIFT_INTERVAL") return language.LANG_GUI_LIFT_INTERVAL;
@@ -994,12 +1024,12 @@ String Webserver::processTemplate(const String &var) {
   if (var == "LANG_GUI_AUTO") return language.LANG_GUI_AUTO;
   if (var == "LANG_GUI_RESOLUTION_AND_ACCURACY") return language.LANG_GUI_RESOLUTION_AND_ACCURACY;
   if (var == "LANG_GUI_FLOW_VAL_ROUNDING") return language.LANG_GUI_FLOW_VAL_ROUNDING;
-  if (var == "LANG_GUI_FLOW_DECIMAL_ROUNDING") return language.LANG_GUI_FLOW_DECIMAL_ROUNDING;
+  if (var == "LANG_GUI_FLOW_DECIMAL_ACCURACY") return language.LANG_GUI_FLOW_DECIMAL_ACCURACY;
   if (var == "LANG_GUI_GEN_DECIMAL_ACCURACY") return language.LANG_GUI_GEN_DECIMAL_ACCURACY;
   if (var == "LANG_GUI_DATA_FILTERS") return language.LANG_GUI_DATA_FILTERS;
-  if (var == "LANG_GUI_DATA_FILTER_TYP") return language.LANG_GUI_DATA_FILTER_TYP;
+  if (var == "LANG_GUI_DATA_FLTR_TYP") return language.LANG_GUI_DATA_FLTR_TYP;
   if (var == "LANG_GUI_MIN_FLOW_RATE") return language.LANG_GUI_MIN_FLOW_RATE;
-  if (var == "LANG_GUI_MIN_BENCH_PRESSURE") return language.LANG_GUI_MIN_BENCH_PRESSURE;
+  if (var == "LANG_GUI_MIN_PRESSUREURE") return language.LANG_GUI_MIN_PRESSUREURE;
   if (var == "LANG_GUI_MAF_MIN_VOLTS") return language.LANG_GUI_MAF_MIN_VOLTS;
   if (var == "LANG_GUI_CYCLIC_AVERAGE_BUFFER") return language.LANG_GUI_CYCLIC_AVERAGE_BUFFER;
   if (var == "LANG_GUI_CONVERSION_SETTINGS") return language.LANG_GUI_CONVERSION_SETTINGS;
@@ -1024,7 +1054,7 @@ String Webserver::processTemplate(const String &var) {
   if (var == "LANG_GUI_ORIFICE6_PRESSURE") return language.LANG_GUI_ORIFICE6_PRESSURE;
   if (var == "LANG_GUI_API_SETTINGS") return language.LANG_GUI_API_SETTINGS;
   if (var == "LANG_GUI_API_DELIMITER") return language.LANG_GUI_API_DELIMITER;
-  if (var == "LANG_GUI_SERIAL_BAUDRATE") return language.LANG_GUI_SERIAL_BAUDRATE;
+  if (var == "LANG_GUI_SERIAL_BAUD") return language.LANG_GUI_SERIAL_BAUD;
   if (var == "LANG_GUI_CALIBRATION_DATA") return language.LANG_GUI_CALIBRATION_DATA;
   if (var == "LANG_GUI_CAL_OFFSET") return language.LANG_GUI_CAL_OFFSET;
   if (var == "LANG_GUI_LEAK_TEST_BASELINE") return language.LANG_GUI_LEAK_TEST_BASELINE;
@@ -1038,6 +1068,8 @@ String Webserver::processTemplate(const String &var) {
   if (var == "LANG_GUI_PREF_VOLTS") return language.LANG_GUI_PREF_VOLTS;
   if (var == "LANG_GUI_PDIFF_VOLTS") return language.LANG_GUI_PDIFF_VOLTS;
   if (var == "LANG_GUI_PITOT_VOLTS") return language.LANG_GUI_PITOT_VOLTS;
+  if (var == "LANG_GUI_MAF_TYPE") return language.LANG_GUI_MAF_TYPE;
+  
 
   
   if (var == "MAF_FLOW_UNIT") {
@@ -1075,22 +1107,25 @@ String Webserver::processTemplate(const String &var) {
   }
 
 
-  // Config Info
+  // NOTE Build Vars are added to environment by user_actions.py at compile time
   if (var == "RELEASE") return RELEASE;
   if (var == "BUILD_NUMBER") return BUILD_NUMBER;
-  if (var == "GUI_BUILD_NUMBER") return GUI_BUILD_NUMBER;
-  if (var == "SPIFFS_MEM_SIZE") return String(status.spiffs_mem_size);
-  if (var == "SPIFFS_MEM_USED") return String(status.spiffs_mem_used);
+  if (var == "GUI_BUILD_NUMBER") return GUI_BUILD_NUMBER; 
+
+  // Config Info
+  if (var == "SPIFFS_MEM_SIZE") return String(_calculations.byteDecode(status.spiffs_mem_size));
+  if (var == "SPIFFS_MEM_USED") return String(_calculations.byteDecode(status.spiffs_mem_used));
   if (var == "LOCAL_IP_ADDRESS") return String(status.local_ip_address);
-  if (var == "HOSTNAME") return String(status.hostname);
+  if (var == "sHOSTNAME") return String(status.hostname);
   if (var == "UPTIME") return String(esp_timer_get_time()/1000);
-  if (var == "BENCH_TYPE") return String(status.benchType);
+  if (var == "iBENCH_TYPE") return String(status.benchType);
   if (var == "BOARD_TYPE") return String(status.boardType);
   if (var == "BOOT_TIME") return String(status.boot_time);
 
   // Sensor Values
   if (var == "MAF_SENSOR") return String(status.mafSensor);
-  if (var == "MAF_LINK") return String(status.mafLink);
+  if (var == "MAF_LINK") return _maf.getMafLink();
+  if (var == "MAF_TYPE") return _maf.getType();
   if (var == "PREF_SENSOR") return String(status.prefSensor);
   if (var == "TEMP_SENSOR") return String(status.tempSensor);
   if (var == "RELH_SENSOR") return String(status.relhSensor);
@@ -1120,32 +1155,39 @@ String Webserver::processTemplate(const String &var) {
   }
 
   //Datagraph Max Val selected item
-  if (var == "DATAGRAPH_MAX_0" && settings.dataGraphMax == 0) return String("selected");
-  if (var == "DATAGRAPH_MAX_1" && settings.dataGraphMax == 1) return String("selected");
-  if (var == "DATAGRAPH_MAX_2" && settings.dataGraphMax == 2) return String("selected");
-  if (var == "DATAGRAPH_MAX_3" && settings.dataGraphMax == 3) return String("selected");
+  if (var == "iDATAGRAPH_MAX_0" && settings.dataGraphMax == 0) return String("selected");
+  if (var == "iDATAGRAPH_MAX_1" && settings.dataGraphMax == 1) return String("selected");
+  if (var == "iDATAGRAPH_MAX_2" && settings.dataGraphMax == 2) return String("selected");
+  if (var == "iDATAGRAPH_MAX_3" && settings.dataGraphMax == 3) return String("selected");
 
 
   // Datagraph Stuff
-  extern struct ValveLiftData valveData;
+
+
   int maxval = 0;
   int maxcfm = 0;
   double scaleFactor = 0.0;
 
-  // very rough cfm calculation from max mafdata (approx half of KG/h rate)
-	const auto unitMG_S = std::string("MG_S");
-	const auto mafUnit = std::string(status.mafUnits);
-	bool mafUnitIsMG_S = mafUnit.find(unitMG_S) != string::npos;
+  
 
-	if (mafUnitIsMG_S) {
-    maxcfm = (0.0036 * status.mafDataValMax) / 2; 
-  } else {
-    maxcfm = status.mafDataValMax / 2;
-  }
+  
+  //DEPRECATED - All maf data now in Kg/H
+	// const auto unitMG_S = std::string("MG_S");
+	// const auto mafUnit = std::string(status.mafUnits);
+	// bool mafUnitIsMG_S = mafUnit.find(unitMG_S) != string::npos;
+
+	// if (mafUnitIsMG_S) {
+  //   maxcfm = (0.0036 * status.mafDataValMax) / 2; 
+  // } else {
+  //   maxcfm = status.mafDataValMax / 2;
+  // }
+
+  // very rough cfm calculation from max mafdata (approx half of KG/h rate)
+  maxcfm = _maf.getMaxKGH() / 2;
 
   // Determine data graph flow axis scale
   // NOTE: currently 1000cfm is the largest flow that the graph will display. 
-  // We could change scaling to be realtive to SVG height (surface currently fixed at 500)
+  // We could change scaling to be relative to SVG height (surface currently fixed at 500)
   if ((maxcfm < 500) || (settings.dataGraphMax == 1)) {
     maxval = 250;
     scaleFactor = 2;
@@ -1263,18 +1305,18 @@ String Webserver::processTemplate(const String &var) {
 
 
   // Orifice plates
-  if (var == "ORIFICE1_FLOW") return String(settings.orificeOneFlow);
-  if (var == "ORIFICE1_PRESS") return String(settings.orificeOneDepression);
-  if (var == "ORIFICE2_FLOW") return String(settings.orificeTwoFlow);
-  if (var == "ORIFICE2_PRESS") return String(settings.orificeTwoDepression);
-  if (var == "ORIFICE3_FLOW") return String(settings.orificeThreeFlow);
-  if (var == "ORIFICE3_PRESS") return String(settings.orificeThreeDepression);
-  if (var == "ORIFICE4_FLOW") return String(settings.orificeFourFlow);
-  if (var == "ORIFICE4_PRESS") return String(settings.orificeFourDepression);
-  if (var == "ORIFICE5_FLOW") return String(settings.orificeFiveFlow);
-  if (var == "ORIFICE5_PRESS") return String(settings.orificeFiveDepression);
-  if (var == "ORIFICE6_FLOW") return String(settings.orificeSixFlow);
-  if (var == "ORIFICE6_PRESS") return String(settings.orificeSixDepression);
+  if (var == "dORIFICE1_FLOW") return String(settings.orificeOneFlow);
+  if (var == "dORIFICE1_PRESS") return String(settings.orificeOneDepression);
+  if (var == "dORIFICE2_FLOW") return String(settings.orificeTwoFlow);
+  if (var == "dORIFICE2_PRESS") return String(settings.orificeTwoDepression);
+  if (var == "dORIFICE3_FLOW") return String(settings.orificeThreeFlow);
+  if (var == "dORIFICE3_PRESS") return String(settings.orificeThreeDepression);
+  if (var == "dORIFICE4_FLOW") return String(settings.orificeFourFlow);
+  if (var == "dORIFICE4_PRESS") return String(settings.orificeFourDepression);
+  if (var == "dORIFICE5_FLOW") return String(settings.orificeFiveFlow);
+  if (var == "dORIFICE5_PRESS") return String(settings.orificeFiveDepression);
+  if (var == "dORIFICE6_FLOW") return String(settings.orificeSixFlow);
+  if (var == "dORIFICE6_PRESS") return String(settings.orificeSixDepression);
 
   // Current orifice data
   if (var == "ACTIVE_ORIFICE") return String(status.activeOrifice);
@@ -1283,62 +1325,39 @@ String Webserver::processTemplate(const String &var) {
 
 
    // Wifi Settings
-  if (var == "WIFI_SSID") return settings.wifi_ssid;
-  if (var == "WIFI_PSWD") return settings.wifi_pswd;
-  if (var == "WIFI_AP_SSID") return settings.wifi_ap_ssid;
-  if (var == "WIFI_AP_PSWD") return settings.wifi_ap_pswd;
-  if (var == "HOSTNAME") return settings.hostname;
-  if (var == "WIFI_TIMEOUT") return String(settings.wifi_timeout);
+  if (var == "sWIFI_SSID") return settings.wifi_ssid;
+  if (var == "sWIFI_PSWD") return settings.wifi_pswd;
+  if (var == "sWIFI_AP_SSID") return settings.wifi_ap_ssid;
+  if (var == "sWIFI_AP_PSWD") return settings.wifi_ap_pswd;
+  if (var == "sHOSTNAME") return settings.hostname;
+  if (var == "iWIFI_TIMEOUT") return String(settings.wifi_timeout);
 
   // API Settings
-  if (var == "API_DELIM") return settings.api_delim;
-  if (var == "SERIAL_BAUDRATE") return String(settings.serial_baud_rate);
+  if (var == "sAPI_DELIM") return settings.api_delim;
+  if (var == "iSERIAL_BAUD") return String(settings.serial_baud_rate);
 
-  // Update javascript template vars
-  if (var == "FLOW_DECI_ACC") return String(settings.flow_decimal_length);
-  if (var == "GEN_DECI_ACC") return String(settings.gen_decimal_length);
+  // Decinal accuracy
+  if (var == "iFLOW_DECI_ACC") return String(settings.flow_decimal_length);
+  if (var == "iGEN_DECI_ACC") return String(settings.gen_decimal_length);
 
-  // Rounding type
-  if (var == "ROUNDING_TYPE_DROPDOWN"){
-
-    switch (settings.rounding_type) {
-      case NONE:
-        return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='1' selected>No Rounding</option><option value='2'>Integer</option><option value='3'>Half</option></select>");
-      break;
-
-      case INTEGER:
-        return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='1'>No Rounding</option><option value='2' selected>Integer</option><option value='3'>Half</option></select>");
-      break;
-
-      case HALF:
-        return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='1'>No Rounding</option><option value='2'>Integer</option><option value='3' selected>Half</option></select>");
-      break;
-
-      default:
-        return String( "<select name='ROUNDING_TYPE' class='config-select'><option value='1' selected>No Rounding</option><option value='2'>Integer</option><option value='3'>Half</option></select>");
-      break;
-    }
-  }
-
-  if (var == "STD_ADJ_FLOW" ) {
-    if (settings.std_adj_flow == 1) {
-      return String("Checked");
-    }
-  }
-
-  if (var == "AFLOW_UNITS" && settings.std_adj_flow == 0) return String("ACFM");
-  if (var == "AFLOW_UNITS" && settings.std_adj_flow == 1) return String("SCFM");
+  
+  if (var == "AFLOW_UNITS" && settings.std_adj_flow == 1) return String("ACFM");
+  if (var == "AFLOW_UNITS" && settings.std_adj_flow == 2) return String("SCFM");
   
 
   // Reference standard type dropdown selected item
-  if (var == "STD_REF_1" && settings.standardReference == 1) return String("selected");
-  if (var == "STD_REF_2" && settings.standardReference == 2) return String("selected");
-  if (var == "STD_REF_3" && settings.standardReference == 3) return String("selected");
-  if (var == "STD_REF_4" && settings.standardReference == 4) return String("selected");
-  if (var == "STD_REF_5" && settings.standardReference == 5) return String("selected");
+  if (var == "iSTD_REF_1" && settings.standardReference == 1) return String("selected");
+  if (var == "iSTD_REF_2" && settings.standardReference == 2) return String("selected");
+  if (var == "iSTD_REF_3" && settings.standardReference == 3) return String("selected");
+  if (var == "iSTD_REF_4" && settings.standardReference == 4) return String("selected");
+  if (var == "iSTD_REF_5" && settings.standardReference == 5) return String("selected");
+
+  if (var == "iSTD_ADJ_FLOW_1" && settings.std_adj_flow == 1) return String("selected");
+  if (var == "iSTD_ADJ_FLOW_2" && settings.std_adj_flow == 2) return String("selected");
 
 
-  if (var == "STD_REF"  || var == "STANDARD_FLOW") {
+
+  if (var == "iSTD_REF"  || var == "STANDARD_FLOW") {
     // Standard reference
     switch (settings.standardReference) {
 
@@ -1364,61 +1383,82 @@ String Webserver::processTemplate(const String &var) {
     }
   }
 
-  // Flow Decimal type
-  if (var == "FLOW_DECI_ACC_DROPDOWN"){
-      if (settings.flow_decimal_length == 0) {
-      return String( "<select name='FLOW_DECI_ACC' class='config-select'><option value='0' selected>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
-    } else if (settings.flow_decimal_length == 1) {
-      return String( "<select name='FLOW_DECI_ACC' class='config-select'><option value='0'>1 Whole</option><option value='1' selected>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
-    } else if (settings.flow_decimal_length == 2) {
-      return String( "<select name='FLOW_DECI_ACC' class='config-select'><option value='0'>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2' selected>0.01 Hundredths </option></select>");
-    }
-  }
-
   // General Decimal type
-  if (var == "GEN_DECI_ACC_DROPDOWN"){
-    if (settings.gen_decimal_length == 0) {
-      return String( "<select name='GEN_DECI_ACC' class='config-select'><option value='0' selected>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
-    } else if (settings.flow_decimal_length == 1) {
-      return String( "<select name='GEN_DECI_ACC' class='config-select'><option value='0'>1 Whole</option><option value='1' selected>0.1 Tenths</option><option value='2'>0.01 Hundredths </option></select>");
-    } else if (settings.flow_decimal_length == 2) {
-      return String( "<select name='GEN_DECI_ACC' class='config-select'><option value='0'>1 Whole</option><option value='1'>0.1 Tenths</option><option value='2' selected>0.01 Hundredths </option></select>");
-    }
-  }
+  if (var == "iGEN_DECI_ACC_1" && settings.gen_decimal_length == 1) return String("selected");
+  if (var == "iGEN_DECI_ACC_2" && settings.gen_decimal_length == 2) return String("selected");
+  if (var == "iGEN_DECI_ACC_3" && settings.gen_decimal_length == 3) return String("selected");
+
+  // Flow Decimal type
+  if (var == "iFLOW_DECI_ACC_1" && settings.flow_decimal_length == 1) return String("selected");
+  if (var == "iFLOW_DECI_ACC_2" && settings.flow_decimal_length == 2) return String("selected");
+  if (var == "iFLOW_DECI_ACC_3" && settings.flow_decimal_length == 3) return String("selected");
+
 
   // Data Filter type
-  if (var == "DATA_FILTER_TYP_DROPDOWN"){
-    switch (settings.data_filter_type){
+  if (var == "iDATA_FLTR_TYP_1" && settings.data_filter_type == 1) return String("selected");
+  if (var == "iDATA_FLTR_TYP_2" && settings.data_filter_type == 2) return String("selected");
+  if (var == "iDATA_FLTR_TYP_3" && settings.data_filter_type == 3) return String("selected");
+  if (var == "iDATA_FLTR_TYP_4" && settings.data_filter_type == 4) return String("selected");
+
+  // Rounding type
+  if (var == "iROUNDING_TYP_1" && settings.rounding_type == NONE) return String("selected");
+  if (var == "iROUNDING_TYP_2" && settings.rounding_type == INTEGER) return String("selected");
+  if (var == "iROUNDING_TYP_3" && settings.rounding_type == HALF) return String("selected");
+
+  // if (var == "iROUNDING_TYP_DROPDOWN"){
+
+  //   switch (settings.rounding_type) {
+  //     case NONE:
+  //       return String( "<select name='iROUNDING_TYP' class='config-select'><option value='1' selected>No Rounding</option><option value='2'>Integer</option><option value='3'>Half</option></select>");
+  //     break;
+
+  //     case INTEGER:
+  //       return String( "<select name='iROUNDING_TYP' class='config-select'><option value='1'>No Rounding</option><option value='2' selected>Integer</option><option value='3'>Half</option></select>");
+  //     break;
+
+  //     case HALF:
+  //       return String( "<select name='iROUNDING_TYP' class='config-select'><option value='1'>No Rounding</option><option value='2'>Integer</option><option value='3' selected>Half</option></select>");
+  //     break;
+
+  //     default:
+  //       return String( "<select name='iROUNDING_TYP' class='config-select'><option value='1' selected>No Rounding</option><option value='2'>Integer</option><option value='3'>Half</option></select>");
+  //     break;
+  //   }
+  // }
+
+  
+  // if (var == "iDATA_FLTR_TYP_DROPDOWN"){
+  //   switch (settings.data_filter_type){
       
-      case NONE:
-        return String( "<select name='DATA_FILTER_TYP' class='config-select'><option value='1' selected>None</option><option value='2'>Rolling Median</option><option value='3'>Cyclic Average </option><option value='4'>Mode</option></select>");
-      break;
+  //     case NONE:
+  //       return String( "<select name='iDATA_FLTR_TYP' class='config-select'><option value='1' selected>None</option><option value='2'>Rolling Median</option><option value='3'>Cyclic Average </option><option value='4'>Mode</option></select>");
+  //     break;
 
-      case MEDIAN:
-        return String( "<select name='DATA_FILTER_TYP' class='config-select'><option value='1'>None</option><option value='2' selected>Rolling Median</option><option value='3'>Cyclic Average </option><option value='4'>Mode</option></select>");
-      break;
+  //     case MEDIAN:
+  //       return String( "<select name='iDATA_FLTR_TYP' class='config-select'><option value='1'>None</option><option value='2' selected>Rolling Median</option><option value='3'>Cyclic Average </option><option value='4'>Mode</option></select>");
+  //     break;
 
-      case AVERAGE:
-        return String( "<select name='DATA_FILTER_TYP' class='config-select'><option value='1'>None</option><option value='2'>Rolling Median</option><option value='3' selected>Cyclic Average </option><option value='4'>Mode</option></select>");
-      break;
+  //     case AVERAGE:
+  //       return String( "<select name='iDATA_FLTR_TYP' class='config-select'><option value='1'>None</option><option value='2'>Rolling Median</option><option value='3' selected>Cyclic Average </option><option value='4'>Mode</option></select>");
+  //     break;
 
-      case MODE:
-        return String( "<select name='DATA_FILTER_TYP' class='config-select'><option value='1'>None</option><option value='2'>Rolling Median</option><option value='3'>Cyclic Average </option><option value='4' selected>Mode</option></select>");
-      break;
-    }
-  }
+  //     case MODE:
+  //       return String( "<select name='iDATA_FLTR_TYP' class='config-select'><option value='1'>None</option><option value='2'>Rolling Median</option><option value='3'>Cyclic Average </option><option value='4' selected>Mode</option></select>");
+  //     break;
+  //   }
+  // }
 
   // Data Filter Settings
-  if (var == "MIN_FLOW_RATE") return String(settings.min_flow_rate);
-  if (var == "MIN_BENCH_PRESS") return String(settings.min_bench_pressure);
-  if (var == "MAF_MIN_VOLTS") return String(settings.maf_min_volts);
-  if (var == "CYCLIC_AV_BUFF") return String(settings.cyc_av_buffer);
+  if (var == "iMIN_FLOW_RATE") return String(settings.min_flow_rate);
+  if (var == "iMIN_PRESSURE") return String(settings.min_bench_pressure);
+  if (var == "iMAF_MIN_VOLTS") return String(settings.maf_min_volts);
+  if (var == "iCYC_AV_BUFF") return String(settings.cyc_av_buffer);
 
   // Bench Settings
-  if (var == "MAF_HOUSING_DIA") return String(settings.maf_housing_diameter);
-  if (var == "REFRESH_RATE") return String(settings.refresh_rate);
-  if (var == "ADJ_FLOW_DEP") return String(settings.adj_flow_depression);
-  if (var == "TEMP_UNIT") {
+  if (var == "iMAF_DIAMETER") return String(settings.maf_housing_diameter);
+  if (var == "iREFRESH_RATE") return String(settings.refresh_rate);
+  if (var == "iADJ_FLOW_DEP") return String(settings.adj_flow_depression);
+  if (var == "iTEMP_UNIT") {
     if (settings.temp_unit == CELCIUS) {
       return String("Celcius");
     } else {
@@ -1429,32 +1469,32 @@ String Webserver::processTemplate(const String &var) {
   // Temperature
   if (var == "TEMPERATURE_DROPDOWN"){
     if (settings.temp_unit == CELCIUS) {
-      return String( "<select name='TEMP_UNIT' class='config-select' id='TEMP_UNIT'><option value='Celcius' selected>Celcius </option><option value='Farenheit'>Farenheit </option></select>");
+      return String( "<select name='iTEMP_UNIT' class='config-select' id='iTEMP_UNIT'><option value='1' selected>Celcius </option><option value='2'>Farenheit </option></select>");
     } else {
-      return String("<select name='TEMP_UNIT' class='config-select' id='TEMP_UNIT'><option value='Celcius'>Celcius </option><option value='Farenheit' selected>Farenheit </option></select>");
+      return String("<select name='iTEMP_UNIT' class='config-select' id='iTEMP_UNIT'><option value='1'>Celcius </option><option value='2' selected>Farenheit </option></select>");
     }
   }
 
   // Lift
-  if (var == "LIFT_INTERVAL") return String(settings.valveLiftInterval);
+  if (var == "dLIFT_INTERVAL") return String(settings.valveLiftInterval);
 
   // Bench type
-  if (var == "BENCH_TYPE_DROPDOWN") {
+  if (var == "iBENCH_TYPE_DROPDOWN") {
     switch (settings.bench_type) {
       case MAF:
-        return String( "<select name='BENCH_TYPE' class='config-select'><option value='1' selected>MAF Style</option><option value='2'>Orifice Style</option><option value='3'>Venturi Style </option><option value='4'>Pitot Style</option></select>");
+        return String( "<select name='iBENCH_TYPE' class='config-select'><option value='1' selected>MAF Style</option><option value='2'>Orifice Style</option><option value='3'>Venturi Style </option><option value='4'>Pitot Style</option></select>");
       break;
 
       case ORIFICE:
-        return String( "<select name='BENCH_TYPE' class='config-select'><option value='1'>MAF Style</option><option value='2' selected>Orifice Style</option><option value='3'>Venturi Style </option><option value='4'>Pitot Style</option></select>");
+        return String( "<select name='iBENCH_TYPE' class='config-select'><option value='1'>MAF Style</option><option value='2' selected>Orifice Style</option><option value='3'>Venturi Style </option><option value='4'>Pitot Style</option></select>");
       break;
 
       case VENTURI:
-        return String( "<select name='BENCH_TYPE' class='config-select'><option value='1'>MAF Style</option><option value='2'>Orifice Style</option><option value='3' selected>Venturi Style </option><option value='4'>Pitot Style</option></select>");
+        return String( "<select name='iBENCH_TYPE' class='config-select'><option value='1'>MAF Style</option><option value='2'>Orifice Style</option><option value='3' selected>Venturi Style </option><option value='4'>Pitot Style</option></select>");
       break;
       
       case PITOT:
-        return String( "<select name='BENCH_TYPE' class='config-select'><option value='1'>MAF Style</option><option value='2'>Orifice Style</option><option value='3'>Venturi Style </option><option value='4' selected>Pitot Style</option></select>");
+        return String( "<select name='iBENCH_TYPE' class='config-select'><option value='1'>MAF Style</option><option value='2'>Orifice Style</option><option value='3'>Venturi Style </option><option value='4' selected>Pitot Style</option></select>");
       break;
     }
   }
@@ -1483,8 +1523,8 @@ String Webserver::processTemplate(const String &var) {
 
 
   // Calibration Settings
-  if (var == "CAL_FLOW_RATE") return String(settings.cal_flow_rate);
-  if (var == "CAL_REF_PRESS") return String(settings.cal_ref_press);
+  if (var == "dCAL_FLW_RATE") return String(settings.cal_flow_rate);
+  if (var == "dCAL_REF_PRESS") return String(settings.cal_ref_press);
 
   // Calibration Data
   if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
@@ -1511,7 +1551,12 @@ String Webserver::processTemplate(const String &var) {
       file = root.openNextFile();
     }
     // FILESYSTEM.end();
-    return fileList;
+
+    if (fileList.isEmpty()) {
+      return "<div class='fileListRow'><span class='column left'>No Files Found</span></div>";
+    } else {
+      return fileList;
+    } 
   }
 
   return "";

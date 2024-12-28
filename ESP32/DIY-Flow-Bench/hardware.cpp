@@ -61,18 +61,18 @@ void Hardware::begin () {
   Hardware _hardware;
   Messages _message;
 
-  // adc = ADS1115_lite(config.ADC_I2C_ADDR);
+  // adc = ADS1115_lite(config.iADC_I2C_ADDR);
 
   _message.serialPrintf("Initialising Hardware \n");
 
-  ADS1115_lite adc(config.ADC_I2C_ADDR);
+  ADS1115_lite adc(config.iADC_I2C_ADDR);
 
 
   this->getI2CList(); // Scan and print I2C device list to serial monitor
 
-  if (config.ADC_TYPE != SENSOR_DISABLED) {
+  if (config.iADC_TYPE != SENSOR_DISABLED) {
 
-    _message.serialPrintf("Initialising ADS1115 ( Address: %u ) \n", config.ADC_I2C_ADDR);
+    _message.serialPrintf("Initialising ADS1115 ( Address: %u ) \n", config.iADC_I2C_ADDR);
 
     adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
     adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 8 SPS
@@ -254,8 +254,8 @@ bool Hardware::setPinMode () {
 
   _message.serialPrintf("Initialising I/O \n");   
 
-  // if (config.ADC_TYPE != SENSOR_DISABLED){
-  //   ADS1115_lite adc(config.ADC_I2C_ADDR);
+  // if (config.iADC_TYPE != SENSOR_DISABLED){
+  //   ADS1115_lite adc(config.iADC_I2C_ADDR);
   // }
 
 
@@ -293,37 +293,37 @@ bool Hardware::setPinMode () {
       pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
       status.ioError = false;
     }
-    if (config.MAF_SRC_TYPE == LINEAR_ANALOG && pins.MAF_PIN < 99) {
+    if (config.iMAF_SRC_TYPE == LINEAR_ANALOG && pins.MAF_PIN < 99) {
       _message.verbosePrintf("Input MAF_PIN: %d\n", pins.MAF_PIN );
       pinMode(pins.MAF_PIN, INPUT);   
       status.ioError = false;
     }
-    if (config.PREF_SENS_TYPE == LINEAR_ANALOG && pins.PREF_PIN < 99){
+    if (config.iPREF_SENS_TYP == LINEAR_ANALOG && pins.PREF_PIN < 99){
       _message.verbosePrintf("Input PREF_PIN: %d\n", pins.PREF_PIN );
       pinMode(pins.PREF_PIN, INPUT);   
       status.ioError = false;
     }
-    if (config.PDIFF_SENS_TYPE == LINEAR_ANALOG && pins.PDIFF_PIN < 99) {
+    if (config.iPDIFF_SENS_TYP == LINEAR_ANALOG && pins.PDIFF_PIN < 99) {
       _message.verbosePrintf("Input PDIFF_PIN: %d\n", pins.PDIFF_PIN );
       pinMode(pins.PDIFF_PIN, INPUT);   
       status.ioError = false;
     }
-    if (config.PITOT_SENS_TYPE  == LINEAR_ANALOG && pins.PITOT_PIN < 99) {
+    if (config.iPITOT_SENS_TYP  == LINEAR_ANALOG && pins.PITOT_PIN < 99) {
       _message.verbosePrintf("Input PITOT_PIN: %d\n", pins.PITOT_PIN );
       pinMode(pins.PITOT_PIN, INPUT);   
       status.ioError = false;
     }
-    if (config.TEMP_SENS_TYPE == LINEAR_ANALOG && pins.TEMPERATURE_PIN < 99) {
+    if (config.iTEMP_SENS_TYPE == LINEAR_ANALOG && pins.TEMPERATURE_PIN < 99) {
       _message.verbosePrintf("Input TEMPERATURE_PIN: %d\n", pins.TEMPERATURE_PIN );
       pinMode(pins.TEMPERATURE_PIN, INPUT);   
       status.ioError = false;
     }
-    if (config.RELH_SENS_TYPE == LINEAR_ANALOG && pins.HUMIDITY_PIN < 99 ){
+    if (config.iRELH_SENS_TYP == LINEAR_ANALOG && pins.HUMIDITY_PIN < 99 ){
       _message.verbosePrintf("Input HUMIDITY_PIN: %d\n", pins.HUMIDITY_PIN );
       pinMode(pins.HUMIDITY_PIN, INPUT);   
       status.ioError = false;
     }
-    if (config.BARO_SENS_TYPE == LINEAR_ANALOG && pins.REF_BARO_PIN < 99 ) {
+    if (config.iBARO_SENS_TYP == LINEAR_ANALOG && pins.REF_BARO_PIN < 99 ) {
       _message.verbosePrintf("Input REF_BARO_PIN: %d\n", pins.REF_BARO_PIN );
       pinMode(pins.REF_BARO_PIN, INPUT);     
       status.ioError = false;
@@ -348,7 +348,7 @@ bool Hardware::setPinMode () {
       pinMode(pins.SCL_PIN, INPUT);   
       status.ioError = false;
     }
-    if (config.SD_ENABLED) {
+    if (config.bSD_ENABLED) {
       // if (pins.SD_CS_PIN < 99 ) {
       //   _message.verbosePrintf("Input SD_CS_PIN: %d\n", pins.SD_CS_PIN );
       //   pinMode(pins.SD_CS_PIN, INPUT);     
@@ -417,7 +417,7 @@ bool Hardware::setPinMode () {
       pinMode(pins.FLOW_VALVE_DIR_PIN, OUTPUT);
       status.ioError = false;
     }
-    if (config.SD_ENABLED) {
+    if (config.bSD_ENABLED) {
       // if (pins.SD_MOSI_PIN < 99 ) {
       //   _message.verbosePrintf("Output SD_MOSI_PIN: %d\n", pins.SD_MOSI_PIN );
       //   pinMode(pins.SD_MOSI_PIN, OUTPUT);
@@ -503,7 +503,7 @@ int32_t Hardware::getADCRawData(int channel) {
 
   int32_t rawADCval = 0;
 
-  if (config.ADC_TYPE != SENSOR_DISABLED){
+  if (config.iADC_TYPE != SENSOR_DISABLED){
 
     if (channel > 3) {
       return 0;
@@ -545,8 +545,8 @@ int32_t Hardware::getADCRawData(int channel) {
  * @param channel ADC channel (0-3)
  * @note 1115: 16 bits less sign bit = 15 bits mantissa = 32767 | 6.144v = max voltage (gain) of ADC | 187.5 uV / LSB
  * @note 1015: 12 bits less sign bit = 11 bit mantissa = 2047 | 6.144v = max voltage (gain) of ADC
- * int ADC_RANGE = 32767;
- * double ADC_GAIN = 6.144;
+ * int iADC_RANGE = 32767;
+ * double dADC_GAIN = 6.144;
  ***/
  double Hardware::getADCVolts(int channel) {
 
@@ -556,19 +556,19 @@ int32_t Hardware::getADCRawData(int channel) {
 
   int rawADCval = getADCRawData(channel);
 
-  switch (config.ADC_TYPE) {
+  switch (config.iADC_TYPE) {
 
     case SENSOR_DISABLED:
       return 1.00F;
     break;
 
     case ADS1115:
-      // volts = rawADCval * config.ADC_GAIN / config.ADC_RANGE;
+      // volts = rawADCval * config.dADC_GAIN / config.iADC_RANGE;
       volts = rawADCval * 6.144F / 32767;
     break;
 
     case ADS1015:
-      // volts = rawADCval * config.ADC_GAIN / 2047.00F; 
+      // volts = rawADCval * config.dADC_GAIN / 2047.00F; 
       volts = rawADCval * 32767 / 2047.00F; 
     break;
 
@@ -602,12 +602,12 @@ double Hardware::get5vSupplyVolts() {
 
   double vcc5vSupplyVolts = 5.0F;
 
-  if (config.FIXED_5V_VAL == true) {
+  if (config.bFIXED_5V == true) {
     return vcc5vSupplyVolts; 
   } else {
     long rawVoltageValue = analogRead(pins.VCC_5V_PIN);  
     vcc5vSupplyVolts = (2 * static_cast<double>(rawVoltageValue) * 0.805860805860806F) ;
-    return vcc5vSupplyVolts + config.VCC_5V_TRIM;
+    return vcc5vSupplyVolts + config.dVCC_5V_TRIM;
   }
 }
 
@@ -628,12 +628,12 @@ double Hardware::get3v3SupplyVolts() {
 
   double vcc3v3SupplyVolts = 3.3F;
 
-  if (config.FIXED_3_3V_VAL) {
+  if (config.bFIXED_3_3V) {
     return vcc3v3SupplyVolts; 
   } else {
     long rawVoltageValue = analogRead(pins.VCC_3V3_PIN );  
     vcc3v3SupplyVolts = (2 * static_cast<double>(rawVoltageValue) * 0.805860805860806F) ;
-    return vcc3v3SupplyVolts + config.VCC_3V3_TRIM;
+    return vcc3v3SupplyVolts + config.dVCC_3V3_TRIM;
   }
 }
 
@@ -694,10 +694,10 @@ void Hardware::checkRefPressure() {
   double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
     
   // REVIEW  - Ref pressure check
-  // Check that pressure does not fall below limit set by MIN_PRESS_PCNT when bench is running
+  // Check that pressure does not fall below limit set by iMIN_PRESS_PCT when bench is running
   // note alarm commented out in alarm function as 'nag' can get quite annoying
   // Is this a redundant check? Maybe a different alert would be more appropriate
-  if ((refPressure < (settings.cal_ref_press * (config.MIN_PRESS_PCNT / 100))) && (Hardware::benchIsRunning()))
+  if ((refPressure < (settings.cal_ref_press * (config.iMIN_PRESS_PCT / 100))) && (Hardware::benchIsRunning()))
   {
     _message.Handler(language.LANG_REF_PRESS_LOW);
   }

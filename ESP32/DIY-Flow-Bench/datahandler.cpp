@@ -67,6 +67,7 @@ void DataHandler::begin() {
     Comms _comms;
     DataHandler _data;
     Calibration _calibration;
+    Calculations _calculations;
 
     StaticJsonDocument<1024> pinData;
 
@@ -127,7 +128,7 @@ void DataHandler::begin() {
     Wire.setClock(100000);
 
     // TODO Initialise SD card
-    if (config.SD_ENABLED) {
+    if (config.bSD_ENABLED) {
 
     // test code from https://github.com/espressif/arduino-esp32/blob/master/libraries/SD/examples/SD_Test/SD_Test.ino
 
@@ -190,8 +191,8 @@ void DataHandler::begin() {
     status.spiffs_mem_used = SPIFFS.usedBytes();
 
     _message.serialPrintf("=== SPIFFS File system info === \n");
-    _message.serialPrintf("Total space:      %s \n", byteDecode(status.spiffs_mem_size));
-    _message.serialPrintf("Total space used: %s \n", byteDecode(status.spiffs_mem_used));
+    _message.serialPrintf("Total space:      %s \n", _calculations.byteDecode(status.spiffs_mem_size));
+    _message.serialPrintf("Total space used: %s \n", _calculations.byteDecode(status.spiffs_mem_used));
 
 }
 
@@ -224,153 +225,6 @@ bool DataHandler::checkSubstring(std::string firstString, std::string secondStri
     }
     return false;
 }
-
-
-
-// DEPRECATED
-// /***********************************************************
-// * @name checkUserFile.cpp
-// * @brief Loop through all files in SPIFFS to match filename prefix
-// * @param filetype INT (MAFFILE or PINSFILE [default])
-// * @returns true if file found
-// * @see status.pinsFilename 
-// * @see variable status.mafFilename 
-// ***/
-// bool DataHandler::checkUserFile(int filetype) {
-      
-// // TODO Change to accept prefix as arguement
-
-//     DataHandler _data;
-//     Messages _message;
-//     extern struct DeviceStatus status;
-
-//     FILESYSTEM.begin();
-//     File root = FILESYSTEM.open("/");
-//     File file = root.openNextFile();
-
-//     std::string matchCONFIG = "config";
-//     std::string matchPINS = "PINS";
-//     std::string matchMAF = "MAF";
-//     std::string matchINDEX = "index";
-//     std::string spiffsFile;
-//     std::string configFile;
-//     std::string pinsFile;
-//     std::string mafFile;
-//     std::string indexFile;
-
-//     // Check SPIFFS for pins and MAF files
-//     while (file)  {
-//       spiffsFile = file.name();
-
-//       // Check config file
-//       if (checkSubstring(spiffsFile.c_str(), matchCONFIG.c_str()) && (filetype == CONFIGFILE)) {
-//         configFile = "/" + spiffsFile;
-//         _message.serialPrintf("CONFIG file Found: %s\n", configFile.c_str() );  
-//         status.pinsFilename = configFile.c_str();        
-//         // loadConfiguration();
-//         status.configLoaded = true;
-//         return true;
-//       }   
-
-//       // Check PINS file      
-//       if (checkSubstring(spiffsFile.c_str(), matchPINS.c_str()) && (filetype == PINSFILE)) {
-//         pinsFile = "/" + spiffsFile;
-//         _message.serialPrintf("PINS file Found: %s\n", pinsFile.c_str() );  
-//         status.pinsFilename = pinsFile.c_str();        
-//         // loadPinsData();
-//         status.pinsLoaded = true;
-//         return true;
-//       }   
-      
-//       // Check MAF file
-//       if (checkSubstring(spiffsFile.c_str(), matchMAF.c_str()) && (filetype == MAFFILE)) {
-//         mafFile = "/" + spiffsFile;
-//         _message.serialPrintf("MAF file Found: %s\n", mafFile.c_str() );  
-//         status.mafFilename = mafFile.c_str();
-//         // loadMAFData();
-//         status.mafLoaded = true;
-//         return true;
-//       }
-      
-//       // // Check index file
-//       // if (checkSubstring(spiffsFile.c_str(), matchINDEX.c_str()) && (filetype == INDEXFILE)) {
-//       //   indexFile = "/" + spiffsFile;
-//       //   _message.serialPrintf("Index file Found: %s\n", indexFile.c_str() );  
-//       //   status.indexFilename = indexFile.c_str();
-//       //   status.GUIexists = true;
-//       //   return true;
-//       // }
-
-//       file = root.openNextFile();
-//     }
-
-
-
-//     return false;
-
-// }
-
-
-
-// /***********************************************************
-// * @brief createConfig
-// * @details Create basic minimum configuration json file
-// * @note Called from DataHandler::begin() if settings.json not found
-// ***/
-// void DataHandler::createSettingsFile() {
-
-//   extern struct BenchSettings settings;
-//   Messages _message;
-//   String jsonString;  
-//   StaticJsonDocument<CONFIG_JSON_SIZE> configData;
-
-//   _message.serialPrintf("Creating settings.json file... \n"); 
- 
-//   configData["PAGE_TITLE"] = settings.pageTitle;
-//   configData["WIFI_SSID"] = settings.wifi_ssid;
-//   configData["WIFI_PSWD"] = settings.wifi_pswd;
-//   configData["WIFI_AP_SSID"] = settings.wifi_ap_ssid;
-//   configData["WIFI_AP_PSWD"] = settings.wifi_ap_pswd;
-//   configData["HOSTNAME"] = settings.hostname;
-//   configData["WIFI_TIMEOUT"] = settings.wifi_timeout;
-//   configData["MAF_HOUSING_DIA"] = settings.maf_housing_diameter;
-//   configData["REFRESH_RATE"] = settings.refresh_rate;
-//   configData["MIN_BENCH_PRESS"] = settings.min_bench_pressure;
-//   configData["MIN_FLOW_RATE"] = settings.min_flow_rate;
-//   configData["DATA_FILTER_TYP"] = settings.data_filter_type;
-//   configData["ROUNDING_TYPE"] = settings.rounding_type;
-//   configData["FLOW_DECI_ACC"] = settings.flow_decimal_length;
-//   configData["GEN_DECI_ACC"] = settings.gen_decimal_length;
-//   configData["CYCLIC_AV_BUFF"] = settings.cyc_av_buffer;
-//   configData["MAF_MIN_VOLTS"] = settings.maf_min_volts;
-//   configData["API_DELIM"] = settings.api_delim;
-//   configData["SERIAL_BAUDRATE"] = settings.serial_baud_rate;
-//   configData["ADJ_FLOW_DEP"] = settings.adj_flow_depression;
-//   configData["STD_REF"] = settings.standardReference;
-//   configData["STD_ADJ_FLOW"] = settings.std_adj_flow;
-//   configData["DATAGRAPH_MAX"] = settings.dataGraphMax;
-//   configData["TEMP_UNIT"] = settings.temp_unit;
-//   configData["LIFT_INTERVAL"] = settings.valveLiftInterval;
-//   configData["SHOW_ALARMS"] = settings.show_alarms;
-//   configData["BENCH_TYPE"] = settings.bench_type;
-//   configData["CAL_FLOW_RATE"] = settings.cal_flow_rate;
-//   configData["CAL_REF_PRESS"] = settings.cal_ref_press;
-//   configData["ORIFICE1_FLOW"] = settings.orificeOneFlow;
-//   configData["ORIFICE1_PRESS"] = settings.orificeOneDepression;
-//   configData["ORIFICE2_FLOW"] = settings.orificeTwoFlow;
-//   configData["ORIFICE2_PRESS"] = settings.orificeThreeDepression;
-//   configData["ORIFICE3_FLOW"] = settings.orificeThreeFlow;
-//   configData["ORIFICE4_FLOW"] = settings.orificeFourFlow;
-//   configData["ORIFICE4_PRESS"] = settings.orificeFourDepression;
-//   configData["ORIFICE5_FLOW"] = settings.orificeFiveFlow;
-//   configData["ORIFICE5_PRESS"] = settings.orificeFiveDepression;
-//   configData["ORIFICE6_FLOW"] = settings.orificeSixFlow;
-//   configData["ORIFICE7_TEST_PRESSURE"] = settings.orificeSixDepression;
-
-//   serializeJsonPretty(configData, jsonString);
-//   writeJSONFile(jsonString, "/settings.json", CONFIG_JSON_SIZE);
-
-// }
 
 
 
@@ -545,6 +399,8 @@ void DataHandler::beginSerial(void) {
 * @details define settings in NVM
 * @note Replaces pre-compile macros in original config.h file
 * @note Preferences Key can not exceed 15 chars long
+* @note Datatype prefix allows for reduced save method
+* @note b = bool, i = int, d = double, s = string
 ***/ 
 void DataHandler::initialiseConfig () {
 
@@ -555,7 +411,7 @@ void DataHandler::initialiseConfig () {
 
   _config_pref.begin("config", false);
 
-  if (_config_pref.isKey("SWIRL_ENABLED")) { // we've already initialised _config_pref
+  if (_config_pref.isKey("bSWIRL_ENBLD")) { // we've already initialised _config_pref
     _config_pref.end();
     return;
   }
@@ -563,79 +419,79 @@ void DataHandler::initialiseConfig () {
   _message.serialPrintf("Initialising Configuration \n");    
 
   // _config_pref.clear(); // completely remove namepace
-  // _config_pref.remove("ADC_I2C_ADDR"); // remove individual key
+  // _config_pref.remove("iADC_I2C_ADDR"); // remove individual key
 
-  if (!_config_pref.isKey("SD_ENABLED")) _config_pref.putBool("SD_ENABLED", false);
-  if (!_config_pref.isKey("MIN_PRESS_PCNT")) _config_pref.putInt("MIN_PRESS_PCNT", 80);
-  if (!_config_pref.isKey("PIPE_RAD_FT")) _config_pref.putDouble("PIPE_RAD_FT", 0.328084);
+  if (!_config_pref.isKey("bSD_ENABLED")) _config_pref.putBool("bSD_ENABLED", false);
+  if (!_config_pref.isKey("iMIN_PRESS_PCT")) _config_pref.putInt("iMIN_PRESS_PCT", 80);
+  if (!_config_pref.isKey("dPIPE_RAD_FT")) _config_pref.putDouble("dPIPE_RAD_FT", 0.328084);
 
-  if (!_config_pref.isKey("VCC_3V3_TRIM")) _config_pref.putDouble("VCC_3V3_TRIM", 0.0);
-  if (!_config_pref.isKey("VCC_5V_TRIM")) _config_pref.putDouble("VCC_5V_TRIM", 0.0);
-  if (!_config_pref.isKey("FIXED_3_3V_VAL")) _config_pref.putBool("FIXED_3_3V_VAL", true);
-  if (!_config_pref.isKey("FIXED_5V_VAL")) _config_pref.putBool("FIXED_5V_VAL", true);
+  if (!_config_pref.isKey("dVCC_3V3_TRIM")) _config_pref.putDouble("dVCC_3V3_TRIM", 0.0);
+  if (!_config_pref.isKey("dVCC_5V_TRIM")) _config_pref.putDouble("dVCC_5V_TRIM", 0.0);
+  if (!_config_pref.isKey("bFIXED_3_3V")) _config_pref.putBool("bFIXED_3_3V", true);
+  if (!_config_pref.isKey("bFIXED_5V")) _config_pref.putBool("bFIXED_5V", true);
 
-  if (!_config_pref.isKey("BME280_ENABLED")) _config_pref.putBool("BME280_ENABLED", true);
-  if (!_config_pref.isKey("BME280_I2C_ADDR")) _config_pref.putInt("BME280_I2C_ADDR", 118);
-  if (!_config_pref.isKey("BME280_SCAN_MS")) _config_pref.putInt("BME280_SCAN_MS", 1000);
+  if (!_config_pref.isKey("bBME280_ENBLD")) _config_pref.putBool("bBME280_ENBLD", true);
+  if (!_config_pref.isKey("iBME280_ADDR")) _config_pref.putInt("iBME280_ADDR", 118);
+  if (!_config_pref.isKey("iBME280_SCN_MS")) _config_pref.putInt("iBME280_SCN_MS", 1000);
 
-  if (!_config_pref.isKey("BME680_ENABLED")) _config_pref.putBool("BME680_ENABLED", true);
-  if (!_config_pref.isKey("BME680_I2C_ADDR")) _config_pref.putInt("BME680_I2C_ADDR", 119);
-  if (!_config_pref.isKey("BME680_SCAN_MS")) _config_pref.putInt("BME680_SCAN_MS", 1000);
+  if (!_config_pref.isKey("bBME680_ENBLD")) _config_pref.putBool("bBME680_ENBLD", true);
+  if (!_config_pref.isKey("iBME680_ADDR")) _config_pref.putInt("iBME680_ADDR", 119);
+  if (!_config_pref.isKey("iBME680_SCN_MS")) _config_pref.putInt("iBME680_SCN_MS", 1000);
 
-  if (!_config_pref.isKey("ADC_TYPE")) _config_pref.putInt("ADC_TYPE", 11);
-  if (!_config_pref.isKey("ADC_I2C_ADDR")) _config_pref.putInt("ADC_I2C_ADDR", 72);
-  if (!_config_pref.isKey("ADC_SCAN_DELAY")) _config_pref.putInt("ADC_SCAN_DELAY", 1000);
-  if (!_config_pref.isKey("ADC_MAX_RETRIES")) _config_pref.putInt("ADC_MAX_RETRIES", 10);
-  if (!_config_pref.isKey("ADC_RANGE")) _config_pref.putInt("ADC_RANGE", 32767);
-  if (!_config_pref.isKey("ADC_GAIN")) _config_pref.putDouble("ADC_GAIN", 6.144);
+  if (!_config_pref.isKey("iADC_TYPE")) _config_pref.putInt("iADC_TYPE", 11);
+  if (!_config_pref.isKey("iADC_I2C_ADDR")) _config_pref.putInt("iADC_I2C_ADDR", 72);
+  if (!_config_pref.isKey("iADC_SCAN_DLY")) _config_pref.putInt("iADC_SCAN_DLY", 1000);
+  if (!_config_pref.isKey("iADC_MAX_RETRY")) _config_pref.putInt("iADC_MAX_RETRY", 10);
+  if (!_config_pref.isKey("iADC_RANGE")) _config_pref.putInt("iADC_RANGE", 32767);
+  if (!_config_pref.isKey("dADC_GAIN")) _config_pref.putDouble("dADC_GAIN", 6.144);
 
-  if (!_config_pref.isKey("MAF_SRC_TYPE")) _config_pref.putInt("MAF_SRC_TYPE", 11);
-  if (!_config_pref.isKey("MAF_SENS_TYPE")) _config_pref.putString("MAF_SENS_TYPE", 0);
-  if (!_config_pref.isKey("MAF_MV_TRIM")) _config_pref.putDouble("MAF_MV_TRIM", 0.0);
-  if (!_config_pref.isKey("MAF_ADC_CHAN")) _config_pref.putInt("MAF_ADC_CHAN", 0);
+  if (!_config_pref.isKey("iMAF_SRC_TYPE")) _config_pref.putInt("iMAF_SRC_TYPE", 11);
+  if (!_config_pref.isKey("iMAF_SENS_TYPE")) _config_pref.putString("iMAF_SENS_TYPE", 0);
+  if (!_config_pref.isKey("dMAF_MV_TRIM")) _config_pref.putDouble("dMAF_MV_TRIM", 0.0);
+  if (!_config_pref.isKey("iMAF_ADC_CHAN")) _config_pref.putInt("iMAF_ADC_CHAN", 0);
 
-  if (!_config_pref.isKey("PREF_SENS_TYPE")) _config_pref.putInt("PREF_SENS_TYPE", 4);
-  if (!_config_pref.isKey("PREF_SRC_TYPE")) _config_pref.putInt("PREF_SRC_TYPE", 11);
-  if (!_config_pref.isKey("FIXED_PREF_VAL")) _config_pref.putInt("FIXED_PREF_VAL", 1);
-  if (!_config_pref.isKey("PREF_MV_TRIM")) _config_pref.putDouble("PREF_MV_TRIM", 0.0);
-  if (!_config_pref.isKey("PREF_ALOG_SCALE")) _config_pref.putDouble("PREF_ALOG_SCALE", 0.0);
-  if (!_config_pref.isKey("PREF_ADC_CHAN")) _config_pref.putInt("PREF_ADC_CHAN", 1);
+  if (!_config_pref.isKey("iPREF_SENS_TYP")) _config_pref.putInt("iPREF_SENS_TYP", 4);
+  if (!_config_pref.isKey("iPREF_SRC_TYP")) _config_pref.putInt("iPREF_SRC_TYP", 11);
+  if (!_config_pref.isKey("iFIXED_PREF_VAL")) _config_pref.putInt("iFIXED_PREF_VAL", 1);
+  if (!_config_pref.isKey("dPREF_MV_TRIM")) _config_pref.putDouble("dPREF_MV_TRIM", 0.0);
+  if (!_config_pref.isKey("dPREF_ALG_SCALE")) _config_pref.putDouble("dPREF_ALG_SCALE", 0.0);
+  if (!_config_pref.isKey("iPREF_ADC_CHAN")) _config_pref.putInt("iPREF_ADC_CHAN", 1);
 
-  if (!_config_pref.isKey("PDIFF_SENS_TYPE")) _config_pref.putInt("PDIFF_SENS_TYPE", 4);
-  if (!_config_pref.isKey("PDIFF_SRC_TYPE")) _config_pref.putInt("PDIFF_SRC_TYPE", 11);
-  if (!_config_pref.isKey("FIXED_PDIFF_VAL")) _config_pref.putInt("FIXED_PDIFF_VAL", 1);
-  if (!_config_pref.isKey("PDIFF_MV_TRIM")) _config_pref.putDouble("PDIFF_MV_TRIM", 0.0);
-  if (!_config_pref.isKey("PDIFF_SCALE")) _config_pref.putDouble("PDIFF_SCALE", 0.0);
-  if (!_config_pref.isKey("PDIFF_ADC_CHAN")) _config_pref.putInt("PDIFF_ADC_CHAN", 1);
+  if (!_config_pref.isKey("iPDIFF_SENS_TYP")) _config_pref.putInt("iPDIFF_SENS_TYP", 4);
+  if (!_config_pref.isKey("iPDIFF_SRC_TYP")) _config_pref.putInt("iPDIFF_SRC_TYP", 11);
+  if (!_config_pref.isKey("iFIXD_PDIFF_VAL")) _config_pref.putInt("iFIXD_PDIFF_VAL", 1);
+  if (!_config_pref.isKey("dPDIFF_MV_TRIM")) _config_pref.putDouble("dPDIFF_MV_TRIM", 0.0);
+  if (!_config_pref.isKey("dPDIFF_SCALE")) _config_pref.putDouble("dPDIFF_SCALE", 0.0);
+  if (!_config_pref.isKey("iPDIFF_ADC_CHAN")) _config_pref.putInt("iPDIFF_ADC_CHAN", 1);
 
-  if (!_config_pref.isKey("PITOT_SENS_TYPE")) _config_pref.putInt("PITOT_SENS_TYPE", 4);
-  if (!_config_pref.isKey("PITOT_SRC_TYPE")) _config_pref.putInt("PITOT_SRC_TYPE", 11);
-  if (!_config_pref.isKey("PITOT_MV_TRIM")) _config_pref.putDouble("PITOT_MV_TRIM", 0.0);
-  if (!_config_pref.isKey("PITOT_SCALE")) _config_pref.putDouble("PITOT_SCALE", 0.0);
-  if (!_config_pref.isKey("PITOT_ADC_CHAN")) _config_pref.putInt("PITOT_ADC_CHAN", 1);
+  if (!_config_pref.isKey("iPITOT_SENS_TYP")) _config_pref.putInt("iPITOT_SENS_TYP", 4);
+  if (!_config_pref.isKey("iPITOT_SRC_TYP")) _config_pref.putInt("iPITOT_SRC_TYP", 11);
+  if (!_config_pref.isKey("dPITOT_MV_TRIM")) _config_pref.putDouble("dPITOT_MV_TRIM", 0.0);
+  if (!_config_pref.isKey("dPITOT_SCALE")) _config_pref.putDouble("dPITOT_SCALE", 0.0);
+  if (!_config_pref.isKey("iPITOT_ADC_CHAN")) _config_pref.putInt("iPITOT_ADC_CHAN", 1);
 
-  if (!_config_pref.isKey("BARO_SENS_TYPE")) _config_pref.putInt("BARO_SENS_TYPE", BOSCH_BME280);
-  if (!_config_pref.isKey("FIXED_BARO_VAL")) _config_pref.putDouble("FIXED_BARO_VAL", 101.3529);
-  if (!_config_pref.isKey("BARO_ALOG_SCALE")) _config_pref.putDouble("BARO_ALOG_SCALE", 1.0);
-  if (!_config_pref.isKey("BARO_MV_TRIM")) _config_pref.putDouble("BARO_MV_TRIM", 1.0);
-  if (!_config_pref.isKey("BARO_FINE_TUNE")) _config_pref.putDouble("BARO_FINE_TUNE", 1.0);
-  if (!_config_pref.isKey("BARO_SCALE")) _config_pref.putDouble("BARO_SCALE", 1.0);
-  if (!_config_pref.isKey("BARO_OFFSET")) _config_pref.putDouble("BARO_OFFSET", 1.0);
-  if (!_config_pref.isKey("SEALEVEL_PRESS")) _config_pref.putDouble("SEALEVEL_PRESS", 0.0);
-  if (!_config_pref.isKey("BARO_ADC_CHAN")) _config_pref.putInt("BARO_ADC_CHAN", 4);
+  if (!_config_pref.isKey("iBARO_SENS_TYP")) _config_pref.putInt("iBARO_SENS_TYP", BOSCH_BME280);
+  if (!_config_pref.isKey("dFIXD_BARO_VAL")) _config_pref.putDouble("dFIXD_BARO_VAL", 101.3529);
+  if (!_config_pref.isKey("dBARO_ALG_SCALE")) _config_pref.putDouble("dBARO_ALG_SCALE", 1.0);
+  if (!_config_pref.isKey("dBARO_MV_TRIM")) _config_pref.putDouble("dBARO_MV_TRIM", 1.0);
+  if (!_config_pref.isKey("dBARO_FINE_TUNE")) _config_pref.putDouble("dBARO_FINE_TUNE", 1.0);
+  if (!_config_pref.isKey("dBARO_SCALE")) _config_pref.putDouble("dBARO_SCALE", 1.0);
+  if (!_config_pref.isKey("dBARO_OFFSET")) _config_pref.putDouble("dBARO_OFFSET", 1.0);
+  if (!_config_pref.isKey("dSEALEVEL_PRESS")) _config_pref.putDouble("dSEALEVEL_PRESS", 0.0);
+  if (!_config_pref.isKey("iBARO_ADC_CHAN")) _config_pref.putInt("iBARO_ADC_CHAN", 4);
 
-  if (!_config_pref.isKey("TEMP_SENS_TYPE")) _config_pref.putInt("TEMP_SENS_TYPE", BOSCH_BME280);
-  if (!_config_pref.isKey("FIXED_TEMP_VAL")) _config_pref.putDouble("FIXED_TEMP_VAL", 21.0);
-  if (!_config_pref.isKey("TEMP_ALOG_SCALE")) _config_pref.putDouble("TEMP_ALOG_SCALE", 1.0);
-  if (!_config_pref.isKey("TEMP_MV_TRIM")) _config_pref.putDouble("TEMP_MV_TRIM", 1.0);
-  if (!_config_pref.isKey("TEMP_FINE_TUNE")) _config_pref.putDouble("TEMP_FINE_TUNE", 1.0);
+  if (!_config_pref.isKey("iTEMP_SENS_TYPE")) _config_pref.putInt("iTEMP_SENS_TYPE", BOSCH_BME280);
+  if (!_config_pref.isKey("dFIXED_TEMP_VAL")) _config_pref.putDouble("dFIXED_TEMP_VAL", 21.0);
+  if (!_config_pref.isKey("dTEMP_ALG_SCALE")) _config_pref.putDouble("dTEMP_ALG_SCALE", 1.0);
+  if (!_config_pref.isKey("dTEMP_MV_TRIM")) _config_pref.putDouble("dTEMP_MV_TRIM", 1.0);
+  if (!_config_pref.isKey("dTEMP_FINE_TUNE")) _config_pref.putDouble("dTEMP_FINE_TUNE", 1.0);
 
-  if (!_config_pref.isKey("RELH_SENS_TYPE")) _config_pref.putInt("RELH_SENS_TYPE", BOSCH_BME280);
-  if (!_config_pref.isKey("FIXED_RELH_VAL")) _config_pref.putDouble("FIXED_RELH_VAL", 36.0);
-  if (!_config_pref.isKey("RELH_ALOG_SCALE")) _config_pref.putDouble("RELH_ALOG_SCALE", 1.0);
-  if (!_config_pref.isKey("RELH_MV_TRIM")) _config_pref.putDouble("RELH_MV_TRIM", 1.0);
-  if (!_config_pref.isKey("RELH_FINE_TUNE")) _config_pref.putDouble("RELH_FINE_TUNE", 1.0);
-  if (!_config_pref.isKey("SWIRL_ENABLED")) _config_pref.putBool("SWIRL_ENABLED", false);
+  if (!_config_pref.isKey("iRELH_SENS_TYP")) _config_pref.putInt("iRELH_SENS_TYP", BOSCH_BME280);
+  if (!_config_pref.isKey("dFIXED_RELH_VAL")) _config_pref.putDouble("dFIXED_RELH_VAL", 36.0);
+  if (!_config_pref.isKey("dRELH_ALG_SCALE")) _config_pref.putDouble("dRELH_ALG_SCALE", 1.0);
+  if (!_config_pref.isKey("dRELH_MV_TRIM")) _config_pref.putDouble("dRELH_MV_TRIM", 1.0);
+  if (!_config_pref.isKey("dRELH_FINE_TUNE")) _config_pref.putDouble("dRELH_FINE_TUNE", 1.0);
+  if (!_config_pref.isKey("bSWIRL_ENBLD")) _config_pref.putBool("bSWIRL_ENBLD", false);
 
   _config_pref.end();
 
@@ -649,6 +505,8 @@ void DataHandler::initialiseConfig () {
 * @details read settings from ESP32 NVM and loads into global struct
 * @note Replaces pre-compile macros in original config.h file
 * @note Preferences Kay can not exceed 15 chars long
+* @note Datatype prefix allows for reduced save method
+* @note b = bool, i = int, d = double, s = string
 ***/ 
 void DataHandler::loadConfig () {
 
@@ -661,77 +519,77 @@ void DataHandler::loadConfig () {
   
   _config_pref.begin("config", true);
 
-  config.SD_ENABLED = _config_pref.getBool("SD_ENABLED", false);
-  config.MIN_PRESS_PCNT = _config_pref.getInt("MIN_PRESS_PCNT", 80);
-  config.PIPE_RAD_FT = _config_pref.getDouble("PIPE_RAD_FT", 0.328084);
+  config.bSD_ENABLED = _config_pref.getBool("bSD_ENABLED", false);
+  config.iMIN_PRESS_PCT = _config_pref.getInt("iMIN_PRESS_PCT", 80);
+  config.dPIPE_RAD_FT = _config_pref.getDouble("dPIPE_RAD_FT", 0.328084);
 
-  config.VCC_3V3_TRIM = _config_pref.getDouble("VCC_3V3_TRIM", 0.0);
-  config.VCC_5V_TRIM = _config_pref.getDouble("VCC_5V_TRIM", 0.0);
-  config.FIXED_3_3V_VAL = _config_pref.getBool("FIXED_3_3V_VAL", true);
-  config.FIXED_5V_VAL = _config_pref.getBool("FIXED_5V_VAL", true);
+  config.dVCC_3V3_TRIM = _config_pref.getDouble("dVCC_3V3_TRIM", 0.0);
+  config.dVCC_5V_TRIM = _config_pref.getDouble("dVCC_5V_TRIM", 0.0);
+  config.bFIXED_3_3V = _config_pref.getBool("bFIXED_3_3V", true);
+  config.bFIXED_5V = _config_pref.getBool("bFIXED_5V", true);
 
-  config.BME280_ENABLED = _config_pref.getBool("BME280_ENABLED", true);
-  config.BME280_I2C_ADDR = _config_pref.getInt("BME280_I2C_ADDR", 118);
-  config.BME280_SCAN_MS = _config_pref.getInt("BME280_SCAN_MS", 1000);
+  config.bBME280_ENBLD = _config_pref.getBool("bBME280_ENBLD", true);
+  config.iBME280_ADDR = _config_pref.getInt("iBME280_ADDR", 118);
+  config.iBME280_SCN_MS = _config_pref.getInt("iBME280_SCN_MS", 1000);
 
-  config.BME680_ENABLED = _config_pref.getBool("BME680_ENABLED", false);
-  config.BME680_I2C_ADDR = _config_pref.getInt("BME680_I2C_ADDR", 119);
-  config.BME680_SCAN_MS = _config_pref.getInt("BME680_SCAN_MS", 1000);
+  config.bBME680_ENBLD = _config_pref.getBool("bBME680_ENBLD", false);
+  config.iBME680_ADDR = _config_pref.getInt("iBME680_ADDR", 119);
+  config.iBME680_SCN_MS = _config_pref.getInt("iBME680_SCN_MS", 1000);
 
-  config.ADC_TYPE = _config_pref.getInt("ADC_TYPE", 11);
-  config.ADC_I2C_ADDR = _config_pref.getInt("ADC_I2C_ADDR", 72);
-  config.ADC_SCAN_DELAY = _config_pref.getInt("ADC_SCAN_DELAY", 1000);
-  config.ADC_MAX_RETRIES  = _config_pref.getInt("ADC_MAX_RETRIES", 10);
-  config.ADC_RANGE = _config_pref.getInt("ADC_RANGE", 32767);
-  config.ADC_GAIN = _config_pref.getDouble("ADC_GAIN", 6.144);
+  config.iADC_TYPE = _config_pref.getInt("iADC_TYPE", 11);
+  config.iADC_I2C_ADDR = _config_pref.getInt("iADC_I2C_ADDR", 72);
+  config.iADC_SCAN_DLY = _config_pref.getInt("iADC_SCAN_DLY", 1000);
+  config.iADC_MAX_RETRY  = _config_pref.getInt("iADC_MAX_RETRY", 10);
+  config.iADC_RANGE = _config_pref.getInt("iADC_RANGE", 32767);
+  config.dADC_GAIN = _config_pref.getDouble("dADC_GAIN", 6.144);
 
-  config.MAF_SRC_TYPE = _config_pref.getInt("MAF_SRC_TYPE", 11);
-  config.MAF_SENS_TYPE = _config_pref.getInt("MAF_SENS_TYPE", 0);
-  config.MAF_MV_TRIM = _config_pref.getDouble("MAF_MV_TRIM", 0.0);
-  config.MAF_ADC_CHAN = _config_pref.getInt("MAF_ADC_CHAN", 0);
+  config.iMAF_SRC_TYPE = _config_pref.getInt("iMAF_SRC_TYPE", 11);
+  config.iMAF_SENS_TYPE = _config_pref.getInt("iMAF_SENS_TYPE", 0);
+  config.dMAF_MV_TRIM = _config_pref.getDouble("dMAF_MV_TRIM", 0.0);
+  config.iMAF_ADC_CHAN = _config_pref.getInt("iMAF_ADC_CHAN", 0);
 
-  config.PREF_SENS_TYPE = _config_pref.getInt("PREF_SENS_TYPE", 4);
-  config.PREF_SRC_TYPE = _config_pref.getInt("PREF_SRC_TYPE", 11);
-  config.FIXED_PREF_VAL = _config_pref.getInt("FIXED_PREF_VAL", 1);
-  config.PREF_MV_TRIM = _config_pref.getDouble("PREF_MV_TRIM", 0.0);
-  config.PREF_ALOG_SCALE = _config_pref.getDouble("PREF_ALOG_SCALE", 1.0);
-  config.PREF_ADC_CHAN = _config_pref.getInt("PREF_ADC_CHAN", 1);
+  config.iPREF_SENS_TYP = _config_pref.getInt("iPREF_SENS_TYP", 4);
+  config.iPREF_SRC_TYP = _config_pref.getInt("iPREF_SRC_TYP", 11);
+  config.iFIXED_PREF_VAL = _config_pref.getInt("iFIXED_PREF_VAL", 1);
+  config.dPREF_MV_TRIM = _config_pref.getDouble("dPREF_MV_TRIM", 0.0);
+  config.dPREF_ALG_SCALE = _config_pref.getDouble("dPREF_ALG_SCALE", 1.0);
+  config.iPREF_ADC_CHAN = _config_pref.getInt("iPREF_ADC_CHAN", 1);
 
-  config.PDIFF_SENS_TYPE = _config_pref.getInt("PDIFF_SENS_TYPE", 4);
-  config.PDIFF_SRC_TYPE = _config_pref.getInt("PDIFF_SRC_TYPE", 11);
-  config.FIXED_PDIFF_VAL = _config_pref.getInt("FIXED_PDIFF_VAL", 1);
-  config.PDIFF_MV_TRIM = _config_pref.getDouble("PDIFF_MV_TRIM", 0.0);
-  config.PDIFF_SCALE = _config_pref.getDouble("PDIFF_SCALE", 1.0);
-  config.PDIFF_ADC_CHAN = _config_pref.getInt("PDIFF_ADC_CHAN", 2);
+  config.iPDIFF_SENS_TYP = _config_pref.getInt("iPDIFF_SENS_TYP", 4);
+  config.iPDIFF_SRC_TYP = _config_pref.getInt("iPDIFF_SRC_TYP", 11);
+  config.iFIXD_PDIFF_VAL = _config_pref.getInt("iFIXD_PDIFF_VAL", 1);
+  config.dPDIFF_MV_TRIM = _config_pref.getDouble("dPDIFF_MV_TRIM", 0.0);
+  config.dPDIFF_SCALE = _config_pref.getDouble("dPDIFF_SCALE", 1.0);
+  config.iPDIFF_ADC_CHAN = _config_pref.getInt("iPDIFF_ADC_CHAN", 2);
  
-  config.PITOT_SENS_TYPE = _config_pref.getInt("PITOT_SENS_TYPE", SENSOR_DISABLED);
-  config.PITOT_SRC_TYPE = _config_pref.getInt("PITOT_SRC_TYPE", 11);
-  config.PITOT_MV_TRIM = _config_pref.getDouble("PITOT_MV_TRIM", 0.0);
-  config.PITOT_SCALE = _config_pref.getDouble("PITOT_SCALE", 1.0);
-  config.PITOT_ADC_CHAN = _config_pref.getInt("PITOT_ADC_CHAN", 3);
+  config.iPITOT_SENS_TYP = _config_pref.getInt("iPITOT_SENS_TYP", SENSOR_DISABLED);
+  config.iPITOT_SRC_TYP = _config_pref.getInt("iPITOT_SRC_TYP", 11);
+  config.dPITOT_MV_TRIM = _config_pref.getDouble("dPITOT_MV_TRIM", 0.0);
+  config.dPITOT_SCALE = _config_pref.getDouble("dPITOT_SCALE", 1.0);
+  config.iPITOT_ADC_CHAN = _config_pref.getInt("iPITOT_ADC_CHAN", 3);
 
-  config.BARO_SENS_TYPE = _config_pref.getInt("BARO_SENS_TYPE", BOSCH_BME280);
-  config.FIXED_BARO_VAL = _config_pref.getDouble("FIXED_BARO_VAL", 101.3529);
-  config.BARO_ALOG_SCALE =_config_pref.getDouble("BARO_ALOG_SCALE", 1.0);
-  config.BARO_MV_TRIM = _config_pref.getDouble("BARO_MV_TRIM", 1.0);
-  config.BARO_FINE_TUNE = _config_pref.getDouble("BARO_FINE_TUNE", 1.0);
-  config.BARO_SCALE = _config_pref.getDouble("BARO_SCALE", 100);
-  config.BARO_OFFSET = _config_pref.getDouble("BARO_OFFSET", 100);
-  config.SEALEVEL_PRESS = _config_pref.getDouble("SEALEVEL_PRESS", 1016.90);
-  config.BARO_ADC_CHAN = _config_pref.getInt("BARO_ADC_CHAN", 4);
+  config.iBARO_SENS_TYP = _config_pref.getInt("iBARO_SENS_TYP", BOSCH_BME280);
+  config.dFIXD_BARO_VAL = _config_pref.getDouble("dFIXD_BARO_VAL", 101.3529);
+  config.dBARO_ALG_SCALE =_config_pref.getDouble("dBARO_ALG_SCALE", 1.0);
+  config.dBARO_MV_TRIM = _config_pref.getDouble("dBARO_MV_TRIM", 1.0);
+  config.dBARO_FINE_TUNE = _config_pref.getDouble("dBARO_FINE_TUNE", 1.0);
+  config.dBARO_SCALE = _config_pref.getDouble("dBARO_SCALE", 100);
+  config.dBARO_OFFSET = _config_pref.getDouble("dBARO_OFFSET", 100);
+  config.dSEALEVEL_PRESS = _config_pref.getDouble("dSEALEVEL_PRESS", 1016.90);
+  config.iBARO_ADC_CHAN = _config_pref.getInt("iBARO_ADC_CHAN", 4);
 
-  config.TEMP_SENS_TYPE = _config_pref.getInt("TEMP_SENS_TYPE", BOSCH_BME280);
-  config.FIXED_TEMP_VAL = _config_pref.getDouble("FIXED_TEMP_VAL", 21.0);
-  config.TEMP_ALOG_SCALE = _config_pref.getDouble("TEMP_ALOG_SCALE", 1.0);
-  config.TEMP_MV_TRIM = _config_pref.getDouble("TEMP_MV_TRIM", 0.0);
-  config.TEMP_FINE_TUNE = _config_pref.getDouble("TEMP_FINE_TUNE", 0.0);
+  config.iTEMP_SENS_TYPE = _config_pref.getInt("iTEMP_SENS_TYPE", BOSCH_BME280);
+  config.dFIXED_TEMP_VAL = _config_pref.getDouble("dFIXED_TEMP_VAL", 21.0);
+  config.dTEMP_ALG_SCALE = _config_pref.getDouble("dTEMP_ALG_SCALE", 1.0);
+  config.dTEMP_MV_TRIM = _config_pref.getDouble("dTEMP_MV_TRIM", 0.0);
+  config.dTEMP_FINE_TUNE = _config_pref.getDouble("dTEMP_FINE_TUNE", 0.0);
 
-  config.RELH_SENS_TYPE = _config_pref.getInt("RELH_SENS_TYPE", BOSCH_BME280);
-  config.FIXED_RELH_VAL = _config_pref.getDouble("FIXED_RELH_VAL", 36.0);
-  config.RELH_ALOG_SCALE = _config_pref.getDouble("RELH_ALOG_SCALE", 1.0);
-  config.RELH_MV_TRIM = _config_pref.getDouble("RELH_MV_TRIM", 0.0);
-  config.RELH_FINE_TUNE = _config_pref.getDouble("RELH_FINE_TUNE", 0.0);
-  config.SWIRL_ENABLED = _config_pref.getBool("SWIRL_ENABLED", false);
+  config.iRELH_SENS_TYP = _config_pref.getInt("iRELH_SENS_TYP", BOSCH_BME280);
+  config.dFIXED_RELH_VAL = _config_pref.getDouble("dFIXED_RELH_VAL", 36.0);
+  config.dRELH_ALG_SCALE = _config_pref.getDouble("dRELH_ALG_SCALE", 1.0);
+  config.dRELH_MV_TRIM = _config_pref.getDouble("dRELH_MV_TRIM", 0.0);
+  config.dRELH_FINE_TUNE = _config_pref.getDouble("dRELH_FINE_TUNE", 0.0);
+  config.bSWIRL_ENBLD = _config_pref.getBool("bSWIRL_ENBLD", false);
 
   _config_pref.end();
 }
@@ -749,7 +607,8 @@ void DataHandler::loadConfig () {
 * @brief initialiseSettings
 * @note - Initialise settings in NVM if they do not exist
 * @note Key must be 15 chars or shorter.
-***/ 
+* @note Datatype prefix allows for reduced save method
+* @note b = bool, i = int, d = double, s = string***/ 
 void DataHandler::initialiseSettings () {
 
   extern struct BenchSettings settings;
@@ -762,55 +621,55 @@ void DataHandler::initialiseSettings () {
   
   _settings_pref.begin("settings", false);
 
-  // _settings_pref.remove("DATA_FILTER_TYP"); // remove individual key
-  // _settings_pref.remove("TEMP_UNIT"); // remove individual key
+  // _settings_pref.remove("iDATA_FLTR_TYP"); // remove individual key
+  // _settings_pref.remove("iTEMP_UNIT"); // remove individual key
 
-  if (!_settings_pref.isKey("WIFI_SSID")) _settings_pref.putString("WIFI_SSID", "WIFI-SSID");
-  if (!_settings_pref.isKey("WIFI_PSWD")) _settings_pref.putString("WIFI_PSWD", static_cast<String>("PASSWORD"));
-  if (!_settings_pref.isKey("WIFI_AP_SSID")) _settings_pref.putString("WIFI_AP_SSID", static_cast<String>("DIYFB"));
-  if (!_settings_pref.isKey("WIFI_AP_PSWD")) _settings_pref.putString("WIFI_AP_PSWD", static_cast<String>("123456789"));
-  if (!_settings_pref.isKey("HOSTNAME")) _settings_pref.putString("HOSTNAME", static_cast<String>("diyfb"));
+  if (!_settings_pref.isKey("sWIFI_SSID")) _settings_pref.putString("sWIFI_SSID", "WIFI-SSID");
+  if (!_settings_pref.isKey("sWIFI_PSWD")) _settings_pref.putString("sWIFI_PSWD", static_cast<String>("PASSWORD"));
+  if (!_settings_pref.isKey("sWIFI_AP_SSID")) _settings_pref.putString("sWIFI_AP_SSID", static_cast<String>("DIYFB"));
+  if (!_settings_pref.isKey("sWIFI_AP_PSWD")) _settings_pref.putString("sWIFI_AP_PSWD", static_cast<String>("123456789"));
+  if (!_settings_pref.isKey("sHOSTNAME")) _settings_pref.putString("sHOSTNAME", static_cast<String>("diyfb"));
 
-  if (!_settings_pref.isKey("WIFI_TIMEOUT")) _settings_pref.putInt("WIFI_TIMEOUT", 4000);
-  if (!_settings_pref.isKey("MAF_HOUSING_DIA")) _settings_pref.putInt("MAF_HOUSING_DIA", 0);
-  if (!_settings_pref.isKey("REFRESH_RATE")) _settings_pref.putInt("REFRESH_RATE", 500);
-  if (!_settings_pref.isKey("MIN_BENCH_PRESS")) _settings_pref.putInt("MIN_BENCH_PRESS", 1);
-  if (!_settings_pref.isKey("MIN_FLOW_RATE")) _settings_pref.putInt("MIN_FLOW_RATE", 1);
+  if (!_settings_pref.isKey("iWIFI_TIMEOUT")) _settings_pref.putInt("iWIFI_TIMEOUT", 4000);
+  if (!_settings_pref.isKey("iMAF_DIAMETER")) _settings_pref.putInt("iMAF_DIAMETER", 0);
+  if (!_settings_pref.isKey("iREFRESH_RATE")) _settings_pref.putInt("iREFRESH_RATE", 500);
+  if (!_settings_pref.isKey("iMIN_PRESSURE")) _settings_pref.putInt("iMIN_PRESSURE", 1);
+  if (!_settings_pref.isKey("iMIN_FLOW_RATE")) _settings_pref.putInt("iMIN_FLOW_RATE", 1);
 
-  if (!_settings_pref.isKey("DATA_FILTER_TYP")) _settings_pref.putInt("DATA_FILTER_TYP", NONE);
-  if (!_settings_pref.isKey("ROUNDING_TYPE")) _settings_pref.putInt("ROUNDING_TYPE", NONE);
+  if (!_settings_pref.isKey("iDATA_FLTR_TYP")) _settings_pref.putInt("iDATA_FLTR_TYP", NONE);
+  if (!_settings_pref.isKey("iROUNDING_TYP")) _settings_pref.putInt("iROUNDING_TYP", NONE);
 
-  if (!_settings_pref.isKey("FLOW_DECI_ACC")) _settings_pref.putInt("FLOW_DECI_ACC", 1);
-  if (!_settings_pref.isKey("GEN_DECI_ACC")) _settings_pref.putInt("GEN_DECI_ACC", 2);
-  if (!_settings_pref.isKey("CYCLIC_AV_BUFF")) _settings_pref.putInt("CYCLIC_AV_BUFF", 5);
-  if (!_settings_pref.isKey("MAF_MIN_VOLTS")) _settings_pref.putInt("MAF_MIN_VOLTS", 1);
+  if (!_settings_pref.isKey("iFLOW_DECI_ACC")) _settings_pref.putInt("iFLOW_DECI_ACC", 1);
+  if (!_settings_pref.isKey("iGEN_DECI_ACC")) _settings_pref.putInt("iGEN_DECI_ACC", 2);
+  if (!_settings_pref.isKey("iCYC_AV_BUFF")) _settings_pref.putInt("iCYC_AV_BUFF", 5);
+  if (!_settings_pref.isKey("iMAF_MIN_VOLTS")) _settings_pref.putInt("iMAF_MIN_VOLTS", 1);
 
-  if (!_settings_pref.isKey("API_DELIM")) _settings_pref.putString("API_DELIM", ":");
-  if (!_settings_pref.isKey("SERIAL_BAUDRATE")) _settings_pref.putInt("SERIAL_BAUDRATE", 115200);
-  if (!_settings_pref.isKey("SHOW_ALARMS")) _settings_pref.putInt("SHOW_ALARMS", true);
-  if (!_settings_pref.isKey("ADJ_FLOW_DEP")) _settings_pref.putInt("ADJ_FLOW_DEP", 28);
-  if (!_settings_pref.isKey("STD_REF")) _settings_pref.putInt("STD_REF", 1);
-  if (!_settings_pref.isKey("STD_ADJ_FLOW")) _settings_pref.putInt("STD_ADJ_FLOW", 0);
-  if (!_settings_pref.isKey("DATAGRAPH_MAX")) _settings_pref.putInt("DATAGRAPH_MAX", 0);
-  if (!_settings_pref.isKey("MAF_MIN_VOLTS")) _settings_pref.putInt("MAF_MIN_VOLTS", 1);
-  if (!_settings_pref.isKey("TEMP_UNIT")) _settings_pref.putInt("TEMP_UNIT", CELCIUS);
+  if (!_settings_pref.isKey("sAPI_DELIM")) _settings_pref.putString("sAPI_DELIM", ":");
+  if (!_settings_pref.isKey("iSERIAL_BAUD")) _settings_pref.putInt("iSERIAL_BAUD", 115200);
+  if (!_settings_pref.isKey("iSHOW_ALARMS")) _settings_pref.putInt("iSHOW_ALARMS", true);
+  if (!_settings_pref.isKey("iADJ_FLOW_DEP")) _settings_pref.putInt("iADJ_FLOW_DEP", 28);
+  if (!_settings_pref.isKey("iSTD_REF")) _settings_pref.putInt("iSTD_REF", 1);
+  if (!_settings_pref.isKey("iSTD_ADJ_FLOW")) _settings_pref.putInt("iSTD_ADJ_FLOW", 0);
+  if (!_settings_pref.isKey("iDATAGRAPH_MAX")) _settings_pref.putInt("iDATAGRAPH_MAX", 0);
+  if (!_settings_pref.isKey("iMAF_MIN_VOLTS")) _settings_pref.putInt("iMAF_MIN_VOLTS", 1);
+  if (!_settings_pref.isKey("iTEMP_UNIT")) _settings_pref.putInt("iTEMP_UNIT", CELCIUS);
 
-  if (!_settings_pref.isKey("LIFT_INTERVAL")) _settings_pref.putDouble("LIFT_INTERVAL", 1.5F);
-  if (!_settings_pref.isKey("BENCH_TYPE")) _settings_pref.putInt("BENCH_TYPE", MAF);
-  if (!_settings_pref.isKey("CAL_FLOW_RATE")) _settings_pref.putDouble("CAL_FLOW_RATE", 14.4F);
-  if (!_settings_pref.isKey("CAL_REF_PRESS")) _settings_pref.putDouble("CAL_REF_PRESS", 10.0F);
-  if (!_settings_pref.isKey("ORIFICE1_FLOW")) _settings_pref.putDouble("ORIFICE1_FLOW", 0.0F);
-  if (!_settings_pref.isKey("ORIFICE1_PRESS")) _settings_pref.putDouble("ORIFICE1_PRESS", 0.0F);
-  if (!_settings_pref.isKey("ORIFICE2_FLOW")) _settings_pref.putDouble("ORIFICE2_FLOW", 0.0F);
-  if (!_settings_pref.isKey("ORIFICE2_PRESS")) _settings_pref.putDouble("ORIFICE2_PRESS", 0.0F);
-  if (!_settings_pref.isKey("ORIFICE3_FLOW")) _settings_pref.putDouble("ORIFICE3_FLOW", 0.0F);
-  if (!_settings_pref.isKey("ORIFICE3_PRESS")) _settings_pref.putDouble("ORIFICE3_PRESS", 0.0F);
-  if (!_settings_pref.isKey("ORIFICE4_FLOW")) _settings_pref.putDouble("ORIFICE4_FLOW", 0.0F);
-  if (!_settings_pref.isKey("ORIFICE4_PRESS")) _settings_pref.putDouble("ORIFICE4_PRESS", 0.0F);
-  if (!_settings_pref.isKey("ORIFICE5_FLOW")) _settings_pref.putDouble("ORIFICE5_FLOW", 0.0F);
-  if (!_settings_pref.isKey("ORIFICE5_PRESS")) _settings_pref.putDouble("ORIFICE5_PRESS", 0.0F);
-  if (!_settings_pref.isKey("ORIFICE6_FLOW")) _settings_pref.putDouble("ORIFICE6_FLOW", 0.0F);
-  if (!_settings_pref.isKey("ORIFICE6_PRESS")) _settings_pref.putDouble("ORIFICE6_PRESS", 0.0F);
+  if (!_settings_pref.isKey("dLIFT_INTERVAL")) _settings_pref.putDouble("dLIFT_INTERVAL", 1.5F);
+  if (!_settings_pref.isKey("iBENCH_TYPE")) _settings_pref.putInt("iBENCH_TYPE", MAF);
+  if (!_settings_pref.isKey("dCAL_FLW_RATE")) _settings_pref.putDouble("dCAL_FLW_RATE", 14.4F);
+  if (!_settings_pref.isKey("dCAL_REF_PRESS")) _settings_pref.putDouble("dCAL_REF_PRESS", 10.0F);
+  if (!_settings_pref.isKey("dORIFICE1_FLOW")) _settings_pref.putDouble("dORIFICE1_FLOW", 0.0F);
+  if (!_settings_pref.isKey("dORIFICE1_PRESS")) _settings_pref.putDouble("dORIFICE1_PRESS", 0.0F);
+  if (!_settings_pref.isKey("dORIFICE2_FLOW")) _settings_pref.putDouble("dORIFICE2_FLOW", 0.0F);
+  if (!_settings_pref.isKey("dORIFICE2_PRESS")) _settings_pref.putDouble("dORIFICE2_PRESS", 0.0F);
+  if (!_settings_pref.isKey("dORIFICE3_FLOW")) _settings_pref.putDouble("dORIFICE3_FLOW", 0.0F);
+  if (!_settings_pref.isKey("dORIFICE3_PRESS")) _settings_pref.putDouble("dORIFICE3_PRESS", 0.0F);
+  if (!_settings_pref.isKey("dORIFICE4_FLOW")) _settings_pref.putDouble("dORIFICE4_FLOW", 0.0F);
+  if (!_settings_pref.isKey("dORIFICE4_PRESS")) _settings_pref.putDouble("dORIFICE4_PRESS", 0.0F);
+  if (!_settings_pref.isKey("dORIFICE5_FLOW")) _settings_pref.putDouble("dORIFICE5_FLOW", 0.0F);
+  if (!_settings_pref.isKey("dORIFICE5_PRESS")) _settings_pref.putDouble("dORIFICE5_PRESS", 0.0F);
+  if (!_settings_pref.isKey("dORIFICE6_FLOW")) _settings_pref.putDouble("dORIFICE6_FLOW", 0.0F);
+  if (!_settings_pref.isKey("dORIFICE6_PRESS")) _settings_pref.putDouble("dORIFICE6_PRESS", 0.0F);
 
   _settings_pref.end();
 
@@ -828,7 +687,9 @@ void DataHandler::initialiseSettings () {
 
 /***********************************************************
 * @brief loadSettings
-* @details read settings settings.json file and loads into global struct
+* @details read settings from NVM and loads into global struct
+* @note Datatype prefix allows for reduced save method
+* @note b = bool, i = int, d = double, s = string
 ***/ 
 void DataHandler::loadSettings () {
 
@@ -838,50 +699,50 @@ void DataHandler::loadSettings () {
   Messages _message;
   Preferences _settings_pref;
 
-  _message.serialPrintf("Loading Configuration \n");    
+  _message.serialPrintf("Loading Settings \n");    
   
   _settings_pref.begin("settings", true);
 
-  settings.wifi_ssid = _settings_pref.getString("WIFI_SSID", "WIFI-SSID");
-  settings.wifi_pswd = _settings_pref.getString("WIFI_PSWD", "PASSWORD");
-  settings.wifi_ap_ssid = _settings_pref.getString("WIFI_AP_SSID", "DIYFB" );
-  settings.wifi_ap_pswd =_settings_pref.getString("WIFI_AP_PSWD", "123456789" );
-  settings.hostname = _settings_pref.getString("HOSTNAME", "diyfb" );
-  settings.wifi_timeout = _settings_pref.getInt("WIFI_TIMEOUT", 4000 );
-  settings.maf_housing_diameter = _settings_pref.getInt("MAF_HOUSING_DIA", 0 );
-  settings.refresh_rate = _settings_pref.getInt("REFRESH_RATE", 500 );
-  settings.min_bench_pressure  = _settings_pref.getInt("MIN_BENCH_PRESS", 1 );
-  settings.min_flow_rate = _settings_pref.getInt("MIN_FLOW_RATE", 1 );
-  settings.data_filter_type = _settings_pref.getInt("DATA_FILTER_TYP", NONE );
-  settings.rounding_type = _settings_pref.getInt("ROUNDING_TYPE", NONE );
-  settings.flow_decimal_length = _settings_pref.getInt("FLOW_DECI_ACC", 1 );
-  settings.gen_decimal_length = _settings_pref.getInt("GEN_DECI_ACC", 2 );
-  settings.cyc_av_buffer  = _settings_pref.getInt("CYCLIC_AV_BUFF", 5 );
-  settings.maf_min_volts  = _settings_pref.getInt("MAF_MIN_VOLTS", 0.1F );
-  settings.api_delim = _settings_pref.getString("API_DELIM", ":" );
-  settings.serial_baud_rate = _settings_pref.getInt("SERIAL_BAUDRATE",  115200 );
-  settings.show_alarms = _settings_pref.getInt("SHOW_ALARMS",  true  );
-  settings.adj_flow_depression = _settings_pref.getInt("ADJ_FLOW_DEP",  28  );
-  settings.standardReference = _settings_pref.getInt("STD_REF", 1  );
-  settings.std_adj_flow = _settings_pref.getInt("STD_ADJ_FLOW",  0 );
-  settings.dataGraphMax = _settings_pref.getInt("DATAGRAPH_MAX", 0 );
-  settings.temp_unit = _settings_pref.getInt("TEMP_UNIT", CELCIUS );
-  settings.valveLiftInterval = _settings_pref.getDouble("LIFT_INTERVAL", 1.5F  );
-  settings.bench_type = _settings_pref.getInt("BENCH_TYPE", MAF );
-  settings.cal_flow_rate = _settings_pref.getDouble("CAL_FLOW_RATE", 14.4F );
-  settings.cal_ref_press = _settings_pref.getDouble("CAL_REF_PRESS", 10.0F );
-  settings.orificeOneFlow = _settings_pref.getDouble("ORIFICE1_FLOW", 0.0F );
-  settings.orificeOneDepression = _settings_pref.getDouble("ORIFICE1_PRESS", 0.0F );
-  settings.orificeTwoFlow = _settings_pref.getDouble("ORIFICE2_FLOW", 0.0F );
-  settings.orificeTwoDepression = _settings_pref.getDouble("ORIFICE2_PRESS", 0.0F );
-  settings.orificeThreeFlow = _settings_pref.getDouble("ORIFICE3_FLOW", 0.0F );
-  settings.orificeThreeDepression = _settings_pref.getDouble("ORIFICE3_PRESS", 0.0F );
-  settings.orificeFourFlow = _settings_pref.getDouble("ORIFICE4_FLOW", 0.0F );
-  settings.orificeFourDepression = _settings_pref.getDouble("ORIFICE4_PRESS", 0.0F );
-  settings.orificeFiveFlow = _settings_pref.getDouble("ORIFICE5_FLOW", 0.0F );
-  settings.orificeFiveDepression = _settings_pref.getDouble("ORIFICE5_PRESS", 0.0F );
-  settings.orificeSixFlow = _settings_pref.getDouble("ORIFICE6_FLOW", 0.0F );
-  settings.orificeSixDepression = _settings_pref.getDouble("ORIFICE6_PRESS",  0.0F);
+  settings.wifi_ssid = _settings_pref.getString("sWIFI_SSID", "WIFI-SSID");
+  settings.wifi_pswd = _settings_pref.getString("sWIFI_PSWD", "PASSWORD");
+  settings.wifi_ap_ssid = _settings_pref.getString("sWIFI_AP_SSID", "DIYFB" );
+  settings.wifi_ap_pswd =_settings_pref.getString("sWIFI_AP_PSWD", "123456789" );
+  settings.hostname = _settings_pref.getString("sHOSTNAME", "diyfb" );
+  settings.wifi_timeout = _settings_pref.getInt("iWIFI_TIMEOUT", 4000 );
+  settings.maf_housing_diameter = _settings_pref.getInt("iMAF_DIAMETER", 0 );
+  settings.refresh_rate = _settings_pref.getInt("iREFRESH_RATE", 500 );
+  settings.min_bench_pressure  = _settings_pref.getInt("iMIN_PRESSURE", 1 );
+  settings.min_flow_rate = _settings_pref.getInt("iMIN_FLOW_RATE", 1 );
+  settings.data_filter_type = _settings_pref.getInt("iDATA_FLTR_TYP", NONE );
+  settings.rounding_type = _settings_pref.getInt("iROUNDING_TYP", NONE );
+  settings.flow_decimal_length = _settings_pref.getInt("iFLOW_DECI_ACC", 1 );
+  settings.gen_decimal_length = _settings_pref.getInt("iGEN_DECI_ACC", 2 );
+  settings.cyc_av_buffer  = _settings_pref.getInt("iCYC_AV_BUFF", 5 );
+  settings.maf_min_volts  = _settings_pref.getInt("iMAF_MIN_VOLTS", 0.1F );
+  settings.api_delim = _settings_pref.getString("sAPI_DELIM", ":" );
+  settings.serial_baud_rate = _settings_pref.getInt("iSERIAL_BAUD",  115200 );
+  settings.show_alarms = _settings_pref.getInt("iSHOW_ALARMS",  true  );
+  settings.adj_flow_depression = _settings_pref.getInt("iADJ_FLOW_DEP",  28  );
+  settings.standardReference = _settings_pref.getInt("iSTD_REF", 1  );
+  settings.std_adj_flow = _settings_pref.getInt("iSTD_ADJ_FLOW",  0 );
+  settings.dataGraphMax = _settings_pref.getInt("iDATAGRAPH_MAX", 0 );
+  settings.temp_unit = _settings_pref.getInt("iTEMP_UNIT", CELCIUS );
+  settings.valveLiftInterval = _settings_pref.getDouble("dLIFT_INTERVAL", 1.5F  );
+  settings.bench_type = _settings_pref.getInt("iBENCH_TYPE", MAF );
+  settings.cal_flow_rate = _settings_pref.getDouble("dCAL_FLW_RATE", 14.4F );
+  settings.cal_ref_press = _settings_pref.getDouble("dCAL_REF_PRESS", 10.0F );
+  settings.orificeOneFlow = _settings_pref.getDouble("dORIFICE1_FLOW", 0.0F );
+  settings.orificeOneDepression = _settings_pref.getDouble("dORIFICE1_PRESS", 0.0F );
+  settings.orificeTwoFlow = _settings_pref.getDouble("dORIFICE2_FLOW", 0.0F );
+  settings.orificeTwoDepression = _settings_pref.getDouble("dORIFICE2_PRESS", 0.0F );
+  settings.orificeThreeFlow = _settings_pref.getDouble("dORIFICE3_FLOW", 0.0F );
+  settings.orificeThreeDepression = _settings_pref.getDouble("dORIFICE3_PRESS", 0.0F );
+  settings.orificeFourFlow = _settings_pref.getDouble("dORIFICE4_FLOW", 0.0F );
+  settings.orificeFourDepression = _settings_pref.getDouble("dORIFICE4_PRESS", 0.0F );
+  settings.orificeFiveFlow = _settings_pref.getDouble("dORIFICE5_FLOW", 0.0F );
+  settings.orificeFiveDepression = _settings_pref.getDouble("dORIFICE5_PRESS", 0.0F );
+  settings.orificeSixFlow = _settings_pref.getDouble("dORIFICE6_FLOW", 0.0F );
+  settings.orificeSixDepression = _settings_pref.getDouble("dORIFICE6_PRESS",  0.0F);
 
   _settings_pref.end();
 
@@ -996,25 +857,6 @@ void DataHandler::clearLiftDataFile(AsyncWebServerRequest *request){
 
 
 
-/***********************************************************
- * @brief byteDecode
- * @param bytes size to be decoded
- * @details Byte Decode (returns string i.e '52 GB')
- ***/
-String DataHandler::byteDecode(size_t bytes)
-{
-  if (bytes < 1024)
-    return String(bytes) + " B";
-  else if (bytes < (1024 * 1024))
-    return String(bytes / 1024.0) + " KB";
-  else if (bytes < (1024 * 1024 * 1024))
-    return String(bytes / 1024.0 / 1024.0) + " MB";
-  else
-    return String(bytes / 1024.0 / 1024.0 / 1024.0) + " GB";
-}
-
-
-
 
 
 
@@ -1034,6 +876,7 @@ String DataHandler::getFileListJSON()
   StaticJsonDocument<1024> dataJson;
 
   Messages _message;
+  Calculations _calculations;
 
   _message.statusPrintf("Filesystem contents: \n");
   FILESYSTEM.begin();
@@ -1043,7 +886,7 @@ String DataHandler::getFileListJSON()
     fileName = file.name();
     fileSize = file.size();
     dataJson[fileName] = String(fileSize);
-    _message.statusPrintf("%s : %s \n", fileName, byteDecode(fileSize));
+    _message.statusPrintf("%s : %s \n", fileName, _calculations.byteDecode(fileSize));
     file = root.openNextFile();
   }
   // FILESYSTEM.end();
@@ -1134,23 +977,23 @@ String DataHandler::buildIndexSSEJsonData()
   switch (settings.standardReference) {
 
     case ISO_1585:
-      dataJson["STD_REF"] = "ISO-1585";
+      dataJson["iSTD_REF"] = "ISO-1585";
     break;
 
     case ISA :
-      dataJson["STD_REF"] = "ISA";
+      dataJson["iSTD_REF"] = "ISA";
     break;
 
     case ISO_13443:
-      dataJson["STD_REF"] = "ISO-13443";
+      dataJson["iSTD_REF"] = "ISO-13443";
     break;
 
     case ISO_5011:
-      dataJson["STD_REF"] = "ISO-5011";
+      dataJson["iSTD_REF"] = "ISO-5011";
     break;
 
     case ISO_2533:
-      dataJson["STD_REF"] = "ISO-2533";
+      dataJson["iSTD_REF"] = "ISO-2533";
     break;
 
   }
@@ -1168,19 +1011,19 @@ String DataHandler::buildIndexSSEJsonData()
   switch (settings.bench_type){
 
     case MAF:
-      dataJson["BENCH_TYPE"] = "MAF";
+      dataJson["iBENCH_TYPE"] = "MAF";
     break;
 
     case ORIFICE:
-      dataJson["BENCH_TYPE"] = "ORIFICE";
+      dataJson["iBENCH_TYPE"] = "ORIFICE";
     break;
 
     case VENTURI:
-      dataJson["BENCH_TYPE"] = "VENTURI";
+      dataJson["iBENCH_TYPE"] = "VENTURI";
     break;
 
     case PITOT:
-      dataJson["BENCH_TYPE"] = "PITOT";
+      dataJson["iBENCH_TYPE"] = "PITOT";
     break;
 
   }

@@ -42,8 +42,7 @@ class DataHandler {
 
     protected:
 
-		String byteDecode(size_t bytes);
-    	AsyncWebServer *tempServer;
+		AsyncWebServer *tempServer;
 
     private:
 

@@ -56,9 +56,9 @@ if (!!window.EventSource) {
            // we've not got a string... 
            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'SFLOW' || key === 'FDIFF') {
               // HACK: template vars - replaced before page load
-              document.getElementById(key).innerHTML = myObj[key].toFixed(2);//~FLOW_DECI_ACC~);  
+              document.getElementById(key).innerHTML = myObj[key].toFixed(2);//~iFLOW_DECI_ACC~);  
             } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'PITOT_DELTA' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
-              document.getElementById(key).innerHTML = myObj[key].toFixed(2);//~GEN_DECI_ACC~); 
+              document.getElementById(key).innerHTML = myObj[key].toFixed(2);//~iGEN_DECI_ACC~); 
             //} else if (key === '') {
             } else {
               document.getElementById(key).innerHTML = myObj[key];
@@ -72,7 +72,7 @@ if (!!window.EventSource) {
       } 
 
       // get bench type and set up GUI accoordingly
-      var benchType = myObj["BENCH_TYPE"];
+      var benchType = myObj["iBENCH_TYPE"];
 
       // get active orifice and set up GUI accoordingly
       activeOrifice = myObj["ACTIVE_ORIFICE"];
@@ -102,7 +102,7 @@ if (!!window.EventSource) {
       }
 
       // Get data filter type
-      var dataFilterType = myObj["DATA_FILTER_TYP"];
+      var dataFilterType = myObj["iDATA_FLTR_TYP"];
 
       // Get Pitot Tile status colours
       var pitotTileColour = myObj["PITOT_COLOUR"];

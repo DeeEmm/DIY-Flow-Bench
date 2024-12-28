@@ -5,306 +5,319 @@
         <div class="config-container">
             <!-- System Settings -->
             <fieldset>
-                <legend>System Settings</legend>
+                <legend>System Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="SD_ENABLED">SD Card Enabled</label>
-                    <input type="checkbox" id="SD_ENABLED" name="SD_ENABLED">
+                    <label for="bSD_ENABLED">SD Card Enabled</label>
+                    <input type="checkbox" id="bSD_ENABLED" name="bSD_ENABLED">
                 </div>
                 <div class="input-group">
-                    <label for="MIN_PRESS_PCNT">Minimum Pressure Percent</label>
-                    <input type="number" id="MIN_PRESS_PCNT" name="MIN_PRESS_PCNT" value="80">
+                    <label for="iMIN_PRESS_PCT">Minimum Pressure Percent</label>
+                    <input type="number" id="iMIN_PRESS_PCT" name="iMIN_PRESS_PCT" value="80">
                 </div>
                 <div class="input-group">
-                    <label for="PIPE_RAD_FT">Pipe Radius (ft)</label>
-                    <input type="number" id="PIPE_RAD_FT" name="PIPE_RAD_FT" step="0.000001" value="0.328084">
+                    <label for="dPIPE_RAD_FT">Pipe Radius (ft)</label>
+                    <input type="number" id="dPIPE_RAD_FT" name="dPIPE_RAD_FT" step="0.000001" value="0.328084">
                 </div>
             </fieldset>
 
             <!-- Power Settings -->
             <fieldset>
-                <legend>Power Settings</legend>
+                <legend>Power Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="VCC_3V3_TRIM">3.3V Trim</label>
-                    <input type="number" id="VCC_3V3_TRIM" name="VCC_3V3_TRIM" step="0.1" value="0.0">
+                    <label for="dVCC_3V3_TRIM">3.3V Trim</label>
+                    <input type="number" id="dVCC_3V3_TRIM" name="dVCC_3V3_TRIM" step="0.1" value="0.0">
                 </div>
                 <div class="input-group">
-                    <label for="VCC_5V_TRIM">5V Trim</label>
-                    <input type="number" id="VCC_5V_TRIM" name="VCC_5V_TRIM" step="0.1" value="0.0">
+                    <label for="dVCC_5V_TRIM">5V Trim</label>
+                    <input type="number" id="dVCC_5V_TRIM" name="dVCC_5V_TRIM" step="0.1" value="0.0">
                 </div>
                 <div class="input-group">
-                    <label for="FIXED_3_3V_VAL">Fixed 3.3V Value</label>
-                    <input type="checkbox" id="FIXED_3_3V_VAL" name="FIXED_3_3V_VAL" checked>
+                    <label for="bFIXED_3_3V">Fixed 3.3V Value</label>
+                    <input type="checkbox" id="bFIXED_3_3V" name="bFIXED_3_3V" checked>
                 </div>
                 <div class="input-group">
-                    <label for="FIXED_5V_VAL">Fixed 5V Value</label>
-                    <input type="checkbox" id="FIXED_5V_VAL" name="FIXED_5V_VAL" checked>
+                    <label for="bFIXED_5V">Fixed 5V Value</label>
+                    <input type="checkbox" id="bFIXED_5V" name="bFIXED_5V" checked>
                 </div>
             </fieldset>
 
             <!-- BME280 Settings -->
             <fieldset>
-                <legend>BME280 Settings</legend>
+                <legend>BME280 Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="BME280_ENABLED">BME280 Enabled</label>
-                    <input type="checkbox" id="BME280_ENABLED" name="BME280_ENABLED" checked>
+                    <label for="bBME280_ENBLD">BME280 Enabled</label>
+                    <input type="checkbox" id="bBME280_ENBLD" name="bBME280_ENBLD" checked>
                 </div>
                 <div class="input-group">
-                    <label for="BME280_I2C_ADDR">I2C Address</label>
-                    <input type="number" id="BME280_I2C_ADDR" name="BME280_I2C_ADDR" value="118">
+                    <label for="iBME280_ADDR">I2C Address</label>
+                    <input type="number" id="iBME280_ADDR" name="iBME280_ADDR" value="118">
                 </div>
                 <div class="input-group">
-                    <label for="BME280_SCAN_MS">Scan Interval (ms)</label>
-                    <input type="number" id="BME280_SCAN_MS" name="BME280_SCAN_MS" value="1000">
+                    <label for="iBME280_SCN_MS">Scan Interval (ms)</label>
+                    <input type="number" id="iBME280_SCN_MS" name="iBME280_SCN_MS" value="1000">
                 </div>
             </fieldset>
 
             <!-- BME680 Settings -->
             <fieldset>
-                <legend>BME680 Settings</legend>
+                <legend>BME680 Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="BME680_ENABLED">BME680 Enabled</label>
-                    <input type="checkbox" id="BME680_ENABLED" name="BME680_ENABLED" checked>
+                    <label for="bBME680_ENBLD">BME680 Enabled</label>
+                    <input type="checkbox" id="bBME680_ENBLD" name="bBME680_ENBLD" checked>
                 </div>
                 <div class="input-group">
-                    <label for="BME680_I2C_ADDR">I2C Address</label>
-                    <input type="number" id="BME680_I2C_ADDR" name="BME680_I2C_ADDR" value="119">
+                    <label for="iBME680_ADDR">I2C Address</label>
+                    <input type="number" id="iBME680_ADDR" name="iBME680_ADDR" value="119">
                 </div>
                 <div class="input-group">
-                    <label for="BME680_SCAN_MS">Scan Interval (ms)</label>
-                    <input type="number" id="BME680_SCAN_MS" name="BME680_SCAN_MS" value="1000">
+                    <label for="iBME680_SCN_MS">Scan Interval (ms)</label>
+                    <input type="number" id="iBME680_SCN_MS" name="iBME680_SCN_MS" value="1000">
                 </div>
             </fieldset>
 
             <!-- ADC Settings -->
             <fieldset>
-                <legend>ADC Settings</legend>
+                <legend>ADC Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="ADC_TYPE">ADC Type</label>
-                    <input type="number" id="ADC_TYPE" name="ADC_TYPE" value="11">
+                    <label for="iADC_TYPE">ADC Type</label>
+                    <input type="number" id="iADC_TYPE" name="iADC_TYPE" value="11">
                 </div>
                 <div class="input-group">
-                    <label for="ADC_I2C_ADDR">I2C Address</label>
-                    <input type="number" id="ADC_I2C_ADDR" name="ADC_I2C_ADDR" value="72">
+                    <label for="iADC_I2C_ADDR">I2C Address</label>
+                    <input type="number" id="iADC_I2C_ADDR" name="iADC_I2C_ADDR" value="72">
                 </div>
                 <div class="input-group">
-                    <label for="ADC_SCAN_DELAY">Scan Delay (ms)</label>
-                    <input type="number" id="ADC_SCAN_DELAY" name="ADC_SCAN_DELAY" value="250">
+                    <label for="iADC_SCAN_DLY">Scan Delay (ms)</label>
+                    <input type="number" id="iADC_SCAN_DLY" name="iADC_SCAN_DLY" value="250">
                 </div>
                 <div class="input-group">
-                    <label for="ADC_MAX_RETRIES">Max Retries</label>
-                    <input type="number" id="ADC_MAX_RETRIES" name="ADC_MAX_RETRIES" value="10">
+                    <label for="iADC_MAX_RETRY">Max Retries</label>
+                    <input type="number" id="iADC_MAX_RETRY" name="iADC_MAX_RETRY" value="10">
                 </div>
                 <div class="input-group">
-                    <label for="ADC_RANGE">ADC Range</label>
-                    <input type="number" id="ADC_RANGE" name="ADC_RANGE" value="32767">
+                    <label for="iADC_RANGE">ADC Range</label>
+                    <input type="number" id="iADC_RANGE" name="iADC_RANGE" value="32767">
                 </div>
                 <div class="input-group">
-                    <label for="ADC_GAIN">ADC Gain</label>
-                    <input type="number" id="ADC_GAIN" name="ADC_GAIN" step="0.001" value="6.144">
+                    <label for="dADC_GAIN">ADC Gain</label>
+                    <input type="number" id="dADC_GAIN" name="dADC_GAIN" step="0.001" value="6.144">
                 </div>
             </fieldset>
 
             <!-- MAF Settings -->
             <fieldset>
-                <legend>MAF Settings</legend>
+                <legend>MAF Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="MAF_SRC_TYPE">Source Type</label>
-                    <input type="number" id="MAF_SRC_TYPE" name="MAF_SRC_TYPE" value="11">
+                    <label for="iMAF_SRC_TYPE">Source Type</label>
+                    <input type="number" id="iMAF_SRC_TYPE" name="iMAF_SRC_TYPE" value="11">
+                </div>
+
+                <label for="iMAF_SRC_TYPE">Source Type</label>
+                <span>
+                    <select name="iMAF_SRC_TYPE" class="config-select">
+                        <option value="1" selected="">MAF Style</option>
+                        <option value="2">Orifice Style</option>
+                        <option value="3">Venturi Style </option>
+                        <option value="4">Pitot Style</option>
+                    </select>
+                </span>
+
+
+                <div class="input-group">
+                    <label for="iMAF_SENS_TYPE">Sensor Type</label>
+                    <input type="number" id="iMAF_SENS_TYPE" name="iMAF_SENS_TYPE" value="Not Set">
+                </div>
+                
+                <div class="input-group">
+                    <label for="dMAF_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dMAF_MV_TRIM" name="dMAF_MV_TRIM" step="0.1" value="0.0">
                 </div>
                 <div class="input-group">
-                    <label for="MAF_SENS_TYPE">Sensor Type</label>
-                    <input type="number" id="MAF_SENS_TYPE" name="MAF_SENS_TYPE" value="Not Set">
-                </div>
-                <div class="input-group">
-                    <label for="MAF_MV_TRIM">mV Trim</label>
-                    <input type="number" id="MAF_MV_TRIM" name="MAF_MV_TRIM" step="0.1" value="0.0">
-                </div>
-                <div class="input-group">
-                    <label for="MAF_ADC_CHAN">ADC Channel</label>
-                    <input type="number" id="MAF_ADC_CHAN" name="MAF_ADC_CHAN" value="0">
+                    <label for="iMAF_ADC_CHAN">ADC Channel</label>
+                    <input type="number" id="iMAF_ADC_CHAN" name="iMAF_ADC_CHAN" value="0">
                 </div>
             </fieldset>
 
             <!-- Reference Pressure Settings -->
             <fieldset>
-                <legend>Reference Pressure Settings</legend>
+                <legend>Reference Pressure Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="PREF_SENS_TYPE">Sensor Type</label>
-                    <input type="number" id="PREF_SENS_TYPE" name="PREF_SENS_TYPE" value="4">
+                    <label for="iPREF_SENS_TYP">Sensor Type</label>
+                    <input type="number" id="iPREF_SENS_TYP" name="iPREF_SENS_TYP" value="4">
                 </div>
                 <div class="input-group">
-                    <label for="PREF_SRC_TYPE">Source Type</label>
-                    <input type="number" id="PREF_SRC_TYPE" name="PREF_SRC_TYPE" value="11">
+                    <label for="iPREF_SRC_TYP">Source Type</label>
+                    <input type="number" id="iPREF_SRC_TYP" name="iPREF_SRC_TYP" value="11">
                 </div>
                 <div class="input-group">
-                    <label for="FIXED_PREF_VAL">Fixed Value</label>
-                    <input type="number" id="FIXED_PREF_VAL" name="FIXED_PREF_VAL" value="1">
+                    <label for="iFIXED_PREF_VAL">Fixed Value</label>
+                    <input type="number" id="iFIXED_PREF_VAL" name="iFIXED_PREF_VAL" value="1">
                 </div>
                 <div class="input-group">
-                    <label for="PREF_MV_TRIM">mV Trim</label>
-                    <input type="number" id="PREF_MV_TRIM" name="PREF_MV_TRIM" step="0.1" value="0.0">
+                    <label for="dPREF_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dPREF_MV_TRIM" name="dPREF_MV_TRIM" step="0.1" value="0.0">
                 </div>
                 <div class="input-group">
-                    <label for="PREF_ALOG_SCALE">Analog Scale</label>
-                    <input type="number" id="PREF_ALOG_SCALE" name="PREF_ALOG_SCALE" step="0.1" value="1.0">
+                    <label for="dPREF_ALG_SCALE">Analog Scale</label>
+                    <input type="number" id="dPREF_ALG_SCALE" name="dPREF_ALG_SCALE" step="0.1" value="1.0">
                 </div>
                 <div class="input-group">
-                    <label for="PREF_ADC_CHAN">ADC Channel</label>
-                    <input type="number" id="PREF_ADC_CHAN" name="PREF_ADC_CHAN" value="1">
+                    <label for="iPREF_ADC_CHAN">ADC Channel</label>
+                    <input type="number" id="iPREF_ADC_CHAN" name="iPREF_ADC_CHAN" value="1">
                 </div>
             </fieldset>
 
             <!-- Differential Pressure Settings -->
             <fieldset>
-                <legend>Differential Pressure Settings</legend>
+                <legend>Differential Pressure Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="PDIFF_SENS_TYPE">Sensor Type</label>
-                    <input type="number" id="PDIFF_SENS_TYPE" name="PDIFF_SENS_TYPE" value="4">
+                    <label for="iPDIFF_SENS_TYP">Sensor Type</label>
+                    <input type="number" id="iPDIFF_SENS_TYP" name="iPDIFF_SENS_TYP" value="4">
                 </div>
                 <div class="input-group">
-                    <label for="PDIFF_SRC_TYPE">Source Type</label>
-                    <input type="number" id="PDIFF_SRC_TYPE" name="PDIFF_SRC_TYPE" value="11">
+                    <label for="iPDIFF_SRC_TYP">Source Type</label>
+                    <input type="number" id="iPDIFF_SRC_TYP" name="iPDIFF_SRC_TYP" value="11">
                 </div>
                 <div class="input-group">
-                    <label for="FIXED_PDIFF_VAL">Fixed Value</label>
-                    <input type="number" id="FIXED_PDIFF_VAL" name="FIXED_PDIFF_VAL" value="1">
+                    <label for="iFIXD_PDIFF_VAL">Fixed Value</label>
+                    <input type="number" id="iFIXD_PDIFF_VAL" name="iFIXD_PDIFF_VAL" value="1">
                 </div>
                 <div class="input-group">
-                    <label for="PDIFF_MV_TRIM">mV Trim</label>
-                    <input type="number" id="PDIFF_MV_TRIM" name="PDIFF_MV_TRIM" step="0.1" value=                                        <input type="number" id="PDIFF_MV_TRIM" name="PDIFF_MV_TRIM" step="0.1" value="0.0">
+                    <label for="dPDIFF_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dPDIFF_MV_TRIM" name="dPDIFF_MV_TRIM" step="0.1" value=                                        <input type="number" id="dPDIFF_MV_TRIM" name="dPDIFF_MV_TRIM" step="0.1" value="0.0">
                 </div>
                 <div class="input-group">
-                    <label for="PDIFF_SCALE">Scale</label>
-                    <input type="number" id="PDIFF_SCALE" name="PDIFF_SCALE" step="0.1" value="1.0">
+                    <label for="dPDIFF_SCALE">Scale</label>
+                    <input type="number" id="dPDIFF_SCALE" name="dPDIFF_SCALE" step="0.1" value="1.0">
                 </div>
                 <div class="input-group">
-                    <label for="PDIFF_ADC_CHAN">ADC Channel</label>
-                    <input type="number" id="PDIFF_ADC_CHAN" name="PDIFF_ADC_CHAN" value="2">
+                    <label for="iPDIFF_ADC_CHAN">ADC Channel</label>
+                    <input type="number" id="iPDIFF_ADC_CHAN" name="iPDIFF_ADC_CHAN" value="2">
                 </div>
             </fieldset>
 
             <!-- Pitot Sensor Settings -->
             <fieldset>
-                <legend>Pitot Sensor Settings</legend>
+                <legend>Pitot Sensor Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="PITOT_SENS_TYPE">Sensor Type</label>
-                    <input type="number" id="PITOT_SENS_TYPE" name="PITOT_SENS_TYPE" value="0">
+                    <label for="iPITOT_SENS_TYP">Sensor Type</label>
+                    <input type="number" id="iPITOT_SENS_TYP" name="iPITOT_SENS_TYP" value="0">
                 </div>
                 <div class="input-group">
-                    <label for="PITOT_SRC_TYPE">Source Type</label>
-                    <input type="number" id="PITOT_SRC_TYPE" name="PITOT_SRC_TYPE" value="11">
+                    <label for="iPITOT_SRC_TYP">Source Type</label>
+                    <input type="number" id="iPITOT_SRC_TYP" name="iPITOT_SRC_TYP" value="11">
                 </div>
                 <div class="input-group">
-                    <label for="PITOT_MV_TRIM">mV Trim</label>
-                    <input type="number" id="PITOT_MV_TRIM" name="PITOT_MV_TRIM" step="0.1" value="0.0">
+                    <label for="dPITOT_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dPITOT_MV_TRIM" name="dPITOT_MV_TRIM" step="0.1" value="0.0">
                 </div>
                 <div class="input-group">
-                    <label for="PITOT_SCALE">Scale</label>
-                    <input type="number" id="PITOT_SCALE" name="PITOT_SCALE" step="0.1" value="1.0">
+                    <label for="dPITOT_SCALE">Scale</label>
+                    <input type="number" id="dPITOT_SCALE" name="dPITOT_SCALE" step="0.1" value="1.0">
                 </div>
                 <div class="input-group">
-                    <label for="PITOT_ADC_CHAN">ADC Channel</label>
-                    <input type="number" id="PITOT_ADC_CHAN" name="PITOT_ADC_CHAN" value="3">
+                    <label for="iPITOT_ADC_CHAN">ADC Channel</label>
+                    <input type="number" id="iPITOT_ADC_CHAN" name="iPITOT_ADC_CHAN" value="3">
                 </div>
             </fieldset>
 
             <!-- Barometric Settings -->
             <fieldset>
-                <legend>Barometric Settings</legend>
+                <legend>Barometric Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="BARO_SENS_TYPE">Sensor Type</label>
-                    <input type="number" id="BARO_SENS_TYPE" name="BARO_SENS_TYPE" value="7">
+                    <label for="iBARO_SENS_TYP">Sensor Type</label>
+                    <input type="number" id="iBARO_SENS_TYP" name="iBARO_SENS_TYP" value="7">
                 </div>
                 <div class="input-group">
-                    <label for="FIXED_BARO_VAL">Fixed Value (kPa)</label>
-                    <input type="number" id="FIXED_BARO_VAL" name="FIXED_BARO_VAL" step="0.0001" value="101.3529">
+                    <label for="dFIXD_BARO_VAL">Fixed Value (kPa)</label>
+                    <input type="number" id="dFIXD_BARO_VAL" name="dFIXD_BARO_VAL" step="0.0001" value="101.3529">
                 </div>
                 <div class="input-group">
-                    <label for="BARO_ALOG_SCALE">Analog Scale</label>
-                    <input type="number" id="BARO_ALOG_SCALE" name="BARO_ALOG_SCALE" step="0.1" value="1.0">
+                    <label for="dBARO_ALG_SCALE">Analog Scale</label>
+                    <input type="number" id="dBARO_ALG_SCALE" name="dBARO_ALG_SCALE" step="0.1" value="1.0">
                 </div>
                 <div class="input-group">
-                    <label for="BARO_SCALE">Scale</label>
-                    <input type="number" id="BARO_SCALE" name="BARO_SCALE" step="0.1" value="1.0">
+                    <label for="dBARO_SCALE">Scale</label>
+                    <input type="number" id="dBARO_SCALE" name="dBARO_SCALE" step="0.1" value="1.0">
                 </div>
                 <div class="input-group">
-                    <label for="BARO_OFFSET">Offset</label>
-                    <input type="number" id="BARO_OFFSET" name="BARO_OFFSET" step="0.1" value="0.0">
+                    <label for="dBARO_OFFSET">Offset</label>
+                    <input type="number" id="dBARO_OFFSET" name="dBARO_OFFSET" step="0.1" value="0.0">
                 </div>
                 <div class="input-group">
-                    <label for="BARO_MV_TRIM">mV Trim</label>
-                    <input type="number" id="BARO_MV_TRIM" name="BARO_MV_TRIM" step="0.1" value="0.0">
+                    <label for="dBARO_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dBARO_MV_TRIM" name="dBARO_MV_TRIM" step="0.1" value="0.0">
                 </div>
                 <div class="input-group">
-                    <label for="BARO_FINE_TUNE">Fine Tune</label>
-                    <input type="number" id="BARO_FINE_TUNE" name="BARO_FINE_TUNE" step="0.1" value="0.0">
+                    <label for="dBARO_FINE_TUNE">Fine Tune</label>
+                    <input type="number" id="dBARO_FINE_TUNE" name="dBARO_FINE_TUNE" step="0.1" value="0.0">
                 </div>
                 <div class="input-group">
-                    <label for="SEALEVEL_PRESS">Sea Level Pressure</label>
-                    <input type="number" id="SEALEVEL_PRESS" name="SEALEVEL_PRESS" step="0.01" value="1016.90">
+                    <label for="dSEALEVEL_PRESS">Sea Level Pressure</label>
+                    <input type="number" id="dSEALEVEL_PRESS" name="dSEALEVEL_PRESS" step="0.01" value="1016.90">
                 </div>
                 <div class="input-group">
-                    <label for="BARO_ADC_CHAN">ADC Channel</label>
-                    <input type="number" id="BARO_ADC_CHAN" name="BARO_ADC_CHAN" value="4">
+                    <label for="iBARO_ADC_CHAN">ADC Channel</label>
+                    <input type="number" id="iBARO_ADC_CHAN" name="iBARO_ADC_CHAN" value="4">
                 </div>
             </fieldset>
 
             <!-- Temperature Settings -->
             <fieldset>
-                <legend>Temperature Settings</legend>
+                <legend>Temperature Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="TEMP_SENS_TYPE">Sensor Type</label>
-                    <input type="number" id="TEMP_SENS_TYPE" name="TEMP_SENS_TYPE" value="7">
+                    <label for="iTEMP_SENS_TYPE">Sensor Type</label>
+                    <input type="number" id="iTEMP_SENS_TYPE" name="iTEMP_SENS_TYPE" value="7">
                 </div>
                 <div class="input-group">
-                    <label for="FIXED_TEMP_VAL">Fixed Value (&deg;C)</label>
-                    <input type="number" id="FIXED_TEMP_VAL" name="FIXED_TEMP_VAL" step="0.1" value="21.0">
+                    <label for="dFIXED_TEMP_VAL">Fixed Value (&deg;C)</label>
+                    <input type="number" id="dFIXED_TEMP_VAL" name="dFIXED_TEMP_VAL" step="0.1" value="21.0">
                 </div>
                 <div class="input-group">
-                    <label for="TEMP_ALOG_SCALE">Analog Scale</label>
-                    <input type="number" id="TEMP_ALOG_SCALE" name="TEMP_ALOG_SCALE" step="0.1" value="1.0">
+                    <label for="dTEMP_ALG_SCALE">Analog Scale</label>
+                    <input type="number" id="dTEMP_ALG_SCALE" name="dTEMP_ALG_SCALE" step="0.1" value="1.0">
                 </div>
                 <div class="input-group">
-                    <label for="TEMP_MV_TRIM">mV Trim</label>
-                    <input type="number" id="TEMP_MV_TRIM" name="TEMP_MV_TRIM" step="0.1" value="0.0">
+                    <label for="dTEMP_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dTEMP_MV_TRIM" name="dTEMP_MV_TRIM" step="0.1" value="0.0">
                 </div>
                 <div class="input-group">
-                    <label for="TEMP_FINE_TUNE">Fine Tune</label>
-                    <input type="number" id="TEMP_FINE_TUNE" name="TEMP_FINE_TUNE" step="0.1" value="0.0">
+                    <label for="dTEMP_FINE_TUNE">Fine Tune</label>
+                    <input type="number" id="dTEMP_FINE_TUNE" name="dTEMP_FINE_TUNE" step="0.1" value="0.0">
                 </div>
             </fieldset>
 
             <!-- Relative Humidity Settings -->
             <fieldset>
-                <legend>Relative Humidity Settings</legend>
+                <legend>Relative Humidity Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="RELH_SENS_TYPE">Sensor Type</label>
-                    <input type="number" id="RELH_SENS_TYPE" name="RELH_SENS_TYPE" value="7">
+                    <label for="iRELH_SENS_TYP">Sensor Type</label>
+                    <input type="number" id="iRELH_SENS_TYP" name="iRELH_SENS_TYP" value="7">
                 </div>
                 <div class="input-group">
-                    <label for="FIXED_RELH_VAL">Fixed Value (%)</label>
-                    <input type="number" id="FIXED_RELH_VAL" name="FIXED_RELH_VAL" step="0.1" value="36.0">
+                    <label for="dFIXED_RELH_VAL">Fixed Value (%)</label>
+                    <input type="number" id="dFIXED_RELH_VAL" name="dFIXED_RELH_VAL" step="0.1" value="36.0">
                 </div>
                 <div class="input-group">
-                    <label for="RELH_ALOG_SCALE">Analog Scale</label>
-                    <input type="number" id="RELH_ALOG_SCALE" name="RELH_ALOG_SCALE" step="0.1" value="1.0">
+                    <label for="dRELH_ALG_SCALE">Analog Scale</label>
+                    <input type="number" id="dRELH_ALG_SCALE" name="dRELH_ALG_SCALE" step="0.1" value="1.0">
                 </div>
                 <div class="input-group">
-                    <label for="RELH_MV_TRIM">mV Trim</label>
-                    <input type="number" id="RELH_MV_TRIM" name="RELH_MV_TRIM" step="0.1" value="0.0">
+                    <label for="dRELH_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dRELH_MV_TRIM" name="dRELH_MV_TRIM" step="0.1" value="0.0">
                 </div>
                 <div class="input-group">
-                    <label for="RELH_FINE_TUNE">Fine Tune</label>
-                    <input type="number" id="RELH_FINE_TUNE" name="RELH_FINE_TUNE" step="0.1" value="0.0">
+                    <label for="dRELH_FINE_TUNE">Fine Tune</label>
+                    <input type="number" id="dRELH_FINE_TUNE" name="dRELH_FINE_TUNE" step="0.1" value="0.0">
                 </div>
             </fieldset>
 
             <!-- Swirl Settings -->
             <fieldset>
-                <legend>Swirl Settings</legend>
+                <legend>Swirl Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="SWIRL_ENABLED">Enable Swirl</label>
-                    <input type="checkbox" id="SWIRL_ENABLED" name="SWIRL_ENABLED">
+                    <label for="bSWIRL_ENBLD">Enable Swirl</label>
+                    <input type="checkbox" id="bSWIRL_ENBLD" name="bSWIRL_ENBLD">
                 </div>
             </fieldset>
             <button type="submit" class="button">Save</button>

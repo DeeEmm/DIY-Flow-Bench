@@ -46,4 +46,6 @@ class Calculations {
         double calculateMafFlow(double mafVolts);
 		double startupBaroPressure;
 
+		String byteDecode(size_t bytes);
+
 };

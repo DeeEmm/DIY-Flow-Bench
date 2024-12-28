@@ -25,7 +25,7 @@
 
 #include "html_data.h"
 
-uint8_t decompBuffer[20000]; 
+uint8_t decompBuffer[21000]; 
 
 // Combine arrays
 uint8_t* combineArrays(const uint8_t* arr1, size_t len1, const uint8_t* arr2, size_t len2) {
@@ -80,14 +80,15 @@ String PublicHTML::decompressMultipleToStream(const uint8_t** arrays, const size
   memset(decompBuffer, 0, sizeof(decompBuffer));
   z_stream stream;
   String result;
-  
+
   for(int i = 0; i < count; i++) {
+
     stream.zalloc = Z_NULL;
     stream.zfree = Z_NULL;
     stream.opaque = Z_NULL;
-    
+
     if (inflateInit(&stream) != Z_OK) {
-      return "Decompression error";
+      return "Decompression error [Init]";
     }
     
     stream.next_in = (uint8_t*)arrays[i];
@@ -101,7 +102,7 @@ String PublicHTML::decompressMultipleToStream(const uint8_t** arrays, const size
       ret = inflate(&stream, Z_NO_FLUSH);
       if (ret != Z_OK && ret != Z_STREAM_END) {
         inflateEnd(&stream);
-        return "Decompression error";
+        return "Decompression error [NOK]";
       }
       
       size_t have = sizeof(decompBuffer) - stream.avail_out;
@@ -123,9 +124,10 @@ String PublicHTML::indexPage() {
 }
 
 String PublicHTML::settingsPage() {
-    const uint8_t* arrays[] = {header_html, settings_html, footer_html};
-    const size_t lengths[] = {header_html_len, settings_html_len, footer_html_len};
-    return decompressMultipleToStream(arrays, lengths, 3);
+    // NOTE settings page split into two parts to address memory issues
+    const uint8_t* arrays[] = {header_html, settings_modals_html, settings_html, footer_html};
+    const size_t lengths[] = {header_html_len, settings_modals_html_len, settings_html_len, footer_html_len};
+    return decompressMultipleToStream(arrays, lengths, 4);
 }
 
 String PublicHTML::dataPage() {
@@ -147,7 +149,6 @@ String PublicHTML::configPage() {
 }
 
 
-// Update methods to use compressed data
 String PublicHTML::header() {
     return decompress(header_html, header_html_len);
 }
