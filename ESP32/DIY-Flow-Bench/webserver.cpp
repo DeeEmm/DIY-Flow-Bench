@@ -1384,14 +1384,14 @@ String Webserver::processTemplate(const String &var) {
   }
 
   // General Decimal type
+  if (var == "iGEN_DECI_ACC_0" && settings.gen_decimal_length == 0) return String("selected");
   if (var == "iGEN_DECI_ACC_1" && settings.gen_decimal_length == 1) return String("selected");
   if (var == "iGEN_DECI_ACC_2" && settings.gen_decimal_length == 2) return String("selected");
-  if (var == "iGEN_DECI_ACC_3" && settings.gen_decimal_length == 3) return String("selected");
 
   // Flow Decimal type
+  if (var == "iFLOW_DECI_ACC_0" && settings.flow_decimal_length == 0) return String("selected");
   if (var == "iFLOW_DECI_ACC_1" && settings.flow_decimal_length == 1) return String("selected");
   if (var == "iFLOW_DECI_ACC_2" && settings.flow_decimal_length == 2) return String("selected");
-  if (var == "iFLOW_DECI_ACC_3" && settings.flow_decimal_length == 3) return String("selected");
 
 
   // Data Filter type

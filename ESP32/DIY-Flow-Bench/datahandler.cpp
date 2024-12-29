@@ -1074,6 +1074,10 @@ String DataHandler::buildIndexSSEJsonData()
   // Orifice Calibration Depression
   dataJson["ORIFICE_CALIBRATED_DEPRESSION"] = status.activeOrificeTestPressure;
 
+  // Decimal accuracy
+  dataJson["FLOW_DECIMAL_ACCURACY"] = settings.flow_decimal_length;
+  dataJson["GEN_DECIMAL_ACCURACY"] = settings.gen_decimal_length;
+
   serializeJson(dataJson, jsonString);
 
   return jsonString;

@@ -118,6 +118,10 @@ hr {
   width: 95%;
 }
 
+.fieldset-divider {
+  border-top: 1px dashed #DDD;
+}
+
 .content {
 	padding: 30px;
 }
@@ -221,12 +225,17 @@ flowTargetValInput {
   float: right;
 }
 
-.config-text-long {
-  width: 130px !important;
+.config-select-long {
+  width: 155px !important;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  float:right;
+  height:27px;
 }
 
 .config-select {
   width: 82px;
+  border: 1px solid #ddd;
   float: right;
   height: 25px;
 }

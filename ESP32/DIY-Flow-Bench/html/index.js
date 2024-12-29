@@ -40,6 +40,9 @@ if (!!window.EventSource) {
   source.addEventListener('JSON_DATA', function(e) {
     var myObj = JSON.parse(e.data);
 
+    var FLOW_DECIMAL_ACCURACY = myObj["FLOW_DECIMAL_ACCURACY"];
+    var GEN_DECIMAL_ACCURACY = myObj["GEN_DECIMAL_ACCURACY"];
+
     if (updateSSE === true){
 
       for (key in myObj) {
@@ -53,12 +56,14 @@ if (!!window.EventSource) {
             }
  
           } else {
-           // we've not got a string... 
+            // we've not got a string... 
+            
+
+
            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'SFLOW' || key === 'FDIFF') {
-              // HACK: template vars - replaced before page load
-              document.getElementById(key).innerHTML = myObj[key].toFixed(2);//~iFLOW_DECI_ACC~);  
+              document.getElementById(key).innerHTML = myObj[key].toFixed(FLOW_DECIMAL_ACCURACY);  
             } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'PITOT_DELTA' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
-              document.getElementById(key).innerHTML = myObj[key].toFixed(2);//~iGEN_DECI_ACC~); 
+              document.getElementById(key).innerHTML = myObj[key].toFixed(GEN_DECIMAL_ACCURACY); 
             //} else if (key === '') {
             } else {
               document.getElementById(key).innerHTML = myObj[key];

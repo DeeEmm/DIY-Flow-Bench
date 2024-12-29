@@ -101,6 +101,7 @@ class Webserver {
 		static void parseLiftDataForm(AsyncWebServerRequest *request);
 		static void parseUserFlowTargetForm(AsyncWebServerRequest *request);
 		static String processLandingPageTemplate(const String& var);
+		static String processindexJavascriptTemplate(const String& var);
 
 		static void toggleFlowDiffTile (); 
 		static void fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
