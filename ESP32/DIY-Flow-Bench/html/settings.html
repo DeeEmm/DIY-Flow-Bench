@@ -1,5 +1,3 @@
-
-  
     <!-- settings tab -->
     <div id="settings">
       <div class="config-panel">
@@ -202,13 +200,11 @@
                   <label class="config-label">~LANG_GUI_SERIAL_BAUD~:</label>
                   <input type="text" id="iSERIAL_BAUD" name="iSERIAL_BAUD" value="~iSERIAL_BAUD~" class="config-text">
             </fieldset>
-            <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
-            <br>
-            <br>
           </div>
-          </form>
-          <br>
-          <br>
+          <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
+        </form>
+        <br>
+        <br>
           <form method="POST" action="/api/savecalibration">
             <fieldset>
               <legend>~LANG_GUI_CALIBRATION_DATA~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
@@ -227,8 +223,8 @@
                 <label class="config-label">~LANG_GUI_LEAK_TEST_OFFSET_REV~:</label>
                 <input type="text" id="LEAK_OFFSET_REV" name="LEAK_OFFSET_REV" value="~LEAK_OFFSET_REV~" class="config-text">
                 <br>
-              <div class="float-right"><input id="save-config-button" type="submit" class="button" value="~LANG_GUI_OVERWRITE~"></div>
               </fieldset>
+              <div class="float-right"><input id="save-config-button" type="submit" class="button" value="~LANG_GUI_OVERWRITE~"></div>
           </form>    
       </div>
     </div>

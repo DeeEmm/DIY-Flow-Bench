@@ -114,7 +114,7 @@ void API::ParseMessage(char apiMessage) {
   Calibration _calibration;
   DataHandler _data;
   Comms _comms;
-  Preferences _settings_pref;
+  Preferences _prefs;
   
   extern TaskHandle_t sensorDataTask;
   extern TaskHandle_t enviroDataTask;
@@ -178,17 +178,27 @@ void API::ParseMessage(char apiMessage) {
   X : xTask memory usage   
   x : Heap memory usage   
   ? : Help
+  < : Last Error
   / : SPIFFS File List
   ~ : Restart ESP
   $ : Reset WiFi
-  % : Reset WiFi AP SSID & Password
   @ : Stream Status
   ! : Debug Mode
   + : Verbose Mode
   = : Status Mode
-  < : Last Error
+  ^ : FUNCTION MODE
   ============================== 
   )";
+
+  //API Response for boot loop
+  char apiFunctionHelpText[] = R"(
+  DIYFB Function Commands
+  ==============================
+  & : Reset Pins
+  % : Reset WiFi AP SSID & Password
+  ============================== 
+  )";
+
 
   //API Response for boot loop
   char bootHelpText[] = R"(
@@ -221,6 +231,9 @@ void API::ParseMessage(char apiMessage) {
   < : Last Error
   ============================== 
   )";
+
+
+
 
 
   switch (apiMessage)   {
@@ -534,7 +547,9 @@ void API::ParseMessage(char apiMessage) {
 
       case '?': // Help      
           if (status.doBootLoop) {
-            // snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s", bootHelpText);            
+            snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s", bootHelpText);            
+          } else if (settings.function_mode == true) {
+            snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s", apiFunctionHelpText);
           } else {
             snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s", apiHelpText);
           }
@@ -611,12 +626,22 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case '#': // Developer Mode (Enable additional developer tools)
-        if (settings.dev_mode == true){
+        if (settings.dev_mode == true) {
           settings.dev_mode = false;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "Developer Mode Off" ); 
         } else {
           settings.dev_mode = true;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "Developer Mode On" ); 
+        }
+      break;
+      
+      case '^': // Function Mode (Enable additional tools)
+        if (settings.function_mode == true) {
+          settings.function_mode = false;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "Function Mode Off" ); 
+        } else {
+          settings.function_mode = true;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "Function Mode On" ); 
         }
       break;
       
@@ -636,13 +661,30 @@ void API::ParseMessage(char apiMessage) {
           // settings.api_enabled = true;
       break;
 
-      case '%': // Reset WiFi passwords
+      case '%':{ // Reset WiFi passwords
+        if (settings.function_mode == true) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", "Attempting to reset WiFi passwords");
-            _settings_pref.begin("settings", false);
-            _settings_pref.putString("sWIFI_AP_SSID", static_cast<String>("DIYFB"));
-            _settings_pref.putString("sWIFI_AP_PSWD", static_cast<String>("123456789"));
-            _settings_pref.end();
-      break;
+          _prefs.begin("settings");
+          _prefs.putString("sWIFI_AP_SSID", static_cast<String>("DIYFB"));
+          _prefs.putString("sWIFI_AP_PSWD", static_cast<String>("123456789"));
+          _prefs.end();
+          settings.function_mode = false;
+        }
+        break;
+      }
+
+      case '&':{ // Reset Pins
+        if (settings.function_mode == true) {
+          _hardware.resetPins();
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "Pins Reset" ); 
+          settings.function_mode = false;
+        }
+        break;
+      }
+
+
+
+
 
       case ' ': // <<<<(TEST [space] exclude from API listing)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 
            
@@ -716,9 +758,11 @@ void API::ParseMessage(char apiMessage) {
       if (*apiResponseBlob != 0) {
         _message.blobPrintf("%s\n", apiResponseBlob);     
         _message.serialPrintf("\n\n", "");    
+     
       } else if (*apiResponse != 0) {
         _message.serialPrintf("%s\n", apiResponse);    
-      }else {
+      
+      } else {
         //invalid response
         _message.serialPrintf("%s\n", "Invalid Response");
       }

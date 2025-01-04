@@ -72,7 +72,7 @@ Configuration config;
 Pins pins;
 
 // Initiate Classes
-// Preferences _config_pref;
+Preferences _prefs;
 DataHandler _data;
 API _api;
 Calculations _calculations;
@@ -122,22 +122,22 @@ void TASKgetSensorData( void * parameter ){
 
         switch (settings.bench_type){
 
-          case MAF:
+          case MAF_BENCH:
             if (config.iMAF_SRC_TYPE != SENSOR_DISABLED) {
               sensorVal.FlowKGH = _sensors.getMafFlow();
               sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
             }
           break;
 
-          case ORIFICE:
+          case ORIFICE_BENCH:
             sensorVal.FlowCFMraw = _sensors.getDifferentialFlow();
           break;
 
-          case VENTURI:
+          case VENTURI_BENCH:
             //TODO
           break;
 
-          case PITOT:
+          case PITOT_BENCH:
             //TODO
           break;
 
@@ -273,7 +273,7 @@ void TASKgetEnviroData( void * parameter ){
     if (millis() > status.bmePollTimer){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
-        status.bmePollTimer = millis() + config.iBME280_SCN_MS; // Only reset timer when task executes
+        status.bmePollTimer = millis() + config.iBME_SCAN_MS; // Only reset timer when task executes
         
         sensorVal.TempDegC = _sensors.getTempValue();
 
@@ -347,7 +347,7 @@ void setup(void) {
 
   if (config.bSWIRL_ENBLD){
     // TODO #227
-    // MD_REncoder Encoder = MD_REncoder(SWIRL_ENCODER_PIN_A, SWIRL_ENCODER_PIN_B);
+    // MD_REncoder Encoder = MD_REncoder(SWIRL_ENCODER_A, SWIRL_ENCODER_B);
   }
 
   // Report free stack and heap to serial monitor

@@ -55,10 +55,12 @@ class Webserver {
 
 		static void saveConfigurationForm(AsyncWebServerRequest *request);
 		static void saveSettingsForm(AsyncWebServerRequest *request);
+		static void savePinsForm(AsyncWebServerRequest *request);
 
 		int decodeMessageHeader (char *data);
-		static String processTemplate(const String& var);
-	
+
+
+
 	private:
 		
 		void sendIndexPage();
@@ -100,13 +102,24 @@ class Webserver {
 
 		static void parseLiftDataForm(AsyncWebServerRequest *request);
 		static void parseUserFlowTargetForm(AsyncWebServerRequest *request);
-		static String processLandingPageTemplate(const String& var);
-		static String processindexJavascriptTemplate(const String& var);
+
+
 
 		static void toggleFlowDiffTile (); 
 		static void fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 
+		static String processIndexPageTemplate(const String& var);
+		static String processLandingPageTemplate(const String& var);
+		static String processindexJavascriptTemplate(const String& var);
+		static String processSettingsPageTemplate(const String& var);
+		static String processDataPageTemplate(const String& var);
+		static String processPinsPageTemplate(const String& var);
+		static String processConfigPageTemplate(const String& var);
+		static String processOrificePageTemplate(const String& var);
+		static String processDatagraphPageTemplate(const String& var);
+		
 
+		static String processLanguageTemplateVars(const String& var);
 
 		
 };

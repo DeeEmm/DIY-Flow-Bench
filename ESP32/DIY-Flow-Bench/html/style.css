@@ -308,6 +308,10 @@ flowTargetValInput {
   cursor: pointer;
 }
 
+#save-config-button {
+  float: right;
+}
+
 #record-button {
   background-color: #fa7b04;
 }
@@ -789,22 +793,19 @@ svg .dataCircle:hover {
 
 
 
-
-
-
-
-
 .config-container {
     max-width: 1200px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
     gap: 20px;
     /* background: white; */
-    background-color: rgba(250, 250, 250, 0.5);
     padding: 20px;
+/*
+    background-color: rgba(250, 250, 250, 0.5);
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    */
 }
 
 fieldset {

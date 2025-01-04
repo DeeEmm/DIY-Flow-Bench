@@ -58,10 +58,9 @@ if (!!window.EventSource) {
           } else {
             // we've not got a string... 
             
-
-
            if (key === 'FLOW' || key === 'AFLOW' || key === 'MFLOW' || key === 'SFLOW' || key === 'FDIFF') {
               document.getElementById(key).innerHTML = myObj[key].toFixed(FLOW_DECIMAL_ACCURACY);  
+              
             } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'PITOT_DELTA' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
               document.getElementById(key).innerHTML = myObj[key].toFixed(GEN_DECIMAL_ACCURACY); 
             //} else if (key === '') {
@@ -88,19 +87,19 @@ if (!!window.EventSource) {
 
       switch (benchType) {
     
-        case "MAF":
+        case "MAF_BENCH":
           document.getElementById('orificeRadio').style.display='none';
         break;
     
-        case "ORIFICE":
+        case "ORIFICE_BENCH":
           document.getElementById('orificeRadio').style.display='block';
         break;
           
-        case "VENTURI":
+        case "VENTURI_BENCH":
           document.getElementById('orificeData').style.display='block';
         break;
           
-        case "PITOT":
+        case "PITOT_BENCH":
           document.getElementById('orificeData').style.display='block';
         break;
           
@@ -113,7 +112,7 @@ if (!!window.EventSource) {
       var pitotTileColour = myObj["PITOT_COLOUR"];
       document.getElementById('PITOT').style.color=pitotTileColour;
 
-      // Get pDiff tile tatus colours
+      // Get pDiff tile status colours
       var pDiffTileColour = myObj["PDIFF_COLOUR"];
       document.getElementById('PDIFF').style.color=pDiffTileColour;
     }

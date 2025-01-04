@@ -29,6 +29,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501050009      - Resolved NVM Save issue
+2412310045      - Update Pins configuration
 2412290045      - Update Hardware configuration layout
 2412290022      - Sensor page validation
 2412280024      - Update settings layout

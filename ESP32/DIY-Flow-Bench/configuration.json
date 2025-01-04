@@ -56,7 +56,7 @@
     "dBARO_SCALE" : 1,
     "dBARO_OFFSET" : 100,
     
-    "iTEMP_SENS_TYPE" : 7,
+    "iTEMP_SENS_TYP" : 7,
     "dFIXED_TEMP_VAL" : 21,
     "dTEMP_ALG_SCALE" : 1.0,
     "dTEMP_MV_TRIM" : 0.0,

@@ -33,6 +33,8 @@ class Hardware {
 		uint8_t		_rate;			  
         uint32_t 	_config;
 
+
+
 	public:
 		Hardware();
 		void begin ();
@@ -40,7 +42,8 @@ class Hardware {
 		void getI2CDeviceList();
 		void loadPinsData ();
 		void initialisePins ();
-		bool setPinMode ();
+		int setPinMode ();
+		void resetPins ();
 		
 		int32_t getADCRawData(int channel);
 		double get3v3SupplyVolts();
@@ -56,10 +59,13 @@ class Hardware {
 		float uptime();
 
 		void stepperTest();
+		long readAnalog(int sensorPin);
+		void save_ADC_Reg(void);
 
 
 	private:
 		// void configurePins ();
+		void restore_ADC_Reg(void);
 
 
 };

@@ -55,10 +55,11 @@ struct BenchSettings {
   bool show_alarms = true;                        // Display Alarms?
   bool debug_mode = false;                        // Global debug print override
   bool dev_mode = false;                          // Developer mode
+  bool function_mode = false;                     // Function mode
   bool status_print_mode = false;                 // Stream status data to serial
   bool verbose_print_mode = false;                // Stream verbose data to serial
   bool api_enabled = true;                        // Can disable serial API if required
-  int bench_type = MAF;                           // Default bench type
+  int bench_type = MAF_BENCH;                           // Default bench type
   int maf_housing_diameter = 0;                   // MAF Housing diameter
   int tatltuae = 42;
   int parsecs = 12;
@@ -107,42 +108,38 @@ struct Configuration {
   bool bFIXED_3_3V = true;
   bool bFIXED_5V = true;
 
-  bool bBME280_ENBLD = true;
-  int iBME280_ADDR = 118;
-  int iBME280_SCN_MS =  1000;
+  int iBME_TYP = BOSCH_BME280;
+  int iBME_ADDR = 118;
+  int iBME_SCAN_MS =  1000;
 
-  bool bBME680_ENBLD = true;
-  int iBME680_ADDR = 119;
-  int iBME680_SCN_MS =  1000;
-
-  int iADC_TYPE = 11;
+  int iADC_TYPE = ADS1115;
   int iADC_I2C_ADDR = 72; 
   int iADC_SCAN_DLY = 250;
   int iADC_MAX_RETRY = 10;
   int iADC_RANGE = 32767;
   double dADC_GAIN = 6.144;
 
-  int iMAF_SRC_TYPE = 11;
+  int iMAF_SRC_TYPE = ADS1115;
   int iMAF_SENS_TYPE = 0;
   double dMAF_MV_TRIM = 0.0;
   int iMAF_ADC_CHAN = 0;
 
-  int iPREF_SENS_TYP = 4;
-  int iPREF_SRC_TYP = 11;
+  int iPREF_SENS_TYP = MPXV7007;
+  int iPREF_SRC_TYP = ADS1115;
   int iFIXED_PREF_VAL = 1;
   double dPREF_MV_TRIM =  0.0;
   double dPREF_ALG_SCALE =  1.0;
   int iPREF_ADC_CHAN = 1;
 
-  int iPDIFF_SENS_TYP = 4; 
-  int iPDIFF_SRC_TYP = 11;
+  int iPDIFF_SENS_TYP = MPXV7007; 
+  int iPDIFF_SRC_TYP = ADS1115;
   int iFIXD_PDIFF_VAL = 1;
   double dPDIFF_MV_TRIM = 0.0;
   double dPDIFF_SCALE = 1.0;
   int iPDIFF_ADC_CHAN = 2;
   
-  int iPITOT_SENS_TYP = SENSOR_DISABLED;
-  int iPITOT_SRC_TYP = 11;
+  int iPITOT_SENS_TYP = MPXV7007;
+  int iPITOT_SRC_TYP = ADS1115;
   double dPITOT_MV_TRIM = 0.0;
   double dPITOT_SCALE = 1.0;
   int iPITOT_ADC_CHAN = 3;
@@ -157,7 +154,7 @@ struct Configuration {
   double dSEALEVEL_PRESS = 1016.90;
   int iBARO_ADC_CHAN = 4;
 
-  int iTEMP_SENS_TYPE = BOSCH_BME280; //7
+  int iTEMP_SENS_TYP = BOSCH_BME280; //7
   double dFIXED_TEMP_VAL = 21.0;
   double dTEMP_ALG_SCALE = 1.0;
   double dTEMP_MV_TRIM = 0.0;
@@ -242,7 +239,7 @@ struct DeviceStatus {
   String mafFilename;
   String indexFilename;
   bool doBootLoop = false;
-  bool ioError = false;
+  int ioError = -1;
   bool webserverIsRunning = false;
   int mafDataTableRows = 0;
   u_int mafDataValMax = 0;
@@ -255,6 +252,9 @@ struct DeviceStatus {
   char mafLink[100];
   std::vector<std::vector<u_int>> mafLookupTable;  
   int GUIpage = 0;
+  size_t nvmPins = 0;
+  size_t nvmConfig = 0;
+  size_t nvmSettings = 0;
 };
 
 
@@ -329,41 +329,44 @@ struct ValveLiftData {
  * Pin Data
  ***/
 struct Pins {
-  int VAC_SPEED_PIN = 99;
-  int VAC_BLEED_VALVE_PIN = 99;
-  int VAC_BANK_1_PIN = 99;
-  int VAC_BANK_2_PIN = 99; 
-  int VAC_BANK_3_PIN = 99;
-  int AVO_STEP_PIN = 99;
-  int AVO_DIR_PIN = 99;
-  int FLOW_VALVE_STEP_PIN = 99;
-  int FLOW_VALVE_DIR_PIN = 99;
-  int VCC_3V3_PIN = 99;
-  int VCC_5V_PIN = 99;
-  int SPEED_SENS_PIN = 99;
-  int SWIRL_ENCODER_PIN_A = 99;
-  int SWIRL_ENCODER_PIN_B = 99;
-  int ORIFICE_BCD_BIT1_PIN = 99;
-  int ORIFICE_BCD_BIT2_PIN = 99;
-  int ORIFICE_BCD_BIT3_PIN = 99;
-  int MAF_PIN = 99;
-  int PREF_PIN = 99;
-  int PDIFF_PIN = 99;
-  int PITOT_PIN = 99;
-  int TEMPERATURE_PIN = 99;
-  int REF_BARO_PIN = 99;
-  int HUMIDITY_PIN = 99;
-  int SERIAL0_TX_PIN = 99;
-  int SERIAL0_RX_PIN = 99;
-  int SERIAL2_TX_PIN = 99;
-  int SERIAL2_RX_PIN = 99;
-  int SDA_PIN = 99;
-  int SCL_PIN = 99;
-  int SD_CS_PIN = 99;
-  int SD_MOSI_PIN = 99;
-  int SD_MISO_PIN = 99;             
-  int SD_SCK_PIN = 99;
-  int WEMOS_SPARE_PIN_1 = 99;
+  // Inputs
+  int VCC_5V = -1;
+  int VCC_3V3 = -1;
+  int SPEED_SENS = 15;
+  int ORIFICE_BCD_1 = 34;
+  int ORIFICE_BCD_2 = 36;
+  int ORIFICE_BCD_3 = 39;
+  int MAF = -1;
+  int PREF = -1;
+  int PDIFF = -1;
+  int PITOT = -1;
+  int TEMPERATURE = -1;
+  int HUMIDITY = -1;
+  int REF_BARO = -1;
+  int SWIRL_ENCODER_A = -1;
+  int SWIRL_ENCODER_B = -1;
+  int SERIAL0_RX = 3;
+  int SERIAL2_RX = 17;
+  int SDA = 21;
+  int SCL = 22;
+  int SD_CS = 5;
+  int SD_MISO = 19;             
+  int SD_SCK = 18;
+  int SPARE_PIN_1 = -1;
+  int SPARE_PIN_2 = -1;
+  // Outputs
+  int VAC_SPEED = 25;
+  int VAC_BANK_1 = 13;
+  int VAC_BANK_2 = 12; 
+  int VAC_BANK_3 = 14;
+  int VAC_BLEED_VALVE = 26;
+  int AVO_STEP = 32;
+  int AVO_DIR = 33;
+  int FLOW_VALVE_STEP = 27;
+  int FLOW_VALVE_DIR = 4;
+  int SD_MOSI = 23;
+  int SERIAL0_TX = 1;
+  int SERIAL2_TX = 16;
 };
 
 

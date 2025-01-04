@@ -185,9 +185,9 @@ String PublicHTML::settingsJs() {
     return decompress(settings_js, settings_js_len);
 }
 
-// String PublicHTML::configJs() {
-//     return decompress(config_js, config_js_len);
-// }
+String PublicHTML::configJs() {
+    return decompress(config_js, config_js_len);
+}
 
 // String PublicHTML::pinsJs() {
 //     return decompress(pins_js, pins_js_len);

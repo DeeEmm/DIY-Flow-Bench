@@ -73,16 +73,16 @@ void Sensors::begin () {
 	MafData _maf(config.iMAF_SRC_TYPE);
 
 	//initialise BME280
-	if (config.bBME280_ENBLD) {
+	if (config.iBME_TYP == BOSCH_BME280) {
 
-		// uint8_t I2CAddress = (unsigned int)config.iBME280_ADDR;
+		// uint8_t I2CAddress = (unsigned int)config_ADDR;
 
-		_message.serialPrintf("Initialising BME280: ( Address: %u )\n", config.iBME280_ADDR);	
+		_message.serialPrintf("Initialising BME280: ( Address: %u )\n", config.iBME_ADDR);	
 		
-		if (_BME280Sensor.beginI2C((int)config.iBME280_ADDR) == false) {
+		if (_BME280Sensor.beginI2C((int)config.iBME_ADDR) == false) {
 			_message.serialPrintf("BME sensor did not respond. \n");
 			_message.serialPrintf("Please check wiring and I2C address\n");
-			_message.serialPrintf("BME I2C address %s set in configuration.h. \n", config.iBME280_ADDR);
+			_message.serialPrintf("BME I2C address %s set in configuration.h. \n", config.iBME_ADDR);
 			while(1); //Freeze
 		} else {
 			_message.serialPrintf("BME280 Initialised\n");
@@ -99,15 +99,15 @@ void Sensors::begin () {
 
 
 	//initialise BME680
-	if (config.bBME680_ENBLD) {
+	if (config.iBME_TYP == BOSCH_BME680) {
 
 		// TODO #233
 		// BME680_Class _BME680Sensor;
 	
-		// _message.serialPrintf("Initialising BME680: ( Address: %u )\n", config.iBME680_ADDR);	
+		// _message.serialPrintf("Initialising BME680: ( Address: %u )\n", config.iBME_ADDR);	
 
-		// // while (!_BME680Sensor.begin(I2C_STANDARD_MODE, (int)config.iBME680_ADDR)) { 
-		// while (!_BME680Sensor.begin(I2C_STANDARD_MODE, (int)config.iBME680_ADDR)) { 
+		// // while (!_BME680Sensor.begin(I2C_STANDARD_MODE, (int)config.iBME_ADDR)) { 
+		// while (!_BME680Sensor.begin(I2C_STANDARD_MODE, (int)config.iBME_ADDR)) { 
 		// 	_message.serialPrintf("-  Unable to find BME680. Trying again in 5 seconds.\n");
 		// 	delay(5000);
 		// }  
@@ -138,7 +138,7 @@ void Sensors::begin () {
 
 /* temp disabled - need to reenable	
 	if (_maf.outputType == FREQUENCY) {	
-		__mafVoodoo.mafSetupISR(MAF_PIN, []{__mafVoodoo.mafFreqCountISR();}, FALLING);
+		__mafVoodoo.mafSetupISR(MAF, []{__mafVoodoo.mafFreqCountISR();}, FALLING);
 		timer = timerBegin(0, 2, true);                                  
 		timerStart(timer);	
 	}
@@ -148,7 +148,7 @@ void Sensors::begin () {
 	// Set status values for GUI
 	status.mafSensor = _maf.getCurrentType();
 	status.baroSensor = getSensorType(config.iBARO_SENS_TYP);
-	status.tempSensor  = getSensorType(config.iTEMP_SENS_TYPE);
+	status.tempSensor  = getSensorType(config.iTEMP_SENS_TYP);
 	status.relhSensor = getSensorType(config.iRELH_SENS_TYP);
 	status.prefSensor = getSensorType(config.iPREF_SENS_TYP);
 	status.pdiffSensor = getSensorType(config.iPDIFF_SENS_TYP);
@@ -292,7 +292,7 @@ long Sensors::getMafRaw() {
 		}
 
 		case LINEAR_ANALOG: {
-			long mafFlowRaw = analogRead(pins.MAF_PIN);
+			long mafFlowRaw = analogRead(pins.MAF);
 			break;
 		}
 
@@ -328,8 +328,13 @@ double Sensors::getMafVolts() {
 			break;
 		}
 
+		case ADS1015:{
+			sensorVolts = _hardware.getADCVolts(config.iMAF_ADC_CHAN);
+			break;
+		}
+
 		case LINEAR_ANALOG: {
-			long mafRaw = analogRead(pins.MAF_PIN);
+			long mafRaw = analogRead(pins.MAF);
 			sensorVolts = static_cast<double>(mafRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}
@@ -571,7 +576,7 @@ double Sensors::getPRefVolts() {
 		}
 
 		case LINEAR_ANALOG : {
-			long refPressRaw = analogRead(pins.PREF_PIN);
+			long refPressRaw = analogRead(pins.PREF);
 			sensorVolts = static_cast<double>(refPressRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}
@@ -692,7 +697,7 @@ double Sensors::getPDiffVolts() {
 		}
 
 		case LINEAR_ANALOG : {
-			long pDiffRaw = analogRead(pins.PDIFF_PIN);
+			long pDiffRaw = analogRead(pins.PDIFF);
 			sensorVolts = static_cast<double>(pDiffRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}
@@ -811,7 +816,7 @@ double Sensors::getPitotVolts() {
 		}
 
 		case LINEAR_ANALOG : {
-			long pDiffRaw = analogRead(pins.PITOT_PIN);
+			long pDiffRaw = analogRead(pins.PITOT);
 			sensorVolts = static_cast<double>(pDiffRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
 			break;
 		}
@@ -985,10 +990,10 @@ double Sensors::getTempValue() {
 	int32_t  unusedRH, unusedBaro, unusedGas;
 	
 
-	switch (config.iTEMP_SENS_TYPE) {
+	switch (config.iTEMP_SENS_TYP) {
 
 		case LINEAR_ANALOG: {
-			long rawTempValue = analogRead(pins.TEMPERATURE_PIN);	
+			long rawTempValue = analogRead(pins.TEMPERATURE);	
 			double tempVolts = rawTempValue * (_hardware.get3v3SupplyVolts() / 4095.0);	
 			tempVolts += config.dTEMP_MV_TRIM;		
 			refTempDegC = tempVolts * config.dTEMP_ALG_SCALE;
@@ -1060,7 +1065,7 @@ double Sensors::getBaroValue() {
 	switch (config.iBARO_SENS_TYP) {
 
 		case LINEAR_ANALOG: {
-			long rawBaroValue = analogRead(pins.REF_BARO_PIN);
+			long rawBaroValue = analogRead(pins.REF_BARO);
 			double baroVolts = rawBaroValue * (_hardware.get3v3SupplyVolts() / 4095.0);
 			baroVolts += config.dBARO_MV_TRIM;		
 			baroPressureHpa = baroVolts * config.dBARO_ALG_SCALE;
@@ -1132,7 +1137,7 @@ double Sensors::getRelHValue() {
 	switch (config.iRELH_SENS_TYP){
 
 		case LINEAR_ANALOG: {
-			long rawRelhValue = analogRead(pins.HUMIDITY_PIN);
+			long rawRelhValue = analogRead(pins.HUMIDITY);
 			double relhVolts = rawRelhValue * (_hardware.get3v3SupplyVolts() / 4095.0);
 			relhVolts += config.dRELH_MV_TRIM;		
 			relativeHumidity = relhVolts * config.dRELH_ALG_SCALE;

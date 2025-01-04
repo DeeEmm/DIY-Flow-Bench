@@ -296,10 +296,13 @@ void Webserver::begin()
   server->on("/api/saveflowtarget", HTTP_POST, parseUserFlowTargetForm);
   
   // Save Settings Form
-  server->on("/api/savesettings", HTTP_POST, saveSettingsForm);
+  server->on("/api/savesettings", HTTP_POST, saveSettingsForm); 
 
   // Save Configuration Form
   server->on("/api/saveconfig", HTTP_POST, saveConfigurationForm);
+
+  // Save Pins Form
+  server->on("/api/savepins", HTTP_POST, savePinsForm);
 
   // Save Calibration Form
   server->on("/api/savecalibration", HTTP_POST, saveCalibrationForm);
@@ -315,8 +318,6 @@ void Webserver::begin()
     DataHandler _data;
     _data.clearLiftDataFile;
   });  
-
-
 
 
   // HTML server responses
@@ -359,7 +360,6 @@ void Webserver::begin()
         request->send(response);
       });
   
-  // Javascript.js request handler
   server->on("/settings.js", HTTP_ANY, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         AsyncResponseStream *response = request->beginResponseStream("text/javascript");
@@ -367,38 +367,45 @@ void Webserver::begin()
         request->send(response);
       });
   
+  server->on("/config.js", HTTP_ANY, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        AsyncResponseStream *response = request->beginResponseStream("text/javascript");
+        response->print(_public_html.configJs().c_str());
+        request->send(response);
+      });
+  
   // Settings page request handler
   server->on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         status.GUIpage = SETTINGS_PAGE;
-        request->send_P(200, "text/html", _public_html.settingsPage().c_str(), processTemplate); 
+        request->send_P(200, "text/html", _public_html.settingsPage().c_str(), processSettingsPageTemplate); 
       });
 
   // Data page request handler
   server->on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         status.GUIpage = DATA_PAGE;
-        request->send_P(200, "text/html", _public_html.dataPage().c_str(), processTemplate); 
+        request->send_P(200, "text/html", _public_html.dataPage().c_str(), processDatagraphPageTemplate); 
       });
 
   // Configuration page request handler
   server->on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         status.GUIpage = CONFIG_PAGE;
-        request->send_P(200, "text/html", _public_html.configPage().c_str(), processTemplate); 
+        request->send_P(200, "text/html", _public_html.configPage().c_str(), processConfigPageTemplate); 
       });
 
   // Pins page request handler
   server->on("/pins", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         status.GUIpage = PINS_PAGE;
-        request->send_P(200, "text/html", _public_html.pinsPage().c_str(), processTemplate); 
+        request->send_P(200, "text/html", _public_html.pinsPage().c_str(), processPinsPageTemplate); 
       });
 
   // // Index page request handler
   // server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
   //       PublicHTML _public_html;
-  //       request->send_P(200, "text/html", _public_html.indexPage().c_str(), processTemplate); 
+  //       request->send_P(200, "text/html", _public_html.indexPage().c_str(), processIndexPageTemplate); 
   //     });
 
 
@@ -406,7 +413,7 @@ void Webserver::begin()
   server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         status.GUIpage = INDEX_PAGE;
-        request->send_P(200, "text/html", _public_html.indexPage().c_str(),  processTemplate);
+        request->send_P(200, "text/html", _public_html.indexPage().c_str(),  processIndexPageTemplate);
       });
 
 
@@ -495,9 +502,11 @@ void Webserver::saveConfigurationForm(AsyncWebServerRequest *request)
 
   Messages _message;
   DataHandler _data;
-  Preferences _config_pref;
+  Preferences _prefs;
 
-  _config_pref.begin("config", false);
+  AsyncWebParameter* p;
+
+  _prefs.begin("config");
 
   int params = request->params();
 
@@ -505,22 +514,22 @@ void Webserver::saveConfigurationForm(AsyncWebServerRequest *request)
 
   // Update Config Vars
   for(int i=0;i<params;i++){
-    AsyncWebParameter* p = request->getParam(i);
+    p = request->getParam(i);
       if (p->name().startsWith("i")) {
-        _config_pref.putInt(p->name().c_str(), p->value().toInt());
+        _prefs.putInt(p->name().c_str(), p->value().toInt());
       } else if (p->name().startsWith("b")) {
-        _config_pref.putBool(p->name().c_str(), p->value().toInt());
+        _prefs.putBool(p->name().c_str(), p->value().toInt());
       } else if (p->name().startsWith("d")) {
-        _config_pref.putDouble(p->name().c_str(), p->value().toDouble());
+        _prefs.putDouble(p->name().c_str(), p->value().toDouble());
       } else if (p->name().startsWith("f")) {
-        _config_pref.putFloat(p->name().c_str(), p->value().toFloat());
+        _prefs.putFloat(p->name().c_str(), p->value().toFloat());
       } else if (p->name().startsWith("s")) {
-        _config_pref.putString(p->name().c_str(), p->value().c_str());
+        _prefs.putString(p->name().c_str(), p->value().c_str());
       }
       _message.verbosePrintf("Writing Configuration: Key: %s  Value: %s \n", p->name().c_str(), p->value().c_str());
   }
 
-  _config_pref.end();
+  _prefs.end();
   _data.loadConfig();
   request->redirect("/");
 }
@@ -538,35 +547,76 @@ void Webserver::saveSettingsForm(AsyncWebServerRequest *request)
 
   Messages _message;
   DataHandler _data;
-  Preferences _settings_pref;
+  Preferences _prefs;
 
-  _settings_pref.begin("settings", false);
+  AsyncWebParameter* p;
+
+  _prefs.begin("settings");
 
   int params = request->params();
 
-  _message.debugPrintf("Saving Settings... \n");
+  _message.debugPrintf("Saving Settings to NVM... \n");
 
   // Update Settings Vars
   for(int i=0;i<params;i++){
-    AsyncWebParameter* p = request->getParam(i);
+    p = request->getParam(i);
       if (p->name().startsWith("i")) {
-        _settings_pref.putInt(p->name().c_str(), p->value().toInt());
+        _prefs.putInt(p->name().c_str(), p->value().toInt());
       } else if (p->name().startsWith("b")) {
-        _settings_pref.putBool(p->name().c_str(), p->value().toInt());
+        _prefs.putBool(p->name().c_str(), p->value().toInt());
       } else if (p->name().startsWith("d")) {
-        _settings_pref.putDouble(p->name().c_str(), p->value().toDouble());
+        _prefs.putDouble(p->name().c_str(), p->value().toDouble());
       } else if (p->name().startsWith("f")) {
-        _settings_pref.putFloat(p->name().c_str(), p->value().toFloat());
+        _prefs.putFloat(p->name().c_str(), p->value().toFloat());
       } else if (p->name().startsWith("s")) {
-        _settings_pref.putString(p->name().c_str(), p->value().c_str());
+        _prefs.putString(p->name().c_str(), p->value().c_str());
       }
 
       _message.verbosePrintf("Writing Setting: Key: %s  Value: %s \n", p->name().c_str(), p->value().c_str());
   }
 
-  _settings_pref.end();
-  delay(100); //TEST lets wait to allow things to happen
+  _prefs.end();
   _data.loadSettings();
+  request->redirect("/");
+}
+
+
+
+
+
+
+
+
+/***********************************************************
+ * @brief savePinsForm
+ * @details Parses pins form post vars and stores into NVM memory
+ * @note Loads data into structs
+ ***/
+void Webserver::savePinsForm(AsyncWebServerRequest *request)
+{
+
+  Messages _message;
+  DataHandler _data;
+  Hardware _hardware;
+  Preferences _prefs;
+
+  AsyncWebParameter* p;
+
+  _prefs.begin("pins");
+
+  int params = request->params();
+
+  _message.debugPrintf("Saving Pins data to NVM... \n");
+
+  // Update pins
+  for(int i=0;i<params;i++){
+    p = request->getParam(i);
+    _prefs.putInt(p->name().c_str(), p->value().toInt());
+    _message.verbosePrintf("Writing Pins data: Pin: %s  Value: %u \n", p->name().c_str(), p->value().toInt());
+  }
+
+  _prefs.end();
+  _hardware.loadPinsData();
   request->redirect("/");
 }
 
@@ -589,22 +639,24 @@ void Webserver::saveCalibrationForm(AsyncWebServerRequest *request)
 
   Calibration _calibrate;
   Messages _message;
-  Preferences _cal_pref;
+  Preferences _prefs;
+
+  AsyncWebParameter* p;
 
   extern struct CalibrationData calVal;
 
-  _cal_pref.begin("calibration", false);
+  _prefs.begin("calibration");
 
   int params = request->params();
 
   _message.debugPrintf("Parsing Calibration Form Data... \n");
 
   for(int i=0;i<params;i++){
-    AsyncWebParameter* p = request->getParam(i);
-    _cal_pref.putDouble(p->name().c_str(), p->value().toDouble());
+    p = request->getParam(i);
+    _prefs.putDouble(p->name().c_str(), p->value().toDouble());
   }
 
-  _cal_pref.end();
+  _prefs.end();
   _calibrate.loadCalibrationData();
   request->redirect("/");
 
@@ -832,23 +884,23 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request){
       break;
   }
 
-  Preferences _lift_data_pref;
-  _lift_data_pref.begin("liftData", false);
+  Preferences _prefs;
+  _prefs.begin("liftData");
 
-  _lift_data_pref.putDouble("LIFTDATA1", valveData.LiftData1);
-  _lift_data_pref.putDouble("LIFTDATA2", valveData.LiftData2);
-  _lift_data_pref.putDouble("LIFTDATA3", valveData.LiftData3);
-  _lift_data_pref.putDouble("LIFTDATA4", valveData.LiftData4);
-  _lift_data_pref.putDouble("LIFTDATA5", valveData.LiftData5);
-  _lift_data_pref.putDouble("LIFTDATA6", valveData.LiftData6);
-  _lift_data_pref.putDouble("LIFTDATA7", valveData.LiftData7);
-  _lift_data_pref.putDouble("LIFTDATA8", valveData.LiftData8);
-  _lift_data_pref.putDouble("LIFTDATA9", valveData.LiftData9);
-  _lift_data_pref.putDouble("LIFTDATA10", valveData.LiftData10);
-  _lift_data_pref.putDouble("LIFTDATA11", valveData.LiftData11);
-  _lift_data_pref.putDouble("LIFTDATA12", valveData.LiftData12);
+  _prefs.putDouble("LIFTDATA1", valveData.LiftData1);
+  _prefs.putDouble("LIFTDATA2", valveData.LiftData2);
+  _prefs.putDouble("LIFTDATA3", valveData.LiftData3);
+  _prefs.putDouble("LIFTDATA4", valveData.LiftData4);
+  _prefs.putDouble("LIFTDATA5", valveData.LiftData5);
+  _prefs.putDouble("LIFTDATA6", valveData.LiftData6);
+  _prefs.putDouble("LIFTDATA7", valveData.LiftData7);
+  _prefs.putDouble("LIFTDATA8", valveData.LiftData8);
+  _prefs.putDouble("LIFTDATA9", valveData.LiftData9);
+  _prefs.putDouble("LIFTDATA10", valveData.LiftData10);
+  _prefs.putDouble("LIFTDATA11", valveData.LiftData11);
+  _prefs.putDouble("LIFTDATA12", valveData.LiftData12);
 
-  _lift_data_pref.end();
+  _prefs.end();
     
   request->send(200);
 
@@ -920,29 +972,16 @@ void Webserver::parseOrificeForm(AsyncWebServerRequest *request)
 
 
 
-
-
 /***********************************************************
- * @brief processTemplate
+ * @brief parseLanguage Template Vars
  * @details Replaces template placeholders with variable values
  * @param &var HTML payload 
  * @note %PLACEHOLDER_FORMAT%
  * @note using IF statements for this sucks but C++ switch statement cannot handle text operators
  ***/
-String Webserver::processTemplate(const String &var) {
+String Webserver::processLanguageTemplateVars(const String &var) {
 
-  extern struct DeviceStatus status;
-  extern struct BenchSettings settings;
-  extern struct CalibrationData calVal;
   extern struct Language language;
-  extern struct Configuration config;
-  extern struct ValveLiftData valveData;
-
-  Calculations _calculations;
-  Messages _message;
-
-  MafData _maf(config.iMAF_SRC_TYPE);
-
 
   // Translate GUI
   // Note language struct is overwritten when language.json file is present
@@ -1069,11 +1108,44 @@ String Webserver::processTemplate(const String &var) {
   if (var == "LANG_GUI_PDIFF_VOLTS") return language.LANG_GUI_PDIFF_VOLTS;
   if (var == "LANG_GUI_PITOT_VOLTS") return language.LANG_GUI_PITOT_VOLTS;
   if (var == "LANG_GUI_MAF_TYPE") return language.LANG_GUI_MAF_TYPE;
+
+  return var;
   
+}
+
+
+
+
+
+
+/***********************************************************
+ * @brief processindexTemplate
+ * @details Replaces template placeholders with variable values
+ * @param &var HTML payload 
+ * @note %PLACEHOLDER_FORMAT%
+ * @note using IF statements for this sucks but C++ switch statement cannot handle text operators
+ ***/
+String Webserver::processIndexPageTemplate(const String &var) {
+
+  extern struct DeviceStatus status;
+  extern struct BenchSettings settings;
+  extern struct CalibrationData calVal;
+  extern struct Language language;
+  extern struct Configuration config;
+  extern struct ValveLiftData valveData;
+
+  Calculations _calculations;
+  Messages _message;
+
+  MafData _maf(config.iMAF_SRC_TYPE);
+
+  // Process language vars
+  String langVar = processLanguageTemplateVars(var);
+  if ( langVar != var) return langVar;
+
 
   
   if (var == "MAF_FLOW_UNIT") {
-
   	const auto unitKG_H = std::string("KG_H");
 	  const auto mafUnit = std::string(status.mafUnits);
 	  bool mafUnitIsKG_H = mafUnit.find(unitKG_H) != string::npos;
@@ -1084,55 +1156,6 @@ String Webserver::processTemplate(const String &var) {
       return "mg/s";
     }
   }
-
-  // Bench definitions for system status pane 
-  switch (settings.bench_type){
-
-    case MAF:
-      status.benchType = "MAF Style";
-    break;
-
-    case ORIFICE:
-      status.benchType = "Orifice Style";
-    break;
-
-    case VENTURI:
-      status.benchType = "Venturi Style";
-    break;
-
-    case PITOT:
-      status.benchType = "Pitot Style";
-    break;
-
-  }
-
-
-  // NOTE Build Vars are added to environment by user_actions.py at compile time
-  if (var == "RELEASE") return RELEASE;
-  if (var == "BUILD_NUMBER") return BUILD_NUMBER;
-  if (var == "GUI_BUILD_NUMBER") return GUI_BUILD_NUMBER; 
-
-  // Config Info
-  if (var == "SPIFFS_MEM_SIZE") return String(_calculations.byteDecode(status.spiffs_mem_size));
-  if (var == "SPIFFS_MEM_USED") return String(_calculations.byteDecode(status.spiffs_mem_used));
-  if (var == "LOCAL_IP_ADDRESS") return String(status.local_ip_address);
-  if (var == "sHOSTNAME") return String(status.hostname);
-  if (var == "UPTIME") return String(esp_timer_get_time()/1000);
-  if (var == "iBENCH_TYPE") return String(status.benchType);
-  if (var == "BOARD_TYPE") return String(status.boardType);
-  if (var == "BOOT_TIME") return String(status.boot_time);
-
-  // Sensor Values
-  if (var == "MAF_SENSOR") return String(status.mafSensor);
-  if (var == "MAF_LINK") return _maf.getMafLink();
-  if (var == "MAF_TYPE") return _maf.getType();
-  if (var == "PREF_SENSOR") return String(status.prefSensor);
-  if (var == "TEMP_SENSOR") return String(status.tempSensor);
-  if (var == "RELH_SENSOR") return String(status.relhSensor);
-  if (var == "BARO_SENSOR") return String(status.baroSensor);
-  if (var == "PITOT_SENSOR") return String(status.pitotSensor);
-  if (var == "PDIFF_SENSOR") return String(status.pdiffSensor);
-  if (var == "STATUS_MESSAGE") return String(status.statusMessage);
 
   if (var == "PITOT_COLOUR"){
     if (calVal.pitot_cal_offset == 0) {
@@ -1154,116 +1177,25 @@ String Webserver::processTemplate(const String &var) {
     }
   }
 
-  //Datagraph Max Val selected item
-  if (var == "iDATAGRAPH_MAX_0" && settings.dataGraphMax == 0) return String("selected");
-  if (var == "iDATAGRAPH_MAX_1" && settings.dataGraphMax == 1) return String("selected");
-  if (var == "iDATAGRAPH_MAX_2" && settings.dataGraphMax == 2) return String("selected");
-  if (var == "iDATAGRAPH_MAX_3" && settings.dataGraphMax == 3) return String("selected");
+
+  // Current orifice data
+  if (var == "ACTIVE_ORIFICE") return String(status.activeOrifice);
+  if (var == "ORIFICE_MAX_FLOW") return String(status.activeOrificeFlowRate);
+  if (var == "ORIFICE_CALIBRATED_DEPRESSION") return String(status.activeOrificeTestPressure);
 
 
-  // Datagraph Stuff
+  // Temp Unit
+  if (var == "iTEMP_UNIT") {
+    if (settings.temp_unit == CELCIUS) {
+      return String("Celcius");
+    } else {
+      return String("Farenheit");
+    }
+  } 
 
-
-  int maxval = 0;
-  int maxcfm = 0;
-  double scaleFactor = 0.0;
-
-  
-
-  
-  //DEPRECATED - All maf data now in Kg/H
-	// const auto unitMG_S = std::string("MG_S");
-	// const auto mafUnit = std::string(status.mafUnits);
-	// bool mafUnitIsMG_S = mafUnit.find(unitMG_S) != string::npos;
-
-	// if (mafUnitIsMG_S) {
-  //   maxcfm = (0.0036 * status.mafDataValMax) / 2; 
-  // } else {
-  //   maxcfm = status.mafDataValMax / 2;
-  // }
-
-  // very rough cfm calculation from max mafdata (approx half of KG/h rate)
-  maxcfm = _maf.getMaxKGH() / 2;
-
-  // Determine data graph flow axis scale
-  // NOTE: currently 1000cfm is the largest flow that the graph will display. 
-  // We could change scaling to be relative to SVG height (surface currently fixed at 500)
-  if ((maxcfm < 500) || (settings.dataGraphMax == 1)) {
-    maxval = 250;
-    scaleFactor = 2;
-  } else if ((maxcfm > 250 && maxcfm < 500) || (settings.dataGraphMax == 2)) {
-    maxval = 500;
-    scaleFactor = 1;
-  } else if ((maxcfm > 500)  || (settings.dataGraphMax == 3)  || (settings.dataGraphMax == 0)){
-    maxval = 1000; 
-    scaleFactor = 0.5;
-  }
-
-
-
-  // scale the data graph flow axis
-  if (var == "flow1") return String(maxval / 10);
-  if (var == "flow2") return String(maxval / 10 * 2);
-  if (var == "flow3") return String(maxval / 10 * 3);
-  if (var == "flow4") return String(maxval / 10 * 4);
-  if (var == "flow5") return String(maxval / 10 * 5);
-  if (var == "flow6") return String(maxval / 10 * 6);
-  if (var == "flow7") return String(maxval / 10 * 7);
-  if (var == "flow8") return String(maxval / 10 * 8);
-  if (var == "flow9") return String(maxval / 10 * 9);
-  if (var == "flow10") return String(maxval );
-
-  // scale the datapoint values to fit the flow axis scale
-  // NOTE: surface is 500 units high with zero at the bottom
-  if (var == "LINE_DATA1") return String(500 - (valveData.LiftData1 * scaleFactor));
-  if (var == "LINE_DATA2") return String(500 - (valveData.LiftData2 * scaleFactor));
-  if (var == "LINE_DATA3") return String(500 - (valveData.LiftData3 * scaleFactor));
-  if (var == "LINE_DATA4") return String(500 - (valveData.LiftData4 * scaleFactor));
-  if (var == "LINE_DATA5") return String(500 - (valveData.LiftData5 * scaleFactor));
-  if (var == "LINE_DATA6") return String(500 - (valveData.LiftData6 * scaleFactor));
-  if (var == "LINE_DATA7") return String(500 - (valveData.LiftData7 * scaleFactor));
-  if (var == "LINE_DATA8") return String(500 - (valveData.LiftData8 * scaleFactor));
-  if (var == "LINE_DATA9") return String(500 - (valveData.LiftData9 * scaleFactor));
-  if (var == "LINE_DATA10") return String(500 - (valveData.LiftData10 * scaleFactor));
-  if (var == "LINE_DATA11") return String(500 - (valveData.LiftData11 * scaleFactor));
-  if (var == "LINE_DATA12") return String(500 - (valveData.LiftData12 * scaleFactor));
-
-
-  // Lift Profile
-  if (floor(settings.valveLiftInterval) == settings.valveLiftInterval) {
-
-    // it's an integer so lets truncate fractional part
-    int liftInterval = settings.valveLiftInterval;
-    if (var == "lift1") return String(1 * liftInterval);
-    if (var == "lift2") return String(2 * liftInterval);
-    if (var == "lift3") return String(3 * liftInterval);
-    if (var == "lift4") return String(4 * liftInterval);
-    if (var == "lift5") return String(5 * liftInterval);
-    if (var == "lift6") return String(6 * liftInterval);
-    if (var == "lift7") return String(7 * liftInterval);
-    if (var == "lift8") return String(8 * liftInterval);
-    if (var == "lift9") return String(9 * liftInterval);
-    if (var == "lift10") return String(10 * liftInterval);
-    if (var == "lift11") return String(11 * liftInterval);
-    if (var == "lift12") return String(12 * liftInterval);
-
-  } else {
-    // Display the double
-    if (var == "lift1") return String(1 * settings.valveLiftInterval);
-    if (var == "lift2") return String(2 * settings.valveLiftInterval);
-    if (var == "lift3") return String(3 * settings.valveLiftInterval);
-    if (var == "lift4") return String(4 * settings.valveLiftInterval);
-    if (var == "lift5") return String(5 * settings.valveLiftInterval);
-    if (var == "lift6") return String(6 * settings.valveLiftInterval);
-    if (var == "lift7") return String(7 * settings.valveLiftInterval);
-    if (var == "lift8") return String(8 * settings.valveLiftInterval);
-    if (var == "lift9") return String(9 * settings.valveLiftInterval);
-    if (var == "lift10") return String(10 * settings.valveLiftInterval);
-    if (var == "lift11") return String(11 * settings.valveLiftInterval);
-    if (var == "lift12") return String(12 * settings.valveLiftInterval);
-  }
-
-
+  // Adj Flow Unit
+  if (var == "AFLOW_UNITS" && settings.std_adj_flow == 1) return String("ACFM");
+  if (var == "AFLOW_UNITS" && settings.std_adj_flow == 2) return String("SCFM");
 
 
 
@@ -1304,6 +1236,132 @@ String Webserver::processTemplate(const String &var) {
 
 
 
+  return "";
+}
+
+
+
+
+
+/***********************************************************
+ * @brief processLandingPage
+ * @details Replaces template placeholders with variable values
+ * @param &var HTML payload 
+ * @note ~PLACEHOLDER_FORMAT~
+ ***/
+String Webserver::processLandingPageTemplate(const String &var) {
+
+  extern struct DeviceStatus status;
+
+  // if (var == "INDEX_STATUS") {
+  //   if (status.GUIexists == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/release/' target='_BLANK'>index.html</a>");    
+  //   // if (!SPIFFS.exists(status.indexFilename)) return String("index.html");
+  // }  
+  
+  // if (var == "SETTINGS_STATUS") {
+  //   if (!SPIFFS.exists("/settings.json")) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/release/' target='_BLANK'>settings.json</a>");
+  // }
+
+  if (var == "PINS_STATUS" ) {
+    if (status.pinsLoaded == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/pins/' target='_BLANK'>pins.json</a>");    
+    // if (!SPIFFS.exists(status.pinsFilename)) return String("PINS_***.json");    
+  }
+
+  if (var == "MAF_STATUS" ) {
+    if (status.mafLoaded == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/mafData/' target='_BLANK'>maf.json</a>");    
+  }
+
+  if (var == "CONFIGURATION_STATUS") {
+    if (!SPIFFS.exists("/configuration.json")) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/' target='_BLANK'>configuration.json</a>");
+  }
+
+  return "";
+
+}
+
+
+
+
+/***********************************************************
+ * @brief processSettingsPageTemplate
+ * @details Replaces template placeholders with variable values
+ * @param &var HTML payload 
+ * @note ~PLACEHOLDER_FORMAT~
+ ***/
+String Webserver::processSettingsPageTemplate(const String &var) {
+
+  extern struct DeviceStatus status;
+  extern struct BenchSettings settings;
+  extern struct Configuration config;
+  extern struct CalibrationData calVal;
+  
+  Calculations _calculations;
+
+  MafData _maf(config.iMAF_SRC_TYPE);
+
+  // Process language vars
+  String langVar = processLanguageTemplateVars(var);
+  if ( langVar != var) return langVar;
+
+
+
+  // Bench definitions for system status pane 
+  switch (settings.bench_type){
+
+    case MAF_BENCH:
+      status.benchType = "MAF Style";
+    break;
+
+    case ORIFICE_BENCH:
+      status.benchType = "Orifice Style";
+    break;
+
+    case VENTURI_BENCH:
+      status.benchType = "Venturi Style";
+    break;
+
+    case PITOT_BENCH:
+      status.benchType = "Pitot Style";
+    break;
+
+  }
+
+
+  // NOTE Build Vars are added to environment by user_actions.py at compile time
+  if (var == "RELEASE") return RELEASE;
+  if (var == "BUILD_NUMBER") return BUILD_NUMBER;
+  if (var == "GUI_BUILD_NUMBER") return GUI_BUILD_NUMBER; 
+
+  // Config Info
+  if (var == "SPIFFS_MEM_SIZE") return String(_calculations.byteDecode(status.spiffs_mem_size));
+  if (var == "SPIFFS_MEM_USED") return String(_calculations.byteDecode(status.spiffs_mem_used));
+  if (var == "LOCAL_IP_ADDRESS") return String(status.local_ip_address);
+  if (var == "sHOSTNAME") return String(status.hostname);
+  if (var == "UPTIME") return String(esp_timer_get_time()/1000);
+  if (var == "iBENCH_TYPE") return String(status.benchType);
+  if (var == "BOARD_TYPE") return String(status.boardType);
+  if (var == "BOOT_TIME") return String(status.boot_time);
+
+  // Sensor Values
+  if (var == "MAF_SENSOR") return String(status.mafSensor);
+  if (var == "MAF_LINK") return _maf.getMafLink();
+  if (var == "MAF_TYPE") return _maf.getType();
+  if (var == "PREF_SENSOR") return String(status.prefSensor);
+  if (var == "TEMP_SENSOR") return String(status.tempSensor);
+  if (var == "RELH_SENSOR") return String(status.relhSensor);
+  if (var == "BARO_SENSOR") return String(status.baroSensor);
+  if (var == "PITOT_SENSOR") return String(status.pitotSensor);
+  if (var == "PDIFF_SENSOR") return String(status.pdiffSensor);
+  if (var == "STATUS_MESSAGE") return String(status.statusMessage);
+
+
+  //Datagraph Max Val selected item
+  if (var == "iDATAGRAPH_MAX_0" && settings.dataGraphMax == 0) return String("selected");
+  if (var == "iDATAGRAPH_MAX_1" && settings.dataGraphMax == 1) return String("selected");
+  if (var == "iDATAGRAPH_MAX_2" && settings.dataGraphMax == 2) return String("selected");
+  if (var == "iDATAGRAPH_MAX_3" && settings.dataGraphMax == 3) return String("selected");
+
+
   // Orifice plates
   if (var == "dORIFICE1_FLOW") return String(settings.orificeOneFlow);
   if (var == "dORIFICE1_PRESS") return String(settings.orificeOneDepression);
@@ -1317,11 +1375,6 @@ String Webserver::processTemplate(const String &var) {
   if (var == "dORIFICE5_PRESS") return String(settings.orificeFiveDepression);
   if (var == "dORIFICE6_FLOW") return String(settings.orificeSixFlow);
   if (var == "dORIFICE6_PRESS") return String(settings.orificeSixDepression);
-
-  // Current orifice data
-  if (var == "ACTIVE_ORIFICE") return String(status.activeOrifice);
-  if (var == "ORIFICE_MAX_FLOW") return String(status.activeOrificeFlowRate);
-  if (var == "ORIFICE_CALIBRATED_DEPRESSION") return String(status.activeOrificeTestPressure);
 
 
    // Wifi Settings
@@ -1339,11 +1392,6 @@ String Webserver::processTemplate(const String &var) {
   // Decinal accuracy
   if (var == "iFLOW_DECI_ACC") return String(settings.flow_decimal_length);
   if (var == "iGEN_DECI_ACC") return String(settings.gen_decimal_length);
-
-  
-  if (var == "AFLOW_UNITS" && settings.std_adj_flow == 1) return String("ACFM");
-  if (var == "AFLOW_UNITS" && settings.std_adj_flow == 2) return String("SCFM");
-  
 
   // Reference standard type dropdown selected item
   if (var == "iSTD_REF_1" && settings.standardReference == 1) return String("selected");
@@ -1458,13 +1506,6 @@ String Webserver::processTemplate(const String &var) {
   if (var == "iMAF_DIAMETER") return String(settings.maf_housing_diameter);
   if (var == "iREFRESH_RATE") return String(settings.refresh_rate);
   if (var == "iADJ_FLOW_DEP") return String(settings.adj_flow_depression);
-  if (var == "iTEMP_UNIT") {
-    if (settings.temp_unit == CELCIUS) {
-      return String("Celcius");
-    } else {
-      return String("Farenheit");
-    }
-  } 
 
   // Temperature
   if (var == "TEMPERATURE_DROPDOWN"){
@@ -1481,19 +1522,19 @@ String Webserver::processTemplate(const String &var) {
   // Bench type
   if (var == "iBENCH_TYPE_DROPDOWN") {
     switch (settings.bench_type) {
-      case MAF:
+      case MAF_BENCH:
         return String( "<select name='iBENCH_TYPE' class='config-select'><option value='1' selected>MAF Style</option><option value='2'>Orifice Style</option><option value='3'>Venturi Style </option><option value='4'>Pitot Style</option></select>");
       break;
 
-      case ORIFICE:
+      case ORIFICE_BENCH:
         return String( "<select name='iBENCH_TYPE' class='config-select'><option value='1'>MAF Style</option><option value='2' selected>Orifice Style</option><option value='3'>Venturi Style </option><option value='4'>Pitot Style</option></select>");
       break;
 
-      case VENTURI:
+      case VENTURI_BENCH:
         return String( "<select name='iBENCH_TYPE' class='config-select'><option value='1'>MAF Style</option><option value='2'>Orifice Style</option><option value='3' selected>Venturi Style </option><option value='4'>Pitot Style</option></select>");
       break;
       
-      case PITOT:
+      case PITOT_BENCH:
         return String( "<select name='iBENCH_TYPE' class='config-select'><option value='1'>MAF Style</option><option value='2'>Orifice Style</option><option value='3'>Venturi Style </option><option value='4' selected>Pitot Style</option></select>");
       break;
     }
@@ -1503,36 +1544,28 @@ String Webserver::processTemplate(const String &var) {
   // Bench definitions for system status pane 
   switch (settings.bench_type){
 
-    case MAF:
+    case MAF_BENCH:
       status.benchType = "MAF Style";
     break;
 
-    case ORIFICE:
+    case ORIFICE_BENCH:
       status.benchType = "Orifice Style";
     break;
 
-    case VENTURI:
+    case VENTURI_BENCH:
       status.benchType = "Venturi Style";
     break;
 
-    case PITOT:
+    case PITOT_BENCH:
       status.benchType = "Pitot Style";
     break;
 
   }
 
 
-  // Calibration Settings
-  if (var == "dCAL_FLW_RATE") return String(settings.cal_flow_rate);
-  if (var == "dCAL_REF_PRESS") return String(settings.cal_ref_press);
 
-  // Calibration Data
-  if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
-  if (var == "USER_OFFSET") return String(calVal.user_offset);
-  if (var == "LEAK_BASE") return String(calVal.leak_cal_baseline);
-  if (var == "LEAK_OFFSET") return String(calVal.leak_cal_offset);
-  if (var == "LEAK_BASE_REV") return String(calVal.leak_cal_baseline_rev);
-  if (var == "LEAK_OFFSET_REV") return String(calVal.leak_cal_offset_rev);
+
+
 
   // Generate file list HTML code
   if (var == "FILE_LIST"){
@@ -1559,43 +1592,328 @@ String Webserver::processTemplate(const String &var) {
     } 
   }
 
+
+
+  // Calibration Settings
+  if (var == "dCAL_FLW_RATE") return String(settings.cal_flow_rate);
+  if (var == "dCAL_REF_PRESS") return String(settings.cal_ref_press);
+
+  // Calibration Data
+  if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
+  if (var == "USER_OFFSET") return String(calVal.user_offset);
+  if (var == "LEAK_BASE") return String(calVal.leak_cal_baseline);
+  if (var == "LEAK_OFFSET") return String(calVal.leak_cal_offset);
+  if (var == "LEAK_BASE_REV") return String(calVal.leak_cal_baseline_rev);
+  if (var == "LEAK_OFFSET_REV") return String(calVal.leak_cal_offset_rev);
+
   return "";
 }
+
+
+
 
 
 
 
 
 /***********************************************************
- * @brief processLandingPage
+ * @brief processConfigPageTemplate
  * @details Replaces template placeholders with variable values
  * @param &var HTML payload 
  * @note ~PLACEHOLDER_FORMAT~
  ***/
-String Webserver::processLandingPageTemplate(const String &var) {
+String Webserver::processConfigPageTemplate(const String &var) {
 
-  extern struct DeviceStatus status;
+  extern struct Configuration config;
 
-  // if (var == "INDEX_STATUS") {
-  //   if (status.GUIexists == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/release/' target='_BLANK'>index.html</a>");    
-  //   // if (!SPIFFS.exists(status.indexFilename)) return String("index.html");
-  // }  
+
+  // Process language vars
+  String langVar = processLanguageTemplateVars(var);
+  if ( langVar != var) return langVar;
+
+
+  //SD Dropdown
+  if (var == "bSD_ENABLED_0" && config.bSD_ENABLED == 0) return String("selected");
+  if (var == "bSD_ENABLED_1" && config.bSD_ENABLED == 1) return String("selected");
+
+  if (var == "iMIN_PRESS_PCT" ) return String(config.iMIN_PRESS_PCT);
+  if (var == "dPIPE_RAD_FT" ) return String(config.dPIPE_RAD_FT);
+
+  // 3.3v dropdown
+  if (var == "bFIXED_3_3V_0" && config.bFIXED_3_3V == 0) return String("selected");
+  if (var == "bFIXED_3_3V_1" && config.bFIXED_3_3V == 1) return String("selected");
+
+  if (var == "dVCC_3V3_TRIM" ) return String(config.dVCC_3V3_TRIM);
+
+  // 5v dropdown
+  if (var == "bFIXED_5V_0" && config.bFIXED_5V == 0) return String("selected");
+  if (var == "bFIXED_5_1" && config.bFIXED_5V == 1) return String("selected");
+
+  if (var == "dVCC_5V_TRIM" ) return String(config.dVCC_5V_TRIM);
+
+  // BME dropdown
+  if (var == "iBME_TYP_1" && config.iBME_TYP == SENSOR_DISABLED) return String("selected");
+  if (var == "iBME_TYP_7" && config.iBME_TYP == BOSCH_BME280) return String("selected");
+  if (var == "iBME_TYP_17" && config.iBME_TYP == BOSCH_BME680) return String("selected");
+
+  if (var == "iBME_ADDR" ) return String(config.iBME_ADDR);
+  if (var == "iBME_SCAN_MS" ) return String(config.iBME_SCAN_MS);
+
+  // ADC dropdown
+  if (var == "iADC_TYPE_10" && config.iADC_TYPE == 10) return String("selected");
+  if (var == "iADC_TYPE_11" && config.iADC_TYPE == 11) return String("selected");
+
+  if (var == "iADC_I2C_ADDR" ) return String(config.iADC_I2C_ADDR);
+  if (var == "iADC_SCAN_DLY" ) return String(config.iADC_SCAN_DLY);
+  if (var == "iADC_MAX_RETRY" ) return String(config.iADC_MAX_RETRY);
+  if (var == "iADC_RANGE" ) return String(config.iADC_RANGE);
+  if (var == "dADC_GAIN" ) return String(config.dADC_GAIN);
+
+  // MAF Type dropdown
+  if (var == "iMAF_SENS_TYPE_0" && config.iMAF_SENS_TYPE == 0) return String("selected");
+  if (var == "iMAF_SENS_TYPE_1" && config.iMAF_SENS_TYPE == 1) return String("selected");
+
+  if (var == "dMAF_MV_TRIM" ) return String(config.dMAF_MV_TRIM);
+  if (var == "iMAF_ADC_CHAN" ) return String(config.iMAF_ADC_CHAN);
+
+  // MAF Source dropdown
+  if (var == "iMAF_SRC_TYPE_10" && config.iMAF_SRC_TYPE == 10) return String("selected");
+  if (var == "iMAF_SRC_TYPE_11" && config.iMAF_SRC_TYPE == 11) return String("selected");
+
+  // MAF ADC Channel dropdown
+  if (var == "iMAF_SRC_TYPE_0" && config.iMAF_SRC_TYPE == 0) return String("selected");
+  if (var == "iMAF_SRC_TYPE_1" && config.iMAF_SRC_TYPE == 1) return String("selected");
+  if (var == "iMAF_SRC_TYPE_2" && config.iMAF_SRC_TYPE == 2) return String("selected");
+  if (var == "iMAF_SRC_TYPE_3" && config.iMAF_SRC_TYPE == 3) return String("selected");
+
+  // pRef Sensor type dropdown
+  if (var == "iPREF_SENS_TYP_1" && config.iPREF_SENS_TYP == 1) return String("selected");
+  if (var == "iPREF_SENS_TYP_2" && config.iPREF_SENS_TYP == 2) return String("selected");
+  if (var == "iPREF_SENS_TYP_3" && config.iPREF_SENS_TYP == 3) return String("selected");
+  if (var == "iPREF_SENS_TYP_4" && config.iPREF_SENS_TYP == 4) return String("selected");
+  if (var == "iPREF_SENS_TYP_5" && config.iPREF_SENS_TYP == 5) return String("selected");
+  if (var == "iPREF_SENS_TYP_8" && config.iPREF_SENS_TYP == 8) return String("selected");
+  if (var == "iPREF_SENS_TYP_12" && config.iPREF_SENS_TYP == 12) return String("selected");
+  if (var == "iPREF_SENS_TYP_13" && config.iPREF_SENS_TYP == 13) return String("selected");
+  if (var == "iPREF_SENS_TYP_14" && config.iPREF_SENS_TYP == 14) return String("selected");
+  if (var == "iPREF_SENS_TYP_15" && config.iPREF_SENS_TYP == 15) return String("selected");
+  if (var == "iPREF_SENS_TYP_16" && config.iPREF_SENS_TYP == 16) return String("selected");
+
+  // pRef ADC Source dropdown
+  if (var == "iPREF_SRC_TYP_1" && config.iPREF_SRC_TYP == 11) return String("selected");
+  if (var == "iPREF_SRC_TYP_2" && config.iPREF_SRC_TYP == 12) return String("selected");
+
+  //pRef ADC channel Dropdown
+  if (var == "iPREF_ADC_CHAN_1" && config.iPREF_ADC_CHAN == 1) return String("selected");
+  if (var == "iPREF_ADC_CHAN_2" && config.iPREF_ADC_CHAN == 2) return String("selected");
+  if (var == "iPREF_ADC_CHAN_3" && config.iPREF_ADC_CHAN == 3) return String("selected");
+  if (var == "iPREF_ADC_CHAN_4" && config.iPREF_ADC_CHAN == 4) return String("selected");
+
+  if (var == "iFIXED_PREF_VAL" ) return String(config.iFIXED_PREF_VAL);
+  if (var == "dPREF_ALG_SCALE" ) return String(config.dPREF_ALG_SCALE);
+
+  //pDiff Sensor type dropdown
+  if (var == "iPDIFF_SENS_TYP_1" && config.iPDIFF_SENS_TYP == 1) return String("selected");
+  if (var == "iPDIFF_SENS_TYP_3" && config.iPDIFF_SENS_TYP == 3) return String("selected");
+  if (var == "iPDIFF_SENS_TYP_4" && config.iPDIFF_SENS_TYP == 4) return String("selected");
+  if (var == "iPDIFF_SENS_TYP_5" && config.iPDIFF_SENS_TYP == 5) return String("selected");
+  if (var == "iPDIFF_SENS_TYP_8" && config.iPDIFF_SENS_TYP == 8) return String("selected");
+  if (var == "iPDIFF_SENS_TYP_12" && config.iPDIFF_SENS_TYP == 12) return String("selected");
+  if (var == "iPDIFF_SENS_TYP_13" && config.iPDIFF_SENS_TYP == 13) return String("selected");
+  if (var == "iPDIFF_SENS_TYP_14" && config.iPDIFF_SENS_TYP == 14) return String("selected");
+  if (var == "iPDIFF_SENS_TYP_15" && config.iPDIFF_SENS_TYP == 15) return String("selected");
+  if (var == "iPDIFF_SENS_TYP_16" && config.iPDIFF_SENS_TYP == 16) return String("selected");
+
+  if (var == "dPDIFF_MV_TRIM" ) return String(config.dPDIFF_MV_TRIM);
+
+  // pDiff ADC Source dropdown
+  if (var == "iPDIFF_SRC_TYP_1" && config.iPDIFF_SRC_TYP == 11) return String("selected");
+  if (var == "iPDIFF_SRC_TYP_2" && config.iPDIFF_SRC_TYP == 12) return String("selected");
+
+  //pDiff ADC channel Dropdown
+  if (var == "iPDIFF_ADC_CHAN_1" && config.iPDIFF_ADC_CHAN == 1) return String("selected");
+  if (var == "iPDIFF_ADC_CHAN_2" && config.iPDIFF_ADC_CHAN == 2) return String("selected");
+  if (var == "iPDIFF_ADC_CHAN_3" && config.iPDIFF_ADC_CHAN == 3) return String("selected");
+  if (var == "iPDIFF_ADC_CHAN_4" && config.iPDIFF_ADC_CHAN == 4) return String("selected");
+
+  if (var == "iFIXD_PDIFF_VAL" ) return String(config.iFIXD_PDIFF_VAL);
+  if (var == "dPDIFF_SCALE" ) return String(config.dPDIFF_SCALE);
+
+  // Pitot Semnsor type dropdown
+  if (var == "iPITOT_SENS_TYP_1" && config.iPITOT_SENS_TYP == 1) return String("selected");
+  if (var == "iPITOT_SENS_TYP_3" && config.iPITOT_SENS_TYP == 3) return String("selected");
+  if (var == "iPITOT_SENS_TYP_4" && config.iPITOT_SENS_TYP == 4) return String("selected");
+  if (var == "iPITOT_SENS_TYP_5" && config.iPITOT_SENS_TYP == 5) return String("selected");
+  if (var == "iPITOT_SENS_TYP_8" && config.iPITOT_SENS_TYP == 8) return String("selected");
+  if (var == "iPITOT_SENS_TYP_12" && config.iPITOT_SENS_TYP == 12) return String("selected");
+  if (var == "iPITOT_SENS_TYP_13" && config.iPITOT_SENS_TYP == 13) return String("selected");
+  if (var == "iPITOT_SENS_TYP_14" && config.iPITOT_SENS_TYP == 14) return String("selected");
+  if (var == "iPITOT_SENS_TYP_15" && config.iPITOT_SENS_TYP == 15) return String("selected");
+  if (var == "iPITOT_SENS_TYP_16" && config.iPITOT_SENS_TYP == 16) return String("selected");
+
+  if (var == "dPITOT_MV_TRIM" ) return String(config.dPITOT_MV_TRIM);
+
+  // Pitot ADC Source dropdown
+  if (var == "iPITOT_SRC_TYP_1" && config.iPITOT_SRC_TYP == 11) return String("selected");
+  if (var == "iPITOT_SRC_TYP_2" && config.iPITOT_SRC_TYP == 12) return String("selected");
+
+  //Pitot ADC channel Dropdown
+  if (var == "iPITOT_ADC_CHAN_1" && config.iPITOT_ADC_CHAN == 1) return String("selected");
+  if (var == "iPITOT_ADC_CHAN_2" && config.iPITOT_ADC_CHAN == 2) return String("selected");
+  if (var == "iPITOT_ADC_CHAN_3" && config.iPITOT_ADC_CHAN == 3) return String("selected");
+  if (var == "iPITOT_ADC_CHAN_4" && config.iPITOT_ADC_CHAN == 4) return String("selected");
+
+  if (var == "dPITOT_SCALE" ) return String(config.dPITOT_SCALE);
+
+  // Baro Sensor type dropdown
+  if (var == "iBARO_SENS_TYP_1" && config.iBARO_SENS_TYP == 1) return String("selected");
+  if (var == "iBARO_SENS_TYP_3" && config.iBARO_SENS_TYP == 3) return String("selected");
+  if (var == "iBARO_SENS_TYP_7" && config.iBARO_SENS_TYP == 7) return String("selected");
+  if (var == "iBARO_SENS_TYP_12" && config.iBARO_SENS_TYP == 12) return String("selected");
+  if (var == "iBARO_SENS_TYP_17" && config.iBARO_SENS_TYP == 17) return String("selected");
+
+  if (var == "dBARO_MV_TRIM" ) return String(config.dBARO_MV_TRIM);
+  if (var == "dBARO_FINE_TUNE" ) return String(config.dBARO_FINE_TUNE);
+
+  if (var == "dFIXD_BARO_VAL" ) return String(config.dFIXD_BARO_VAL);
+  if (var == "dBARO_ALG_SCALE" ) return String(config.dBARO_ALG_SCALE);
+  if (var == "dBARO_SCALE" ) return String(config.dBARO_SCALE);
+  if (var == "dBARO_OFFSET" ) return String(config.dBARO_OFFSET);
+
+  // Temp Sensor type dropdown
+  if (var == "iTEMP_SENS_TYP_1" && config.iTEMP_SENS_TYP == 1) return String("selected");
+  if (var == "iTEMP_SENS_TYP_3" && config.iTEMP_SENS_TYP == 3) return String("selected");
+  if (var == "iTEMP_SENS_TYP_7" && config.iTEMP_SENS_TYP == 7) return String("selected");
+  if (var == "iTEMP_SENS_TYP_12" && config.iTEMP_SENS_TYP == 12) return String("selected");
+  if (var == "iTEMP_SENS_TYP_17" && config.iTEMP_SENS_TYP == 17) return String("selected");
+
+  if (var == "dTEMP_MV_TRIM" ) return String(config.dTEMP_MV_TRIM);
+  if (var == "dTEMP_FINE_TUNE" ) return String(config.dTEMP_FINE_TUNE);
+  if (var == "dFIXED_TEMP_VAL" ) return String(config.dFIXED_TEMP_VAL);
+  if (var == "dTEMP_ALG_SCALE" ) return String(config.dTEMP_ALG_SCALE);
+
+  // Humidity Sensor type dropdown
+  if (var == "iRELH_SENS_TYP_1" && config.iRELH_SENS_TYP == 1) return String("selected");
+  if (var == "iRELH_SENS_TYP_3" && config.iRELH_SENS_TYP == 3) return String("selected");
+  if (var == "iRELH_SENS_TYP_7" && config.iRELH_SENS_TYP == 7) return String("selected");
+  if (var == "iRELH_SENS_TYP_12" && config.iRELH_SENS_TYP == 12) return String("selected");
+  if (var == "iRELH_SENS_TYP_17" && config.iRELH_SENS_TYP == 17) return String("selected");
+
+  if (var == "dRELH_MV_TRIM" ) return String(config.dRELH_MV_TRIM);
+  if (var == "dRELH_FINE_TUNE" ) return String(config.dRELH_FINE_TUNE);
+  if (var == "dFIXED_RELH_VAL" ) return String(config.dFIXED_RELH_VAL);
+  if (var == "dRELH_ALG_SCALE" ) return String(config.dRELH_ALG_SCALE);
   
-  // if (var == "SETTINGS_STATUS") {
-  //   if (!SPIFFS.exists("/settings.json")) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/release/' target='_BLANK'>settings.json</a>");
-  // }
+  
+  return "";
+}
 
-  if (var == "PINS_STATUS" ) {
-    if (status.pinsLoaded == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/pins/' target='_BLANK'>pins.json</a>");    
-    // if (!SPIFFS.exists(status.pinsFilename)) return String("PINS_***.json");    
+
+
+/***********************************************************
+ * @brief processDatagraphPage
+ * @details Replaces template placeholders with variable values
+ * @param &var HTML payload 
+ * @note ~PLACEHOLDER_FORMAT~
+ ***/
+String Webserver::processDatagraphPageTemplate(const String &var) {
+
+  extern struct BenchSettings settings;
+  extern struct ValveLiftData valveData;  
+  extern struct Configuration config;
+
+  MafData _maf(config.iMAF_SRC_TYPE);
+
+  // Process language vars
+  String langVar = processLanguageTemplateVars(var);
+  if ( langVar != var) return langVar;
+
+
+
+  // Datagraph Stuff
+  int maxval = 0;
+  int maxcfm = 0;
+  double scaleFactor = 0.0;
+
+  // very rough cfm calculation from max mafdata (approx half of KG/h rate)
+  maxcfm = _maf.getMaxKGH() / 2;
+
+  // Determine data graph flow axis scale
+  // NOTE: currently 1000cfm is the largest flow that the graph will display. 
+  // We could change scaling to be relative to SVG height (surface currently fixed at 500)
+  if ((maxcfm < 500) || (settings.dataGraphMax == 1)) {
+    maxval = 250;
+    scaleFactor = 2;
+  } else if ((maxcfm > 250 && maxcfm < 500) || (settings.dataGraphMax == 2)) {
+    maxval = 500;
+    scaleFactor = 1;
+  } else if ((maxcfm > 500)  || (settings.dataGraphMax == 3)  || (settings.dataGraphMax == 0)){
+    maxval = 1000; 
+    scaleFactor = 0.5;
   }
 
-  if (var == "MAF_STATUS" ) {
-    if (status.mafLoaded == false) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/mafData/' target='_BLANK'>maf.json</a>");    
-  }
 
-  if (var == "CONFIGURATION_STATUS") {
-    if (!SPIFFS.exists("/configuration.json")) return String("<a href='https://github.com/DeeEmm/DIY-Flow-Bench/tree/master/ESP32/DIY-Flow-Bench/' target='_BLANK'>configuration.json</a>");
+
+  // scale the data graph flow axis
+  if (var == "flow1") return String(maxval / 10);
+  if (var == "flow2") return String(maxval / 10 * 2);
+  if (var == "flow3") return String(maxval / 10 * 3);
+  if (var == "flow4") return String(maxval / 10 * 4);
+  if (var == "flow5") return String(maxval / 10 * 5);
+  if (var == "flow6") return String(maxval / 10 * 6);
+  if (var == "flow7") return String(maxval / 10 * 7);
+  if (var == "flow8") return String(maxval / 10 * 8);
+  if (var == "flow9") return String(maxval / 10 * 9);
+  if (var == "flow10") return String(maxval );
+
+  // scale the datapoint values to fit the flow axis scale
+  // NOTE: surface is 500 units high with zero at the bottom
+  if (var == "LINE_DATA1") return String(500 - (valveData.LiftData1 * scaleFactor));
+  if (var == "LINE_DATA2") return String(500 - (valveData.LiftData2 * scaleFactor));
+  if (var == "LINE_DATA3") return String(500 - (valveData.LiftData3 * scaleFactor));
+  if (var == "LINE_DATA4") return String(500 - (valveData.LiftData4 * scaleFactor));
+  if (var == "LINE_DATA5") return String(500 - (valveData.LiftData5 * scaleFactor));
+  if (var == "LINE_DATA6") return String(500 - (valveData.LiftData6 * scaleFactor));
+  if (var == "LINE_DATA7") return String(500 - (valveData.LiftData7 * scaleFactor));
+  if (var == "LINE_DATA8") return String(500 - (valveData.LiftData8 * scaleFactor));
+  if (var == "LINE_DATA9") return String(500 - (valveData.LiftData9 * scaleFactor));
+  if (var == "LINE_DATA10") return String(500 - (valveData.LiftData10 * scaleFactor));
+  if (var == "LINE_DATA11") return String(500 - (valveData.LiftData11 * scaleFactor));
+  if (var == "LINE_DATA12") return String(500 - (valveData.LiftData12 * scaleFactor));
+
+
+  // Lift Profile
+  if (floor(settings.valveLiftInterval) == settings.valveLiftInterval) {
+
+    // it's an integer so lets truncate fractional part
+    int liftInterval = settings.valveLiftInterval;
+    if (var == "lift1") return String(1 * liftInterval);
+    if (var == "lift2") return String(2 * liftInterval);
+    if (var == "lift3") return String(3 * liftInterval);
+    if (var == "lift4") return String(4 * liftInterval);
+    if (var == "lift5") return String(5 * liftInterval);
+    if (var == "lift6") return String(6 * liftInterval);
+    if (var == "lift7") return String(7 * liftInterval);
+    if (var == "lift8") return String(8 * liftInterval);
+    if (var == "lift9") return String(9 * liftInterval);
+    if (var == "lift10") return String(10 * liftInterval);
+    if (var == "lift11") return String(11 * liftInterval);
+    if (var == "lift12") return String(12 * liftInterval);
+
+  } else {
+    // Display the double
+    if (var == "lift1") return String(1 * settings.valveLiftInterval);
+    if (var == "lift2") return String(2 * settings.valveLiftInterval);
+    if (var == "lift3") return String(3 * settings.valveLiftInterval);
+    if (var == "lift4") return String(4 * settings.valveLiftInterval);
+    if (var == "lift5") return String(5 * settings.valveLiftInterval);
+    if (var == "lift6") return String(6 * settings.valveLiftInterval);
+    if (var == "lift7") return String(7 * settings.valveLiftInterval);
+    if (var == "lift8") return String(8 * settings.valveLiftInterval);
+    if (var == "lift9") return String(9 * settings.valveLiftInterval);
+    if (var == "lift10") return String(10 * settings.valveLiftInterval);
+    if (var == "lift11") return String(11 * settings.valveLiftInterval);
+    if (var == "lift12") return String(12 * settings.valveLiftInterval);
   }
 
   return "";
@@ -1603,6 +1921,64 @@ String Webserver::processLandingPageTemplate(const String &var) {
 }
 
 
+
+
+
+
+/***********************************************************
+ * @brief processPinsPage
+ * @details Replaces template placeholders with variable values
+ * @param &var HTML payload 
+ * @note ~PLACEHOLDER_FORMAT~
+ ***/
+String Webserver::processPinsPageTemplate(const String &var) {
+
+  extern struct Pins pins;
+
+  // Process language vars
+  String langVar = processLanguageTemplateVars(var);
+  if (langVar != var) return langVar;
+
+  if (var == "VAC_SPEED") return String(pins.VAC_SPEED);
+  if (var == "VAC_BLEED_VALVE") return String(pins.VAC_BLEED_VALVE);
+  if (var == "VAC_BANK_1") return String(pins.VAC_BANK_1);
+  if (var == "VAC_BANK_2") return String(pins.VAC_BANK_2);
+  if (var == "VAC_BANK_3") return String(pins.VAC_BANK_3);
+  if (var == "AVO_STEP") return String(pins.AVO_STEP);
+  if (var == "AVO_DIR") return String(pins.AVO_DIR);
+  if (var == "FLOW_VALVE_STEP") return String(pins.FLOW_VALVE_STEP);
+  if (var == "FLOW_VALVE_DIR") return String(pins.FLOW_VALVE_DIR);
+  if (var == "VCC_3V3") return String(pins.VCC_3V3);
+  if (var == "VCC_5V") return String(pins.VCC_5V);
+  if (var == "SPEED_SENS") return String(pins.SPEED_SENS);
+  if (var == "SWIRL_ENCODER_A") return String(pins.SWIRL_ENCODER_A);
+  if (var == "SWIRL_ENCODER_B") return String(pins.SWIRL_ENCODER_B);
+  if (var == "ORIFICE_BCD_1") return String(pins.ORIFICE_BCD_1);
+  if (var == "ORIFICE_BCD_2") return String(pins.ORIFICE_BCD_2);
+  if (var == "ORIFICE_BCD_3") return String(pins.ORIFICE_BCD_3);
+  if (var == "MAF") return String(pins.MAF);
+  if (var == "PREF") return String(pins.PREF);
+  if (var == "PDIFF") return String(pins.PDIFF);
+  if (var == "PITOT") return String(pins.PITOT);
+  if (var == "TEMPERATURE") return String(pins.TEMPERATURE);
+  if (var == "REF_BARO") return String(pins.REF_BARO);
+  if (var == "HUMIDITY") return String(pins.HUMIDITY);
+  if (var == "SERIAL0_TX") return String(pins.SERIAL0_TX);
+  if (var == "SERIAL0_RX") return String(pins.SERIAL0_RX);
+  if (var == "SERIAL2_TX") return String(pins.SERIAL2_TX);
+  if (var == "SERIAL2_RX") return String(pins.SERIAL2_RX);
+  if (var == "SDA") return String(pins.SDA);
+  if (var == "SCL") return String(pins.SCL);
+  if (var == "SD_CS") return String(pins.SD_CS);
+  if (var == "SD_MOSI") return String(pins.SD_MOSI);
+  if (var == "SD_MISO") return String(pins.SD_MISO);
+  if (var == "SD_SCK") return String(pins.SD_SCK);
+  if (var == "SPARE_PIN_1") return String(pins.SPARE_PIN_1);
+  if (var == "SPARE_PIN_2") return String(pins.SPARE_PIN_2);
+
+  return "";
+
+}
 
 
 

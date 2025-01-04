@@ -1,7 +1,7 @@
 <div id="configuration">
     <div class="config-panel">
     <h2>Hardware Configuration</h2>
-    <form id="configForm" action="/api/config/save" method="POST">
+    <form id="configForm" action="/api/saveconfig" method="POST">
         <div class="config-container">
             <!-- System Settings -->
             <fieldset>
@@ -50,42 +50,24 @@
                 </div>
             </fieldset>
 
-            <!-- BME280 Settings -->
+            <!-- BME Settings -->
             <fieldset>
-                <legend>BME280 Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
+                <legend>BME Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="bBME280_ENBLD">BME280 Enabled</label>
-                    <select name='bBME280_ENBLD' class='config-select'>
-                        <option value='0' ~bBME280_ENBLD_0~>Disabled</option>
-                        <option value='1' ~bBME280_ENBLD_1~>Enabled</option>
-                    </select>                    </div>
-                <div class="input-group">
-                    <label for="iBME280_ADDR">I2C Address</label>
-                    <input type="number" id="iBME280_ADDR" name="iBME280_ADDR" value="118">
-                </div>
-                <div class="input-group">
-                    <label for="iBME280_SCN_MS">Scan Interval (ms)</label>
-                    <input type="number" id="iBME280_SCN_MS" name="iBME280_SCN_MS" value="1000">
-                </div>
-            </fieldset>
-
-            <!-- BME680 Settings -->
-            <fieldset>
-                <legend>BME680 Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
-                <div class="input-group">
-                    <label for="bBME680_ENBLD">BME680 Enabled</label>
-                    <select name='bBME680_ENBLD' class='config-select'>
-                        <option value='0' ~bBME680_ENBLD_0~>Disabled</option>
-                        <option value='1' ~bBME680_ENBLD_1~>Enabled</option>
+                    <label for="iBME_TYP">BME Type</label>
+                    <select name='iBME_TYP' class='config-select'>
+                        <option value='1' ~iBME_TYP_1~>Disabled</option>
+                        <option value='7' ~iBME_TYP_7~>BME 280</option>
+                        <option value='17' ~iBME_TYP_17~>BME 680</option>
                     </select>                    
                 </div>
                 <div class="input-group">
-                    <label for="iBME680_ADDR">I2C Address</label>
-                    <input type="number" id="iBME680_ADDR" name="iBME680_ADDR" value="119">
+                    <label for="iBME_ADDR">I2C Address</label>
+                    <input type="number" id="iBME_ADDR" name="iBME_ADDR" value="118">
                 </div>
                 <div class="input-group">
-                    <label for="iBME680_SCN_MS">Scan Interval (ms)</label>
-                    <input type="number" id="iBME680_SCN_MS" name="iBME680_SCN_MS" value="1000">
+                    <label for="iBME_SCAN_MS">Scan Interval (ms)</label>
+                    <input type="number" id="iBME_SCAN_MS" name="iBME_SCAN_MS" value="1000">
                 </div>
             </fieldset>
 
@@ -95,8 +77,8 @@
                 <div class="input-group">
                     <label for="iADC_TYPE">ADC Type</label>
                     <select name='iADC_TYPE' class='config-select'>
-                        <option value='10' ~iADC_TYPE_0~>ADS1015</option>
-                        <option value='11' ~iADC_TYPE_1~>ADS1115</option>
+                        <option value='10' ~iADC_TYPE_10~>ADS1015</option>
+                        <option value='11' ~iADC_TYPE_11~>ADS1115</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -134,8 +116,8 @@
                 <div class="input-group">
                     <label for="iMAF_SRC_TYPE">Source</label>
                     <select name='iMAF_SRC_TYPE' class='config-select'>
-                        <option value='10' ~iMAF_SRC_TYPE_0~>ADS1015</option>
-                        <option value='11' ~iMAF_SRC_TYPE_1~>ADS1115</option>
+                        <option value='10' ~iMAF_SRC_TYPE_10~>ADS1015</option>
+                        <option value='11' ~iMAF_SRC_TYPE_11~>ADS1115</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -146,10 +128,10 @@
                 <div class="input-group">
                     <label for="iMAF_ADC_CHAN">ADC Channel</label>
                     <select name='iMAF_ADC_CHAN' class='config-select'>
+                        <option value='0' ~iMAF_ADC_CHAN_0~>Chan 0</option>
                         <option value='1' ~iMAF_ADC_CHAN_1~>Chan 1</option>
                         <option value='2' ~iMAF_ADC_CHAN_2~>Chan 2</option>
                         <option value='3' ~iMAF_ADC_CHAN_3~>Chan 3</option>
-                        <option value='4' ~iMAF_ADC_CHAN_4~>Chan 4</option>
                     </select>
                 </div>
             </fieldset>
@@ -163,14 +145,14 @@
                         <option value='1' ~iPREF_SENS_TYP_1~>Disabled</option>
                         <option value='2' ~iPREF_SENS_TYP_2~>Use Baro</option>
                         <option value='3' ~iPREF_SENS_TYP_3~>Fixed Value</option>
-                        <option value='12' ~iPREF_SENS_TYP_12~>Analog Pin</option>
                         <option value='4' ~iPREF_SENS_TYP_4~>MPXV7007</option>
                         <option value='5' ~iPREF_SENS_TYP_5~>MPX4250</option>
                         <option value='8' ~iPREF_SENS_TYP_8~>MPX4115</option>
+                        <option value='12' ~iPREF_SENS_TYP_12~>Analog Pin</option>
                         <option value='13' ~iPREF_SENS_TYP_13~>MPXV7025</option>
-                        <option value='14' ~iPREF_SENS_TYP_13~>XGZP6899A007KPDPN</option>
-                        <option value='15' ~iPREF_SENS_TYP_13~>XGZP6899A010KPDPN</option>
-                        <option value='16' ~iPREF_SENS_TYP_13~>M5STACK_TubePressure</option>
+                        <option value='14' ~iPREF_SENS_TYP_14~>XGZP6899A007KPDPN</option>
+                        <option value='15' ~iPREF_SENS_TYP_15~>XGZP6899A010KPDPN</option>
+                        <option value='16' ~iPREF_SENS_TYP_16~>M5STACK_TubePressure</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -210,16 +192,16 @@
                 <div class="input-group">
                     <label for="iPDIFF_SENS_TYP">Sensor Type</label>
                     <select name='iPDIFF_SENS_TYP' class='config-select'>
-                        <option value='0' ~iPDIFF_SENS_TYP_0~>Disabled</option>
-                        <option value='2' ~iPDIFF_SENS_TYP_2~>Fixed Value</option>
+                        <option value='1' ~iPDIFF_SENS_TYP_1~>Disabled</option>
+                        <option value='3' ~iPDIFF_SENS_TYP_3~>Fixed Value</option>
+                        <option value='4' ~iPDIFF_SENS_TYP_4~>MPXV7007</option>
+                        <option value='5' ~iPDIFF_SENS_TYP_5~>MPX4250</option>
+                        <option value='8' ~iPDIFF_SENS_TYP_8~>MPX4115</option>
                         <option value='12' ~iPDIFF_SENS_TYP_12~>Analog Pin</option>
-                        <option value='3' ~iPDIFF_SENS_TYP_3~>MPXV7007</option>
-                        <option value='4' ~iPDIFF_SENS_TYP_4~>MPX4250</option>
-                        <option value='5' ~iPDIFF_SENS_TYP_5~>MPX4115</option>
-                        <option value='6' ~iPDIFF_SENS_TYP_6~>MPXV7025</option>
-                        <option value='7' ~iPDIFF_SENS_TYP_7~>XGZP6899A007KPDPN</option>
-                        <option value='8' ~iPDIFF_SENS_TYP_8~>XGZP6899A010KPDPN</option>
-                        <option value='9' ~iPDIFF_SENS_TYP_9~>M5STACK_TubePressure</option>
+                        <option value='13' ~iPDIFF_SENS_TYP_13~>MPXV7025</option>
+                        <option value='14' ~iPDIFF_SENS_TYP_14~>XGZP6899A007KPDPN</option>
+                        <option value='15' ~iPDIFF_SENS_TYP_15~>XGZP6899A010KPDPN</option>
+                        <option value='16' ~iPDIFF_SENS_TYP_16~>M5STACK_TubePressure</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -259,14 +241,14 @@
                 <div class="input-group">
                     <label for="iPITOT_SENS_TYP">Sensor Type</label>
                     <select name='iPITOT_SENS_TYP' class='config-select'>
-                        <option value='0' ~iPITOT_SENS_TYP_0~>Disabled</option>
-                        <option value='3' ~iPITOT_SENS_TYP_3~>MPXV7007</option>
-                        <option value='4' ~iPITOT_SENS_TYP_4~>MPX4250</option>
-                        <option value='5' ~iPITOT_SENS_TYP_5~>MPX4115</option>
-                        <option value='6' ~iPITOT_SENS_TYP_6~>MPXV7025</option>
-                        <option value='7' ~iPITOT_SENS_TYP_7~>XGZP6899A007KPDPN</option>
-                        <option value='8' ~iPITOT_SENS_TYP_8~>XGZP6899A010KPDPN</option>
-                        <option value='9' ~iPITOT_SENS_TYP_9~>M5STACK_TubePressure</option>
+                        <option value='1' ~iPITOT_SENS_TYP_1~>Disabled</option>
+                        <option value='4' ~iPITOT_SENS_TYP_4~>MPXV7007</option>
+                        <option value='5' ~iPITOT_SENS_TYP_5~>MPX4250</option>
+                        <option value='8' ~iPITOT_SENS_TYP_8~>MPX4115</option>
+                        <option value='13' ~iPITOT_SENS_TYP_13~>MPXV7025</option>
+                        <option value='14' ~iPITOT_SENS_TYP_14~>XGZP6899A007KPDPN</option>
+                        <option value='15' ~iPITOT_SENS_TYP_15~>XGZP6899A010KPDPN</option>
+                        <option value='16' ~iPITOT_SENS_TYP_16~>M5STACK_TubePressure</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -304,8 +286,8 @@
                     <select name='iBARO_SENS_TYP' class='config-select'>
                         <option value='1' ~iBARO_SENS_TYP_1~>Disabled</option>
                         <option value='3' ~iBARO_SENS_TYP_3~>Fixed Value</option>
-                        <option value='12' ~iBARO_SENS_TYP_12~>Analog Pin</option>
                         <option value='7' ~iBARO_SENS_TYP_7~>BME280</option>
+                        <option value='12' ~iBARO_SENS_TYP_12~>Analog Pin</option>
                         <option value='17' ~iBARO_SENS_TYP_17~>BME680</option>
                     </select>
                 </div>
@@ -340,13 +322,13 @@
             <fieldset>
                 <legend>Temperature Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="iTEMP_SENS_TYPE">Sensor Type</label>
-                    <select name='iTEMP_SENS_TYPE' class='config-select'>
-                        <option value='1' ~iTEMP_SENS_TYPE_1~>Disabled</option>
-                        <option value='3' ~iTEMP_SENS_TYPE_3~>Fixed Value</option>
-                        <option value='12' ~iTEMP_SENS_TYPE_12~>Analog Pin</option>
-                        <option value='7' ~iTEMP_SENS_TYPE_7~>BME280</option>
-                        <option value='17' ~iTEMP_SENS_TYPE_17~>BME680</option>
+                    <label for="iTEMP_SENS_TYP">Sensor Type</label>
+                    <select name='iTEMP_SENS_TYP' class='config-select'>
+                        <option value='1' ~iTEMP_SENS_TYP_1~>Disabled</option>
+                        <option value='3' ~iTEMP_SENS_TYP_3~>Fixed Value</option>
+                        <option value='7' ~iTEMP_SENS_TYP_7~>BME280</option>
+                        <option value='12' ~iTEMP_SENS_TYP_12~>Analog Pin</option>
+                        <option value='17' ~iTEMP_SENS_TYP_17~>BME680</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -411,32 +393,6 @@
                     </select>                   
                 </div>
             </fieldset>
-            <button type="submit" class="button">Save</button>
         </div>
+        <button type="submit" id="save-config-button" class="button">Save</button>
     </form>
-
-    <script>
-        document.getElementById('configForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
-            
-            try {
-                const response = await fetch('/api/config/save', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                if (!response.ok) throw new Error('Save failed');
-                alert('Configuration saved successfully!');
-                
-            } catch (error) {
-                alert('Error saving configuration: ' + error.message);
-            }
-        });
-    </script>
-</body>
-</html>

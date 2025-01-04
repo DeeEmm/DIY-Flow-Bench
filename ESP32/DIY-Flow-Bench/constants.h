@@ -160,10 +160,10 @@
  * Bench Types
  ***/
 
-#define MAF 1
-#define ORIFICE 2
-#define VENTURI 3
-#define PITOT 4
+#define MAF_BENCH 1
+#define ORIFICE_BENCH 2
+#define VENTURI_BENCH 3
+#define PITOT_BENCH 4
 
 
 

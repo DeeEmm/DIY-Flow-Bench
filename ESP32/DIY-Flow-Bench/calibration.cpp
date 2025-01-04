@@ -326,22 +326,22 @@ double Calibration::getPitotCalOffset() {
 void Calibration::initialiseCalibrationData () {
 
   Messages _message;
-  Preferences _cal_pref;
+  Preferences _prefs;
 
   _message.serialPrintf("Loading Bench Settings \n");    
   
-  _cal_pref.begin("calibration", false);
+  _prefs.begin("calibration");
 
-  if (!_cal_pref.isKey("FLOW_OFFSET")) _cal_pref.putDouble("FLOW_OFFSET", 0.0);
-  if (!_cal_pref.isKey("USER_OFFSET")) _cal_pref.putDouble("USER_OFFSET", 0.0);
-  if (!_cal_pref.isKey("LEAK_BASE")) _cal_pref.putDouble("LEAK_BASE", 0.0);
-  if (!_cal_pref.isKey("LEAK_BASE_REV")) _cal_pref.putDouble("LEAK_BASE_REV", 0.0);
-  if (!_cal_pref.isKey("LEAK_OFFSET")) _cal_pref.putDouble("LEAK_OFFSET", 0.0);
-  if (!_cal_pref.isKey("LEAK_OFFSET_REV")) _cal_pref.putDouble("LEAK_OFFSET_REV", 0.0);
-  if (!_cal_pref.isKey("PDIFF_OFFSET")) _cal_pref.putDouble("PDIFF_OFFSET", 0.0);
-  if (!_cal_pref.isKey("PITOT_OFFSET")) _cal_pref.putDouble("PITOT_OFFSET", 0.0);
+  if (!_prefs.isKey("FLOW_OFFSET")) _prefs.putDouble("FLOW_OFFSET", 0.0);
+  if (!_prefs.isKey("USER_OFFSET")) _prefs.putDouble("USER_OFFSET", 0.0);
+  if (!_prefs.isKey("LEAK_BASE")) _prefs.putDouble("LEAK_BASE", 0.0);
+  if (!_prefs.isKey("LEAK_BASE_REV")) _prefs.putDouble("LEAK_BASE_REV", 0.0);
+  if (!_prefs.isKey("LEAK_OFFSET")) _prefs.putDouble("LEAK_OFFSET", 0.0);
+  if (!_prefs.isKey("LEAK_OFFSET_REV")) _prefs.putDouble("LEAK_OFFSET_REV", 0.0);
+  if (!_prefs.isKey("PDIFF_OFFSET")) _prefs.putDouble("PDIFF_OFFSET", 0.0);
+  if (!_prefs.isKey("PITOT_OFFSET")) _prefs.putDouble("PITOT_OFFSET", 0.0);
 
-  _cal_pref.end();
+  _prefs.end();
 }
 
 
@@ -355,7 +355,7 @@ void Calibration::initialiseCalibrationData () {
 void Calibration::loadCalibrationData() {
   
   Messages _message;
-  Preferences _cal_pref;
+  Preferences _prefs;
 
   DataHandler _data;
   String jsonString;
@@ -366,18 +366,18 @@ void Calibration::loadCalibrationData() {
 
   _message.serialPrintf("Loading Calibration Data \n");    
   
-  _cal_pref.begin("calibration", false);
+  _prefs.begin("calibration");
 
-  calVal.flow_offset = _cal_pref.getDouble("FLOW_OFFSET", 0.0);
-  calVal.user_offset = _cal_pref.getDouble("USER_OFFSET", 0.0);
-  calVal.leak_cal_baseline = _cal_pref.getDouble("LEAK_BASE", 0.0);
-  calVal.leak_cal_baseline_rev = _cal_pref.getDouble("LEAK_BASE_REV", 0.0);
-  calVal.leak_cal_offset = _cal_pref.getDouble("LEAK_OFFSET", 0.0);
-  calVal.leak_cal_offset_rev = _cal_pref.getDouble("LEAK_OFFSET_REV", 0.0);
-  calVal.pdiff_cal_offset = _cal_pref.getDouble("PDIFF_OFFSET", 0.0);
-  calVal.pitot_cal_offset = _cal_pref.getDouble("PITOT_OFFSET", 0.0);
+  calVal.flow_offset = _prefs.getDouble("FLOW_OFFSET", 0.0);
+  calVal.user_offset = _prefs.getDouble("USER_OFFSET", 0.0);
+  calVal.leak_cal_baseline = _prefs.getDouble("LEAK_BASE", 0.0);
+  calVal.leak_cal_baseline_rev = _prefs.getDouble("LEAK_BASE_REV", 0.0);
+  calVal.leak_cal_offset = _prefs.getDouble("LEAK_OFFSET", 0.0);
+  calVal.leak_cal_offset_rev = _prefs.getDouble("LEAK_OFFSET_REV", 0.0);
+  calVal.pdiff_cal_offset = _prefs.getDouble("PDIFF_OFFSET", 0.0);
+  calVal.pitot_cal_offset = _prefs.getDouble("PITOT_OFFSET", 0.0);
 
-  _cal_pref.end();
+  _prefs.end();
 }
 
 
@@ -388,7 +388,7 @@ void Calibration::loadCalibrationData() {
 ***/
 void Calibration::saveCalibrationData() {
   
-  Preferences _cal_pref;
+  Preferences _prefs;
   Messages _message;
   DataHandler _data;
 
@@ -397,18 +397,18 @@ void Calibration::saveCalibrationData() {
 
   _message.Handler(language.LANG_SAVING_CALIBRATION);
 
-  _cal_pref.begin("calibration", false);
+  _prefs.begin("calibration");
 
-  _cal_pref.putDouble("FLOW_OFFSET", calVal.flow_offset);
-  _cal_pref.putDouble("USER_OFFSET", calVal.user_offset);
-  _cal_pref.putDouble("LEAK_BASE", calVal.leak_cal_baseline);
-  _cal_pref.putDouble("LEAK_BASE_REV", calVal.leak_cal_baseline_rev);
-  _cal_pref.putDouble("LEAK_OFFSET", calVal.leak_cal_offset);
-  _cal_pref.putDouble("LEAK_OFFSET_REV", calVal.leak_cal_offset_rev);
-  _cal_pref.putDouble("PDIFF_OFFSET", calVal.pdiff_cal_offset);
-  _cal_pref.putDouble("PITOT_OFFSET", calVal.pitot_cal_offset);
+  _prefs.putDouble("FLOW_OFFSET", calVal.flow_offset);
+  _prefs.putDouble("USER_OFFSET", calVal.user_offset);
+  _prefs.putDouble("LEAK_BASE", calVal.leak_cal_baseline);
+  _prefs.putDouble("LEAK_BASE_REV", calVal.leak_cal_baseline_rev);
+  _prefs.putDouble("LEAK_OFFSET", calVal.leak_cal_offset);
+  _prefs.putDouble("LEAK_OFFSET_REV", calVal.leak_cal_offset_rev);
+  _prefs.putDouble("PDIFF_OFFSET", calVal.pdiff_cal_offset);
+  _prefs.putDouble("PITOT_OFFSET", calVal.pitot_cal_offset);
     
-  _cal_pref.end();
+  _prefs.end();
 
 }
 

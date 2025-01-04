@@ -87,21 +87,21 @@ if (!!window.EventSource) {
 
       switch (benchType) {
     
-        case "MAF":
+        case "MAF_BENCH":
           document.getElementById('orificeData').style.display='none';
           document.getElementById('orificeRadio').style.display='none';
         break;
     
-        case "ORIFICE":
+        case "ORIFICE_BENCH":
           document.getElementById('orificeData').style.display='block';
           document.getElementById('orificeRadio').style.display='block';
         break;
           
-        case "VENTURI":
+        case "VENTURI_BENCH":
           document.getElementById('orificeData').style.display='block';
         break;
           
-        case "PITOT":
+        case "PITOT_BENCH":
           document.getElementById('orificeData').style.display='block';
         break;
           

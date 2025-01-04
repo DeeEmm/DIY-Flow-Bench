@@ -3,186 +3,186 @@
      <div id="pins">
         <div class="config-panel">
             <h2>Pin Configuration</h2>
-            <form class="pin-form" action="/api/pins/save" method="POST">
+            <form class="pin-form" action="/api/savepins" method="POST">
                 <div class="config-container">
                     <fieldset>
-                        <legend>Vacuum Control</legend>
+                        <legend>Vacuum Control&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                         <div class="pin-input">
-                            <label for="VAC_SPEED_PIN">VAC Speed Pin:</label>
-                            <input type="number" id="VAC_SPEED_PIN" name="VAC_SPEED_PIN" min="0" max="39" value="99">
+                            <label for="VAC_SPEED">VAC Speed Pin:</label>
+                            <input type="number" id="VAC_SPEED" name="VAC_SPEED" min="-1" max="39" value="~VAC_SPEED~">
                         </div>
                         <div class="pin-input">
-                            <label for="VAC_BLEED_VALVE_PIN">VAC Bleed Valve Pin:</label>
-                            <input type="number" id="VAC_BLEED_VALVE_PIN" name="VAC_BLEED_VALVE_PIN" min="0" max="39" value="99">
+                            <label for="VAC_BLEED_VALVE">VAC Bleed Valve Pin:</label>
+                            <input type="number" id="VAC_BLEED_VALVE" name="VAC_BLEED_VALVE" min="-1" max="39" value="~VAC_BLEED_VALVE~">
                         </div>
                         <div class="pin-input">
-                            <label for="VAC_BANK_1_PIN">VAC Bank 1 Pin:</label>
-                            <input type="number" id="VAC_BANK_1_PIN" name="VAC_BANK_1_PIN" min="0" max="39" value="99">
+                            <label for="VAC_BANK_1">VAC Bank 1 Pin:</label>
+                            <input type="number" id="VAC_BANK_1" name="VAC_BANK_1" min="-1" max="39" value="~VAC_BANK_1~">
                         </div>
                         <div class="pin-input">
-                            <label for="VAC_BANK_2_PIN">VAC Bank 2 Pin:</label>
-                            <input type="number" id="VAC_BANK_2_PIN" name="VAC_BANK_2_PIN" min="0" max="39" value="99">
+                            <label for="VAC_BANK_2">VAC Bank 2 Pin:</label>
+                            <input type="number" id="VAC_BANK_2" name="VAC_BANK_2" min="-1" max="39" value="~VAC_BANK_2~">
                         </div>
                         <div class="pin-input">
-                            <label for="VAC_BANK_3_PIN">VAC Bank 3 Pin:</label>
-                            <input type="number" id="VAC_BANK_3_PIN" name="VAC_BANK_3_PIN" min="0" max="39" value="99">
-                        </div>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend>Stepper Motors</legend>
-                        <div class="pin-input">
-                            <label for="AVO_STEP_PIN">AVO Step Pin:</label>
-                            <input type="number" id="AVO_STEP_PIN" name="AVO_STEP_PIN" min="0" max="39" value="99">
-                        </div>
-                        <div class="pin-input">
-                            <label for="AVO_DIR_PIN">AVO Direction Pin:</label>
-                            <input type="number" id="AVO_DIR_PIN" name="AVO_DIR_PIN" min="0" max="39" value="99">
-                        </div>
-                        <div class="pin-input">
-                            <label for="FLOW_VALVE_STEP_PIN">Flow Valve Step Pin:</label>
-                            <input type="number" id="FLOW_VALVE_STEP_PIN" name="FLOW_VALVE_STEP_PIN" min="0" max="39" value="99">
-                        </div>
-                        <div class="pin-input">
-                            <label for="FLOW_VALVE_DIR_PIN">Flow Valve Direction Pin:</label>
-                            <input type="number" id="FLOW_VALVE_DIR_PIN" name="FLOW_VALVE_DIR_PIN" min="0" max="39" value="99">
+                            <label for="VAC_BANK_3">VAC Bank 3 Pin:</label>
+                            <input type="number" id="VAC_BANK_3" name="VAC_BANK_3" min="-1" max="39" value="~VAC_BANK_3~">
                         </div>
                     </fieldset>
 
                     <fieldset>
-                        <legend>Power & Sensors</legend>
+                        <legend>Stepper Motors&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                         <div class="pin-input">
-                            <label for="VCC_3V3_PIN">3.3V Reference Pin:</label>
-                            <input type="number" id="VCC_3V3_PIN" name="VCC_3V3_PIN" min="0" max="39" value="99">
+                            <label for="AVO_STEP">AVO Step Pin:</label>
+                            <input type="number" id="AVO_STEP" name="AVO_STEP" min="-1" max="39" value="~AVO_STEP~">
                         </div>
                         <div class="pin-input">
-                            <label for="VCC_5V_PIN">5V Reference Pin:</label>
-                            <input type="number" id="VCC_5V_PIN" name="VCC_5V_PIN" min="0" max="39" value="99">
+                            <label for="AVO_DIR">AVO Direction Pin:</label>
+                            <input type="number" id="AVO_DIR" name="AVO_DIR" min="-1" max="39" value="~AVO_DIR~">
                         </div>
                         <div class="pin-input">
-                            <label for="SPEED_SENS_PIN">Speed Sensor Pin:</label>
-                            <input type="number" id="SPEED_SENS_PIN" name="SPEED_SENS_PIN" min="0" max="39" value="99">
-                        </div>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend>Encoders & BCD</legend>
-                        <div class="pin-input">
-                            <label for="SWIRL_ENCODER_PIN_A">Swirl Encoder A Pin:</label>
-                            <input type="number" id="SWIRL_ENCODER_PIN_A" name="SWIRL_ENCODER_PIN_A" min="0" max="39" value="99">
+                            <label for="FLOW_VALVE_STEP">Flow Valve Step Pin:</label>
+                            <input type="number" id="FLOW_VALVE_STEP" name="FLOW_VALVE_STEP" min="-1" max="39" value="~FLOW_VALVE_STEP~">
                         </div>
                         <div class="pin-input">
-                            <label for="SWIRL_ENCODER_PIN_B">Swirl Encoder B Pin:</label>
-                            <input type="number" id="SWIRL_ENCODER_PIN_B" name="SWIRL_ENCODER_PIN_B" min="0" max="39" value="99">
-                        </div>
-                        <div class="pin-input">
-                            <label for="ORIFICE_BCD_BIT1_PIN">Orifice BCD Bit 1:</label>
-                            <input type="number" id="ORIFICE_BCD_BIT1_PIN" name="ORIFICE_BCD_BIT1_PIN" min="0" max="39" value="99">
-                        </div>
-                        <div class="pin-input">
-                            <label for="ORIFICE_BCD_BIT2_PIN">Orifice BCD Bit 2:</label>
-                            <input type="number" id="ORIFICE_BCD_BIT2_PIN" name="ORIFICE_BCD_BIT2_PIN" min="0" max="39" value="99">
-                        </div>
-                        <div class="pin-input">
-                            <label for="ORIFICE_BCD_BIT3_PIN">Orifice BCD Bit 3:</label>
-                            <input type="number" id="ORIFICE_BCD_BIT3_PIN" name="ORIFICE_BCD_BIT3_PIN" min="0" max="39" value="99">
+                            <label for="FLOW_VALVE_DIR">Flow Valve Direction Pin:</label>
+                            <input type="number" id="FLOW_VALVE_DIR" name="FLOW_VALVE_DIR" min="-1" max="39" value="~FLOW_VALVE_DIR~">
                         </div>
                     </fieldset>
 
                     <fieldset>
-                        <legend>Sensor Inputs</legend>
+                        <legend>Power & Sensors&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                         <div class="pin-input">
-                            <label for="MAF_PIN">MAF Pin:</label>
-                            <input type="number" id="MAF_PIN" name="MAF_PIN" min="0" max="39" value="99">
+                            <label for="VCC_3V3">3.3V Reference Pin:</label>
+                            <input type="number" id="VCC_3V3" name="VCC_3V3" min="-1" max="39" value="~VCC_3V3~">
                         </div>
                         <div class="pin-input">
-                            <label for="PREF_PIN">Pressure Reference Pin:</label>
-                            <input type="number" id="PREF_PIN" name="PREF_PIN" min="0" max="39" value="99">
+                            <label for="VCC_5V">5V Reference Pin:</label>
+                            <input type="number" id="VCC_5V" name="VCC_5V" min="-1" max="39" value="~VCC_5V~">
                         </div>
                         <div class="pin-input">
-                            <label for="PDIFF_PIN">Pressure Differential Pin:</label>
-                            <input type="number" id="PDIFF_PIN" name="PDIFF_PIN" min="0" max="39" value="99">
-                        </div>
-                        <div class="pin-input">
-                            <label for="PITOT_PIN">Pitot Pin:</label>
-                            <input type="number" id="PITOT_PIN" name="PITOT_PIN" min="0" max="39" value="99">
-                        </div>
-                        <div class="pin-input">
-                            <label for="TEMPERATURE_PIN">Temperature Pin:</label>
-                            <input type="number" id="TEMPERATURE_PIN" name="TEMPERATURE_PIN" min="0" max="39" value="99">
-                        </div>
-                        <div class="pin-input">
-                            <label for="REF_BARO_PIN">Reference Barometer Pin:</label>
-                            <input type="number" id="REF_BARO_PIN" name="REF_BARO_PIN" min="0" max="39" value="99">
-                        </div>
-                        <div class="pin-input">
-                            <label for="HUMIDITY_PIN">Humidity Pin:</label>
-                            <input type="number" id="HUMIDITY_PIN" name="HUMIDITY_PIN" min="0" max="39" value="99">
+                            <label for="SPEED_SENS">Speed Sensor Pin:</label>
+                        <input type="number" id="SPEED_SENS" name="SPEED_SENS" min="-1" max="39" value="~SPEED_SENS~">
                         </div>
                     </fieldset>
 
                     <fieldset>
-                        <legend>Communication</legend>
+                        <legend>Encoders & BCD&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                         <div class="pin-input">
-                            <label for="SERIAL0_TX_PIN">Serial0 TX Pin:</label>
-                            <input type="number" id="SERIAL0_TX_PIN" name="SERIAL0_TX_PIN" min="0" max="39" value="99">
+                            <label for="SWIRL_ENCODER_A">Swirl Encoder A Pin:</label>
+                            <input type="number" id="SWIRL_ENCODER_A" name="SWIRL_ENCODER_A" min="-1" max="39" value="~SWIRL_ENCODER_A~">
                         </div>
                         <div class="pin-input">
-                            <label for="SERIAL0_RX_PIN">Serial0 RX Pin:</label>
-                            <input type="number" id="SERIAL0_RX_PIN" name="SERIAL0_RX_PIN" min="0" max="39" value="99">
+                            <label for="SWIRL_ENCODER_B">Swirl Encoder B Pin:</label>
+                            <input type="number" id="SWIRL_ENCODER_B" name="SWIRL_ENCODER_B" min="-1" max="39" value="~SWIRL_ENCODER_B~">
                         </div>
                         <div class="pin-input">
-                            <label for="SERIAL2_TX_PIN">Serial2 TX Pin:</label>
-                            <input type="number" id="SERIAL2_TX_PIN" name="SERIAL2_TX_PIN" min="0" max="39" value="99">
+                            <label for="ORIFICE_BCD_1">Orifice BCD Bit 1:</label>
+                            <input type="number" id="ORIFICE_BCD_1" name="ORIFICE_BCD_1" min="-1" max="39" value="~ORIFICE_BCD_1~">
                         </div>
                         <div class="pin-input">
-                            <label for="SERIAL2_RX_PIN">Serial2 RX Pin:</label>
-                            <input type="number" id="SERIAL2_RX_PIN" name="SERIAL2_RX_PIN" min="0" max="39" value="99">
+                            <label for="ORIFICE_BCD_2">Orifice BCD Bit 2:</label>
+                            <input type="number" id="ORIFICE_BCD_2" name="ORIFICE_BCD_2" min="-1" max="39" value="~ORIFICE_BCD_2~">
                         </div>
                         <div class="pin-input">
-                            <label for="SDA_PIN">I2C SDA Pin:</label>
-                            <input type="number" id="SDA_PIN" name="SDA_PIN" min="0" max="39" value="99">
-                        </div>
-                        <div class="pin-input">
-                            <label for="SCL_PIN">I2C SCL Pin:</label>
-                            <input type="number" id="SCL_PIN" name="SCL_PIN" min="0" max="39" value="99">
+                            <label for="ORIFICE_BCD_3">Orifice BCD Bit 3:</label>
+                            <input type="number" id="ORIFICE_BCD_3" name="ORIFICE_BCD_3" min="-1" max="39" value="~ORIFICE_BCD_3~">
                         </div>
                     </fieldset>
 
                     <fieldset>
-                        <legend>SD Card</legend>
+                        <legend>Sensor Inputs&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                         <div class="pin-input">
-                            <label for="SD_CS_PIN">SD CS Pin:</label>
-                            <input type="number" id="SD_CS_PIN" name="SD_CS_PIN" min="0" max="39" value="99">
+                            <label for="MAF">MAF Pin:</label>
+                            <input type="number" id="MAF" name="MAF" min="-1" max="39" value="~MAF~">
                         </div>
                         <div class="pin-input">
-                            <label for="SD_MOSI_PIN">SD MOSI Pin:</label>
-                            <input type="number" id="SD_MOSI_PIN" name="SD_MOSI_PIN" min="0" max="39" value="99">
+                            <label for="PREF">Pressure Reference Pin:</label>
+                            <input type="number" id="PREF" name="PREF" min="-1" max="39" value="~PREF~">
                         </div>
                         <div class="pin-input">
-                            <label for="SD_MISO_PIN">SD MISO Pin:</label>
-                            <input type="number" id="SD_MISO_PIN" name="SD_MISO_PIN" min="0" max="39" value="99">
+                            <label for="PDIFF">Pressure Differential Pin:</label>
+                            <input type="number" id="PDIFF" name="PDIFF" min="-1" max="39" value="~PDIFF~">
                         </div>
                         <div class="pin-input">
-                            <label for="SD_SCK_PIN">SD SCK Pin:</label>
-                            <input type="number" id="SD_SCK_PIN" name="SD_SCK_PIN" min="0" max="39" value="99">
+                            <label for="PITOT">Pitot Pin:</label>
+                            <input type="number" id="PITOT" name="PITOT" min="-1" max="39" value="~PITOT~">
+                        </div>
+                        <div class="pin-input">
+                            <label for="TEMPERATURE">Temperature Pin:</label>
+                            <input type="number" id="TEMPERATURE" name="TEMPERATURE" min="-1" max="39" value="~TEMPERATURE~">
+                        </div>
+                        <div class="pin-input">
+                            <label for="REF_BARO">Reference Barometer Pin:</label>
+                            <input type="number" id="REF_BARO" name="REF_BARO" min="-1" max="39" value="~REF_BARO~">
+                        </div>
+                        <div class="pin-input">
+                            <label for="HUMIDITY">Humidity Pin:</label>
+                            <input type="number" id="HUMIDITY" name="HUMIDITY" min="-1" max="39" value="~HUMIDITY~">
                         </div>
                     </fieldset>
 
                     <fieldset>
-                        <legend>Spare Pins</legend>
+                        <legend>Communication&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                         <div class="pin-input">
-                            <label for="SPARE1_PIN">Spare 1 Pin:</label>
-                            <input type="number" id="SPARE1_PIN" name="SPARE1_PIN" min="0" max="39" value="99">
+                            <label for="SERIAL0_TX">Serial0 TX Pin:</label>
+                            <input type="number" id="SERIAL0_TX" name="SERIAL0_TX" min="-1" max="39" value="~SERIAL0_TX~">
                         </div>
                         <div class="pin-input">
-                            <label for="SPARE2_PIN">Spare 2 Pin:</label>
-                            <input type="number" id="SPARE2_PIN" name="SPARE2_PIN" min="0" max="39" value="99">
+                            <label for="SERIAL0_RX">Serial0 RX Pin:</label>
+                            <input type="number" id="SERIAL0_RX" name="SERIAL0_RX" min="-1" max="39" value="~SERIAL0_RX~">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SERIAL2_TX">Serial2 TX Pin:</label>
+                            <input type="number" id="SERIAL2_TX" name="SERIAL2_TX" min="-1" max="39" value="~SERIAL2_TX~">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SERIAL2_RX">Serial2 RX Pin:</label>
+                            <input type="number" id="SERIAL2_RX" name="SERIAL2_RX" min="-1" max="39" value="~SERIAL2_RX~">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SDA">I2C SDA Pin:</label>
+                            <input type="number" id="SDA" name="SDA" min="-1" max="39" value="~SDA~">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SCL">I2C SCL Pin:</label>
+                            <input type="number" id="SCL" name="SCL" min="-1" max="39" value="~SCL~">
                         </div>
                     </fieldset>
 
-                    <button type="submit" class="button">Save</button>
+                    <fieldset>
+                        <legend>SD Card&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
+                        <div class="pin-input">
+                            <label for="SD_CS">SD CS Pin:</label>
+                            <input type="number" id="SD_CS" name="SD_CS" min="-1" max="39" value="~SD_CS~">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SD_MOSI">SD MOSI Pin:</label>
+                            <input type="number" id="SD_MOSI" name="SD_MOSI" min="-1" max="39" value="~SD_MOSI~">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SD_MISO">SD MISO Pin:</label>
+                            <input type="number" id="SD_MISO" name="SD_MISO" min="-1" max="39" value="~SD_MISO~">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SD_SCK">SD SCK Pin:</label>
+                            <input type="number" id="SD_SCK" name="SD_SCK" min="-1" max="39" value="~SD_SCK~">
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Spare Pins&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
+                        <div class="pin-input">
+                            <label for="SPARE_PIN_1">Spare 1 Pin:</label>
+                            <input type="number" id="SPARE_PIN_1" name="SPARE_PIN_1" min="-1" max="39" value="~SPARE_PIN_1~">
+                        </div>
+                        <div class="pin-input">
+                            <label for="SPARE_PIN_2">Spare 2 Pin:</label>
+                            <input type="number" id="SPARE_PIN_2" name="SPARE_PIN_2" min="-1" max="39" value="~SPARE_PIN_2~">
+                        </div>
+                    </fieldset>
+
                 </div>
+                <button type="submit" id="save-config-button" class="button">Save</button>
             </form>
         </div>
     </div>

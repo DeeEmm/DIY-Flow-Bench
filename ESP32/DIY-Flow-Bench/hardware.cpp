@@ -36,6 +36,11 @@
 
 #include <ADS1115_lite.h>
 
+// Kludge to fix ADC2 + WiFi - Source: https://forum.arduino.cc/t/interesting-esp32-issue-cant-use-analogread-in-esp_wifimanager-library/679348/2
+#include "soc/sens_reg.h"    // needed for manipulating ADC2 control register
+uint64_t reg_b;              // Used to store ADC2 control register
+int sensorValue = 0;         // variable to store the value coming from the sensor
+
 ADS1115_lite adc;
 
 
@@ -43,11 +48,44 @@ ADS1115_lite adc;
  * @brief CONSTRUCTOR
  ***/
 Hardware::Hardware() {
-
-
 }
 
+/***********************************************************
+ * @brief save_ADC_Reg - Kludge to fix ADC2 + WiFi 
+ * @details  Save ADC2 control register value : Do this before begin Wifi/Bluetooth
+ * @note Source: https://forum.arduino.cc/t/interesting-esp32-issue-cant-use-analogread-in-esp_wifimanager-library/679348/2
+ ***/
+void Hardware::save_ADC_Reg(void)
+{
+  reg_b = READ_PERI_REG(SENS_SAR_READ_CTRL2_REG);
+}
 
+/***********************************************************
+ * @brief restore_ADC_Reg - Kludge to fix ADC2 + WiFi 
+ * @details  Restore ADC2 control register value : Do this after Wifi/Bluetooth
+ * @note Source: https://forum.arduino.cc/t/interesting-esp32-issue-cant-use-analogread-in-esp_wifimanager-library/679348/2
+ ***/
+void Hardware::restore_ADC_Reg(void)
+{ 
+  WRITE_PERI_REG(SENS_SAR_READ_CTRL2_REG, reg_b);
+  SET_PERI_REG_MASK(SENS_SAR_READ_CTRL2_REG, SENS_SAR2_DATA_INV);
+}
+
+/***********************************************************
+ * @brief readAnalog - Kludge to fix ADC2 + WiFi 
+ * @details Read Analog pin value 
+ * @note Source: https://forum.arduino.cc/t/interesting-esp32-issue-cant-use-analogread-in-esp_wifimanager-library/679348/2
+ ***/
+long Hardware::readAnalog(int sensorPin)
+{ 
+  restore_ADC_Reg();
+  sensorValue = analogRead(sensorPin);
+  // Serial.print("Pin " + String(sensorPin) + " = ");
+  // Serial.println(sensorValue);
+
+  return sensorValue;
+
+}
 
 /***********************************************************
  * @name begin
@@ -93,66 +131,90 @@ void Hardware::begin () {
 
 
 
+/***********************************************************
+* @brief resetPins
+* @details reset pins settings in NVM
+***/ 
+void Hardware::resetPins () {
+
+  Messages _message;
+  Preferences _prefs;
+
+  _prefs.begin("pins");
+  _prefs.clear();
+  _prefs.end();
+
+  initialisePins();
+
+}
+
+
+
+
+
 
 
 /***********************************************************
-* @brief initaliseConfiguration
-* @details define settings in NVM
-* @note Replaces pre-compile macros in original config.h file
+* @brief initalisePins
+* @details initialise pins settings in NVM
 * @note Preferences Key can not exceed 15 chars long
+* @note Default pins schema is for official WEMOS D1 R32 style board
 ***/ 
 void Hardware::initialisePins () {
 
   Messages _message;
-  Preferences _pins_pref;
+  Preferences _prefs;
+  Pins pins;
 
-  _pins_pref.begin("pins", false);
+  _prefs.begin("pins");
 
-  if (_pins_pref.isKey("SERIAL2_TX_PIN")) { // we've already initialised _pins_pref
-    _pins_pref.end();
+  if (_prefs.isKey("SERIAL2_TX")) { // we've already initialised _prefs
+    _prefs.end();
     return;
   }
 
   _message.serialPrintf("Initialising Pins \n");    
 
-  if (!_pins_pref.isKey("VCC_5V_PIN")) _pins_pref.putInt("VCC_5V_PIN", 99);
-  if (!_pins_pref.isKey("VCC_3V3_PIN")) _pins_pref.putInt("VCC_3V3_PIN", 99);
-  if (!_pins_pref.isKey("SPEED_SENS_PIN")) _pins_pref.putInt("SPEED_SENS_PIN", 99);
-  if (!_pins_pref.isKey("ORIFICE_BCD_BIT1_PIN")) _pins_pref.putInt("ORIFICE_BCD_BIT1_PIN", 99);
-  if (!_pins_pref.isKey("ORIFICE_BCD_BIT2_PIN")) _pins_pref.putInt("ORIFICE_BCD_BIT2_PIN", 99);
-  if (!_pins_pref.isKey("ORIFICE_BCD_BIT3_PIN")) _pins_pref.putInt("ORIFICE_BCD_BIT3_PIN", 99);
-  if (!_pins_pref.isKey("MAF_PIN")) _pins_pref.putInt("MAF_PIN", 99);
-  if (!_pins_pref.isKey("PREF_PIN")) _pins_pref.putInt("PREF_PIN", 99);
-  if (!_pins_pref.isKey("PDIFF_PIN")) _pins_pref.putInt("PDIFF_PIN", 99);
-  if (!_pins_pref.isKey("PITOT_PIN")) _pins_pref.putInt("PITOT_PIN", 99);
-  if (!_pins_pref.isKey("TEMPERATURE_PIN")) _pins_pref.putInt("TEMPERATURE_PIN", 99);
-  if (!_pins_pref.isKey("HUMIDITY_PIN")) _pins_pref.putInt("HUMIDITY_PIN", 99);
-  if (!_pins_pref.isKey("REF_BARO_PIN")) _pins_pref.putInt("REF_BARO_PIN", 99);
-  if (!_pins_pref.isKey("SERIAL0_RX_PIN")) _pins_pref.putInt("SERIAL0_RX_PIN", 99);
-  if (!_pins_pref.isKey("SERIAL2_RX_PIN")) _pins_pref.putInt("SERIAL2_RX_PIN", 99);
-  if (!_pins_pref.isKey("SDA_PIN")) _pins_pref.putInt("SDA_PIN", 99);
-  if (!_pins_pref.isKey("SCL_PIN")) _pins_pref.putInt("SCL_PIN", 99);
-  if (!_pins_pref.isKey("SD_CS_PIN")) _pins_pref.putInt("SD_CS_PIN", 99);
-  if (!_pins_pref.isKey("SD_MISO_PIN")) _pins_pref.putInt("SD_MISO_PIN", 99);
-  if (!_pins_pref.isKey("SD_MISO_PIN")) _pins_pref.putInt("SD_MISO_PIN", 99);
-  if (!_pins_pref.isKey("SD_SCK_PIN")) _pins_pref.putInt("SD_SCK_PIN", 99);
-  if (!_pins_pref.isKey("WEMOS_SPARE_PIN_1")) _pins_pref.putInt("WEMOS_SPARE_PIN_1", 99);
+  if (!_prefs.isKey("VCC_5V")) _prefs.putInt("VCC_5V", pins.VCC_5V);
+  if (!_prefs.isKey("VCC_3V3")) _prefs.putInt("VCC_3V3", pins.VCC_3V3);
+  if (!_prefs.isKey("SPEED_SENS")) _prefs.putInt("SPEED_SENS", pins.SPEED_SENS);
+  if (!_prefs.isKey("ORIFICE_BCD_1")) _prefs.putInt("ORIFICE_BCD_1", pins.ORIFICE_BCD_1);
+  if (!_prefs.isKey("ORIFICE_BCD_2")) _prefs.putInt("ORIFICE_BCD_2", pins.ORIFICE_BCD_2);
+  if (!_prefs.isKey("ORIFICE_BCD_3")) _prefs.putInt("ORIFICE_BCD_3", pins.ORIFICE_BCD_3);
+  if (!_prefs.isKey("MAF")) _prefs.putInt("MAF", pins.MAF);
+  if (!_prefs.isKey("PREF")) _prefs.putInt("PREF", pins.PREF);
+  if (!_prefs.isKey("PDIFF")) _prefs.putInt("PDIFF", pins.PDIFF);
+  if (!_prefs.isKey("PITOT")) _prefs.putInt("PITOT", pins.PITOT);
+  if (!_prefs.isKey("TEMPERATURE")) _prefs.putInt("TEMPERATURE", pins.TEMPERATURE);
+  if (!_prefs.isKey("HUMIDITY")) _prefs.putInt("HUMIDITY", pins.HUMIDITY);
+  if (!_prefs.isKey("REF_BARO")) _prefs.putInt("REF_BARO", pins.REF_BARO);
+  if (!_prefs.isKey("SWIRL_ENCODER_A")) _prefs.putInt("SWIRL_ENCODER_A", pins.SWIRL_ENCODER_A);
+  if (!_prefs.isKey("SWIRL_ENCODER_B")) _prefs.putInt("SWIRL_ENCODER_B", pins.SWIRL_ENCODER_B);
+  if (!_prefs.isKey("SERIAL0_RX")) _prefs.putInt("SERIAL0_RX", pins.SERIAL0_RX);
+  if (!_prefs.isKey("SERIAL2_RX")) _prefs.putInt("SERIAL2_RX", pins.SERIAL2_RX);
+  if (!_prefs.isKey("SDA")) _prefs.putInt("SDA", pins.SDA);
+  if (!_prefs.isKey("SCL")) _prefs.putInt("SCL", pins.SCL);
+  if (!_prefs.isKey("SD_CS")) _prefs.putInt("SD_CS", pins.SD_CS);
+  if (!_prefs.isKey("SD_MISO")) _prefs.putInt("SD_MISO", pins.SD_MISO);
+  if (!_prefs.isKey("SD_SCK")) _prefs.putInt("SD_SCK", pins.SD_SCK);
+  if (!_prefs.isKey("SPARE_PIN_1")) _prefs.putInt("SPARE_PIN_1", pins.SPARE_PIN_1);
+  if (!_prefs.isKey("SPARE_PIN_2")) _prefs.putInt("SPARE_PIN_2", pins.SPARE_PIN_2);
 
   // Store output pin values in struct
-  if (!_pins_pref.isKey("VAC_BANK_1_PIN")) _pins_pref.putInt("VAC_BANK_1_PIN", 99);
-  if (!_pins_pref.isKey("VAC_BANK_2_PIN")) _pins_pref.putInt("VAC_BANK_2_PIN", 99);
-  if (!_pins_pref.isKey("VAC_BANK_3_PIN")) _pins_pref.putInt("VAC_BANK_3_PIN", 99);
-  if (!_pins_pref.isKey("VAC_SPEED_PIN")) _pins_pref.putInt("VAC_SPEED_PIN", 99);
-  if (!_pins_pref.isKey("VAC_BLEED_VALVE_PIN")) _pins_pref.putInt("VAC_BLEED_VALVE_PIN", 99);
-  if (!_pins_pref.isKey("AVO_STEP_PIN")) _pins_pref.putInt("AVO_STEP_PIN", 99);
-  if (!_pins_pref.isKey("AVO_DIR_PIN")) _pins_pref.putInt("AVO_DIR_PIN", 99);
-  if (!_pins_pref.isKey("FLOW_VALVE_STEP_PIN")) _pins_pref.putInt("FLOW_VALVE_STEP_PIN", 99);
-  if (!_pins_pref.isKey("FLOW_VALVE_DIR_PIN")) _pins_pref.putInt("FLOW_VALVE_DIR_PIN", 99);
-  if (!_pins_pref.isKey("SD_MOSI_PIN")) _pins_pref.putInt("SD_MOSI_PIN", 99);
-  if (!_pins_pref.isKey("SERIAL0_TX_PIN")) _pins_pref.putInt("SERIAL0_TX_PIN", 99);
-  if (!_pins_pref.isKey("SERIAL2_TX_PIN")) _pins_pref.putInt("SERIAL2_TX_PIN", 99);
+  if (!_prefs.isKey("VAC_SPEED")) _prefs.putInt("VAC_SPEED", pins.VAC_SPEED); 
+  if (!_prefs.isKey("VAC_BANK_1")) _prefs.putInt("VAC_BANK_1", pins.VAC_BANK_1);
+  if (!_prefs.isKey("VAC_BANK_2")) _prefs.putInt("VAC_BANK_2", pins.VAC_BANK_2);
+  if (!_prefs.isKey("VAC_BANK_3")) _prefs.putInt("VAC_BANK_3", pins.VAC_BANK_3);
+  if (!_prefs.isKey("VAC_BLEED_VALVE")) _prefs.putInt("VAC_BLEED_VALVE", pins.VAC_BLEED_VALVE);
+  if (!_prefs.isKey("AVO_STEP")) _prefs.putInt("AVO_STEP", pins.AVO_STEP);
+  if (!_prefs.isKey("AVO_DIR")) _prefs.putInt("AVO_DIR", pins.AVO_DIR);
+  if (!_prefs.isKey("FLOW_VALVE_STEP")) _prefs.putInt("FLOW_VALVE_STEP", pins.FLOW_VALVE_STEP);
+  if (!_prefs.isKey("FLOW_VALVE_DIR")) _prefs.putInt("FLOW_VALVE_DIR", pins.FLOW_VALVE_DIR);
+  if (!_prefs.isKey("SD_MOSI")) _prefs.putInt("SD_MOSI", pins.SD_MOSI);
+  if (!_prefs.isKey("SERIAL0_TX")) _prefs.putInt("SERIAL0_TX", pins.SERIAL0_TX);
+  if (!_prefs.isKey("SERIAL2_TX")) _prefs.putInt("SERIAL2_TX", pins.SERIAL2_TX);
   
-  _pins_pref.end();
+  _prefs.end();
 
 }
 
@@ -175,53 +237,59 @@ void Hardware::loadPinsData () {
   DataHandler _data;
   Messages _message;
   Hardware _hardware;
-  Preferences _pins_pref;
+  Preferences _prefs;
 
   extern struct DeviceStatus status;
   extern struct Pins pins;
 
   _message.serialPrintf("Loading Pins Data \n");     
 
-  _pins_pref.begin("pins", true);
+  _prefs.begin("pins");
 
   // Load pin values into struct
-  pins.VCC_3V3_PIN = _pins_pref.getInt("VCC_5V_PIN", 99);
-  pins.VCC_5V_PIN = _pins_pref.getInt("VCC_3V3_PIN", 99);
-  pins.SPEED_SENS_PIN = _pins_pref.getInt("SPEED_SENS_PIN", 99);
-  pins.ORIFICE_BCD_BIT1_PIN = _pins_pref.getInt("ORIFICE_BCD_BIT1_PIN", 99);
-  pins.ORIFICE_BCD_BIT2_PIN = _pins_pref.getInt("ORIFICE_BCD_BIT2_PIN", 99);
-  pins.ORIFICE_BCD_BIT3_PIN = _pins_pref.getInt("ORIFICE_BCD_BIT3_PIN", 99);
-  pins.MAF_PIN = _pins_pref.getInt("MAF_PIN", 99);
-  pins.PREF_PIN = _pins_pref.getInt("PREF_PIN", 99);
-  pins.PDIFF_PIN = _pins_pref.getInt("PDIFF_PIN", 99);
-  pins.PITOT_PIN = _pins_pref.getInt("PITOT_PIN", 99);
-  pins.TEMPERATURE_PIN = _pins_pref.getInt("TEMPERATURE_PIN", 99);
-  pins.HUMIDITY_PIN = _pins_pref.getInt("HUMIDITY_PIN", 99);
-  pins.REF_BARO_PIN = _pins_pref.getInt("REF_BARO_PIN", 99);
-  pins.SERIAL0_RX_PIN = _pins_pref.getInt("SERIAL0_RX_PIN", 99);
-  pins.SERIAL2_RX_PIN = _pins_pref.getInt("SERIAL2_RX_PIN", 99);
-  pins.SDA_PIN = _pins_pref.getInt("SDA_PIN", 99);
-  pins.SCL_PIN = _pins_pref.getInt("SCL_PIN", 99);
-  pins.SD_CS_PIN = _pins_pref.getInt("SD_CS_PIN", 99);
-  pins.SD_MISO_PIN = _pins_pref.getInt("SD_MISO_PIN", 99);
-  pins.SD_SCK_PIN = _pins_pref.getInt("SD_SCK_PIN", 99);
-  pins.WEMOS_SPARE_PIN_1 = _pins_pref.getInt("WEMOS_SPARE_PIN_1", 99);
+  pins.VCC_3V3 = _prefs.getInt("VCC_3V3");
+  pins.VCC_5V = _prefs.getInt("VCC_5V");
+  pins.SPEED_SENS = _prefs.getInt("SPEED_SENS");
+  pins.ORIFICE_BCD_1 = _prefs.getInt("ORIFICE_BCD_1");
+  pins.ORIFICE_BCD_2 = _prefs.getInt("ORIFICE_BCD_2");
+  pins.ORIFICE_BCD_3 = _prefs.getInt("ORIFICE_BCD_3");
+  pins.MAF = _prefs.getInt("MAF");
+  pins.PREF = _prefs.getInt("PREF");
+  pins.PDIFF = _prefs.getInt("PDIFF");
+  pins.PITOT = _prefs.getInt("PITOT");
+  pins.TEMPERATURE = _prefs.getInt("TEMPERATURE");
+  pins.HUMIDITY = _prefs.getInt("HUMIDITY");
+  pins.REF_BARO = _prefs.getInt("REF_BARO");
+  pins.SWIRL_ENCODER_A = _prefs.getInt("SWIRL_ENCODER_A");
+  pins.SWIRL_ENCODER_B = _prefs.getInt("SWIRL_ENCODER_B");
+  pins.SERIAL0_RX = _prefs.getInt("SERIAL0_RX");
+  pins.SERIAL2_RX = _prefs.getInt("SERIAL2_RX");
+  pins.SDA = _prefs.getInt("SDA");
+  pins.SCL = _prefs.getInt("SCL");
+  pins.SD_CS = _prefs.getInt("SD_CS");
+  pins.SD_MISO = _prefs.getInt("SD_MISO");
+  pins.SD_SCK = _prefs.getInt("SD_SCK");
+  pins.SPARE_PIN_1 = _prefs.getInt("SPARE_PIN_1");
+  pins.SPARE_PIN_2 = _prefs.getInt("SPARE_PIN_2");
 
   // Store output pin values in struct
-  pins.VAC_BANK_1_PIN = _pins_pref.getInt("VAC_BANK_1_PIN", 99);
-  pins.VAC_BANK_2_PIN = _pins_pref.getInt("VAC_BANK_2_PIN", 99);
-  pins.VAC_BANK_3_PIN = _pins_pref.getInt("VAC_BANK_3_PIN", 99);
-  pins.VAC_SPEED_PIN = _pins_pref.getInt("VAC_SPEED_PIN", 99);
-  pins.VAC_BLEED_VALVE_PIN = _pins_pref.getInt("VAC_BLEED_VALVE_PIN", 99);
-  pins.AVO_STEP_PIN = _pins_pref.getInt("AVO_STEP_PIN", 99);
-  pins.AVO_DIR_PIN = _pins_pref.getInt("AVO_DIR_PIN", 99);
-  pins.FLOW_VALVE_STEP_PIN = _pins_pref.getInt("FLOW_VALVE_STEP_PIN", 99);
-  pins.FLOW_VALVE_DIR_PIN = _pins_pref.getInt("FLOW_VALVE_DIR_PIN", 99);
-  pins.SD_MOSI_PIN = _pins_pref.getInt("SD_MOSI_PIN", 99);
-  pins.SERIAL0_TX_PIN = _pins_pref.getInt("SERIAL0_TX_PIN", 99);
-  pins.SERIAL2_TX_PIN = _pins_pref.getInt("SERIAL2_TX_PIN", 99);
+  pins.VAC_SPEED = _prefs.getInt("VAC_SPEED");
+  pins.VAC_BANK_1 = _prefs.getInt("VAC_BANK_1");
+  pins.VAC_BANK_2 = _prefs.getInt("VAC_BANK_2");
+  pins.VAC_BANK_3 = _prefs.getInt("VAC_BANK_3");
+  pins.VAC_BLEED_VALVE = _prefs.getInt("VAC_BLEED_VALVE");
+  pins.AVO_STEP = _prefs.getInt("AVO_STEP");
+  pins.AVO_DIR = _prefs.getInt("AVO_DIR");
+  pins.FLOW_VALVE_STEP = _prefs.getInt("FLOW_VALVE_STEP");
+  pins.FLOW_VALVE_DIR = _prefs.getInt("FLOW_VALVE_DIR");
+  pins.SD_MOSI = _prefs.getInt("SD_MOSI");
+  pins.SERIAL0_TX = _prefs.getInt("SERIAL0_TX");
+  pins.SERIAL2_TX = _prefs.getInt("SERIAL2_TX");
 
-  _pins_pref.end();
+  status.nvmPins = _prefs.freeEntries();
+  _message.debugPrintf("Pins NVM Free Entries: %u \n", status.nvmPins); 
+
+  _prefs.end();
 
   status.pinsLoaded = true;
 
@@ -244,13 +312,15 @@ void Hardware::loadPinsData () {
  * @return bool
  *
  ***/
-bool Hardware::setPinMode () {
+int Hardware::setPinMode () {
 
   Messages _message;
 
   extern struct Pins pins;
   extern struct DeviceStatus status;
   extern struct Configuration config;
+
+  int currentPin = status.ioError;
 
   _message.serialPrintf("Initialising I/O \n");   
 
@@ -262,189 +332,196 @@ bool Hardware::setPinMode () {
 
   try {
     // Set Inputs
-    if (pins.VCC_3V3_PIN < 99 ) {
-      _message.verbosePrintf("Input VCC_3V3_PIN: %d\n", pins.VCC_3V3_PIN );
-      pinMode(pins.VCC_3V3_PIN, INPUT);   
-      status.ioError = false;
+    if (pins.VCC_3V3 > -1 ) {
+      _message.verbosePrintf("Input VCC_3V3: %d\n", pins.VCC_3V3 );
+      currentPin = pins.VCC_3V3 ;
+      pinMode(pins.VCC_3V3, INPUT);   
     }
-    if (pins.VCC_5V_PIN < 99) {
-      _message.verbosePrintf("Input VCC_5V_PIN: %d\n", pins.VCC_5V_PIN );  
-      pinMode(pins.VCC_5V_PIN, INPUT);
-      status.ioError = false;
+    if (pins.VCC_5V > -1) {
+      _message.verbosePrintf("Input VCC_5V: %d\n", pins.VCC_5V );  
+      currentPin = pins.VCC_5V;
+      pinMode(pins.VCC_5V, INPUT);
     }  
-    if (pins.SPEED_SENS_PIN < 99 ) {
-      _message.verbosePrintf("Input SPEED_SENS_PIN: %d\n", pins.SPEED_SENS_PIN );
-      pinMode(pins.SPEED_SENS_PIN, INPUT);   
-      status.ioError = false;
+    if (pins.SPEED_SENS > -1 ) {
+      _message.verbosePrintf("Input SPEED_SENS: %d\n", pins.SPEED_SENS );
+      currentPin = pins.SPEED_SENS;
+      pinMode(pins.SPEED_SENS, INPUT);   
     }
-    if (pins.ORIFICE_BCD_BIT1_PIN < 99 ) {
-      _message.verbosePrintf("Input ORIFICE_BCD_BIT1_PIN: %d\n", pins.ORIFICE_BCD_BIT1_PIN );
-      pinMode(pins.ORIFICE_BCD_BIT1_PIN, INPUT);   
-      status.ioError = false;
+    if (pins.ORIFICE_BCD_1 > -1 ) {
+      _message.verbosePrintf("Input ORIFICE_BCD_1: %d\n", pins.ORIFICE_BCD_1 );
+      currentPin = pins.ORIFICE_BCD_1;
+      pinMode(pins.ORIFICE_BCD_1, INPUT);   
     }
-    if (pins.ORIFICE_BCD_BIT2_PIN < 99 ) {
-      _message.verbosePrintf("Input ORIFICE_BCD_BIT2_PIN: %d\n", pins.ORIFICE_BCD_BIT2_PIN );
-      pinMode(pins.ORIFICE_BCD_BIT2_PIN, INPUT);   
-      status.ioError = false;
+    if (pins.ORIFICE_BCD_2 > -1 ) {
+      _message.verbosePrintf("Input ORIFICE_BCD_2: %d\n", pins.ORIFICE_BCD_2 );
+      pinMode(pins.ORIFICE_BCD_2, INPUT);   
+      currentPin = pins.ORIFICE_BCD_2;
+      pinMode(pins.ORIFICE_BCD_2, INPUT);   
     }
-    if (pins.ORIFICE_BCD_BIT3_PIN < 99 ) {
-      pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
-      _message.verbosePrintf("Input ORIFICE_BCD_BIT3_PIN: %d\n", pins.ORIFICE_BCD_BIT3_PIN );
-      pinMode(pins.ORIFICE_BCD_BIT3_PIN, INPUT);   
-      status.ioError = false;
+    if (pins.ORIFICE_BCD_3 > -1 ) {
+      pinMode(pins.ORIFICE_BCD_3, INPUT);   
+      _message.verbosePrintf("Input ORIFICE_BCD_3: %d\n", pins.ORIFICE_BCD_3 );
+      currentPin = pins.ORIFICE_BCD_3;
+      pinMode(pins.ORIFICE_BCD_3, INPUT);   
     }
-    if (config.iMAF_SRC_TYPE == LINEAR_ANALOG && pins.MAF_PIN < 99) {
-      _message.verbosePrintf("Input MAF_PIN: %d\n", pins.MAF_PIN );
-      pinMode(pins.MAF_PIN, INPUT);   
-      status.ioError = false;
+    if (config.iMAF_SRC_TYPE == LINEAR_ANALOG && pins.MAF > -1) {
+      _message.verbosePrintf("Input MAF_BENCH: %d\n", pins.MAF );
+      currentPin = pins.MAF;
+      pinMode(pins.MAF, INPUT);   
     }
-    if (config.iPREF_SENS_TYP == LINEAR_ANALOG && pins.PREF_PIN < 99){
-      _message.verbosePrintf("Input PREF_PIN: %d\n", pins.PREF_PIN );
-      pinMode(pins.PREF_PIN, INPUT);   
-      status.ioError = false;
+    if (config.iPREF_SENS_TYP == LINEAR_ANALOG && pins.PREF > -1){
+      _message.verbosePrintf("Input PREF: %d\n", pins.PREF );
+      currentPin = pins.PREF;
+      pinMode(pins.PREF, INPUT);   
     }
-    if (config.iPDIFF_SENS_TYP == LINEAR_ANALOG && pins.PDIFF_PIN < 99) {
-      _message.verbosePrintf("Input PDIFF_PIN: %d\n", pins.PDIFF_PIN );
-      pinMode(pins.PDIFF_PIN, INPUT);   
-      status.ioError = false;
+    if (config.iPDIFF_SENS_TYP == LINEAR_ANALOG && pins.PDIFF > -1) {
+      _message.verbosePrintf("Input PDIFF: %d\n", pins.PDIFF );
+      currentPin = pins.PDIFF;
+      pinMode(pins.PDIFF, INPUT);   
     }
-    if (config.iPITOT_SENS_TYP  == LINEAR_ANALOG && pins.PITOT_PIN < 99) {
-      _message.verbosePrintf("Input PITOT_PIN: %d\n", pins.PITOT_PIN );
-      pinMode(pins.PITOT_PIN, INPUT);   
-      status.ioError = false;
+    if (config.iPITOT_SENS_TYP  == LINEAR_ANALOG && pins.PITOT > -1) {
+      _message.verbosePrintf("Input PITOT_BENCH: %d\n", pins.PITOT );
+      currentPin = pins.PITOT;
+      pinMode(pins.PITOT, INPUT);   
     }
-    if (config.iTEMP_SENS_TYPE == LINEAR_ANALOG && pins.TEMPERATURE_PIN < 99) {
-      _message.verbosePrintf("Input TEMPERATURE_PIN: %d\n", pins.TEMPERATURE_PIN );
-      pinMode(pins.TEMPERATURE_PIN, INPUT);   
-      status.ioError = false;
+    if (config.iTEMP_SENS_TYP == LINEAR_ANALOG && pins.TEMPERATURE > -1) {
+      _message.verbosePrintf("Input TEMPERATURE: %d\n", pins.TEMPERATURE );
+      currentPin = pins.TEMPERATURE;
+      pinMode(pins.TEMPERATURE, INPUT);   
     }
-    if (config.iRELH_SENS_TYP == LINEAR_ANALOG && pins.HUMIDITY_PIN < 99 ){
-      _message.verbosePrintf("Input HUMIDITY_PIN: %d\n", pins.HUMIDITY_PIN );
-      pinMode(pins.HUMIDITY_PIN, INPUT);   
-      status.ioError = false;
+    if (config.iRELH_SENS_TYP == LINEAR_ANALOG && pins.HUMIDITY > -1 ){
+      _message.verbosePrintf("Input HUMIDITY: %d\n", pins.HUMIDITY );
+      currentPin = pins.HUMIDITY;
+      pinMode(pins.HUMIDITY, INPUT);   
     }
-    if (config.iBARO_SENS_TYP == LINEAR_ANALOG && pins.REF_BARO_PIN < 99 ) {
-      _message.verbosePrintf("Input REF_BARO_PIN: %d\n", pins.REF_BARO_PIN );
-      pinMode(pins.REF_BARO_PIN, INPUT);     
-      status.ioError = false;
+    if (config.iBARO_SENS_TYP == LINEAR_ANALOG && pins.REF_BARO > -1 ) {
+      _message.verbosePrintf("Input REF_BARO: %d\n", pins.REF_BARO );
+      currentPin = pins.REF_BARO;
+      pinMode(pins.REF_BARO, INPUT);     
     }
-    // if (pins.SERIAL0_RX_PIN < 99 ) {
-    //   _message.verbosePrintf("Input SERIAL0_RX_PIN: %d\n", pins.SERIAL0_RX_PIN );
-    //   pinMode(pins.SERIAL0_RX_PIN, INPUT);   
-      // status.ioError = false;
+    if (pins.SWIRL_ENCODER_A > -1 ) {
+      _message.verbosePrintf("Input SERIAL0_RX: %d\n", pins.SWIRL_ENCODER_A );
+      currentPin = pins.SWIRL_ENCODER_A;
+      pinMode(pins.SWIRL_ENCODER_A, INPUT);   
+    }
+    if (pins.SWIRL_ENCODER_B > -1 ) {
+      _message.verbosePrintf("Input SERIAL2_RX: %d\n", pins.SWIRL_ENCODER_B );
+      currentPin = pins.SWIRL_ENCODER_B;
+      pinMode(pins.SWIRL_ENCODER_B, INPUT);   
+    }
+        // if (pins.SERIAL0_RX > -1 ) {
+    //   _message.verbosePrintf("Input SERIAL0_RX: %d\n", pins.SERIAL0_RX );
+      // currentPin = pins.SERIAL0_RX;
+    //   pinMode(pins.SERIAL0_RX, INPUT);   
     // }
-    // if (pins.SERIAL2_RX_PIN < 99 ) {
-    //   _message.verbosePrintf("Input SERIAL2_RX_PIN: %d\n", pins.SERIAL2_RX_PIN );
-    //   pinMode(pins.SERIAL2_RX_PIN, INPUT);   
-      // status.ioError = false;
+    // if (pins.SERIAL2_RX > -1 ) {
+    //   _message.verbosePrintf("Input SERIAL2_RX: %d\n", pins.SERIAL2_RX );
+      // currentPin = pins.SERIAL2_RX;
+    //   pinMode(pins.SERIAL2_RX, INPUT);   
     // }
-    if (pins.SDA_PIN < 99 ) {
-      _message.verbosePrintf("Input SDA_PIN: %d\n", pins.SDA_PIN );
-      pinMode(pins.SDA_PIN, INPUT);   
-      status.ioError = false;
+    if (pins.SDA > -1 ) {
+      _message.verbosePrintf("Input SDA: %d\n", pins.SDA );
+      currentPin = pins.SDA;
+      pinMode(pins.SDA, INPUT);   
     }
-    if (pins.SCL_PIN < 99 ) {
-      _message.verbosePrintf("Input SCL_PIN: %d\n", pins.SCL_PIN );
-      pinMode(pins.SCL_PIN, INPUT);   
-      status.ioError = false;
+    if (pins.SCL > -1 ) {
+      _message.verbosePrintf("Input SCL: %d\n", pins.SCL );
+      currentPin = pins.SCL;
+      pinMode(pins.SCL, INPUT);   
     }
     if (config.bSD_ENABLED) {
-      // if (pins.SD_CS_PIN < 99 ) {
-      //   _message.verbosePrintf("Input SD_CS_PIN: %d\n", pins.SD_CS_PIN );
-      //   pinMode(pins.SD_CS_PIN, INPUT);     
-      // status.ioError = false;
+      // if (pins.SD_CS > -1 ) {
+      //   _message.verbosePrintf("Input SD_CS: %d\n", pins.SD_CS );
+      // currentPin = pins.SD_CS;
+      //   pinMode(pins.SD_CS, INPUT);     
       // }
-      // if (pins.SD_MISO_PIN < 99 ) {
-      //   _message.verbosePrintf("Input SD_MISO_PIN: %d\n", pins.SD_MISO_PIN );
-      //   pinMode(pins.SD_MISO_PIN, INPUT);   
-      // status.ioError = false;
+      // if (pins.SD_MISO > -1 ) {
+      //   _message.verbosePrintf("Input SD_MISO: %d\n", pins.SD_MISO );
+      // currentPin = pins.SD_MISO;
+      //   pinMode(pins.SD_MISO, INPUT);   
       // }
-      // if (pins.SD_SCK_PIN < 99 ) {
-      //   _message.verbosePrintf("Input SD_SCK_PIN: %d\n", pins.SD_SCK_PIN );
-      //   pinMode(pins.SD_SCK_PIN, INPUT);   
-      // status.ioError = false;
+      // if (pins.SD_SCK > -1 ) {
+      //   _message.verbosePrintf("Input SD_SCK: %d\n", pins.SD_SCK );
+      // currentPin = pins.SD_SCK;
+      //   pinMode(pins.SD_SCK, INPUT);   
       // }
     }
-    // if (pins.WEMOS_SPARE_PIN_1 >= 0 ) {
-    //   _message.verbosePrintf("Input WEMOS_SPARE_PIN_1: %d\n", pins.WEMOS_SPARE_PIN_1 );
-    //   pinMode(pins.WEMOS_SPARE_PIN_1, INPUT);   
-      // status.ioError = false;
+    // if (pins.SPARE_PIN_1 >= 0 ) {
+    //   _message.verbosePrintf("Input SPARE_PIN_1: %d\n", pins.SPARE_PIN_1 );
+      // currentPin = pins.SPARE_PIN_1;
+    //   pinMode(pins.SPARE_PIN_1, INPUT);   
     // }
 
     // // Set Outputs
-    if (pins.VAC_BANK_1_PIN < 99 ) {
-      _message.verbosePrintf("Output VAC_BANK_1_PIN: %d\n", pins.VAC_BANK_1_PIN );
-      pinMode(pins.VAC_BANK_1_PIN, OUTPUT);
-      status.ioError = false;
+    if (pins.VAC_BANK_1 > -1 ) {
+      _message.verbosePrintf("Output VAC_BANK_1: %d\n", pins.VAC_BANK_1 );
+      currentPin = pins.VAC_BANK_1;
+      pinMode(pins.VAC_BANK_1, OUTPUT);
     }
-    if (pins.VAC_BANK_2_PIN < 99 ) {
-      _message.verbosePrintf("Output VAC_BANK_2_PIN: %d\n", pins.VAC_BANK_2_PIN );
-      pinMode(pins.VAC_BANK_2_PIN, OUTPUT);
-      status.ioError = false;
+    if (pins.VAC_BANK_2 > -1 ) {
+      _message.verbosePrintf("Output VAC_BANK_2: %d\n", pins.VAC_BANK_2 );
+      currentPin = pins.VAC_BANK_2;
+      pinMode(pins.VAC_BANK_2, OUTPUT);
     }
-    if (pins.VAC_BANK_3_PIN < 99 ) {
-      _message.verbosePrintf("Output VAC_BANK_3_PIN: %d\n", pins.VAC_BANK_3_PIN );
-      pinMode(pins.VAC_BANK_3_PIN, OUTPUT);
-      status.ioError = false;
+    if (pins.VAC_BANK_3 > -1 ) {
+      _message.verbosePrintf("Output VAC_BANK_3: %d\n", pins.VAC_BANK_3 );
+      currentPin = pins.VAC_BANK_3;
+      pinMode(pins.VAC_BANK_3, OUTPUT);
     }
-    if (pins.VAC_SPEED_PIN < 99 ) {
-      _message.verbosePrintf("Output VAC_SPEED_PIN: %d\n", pins.VAC_SPEED_PIN );
-      pinMode(pins.VAC_SPEED_PIN, OUTPUT);
-      status.ioError = false;
+    if (pins.VAC_SPEED > -1 ) {
+      _message.verbosePrintf("Output VAC_SPEED: %d\n", pins.VAC_SPEED );
+      currentPin = pins.VAC_SPEED;
+      pinMode(pins.VAC_SPEED, OUTPUT);
     }
-    if (pins.VAC_BLEED_VALVE_PIN < 99 ) {
-      _message.verbosePrintf("Output VAC_BLEED_VALVE_PIN: %d\n", pins.VAC_BLEED_VALVE_PIN );
-      pinMode(pins.VAC_BLEED_VALVE_PIN, OUTPUT);
-      status.ioError = false;
+    if (pins.VAC_BLEED_VALVE > -1 ) {
+      _message.verbosePrintf("Output VAC_BLEED_VALVE: %d\n", pins.VAC_BLEED_VALVE );
+      currentPin = pins.VAC_BLEED_VALVE;
+      pinMode(pins.VAC_BLEED_VALVE, OUTPUT);
     }
-    if (pins.AVO_STEP_PIN < 99 ) {
-      _message.verbosePrintf("Output AVO_STEP_PIN: %d\n", pins.AVO_STEP_PIN );
-      pinMode(pins.AVO_STEP_PIN, OUTPUT);
-      status.ioError = false;
+    if (pins.AVO_STEP > -1 ) {
+      _message.verbosePrintf("Output AVO_STEP: %d\n", pins.AVO_STEP );
+      currentPin = pins.AVO_STEP;
+      pinMode(pins.AVO_STEP, OUTPUT);
     }
-    if (pins.AVO_DIR_PIN < 99 ) {
-      _message.verbosePrintf("Output AVO_DIR_PIN: %d\n", pins.AVO_DIR_PIN );
-      pinMode(pins.AVO_DIR_PIN, OUTPUT);
-      status.ioError = false;
+    if (pins.AVO_DIR > -1 ) {
+      _message.verbosePrintf("Output AVO_DIR: %d\n", pins.AVO_DIR );
+      currentPin = pins.AVO_DIR;
+      pinMode(pins.AVO_DIR, OUTPUT);
     }
-    if (pins.FLOW_VALVE_STEP_PIN < 99 ) {
-      _message.verbosePrintf("Output FLOW_VALVE_STEP_PIN: %d\n", pins.FLOW_VALVE_STEP_PIN );
-      pinMode(pins.FLOW_VALVE_STEP_PIN, OUTPUT);
-      status.ioError = false;
+    if (pins.FLOW_VALVE_STEP > -1 ) {
+      _message.verbosePrintf("Output FLOW_VALVE_STEP: %d\n", pins.FLOW_VALVE_STEP );
+      currentPin = pins.FLOW_VALVE_STEP;
+      pinMode(pins.FLOW_VALVE_STEP, OUTPUT);
     }
-    if (pins.FLOW_VALVE_DIR_PIN < 99 ) {
-      _message.verbosePrintf("Output FLOW_VALVE_DIR_PIN: %d\n", pins.FLOW_VALVE_DIR_PIN );
-      pinMode(pins.FLOW_VALVE_DIR_PIN, OUTPUT);
-      status.ioError = false;
+    if (pins.FLOW_VALVE_DIR > -1 ) {
+      _message.verbosePrintf("Output FLOW_VALVE_DIR: %d\n", pins.FLOW_VALVE_DIR );
+      currentPin = pins.FLOW_VALVE_DIR;
+      pinMode(pins.FLOW_VALVE_DIR, OUTPUT);
     }
     if (config.bSD_ENABLED) {
-      // if (pins.SD_MOSI_PIN < 99 ) {
-      //   _message.verbosePrintf("Output SD_MOSI_PIN: %d\n", pins.SD_MOSI_PIN );
-      //   pinMode(pins.SD_MOSI_PIN, OUTPUT);
-      // status.ioError = false;
+      // if (pins.SD_MOSI > -1 ) {
+      //   _message.verbosePrintf("Output SD_MOSI: %d\n", pins.SD_MOSI );
+      // currentPin = pins.SD_MOSI;
+      //   pinMode(pins.SD_MOSI, OUTPUT);
       // }
     }
-    // if (pins.SERIAL0_TX_PIN < 99 ) {
-    //   _message.verbosePrintf("Output SERIAL0_TX_PIN: %d\n", pins.SERIAL0_TX_PIN );
-    //   pinMode(pins.SERIAL0_TX_PIN, OUTPUT);
-      // status.ioError = false;
+    // if (pins.SERIAL0_TX > -1 ) {
+    //   _message.verbosePrintf("Output SERIAL0_TX: %d\n", pins.SERIAL0_TX );
+      // currentPin = pins.SERIAL0_TX;
+    //   pinMode(pins.SERIAL0_TX, OUTPUT);
     // }
-    // if (pins.SERIAL2_TX_PIN < 99 ) {
-    //   _message.verbosePrintf("Output SERIAL2_TX_PIN: %d\n", pins.SERIAL2_TX_PIN );
-    //   pinMode(pins.SERIAL2_TX_PIN, OUTPUT);
-      // status.ioError = false;
+    // if (pins.SERIAL2_TX > -1 ) {
+    //   _message.verbosePrintf("Output SERIAL2_TX: %d\n", pins.SERIAL2_TX );
+      // currentPin = pins.SERIAL2_TX;
+    //   pinMode(pins.SERIAL2_TX, OUTPUT);
     // }
 
   } catch (...) {
-    _message.debugPrintf("I/O Initialisation Error");
-    status.ioError = true;
-    return false;
-
+    _message.debugPrintf("I/O Initialisation Error. Pin: %u", currentPin);
+    return currentPin;
   }
   _message.debugPrintf("I/O Initialised");
-
-  return true;
-
+  return status.ioError;
 
 }
 
@@ -605,7 +682,8 @@ double Hardware::get5vSupplyVolts() {
   if (config.bFIXED_5V == true) {
     return vcc5vSupplyVolts; 
   } else {
-    long rawVoltageValue = analogRead(pins.VCC_5V_PIN);  
+    // long rawVoltageValue = readAnalog(pins.VCC_5V);  // Uses custom function to fix ADC2 + WiFi issue
+    long rawVoltageValue = analogRead(pins.VCC_5V);  // Uses custom function to fix ADC2 + WiFi issue
     vcc5vSupplyVolts = (2 * static_cast<double>(rawVoltageValue) * 0.805860805860806F) ;
     return vcc5vSupplyVolts + config.dVCC_5V_TRIM;
   }
@@ -631,7 +709,7 @@ double Hardware::get3v3SupplyVolts() {
   if (config.bFIXED_3_3V) {
     return vcc3v3SupplyVolts; 
   } else {
-    long rawVoltageValue = analogRead(pins.VCC_3V3_PIN );  
+    long rawVoltageValue = analogRead(pins.VCC_3V3 );  
     vcc3v3SupplyVolts = (2 * static_cast<double>(rawVoltageValue) * 0.805860805860806F) ;
     return vcc3v3SupplyVolts + config.dVCC_3V3_TRIM;
   }
@@ -715,9 +793,9 @@ void Hardware::benchOn() {
 
   extern struct Pins pins;
 
-  digitalWrite(pins.VAC_BANK_1_PIN, HIGH);
-//  digitalWrite(pins.VAC_BANK_2_PIN, HIGH);
-//  digitalWrite(pins.VAC_BANK_3_PIN, HIGH);
+  digitalWrite(pins.VAC_BANK_1, HIGH);
+//  digitalWrite(pins.VAC_BANK_2, HIGH);
+//  digitalWrite(pins.VAC_BANK_3, HIGH);
 }
 
 
@@ -729,9 +807,9 @@ void Hardware::benchOff() {
 
   extern struct Pins pins;
 
-  digitalWrite(pins.VAC_BANK_1_PIN, LOW);
-//  digitalWrite(pins.VAC_BANK_2_PIN, LOW);
-//  digitalWrite(pins.VAC_BANK_3_PIN, LOW);
+  digitalWrite(pins.VAC_BANK_1, LOW);
+//  digitalWrite(pins.VAC_BANK_2, LOW);
+//  digitalWrite(pins.VAC_BANK_3, LOW);
 }
 
 
@@ -801,11 +879,11 @@ void Hardware::stepperTest() {
 
   _message.serialPrintf("Testing Stepper\n");
 
-  digitalWrite(pins.AVO_DIR_PIN, HIGH);
+  digitalWrite(pins.AVO_DIR, HIGH);
   for(int n = 0; n < numberOfSteps; n++) {
-    digitalWrite(pins.AVO_STEP_PIN, HIGH);
+    digitalWrite(pins.AVO_STEP, HIGH);
     delayMicroseconds(pulseWidthMicros); // this line is probably unnecessary
-    digitalWrite(pins.AVO_STEP_PIN, LOW);
+    digitalWrite(pins.AVO_STEP, LOW);
     
     delay(millisbetweenSteps);
     
@@ -814,11 +892,11 @@ void Hardware::stepperTest() {
   delay(1000);
   
 
-  digitalWrite(pins.AVO_DIR_PIN, LOW);
+  digitalWrite(pins.AVO_DIR, LOW);
   for(int n = 0; n < numberOfSteps; n++) {
-    digitalWrite(pins.AVO_STEP_PIN, HIGH);
+    digitalWrite(pins.AVO_STEP, HIGH);
     delayMicroseconds(pulseWidthMicros); // probably not needed
-    digitalWrite(pins.AVO_STEP_PIN, LOW);
+    digitalWrite(pins.AVO_STEP, LOW);
     
     delay(millisbetweenSteps);
   }
