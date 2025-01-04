@@ -42,8 +42,7 @@ class DataHandler {
 
     protected:
 
-		String byteDecode(size_t bytes);
-    	AsyncWebServer *tempServer;
+		AsyncWebServer *tempServer;
 
     private:
 
@@ -67,21 +66,20 @@ class DataHandler {
 		StaticJsonDocument<JSON_FILE_SIZE> loadJSONFile(String filename); 
 		void beginSerial(void);
 		void loadMAFData();
+		void loadMAFCoefficients();
 		void initialiseConfig();
 		void loadConfig();
-		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfiguration();
-		StaticJsonDocument<SETTINGS_JSON_SIZE> loadSettings ();
-		StaticJsonDocument<LIFT_DATA_JSON_SIZE> loadLiftData ();
+		void initialiseSettings ();
+		void initialiseLiftData ();
+		void loadSettings ();
+		void loadLiftData ();
 		static void clearLiftDataFile(AsyncWebServerRequest *request);
-		StaticJsonDocument<1024> loadCalibrationData ();
-		void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
-		String buildSSEJsonData();
+		String buildIndexSSEJsonData();
+		String buildMimicSSEJsonData();
 		static void fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 		void bootLoop();
 		String getRemote(const char* serverName);
 		bool checkUserFile(int filetype = PINSFILE); 
 		bool checkSubstring(std::string firstString, std::string secondString);
-		void loadPinsData ();
-		void parsePinsData(StaticJsonDocument<1024> pinData);
 
 };

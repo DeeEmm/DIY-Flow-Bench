@@ -43,10 +43,10 @@ struct BenchSettings {
   double maf_min_volts = 0.1;                     // Filter out results less than this
   int refresh_rate = 500;                         // Screen refresh rate in milliseconds (>180)
   int adj_flow_depression = 28;                   // Adjusted flow depression in inches of water
-  char rounding_type[12] = "NONE";                // Rounding type 
+  int rounding_type = NONE;                       // Rounding type 
   int flow_decimal_length = 1;                    // Flow decimal number of places 
   int gen_decimal_length = 2;                     // General decimal number of places 
-  char data_filter_type[12] = "NONE";             // Data filter type 
+  int data_filter_type = NONE;                    // Data filter type 
   int data_capture_datatype = 1;                  // Datacapture datatype
   int standardReference = 1;                      // Standard reference conditions (default ISO 1585)
   int std_adj_flow = 0;                           // Standardised adjusted flow
@@ -55,21 +55,22 @@ struct BenchSettings {
   bool show_alarms = true;                        // Display Alarms?
   bool debug_mode = false;                        // Global debug print override
   bool dev_mode = false;                          // Developer mode
+  bool function_mode = false;                     // Function mode
   bool status_print_mode = false;                 // Stream status data to serial
   bool verbose_print_mode = false;                // Stream verbose data to serial
   bool api_enabled = true;                        // Can disable serial API if required
-  char bench_type[8] = "MAF";                     // Default bench type
+  int bench_type = MAF_BENCH;                           // Default bench type
   int maf_housing_diameter = 0;                   // MAF Housing diameter
   int tatltuae = 42;
   int parsecs = 12;
-  char pageTitle[32] = "DIY Flow Bench";          // Display name for software
-  char wifi_ssid[32] = "WIFI-SSID";               // Your Wifi SSID
-  char wifi_pswd[32] = "PASSWORD";                // Your Wifi Password
-  char wifi_ap_pswd[32] = "123456789";            // Default Access Point Password
-  char hostname[32] = "diyfb";                    // Default Hostname
-  char api_delim[2] = ":";                        // API Serial comms delimiter
-  char wifi_ap_ssid[32] = "DIYFB";                // Default Access Point name
-  char temp_unit[11] = "Celcius";                 // Defalt display unit of temperature
+  String pageTitle = "DIY Flow Bench";          // Display name for software
+  String wifi_ssid = "WIFI-SSID";               // Your Wifi SSID
+  String wifi_pswd = "PASSWORD";                // Your Wifi Password
+  String wifi_ap_pswd = "123456789";            // Default Access Point Password
+  String hostname = "diyfb";                    // Default Hostname
+  String api_delim = ":";                        // API Serial comms delimiter
+  String wifi_ap_ssid = "DIYFB";                // Default Access Point name
+  int temp_unit = CELCIUS;                        // Defalt display unit of temperature
   bool ap_mode = false;                           // Default WiFi connection mode is accesspoint mode
   double valveLiftInterval = 1.5;                 // Distance between valve lift data points (can be metric or imperial)
   double cal_ref_press = 10;                      // Calibration orifice ref pressure
@@ -98,78 +99,73 @@ struct BenchSettings {
  * Configuration Data
  ***/
 struct Configuration {
-  bool SD_ENABLED = false;
-  int MIN_PRESS_PCNT = 80;
-  double PIPE_RAD_FT = 0.328084;
+  bool bSD_ENABLED = false;
+  int iMIN_PRESS_PCT = 80;
+  double dPIPE_RAD_FT = 0.328084;
 
-  double VCC_3V3_TRIM = 0.0;
-  double VCC_5V_TRIM = 0.0;
-  bool FIXED_3_3V_VAL = true;
-  bool FIXED_5V_VAL = true;
+  double dVCC_3V3_TRIM = 0.0;
+  double dVCC_5V_TRIM = 0.0;
+  bool bFIXED_3_3V = true;
+  bool bFIXED_5V = true;
 
-  bool BME280_ENABLED = true;
-  int BME280_I2C_ADDR = 118;
-  int BME280_SCAN_MS =  1000;
+  int iBME_TYP = BOSCH_BME280;
+  int iBME_ADDR = 118;
+  int iBME_SCAN_MS =  1000;
 
-  bool BME680_ENABLED = true;
-  int BME680_I2C_ADDR = 119;
-  int BME680_SCAN_MS =  1000;
+  int iADC_TYPE = ADS1115;
+  int iADC_I2C_ADDR = 72; 
+  int iADC_SCAN_DLY = 250;
+  int iADC_MAX_RETRY = 10;
+  int iADC_RANGE = 32767;
+  double dADC_GAIN = 6.144;
 
-  int ADC_TYPE = 11;
-  int ADC_I2C_ADDR = 72; 
-  int ADC_SCAN_DELAY = 250;
-  int ADC_MAX_RETRIES = 10;
-  int ADC_RANGE = 32767;
-  double ADC_GAIN = 6.144;
+  int iMAF_SRC_TYPE = ADS1115;
+  int iMAF_SENS_TYPE = 0;
+  double dMAF_MV_TRIM = 0.0;
+  int iMAF_ADC_CHAN = 0;
 
-  int MAF_SRC_TYPE = 11;
-  String MAF_SENS_TYPE = "Not Set";
-  // const char MAF_SENS_TYPE[35] = "Not Set";
-  double MAF_MV_TRIM = 0.0;
-  int MAF_ADC_CHAN = 0;
+  int iPREF_SENS_TYP = MPXV7007;
+  int iPREF_SRC_TYP = ADS1115;
+  int iFIXED_PREF_VAL = 1;
+  double dPREF_MV_TRIM =  0.0;
+  double dPREF_ALG_SCALE =  1.0;
+  int iPREF_ADC_CHAN = 1;
 
-  int PREF_SENS_TYPE = 4;
-  int PREF_SRC_TYPE = 11;
-  int FIXED_PREF_VAL = 1;
-  double PREF_MV_TRIM =  0.0;
-  double PREF_ALOG_SCALE =  1.0;
-  int PREF_ADC_CHAN = 1;
-
-  int PDIFF_SENS_TYPE = 4; 
-  int PDIFF_SRC_TYPE = 11;
-  int FIXED_PDIFF_VAL = 1;
-  double PDIFF_MV_TRIM = 0.0;
-  double PDIFF_SCALE = 1.0;
-  int PDIFF_ADC_CHAN = 2;
+  int iPDIFF_SENS_TYP = MPXV7007; 
+  int iPDIFF_SRC_TYP = ADS1115;
+  int iFIXD_PDIFF_VAL = 1;
+  double dPDIFF_MV_TRIM = 0.0;
+  double dPDIFF_SCALE = 1.0;
+  int iPDIFF_ADC_CHAN = 2;
   
-  int PITOT_SENS_TYPE = SENSOR_DISABLED;
-  int PITOT_SRC_TYPE = 11;
-  double PITOT_MV_TRIM = 0.0;
-  double PITOT_SCALE = 1.0;
-  int PITOT_ADC_CHAN = 3;
+  int iPITOT_SENS_TYP = MPXV7007;
+  int iPITOT_SRC_TYP = ADS1115;
+  double dPITOT_MV_TRIM = 0.0;
+  double dPITOT_SCALE = 1.0;
+  int iPITOT_ADC_CHAN = 3;
 
-  int BARO_SENS_TYPE = BOSCH_BME280; //7
-  double FIXED_BARO_VAL = 101.3529;
-  double BARO_ALOG_SCALE = 1.0;  
-  double BARO_SCALE = 1.0;
-  double BARO_OFFSET = 0.0;
-  double BARO_MV_TRIM = 0.0;
-  double BARO_FINE_TUNE = 0.0;
-  double SEALEVEL_PRESS = 1016.90;
-  int BARO_ADC_CHAN = 4;
+  int iBARO_SENS_TYP = BOSCH_BME280; //7
+  double dFIXD_BARO_VAL = 101.3529;
+  double dBARO_ALG_SCALE = 1.0;  
+  double dBARO_SCALE = 1.0;
+  double dBARO_OFFSET = 0.0;
+  double dBARO_MV_TRIM = 0.0;
+  double dBARO_FINE_TUNE = 0.0;
+  double dSEALEVEL_PRESS = 1016.90;
+  int iBARO_ADC_CHAN = 4;
 
-  int TEMP_SENS_TYPE = BOSCH_BME280; //7
-  double FIXED_TEMP_VAL = 21.0;
-  double TEMP_ALOG_SCALE = 1.0;
-  double TEMP_MV_TRIM = 0.0;
-  double TEMP_FINE_TUNE = 0.0;
+  int iTEMP_SENS_TYP = BOSCH_BME280; //7
+  double dFIXED_TEMP_VAL = 21.0;
+  double dTEMP_ALG_SCALE = 1.0;
+  double dTEMP_MV_TRIM = 0.0;
+  double dTEMP_FINE_TUNE = 0.0;
 
-  int RELH_SENS_TYPE = BOSCH_BME280; //7
-  double FIXED_RELH_VAL = 36.0;
-  double RELH_ALOG_SCALE = 1.0;
-  double RELH_MV_TRIM = 0.0;
-  double RELH_FINE_TUNE = 0.0;
-  bool SWIRL_ENABLED = false;
+  int iRELH_SENS_TYP = BOSCH_BME280; //7
+  double dFIXED_RELH_VAL = 36.0;
+  double dRELH_ALG_SCALE = 1.0;
+  double dRELH_MV_TRIM = 0.0;
+  double dRELH_FINE_TUNE = 0.0;
+  bool bSWIRL_ENBLD = false;
 };
 
 
@@ -243,6 +239,7 @@ struct DeviceStatus {
   String mafFilename;
   String indexFilename;
   bool doBootLoop = false;
+  int ioError = -1;
   bool webserverIsRunning = false;
   int mafDataTableRows = 0;
   u_int mafDataValMax = 0;
@@ -254,6 +251,10 @@ struct DeviceStatus {
   char mafOutputType[10];
   char mafLink[100];
   std::vector<std::vector<u_int>> mafLookupTable;  
+  int GUIpage = 0;
+  size_t nvmPins = 0;
+  size_t nvmConfig = 0;
+  size_t nvmSettings = 0;
 };
 
 
@@ -302,6 +303,7 @@ struct SensorData {
 
 
 
+
 /***********************************************************
  * Valve Lift data
  ***/
@@ -327,41 +329,44 @@ struct ValveLiftData {
  * Pin Data
  ***/
 struct Pins {
-  int VAC_SPEED_PIN = 99;
-  int VAC_BLEED_VALVE_PIN = 99;
-  int VAC_BANK_1_PIN = 99;
-  int VAC_BANK_2_PIN = 99; 
-  int VAC_BANK_3_PIN = 99;
-  int AVO_STEP_PIN = 99;
-  int AVO_DIR_PIN = 99;
-  int FLOW_VALVE_STEP_PIN = 99;
-  int FLOW_VALVE_DIR_PIN = 99;
-  int VCC_3V3_PIN = 99;
-  int VCC_5V_PIN = 99;
-  int SPEED_SENS_PIN = 99;
-  int SWIRL_ENCODER_PIN_A = 99;
-  int SWIRL_ENCODER_PIN_B = 99;
-  int ORIFICE_BCD_BIT1_PIN = 99;
-  int ORIFICE_BCD_BIT2_PIN = 99;
-  int ORIFICE_BCD_BIT3_PIN = 99;
-  int MAF_PIN = 99;
-  int REF_PRESSURE_PIN = 99;
-  int DIFF_PRESSURE_PIN = 99;
-  int PITOT_PIN = 99;
-  int TEMPERATURE_PIN = 99;
-  int REF_BARO_PIN = 99;
-  int HUMIDITY_PIN = 99;
-  int SERIAL0_TX_PIN = 99;
-  int SERIAL0_RX_PIN = 99;
-  int SERIAL2_TX_PIN = 99;
-  int SERIAL2_RX_PIN = 99;
-  int SDA_PIN = 99;
-  int SCL_PIN = 99;
-  int SD_CS_PIN = 99;
-  int SD_MOSI_PIN = 99;
-  int SD_MISO_PIN = 99;             
-  int SD_SCK_PIN = 99;
-  int WEMOS_SPARE_PIN_1 = 99;
+  // Inputs
+  int VCC_5V = -1;
+  int VCC_3V3 = -1;
+  int SPEED_SENS = 15;
+  int ORIFICE_BCD_1 = 34;
+  int ORIFICE_BCD_2 = 36;
+  int ORIFICE_BCD_3 = 39;
+  int MAF = -1;
+  int PREF = -1;
+  int PDIFF = -1;
+  int PITOT = -1;
+  int TEMPERATURE = -1;
+  int HUMIDITY = -1;
+  int REF_BARO = -1;
+  int SWIRL_ENCODER_A = -1;
+  int SWIRL_ENCODER_B = -1;
+  int SERIAL0_RX = 3;
+  int SERIAL2_RX = 17;
+  int SDA = 21;
+  int SCL = 22;
+  int SD_CS = 5;
+  int SD_MISO = 19;             
+  int SD_SCK = 18;
+  int SPARE_PIN_1 = -1;
+  int SPARE_PIN_2 = -1;
+  // Outputs
+  int VAC_SPEED = 25;
+  int VAC_BANK_1 = 13;
+  int VAC_BANK_2 = 12; 
+  int VAC_BANK_3 = 14;
+  int VAC_BLEED_VALVE = 26;
+  int AVO_STEP = 32;
+  int AVO_DIR = 33;
+  int FLOW_VALVE_STEP = 27;
+  int FLOW_VALVE_DIR = 4;
+  int SD_MOSI = 23;
+  int SERIAL0_TX = 1;
+  int SERIAL2_TX = 16;
 };
 
 
@@ -397,7 +402,6 @@ struct Language {
     char LANG_GUI_STORAGE[50] = "Storage";
     char LANG_GUI_NETWORK[50] = "Network";
     char LANG_GUI_IP_ADDRESS[50] = "IP Address";
-    char LANG_GUI_HARDWARE_CONFIG[50] = "Hardware Configuration";
     char LANG_GUI_BENCH_TYPE[50] = "Bench Type";
     char LANG_GUI_BOARD_TYPE[50] = "Board Type";
     char LANG_GUI_AUTO[50] = "Auto";
@@ -431,7 +435,7 @@ struct Language {
     char LANG_NOT_ENABLED[50] = "Not Enabled";
     char LANG_START_REF_PRESSURE[50] = "Using Startup Ref Pressure";
     char LANG_FIXED_VAL[50] = "Fixed value: ";
-    char LANG_CALIBRATING[50] = "Calibrating FLow Offset...";
+    char LANG_CALIBRATING[50] = "Calibrating Flow Offset...";
     char LANG_LEAK_CALIBRATING[50] = "Calibrating Leak Test...";
     char LANG_CAL_OFFSET_VAL[50] = "Cal Value: ";
     char LANG_LEAK_CAL_VAL[50] = "Leak Cal Value: ";
@@ -466,7 +470,10 @@ struct Language {
     char LANG_GUI_CAPTURE[50] = "Capture";
     char LANG_GUI_DASHBOARD[50] = "Dashboard";
     char LANG_GUI_DATA[50] = "Data";
+    char LANG_GUI_HARDWARE_CONFIG[50] = "Hardware Configuration";
     char LANG_GUI_CONFIG[50] = "Configuration";
+    char LANG_GUI_SETTINGS[50] = "Settings";
+    char LANG_GUI_PINS[50] = "Pins";
     char LANG_GUI_CLEAR[50] = "Clear";
     char LANG_GUI_EXPORT[50] = "Export";
     char LANG_GUI_IMAGE[50] = "Image";
@@ -479,58 +486,58 @@ struct Language {
     char LANG_GUI_HOSTNAME[50] = "WiFi Hostname";
     char LANG_GUI_WIFI_TIMEOUT[50] = "WiFi Timeout";
     char LANG_GUI_GENERAL_SETTINGS[50] = "Bench Settings";
-    char LANG_GUI_MAF_HOUSING_DIAMETER[50] = "MAF Housing Diameter (mm):";
-    char LANG_GUI_REFRESH_RATE[50] = "GUI Refresh Rate (ms):";
-    char LANG_GUI_TEMPERATURE_UNIT[50] = "Temperature Unit (&degC / &degF):";
-    char LANG_GUI_VALVE_LIFT_INTERVAL[50] = "Valve Lift Interval (mm / inch):";
-    char LANG_GUI_DATA_GRAPH_MAX_VAL[50] = "Data Graph Max Value:";
+    char LANG_GUI_MAF_DIAMETER[50] = "MAF Diameter (mm)";
+    char LANG_GUI_REFRESH_RATE[50] = "GUI Refresh Rate (ms)";
+    char LANG_GUI_TEMPERATURE_UNIT[50] = "Temp Unit (&degC / &degF)";
+    char LANG_GUI_LIFT_INTERVAL[50] = "Lift Interval (mm / inch)";
+    char LANG_GUI_DATA_GRAPH_MAX_VAL[50] = "Max Flow Value";
     char LANG_GUI_RESOLUTION_AND_ACCURACY[50] = "Resolution and Accuracy";
     char LANG_GUI_FLOW_VAL_ROUNDING[50] = "Flow Value Rounding";
-    char LANG_GUI_FLOW_DECIMAL_ROUNDING[50] = "Flow Decimal Accuracy";
-    char LANG_GUI_GEN_DECIMAL_ACCURACY[50] = "General Decimal Accuracy";
+    char LANG_GUI_FLOW_DECIMAL_ACCURACY[50] = "Flow Accuracy";
+    char LANG_GUI_GEN_DECIMAL_ACCURACY[50] = "General Accuracy";
     char LANG_GUI_DATA_FILTERS[50] = "Data Filters";
-    char LANG_GUI_DATA_FILTER_TYPE[50] = "Data Filter Type";
+    char LANG_GUI_DATA_FLTR_TYP[50] = "Data Filter Type";
     char LANG_GUI_MIN_FLOW_RATE[50] = "Min Flow Rate (cfm)";
-    char LANG_GUI_MIN_BENCH_PRESSURE[50] = "Min Bench Pressure (in/H2O)";
+    char LANG_GUI_MIN_PRESSUREURE[50] = "Min Pressure (in/H2O)";
     char LANG_GUI_MAF_MIN_VOLTS[50] = "MAF Min volts";
     char LANG_GUI_CYCLIC_AVERAGE_BUFFER[50] = "Cyclical Average Buffer";
     char LANG_GUI_CONVERSION_SETTINGS[50] = "Conversion Settings";
-    char LANG_GUI_ADJ_FLOW_DEPRESSION[50] = "Adjusted Flow Depression (in/H2O)";
-    char LANG_GUI_STANDARD_REF_CONDITIONS[50] = "Standard Reference Conditions (SCFM)";
-    char LANG_GUI_STANDARDISED_ADJ_FLOW[50] = "Standardised Adjusted Flow";
+    char LANG_GUI_ADJ_FLOW_DEP[50] = "Adj Flow pRef (in/H2O)";
+    char LANG_GUI_STANDARD_REF_CONDITIONS[50] = "Ref Standard (SCFM)";
+    char LANG_GUI_STANDARDISED_ADJ_FLOW[50] = "Std Adjusted Flow";
     char LANG_GUI_CAL_ORIFICE_SETTINGS[50] = "Calibration Orifice Settings";
-    char LANG_GUI_CAL_ORIFICE_FLOW_RATE[50] = "Calibration Orifice Flow Rate (cfm)";
-    char LANG_GUI_CAL_ORIFICE_TEST_PRESS[50] = "Calibration Orifice Test Pressure (in/H2O)";
+    char LANG_GUI_CAL_ORIFICE_FLOW_RATE[50] = "Cal Orifice Flow Rate (cfm)";
+    char LANG_GUI_CAL_ORIFICE_TEST_PRESS[50] = "Cal Orifice pRef (in/H2O)";
     char LANG_GUI_ORIFICE_DATA[50] = "Orifice Data";
     char LANG_GUI_ORIFICE1_FLOW[50] = "Orifice #1 Flow Rate (cfm)";
-    char LANG_GUI_ORIFICE1_PRESSURE[50] = "Orifice #1 Test Pressure (in/H2O)";
+    char LANG_GUI_ORIFICE1_PRESSURE[50] = "Orifice #1 pRef (in/H2O)";
     char LANG_GUI_ORIFICE2_FLOW[50] = "Orifice #2 Flow Rate (cfm)";
-    char LANG_GUI_ORIFICE2_PRESSURE[50] = "Orifice #2 Test Pressure (in/H2O)";
+    char LANG_GUI_ORIFICE2_PRESSURE[50] = "Orifice #2 pRef (in/H2O)";
     char LANG_GUI_ORIFICE3_FLOW[50] = "Orifice #3 Flow Rate (cfm)";
-    char LANG_GUI_ORIFICE3_PRESSURE[50] = "Orifice #3 Test Pressure (in/H2O)";
+    char LANG_GUI_ORIFICE3_PRESSURE[50] = "Orifice #3 pRef (in/H2O)";
     char LANG_GUI_ORIFICE4_FLOW[50] = "Orifice #4 Flow Rate (cfm)";
-    char LANG_GUI_ORIFICE4_PRESSURE[50] = "Orifice #4 Test Pressure (in/H2O)";
+    char LANG_GUI_ORIFICE4_PRESSURE[50] = "Orifice #4 pRef (in/H2O)";
     char LANG_GUI_ORIFICE5_FLOW[50] = "Orifice #5 Flow Rate (cfm)";
-    char LANG_GUI_ORIFICE5_PRESSURE[50] = "Orifice #5 Test Pressure (in/H2O)";
+    char LANG_GUI_ORIFICE5_PRESSURE[50] = "Orifice #5 pRef (in/H2O)";
     char LANG_GUI_ORIFICE6_FLOW[50] = "Orifice #6 Flow Rate (cfm)";
-    char LANG_GUI_ORIFICE6_PRESSURE[50] = "Orifice #6 Test Pressure (in/H2O)";
+    char LANG_GUI_ORIFICE6_PRESSURE[50] = "Orifice #6 pRef (in/H2O)";
     char LANG_GUI_API_SETTINGS[50] = "API Settings";
     char LANG_GUI_API_DELIMITER[50] = "API Delimiter";
-    char LANG_GUI_SERIAL_BAUD_RATE[50] = "Serial Baud Rate";
+    char LANG_GUI_SERIAL_BAUD[50] = "Serial Baud Rate";
     char LANG_GUI_CALIBRATION_DATA[50] = "Calibration Data";
     char LANG_GUI_CAL_OFFSET[50] = "Calibration Offset (cfm)";
     char LANG_GUI_LEAK_TEST_BASELINE[50] = "Leak Test Baseline (cfm)";
     char LANG_GUI_LEAK_TEST_OFFSET[50] = "Leak Test Offset (cfm)";
-    char LANG_GUI_LEAK_TEST_BASELINE_REV[50] = "Leak Test Baseline (Reverse) (cfm)";
-    char LANG_GUI_LEAK_TEST_OFFSET_REV[50] = "Leak Test Offset (Reverse) (cfm)";
+    char LANG_GUI_LEAK_TEST_BASELINE_REV[50] = "Leak Test Baseline (Rev) (cfm)";
+    char LANG_GUI_LEAK_TEST_OFFSET_REV[50] = "Leak Test Offset (Rev) (cfm)";
     char LANG_GUI_OVERWRITE[50] = "Overwrite";  
-    char LANG_GUI_DATA_CAPTURE_SETTINGS[50] = "Data Capture Settings";
+    char LANG_GUI_DATA_CAPTURE_SETTINGS[50] = "DataGraph Settings";
     char LANG_GUI_CAPTURE_DATATYPE[50] = "Datatype";
     char LANG_GUI_MAF_VOLTS[50] = "MAF Volts";
     char LANG_GUI_PREF_VOLTS[50] = "pRef Volts";
     char LANG_GUI_PDIFF_VOLTS[50] = "pDiff Volts";
     char LANG_GUI_PITOT_VOLTS[50] = "Pitot Volts";
-    
+    char LANG_GUI_MAF_TYPE[50] = "MAF Type";
 
 
 };

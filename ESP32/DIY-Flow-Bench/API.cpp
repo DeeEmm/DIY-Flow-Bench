@@ -34,6 +34,7 @@
 #include "webserver.h"
 #include "datahandler.h"
 #include "comms.h"
+#include <Preferences.h>
 
 extern struct BenchSettings settings;
 
@@ -67,9 +68,9 @@ String API::getConfigJSON() {
   StaticJsonDocument<1024> dataJson;    
   
   // Can add more settings as required
-  dataJson["MIN_FLOW_RATE"] = settings.min_flow_rate;
-  dataJson["MIN_BENCH_PRESSURE"] = settings.min_bench_pressure;
-  dataJson["REFRESH_RATE"] = settings.refresh_rate;
+  dataJson["iMIN_FLOW_RATE"] = settings.min_flow_rate;
+  dataJson["iMIN_PRESSUREURE"] = settings.min_bench_pressure;
+  dataJson["iREFRESH_RATE"] = settings.refresh_rate;
 
   
   serializeJson(dataJson, jsonString);  
@@ -113,6 +114,7 @@ void API::ParseMessage(char apiMessage) {
   Calibration _calibration;
   DataHandler _data;
   Comms _comms;
+  Preferences _prefs;
   
   extern TaskHandle_t sensorDataTask;
   extern TaskHandle_t enviroDataTask;
@@ -157,8 +159,7 @@ void API::ParseMessage(char apiMessage) {
   j : JSON Configuration Data
   K : MAF Data Key Value
   k : MAF Data Lookup Value
-  L : Leak Test Calibration
-  l : Leak Test
+  l : Lift Data
   M : MAF.json
   N : Hostname
   o : Active Orifice
@@ -171,10 +172,13 @@ void API::ParseMessage(char apiMessage) {
   t : Temperature in Fahrenheit
   U : Uptime in hhhh.mm
   V : Version
+  v : GUI Version
   v : Valve lift data in JSON format
   W : WiFi SSID
   X : xTask memory usage   
+  x : Heap memory usage   
   ? : Help
+  < : Last Error
   / : SPIFFS File List
   ~ : Restart ESP
   $ : Reset WiFi
@@ -182,9 +186,19 @@ void API::ParseMessage(char apiMessage) {
   ! : Debug Mode
   + : Verbose Mode
   = : Status Mode
-  < : Last Error
+  ^ : FUNCTION MODE
   ============================== 
   )";
+
+  //API Response for boot loop
+  char apiFunctionHelpText[] = R"(
+  DIYFB Function Commands
+  ==============================
+  & : Reset Pins
+  % : Reset WiFi AP SSID & Password
+  ============================== 
+  )";
+
 
   //API Response for boot loop
   char bootHelpText[] = R"(
@@ -204,10 +218,12 @@ void API::ParseMessage(char apiMessage) {
   V : Version
   W : WiFi SSID
   X : xTask memory usage   
+  x : Heap memory usage   
   ? : Help
   / : SPIFFS File List
   ~ : Restart ESP
   $ : Reset WiFi
+  % : Reset WiFi AP SSID & Password
   @ : Stream Status
   ! : Debug Mode
   + : Verbose Mode
@@ -215,6 +231,9 @@ void API::ParseMessage(char apiMessage) {
   < : Last Error
   ============================== 
   )";
+
+
+
 
 
   switch (apiMessage)   {
@@ -244,20 +263,20 @@ void API::ParseMessage(char apiMessage) {
       case 'A': // Report ADC voltage values
           if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "A%s%f%s%f%s%f%s%f", 
-          settings.api_delim, _hardware.getADCVolts(config.MAF_ADC_CHAN), 
-          settings.api_delim, _hardware.getADCVolts(config.PREF_ADC_CHAN), 
-          settings.api_delim, _hardware.getADCVolts(config.PDIFF_ADC_CHAN), 
-          settings.api_delim, _hardware.getADCVolts(config.PITOT_ADC_CHAN)); 
+          settings.api_delim, _hardware.getADCVolts(config.iMAF_ADC_CHAN), 
+          settings.api_delim, _hardware.getADCVolts(config.iPREF_ADC_CHAN), 
+          settings.api_delim, _hardware.getADCVolts(config.iPDIFF_ADC_CHAN), 
+          settings.api_delim, _hardware.getADCVolts(config.iPITOT_ADC_CHAN)); 
      break;
 
 
       case 'a': // Report Raw ADC values
           if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "a%s%u%s%u%s%u%s%u", 
-          settings.api_delim, _hardware.getADCRawData(config.MAF_ADC_CHAN), 
-          settings.api_delim, _hardware.getADCRawData(config.PREF_ADC_CHAN), 
-          settings.api_delim, _hardware.getADCRawData(config.PDIFF_ADC_CHAN), 
-          settings.api_delim, _hardware.getADCRawData(config.PITOT_ADC_CHAN)); 
+          settings.api_delim, _hardware.getADCRawData(config.iMAF_ADC_CHAN), 
+          settings.api_delim, _hardware.getADCRawData(config.iPREF_ADC_CHAN), 
+          settings.api_delim, _hardware.getADCRawData(config.iPDIFF_ADC_CHAN), 
+          settings.api_delim, _hardware.getADCRawData(config.iPITOT_ADC_CHAN)); 
      break;
 
 
@@ -266,24 +285,20 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "B%s%f", settings.api_delim , sensorVal.BaroHPA);
       break;
 
+      // DEPRECATED - Configuration no longer in JSON file
       case 'C': { // Show configuration.json  'C\r\n'        
-          StaticJsonDocument<CONFIG_JSON_SIZE> configurationJSON;
-          if (SPIFFS.exists("/configuration.json"))  {
-            configurationJSON = _data.loadJSONFile("/configuration.json");
-          }
-          serializeJsonPretty(configurationJSON, Serial);
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
+          // StaticJsonDocument<CONFIG_JSON_SIZE> configurationJSON;
+          // if (SPIFFS.exists("/configuration.json"))  {
+          //   configurationJSON = _data.loadJSONFile("/configuration.json");
+          // }
+          // serializeJsonPretty(configurationJSON, Serial);
+          // snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
       break; }
 
       case 'D': // Differential Pressure value
           if (status.doBootLoop) break;
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%u", settings.api_delim , _calculations.convertPressure(sensorVal.PDiffKPA, INH2O));
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "D%s%d", settings.api_delim , _calculations.convertPressure(sensorVal.PDiffKPA, INH2O));
       break;      
-
-      // DEPRECATED 
-      // case 'd': // Differential pressure sensor voltage
-      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "d%s%u", settings.api_delim , sensorVal.PDiffMv);
-      // break;      
 
       case 'E': // Enum1 - Flow:Ref:Temp:Humidity:Baro
           if (status.doBootLoop) break;          
@@ -325,28 +340,31 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "I%s%s", settings.api_delim, status.local_ip_address.c_str());
       break;
 
-      case 'J':{ // JSON Data
+      case 'J':{ // JSON SSE Data
           if (status.doBootLoop) break;
           StaticJsonDocument <DATA_JSON_SIZE> jsondoc;
-          jsonString = _data.buildSSEJsonData();
+          jsonString = _data.buildIndexSSEJsonData();
           deserializeJson(jsondoc, jsonString);
           serializeJsonPretty(jsondoc, Serial);
           // snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", settings.api_delim, String(jsonString).c_str());
           snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
       break;}
-      
+
+
+      // DEPRECATED - config no longer in JSON file
       case 'j': // Current configuration in JSON
-          if (status.doBootLoop) break;
-          jsonString = this->getConfigJSON();
-          jsonString.toCharArray(charDataJSON, API_JSON_LENGTH);
-          snprintf(apiResponseBlob, API_BLOB_LENGTH, "C%s%s", settings.api_delim, charDataJSON);
+          // if (status.doBootLoop) break;
+          // jsonString = this->getConfigJSON();
+          // jsonString.toCharArray(charDataJSON, API_JSON_LENGTH);
+          // snprintf(apiResponseBlob, API_BLOB_LENGTH, "C%s%s", settings.api_delim, charDataJSON);
       break;
       
+      // DEPRECATED MAF Data now uses transfer function
       case 'K': // MAF Data Key Value A
-          if (status.doBootLoop) break;
-          // refValue =  map(_sensors.getMafVolts(), 0, 5, 0, status.mafDataKeyMax); 
-          refValue = (status.mafDataKeyMax / 5) * _sensors.getMafVolts();
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "K%s MAF DATA Key value: %d ", settings.api_delim , refValue); 
+          // if (status.doBootLoop) break;
+          // // refValue =  map(_sensors.getMafVolts(), 0, 5, 0, status.mafDataKeyMax); 
+          // refValue = (status.mafDataKeyMax / 5) * _sensors.getMafVolts();
+          // snprintf(apiResponse, API_RESPONSE_LENGTH, "K%s MAF DATA Key value: %d ", settings.api_delim , refValue); 
       break;
 
       case 'k': // MAF Data lookup value
@@ -354,30 +372,24 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "k%s MAF DATA Lookup value: %d ", settings.api_delim , sensorVal.MafLookup); 
       break;
 
-      case 'L': // Perform Leak Test Calibration 'L\r\n'
+      case 'l': // Valve lift Data
           if (status.doBootLoop) break;
-          _calibration.setLeakOffset();
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "L%s%F", settings.api_delim , calVal.leak_cal_offset );
-          // TODO: confirm Leak Test Calibration success in response
+          jsonString = _webserver.getValveDataJSON();
+          // snprintf(apiResponseBlob, API_BLOB_LENGTH, "l%s%s", settings.api_delim, String(jsonString).c_str()); // TODO: Fix this - not working
       break;
       
-      case 'l': // Perform Leak Test 'l\r\n'      
-          if (status.doBootLoop) break;
-          // TODO: apiResponse = ("l") + settings.api_delim + leakTest();
-          // TODO: confirm Leak Test success in response
-      break;
-      
+      // TODO - MAF data now uses transfer function
       case 'M': { // Get MAF.json 
-            StaticJsonDocument<MAF_JSON_SIZE> mafJSON;
-            if (SPIFFS.exists(status.mafFilename))  {
-              mafJSON = _data.loadJSONFile(status.mafFilename);
-            }
-            if (mafJSON.overflowed() == true) {
-              _message.serialPrintf("MAF Data file - JsonDocument::overflowed()");
-            } else {
-              serializeJsonPretty(mafJSON, Serial);
-            }
-            snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
+            // StaticJsonDocument<MAF_JSON_SIZE> mafJSON;
+            // if (SPIFFS.exists(status.mafFilename))  {
+            //   mafJSON = _data.loadJSONFile(status.mafFilename);
+            // }
+            // if (mafJSON.overflowed() == true) {
+            //   _message.serialPrintf("MAF Data file - JsonDocument::overflowed()");
+            // } else {
+            //   serializeJsonPretty(mafJSON, Serial);
+            // }
+            // snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
       break; }
            
       case 'N': // Hostname
@@ -398,20 +410,17 @@ void API::ParseMessage(char apiMessage) {
           if (status.doBootLoop) break;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "P%s%f", settings.api_delim , _calculations.convertPressure(sensorVal.PitotKPA, INH2O));
       break;
-      
-      // DEPRECATED 
-      // case 'p': // Get Pitot sensor output voltage          
-      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "r%s%f", settings.api_delim , _sensors.getPitotVolts());
-      // break;   
 
+      // DEPRECATED - No longer using MAF lookup table
       case 'Q': // mafdata max value
-          if (status.doBootLoop) break;
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "Q%s%u", settings.api_delim , status.mafDataValMax);
+          // if (status.doBootLoop) break;
+          // snprintf(apiResponse, API_RESPONSE_LENGTH, "Q%s%u", settings.api_delim , status.mafDataValMax);
       break;      
 
+      // DEPRECATED - No longer using MAF lookup table
       case 'q': // mafdata max key value
-          if (status.doBootLoop) break;
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "q%s%u", settings.api_delim , status.mafDataKeyMax);
+          // if (status.doBootLoop) break;
+          // snprintf(apiResponse, API_RESPONSE_LENGTH, "q%s%u", settings.api_delim , status.mafDataKeyMax);
       break;      
 
       case 'R': // Get measured Reference Pressure 'R.123.45\r\n'
@@ -419,67 +428,62 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "R%s%f", settings.api_delim , _calculations.convertPressure(sensorVal.PRefKPA, INH2O));
       break;
       
-      // DEPRECATED 
-      // case 'r': // Get Reference Pressure sensor output voltage          
-      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "r%s%f", settings.api_delim , _sensors.getPRefVolts());
-      // break;      
-      
-      case 'S': { // Status  'S.123.45\r\n'
+  //     case 'S': { // Status  'S.123.45\r\n'
 
-          _message.serialPrintf("debug = %d\n",status.debug ? "true" : "false");
-          _message.serialPrintf("spiffs_mem_size = %i\n", status.spiffs_mem_size);
-          _message.serialPrintf("spiffs_mem_used = %i\n", status.spiffs_mem_used);
-          _message.serialPrintf("pageSize = %i\n", status.pageSize);
-          _message.serialPrintf("local_ip_address = %s\n", status.local_ip_address);
-          _message.serialPrintf("hostname = %s\n", status.hostname);
-          _message.serialPrintf("boardType = %s\n", status.boardType);
-          _message.serialPrintf("benchType = %s\n", status.benchType);
-          _message.serialPrintf("mafSensor = %s\n", status.mafSensor);
-          _message.serialPrintf("mafLink = %s \n", status.mafLink);
-          _message.serialPrintf("prefSensor = %s\n", status.prefSensor);
-          _message.serialPrintf("pdiffSensor = %s\n", status.pdiffSensor);
-          _message.serialPrintf("tempSensor = %s\n", status.tempSensor);
-          _message.serialPrintf("relhSensor = %s\n", status.relhSensor);
-          _message.serialPrintf("baroSensor = %s\n", status.baroSensor);
-          _message.serialPrintf("pitotSensor = %s\n", status.pitotSensor);
-          _message.serialPrintf("boot_time = %i\n", status.boot_time);
-          _message.serialPrintf("liveStream = %s\n", status.liveStream ? "true" : "false");
-          _message.serialPrintf("adcPollTimer = %lu\n", status.adcPollTimer);
-          _message.serialPrintf("bmePollTimer = %lu\n", status.bmePollTimer);
-          _message.serialPrintf("apiPollTimer = %lu\n", status.apiPollTimer);
-          _message.serialPrintf("browserUpdateTimer = %lu\n", status.browserUpdateTimer);
-          _message.serialPrintf("wsCLeanPollTimer = %lu\n", status.wsCLeanPollTimer);
-          _message.serialPrintf("pollTimer = %i\n", status.pollTimer);
-          _message.serialPrintf("serialData = %i\n", status.serialData);;
-          _message.serialPrintf("statusMessage = %s\n", status.statusMessage);
-          _message.serialPrintf("apMode = %s\n",status.apMode ? "true" : "false");
-          _message.serialPrintf("HWMBME = %d\n",status.HWMBME);
-          _message.serialPrintf("HWMADC = %d\n",status.HWMADC);
-          _message.serialPrintf("HWMSSE = %d\n",status.HWMSSE);
-          _message.serialPrintf("activeOrifice =  %s\n", status.activeOrifice);
+  //         _message.serialPrintf("debug = %d\n",status.debug ? "true" : "false");
+  //         _message.serialPrintf("spiffs_mem_size = %i\n", status.spiffs_mem_size);
+  //         _message.serialPrintf("spiffs_mem_used = %i\n", status.spiffs_mem_used);
+  //         _message.serialPrintf("pageSize = %i\n", status.pageSize);
+  //         _message.serialPrintf("local_ip_address = %s\n", status.local_ip_address);
+  //         _message.serialPrintf("hostname = %s\n", status.hostname);
+  //         _message.serialPrintf("boardType = %s\n", status.boardType);
+  //         _message.serialPrintf("benchType = %s\n", status.benchType);
+  //         _message.serialPrintf("mafSensor = %s\n", status.mafSensor);
+  //         _message.serialPrintf("mafLink = %s \n", status.mafLink);
+  //         _message.serialPrintf("prefSensor = %s\n", status.prefSensor);
+  //         _message.serialPrintf("pdiffSensor = %s\n", status.pdiffSensor);
+  //         _message.serialPrintf("tempSensor = %s\n", status.tempSensor);
+  //         _message.serialPrintf("relhSensor = %s\n", status.relhSensor);
+  //         _message.serialPrintf("baroSensor = %s\n", status.baroSensor);
+  //         _message.serialPrintf("pitotSensor = %s\n", status.pitotSensor);
+  //         _message.serialPrintf("boot_time = %i\n", status.boot_time);
+  //         _message.serialPrintf("liveStream = %s\n", status.liveStream ? "true" : "false");
+  //         _message.serialPrintf("adcPollTimer = %lu\n", status.adcPollTimer);
+  //         _message.serialPrintf("bmePollTimer = %lu\n", status.bmePollTimer);
+  //         _message.serialPrintf("apiPollTimer = %lu\n", status.apiPollTimer);
+  //         _message.serialPrintf("browserUpdateTimer = %lu\n", status.browserUpdateTimer);
+  //         _message.serialPrintf("wsCLeanPollTimer = %lu\n", status.wsCLeanPollTimer);
+  //         _message.serialPrintf("pollTimer = %i\n", status.pollTimer);
+  //         _message.serialPrintf("serialData = %i\n", status.serialData);;
+  //         _message.serialPrintf("statusMessage = %s\n", status.statusMessage);
+  //         _message.serialPrintf("apMode = %s\n",status.apMode ? "true" : "false");
+  //         _message.serialPrintf("HWMBME = %d\n",status.HWMBME);
+  //         _message.serialPrintf("HWMADC = %d\n",status.HWMADC);
+  //         _message.serialPrintf("HWMSSE = %d\n",status.HWMSSE);
+  //         _message.serialPrintf("activeOrifice =  %s\n", status.activeOrifice);
 
-          _message.serialPrintf("activeOrificeFlowRate =  %d\n", status.activeOrifice);
-          _message.serialPrintf("activeOrificeTestPressure =  %d\n", status.activeOrifice);
-          _message.serialPrintf("shouldReboot  =  %s\n", status.activeOrifice ? "true" : "false");
-          _message.serialPrintf("pinsLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
-          _message.serialPrintf("mafLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
-          _message.serialPrintf("configLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
-          _message.serialPrintf("GUIexists  =  %s", status.GUIexists ? "true" : "false");
-          _message.serialPrintf("pinsFilename =  %s\n", status.pinsFilename);
-          _message.serialPrintf("mafFilename =  %s\n", status.mafFilename);
-          _message.serialPrintf("indexFilename =  %s\n", status.indexFilename);
-          _message.serialPrintf("doBootLoop =  %s\n", status.doBootLoop ? "true" : "false");
-          _message.serialPrintf("webserverIsRunning  =  %s\n", status.webserverIsRunning ? "true" : "false");
-          _message.serialPrintf("mafDataTableRows  =  %i\n", status.mafDataTableRows);
-          _message.serialPrintf("mafDataValMax  =  %s\n", status.mafDataValMax ? "true" : "false");
-          _message.serialPrintf("mafDataKeyMax  =  %s\n", status.mafDataKeyMax ? "true" : "false");
-          _message.serialPrintf("mafUnits =  %s\n", status.mafUnits);
-          _message.serialPrintf("mafScaling  =  %d\n", status.mafScaling);
-          _message.serialPrintf("mafDiameter  =  %i\n", status.mafDiameter);
-          _message.serialPrintf("mafSensorType=  %s\n", status.mafSensorType);
-          _message.serialPrintf("mafOutputType =  %s\n", status.mafOutputType);
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
-      break;}
+  //         _message.serialPrintf("activeOrificeFlowRate =  %d\n", status.activeOrifice);
+  //         _message.serialPrintf("activeOrificeTestPressure =  %d\n", status.activeOrifice);
+  //         _message.serialPrintf("shouldReboot  =  %s\n", status.activeOrifice ? "true" : "false");
+  //         _message.serialPrintf("pinsLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
+  //         _message.serialPrintf("mafLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
+  //         _message.serialPrintf("configLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
+  //         _message.serialPrintf("GUIexists  =  %s", status.GUIexists ? "true" : "false");
+  //         _message.serialPrintf("pinsFilename =  %s\n", status.pinsFilename);
+  //         _message.serialPrintf("mafFilename =  %s\n", status.mafFilename);
+  //         _message.serialPrintf("indexFilename =  %s\n", status.indexFilename);
+  //         _message.serialPrintf("doBootLoop =  %s\n", status.doBootLoop ? "true" : "false");
+  //         _message.serialPrintf("webserverIsRunning  =  %s\n", status.webserverIsRunning ? "true" : "false");
+  //         _message.serialPrintf("mafDataTableRows  =  %i\n", status.mafDataTableRows);
+  //         _message.serialPrintf("mafDataValMax  =  %s\n", status.mafDataValMax ? "true" : "false");
+  //         _message.serialPrintf("mafDataKeyMax  =  %s\n", status.mafDataKeyMax ? "true" : "false");
+  //         _message.serialPrintf("mafUnits =  %s\n", status.mafUnits);
+  //         _message.serialPrintf("mafScaling  =  %d\n", status.mafScaling);
+  //         _message.serialPrintf("mafDiameter  =  %i\n", status.mafDiameter);
+  //         _message.serialPrintf("mafSensorType=  %s\n", status.mafSensorType);
+  //         _message.serialPrintf("mafOutputType =  %s\n", status.mafOutputType);
+  //         snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
+  //     break;}
       
       case 't': // Get measured Temperature in Fahrenheit 'F.123.45\r\n'
           if (status.doBootLoop) break;
@@ -505,11 +509,11 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "V%s%s.%s.%s", settings.api_delim , MAJOR_VERSION, MINOR_VERSION, BUILD_NUMBER);
       break;
 
-      case 'v': // Valve lift Data
-          if (status.doBootLoop) break;
-          jsonString = _webserver.getValveDataJSON();
-          snprintf(apiResponseBlob, API_BLOB_LENGTH, "v%s%s", settings.api_delim, String(jsonString).c_str());
+      case 'v': // Get GUI Version 'VMmYYMMDDXX\r\n'          
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "v%s%s", settings.api_delim , GUI_BUILD_NUMBER );
       break;
+
+
       
       case 'W': // WiFi SSID
           if (status.apMode == true) {
@@ -520,30 +524,32 @@ void API::ParseMessage(char apiMessage) {
       break;
 
       case 'X': // Print xTask memory usage (Stack high water mark) to serial monitor 
-          snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack Free Memory EnviroTask=%d / SensorTask=%d ", settings.api_delim , uxTaskGetStackHighWaterMark(enviroDataTask), uxTaskGetStackHighWaterMark(sensorDataTask)); 
+          snprintf(apiResponse, API_RESPONSE_LENGTH,"X%sStack Free Memory EnviroTask=%s / SensorTask=%s ", settings.api_delim , _calculations.byteDecode(uxTaskGetStackHighWaterMark(enviroDataTask)), _calculations.byteDecode(uxTaskGetStackHighWaterMark(sensorDataTask))); 
       break;
       
-      case 'x': // Print xTask memory usage (Stack high water mark) to serial monitor 
-          snprintf(apiResponse, API_RESPONSE_LENGTH,"x%sFree Heap=%u / Max Allocated Heap=%u ", settings.api_delim , ESP.getFreeHeap(), ESP.getMaxAllocHeap()); 
+      case 'x': // Print Heap memory usage to serial monitor 
+          snprintf(apiResponse, API_RESPONSE_LENGTH,"x%sFree Heap=%s / Max Allocated Heap=%s ", settings.api_delim , _calculations.byteDecode(ESP.getFreeHeap()), _calculations.byteDecode(ESP.getMaxAllocHeap())); 
       break;
 
       
-      case '@': // Status Print Mode (Stream status messages to serial)
-          if (status.doBootLoop) break;
-          if (settings.status_print_mode == true){
-            settings.status_print_mode = false;
-            snprintf(apiResponse, API_RESPONSE_LENGTH, "@%s%s", settings.api_delim, "Status Data Disabled" ); 
-          } else {
-            settings.status_print_mode = true;
-            snprintf(apiResponse, API_RESPONSE_LENGTH, "@%s%s", settings.api_delim, "Status Data Enabled~" ); 
-          }
-      break;
+  //     case '@': // Status Print Mode (Stream status messages to serial)
+  //         if (status.doBootLoop) break;
+  //         if (settings.status_print_mode == true){
+  //           settings.status_print_mode = false;
+  //           snprintf(apiResponse, API_RESPONSE_LENGTH, "@%s%s", settings.api_delim, "Status Data Disabled" ); 
+  //         } else {
+  //           settings.status_print_mode = true;
+  //           snprintf(apiResponse, API_RESPONSE_LENGTH, "@%s%s", settings.api_delim, "Status Data Enabled~" ); 
+  //         }
+  //     break;
       
       
 
       case '?': // Help      
           if (status.doBootLoop) {
             snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s", bootHelpText);            
+          } else if (settings.function_mode == true) {
+            snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s", apiFunctionHelpText);
           } else {
             snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s", apiHelpText);
           }
@@ -555,15 +561,36 @@ void API::ParseMessage(char apiMessage) {
           File root = FILESYSTEM.open("/");
           File file = root.openNextFile();
           const char* spiffsFileName;
-          String spiffsFileSize;
+          int spiffsFileSize;
+
+          status.spiffs_mem_size = SPIFFS.totalBytes();
+          status.spiffs_mem_used = SPIFFS.usedBytes();
+
+          strcat(fileListBlob, "Spiffs File List\n");
+          strcat(fileListBlob, "================\n");
+
           while (file)  {
             spiffsFileName = file.name();
-            spiffsFileSize = file.size(); // TODO what about file size????!?!?!
+            spiffsFileSize = file.size(); 
             strcat(fileListBlob, spiffsFileName);
+            strcat(fileListBlob, "  ");
+            strcat(fileListBlob, _calculations.byteDecode(spiffsFileSize).c_str());
             strcat(fileListBlob, "\n");
             file = root.openNextFile();
           }
+
+          strcat(fileListBlob, "================\n");
+          strcat(fileListBlob, "\nTotal space:      ");
+          strcat(fileListBlob, _calculations.byteDecode(status.spiffs_mem_size).c_str());
+          strcat(fileListBlob, "\n");
+          strcat(fileListBlob, "Total space used: ");
+          strcat(fileListBlob, _calculations.byteDecode(status.spiffs_mem_used).c_str());
+          strcat(fileListBlob, "\n");
+          strcat(fileListBlob, "================\n");
+
           snprintf(apiResponseBlob, API_BLOB_LENGTH, "\n%s" , fileListBlob);
+
+
           // FILESYSTEM.end();
         }
       break;
@@ -599,12 +626,22 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case '#': // Developer Mode (Enable additional developer tools)
-        if (settings.dev_mode == true){
+        if (settings.dev_mode == true) {
           settings.dev_mode = false;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "Developer Mode Off" ); 
         } else {
           settings.dev_mode = true;
           snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "Developer Mode On" ); 
+        }
+      break;
+      
+      case '^': // Function Mode (Enable additional tools)
+        if (settings.function_mode == true) {
+          settings.function_mode = false;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "Function Mode Off" ); 
+        } else {
+          settings.function_mode = true;
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "Function Mode On" ); 
         }
       break;
       
@@ -617,12 +654,37 @@ void API::ParseMessage(char apiMessage) {
         ESP.restart();
       break;
 
-      case '$': // Recover server
+      case '$': // Recover WiFi
           snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", "Attempting to recover WiFi Connection");
           // settings.api_enabled = false;
           _comms.wifiReconnect();
           // settings.api_enabled = true;
       break;
+
+      case '%':{ // Reset WiFi passwords
+        if (settings.function_mode == true) {
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", "Attempting to reset WiFi passwords");
+          _prefs.begin("settings");
+          _prefs.putString("sWIFI_AP_SSID", static_cast<String>("DIYFB"));
+          _prefs.putString("sWIFI_AP_PSWD", static_cast<String>("123456789"));
+          _prefs.end();
+          settings.function_mode = false;
+        }
+        break;
+      }
+
+      case '&':{ // Reset Pins
+        if (settings.function_mode == true) {
+          _hardware.resetPins();
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "Pins Reset" ); 
+          settings.function_mode = false;
+        }
+        break;
+      }
+
+
+
+
 
       case ' ': // <<<<(TEST [space] exclude from API listing)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 
            
@@ -647,14 +709,26 @@ void API::ParseMessage(char apiMessage) {
       break; // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
-      case '}': // Flow Offset Calibration  'O\r\n'        
-          if (status.doBootLoop) break;
-          // _calibration.setFlowOffset();
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "C%s%f", settings.api_delim , calVal.flow_offset);
-          // TODO: confirm Flow Offset Calibration success in response
-      break;      
+      // TODO - Calibration API commands
+      // case '}': // Flow Offset Calibration  'O\r\n'        
+      //     if (status.doBootLoop) break;
+      //     // _calibration.setFlowOffset();
+      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "C%s%f", settings.api_delim , calVal.flow_offset);
+      //     // TODO: confirm Flow Offset Calibration success in response
+      // break;      
 
-
+      // case 'L': // Perform Leak Test Calibration 'L\r\n'
+      //     if (status.doBootLoop) break;
+      //     _calibration.setLeakOffset();
+      //     snprintf(apiResponse, API_RESPONSE_LENGTH, "L%s%F", settings.api_delim , calVal.leak_cal_offset );
+      //     // TODO: confirm Leak Test Calibration success in response
+      // break;
+      
+      // case 'l': // Perform Leak Test 'l\r\n'      
+      //     if (status.doBootLoop) break;
+      //     // TODO: apiResponse = ("l") + settings.api_delim + leakTest();
+      //     // TODO: confirm Leak Test success in response
+      // break;
 
 
       // We've got here without a valid API request so lets get outta here before we send garbage to the serial comms
@@ -684,9 +758,11 @@ void API::ParseMessage(char apiMessage) {
       if (*apiResponseBlob != 0) {
         _message.blobPrintf("%s\n", apiResponseBlob);     
         _message.serialPrintf("\n\n", "");    
+     
       } else if (*apiResponse != 0) {
         _message.serialPrintf("%s\n", apiResponse);    
-      }else {
+      
+      } else {
         //invalid response
         _message.serialPrintf("%s\n", "Invalid Response");
       }

@@ -49,12 +49,13 @@
 #include "constants.h"
 #include "system.h"
 #include "structs.h"
+#include "mafdata.h"
 
 #include "hardware.h" 
 #include "sensors.h"
 #include "calculations.h"
 #include "webserver.h"
-#include "public_html.h" 
+#include "publichtml.h" 
 #include "messages.h"
 #include "API.h"
 #include "Wire.h"
@@ -71,7 +72,7 @@ Configuration config;
 Pins pins;
 
 // Initiate Classes
-Preferences _preferences;
+Preferences _prefs;
 DataHandler _data;
 API _api;
 Calculations _calculations;
@@ -114,101 +115,104 @@ void TASKgetSensorData( void * parameter ){
   for( ;; ) {
     // Check if semaphore available
     if (millis() > status.adcPollTimer){
-      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
+
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
-        status.adcPollTimer = millis() + config.ADC_SCAN_DELAY; // Only reset timer when task executes
+      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
+        status.adcPollTimer = millis() + config.iADC_SCAN_DLY; // Only reset timer when task executes
 
-        // Get flow data
-        // Bench is MAF type...
-        if (strstr(String(settings.bench_type).c_str(), String("MAF").c_str())){
-          if (config.MAF_SRC_TYPE != SENSOR_DISABLED) {
-            sensorVal.FlowKGH = _sensors.getMafFlow();
-            sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
-          }
+        switch (settings.bench_type){
 
-        // Bench is ORIFICE type...
-        } else if (strstr(String(settings.bench_type).c_str(), String("ORIFICE").c_str())){
-          sensorVal.FlowCFMraw = _sensors.getDifferentialFlow();
+          case MAF_BENCH:
+            if (config.iMAF_SRC_TYPE != SENSOR_DISABLED) {
+              sensorVal.FlowKGH = _sensors.getMafFlow();
+              sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
+            }
+          break;
 
+          case ORIFICE_BENCH:
+            sensorVal.FlowCFMraw = _sensors.getDifferentialFlow();
+          break;
 
-        // Bench is VENTURI type...
-        } else if (strstr(String(settings.bench_type).c_str(), String("VENTURI").c_str())){
+          case VENTURI_BENCH:
+            //TODO
+          break;
 
-          //TODO
+          case PITOT_BENCH:
+            //TODO
+          break;
 
-        // Bench is PITOT type...
-        } else if (strstr(String(settings.bench_type).c_str(), String("PITOT").c_str())){
-
-          //TODO
-
-        // Error bench type unknown
-        } else {
-
-          //Do nothing?
+          default:
+            // Error bench type unknown
+            _message.debugPrintf("Unknown Bench Type\n");
+          break;
 
         }
 
         // Apply Flow calibration and leak offsets
         sensorVal.FlowCFM = sensorVal.FlowCFMraw  - calVal.leak_cal_baseline - calVal.leak_cal_offset  - calVal.flow_offset;
 
- 
         // Apply Data filters...
+        switch (settings.data_filter_type) {
 
-        // Rolling Median
-        if (strstr(String(settings.data_filter_type).c_str(), String("MEDIAN").c_str())){
- 
-          sensorVal.AverageCFM += ( sensorVal.FlowCFM - sensorVal.AverageCFM ) * 0.1f; // rough running average.
-          sensorVal.MedianCFM += copysign( sensorVal.AverageCFM * 0.01, sensorVal.FlowCFM - sensorVal.MedianCFM );
-          sensorVal.FlowCFM = sensorVal.MedianCFM;
+          case MEDIAN:
+            // Rolling Median      
+            sensorVal.AverageCFM += ( sensorVal.FlowCFM - sensorVal.AverageCFM ) * 0.1f; // rough running average.
+            sensorVal.MedianCFM += copysign( sensorVal.AverageCFM * 0.01, sensorVal.FlowCFM - sensorVal.MedianCFM );
+            sensorVal.FlowCFM = sensorVal.MedianCFM;
+          break;
 
-        //TODO - Cyclic average
-        } else if (strstr(String(settings.data_filter_type).c_str(), String("AVERAGE").c_str())){
+          case AVERAGE:
+            //TODO - Cyclic average
+            // create array / stack of 'Cyclical Average Buffer' length
+            // push value to stack - repeat this for size of stack 
+            
+            // calculate average of values on stack
+            // average results with current value - this is our displayed value
+            // push current (raw) value on to stack, remove oldest value
+            // repeat
+            sensorVal.FlowCFM = sensorVal.FlowCFM;
+          break;
 
-          // create array / stack of 'Cyclical Average Buffer' length
-          // push value to stack - repeat this for size of stack 
-          
-          // calculate average of values on stack
-          // average results with current value - this is our displayed value
-          // push current (raw) value on to stack, remove oldest value
-          // repeat
+          case MODE:
+            //TODO - Mode
+            // return most common value over x number of cycles (requested by @black-top)
+            sensorVal.FlowCFM = sensorVal.FlowCFM;
+          break;
 
-
-          
-        //TODO - Mode
-        } else if (strstr(String(settings.data_filter_type).c_str(), String("MODE").c_str())){
-
-          // return most common value over x number of cycles (requested by @black-top)
+          case NONE:
+          default:
+            // No filter
+            sensorVal.FlowCFM = sensorVal.FlowCFM;
+          break;
 
         }
-
 
         // convert to standard flow
         sensorVal.FlowSCFM = _calculations.convertToSCFM(sensorVal.FlowCFM, settings.standardReference);
 
-
         // Create Flow differential values
         switch (sensorVal.FDiffType) {
 
-        case USERTARGET:
-          sensorVal.FDiff = sensorVal.FlowCFM - calVal.user_offset;
-          strcpy(sensorVal.FDiffTypeDesc, "User Target (cfm)");
-          break;
+          case USERTARGET:
+            sensorVal.FDiff = sensorVal.FlowCFM - calVal.user_offset;
+            strcpy(sensorVal.FDiffTypeDesc, "User Target (cfm)");
+            break;
 
-        case BASELINE:
-          sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline;
-          strcpy(sensorVal.FDiffTypeDesc, "Baseline (cfm)");
-          break;
-        
-        case BASELINE_LEAK :
-          sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline - calVal.leak_cal_offset;
-          strcpy(sensorVal.FDiffTypeDesc, "Offset (cfm)");
-          break;
-                
-        default:
-          break;
+          case BASELINE:
+            sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline;
+            strcpy(sensorVal.FDiffTypeDesc, "Baseline (cfm)");
+            break;
+          
+          case BASELINE_LEAK :
+            sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline - calVal.leak_cal_offset;
+            strcpy(sensorVal.FDiffTypeDesc, "Offset (cfm)");
+            break;
+                  
+          default:
+            break;
         }
           
-        if (config.PREF_SENS_TYPE != SENSOR_DISABLED) {
+        if (config.iPREF_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PRefKPA = _sensors.getPRefValue();
           sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
           if (settings.std_adj_flow == 1) {
@@ -219,18 +223,18 @@ void TASKgetSensorData( void * parameter ){
           sensorVal.FlowADJSCFM = _calculations.convertToSCFM(sensorVal.FlowADJ, settings.standardReference );
         }
 
-        if (config.PDIFF_SENS_TYPE != SENSOR_DISABLED) {
+        if (config.iPDIFF_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PDiffKPA = _sensors.getPDiffValue();
           sensorVal.PDiffH2O = _calculations.convertPressure(sensorVal.PDiffKPA, INH2O) - calVal.pdiff_cal_offset;
         }
 
-        if (config.PITOT_SENS_TYPE != SENSOR_DISABLED) {
+        if (config.iPITOT_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PitotKPA = _sensors.getPitotValue() - calVal.pitot_cal_offset;
           sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O) ;
           sensorVal.PitotVelocity = _sensors.getPitotVelocity();
         }
 
-        if (config.SWIRL_ENABLED) {
+        if (config.bSWIRL_ENBLD) {
           // TODO #227
             // uint8_t Swirl = Encoder.read();
 
@@ -240,8 +244,6 @@ void TASKgetSensorData( void * parameter ){
             //   sensorVal.Swirl = Encoder.speed() * -1;
             // }
         }
-
-
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore        
       }   
@@ -271,7 +273,7 @@ void TASKgetEnviroData( void * parameter ){
     if (millis() > status.bmePollTimer){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
-        status.bmePollTimer = millis() + config.BME280_SCAN_MS; // Only reset timer when task executes
+        status.bmePollTimer = millis() + config.iBME_SCAN_MS; // Only reset timer when task executes
         
         sensorVal.TempDegC = _sensors.getTempValue();
 
@@ -333,24 +335,24 @@ void setup(void) {
   // Set up semaphore handshaking
   i2c_task_mutex = xSemaphoreCreateMutex();
 
-  #ifdef WEBSERVER_ENABLED  // Compile time directive used for testing
+  #ifdef WEBSERVER_ENABLED  
     _webserver.begin();
   #endif
 
-  if (config.ADC_TYPE != SENSOR_DISABLED) { 
-    // xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
-    xTaskCreate(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask); 
-  }
+  // xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
+  xTaskCreate(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask); 
 
-  if (config.BME280_ENABLED) { 
-    // xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
-    xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask); 
-  }
+  // xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
+  xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask); 
 
-  if (config.SWIRL_ENABLED){
+  if (config.bSWIRL_ENBLD){
     // TODO #227
-    // MD_REncoder Encoder = MD_REncoder(SWIRL_ENCODER_PIN_A, SWIRL_ENCODER_PIN_B);
+    // MD_REncoder Encoder = MD_REncoder(SWIRL_ENCODER_A, SWIRL_ENCODER_B);
   }
+
+  // Report free stack and heap to serial monitor
+  _message.serialPrintf("Stack Free Memory: EnviroTask=%s / SensorTask=%s \n", _calculations.byteDecode(uxTaskGetStackHighWaterMark(enviroDataTask)), _calculations.byteDecode(uxTaskGetStackHighWaterMark(sensorDataTask))); 
+  _message.serialPrintf("Free Heap=%s / Max Allocated Heap=%s \n", _calculations.byteDecode(ESP.getFreeHeap()), _calculations.byteDecode(ESP.getMaxAllocHeap())); 
 
 }
 
@@ -386,16 +388,28 @@ void loop () {
   // _hardware.setBleedValveRef();
   
   #ifdef WEBSERVER_ENABLED
-    if (millis() > status.browserUpdateTimer) {        
+    if (millis() > status.browserUpdateTimer) {      
+
         // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE){ // Check if semaphore available
         if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
           status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes
           
-          // Push data to client using Server Side Events (SSE)
-          jsonString = _data.buildSSEJsonData();
-          _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); // Is String causing message queue issue?
-
-          xSemaphoreGive(i2c_task_mutex); // Release semaphore
+          // Build Server Side Events (SSE) data
+          switch (status.GUIpage) {
+            case INDEX_PAGE:{
+              jsonString = _data.buildIndexSSEJsonData();
+              break;
+            }
+            case DATA_PAGE:{
+              jsonString = _data.buildMimicSSEJsonData();
+              break;
+            }
+          }
+          // Push SSE data to client
+          _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); 
+ 
+          // Release semaphore
+          xSemaphoreGive(i2c_task_mutex); 
         }
     }
   #endif

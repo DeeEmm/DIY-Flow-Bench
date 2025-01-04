@@ -17,13 +17,15 @@
  * 
  ***/
 
+#include <SPIFFS.h>
+#include <ArduinoJson.h>
+#include <Preferences.h>
+
 #include "constants.h"
 #include "structs.h"
 #include "datahandler.h"
 
 #include "calibration.h"
-#include <SPIFFS.h>
-#include <ArduinoJson.h>
 #include "sensors.h"
 #include "calculations.h"
 #include "messages.h"
@@ -79,7 +81,7 @@ double Calibration::getFlowOffset() {
 
   extern struct CalibrationData calVal;
   
-  loadCalibrationFile();
+  loadCalibrationData();
 
   return calVal.flow_offset;
 
@@ -104,7 +106,7 @@ bool Calibration::setLeakOffset() {
   extern struct SensorData sensorVal;
 
   // load current calibration data
-  _data.loadCalibrationData();
+  this->loadCalibrationData();
 
   _message.debugPrintf("Calibration::setLeakTest \n");
 
@@ -139,7 +141,7 @@ bool Calibration::setLeakOffset() {
 double Calibration::getLeakOffset() {
 
   extern struct CalibrationData calVal;
-  loadCalibrationFile();
+  loadCalibrationData();
   
   return calVal.leak_cal_offset;
 
@@ -155,7 +157,7 @@ double Calibration::getLeakOffsetReverse() {
 
   extern struct CalibrationData calVal;
   
-  loadCalibrationFile();
+  loadCalibrationData();
   
   return calVal.leak_cal_offset_rev;
 
@@ -182,10 +184,10 @@ double Calibration::getLeakOffsetReverse() {
   
 //   calData["FLOW_OFFSET"] = calVal.flow_offset;
 //   calData["USER_OFFSET"] = calVal.user_offset;
-//   calData["LEAK_CAL_BASELINE"] = calVal.leak_cal_baseline;
-//   calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
-//   calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
-//   calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
+//   calData["LEAK_BASE"] = calVal.leak_cal_baseline;
+//   calData["LEAK_BASE_REV"] = calVal.leak_cal_baseline_rev;
+//   calData["LEAK_OFFSET"] = calVal.leak_cal_offset;
+//   calData["LEAK_OFFSET_REV"] = calVal.leak_cal_offset_rev;
 
 //   serializeJsonPretty(calData, jsonString);
 
@@ -250,7 +252,7 @@ double Calibration::getPdiffCalOffset() {
 
   extern struct CalibrationData calVal;
   
-  loadCalibrationFile();
+  loadCalibrationData();
 
   return calVal.pdiff_cal_offset;
 
@@ -305,7 +307,7 @@ double Calibration::getPitotCalOffset() {
 
   extern struct CalibrationData calVal;
   
-  loadCalibrationFile();
+  loadCalibrationData();
 
   return calVal.pdiff_cal_offset;
 
@@ -314,13 +316,46 @@ double Calibration::getPitotCalOffset() {
 
 
 
+
+
 /***********************************************************
-* @brief saveCalibration 
-* @details write calibration data to cal.json file
+* @brief initialiseLiftData
+* @note - Initialise settings in NVM if they do not exist
+* @note Key must be 15 chars or shorter.
+***/ 
+void Calibration::initialiseCalibrationData () {
+
+  Messages _message;
+  Preferences _prefs;
+
+  _message.serialPrintf("Loading Bench Settings \n");    
+  
+  _prefs.begin("calibration");
+
+  if (!_prefs.isKey("FLOW_OFFSET")) _prefs.putDouble("FLOW_OFFSET", 0.0);
+  if (!_prefs.isKey("USER_OFFSET")) _prefs.putDouble("USER_OFFSET", 0.0);
+  if (!_prefs.isKey("LEAK_BASE")) _prefs.putDouble("LEAK_BASE", 0.0);
+  if (!_prefs.isKey("LEAK_BASE_REV")) _prefs.putDouble("LEAK_BASE_REV", 0.0);
+  if (!_prefs.isKey("LEAK_OFFSET")) _prefs.putDouble("LEAK_OFFSET", 0.0);
+  if (!_prefs.isKey("LEAK_OFFSET_REV")) _prefs.putDouble("LEAK_OFFSET_REV", 0.0);
+  if (!_prefs.isKey("PDIFF_OFFSET")) _prefs.putDouble("PDIFF_OFFSET", 0.0);
+  if (!_prefs.isKey("PITOT_OFFSET")) _prefs.putDouble("PITOT_OFFSET", 0.0);
+
+  _prefs.end();
+}
+
+
+
+
+
+/***********************************************************
+* @brief loadCalibration 
+* @details load calibration data from NVM into struct
 ***/
-void Calibration::saveCalibrationData() {
+void Calibration::loadCalibrationData() {
   
   Messages _message;
+  Preferences _prefs;
 
   DataHandler _data;
   String jsonString;
@@ -329,33 +364,51 @@ void Calibration::saveCalibrationData() {
   extern struct CalibrationData calVal;
   extern struct Language language;
 
-  _message.debugPrintf("Writing to cal.json file... \n");
-    
-  // Populate JSON
-  calData["FLOW_OFFSET"] = calVal.flow_offset;
-  calData["USER_OFFSET"] = calVal.user_offset;
-  calData["LEAK_CAL_BASELINE"] = calVal.leak_cal_baseline;
-  calData["LEAK_CAL_BASELINE_REV"] = calVal.leak_cal_baseline_rev;
-  calData["LEAK_CAL_OFFSET"] = calVal.leak_cal_offset;
-  calData["LEAK_CAL_OFFSET_REV"] = calVal.leak_cal_offset_rev;
-  calData["PDIFF_CAL_OFFSET"] = calVal.pdiff_cal_offset;
-  calData["PITOT_CAL_OFFSET"] = calVal.pitot_cal_offset;
+  _message.serialPrintf("Loading Calibration Data \n");    
+  
+  _prefs.begin("calibration");
+
+  calVal.flow_offset = _prefs.getDouble("FLOW_OFFSET", 0.0);
+  calVal.user_offset = _prefs.getDouble("USER_OFFSET", 0.0);
+  calVal.leak_cal_baseline = _prefs.getDouble("LEAK_BASE", 0.0);
+  calVal.leak_cal_baseline_rev = _prefs.getDouble("LEAK_BASE_REV", 0.0);
+  calVal.leak_cal_offset = _prefs.getDouble("LEAK_OFFSET", 0.0);
+  calVal.leak_cal_offset_rev = _prefs.getDouble("LEAK_OFFSET_REV", 0.0);
+  calVal.pdiff_cal_offset = _prefs.getDouble("PDIFF_OFFSET", 0.0);
+  calVal.pitot_cal_offset = _prefs.getDouble("PITOT_OFFSET", 0.0);
+
+  _prefs.end();
+}
+
+
+
+/***********************************************************
+* @brief saveCalibration 
+* @details write calibration data to NVM
+***/
+void Calibration::saveCalibrationData() {
+  
+  Preferences _prefs;
+  Messages _message;
+  DataHandler _data;
+
+  extern struct CalibrationData calVal;
+  extern struct Language language;
 
   _message.Handler(language.LANG_SAVING_CALIBRATION);
-  
-  serializeJsonPretty(calData, jsonString);
 
-  if (SPIFFS.exists("/cal.json"))  {
-    SPIFFS.remove("/cal.json");
-  }
-  File outputFile = SPIFFS.open("/cal.json", FILE_WRITE);
-  serializeJsonPretty(calData, outputFile);
-  outputFile.close();
-  
-  _data.writeJSONFile(jsonString, "/cal.json", CAL_DATA_JSON_SIZE);
+  _prefs.begin("calibration");
 
-  _message.debugPrintf("Calibration Saved \n");
-
+  _prefs.putDouble("FLOW_OFFSET", calVal.flow_offset);
+  _prefs.putDouble("USER_OFFSET", calVal.user_offset);
+  _prefs.putDouble("LEAK_BASE", calVal.leak_cal_baseline);
+  _prefs.putDouble("LEAK_BASE_REV", calVal.leak_cal_baseline_rev);
+  _prefs.putDouble("LEAK_OFFSET", calVal.leak_cal_offset);
+  _prefs.putDouble("LEAK_OFFSET_REV", calVal.leak_cal_offset_rev);
+  _prefs.putDouble("PDIFF_OFFSET", calVal.pdiff_cal_offset);
+  _prefs.putDouble("PITOT_OFFSET", calVal.pitot_cal_offset);
+    
+  _prefs.end();
 
 }
 

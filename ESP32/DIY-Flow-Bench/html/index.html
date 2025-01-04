@@ -1,0 +1,206 @@
+
+    <!-- Save Data Modal -->
+    <div id="captureLiftDataModal" class="modal">
+      <div class="modal-content">
+        <span class="closeCaptureLiftDataModalButton">&times;</span>
+        <h3>~LANG_GUI_SELECT_LIFT_VAL_BEFORE_CAPTURE~</h3>
+        <hr>
+        <div class="align-center" >
+          <form method="POST" class="lift_data_form" name="lift_data_form" enctype="multipart/form-data">
+            <label>~LANG_GUI_LIFT_VAL~</label>
+            <br>
+              <div class="switch-field">
+                <input type="radio" id="lift-one" name="lift-data" value="1"/>
+                <label for="lift-one">~lift1~</label>
+                <input type="radio" id="lift-two" name="lift-data" value="2" />
+                <label for="lift-two">~lift2~</label>
+                <input type="radio" id="lift-three" name="lift-data" value="3"/>
+                <label for="lift-three">~lift3~</label>
+                <input type="radio" id="lift-four" name="lift-data" value="4" />
+                <label for="lift-four">~lift4~</label>
+                <input type="radio" id="lift-five" name="lift-data" value="5" />
+                <label for="lift-five">~lift5~</label>
+                <input type="radio" id="lift-six" name="lift-data" value="6" />
+                <label for="lift-six">~lift6~</label>
+                <input type="radio" id="lift-seven" name="lift-data" value="7" />
+                <label for="lift-seven">~lift7~</label>
+                <input type="radio" id="lift-eight" name="lift-data" value="8" />
+                <label for="lift-eight">~lift8~</label>
+                <input type="radio" id="lift-nine" name="lift-data" value="9" />
+                <label for="lift-nine">~lift9~</label>
+                <input type="radio" id="lift-ten" name="lift-data" value="10" />
+                <label for="lift-ten">~lift10~</label>
+                <input type="radio" id="lift-eleven" name="lift-data" value="11" />
+                <label for="lift-eleven">~lift11~</label>
+                <input type="radio" id="lift-twelve" name="lift-data" value="12" />
+                <label for="lift-twelve">~lift12~</label>
+              </div>
+            <input class="button submit-button" type="button" id="capture-lift-data-button" value="~LANG_GUI_LIFT_CAPTURE~"/>
+          </form>
+        </div>
+        <div class="clear-both">&nbsp;</div>
+      </div>        
+    </div>
+
+    <!--Flow Target modal-->
+    <div id="flowTargetModal" class="modal">
+      <div class="modal-content flowTargetModal">
+        <span class="closeFlowTargetModalButton">&times;</span>
+        <div class="align-center">
+          <form method="POST" action="/api/saveflowtarget" enctype="multipart/form-data">
+            <label>~LANG_GUI_USER_FLOW_TARGET_VAL~</label>
+              <input id="flowTargetValInput" type="text" name="USER_OFFSET" value="~USER_OFFSET~"/>
+              <input class="button submit-button" type="submit" value="~LANG_GUI_USER_FLOW_TARGET_SAVE~"/>
+            </form>
+        </div>
+      </div>        
+    </div>
+
+    <!--Calibration modal-->
+    <div id="calibrationModal" class="modal">
+      <div class="modal-content calibrationModal">
+        <span class="closeCalibrationModalButton">&times;</span>
+        <div class="align-center">
+          <button id="calibrate-button" class="button">~LANG_GUI_CAL_FLOW_OFFSET~</button>
+          <button id="leak-cal-button" class="button">~LANG_GUI_CAL_LEAK_TEST~</button>
+        </div>
+      </div>        
+    </div>
+
+    <!-- Load Data Modal -->
+    <div id="loadGraphDataModal" class="modal">
+      <div class="modal-content">
+        <span class="closeLoadGraphDataModalButton">&times;</span>
+        <h3>~LANG_GUI_LOAD_LIFT_PROFILE~</h3>
+        <hr>
+        <br>
+        <div class="float-right">
+          <form method="POST" action="/api/viewdata" enctype="multipart/form-data">
+            <input class="button file-submit-button" type="submit" value="~LANG_GUI_LOAD_LIFT_PROFILE_LOAD~"/>
+          </form>
+        </div>
+        <div class="clear-both">&nbsp;</div>
+      </div>        
+    </div>
+
+    <!-- Save Data Modal -->
+    <div id="saveGraphDataModal" class="modal">
+      <div class="modal-content">
+        <span class="closeSaveGraphDataModalButton">&times;</span>
+        <h3>~LANG_GUI_SAVE_LIFT_DATA~</h3>
+        <hr>
+        <br>
+        <div class="float-right">
+          <form method="POST" action="/api/savedata" enctype="multipart/form-data">
+            <label class="config-label">~LANG_GUI_SAVE_GRAPH_FILENAME~:</label>&nbsp;<input type="text" value="~FileName~">
+            <input class="button file-submit-button" type="submit" value="Load"/>
+          </form>
+        </div>
+        <div class="clear-both">&nbsp;</div>
+      </div>        
+    </div>
+
+    <div id="tabcontainer">
+    <!-- Main Tab-->
+    <div id="dashboard">        
+      <div class="content">
+        <div class="tile-grid">
+          <div class="tile tile-pref" id="tile-pref">
+            <p class="tile-title" id="tile-pref-title">~LANG_GUI_PREF~</p>
+            <p><span class="tile-value" id="PREF">&nbsp;</span></p>
+            <p class="units">inH2O</p>
+          </div>
+          <div class="tile tile-pdiff" id="tile-pdiff">
+            <p class="tile-title" id="tile-pdiff-title">~LANG_GUI_PDIFF~</p>
+            <p><span class="differential-tile-value" id="PDIFF">&nbsp;</span></p>
+            <p class="units">inH2O</p>
+          </div>
+          <div class="tile tile-flow" id="flow-tile">
+            <p class="tile-title" id="flow-tile-title">~LANG_GUI_FLOW~</p>
+            <p><span class="tile-value" id="FLOW">&nbsp;</span></p>
+            <p class="units">ACFM</p>
+          </div>
+          <div class="tile tile-aflow" id="aflow-tile">
+            <p class="tile-title" id="aflow-tile-title">~LANG_GUI_AFLOW~</p>
+            <p><span class="tile-value" id="AFLOW">&nbsp;</span></p>
+            <p class="units">~AFLOW_UNITS~&nbsp;&commat;&nbsp;<span id="PADJUST">28</span>&nbsp;inH2O</p>
+          </div>
+          <div class="tile tile-sflow" id="sflow-tile">
+            <p class="tile-title" id="sflow-tile-title">~LANG_GUI_SFLOW~</p>
+            <p><span class="tile-value" id="SFLOW">&nbsp;</span></p>
+            <p class="units">SCFM:&nbsp;<span id="iSTD_REF">~iSTD_REF~</span></p>
+          </div>
+          <div class="tile tile-flow" id="maf-tile">
+            <p class="tile-title" id="maf-tile-title">~LANG_GUI_MFLOW~</p>
+            <p><span class="tile-value" id="MFLOW">&nbsp;</span></p>
+            <p class="units">KGH</p>
+          </div>
+          <div class="tile tile-pitot" id="tile-pitot">
+            <p class="tile-title" id="tile-pitot-title">~LANG_GUI_PITOT~</p>
+            <p><span class="pitot-tile-value" id="PITOT">&nbsp;</span></p>
+            <p class="units">m/sec &Delta; <span id="PITOT_DELTA">~PITOT_DELTA~</span>&nbsp;inH2O</p>
+          </div>
+          <div class="tile tile-swirl" id="tile-swirl">
+            <p class="tile-title" id="tile-swirl-title">~LANG_GUI_SWIRL~</p>
+            <p><span class="tile-value" id="SWIRL">&nbsp;</span></p>
+            <p class="units">rpm</p>
+          </div>
+          <div class="tile tile-fdiff" id="tile-fdiff">
+            <p class="tile-title"  id="tile-fdiff-title">~LANG_GUI_FLOW_DIFF~</p>
+            <p><span class="tile-value flowTargetVal" id="FDIFF">&nbsp;</span></p>
+            <p class="units"><span id="FDIFFTYPEDESC">~FDIFFTYPEDESC~</span></p>
+          </div>
+          <div class="tile tile-temp" id="tile-temp">
+            <p class="tile-title" id="tile-temp-title">~LANG_GUI_TEMP~</p>
+            <p><span class="tile-value" id="TEMP">&nbsp;</span></p>
+            <p class="units">~iTEMP_UNIT~</p>
+          </div>
+          <div class="tile tile-baro" id="tile-baro">
+            <p class="tile-title" id="tile-baro-title">~LANG_GUI_BARO~</p>
+            <p><span class="tile-value" id="BARO">&nbsp;</span></p>
+            <p class="units">millibar (hPa)</p>
+          </div>
+          <div class="tile tile-relh" id="tile-relh">
+            <p class="tile-title"id="tile-relh-title">~LANG_GUI_HUMIDITY~</p>
+            <p><span class="tile-value" id="RELH">&nbsp;</span></p>
+            <p class="units">&percnt;RelH</p>
+          </div>
+        </div>  
+      </div>          
+      <div class="align-center">
+        <div class="status_message"><span id="STATUS_MESSAGE">~STATUS_MESSAGE~</span></div>                        
+        <div class="hidden_div">
+          <br>Ref Pressure mV: <span id="PREF_MV">&nbsp;</span>
+          <br>MAF mV: <span id="MAF_MV">&nbsp;</span>
+          <br>Pitot mV: <span id="PITOT_MV">&nbsp;</span>
+        </div>   
+        
+        <form method="POST" id="orificeRadio" style="display: none;">
+          <div class="switch-field">
+            <input type="radio" id="orifice1" name="radioOrifice" value="1" ~ORIFICE1_CHECKED~ onchange="orificeChange(this);"/>
+            <label for="orifice1">1</label>
+            <input type="radio" id="orifice2" name="radioOrifice" value="2" ~ORIFICE2_CHECKED~ onchange="orificeChange(this);"/>
+            <label for="orifice2">2</label>
+            <input type="radio" id="orifice3" name="radioOrifice" value="3" ~ORIFICE3_CHECKED~ onchange="orificeChange(this);"/>
+            <label for="orifice3">3</label>
+            <input type="radio" id="orifice4" name="radioOrifice" value="4" ~ORIFICE4_CHECKED~ onchange="orificeChange(this);"/>
+            <label for="orifice4">4</label>
+            <input type="radio" id="orifice5" name="radioOrifice" value="5" ~ORIFICE5_CHECKED~ onchange="orificeChange(this);"/>
+            <label for="orifice5">5</label>
+            <input type="radio" id="orifice6" name="radioOrifice" value="6" ~ORIFICE6_CHECKED~ onchange="orificeChange(this);"/>
+            <label for="orifice6">6</label>
+          </div>
+          <div id="orifice-data">Calibrated Flow Rate: <span id="ORIFICE_MAX_FLOW">~ORIFICE_MAX_FLOW~</span>cfm @ <span id="ORIFICE_CALIBRATED_DEPRESSION">~ORIFICE_CALIBRATED_DEPRESSION~</span> inH2O"</div>
+        </form>
+          
+        <button id="on-button" class="control-button">~LANG_GUI_START~</button>
+        <button id="off-button" class="control-button">~LANG_GUI_STOP~</button>
+        <button id="clear-message-button" class="control-button">~LANG_GUI_CLEAR_ALARM~</button>
+        <br>
+        <button id="show-capture-modal-button" class="control-button">~LANG_GUI_CAPTURE~</button>
+
+      </div>
+                
+    </div>
+    <script type="text/javascript" src="index.js"></script>
+    

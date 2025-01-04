@@ -10,7 +10,7 @@ var clean = require('gulp-clean');
 var fs = require('fs')
 var json = JSON.parse(fs.readFileSync('esp32/DIY-Flow-Bench/version.json'))
 console.log(json);
-//console.log('GUI_BUILD_NUMBER: ' + json.GUI_BUILD_NUMBER);
+
 
 
 
@@ -118,8 +118,9 @@ gulp.task('htmlmax', function() {
 
 gulp.task('version', async function() {
 
+	// DEPRECATED - GUI moved into main codebase - GUI_BUILD_NUMBER No longer used.
 	// get release info from version.json
-	gui_build_num = json.GUI_BUILD_NUMBER;
+	gui_build_num = json.GUI_BUILD_NUMBER; 
 	build_num = json.BUILD_NUMBER;
 	release_num = json.RELEASE;
 
@@ -188,9 +189,14 @@ gulp.task('version', async function() {
 
 
 
+// DEPRECATED - GUI moved into main codebase - GUI_BUILD_NUMBER No longer used.
+// gulp.task('combine', gulp.series('cssmax', 'jsmax', 'htmlmax', 'compress', 'clean', 'version'));
+// gulp.task('combine+minify', gulp.series('css', 'js', 'html', 'compress', 'clean', 'version'));
+// gulp.task('combine+minify+gzip', gulp.series('css', 'js', 'html', 'compress+gzip', 'clean', 'version'));
 
-gulp.task('combine', gulp.series('cssmax', 'jsmax', 'htmlmax', 'compress', 'clean', 'version'));
-gulp.task('combine+minify', gulp.series('css', 'js', 'html', 'compress', 'clean', 'version'));
-gulp.task('combine+minify+gzip', gulp.series('css', 'js', 'html', 'compress+gzip', 'clean', 'version'));
+
+gulp.task('combine', gulp.series('cssmax', 'jsmax', 'htmlmax', 'compress', 'clean'));
+gulp.task('combine+minify', gulp.series('css', 'js', 'html', 'compress', 'clean'));
+gulp.task('combine+minify+gzip', gulp.series('css', 'js', 'html', 'compress+gzip', 'clean'));
 
 

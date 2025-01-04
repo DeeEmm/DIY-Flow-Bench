@@ -1,0 +1,115 @@
+
+
+    <!--Serial modal-->
+    <!--
+    <div id="serialModal" class="modal">
+      <div class="modal-content serialModal">
+        <span class="closeSerialModalButton">&times;</span>
+        <div class="align-center">
+          <div class="serialModalData">
+            
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Fastest Serial terminal in your browser for Chrome.</title>
+            <meta name="Description" content="Set your baud speed and hit connect.
+            A serial terminal that runs with out any plugins in chrome.">
+
+            <button onclick="connectSerial()">Connect</button>
+            <button onclick="serialResultsDiv.innerHTML = '';">Clear</button>
+
+            <br>
+            <input type="text" id="lineToSend" style="width:calc(100% - 165px)">
+            <button onclick="sendSerialLine()" style="width:45px">Send</button>
+            <button onclick="sendCharacterNumber()" style="width:100px">Send Char</button>
+            <br>
+
+            <input type="checkbox" id="addLine" onclick="localStorage.addLine = this.checked;" checked>
+            <label for="addLine">send with /r/n</label>
+
+            <input type="checkbox" id="echoOn" onclick="localStorage.echoOn = this.checked;" checked>
+            <label for="echoOn">echo</label>
+
+
+            <br>
+            <div id="serialResults">
+            </div>
+
+          </div>     
+        </div>
+      </div>        
+    </div>
+  -->
+
+
+
+
+<!--
+  // Serial monitor modal
+  // https://developer.chrome.com/docs/capabilities/serial
+  // var port, textEncoder, writableStreamClosed, writer;
+  // async function connectSerial() {
+
+
+  //     try {
+        
+  //         // Prompt user to select any serial port.
+  //         const port = await navigator.serial.requestPort();
+  //         // const port = await navigator.serial.getPort()
+  //         await port.open({ baudRate: 115200 });
+
+  //         textEncoder = new TextEncoderStream();
+  //         writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
+
+  //         writer = textEncoder.writable.getWriter();
+  //         listenToPort();
+  //     } catch {
+  //         alert("Serial Connection Failed");
+  //     }
+  // }
+  // async function sendCharacterNumber() {
+  //     document.getElementById("lineToSend").value = String.fromCharCode(document.getElementById("lineToSend").value);
+  // }
+  // async function sendSerialLine() {
+  //     dataToSend = document.getElementById("lineToSend").value;
+  //     if (document.getElementById("addLine").checked == true) dataToSend = dataToSend + "\r\n";
+  //     if (document.getElementById("echoOn").checked == true) appendToTerminal("> " + dataToSend);
+  //     await writer.write(dataToSend);
+  // }
+  // async function listenToPort() {
+  //     const textDecoder = new TextDecoderStream();
+  //     const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+  //     const reader = textDecoder.readable.getReader();
+  //     // Listen to data coming from the serial device.
+  //     while (true) {
+  //         const { value, done } = await reader.read();
+  //         if (done) {
+  //             // Allow the serial port to be closed later.
+  //             reader.releaseLock();
+  //             break;
+  //         }
+  //         // value is a string.
+  //         appendToTerminal(value);
+  //     }
+  // }
+  // const serialResultsDiv = document.getElementById("serialResults");
+  // async function appendToTerminal(newStuff) {
+  //     serialResultsDiv.innerHTML += newStuff;
+  //     if (serialResultsDiv.innerHTML.length > 3000) serialResultsDiv.innerHTML = serialResultsDiv.innerHTML.slice(serialResultsDiv.innerHTML.length - 3000);
+
+  //     //scroll down to bottom of div
+  //     serialResultsDiv.scrollTop = serialResultsDiv.scrollHeight;
+  // }
+  // document.getElementById("lineToSend").addEventListener("keyup", async function (event) {
+  //     if (event.keyCode === 13) {
+  //         sendSerialLine();
+  //     }
+  // })
+  // document.getElementById("baud").value = (localStorage.baud == undefined ? 115200 : localStorage.baud);
+  // document.getElementById("addLine").checked = (localStorage.addLine == "false" ? false : true);
+  // document.getElementById("echoOn").checked = (localStorage.echoOn == "false" ? false : true);
+
+
+  // // CODELAB: Add feature detection here.
+  // const notSupported = document.getElementById("notSupported");
+  // notSupported.classList.toggle("hidden", "serial" in navigator);
+
+-->
