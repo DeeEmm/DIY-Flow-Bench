@@ -1098,7 +1098,7 @@ String DataHandler::buildIndexSSEJsonData()
 
 /***********************************************************
  * @brief buildMimicSSEJsonData
- * @details Package up mimic page data into JSON string
+ * @details Package up mimic page data into JSON string to send via SSE
  ***/
 String DataHandler::buildMimicSSEJsonData() {
 
@@ -1106,6 +1106,7 @@ String DataHandler::buildMimicSSEJsonData() {
   extern struct BenchSettings settings;
   extern struct SensorData sensorVal;
   extern struct CalibrationData calVal;
+  extern struct Configuration config;
 
   Hardware _hardware;
   Calculations _calculations;
@@ -1115,49 +1116,23 @@ String DataHandler::buildMimicSSEJsonData() {
 
   StaticJsonDocument<DATA_JSON_SIZE> dataJson;
 
-  // Reference pressure
-  dataJson["PREF"] = sensorVal.PRefH2O;
+  dataJson["MAF_ADC"] = _hardware.getADCRawData(config.iMAF_ADC_CHAN);
+  dataJson["PREF_ADC"] = _hardware.getADCRawData(config.iPREF_ADC_CHAN);
+  dataJson["PDIFF_ADC"] = _hardware.getADCRawData(config.iPDIFF_ADC_CHAN);
+  dataJson["PITOT_ADC"] = _hardware.getADCRawData(config.iPITOT_ADC_CHAN);
 
-  double flowComp = fabs(sensorVal.FlowCFM);
-  double pRefComp = fabs(sensorVal.PRefH2O);
+  dataJson["MAF_VOLTS"] = sensorVal.MafVolts;
+  dataJson["PREF_VOLTS"] = sensorVal.PRefVolts;
+  dataJson["PDIFF_VOLTS"] = sensorVal.PDiffVolts;
+  dataJson["PITOT_VOLTS"] = sensorVal.PitotVolts;
 
-  // Flow Rate
-  if ((flowComp > settings.min_flow_rate) && (pRefComp > settings.min_bench_pressure))  {
+  dataJson["FLOW_KG_H"] = sensorVal.FlowKGH;
+  dataJson["FLOW_MG_S"] = _calculations.convertMassFlowUnits(sensorVal.FlowKGH, KG_H, MG_S);
+  dataJson["FLOW_CFM"] = sensorVal.FlowCFM;
+  dataJson["FLOW_LPM"] = _calculations.convertVolumetricFlowUnits(sensorVal.FlowCFM, CFM, LPM);
 
-    switch (settings.rounding_type) {
-      case NONE:
-        dataJson["FLOW"] = sensorVal.FlowCFM;
-        dataJson["MFLOW"] = sensorVal.FlowKGH;
-        dataJson["AFLOW"] = sensorVal.FlowADJ;
-        dataJson["SFLOW"] = sensorVal.FlowSCFM;
-      break;
 
-      // Round to whole value 
-      case INTEGER:
-        dataJson["FLOW"] = round(sensorVal.FlowCFM);
-        dataJson["MFLOW"] = round(sensorVal.FlowKGH);
-        dataJson["AFLOW"] = round(sensorVal.FlowADJ);
-        dataJson["SFLOW"] = round(sensorVal.FlowSCFM);
-      break;
-
-      // Round to half (nearest 0.5)
-      case HALF:
-        dataJson["FLOW"] = round(sensorVal.FlowCFM * 2.0 ) / 2.0;
-        dataJson["MFLOW"] = round(sensorVal.FlowKGH * 2.0) / 2.0;
-        dataJson["AFLOW"] = round(sensorVal.FlowADJ * 2.0) / 2.0;
-        dataJson["SFLOW"] = round(sensorVal.FlowSCFM * 2.0) / 2.0;
-      break;
-
-      default:
-        dataJson["FLOW"] = 0.0;
-        dataJson["MFLOW"] = 0.0;
-        dataJson["AFLOW"] = 0.0;
-        dataJson["SFLOW"] = 0.0;
-      break;
-    }
-
-  }
-
+  serializeJson(dataJson, jsonString);
 
   return jsonString;
 }

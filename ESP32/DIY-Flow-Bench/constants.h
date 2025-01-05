@@ -21,6 +21,12 @@
 #include <stdint.h>
 
 
+enum VolumetricUnits {
+    CFM,    // Cubic feet per minute
+    LPM,    // Liters per minute
+    M3H     // Cubic meters per hour
+};
+
 /***********************************************************
  * General
  ***/
@@ -135,6 +141,7 @@
 #define SETTINGS_PAGE 3
 #define CONFIG_PAGE 4
 #define PINS_PAGE 5
+#define MIMIC_PAGE 5
 
 
 /***********************************************************

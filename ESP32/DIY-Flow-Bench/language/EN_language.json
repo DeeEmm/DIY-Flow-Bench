@@ -119,4 +119,5 @@
    "LANG_GUI_LEAK_TEST_OFFSET_REV" : "Leak Test Offset (Reverse) (cfm)",
    "LANG_GUI_MAF_TYPE" : "MAF Type",
    "LANG_GUI_OVERWRITE" : "Overwrite"
+   "LANG_GUI_MIMIC" : "MIMIC";
 }

@@ -31,7 +31,6 @@
 
 
 
-
 /***********************************************************
  * @brief Class constructor
 */
@@ -232,7 +231,7 @@ double Calculations::convertRelativeHumidity(double relativeHumidity, int units)
  * 1g/m = 277.778mg/s
  * 1g/m = 0.06kg/h
  ***/
-double Calculations::convertMassFlowUnits(double refFlow, int unitsOut, int unitsIn) {
+double Calculations::convertMassFlowUnits(double refFlow, int unitsIn, int unitsOut) {
 
   double massFlowKGH = 0.0;
   double convertedFlow = 0.0;
@@ -273,6 +272,62 @@ double Calculations::convertMassFlowUnits(double refFlow, int unitsOut, int unit
 
   return convertedFlow;
 
+}
+
+
+
+
+
+/***********************************************************
+ * @brief Convert between volumetric flow units
+ * @param refFlow Input flow value
+ * @param unitsIn Input units (CFM, LPM, M3H)
+ * @param unitsOut Output units (CFM, LPM, M3H)
+ * @return Converted flow value
+ * 
+ * 1 CFM = 1.699 m³/h
+ * 1 LPM = 0.06 m³/h
+ ***/
+double Calculations::convertVolumetricFlowUnits(double refFlow, int unitsIn, int unitsOut) {
+    
+    double flowM3H = 0.0;
+    double convertedFlow = 0.0;
+
+    // Convert input to M3H
+    switch (unitsIn) {
+     
+        case CFM:
+            flowM3H = refFlow * 1.699;
+            break;
+     
+        case LPM:
+            flowM3H = refFlow * 0.06;
+            break;
+     
+        case M3H:
+        default:
+            flowM3H = refFlow;
+            break;
+    }
+
+    // Convert M3H to output units
+    switch (unitsOut) {
+     
+        case CFM:
+            convertedFlow = flowM3H * 0.589;
+            break;
+     
+        case LPM:
+            convertedFlow = flowM3H * 16.667;
+            break;
+     
+        case M3H:
+        default:
+            convertedFlow = flowM3H;
+            break;
+    }
+
+    return convertedFlow;
 }
 
 
@@ -358,6 +413,34 @@ double Calculations::convertFlowDepression(double oldPressure, double newPressur
   }
   
 }
+
+
+
+
+
+/***********************************************************
+ * @brief Convert volumetric flow to velocity
+ * @param flowCFM Flow rate in cubic feet per minute
+ * @param pipeDiameterMM Pipe diameter in millimeters
+ * @return Velocity in feet per minute
+ ***/
+double Calculations::convertFlowToVelocity(double flowCFM, double pipeDiameterMM) {
+    // Convert mm to ft
+    double pipeRadiusFt = (pipeDiameterMM / 2.0) * 0.00328084;
+    
+    // Calculate pipe area in sq ft
+    double pipeArea = PI * pow(pipeRadiusFt, 2);
+    
+    // Check for zero area
+    if (pipeArea <= 0.0) {
+        return 0.0;
+    }
+    
+    // Calculate velocity in ft/min
+    return flowCFM / pipeArea;
+}
+
+
 
 
 

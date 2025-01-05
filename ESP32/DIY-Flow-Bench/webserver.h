@@ -115,6 +115,7 @@ class Webserver {
 		static String processDataPageTemplate(const String& var);
 		static String processPinsPageTemplate(const String& var);
 		static String processConfigPageTemplate(const String& var);
+		static String processMimicPageTemplate(const String& var);
 		static String processOrificePageTemplate(const String& var);
 		static String processDatagraphPageTemplate(const String& var);
 		

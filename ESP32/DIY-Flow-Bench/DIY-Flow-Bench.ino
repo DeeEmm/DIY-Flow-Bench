@@ -400,7 +400,7 @@ void loop () {
               jsonString = _data.buildIndexSSEJsonData();
               break;
             }
-            case DATA_PAGE:{
+            case MIMIC_PAGE:{
               jsonString = _data.buildMimicSSEJsonData();
               break;
             }
