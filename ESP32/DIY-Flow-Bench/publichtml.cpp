@@ -148,6 +148,12 @@ String PublicHTML::configPage() {
     return decompressMultipleToStream(arrays, lengths, 3);
 }
 
+String PublicHTML::mimicPage() {
+    const uint8_t* arrays[] = {header_html, mimic_html, footer_html};
+    const size_t lengths[] = {header_html_len, mimic_html_len, footer_html_len};
+    return decompressMultipleToStream(arrays, lengths, 3);
+}
+
 
 String PublicHTML::header() {
     return decompress(header_html, header_html_len);
@@ -187,6 +193,10 @@ String PublicHTML::settingsJs() {
 
 String PublicHTML::configJs() {
     return decompress(config_js, config_js_len);
+}
+
+String PublicHTML::mimicJs() {
+    return decompress(mimic_js, mimic_js_len);
 }
 
 // String PublicHTML::pinsJs() {

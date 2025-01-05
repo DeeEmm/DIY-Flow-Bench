@@ -538,7 +538,6 @@ struct Language {
     char LANG_GUI_PDIFF_VOLTS[50] = "pDiff Volts";
     char LANG_GUI_PITOT_VOLTS[50] = "Pitot Volts";
     char LANG_GUI_MAF_TYPE[50] = "MAF Type";
-
-
+    char LANG_GUI_MIMIC[50] = "Mimic";
 };
 

@@ -1,12 +1,56 @@
-    <!--Data Display modal-->
-    <div id="dataModal" class="modal">
-        <div class="modal-content dataModal">
-          <span class="closeDataModalButton">&times;</span>
-          <div class="align-center">
-            <p><span class="data-title">~LANG_GUI_MAF_VOLTS~</span>&nbsp;<span class="data-value maf_volts" id="MAF_VOLTS">&nbsp;</span></p>
-            <p><span class="data-title">~LANG_GUI_PREF_VOLTS~</span>&nbsp;<span class="data-value maf_volts" id="PREF_VOLTS">&nbsp;</span></p>
-            <p><span class="data-title">~LANG_GUI_PDIFF_VOLTS~</span>&nbsp;<span class="data-value maf_volts" id="PDIFF_VOLTS">&nbsp;</span></p>
-            <p><span class="data-title">~LANG_GUI_PITOT_VOLTS~</span>&nbsp;<span class="data-value maf_volts" id="PITOT_VOLTS">&nbsp;</span></p>
+<div id="mimic">
+  <div class="config-panel">
+    <h2>Mimic Data</h2>
+        <div class="config-container">
+            <fieldset>
+              <legend>ADC Values&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
+              <div class="mimic-data">
+                  <label for="MAF_ADC">MAF Sensor:</label><span class="data-value maf_volts" id="MAF_ADC">&nbsp;</span>&nbsp;
+              </div>
+              <div class="mimic-data">
+                  <label for="PREF_ADC">Ref Press (pRef):</label><span class="data-value pref_volts" id="PREF_ADC">&nbsp;</span>&nbsp;
+              </div>
+              <div class="mimic-data">
+                  <label for="PDIFF_ADC">Diff Press (pDiff):</label><span class="data-value pdiff_volts" id="PDIFF_ADC">&nbsp;</span>&nbsp;
+              </div>
+              <div class="mimic-data">
+                  <label for="PITOT_ADC">Pitot Sensor:</label><span class="data-value pitot_volts" id="PITOT_ADC">&nbsp;</span>&nbsp;
+              </div>
+          </fieldset>
+
+          <fieldset>
+                <legend>Voltages&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
+                <div class="mimic-data">
+                    <label for="MAF_VOLTS">MAF Sensor:</label><span class="data-value maf_volts" id="MAF_VOLTS">&nbsp;</span>&nbsp;v
+                </div>
+                <div class="mimic-data">
+                    <label for="PREF_VOLTS">Ref Press(pRef):</label><span class="data-value pref_volts" id="PREF_VOLTS">&nbsp;</span>&nbsp;v
+                </div>
+                <div class="mimic-data">
+                    <label for="PDIFF_VOLTS">Diff Press (pDiff):</label><span class="data-value pdiff_volts" id="PDIFF_VOLTS">&nbsp;</span>&nbsp;v
+                </div>
+                <div class="mimic-data">
+                    <label for="PITOT_VOLTS">Pitot Sensor:</label><span class="data-value pitot_volts" id="PITOT_VOLTS">&nbsp;</span>&nbsp;v
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Flow Values&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
+                <div class="mimic-data">
+                    <label for="FLOW_KG_H">MAF Flow kg/h:</label><span class="data-value maf_volts" id="FLOW_KG_H">&nbsp;</span>&nbsp;kg/h
+                </div>
+                <div class="mimic-data">
+                    <label for="FLOW_MG_S">MAF Flow mg/s:</label><span class="data-value pref_volts" id="FLOW_MG_S">&nbsp;</span>&nbsp;mg/s
+                </div>
+                <div class="mimic-data">
+                    <label for="FLOW_CFM">MAF Flow CFM:</label><span class="data-value pdiff_volts" id="FLOW_CFM">&nbsp;</span>&nbsp;cfm
+                </div>
+                <div class="mimic-data">
+                    <label for="FLOW_LPM">MAF Flow LPM:</label><span class="data-value pitot_volts" id="FLOW_LPM">&nbsp;</span>&nbsp;l/m
+                </div>
+            </fieldset>
           </div>
-        </div>        
-      </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="mimic.js"></script>

@@ -15,6 +15,7 @@ public:
     String configPage();
     String dataPage();
     String pinsPage();
+    String mimicPage();
 
     String header();
     String footer(); 
@@ -28,4 +29,5 @@ public:
     String settingsJs();
     String configJs();
     String pinsJs();
+    String mimicJs();
 };

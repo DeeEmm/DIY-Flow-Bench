@@ -374,6 +374,13 @@ void Webserver::begin()
         request->send(response);
       });
   
+  server->on("/mimic.js", HTTP_ANY, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        AsyncResponseStream *response = request->beginResponseStream("text/javascript");
+        response->print(_public_html.mimicJs().c_str());
+        request->send(response);
+      });
+  
   // Settings page request handler
   server->on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
@@ -400,6 +407,13 @@ void Webserver::begin()
         PublicHTML _public_html;
         status.GUIpage = PINS_PAGE;
         request->send_P(200, "text/html", _public_html.pinsPage().c_str(), processPinsPageTemplate); 
+      });
+
+  // Mimic page request handler
+  server->on("/mimic", HTTP_GET, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        status.GUIpage = MIMIC_PAGE;
+        request->send_P(200, "text/html", _public_html.mimicPage().c_str(), processMimicPageTemplate); 
       });
 
   // // Index page request handler
@@ -1108,6 +1122,7 @@ String Webserver::processLanguageTemplateVars(const String &var) {
   if (var == "LANG_GUI_PDIFF_VOLTS") return language.LANG_GUI_PDIFF_VOLTS;
   if (var == "LANG_GUI_PITOT_VOLTS") return language.LANG_GUI_PITOT_VOLTS;
   if (var == "LANG_GUI_MAF_TYPE") return language.LANG_GUI_MAF_TYPE;
+  if (var == "LANG_GUI_MIMIC") return language.LANG_GUI_MIMIC;
 
   return var;
   
@@ -1979,6 +1994,37 @@ String Webserver::processPinsPageTemplate(const String &var) {
   return "";
 
 }
+
+
+
+
+
+/***********************************************************
+ * @brief processMimicPage
+ * @details Replaces template placeholders with variable values
+ * @param &var HTML payload 
+ * @note ~PLACEHOLDER_FORMAT~
+ ***/
+String Webserver::processMimicPageTemplate(const String &var) {
+
+  extern struct Pins pins;
+
+  // Process language vars
+  String langVar = processLanguageTemplateVars(var);
+  if (langVar != var) return langVar;
+
+  if (var == "VAC_SPEED") return String(pins.VAC_SPEED);
+  if (var == "VAC_BLEED_VALVE") return String(pins.VAC_BLEED_VALVE);
+
+
+  return "";
+
+}
+
+
+
+
+
 
 
 

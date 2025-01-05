@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501060010      - #236 Added Mimic Page
 2501050009      - Resolved NVM Save issue
 2412310045      - Update Pins configuration
 2412290045      - Update Hardware configuration layout
