@@ -427,6 +427,7 @@ double Sensors::getMafFlow(int units) {
         vPower *= mafMilliVolts;
     }
 
+	flowRateKGH = fabs(flowRateKGH);  // Flip negative value
 	
 
 	status.mafDiameter = _maf.getDiameter();

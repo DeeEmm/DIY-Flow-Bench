@@ -43,7 +43,7 @@ public:
 
     float mafCoeff[NUM_MAF_TYPES][NUM_COEFFICIENTS] = {
         {-0.000751374f, 0.025562336f, -0.000045469f, 0.000000035f, -0.000000f, 0.000000f, 0.000000f}, // ACDELCO_92281162 (Data calculated from Excel V1)
-        {-172.080793765f, -0.351684827f, 0.000983588f, -0.000000660f, -0.000000f, 0.000000f, -0.000000f} // BOSCH_0280218067 (Data calculated from Excel V1)
+        {-172.080793765f, -0.351684827f, 0.000983588f, -0.000000660f, 0.000000f, 0.000000f, 0.000000f} // BOSCH_0280218067 (Data calculated from Excel V1)
     };
 
         // {624.306263f, 25.418081f, 0.365468f, 0.002299f, 0.000003f, -0.000000f, 0.000000f}, // ACDELCO_92281162 (Data calculated from PY V1)
