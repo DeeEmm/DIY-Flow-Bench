@@ -364,7 +364,7 @@ int Hardware::setPinMode () {
       currentPin = pins.ORIFICE_BCD_3;
       pinMode(pins.ORIFICE_BCD_3, INPUT);   
     }
-    if (config.iMAF_SRC_TYPE == LINEAR_ANALOG && pins.MAF > -1) {
+    if (config.iMAF_SRC_TYP == LINEAR_ANALOG && pins.MAF > -1) {
       _message.verbosePrintf("Input MAF_BENCH: %d\n", pins.MAF );
       currentPin = pins.MAF;
       pinMode(pins.MAF, INPUT);   

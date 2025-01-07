@@ -119,27 +119,27 @@ struct Configuration {
   int iADC_RANGE = 32767;
   double dADC_GAIN = 6.144;
 
-  int iMAF_SRC_TYPE = ADS1115;
-  int iMAF_SENS_TYPE = 0;
+  int iMAF_SRC_TYP = ADS_ADC;
+  int iMAF_SENS_TYP = 0;
   double dMAF_MV_TRIM = 0.0;
   int iMAF_ADC_CHAN = 0;
 
   int iPREF_SENS_TYP = MPXV7007;
-  int iPREF_SRC_TYP = ADS1115;
+  int iPREF_SRC_TYP = ADS_ADC;
   int iFIXED_PREF_VAL = 1;
   double dPREF_MV_TRIM =  0.0;
   double dPREF_ALG_SCALE =  1.0;
   int iPREF_ADC_CHAN = 1;
 
   int iPDIFF_SENS_TYP = MPXV7007; 
-  int iPDIFF_SRC_TYP = ADS1115;
+  int iPDIFF_SRC_TYP = ADS_ADC;
   int iFIXD_PDIFF_VAL = 1;
   double dPDIFF_MV_TRIM = 0.0;
   double dPDIFF_SCALE = 1.0;
   int iPDIFF_ADC_CHAN = 2;
   
   int iPITOT_SENS_TYP = MPXV7007;
-  int iPITOT_SRC_TYP = ADS1115;
+  int iPITOT_SRC_TYP = ADS_ADC;
   double dPITOT_MV_TRIM = 0.0;
   double dPITOT_SCALE = 1.0;
   int iPITOT_ADC_CHAN = 3;

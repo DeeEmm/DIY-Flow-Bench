@@ -446,27 +446,27 @@ void DataHandler::initialiseConfig () {
   if (!_prefs.isKey("iADC_RANGE")) _prefs.putInt("iADC_RANGE", 32767);
   if (!_prefs.isKey("dADC_GAIN")) _prefs.putDouble("dADC_GAIN", 6.144);
 
-  if (!_prefs.isKey("iMAF_SRC_TYPE")) _prefs.putInt("iMAF_SRC_TYPE", ADS1115);
-  if (!_prefs.isKey("iMAF_SENS_TYPE")) _prefs.putString("iMAF_SENS_TYPE", 0);
+  if (!_prefs.isKey("iMAF_SRC_TYP")) _prefs.putInt("iMAF_SRC_TYP", ADS1115);
+  if (!_prefs.isKey("iMAF_SENS_TYP")) _prefs.putString("iMAF_SENS_TYP", 0);
   if (!_prefs.isKey("dMAF_MV_TRIM")) _prefs.putDouble("dMAF_MV_TRIM", 0.0);
   if (!_prefs.isKey("iMAF_ADC_CHAN")) _prefs.putInt("iMAF_ADC_CHAN", 0);
 
   if (!_prefs.isKey("iPREF_SENS_TYP")) _prefs.putInt("iPREF_SENS_TYP", MPXV7007);
-  if (!_prefs.isKey("iPREF_SRC_TYP")) _prefs.putInt("iPREF_SRC_TYP", ADS1115);
+  if (!_prefs.isKey("iPREF_SRC_TYP")) _prefs.putInt("iPREF_SRC_TYP", ADS_ADC);
   if (!_prefs.isKey("iFIXED_PREF_VAL")) _prefs.putInt("iFIXED_PREF_VAL", 1);
   if (!_prefs.isKey("dPREF_MV_TRIM")) _prefs.putDouble("dPREF_MV_TRIM", 0.0);
   if (!_prefs.isKey("dPREF_ALG_SCALE")) _prefs.putDouble("dPREF_ALG_SCALE", 0.0);
   if (!_prefs.isKey("iPREF_ADC_CHAN")) _prefs.putInt("iPREF_ADC_CHAN", 1);
 
   if (!_prefs.isKey("iPDIFF_SENS_TYP")) _prefs.putInt("iPDIFF_SENS_TYP", MPXV7007);
-  if (!_prefs.isKey("iPDIFF_SRC_TYP")) _prefs.putInt("iPDIFF_SRC_TYP", ADS1115);
+  if (!_prefs.isKey("iPDIFF_SRC_TYP")) _prefs.putInt("iPDIFF_SRC_TYP", ADS_ADC);
   if (!_prefs.isKey("iFIXD_PDIFF_VAL")) _prefs.putInt("iFIXD_PDIFF_VAL", 1);
   if (!_prefs.isKey("dPDIFF_MV_TRIM")) _prefs.putDouble("dPDIFF_MV_TRIM", 0.0);
   if (!_prefs.isKey("dPDIFF_SCALE")) _prefs.putDouble("dPDIFF_SCALE", 0.0);
   if (!_prefs.isKey("iPDIFF_ADC_CHAN")) _prefs.putInt("iPDIFF_ADC_CHAN", 1);
 
   if (!_prefs.isKey("iPITOT_SENS_TYP")) _prefs.putInt("iPITOT_SENS_TYP", MPXV7007);
-  if (!_prefs.isKey("iPITOT_SRC_TYP")) _prefs.putInt("iPITOT_SRC_TYP", ADS1115);
+  if (!_prefs.isKey("iPITOT_SRC_TYP")) _prefs.putInt("iPITOT_SRC_TYP", ADS_ADC);
   if (!_prefs.isKey("dPITOT_MV_TRIM")) _prefs.putDouble("dPITOT_MV_TRIM", 0.0);
   if (!_prefs.isKey("dPITOT_SCALE")) _prefs.putDouble("dPITOT_SCALE", 0.0);
   if (!_prefs.isKey("iPITOT_ADC_CHAN")) _prefs.putInt("iPITOT_ADC_CHAN", 1);
@@ -541,27 +541,27 @@ void DataHandler::loadConfig () {
   config.iADC_RANGE = _prefs.getInt("iADC_RANGE", 32767);
   config.dADC_GAIN = _prefs.getDouble("dADC_GAIN", 6.144);
 
-  config.iMAF_SRC_TYPE = _prefs.getInt("iMAF_SRC_TYPE", ADS1115);
-  config.iMAF_SENS_TYPE = _prefs.getInt("iMAF_SENS_TYPE", 0);
+  config.iMAF_SRC_TYP = _prefs.getInt("iMAF_SRC_TYP", ADS1115);
+  config.iMAF_SENS_TYP = _prefs.getInt("iMAF_SENS_TYP", 0);
   config.dMAF_MV_TRIM = _prefs.getDouble("dMAF_MV_TRIM", 0.0);
   config.iMAF_ADC_CHAN = _prefs.getInt("iMAF_ADC_CHAN", 0);
 
   config.iPREF_SENS_TYP = _prefs.getInt("iPREF_SENS_TYP", MPXV7007);
-  config.iPREF_SRC_TYP = _prefs.getInt("iPREF_SRC_TYP", ADS1115);
+  config.iPREF_SRC_TYP = _prefs.getInt("iPREF_SRC_TYP", ADS_ADC);
   config.iFIXED_PREF_VAL = _prefs.getInt("iFIXED_PREF_VAL", 1);
   config.dPREF_MV_TRIM = _prefs.getDouble("dPREF_MV_TRIM", 0.0);
   config.dPREF_ALG_SCALE = _prefs.getDouble("dPREF_ALG_SCALE", 1.0);
   config.iPREF_ADC_CHAN = _prefs.getInt("iPREF_ADC_CHAN", 1);
 
   config.iPDIFF_SENS_TYP = _prefs.getInt("iPDIFF_SENS_TYP", MPXV7007);
-  config.iPDIFF_SRC_TYP = _prefs.getInt("iPDIFF_SRC_TYP", ADS1115);
+  config.iPDIFF_SRC_TYP = _prefs.getInt("iPDIFF_SRC_TYP", ADS_ADC);
   config.iFIXD_PDIFF_VAL = _prefs.getInt("iFIXD_PDIFF_VAL", 1);
   config.dPDIFF_MV_TRIM = _prefs.getDouble("dPDIFF_MV_TRIM", 0.0);
   config.dPDIFF_SCALE = _prefs.getDouble("dPDIFF_SCALE", 1.0);
   config.iPDIFF_ADC_CHAN = _prefs.getInt("iPDIFF_ADC_CHAN", 2);
  
   config.iPITOT_SENS_TYP = _prefs.getInt("iPITOT_SENS_TYP", MPXV7007);
-  config.iPITOT_SRC_TYP = _prefs.getInt("iPITOT_SRC_TYP", ADS1115);
+  config.iPITOT_SRC_TYP = _prefs.getInt("iPITOT_SRC_TYP", ADS_ADC);
   config.dPITOT_MV_TRIM = _prefs.getDouble("dPITOT_MV_TRIM", 0.0);
   config.dPITOT_SCALE = _prefs.getDouble("dPITOT_SCALE", 1.0);
   config.iPITOT_ADC_CHAN = _prefs.getInt("iPITOT_ADC_CHAN", 3);

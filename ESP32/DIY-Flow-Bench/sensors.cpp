@@ -70,7 +70,7 @@ void Sensors::begin () {
 	extern struct Pins pins;
 	extern int mafOutputType;
 
-	MafData _maf(config.iMAF_SRC_TYPE);
+	MafData _maf(config.iMAF_SENS_TYP);
 
 	//initialise BME280
 	if (config.iBME_TYP == BOSCH_BME280) {
@@ -279,20 +279,20 @@ long Sensors::getMafRaw() {
 	extern struct Pins pins;
 
 
-	switch (config.iMAF_SRC_TYPE) {
+	switch (config.iMAF_SRC_TYP) {
 
 		case SENSOR_DISABLED: {
 			return 0;
 			break;
 		}
 
-		case ADS1115:{
-			sensorVal.MafRAW = _hardware.getADCRawData(config.iMAF_ADC_CHAN);
+		case LINEAR_ANALOG: {
+			long mafFlowRaw = analogRead(pins.MAF);
 			break;
 		}
 
-		case LINEAR_ANALOG: {
-			long mafFlowRaw = analogRead(pins.MAF);
+		case ADS_ADC:{
+			sensorVal.MafRAW = _hardware.getADCRawData(config.iMAF_ADC_CHAN);
 			break;
 		}
 
@@ -321,21 +321,21 @@ double Sensors::getMafVolts() {
 	Hardware _hardware;
 	double sensorVolts = 0.00F;
 
-	switch (config.iMAF_SRC_TYPE) {
+	switch (config.iMAF_SRC_TYP) {
 
-		case ADS1115:{
-			sensorVolts = _hardware.getADCVolts(config.iMAF_ADC_CHAN);
-			break;
-		}
-
-		case ADS1015:{
-			sensorVolts = _hardware.getADCVolts(config.iMAF_ADC_CHAN);
+		case SENSOR_DISABLED: {
+			return 0;
 			break;
 		}
 
 		case LINEAR_ANALOG: {
 			long mafRaw = analogRead(pins.MAF);
 			sensorVolts = static_cast<double>(mafRaw) * (_hardware.get3v3SupplyVolts() / 4095.00F);
+			break;
+		}
+
+		case ADS_ADC:{
+			sensorVolts = _hardware.getADCVolts(config.iMAF_ADC_CHAN);
 			break;
 		}
 
@@ -380,7 +380,7 @@ double Sensors::getMafFlow(int units) {
 	Hardware _hardware;
 	Messages _message;
 	Calculations _calculations;
-	MafData _maf(config.iMAF_SRC_TYPE);
+	MafData _maf(config.iMAF_SENS_TYP);
 
 	double flowRateCFM = 0.0;
 	double flowRateMGS = 0.0;
@@ -392,34 +392,43 @@ double Sensors::getMafFlow(int units) {
 	double velocity2 = 0.0;
 	double mafVelocity = 0.0;
 	double transposedflowRateKGH = 0.0;
-	u_int mafVolts = 0.0;
+	double mafVolts = 0.0;
+	u_int mafMilliVolts = 0;
 	double MafFlow = 0.0f;
     float vPower = 1.0f;
 
 
-	// get MAF Coefficiants
+	// get MAF Coefficients
 	float mafCoeff0 = _maf.getCoefficient(0);
     float mafCoeff1 = _maf.getCoefficient(1);
 	float mafCoeff2 = _maf.getCoefficient(2);
 	float mafCoeff3 = _maf.getCoefficient(3);
 	float mafCoeff4 = _maf.getCoefficient(4);
 	float mafCoeff5 = _maf.getCoefficient(5);
+	float mafCoeff6 = _maf.getCoefficient(6);
 
 	// Get MAF Volts
 	sensorVal.MafVolts = this->getMafVolts();
 
 	// VCC deviation correction
-	mafVolts = (5.0f / _hardware.get5vSupplyVolts()) * sensorVal.MafVolts;
+	mafVolts = ((5.0f / _hardware.get5vSupplyVolts()) * sensorVal.MafVolts);
+	
+	mafMilliVolts = mafVolts * 1000;
 
 	// 6th degree polynomial calculation (Coefficients stored in mafData class)
-	// flowRateKGH = mafCoeff0 + (mafCoeff1 * mafVolts) + (mafCoeff2 * pow(mafVolts, 2)) + (mafCoeff3 * pow(mafVolts, 3)) + (mafCoeff4 * pow(mafVolts, 4)) + (mafCoeff5 * pow(mafVolts, 5));
+	// flowRateKGH = mafCoeff0 + (mafCoeff1 * mafMilliVolts) + (mafCoeff2 * pow(mafMilliVolts, 2)) + (mafCoeff3 * pow(mafMilliVolts, 3)) + (mafCoeff4 * pow(mafMilliVolts, 4)) + (mafCoeff5 * pow(mafMilliVolts, 5)) + (mafCoeff6 * pow(mafMilliVolts, 6));
+
+	// flowRateKGH = _maf.calculateFlow(mafVolts);
 
 	// Alternate method
 	// 6th degree polynomial calculation (Coefficients stored in mafData class)
-    for(int i = 0; i < 6; i++) {
+    for(int i = 0; i < 7; i++) {
         flowRateKGH += _maf.getCoefficient(i) * vPower;
-        vPower *= mafVolts;
+        vPower *= mafMilliVolts;
     }
+
+	flowRateKGH = fabs(flowRateKGH);  // Flip negative value
+	
 
 	status.mafDiameter = _maf.getDiameter();
 
@@ -570,7 +579,7 @@ double Sensors::getPRefVolts() {
 
 	switch (config.iPREF_SRC_TYP) 	{
 
-		case ADS1115 : {
+		case ADS_ADC : {
 			sensorVolts = _hardware.getADCVolts(config.iPREF_ADC_CHAN);
 			break;
 		}
@@ -691,7 +700,7 @@ double Sensors::getPDiffVolts() {
 
 	switch (config.iPDIFF_SRC_TYP) 	{
 
-		case ADS1115 : {
+		case ADS_ADC : {
 			sensorVolts = _hardware.getADCVolts(config.iPDIFF_ADC_CHAN);
 			break;
 		}
@@ -810,7 +819,7 @@ double Sensors::getPitotVolts() {
 
 		switch (config.iPITOT_SRC_TYP) 	{
 
-		case ADS1115 : {
+		case ADS_ADC : {
 			sensorVolts = _hardware.getADCVolts(config.iPITOT_ADC_CHAN);
 			break;
 		}

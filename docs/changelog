@@ -29,6 +29,10 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501070013      - #307 Update Polynomial Data
+2501070010      - Bugfix (Config dropdowns)
+                - #307 Excel Polynomial Test
+                - Removed Deprecated Code
 2501060010      - #236 Added Mimic Page
 2501050009      - Resolved NVM Save issue
 2412310045      - Update Pins configuration

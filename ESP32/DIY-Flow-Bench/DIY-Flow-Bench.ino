@@ -123,7 +123,7 @@ void TASKgetSensorData( void * parameter ){
         switch (settings.bench_type){
 
           case MAF_BENCH:
-            if (config.iMAF_SRC_TYPE != SENSOR_DISABLED) {
+            if (config.iMAF_SRC_TYP != SENSOR_DISABLED) {
               sensorVal.FlowKGH = _sensors.getMafFlow();
               sensorVal.FlowCFMraw = _calculations.convertFlow(sensorVal.FlowKGH);
             }

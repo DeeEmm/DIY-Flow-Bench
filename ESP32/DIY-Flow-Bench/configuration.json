@@ -23,7 +23,7 @@
     "iADC_RANGE" : 32767,
     "dADC_GAIN" : 6.144,
     
-    "iMAF_SRC_TYPE" : 11,
+    "iMAF_SRC_TYP" : 11,
     "dMAF_MV_TRIM" : 0.0,
     "iMAF_ADC_CHAN" : 0,
     

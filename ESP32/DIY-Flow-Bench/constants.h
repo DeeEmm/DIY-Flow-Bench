@@ -125,6 +125,7 @@ enum VolumetricUnits {
 #define XGZP6899A010KPDPN 15
 #define M5STACK_TubePressure 16
 #define BOSCH_BME680 17
+#define ADS_ADC 18
 
 /***********************************************************
  * Flow Differential types

@@ -10,7 +10,9 @@ Open source flow bench project to measure and display volumetric air flow using 
 
 For more information please visit the [WIKI](https://github.com/DeeEmm/DIY-Flow-Bench/wiki) Or join our [support forums](https://github.com/DeeEmm/DIY-Flow-Bench/discussions) 
 
-This project and all associated files are provided for use under the CERN–OHL–W license which allows people to make their own derivative designs provided that attribution is provided and that any derivative design is also made publicly available. 
+The PCB design and all associated files are provided for use under the CERN–OHL–W license which allows people to make their own derivative designs provided that attribution is provided and that any derivative design is also made publicly available. 
+
+The DIYFB Software is provided under the GPL3 license. More details can be found in the README file in the main project.
 
 ## Notes
 

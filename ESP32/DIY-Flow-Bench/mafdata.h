@@ -42,9 +42,11 @@ public:
     };
 
     float mafCoeff[NUM_MAF_TYPES][NUM_COEFFICIENTS] = {
-        {624.306263f, 25.418081f, 0.365468f, 0.002299f, 0.000003f, -0.000000f, 0.000000f}, // ACDELCO_92281162
-        {817.925606f, -15.237634f, 0.091194f, -0.000073f, -0.000000f, 0.000000f, -0.000000f} // BOSCH_0280218067
+        {-0.000751374f, 0.025562336f, -0.000045469f, 0.000000035f, -0.000000f, 0.000000f, 0.000000f}, // ACDELCO_92281162 (Data calculated from Excel V1)
+        {-172.080793765f, -0.351684827f, 0.000983588f, -0.000000660f, 0.000000f, 0.000000f, 0.000000f} // BOSCH_0280218067 (Data calculated from Excel V1)
     };
+
+        // {624.306263f, 25.418081f, 0.365468f, 0.002299f, 0.000003f, -0.000000f, 0.000000f}, // ACDELCO_92281162 (Data calculated from PY V1)
 
 
     int mafDiameter[NUM_MAF_TYPES] = {94, 82}; // MAF diameter in mm
@@ -53,7 +55,7 @@ public:
 
     int mafOutputType[NUM_MAF_TYPES] = {Voltage, Voltage}; // MAF output type
 
-    int mafMaxKGH[NUM_MAF_TYPES] = {16077, 18055}; // MAF max value
+    int mafMaxKGH[NUM_MAF_TYPES] = {16077, 343}; // MAF kg/h value at 5 volts
 
     String mafType[NUM_MAF_TYPES] = {
         "ACDELCO 92281162",
@@ -120,6 +122,19 @@ public:
 
     String getMafLink() const {
         return mafLink[currentMafType];
+    }
+
+    float calculateFlow(float mafVolts) const {
+        float flow = 0.0f;
+        float v_power = 1.0f;  // V^n starts at V^0
+        
+        // Calculate polynomial using coefficients
+        for(int i = 0; i < NUM_COEFFICIENTS; i++) {
+            flow += mafCoeff[currentMafType][i] * v_power;
+            v_power *= mafVolts;  // Increment power for next term
+        }
+        
+        return flow;
     }
 
 };

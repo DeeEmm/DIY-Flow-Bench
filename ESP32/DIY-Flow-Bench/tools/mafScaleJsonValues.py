@@ -1,17 +1,17 @@
 import json
 
 # Load the original data
-with open('/Users/mick/Documents/ESP32 Projects/DIY-Flow-Bench/ESP32/DIY-Flow-Bench/mafData/mafData.json', 'r') as f:
+with open('/Users/mick/Documents/ESP32 Projects/DIY-Flow-Bench/ESP32/DIY-Flow-Bench/tools/mafData.json', 'r') as f:
     original_data = json.load(f)
 
 # Calculate the scaling factor
 old_max = 1024
-new_max = 500
+new_max = 5000
 scale_factor = new_max / old_max
 
 # Create new dictionary with scaled indices and interpolated values
 new_data = {}
-for new_index in range(new_max + 1):
+for new_index in range(0, new_max + 1, 10):
     # Find the corresponding position in the original data
     old_position = new_index / scale_factor
     
@@ -32,5 +32,5 @@ for new_index in range(new_max + 1):
     new_data[str(new_index)] = round(interpolated_value)
 
 # Save the new data
-with open('/Users/mick/Documents/ESP32 Projects/DIY-Flow-Bench/ESP32/DIY-Flow-Bench/mafData/mafData_500.json', 'w') as f:
+with open('/Users/mick/Documents/ESP32 Projects/DIY-Flow-Bench/ESP32/DIY-Flow-Bench/tools/mafData_5000.json', 'w') as f:
     json.dump(new_data, f, indent=4)
