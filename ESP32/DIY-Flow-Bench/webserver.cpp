@@ -1152,7 +1152,7 @@ String Webserver::processIndexPageTemplate(const String &var) {
   Calculations _calculations;
   Messages _message;
 
-  MafData _maf(config.iMAF_SRC_TYPE);
+  MafData _maf(config.iMAF_SENS_TYP);
 
   // Process language vars
   String langVar = processLanguageTemplateVars(var);
@@ -1312,7 +1312,7 @@ String Webserver::processSettingsPageTemplate(const String &var) {
   
   Calculations _calculations;
 
-  MafData _maf(config.iMAF_SRC_TYPE);
+  MafData _maf(config.iMAF_SENS_TYP);
 
   // Process language vars
   String langVar = processLanguageTemplateVars(var);
@@ -1662,7 +1662,7 @@ String Webserver::processConfigPageTemplate(const String &var) {
 
   // 5v dropdown
   if (var == "bFIXED_5V_0" && config.bFIXED_5V == 0) return String("selected");
-  if (var == "bFIXED_5_1" && config.bFIXED_5V == 1) return String("selected");
+  if (var == "bFIXED_5V_1" && config.bFIXED_5V == 1) return String("selected");
 
   if (var == "dVCC_5V_TRIM" ) return String(config.dVCC_5V_TRIM);
 
@@ -1684,22 +1684,24 @@ String Webserver::processConfigPageTemplate(const String &var) {
   if (var == "iADC_RANGE" ) return String(config.iADC_RANGE);
   if (var == "dADC_GAIN" ) return String(config.dADC_GAIN);
 
-  // MAF Type dropdown
-  if (var == "iMAF_SENS_TYPE_0" && config.iMAF_SENS_TYPE == 0) return String("selected");
-  if (var == "iMAF_SENS_TYPE_1" && config.iMAF_SENS_TYPE == 1) return String("selected");
+  // MAF Sensor Type dropdown
+  if (var == "iMAF_SENS_TYP_0" && config.iMAF_SENS_TYP == 0) return String("selected");
+  if (var == "iMAF_SENS_TYP_1" && config.iMAF_SENS_TYP == 1) return String("selected");
 
   if (var == "dMAF_MV_TRIM" ) return String(config.dMAF_MV_TRIM);
-  if (var == "iMAF_ADC_CHAN" ) return String(config.iMAF_ADC_CHAN);
+
+  // if (var == "iMAF_ADC_CHAN" ) return String(config.iMAF_ADC_CHAN);
 
   // MAF Source dropdown
-  if (var == "iMAF_SRC_TYPE_10" && config.iMAF_SRC_TYPE == 10) return String("selected");
-  if (var == "iMAF_SRC_TYPE_11" && config.iMAF_SRC_TYPE == 11) return String("selected");
+  if (var == "iMAF_SRC_TYP_1" && config.iMAF_SRC_TYP == 1) return String("selected");
+  if (var == "iMAF_SRC_TYP_12" && config.iMAF_SRC_TYP == 12) return String("selected");
+  if (var == "iMAF_SRC_TYP_18" && config.iMAF_SRC_TYP == 18) return String("selected");
 
   // MAF ADC Channel dropdown
-  if (var == "iMAF_SRC_TYPE_0" && config.iMAF_SRC_TYPE == 0) return String("selected");
-  if (var == "iMAF_SRC_TYPE_1" && config.iMAF_SRC_TYPE == 1) return String("selected");
-  if (var == "iMAF_SRC_TYPE_2" && config.iMAF_SRC_TYPE == 2) return String("selected");
-  if (var == "iMAF_SRC_TYPE_3" && config.iMAF_SRC_TYPE == 3) return String("selected");
+  if (var == "iMAF_ADC_CHAN_0" && config.iMAF_ADC_CHAN == 0) return String("selected");
+  if (var == "iMAF_ADC_CHAN_1" && config.iMAF_ADC_CHAN == 1) return String("selected");
+  if (var == "iMAF_ADC_CHAN_2" && config.iMAF_ADC_CHAN == 2) return String("selected");
+  if (var == "iMAF_ADC_CHAN_3" && config.iMAF_ADC_CHAN == 3) return String("selected");
 
   // pRef Sensor type dropdown
   if (var == "iPREF_SENS_TYP_1" && config.iPREF_SENS_TYP == 1) return String("selected");
@@ -1715,8 +1717,8 @@ String Webserver::processConfigPageTemplate(const String &var) {
   if (var == "iPREF_SENS_TYP_16" && config.iPREF_SENS_TYP == 16) return String("selected");
 
   // pRef ADC Source dropdown
-  if (var == "iPREF_SRC_TYP_1" && config.iPREF_SRC_TYP == 11) return String("selected");
-  if (var == "iPREF_SRC_TYP_2" && config.iPREF_SRC_TYP == 12) return String("selected");
+  if (var == "iPREF_SRC_TYP_12" && config.iPREF_SRC_TYP == 12) return String("selected");
+  if (var == "iPREF_SRC_TYP_18" && config.iPREF_SRC_TYP == 18) return String("selected");
 
   //pRef ADC channel Dropdown
   if (var == "iPREF_ADC_CHAN_1" && config.iPREF_ADC_CHAN == 1) return String("selected");
@@ -1742,8 +1744,8 @@ String Webserver::processConfigPageTemplate(const String &var) {
   if (var == "dPDIFF_MV_TRIM" ) return String(config.dPDIFF_MV_TRIM);
 
   // pDiff ADC Source dropdown
-  if (var == "iPDIFF_SRC_TYP_1" && config.iPDIFF_SRC_TYP == 11) return String("selected");
-  if (var == "iPDIFF_SRC_TYP_2" && config.iPDIFF_SRC_TYP == 12) return String("selected");
+  if (var == "iPDIFF_SRC_TYP_12" && config.iPDIFF_SRC_TYP == 12) return String("selected");
+  if (var == "iPDIFF_SRC_TYP_18" && config.iPDIFF_SRC_TYP == 18) return String("selected");
 
   //pDiff ADC channel Dropdown
   if (var == "iPDIFF_ADC_CHAN_1" && config.iPDIFF_ADC_CHAN == 1) return String("selected");
@@ -1769,8 +1771,8 @@ String Webserver::processConfigPageTemplate(const String &var) {
   if (var == "dPITOT_MV_TRIM" ) return String(config.dPITOT_MV_TRIM);
 
   // Pitot ADC Source dropdown
-  if (var == "iPITOT_SRC_TYP_1" && config.iPITOT_SRC_TYP == 11) return String("selected");
-  if (var == "iPITOT_SRC_TYP_2" && config.iPITOT_SRC_TYP == 12) return String("selected");
+  if (var == "iPITOT_SRC_TYP_12" && config.iPITOT_SRC_TYP == 12) return String("selected");
+  if (var == "iPITOT_SRC_TYP_8" && config.iPITOT_SRC_TYP == 18) return String("selected");
 
   //Pitot ADC channel Dropdown
   if (var == "iPITOT_ADC_CHAN_1" && config.iPITOT_ADC_CHAN == 1) return String("selected");
@@ -1837,7 +1839,7 @@ String Webserver::processDatagraphPageTemplate(const String &var) {
   extern struct ValveLiftData valveData;  
   extern struct Configuration config;
 
-  MafData _maf(config.iMAF_SRC_TYPE);
+  MafData _maf(config.iMAF_SENS_TYP);
 
   // Process language vars
   String langVar = processLanguageTemplateVars(var);

@@ -107,17 +107,10 @@
             <fieldset>
                 <legend>MAF Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
-                    <label for="iMAF_SENS_TYPE">Sensor Type</label>
-                    <select name='iMAF_SENS_TYPE' class='config-select-long'>
-                        <option value='0' ~iMAF_SENS_TYPE_0~>ACDELCO_92281162</option>
-                        <option value='1' ~iMAF_SENS_TYPE_1~>BOSCH_0280218067</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="iMAF_SRC_TYPE">Source</label>
-                    <select name='iMAF_SRC_TYPE' class='config-select'>
-                        <option value='10' ~iMAF_SRC_TYPE_10~>ADS1015</option>
-                        <option value='11' ~iMAF_SRC_TYPE_11~>ADS1115</option>
+                    <label for="iMAF_SENS_TYP">Sensor Type</label>
+                    <select name='iMAF_SENS_TYP' class='config-select-long'>
+                        <option value='0' ~iMAF_SENS_TYP_0~>ACDELCO_92281162</option>
+                        <option value='1' ~iMAF_SENS_TYP_1~>BOSCH_0280218067</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -125,6 +118,13 @@
                     <input type="number" id="dMAF_MV_TRIM" name="dMAF_MV_TRIM" step="0.1" value="0.0">
                 </div>
                 <hr class="fieldset-divider">
+                <div class="input-group">
+                    <label for="iMAF_SRC_TYP">Source</label>
+                    <select name='iMAF_SRC_TYP' class='config-select'>
+                        <option value='1' ~iMAF_SRC_TYP_1~>Disabled</option>
+                        <option value='12' ~iMAF_SRC_TYP_12~>Analog Pin</option>
+                        <option value='18' ~iMAF_SRC_TYP_18~>ADC</option>                    </select>
+                </div>
                 <div class="input-group">
                     <label for="iMAF_ADC_CHAN">ADC Channel</label>
                     <select name='iMAF_ADC_CHAN' class='config-select'>
@@ -163,8 +163,8 @@
                 <div class="input-group">
                     <label for="iPREF_SRC_TYP">Source</label>
                     <select name='iPREF_SRC_TYP' class='config-select'>
-                        <option value='11' ~iPREF_SRC_TYP_1~>ADC</option>
-                        <option value='12' ~iPREF_SRC_TYP_2~>PIN</option>
+                        <option value='12' ~iPREF_SRC_TYP_12~>Analog Pin</option>
+                        <option value='18' ~iPREF_SRC_TYP_18~>ADC</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -212,8 +212,8 @@
                 <div class="input-group">
                     <label for="iPDIFF_SRC_TYP">Source</label>
                     <select name='iPDIFF_SRC_TYP' class='config-select'>
-                        <option value='11' ~iPDIFF_SRC_TYP_1~>ADC</option>
-                        <option value='12' ~iPDIFF_SRC_TYP_2~>PIN</option>
+                        <option value='12' ~iPDIFF_SRC_TYP_12~>Analog Pin</option>
+                        <option value='18' ~iPDIFF_SRC_TYP_18~>ADC</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -259,8 +259,8 @@
                 <div class="input-group">
                     <label for="iPITOT_SRC_TYP">Source</label>
                     <select name='iPITOT_SRC_TYP' class='config-select'>
-                        <option value='11' ~iPITOT_SRC_TYP_1~>ADC</option>
-                        <option value='12' ~iPITOT_SRC_TYP_2~>Analog Pin</option>
+                        <option value='12' ~iPITOT_SRC_TYP_12~>Analog Pin</option>
+                        <option value='18' ~iPITOT_SRC_TYP_18~>ADC</option>
                     </select>
                 </div>
                 <div class="input-group">

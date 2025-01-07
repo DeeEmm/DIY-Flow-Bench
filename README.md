@@ -110,7 +110,21 @@ If you find a bug, or have a feature request, please [raise an issue](https://gi
 ## License
 ###
 
-This software is released under the GPLV3 license. For details on usage please refer to the license file included with this project
+The software is released under the GPLV3 license. For details on usage please refer to the license file included with this project.
+
+The PCB design and all associated files are provided for use under the CERN–OHL–W license which allows people to make their own derivative designs provided that attribution is provided and that any derivative design is also made publicly available. 
+
+
+## Statement of Intent
+
+The DIYFB project is released under an open source license to allow the end user to build and operate a flow bench without the cost of purchasing commercial equipment. The project is not-for-profit and is run by volunteers. All code development and contributions have been made with the intent of providing DIYFB at no financial cost to the community. It is the intent of the developers that the DIYFB project should remain free. 
+
+
+## Sharing is Caring
+
+Community projects completely rely on community contributions. If you use the DIYFB project, and have made improvements or changes that you think might benefit the community, please consider sharing those changes so that everyone in the community can benefit. Likewise, if you have something to say about the project, how it works, or how it can be improved, please share your thoughts. 
+
+
 
 ## Demo
 ###

@@ -6,8 +6,9 @@
 # # Coefficients of the best fit function are printed to the console. (generally 6th order polynomial)
 # MAF Coefficients can be added to mafData.h 
 # MAF sensor data must be in the format of a JSON file with the voltage as the key and the flow as the value. 
-# MAF sensor key values must be in format 0-500mv. Values can be scaled from other ranges using the mafScaleJsonValues.py script
+# MAF sensor key values must be in format 0-5000mv. Values can be scaled from other ranges using the mafScaleJsonValues.py script
 # MAF sensor flow values must be in the format KG/H. Values can be converted from MG/S to KG/H using the mafConvertKGHtoMGS.py script
+# Version 1 - 22.12.24
 
 
 import json
@@ -60,7 +61,7 @@ def get_equation_text(fit_type, coeffs, r2):
 
 def main():
     # Load data
-    x, y = load_maf_data('/Users/mick/Documents/ESP32 Projects/DIY-Flow-Bench/ESP32/DIY-Flow-Bench/mafData/mafData.json')
+    x, y = load_maf_data('/Users/mick/Documents/ESP32 Projects/DIY-Flow-Bench/ESP32/DIY-Flow-Bench/tools/mafData.json')
     
     # Remove zero values
     mask = (x != 0) & (y != 0)
