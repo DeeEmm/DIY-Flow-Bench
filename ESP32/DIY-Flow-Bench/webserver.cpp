@@ -1720,7 +1720,7 @@ String Webserver::processConfigPageTemplate(const String &var) {
   if (var == "iPREF_SRC_TYP_12" && config.iPREF_SRC_TYP == 12) return String("selected");
   if (var == "iPREF_SRC_TYP_18" && config.iPREF_SRC_TYP == 18) return String("selected");
 
-  //pRef ADC channel Dropdown
+  // pRef ADC channel Dropdown
   if (var == "iPREF_ADC_CHAN_1" && config.iPREF_ADC_CHAN == 1) return String("selected");
   if (var == "iPREF_ADC_CHAN_2" && config.iPREF_ADC_CHAN == 2) return String("selected");
   if (var == "iPREF_ADC_CHAN_3" && config.iPREF_ADC_CHAN == 3) return String("selected");
@@ -1728,6 +1728,8 @@ String Webserver::processConfigPageTemplate(const String &var) {
 
   if (var == "iFIXED_PREF_VAL" ) return String(config.iFIXED_PREF_VAL);
   if (var == "dPREF_ALG_SCALE" ) return String(config.dPREF_ALG_SCALE);
+  if (var == "dPREF_MV_TRIM" ) return String(config.dPREF_MV_TRIM);
+
 
   //pDiff Sensor type dropdown
   if (var == "iPDIFF_SENS_TYP_1" && config.iPDIFF_SENS_TYP == 1) return String("selected");
@@ -1772,7 +1774,7 @@ String Webserver::processConfigPageTemplate(const String &var) {
 
   // Pitot ADC Source dropdown
   if (var == "iPITOT_SRC_TYP_12" && config.iPITOT_SRC_TYP == 12) return String("selected");
-  if (var == "iPITOT_SRC_TYP_8" && config.iPITOT_SRC_TYP == 18) return String("selected");
+  if (var == "iPITOT_SRC_TYP_18" && config.iPITOT_SRC_TYP == 18) return String("selected");
 
   //Pitot ADC channel Dropdown
   if (var == "iPITOT_ADC_CHAN_1" && config.iPITOT_ADC_CHAN == 1) return String("selected");

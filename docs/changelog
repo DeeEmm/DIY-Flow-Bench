@@ -29,6 +29,10 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501080013      - Added float flag to conf var initalisation
+                - Added 3v3 + 5v bus voltage vars
+                - Zeroed disabled sensor values
+                - #307 Fixed ADC class instantiation
 2501070013      - #307 Update Polynomial Data
 2501070010      - Bugfix (Config dropdowns)
                 - #307 Excel Polynomial Test

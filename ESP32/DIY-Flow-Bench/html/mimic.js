@@ -35,7 +35,7 @@ if (!!window.EventSource) {
             } else {
               // we've got a number... 
               
-                if (key === 'MAF_VOLTS' || key === 'PREF_VOLTS' || key === 'PDIFF_VOLTS' || key === 'PITOT_VOLTS' || key === "FLOW_KG_H" || key === "FLOW_MG_S" || key === "FLOW_CFM" || key === "FLOW_LPM") {
+                if (key === 'MAF_VOLTS' || key === 'PREF_VOLTS' || key === 'PDIFF_VOLTS' || key === 'PITOT_VOLTS' || key === "FLOW_KG_H" || key === "FLOW_MG_S" || key === "FLOW_CFM" || key === "FLOW_LPM" || key === "VCC_5V_BUS" || key === "VCC_3V3_BUS") {
                     document.getElementById(key).innerHTML = myObj[key].toFixed(2);  
 
                 } else if (key === 'MAF_ADC' || key === 'PREF_ADC' || key === 'PDIFF_ADC' || key === 'PITOT_ADC') {

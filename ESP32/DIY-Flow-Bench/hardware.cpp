@@ -50,42 +50,42 @@ ADS1115_lite adc;
 Hardware::Hardware() {
 }
 
-/***********************************************************
- * @brief save_ADC_Reg - Kludge to fix ADC2 + WiFi 
- * @details  Save ADC2 control register value : Do this before begin Wifi/Bluetooth
- * @note Source: https://forum.arduino.cc/t/interesting-esp32-issue-cant-use-analogread-in-esp_wifimanager-library/679348/2
- ***/
-void Hardware::save_ADC_Reg(void)
-{
-  reg_b = READ_PERI_REG(SENS_SAR_READ_CTRL2_REG);
-}
+// /***********************************************************
+//  * @brief save_ADC_Reg - Kludge to fix ADC2 + WiFi 
+//  * @details  Save ADC2 control register value : Do this before begin Wifi/Bluetooth
+//  * @note Source: https://forum.arduino.cc/t/interesting-esp32-issue-cant-use-analogread-in-esp_wifimanager-library/679348/2
+//  ***/
+// void Hardware::save_ADC_Reg(void)
+// {
+//   reg_b = READ_PERI_REG(SENS_SAR_READ_CTRL2_REG);
+// }
 
-/***********************************************************
- * @brief restore_ADC_Reg - Kludge to fix ADC2 + WiFi 
- * @details  Restore ADC2 control register value : Do this after Wifi/Bluetooth
- * @note Source: https://forum.arduino.cc/t/interesting-esp32-issue-cant-use-analogread-in-esp_wifimanager-library/679348/2
- ***/
-void Hardware::restore_ADC_Reg(void)
-{ 
-  WRITE_PERI_REG(SENS_SAR_READ_CTRL2_REG, reg_b);
-  SET_PERI_REG_MASK(SENS_SAR_READ_CTRL2_REG, SENS_SAR2_DATA_INV);
-}
+// /***********************************************************
+//  * @brief restore_ADC_Reg - Kludge to fix ADC2 + WiFi 
+//  * @details  Restore ADC2 control register value : Do this after Wifi/Bluetooth
+//  * @note Source: https://forum.arduino.cc/t/interesting-esp32-issue-cant-use-analogread-in-esp_wifimanager-library/679348/2
+//  ***/
+// void Hardware::restore_ADC_Reg(void)
+// { 
+//   WRITE_PERI_REG(SENS_SAR_READ_CTRL2_REG, reg_b);
+//   SET_PERI_REG_MASK(SENS_SAR_READ_CTRL2_REG, SENS_SAR2_DATA_INV);
+// }
 
-/***********************************************************
- * @brief readAnalog - Kludge to fix ADC2 + WiFi 
- * @details Read Analog pin value 
- * @note Source: https://forum.arduino.cc/t/interesting-esp32-issue-cant-use-analogread-in-esp_wifimanager-library/679348/2
- ***/
-long Hardware::readAnalog(int sensorPin)
-{ 
-  restore_ADC_Reg();
-  sensorValue = analogRead(sensorPin);
-  // Serial.print("Pin " + String(sensorPin) + " = ");
-  // Serial.println(sensorValue);
+// /***********************************************************
+//  * @brief readAnalog - Kludge to fix ADC2 + WiFi 
+//  * @details Read Analog pin value 
+//  * @note Source: https://forum.arduino.cc/t/interesting-esp32-issue-cant-use-analogread-in-esp_wifimanager-library/679348/2
+//  ***/
+// long Hardware::readAnalog(int sensorPin)
+// { 
+//   restore_ADC_Reg();
+//   sensorValue = analogRead(sensorPin);
+//   // Serial.print("Pin " + String(sensorPin) + " = ");
+//   // Serial.println(sensorValue);
 
-  return sensorValue;
+//   return sensorValue;
 
-}
+// }
 
 /***********************************************************
  * @name begin
@@ -99,11 +99,9 @@ void Hardware::begin () {
   Hardware _hardware;
   Messages _message;
 
-  // adc = ADS1115_lite(config.iADC_I2C_ADDR);
+  adc = ADS1115_lite(config.iADC_I2C_ADDR);
 
   _message.serialPrintf("Initialising Hardware \n");
-
-  ADS1115_lite adc(config.iADC_I2C_ADDR);
 
 
   this->getI2CList(); // Scan and print I2C device list to serial monitor
@@ -577,6 +575,7 @@ void Hardware::getI2CList() {
 int32_t Hardware::getADCRawData(int channel) {
 
   extern struct Configuration config;
+  extern struct SensorData sensorVal;
 
   int32_t rawADCval = 0;
 
@@ -610,6 +609,26 @@ int32_t Hardware::getADCRawData(int channel) {
 
   }
 
+  switch (channel) {
+
+    case 0:
+      sensorVal.ADC_CH1_RAW = rawADCval;
+    break;
+
+    case 1:
+      sensorVal.ADC_CH2_RAW = rawADCval;
+    break;
+
+    case 2:
+      sensorVal.ADC_CH3_RAW = rawADCval;
+    break;
+
+    case 3:
+      sensorVal.ADC_CH4_RAW = rawADCval;
+    break;
+
+  }
+
   return rawADCval;
 
 }
@@ -629,6 +648,7 @@ int32_t Hardware::getADCRawData(int channel) {
 
   extern struct Configuration config;
   
+  
   double volts;
 
   int rawADCval = getADCRawData(channel);
@@ -640,13 +660,13 @@ int32_t Hardware::getADCRawData(int channel) {
     break;
 
     case ADS1115:
-      // volts = rawADCval * config.dADC_GAIN / config.iADC_RANGE;
-      volts = rawADCval * 6.144F / 32767;
+      volts = rawADCval * config.dADC_GAIN / config.iADC_RANGE;
+      // volts = rawADCval * 6.144F / 32767;
     break;
 
     case ADS1015:
-      // volts = rawADCval * config.dADC_GAIN / 2047.00F; 
-      volts = rawADCval * 32767 / 2047.00F; 
+      volts = rawADCval * config.dADC_GAIN / 2047.00F; 
+      // volts = rawADCval * 32767 / 2047.00F; 
     break;
 
     default:

@@ -109,6 +109,7 @@ void TASKgetSensorData( void * parameter ){
   extern struct Configuration config;
   
   Sensors _sensors;
+  Hardware _hardware;
 
   int sensorINT;
 
@@ -119,6 +120,9 @@ void TASKgetSensorData( void * parameter ){
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
         status.adcPollTimer = millis() + config.iADC_SCAN_DLY; // Only reset timer when task executes
+
+        sensorVal.VCC_5V_BUS = _hardware.get5vSupplyVolts();
+        sensorVal.VCC_3V3_BUS = _hardware.get3v3SupplyVolts();
 
         switch (settings.bench_type){
 
@@ -221,17 +225,27 @@ void TASKgetSensorData( void * parameter ){
             sensorVal.FlowADJ = _calculations.convertFlowDepression(sensorVal.PRefH2O, settings.adj_flow_depression, sensorVal.FlowCFM);
           }
           sensorVal.FlowADJSCFM = _calculations.convertToSCFM(sensorVal.FlowADJ, settings.standardReference );
+        } else {
+          sensorVal.PRefKPA = 0.0f;
+          sensorVal.PRefH2O = 0.0f;         
         }
 
         if (config.iPDIFF_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PDiffKPA = _sensors.getPDiffValue();
           sensorVal.PDiffH2O = _calculations.convertPressure(sensorVal.PDiffKPA, INH2O) - calVal.pdiff_cal_offset;
+        } else {
+          sensorVal.PDiffKPA = 0.0f;
+          sensorVal.PDiffH2O = 0.0f;
         }
 
         if (config.iPITOT_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PitotKPA = _sensors.getPitotValue() - calVal.pitot_cal_offset;
           sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O) ;
           sensorVal.PitotVelocity = _sensors.getPitotVelocity();
+        } else {
+          sensorVal.PitotKPA = 0.0f;
+          sensorVal.PitotH2O = 0.0f;
+          sensorVal.PitotVelocity = 0.0f;
         }
 
         if (config.bSWIRL_ENBLD) {
@@ -243,6 +257,8 @@ void TASKgetSensorData( void * parameter ){
             // } else {
             //   sensorVal.Swirl = Encoder.speed() * -1;
             // }
+        } else {
+          sensorVal.Swirl = 0;
         }
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore        

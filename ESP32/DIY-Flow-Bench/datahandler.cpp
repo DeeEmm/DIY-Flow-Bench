@@ -119,7 +119,7 @@ void DataHandler::begin() {
         #endif
     }
 
-    _hardware.save_ADC_Reg();
+    // _hardware.save_ADC_Reg(); // ADC WiFi kludge
 
     // Initialise WiFi
     _comms.initaliseWifi();
@@ -432,6 +432,7 @@ void DataHandler::initialiseConfig () {
 
   if (!_prefs.isKey("dVCC_3V3_TRIM")) _prefs.putDouble("dVCC_3V3_TRIM", 0.0);
   if (!_prefs.isKey("dVCC_5V_TRIM")) _prefs.putDouble("dVCC_5V_TRIM", 0.0);
+
   if (!_prefs.isKey("bFIXED_3_3V")) _prefs.putBool("bFIXED_3_3V", true);
   if (!_prefs.isKey("bFIXED_5V")) _prefs.putBool("bFIXED_5V", true);
 
@@ -463,13 +464,13 @@ void DataHandler::initialiseConfig () {
   if (!_prefs.isKey("iFIXD_PDIFF_VAL")) _prefs.putInt("iFIXD_PDIFF_VAL", 1);
   if (!_prefs.isKey("dPDIFF_MV_TRIM")) _prefs.putDouble("dPDIFF_MV_TRIM", 0.0);
   if (!_prefs.isKey("dPDIFF_SCALE")) _prefs.putDouble("dPDIFF_SCALE", 0.0);
-  if (!_prefs.isKey("iPDIFF_ADC_CHAN")) _prefs.putInt("iPDIFF_ADC_CHAN", 1);
+  if (!_prefs.isKey("iPDIFF_ADC_CHAN")) _prefs.putInt("iPDIFF_ADC_CHAN", 2);
 
   if (!_prefs.isKey("iPITOT_SENS_TYP")) _prefs.putInt("iPITOT_SENS_TYP", MPXV7007);
   if (!_prefs.isKey("iPITOT_SRC_TYP")) _prefs.putInt("iPITOT_SRC_TYP", ADS_ADC);
   if (!_prefs.isKey("dPITOT_MV_TRIM")) _prefs.putDouble("dPITOT_MV_TRIM", 0.0);
   if (!_prefs.isKey("dPITOT_SCALE")) _prefs.putDouble("dPITOT_SCALE", 0.0);
-  if (!_prefs.isKey("iPITOT_ADC_CHAN")) _prefs.putInt("iPITOT_ADC_CHAN", 1);
+  if (!_prefs.isKey("iPITOT_ADC_CHAN")) _prefs.putInt("iPITOT_ADC_CHAN", 3);
 
   if (!_prefs.isKey("iBARO_SENS_TYP")) _prefs.putInt("iBARO_SENS_TYP", BOSCH_BME280);
   if (!_prefs.isKey("dFIXD_BARO_VAL")) _prefs.putDouble("dFIXD_BARO_VAL", 101.3529);
@@ -527,6 +528,7 @@ void DataHandler::loadConfig () {
 
   config.dVCC_3V3_TRIM = _prefs.getDouble("dVCC_3V3_TRIM", 0.0);
   config.dVCC_5V_TRIM = _prefs.getDouble("dVCC_5V_TRIM", 0.0);
+
   config.bFIXED_3_3V = _prefs.getBool("bFIXED_3_3V", true);
   config.bFIXED_5V = _prefs.getBool("bFIXED_5V", true);
 
@@ -1102,29 +1104,32 @@ String DataHandler::buildIndexSSEJsonData()
  ***/
 String DataHandler::buildMimicSSEJsonData() {
 
-  extern struct DeviceStatus status;
-  extern struct BenchSettings settings;
+  // extern struct DeviceStatus status;
+  // extern struct BenchSettings settings;
   extern struct SensorData sensorVal;
-  extern struct CalibrationData calVal;
-  extern struct Configuration config;
+  // extern struct CalibrationData calVal;
+  // extern struct Configuration config;
 
-  Hardware _hardware;
+  // Hardware _hardware;
   Calculations _calculations;
-  Messages _message;
+  // Messages _message;
 
   String jsonString;
 
   StaticJsonDocument<DATA_JSON_SIZE> dataJson;
 
-  dataJson["MAF_ADC"] = _hardware.getADCRawData(config.iMAF_ADC_CHAN);
-  dataJson["PREF_ADC"] = _hardware.getADCRawData(config.iPREF_ADC_CHAN);
-  dataJson["PDIFF_ADC"] = _hardware.getADCRawData(config.iPDIFF_ADC_CHAN);
-  dataJson["PITOT_ADC"] = _hardware.getADCRawData(config.iPITOT_ADC_CHAN);
+  dataJson["MAF_ADC"] = sensorVal.ADC_CH1_RAW;
+  dataJson["PREF_ADC"] = sensorVal.ADC_CH2_RAW;
+  dataJson["PDIFF_ADC"] = sensorVal.ADC_CH3_RAW;
+  dataJson["PITOT_ADC"] = sensorVal.ADC_CH4_RAW;
 
   dataJson["MAF_VOLTS"] = sensorVal.MafVolts;
   dataJson["PREF_VOLTS"] = sensorVal.PRefVolts;
   dataJson["PDIFF_VOLTS"] = sensorVal.PDiffVolts;
   dataJson["PITOT_VOLTS"] = sensorVal.PitotVolts;
+
+  dataJson["VCC_3V3_BUS"] = sensorVal.VCC_3V3_BUS;
+  dataJson["VCC_5V_BUS"] = sensorVal.VCC_5V_BUS;
 
   dataJson["FLOW_KG_H"] = sensorVal.FlowKGH;
   dataJson["FLOW_MG_S"] = _calculations.convertMassFlowUnits(sensorVal.FlowKGH, KG_H, MG_S);
