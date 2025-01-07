@@ -252,12 +252,12 @@ void API::ParseMessage(char apiMessage) {
       
       case '3': // Get 3v board supply voltage (mv) 'v.123.45\r\n'
           if (status.doBootLoop) break;
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "3%s%f", settings.api_delim ,_hardware.get3v3SupplyVolts());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "3%s%f", settings.api_delim , sensorVal.VCC_5V_BUS);
       break;
       
       case '5': // Get 5v board supply voltage (mv) 'v.123.45\r\n'
           if (status.doBootLoop) break;
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "5%s%f", settings.api_delim , _hardware.get5vSupplyVolts());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "5%s%f", settings.api_delim , sensorVal.VCC_5V_BUS);
       break;
 
       case 'A': // Report ADC voltage values

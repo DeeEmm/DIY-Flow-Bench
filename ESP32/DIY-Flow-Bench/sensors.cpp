@@ -411,7 +411,7 @@ double Sensors::getMafFlow(int units) {
 	sensorVal.MafVolts = this->getMafVolts();
 
 	// VCC deviation correction
-	mafVolts = ((5.0f / _hardware.get5vSupplyVolts()) * sensorVal.MafVolts);
+	mafVolts = ((5.0f / sensorVal.VCC_5V_BUS) * sensorVal.MafVolts);
 	
 	mafMilliVolts = mafVolts * 1000;
 
@@ -640,13 +640,13 @@ double Sensors::getPRefValue() {
 
 		case MPXV7007:
 			// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
-			returnVal = ((sensorVal.PRefVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+			returnVal = ((sensorVal.PRefVolts / sensorVal.VCC_5V_BUS) -0.5) / 0.057;
 		break;
 
 		case MPXV7025:
 			// Vout = Vcc x (0.018 x P + 0.5)
 			// P = ((Vout / Vcc) - 0.5 ) / 0.018 )
-			returnVal = ((sensorVal.PRefVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+			returnVal = ((sensorVal.PRefVolts / sensorVal.VCC_5V_BUS) -0.5) / 0.018;
 		break;
 
 		case XGZP6899A007KPDPN :
@@ -759,13 +759,13 @@ double Sensors::getPDiffValue() {
 
 			case MPXV7007:
 				// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
-				returnVal = ((sensorVal.PDiffVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+				returnVal = ((sensorVal.PDiffVolts / sensorVal.VCC_5V_BUS) -0.5) / 0.057;
 			break;
 
 			case MPXV7025:
 				// Vout = Vcc x (0.018 x P + 0.5)
 				// P = ((Vout / Vcc) - 0.5 ) / 0.018 )
-				returnVal = ((sensorVal.PDiffVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+				returnVal = ((sensorVal.PDiffVolts / sensorVal.VCC_5V_BUS) -0.5) / 0.018;
 			break;
 
 			case XGZP6899A007KPDPN:
@@ -889,13 +889,13 @@ double Sensors::getPitotValue() {
 
 		case MPXV7007:
 			// Vout = Vcc x (0.057 x sensorVal + 0.5) --- Transfer function formula from MPXV7007DP Datasheet
-			returnVal = ((sensorVal.PitotVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.057;
+			returnVal = ((sensorVal.PitotVolts / sensorVal.VCC_5V_BUS) -0.5) / 0.057;
 		break;
 
 		case MPXV7025:
 			// Vout = Vcc x (0.018 x P + 0.5)
 			// P = ((Vout / Vcc) - 0.5 ) / 0.018 )
-			returnVal = ((sensorVal.PitotVolts / _hardware.get5vSupplyVolts()) -0.5) / 0.018;
+			returnVal = ((sensorVal.PitotVolts / sensorVal.VCC_5V_BUS) -0.5) / 0.018;
 		break;
 
 		case XGZP6899A007KPDPN:

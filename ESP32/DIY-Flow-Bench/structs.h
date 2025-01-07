@@ -103,9 +103,12 @@ struct Configuration {
   int iMIN_PRESS_PCT = 80;
   double dPIPE_RAD_FT = 0.328084;
 
-  double dVCC_3V3_TRIM = 0.0;
-  double dVCC_5V_TRIM = 0.0;
+  double dVCC_3V3_TRIM = 0.0f;
+  double dVCC_3V3_SRC = FIXED_VAL;
   bool bFIXED_3_3V = true;
+
+  double dVCC_5V_TRIM = 0.0f;
+  double dVCC_5V_SRC = FIXED_VAL;
   bool bFIXED_5V = true;
 
   int iBME_TYP = BOSCH_BME280;
@@ -117,54 +120,54 @@ struct Configuration {
   int iADC_SCAN_DLY = 250;
   int iADC_MAX_RETRY = 10;
   int iADC_RANGE = 32767;
-  double dADC_GAIN = 6.144;
+  double dADC_GAIN = 6.144f;
 
   int iMAF_SRC_TYP = ADS_ADC;
   int iMAF_SENS_TYP = 0;
-  double dMAF_MV_TRIM = 0.0;
+  double dMAF_MV_TRIM = 0.0f;
   int iMAF_ADC_CHAN = 0;
 
   int iPREF_SENS_TYP = MPXV7007;
   int iPREF_SRC_TYP = ADS_ADC;
   int iFIXED_PREF_VAL = 1;
-  double dPREF_MV_TRIM =  0.0;
-  double dPREF_ALG_SCALE =  1.0;
+  double dPREF_MV_TRIM =  0.0f;
+  double dPREF_ALG_SCALE =  1.0f;
   int iPREF_ADC_CHAN = 1;
 
   int iPDIFF_SENS_TYP = MPXV7007; 
   int iPDIFF_SRC_TYP = ADS_ADC;
   int iFIXD_PDIFF_VAL = 1;
-  double dPDIFF_MV_TRIM = 0.0;
-  double dPDIFF_SCALE = 1.0;
+  double dPDIFF_MV_TRIM = 0.0f;
+  double dPDIFF_SCALE = 1.0f;
   int iPDIFF_ADC_CHAN = 2;
   
   int iPITOT_SENS_TYP = MPXV7007;
   int iPITOT_SRC_TYP = ADS_ADC;
-  double dPITOT_MV_TRIM = 0.0;
-  double dPITOT_SCALE = 1.0;
+  double dPITOT_MV_TRIM = 0.0f;
+  double dPITOT_SCALE = 1.0f;
   int iPITOT_ADC_CHAN = 3;
 
   int iBARO_SENS_TYP = BOSCH_BME280; //7
-  double dFIXD_BARO_VAL = 101.3529;
-  double dBARO_ALG_SCALE = 1.0;  
-  double dBARO_SCALE = 1.0;
-  double dBARO_OFFSET = 0.0;
-  double dBARO_MV_TRIM = 0.0;
-  double dBARO_FINE_TUNE = 0.0;
-  double dSEALEVEL_PRESS = 1016.90;
+  double dFIXD_BARO_VAL = 101.3529f;
+  double dBARO_ALG_SCALE = 1.0f;  
+  double dBARO_SCALE = 1.0f;
+  double dBARO_OFFSET = 0.0f;
+  double dBARO_MV_TRIM = 0.0f;
+  double dBARO_FINE_TUNE = 0.0f;
+  double dSEALEVEL_PRESS = 1016.90f;
   int iBARO_ADC_CHAN = 4;
 
   int iTEMP_SENS_TYP = BOSCH_BME280; //7
-  double dFIXED_TEMP_VAL = 21.0;
-  double dTEMP_ALG_SCALE = 1.0;
-  double dTEMP_MV_TRIM = 0.0;
-  double dTEMP_FINE_TUNE = 0.0;
+  double dFIXED_TEMP_VAL = 21.0f;
+  double dTEMP_ALG_SCALE = 1.0f;
+  double dTEMP_MV_TRIM = 0.0f;
+  double dTEMP_FINE_TUNE = 0.0f;
 
   int iRELH_SENS_TYP = BOSCH_BME280; //7
-  double dFIXED_RELH_VAL = 36.0;
-  double dRELH_ALG_SCALE = 1.0;
-  double dRELH_MV_TRIM = 0.0;
-  double dRELH_FINE_TUNE = 0.0;
+  double dFIXED_RELH_VAL = 36.0f;
+  double dRELH_ALG_SCALE = 1.0f;
+  double dRELH_MV_TRIM = 0.0f;
+  double dRELH_FINE_TUNE = 0.0f;
   bool bSWIRL_ENBLD = false;
 };
 
@@ -265,6 +268,12 @@ struct DeviceStatus {
  * Sensor data
  ***/
 struct SensorData {
+  double VCC_3V3_BUS = 3.3f;
+  double VCC_5V_BUS = 5.0f;
+  long ADC_CH1_RAW = 0;
+  long ADC_CH2_RAW = 0;
+  long ADC_CH3_RAW = 0;
+  long ADC_CH4_RAW = 0;
   long MafRAW = 0;
   long MafLookup = 0;
   double MedianCFM = 0.0;
