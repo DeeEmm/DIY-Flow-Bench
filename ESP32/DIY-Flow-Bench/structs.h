@@ -270,10 +270,6 @@ struct DeviceStatus {
 struct SensorData {
   double VCC_3V3_BUS = 3.3f;
   double VCC_5V_BUS = 5.0f;
-  long ADC_CH1_RAW = 0;
-  long ADC_CH2_RAW = 0;
-  long ADC_CH3_RAW = 0;
-  long ADC_CH4_RAW = 0;
   long MafRAW = 0;
   long MafLookup = 0;
   double MedianCFM = 0.0;

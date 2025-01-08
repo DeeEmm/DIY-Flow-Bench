@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501090003      - #307 - Validated BOSCH_0280218067 transfer function
 2501080013      - Added float flag to conf var initalisation
                 - Added 3v3 + 5v bus voltage vars
                 - Zeroed disabled sensor values
