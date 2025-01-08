@@ -41,8 +41,7 @@
 uint64_t reg_b;              // Used to store ADC2 control register
 int sensorValue = 0;         // variable to store the value coming from the sensor
 
-ADS1115_lite adc;
-
+ADS1115_lite adc(ADS1115_DEFAULT_ADDRESS);
 
 /***********************************************************
  * @brief CONSTRUCTOR
@@ -98,8 +97,6 @@ void Hardware::begin () {
 
   Hardware _hardware;
   Messages _message;
-
-  adc = ADS1115_lite(config.iADC_I2C_ADDR);
 
   _message.serialPrintf("Initialising Hardware \n");
 
@@ -577,6 +574,8 @@ int32_t Hardware::getADCRawData(int channel) {
   extern struct Configuration config;
   extern struct SensorData sensorVal;
 
+  
+
   int32_t rawADCval = 0;
 
   if (config.iADC_TYPE != SENSOR_DISABLED){
@@ -606,26 +605,6 @@ int32_t Hardware::getADCRawData(int channel) {
     
     adc.triggerConversion(); // Start a conversion. This immediately returns
     rawADCval = adc.getConversion(); // This polls the ADS1115 and wait for conversion to finish, THEN returns the value
-
-  }
-
-  switch (channel) {
-
-    case 0:
-      sensorVal.ADC_CH1_RAW = rawADCval;
-    break;
-
-    case 1:
-      sensorVal.ADC_CH2_RAW = rawADCval;
-    break;
-
-    case 2:
-      sensorVal.ADC_CH3_RAW = rawADCval;
-    break;
-
-    case 3:
-      sensorVal.ADC_CH4_RAW = rawADCval;
-    break;
 
   }
 

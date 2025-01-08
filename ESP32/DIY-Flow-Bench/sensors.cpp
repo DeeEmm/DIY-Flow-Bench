@@ -365,7 +365,7 @@ double Sensors::getMafVolts() {
 
 /***********************************************************
  * @brief Returns MAF mass flow value in KG/H 
- * @note Interpolates lookupvalue from datatable key>value pairs
+ * @note Calculates MAf flow in KG/h using 6th order polynomial calc
  * @returns Mass flow in KG/H
  *
  ***/
@@ -395,17 +395,17 @@ double Sensors::getMafFlow(int units) {
 	double mafVolts = 0.0;
 	u_int mafMilliVolts = 0;
 	double MafFlow = 0.0f;
-    float vPower = 1.0f;
+    double vPower = 1.0f;
 
 
 	// get MAF Coefficients
-	float mafCoeff0 = _maf.getCoefficient(0);
-    float mafCoeff1 = _maf.getCoefficient(1);
-	float mafCoeff2 = _maf.getCoefficient(2);
-	float mafCoeff3 = _maf.getCoefficient(3);
-	float mafCoeff4 = _maf.getCoefficient(4);
-	float mafCoeff5 = _maf.getCoefficient(5);
-	float mafCoeff6 = _maf.getCoefficient(6);
+	double mafCoeff0 = _maf.getCoefficient(0);
+    double mafCoeff1 = _maf.getCoefficient(1);
+	double mafCoeff2 = _maf.getCoefficient(2);
+	double mafCoeff3 = _maf.getCoefficient(3);
+	double mafCoeff4 = _maf.getCoefficient(4);
+	double mafCoeff5 = _maf.getCoefficient(5);
+	double mafCoeff6 = _maf.getCoefficient(6);
 
 	// Get MAF Volts
 	sensorVal.MafVolts = this->getMafVolts();
@@ -418,14 +418,16 @@ double Sensors::getMafFlow(int units) {
 	// 6th degree polynomial calculation (Coefficients stored in mafData class)
 	// flowRateKGH = mafCoeff0 + (mafCoeff1 * mafMilliVolts) + (mafCoeff2 * pow(mafMilliVolts, 2)) + (mafCoeff3 * pow(mafMilliVolts, 3)) + (mafCoeff4 * pow(mafMilliVolts, 4)) + (mafCoeff5 * pow(mafMilliVolts, 5)) + (mafCoeff6 * pow(mafMilliVolts, 6));
 
-	// flowRateKGH = _maf.calculateFlow(mafVolts);
+	flowRateKGH = _maf.calculateFlow(mafMilliVolts);
+
+	// y = 3E-18x6 - 5E-14x5 + 3E-10x4 - 7E-07x3 + 0.001x2 - 0.3517x - 172.08 // Coefficients data from Excel for Bosch
 
 	// Alternate method
 	// 6th degree polynomial calculation (Coefficients stored in mafData class)
-    for(int i = 0; i < 7; i++) {
-        flowRateKGH += _maf.getCoefficient(i) * vPower;
-        vPower *= mafMilliVolts;
-    }
+    // for(int i = 0; i < 7; i++) {
+    //     flowRateKGH += _maf.getCoefficient(i) * vPower;
+    //     vPower *= mafMilliVolts;
+    // }
 
 	flowRateKGH = fabs(flowRateKGH);  // Flip negative value
 	

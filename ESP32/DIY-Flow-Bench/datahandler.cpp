@@ -1108,9 +1108,9 @@ String DataHandler::buildMimicSSEJsonData() {
   // extern struct BenchSettings settings;
   extern struct SensorData sensorVal;
   // extern struct CalibrationData calVal;
-  // extern struct Configuration config;
+  extern struct Configuration config;
 
-  // Hardware _hardware;
+  Hardware _hardware;
   Calculations _calculations;
   // Messages _message;
 
@@ -1118,10 +1118,10 @@ String DataHandler::buildMimicSSEJsonData() {
 
   StaticJsonDocument<DATA_JSON_SIZE> dataJson;
 
-  dataJson["MAF_ADC"] = sensorVal.ADC_CH1_RAW;
-  dataJson["PREF_ADC"] = sensorVal.ADC_CH2_RAW;
-  dataJson["PDIFF_ADC"] = sensorVal.ADC_CH3_RAW;
-  dataJson["PITOT_ADC"] = sensorVal.ADC_CH4_RAW;
+  dataJson["MAF_ADC"] = _hardware.getADCRawData(config.iMAF_ADC_CHAN);
+  dataJson["PREF_ADC"] = _hardware.getADCRawData(config.iPREF_ADC_CHAN);
+  dataJson["PDIFF_ADC"] = _hardware.getADCRawData(config.iPDIFF_ADC_CHAN);
+  dataJson["PITOT_ADC"] = _hardware.getADCRawData(config.iPITOT_ADC_CHAN);
 
   dataJson["MAF_VOLTS"] = sensorVal.MafVolts;
   dataJson["PREF_VOLTS"] = sensorVal.PRefVolts;

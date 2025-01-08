@@ -347,12 +347,12 @@ double Calculations::convertFlow(double massFlowKGH) {
 
   extern struct SensorData sensorVal;
 
-  double airDensity = 0.0; // kg/m3
-  double waterVaporDensity = 0.0; // kg/m3
-  double waterVaporPressure = 0.0; // kg/m3
-  double dryAirPressure = 0.0; // kg/m3
-  double flowM3H = 0.0; // m3/hr
-  double flowCFM = 0.0;
+  double airDensity = 0.0f; // kg/m3
+  double waterVaporDensity = 0.0f; // kg/m3
+  double waterVaporPressure = 0.0f; // kg/m3
+  double dryAirPressure = 0.0f; // kg/m3
+  double flowM3H = 0.0f; // m3/hr
+  double flowCFM = 0.0f;
 
   // TODO validate reference pressure adjustment - do we add it or subtract it? Should be baro pressure less vac amount
   double refPressurePascals = sensorVal.BaroPA - this->convertPressure(sensorVal.PRefKPA, PASCALS) ;
@@ -363,7 +363,7 @@ double Calculations::convertFlow(double massFlowKGH) {
   flowM3H = massFlowKGH / airDensity; 
 
   // Convert to CFM
-  flowCFM = flowM3H * 0.58858;
+  flowCFM = flowM3H * 0.58857833F;
 
   // only return value if valid posotive value received
   if ( massFlowKGH > 0 ) {
