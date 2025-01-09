@@ -40,7 +40,7 @@ def main():
             output += convert_file(filepath)
 
     # Write header file
-    output_path = Path(__file__).parent.parent / 'html_data.h'
+    output_path = Path(__file__).parent.parent / 'htmldata.h'
     with open(output_path, 'w') as f:
         f.write(output)
 

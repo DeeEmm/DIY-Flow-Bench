@@ -21,7 +21,6 @@
 #include <ArduinoJson.h>
 
 class Hardware {
-
 	
 	friend class Messages;
 	friend class Maths;

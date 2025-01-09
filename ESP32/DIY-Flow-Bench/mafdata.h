@@ -27,13 +27,14 @@ class MafData {
     
 private:
     static const int NUM_COEFFICIENTS = 7;
-    static const int NUM_MAF_TYPES = 2;
+    static const int NUM_MAF_TYPES = 3;
     int currentMafType;
 
 public:
     enum MafType {
         ACDELCO_92281162 = 0,
-        BOSCH_0280218067 = 1
+        BOSCH_0280218067 = 1,
+        DELPHI_AF10118 = 2
     };
 
     enum MafOutputType {
@@ -42,31 +43,30 @@ public:
     };
 
     float mafCoeff[NUM_MAF_TYPES][NUM_COEFFICIENTS] = {
-        {-0.000751374f, 0.025562336f, -0.000045469f, 0.000000035f, -0.000000f, 0.000000f, 0.000000f}, // ACDELCO_92281162 (Data calculated from Excel V1)
-        {81.792561f, -0.152376f, 0.000091f, -0.000000f, -0.000000f, 0.000000f, -0.000000f} // BOSCH_0280218067 (Data calculated from PY V1)
+        {0.762518f, 0.001883f, 0.000005f, 0.000000035f, 0.000000f, -0.000000f, 0.000000f}, // ACDELCO_92281162 (Data calculated from PY V1)
+        {81.792561f, -0.152376f, 0.000091f, -0.000000f, -0.000000f, 0.000000f, -0.000000f}, // BOSCH_0280218067 (Data calculated from PY V1)
+        {-147.198775f, 0.544108f, -0.000725f, 0.000000f, -0.000000f, 0.000000f, -0.000000f} // DELPHI_AF10118
     };
 
-        // {-172.080793765f, -0.351684827f, 0.000983588f, -0.000000660f, 0.000000f, 0.000000f, 0.000000f} // BOSCH_0280218067 (Data calculated from Excel V1)
 
-        // {624.306263f, 25.418081f, 0.365468f, 0.002299f, 0.000003f, -0.000000f, 0.000000f}, // ACDELCO_92281162 (Data calculated from PY V1)
-        // {817.925606f, -1.523763f, 0.000912f, -0.000000f, -0.000000f, 0.000000f, -0.000000f}, // BOSCH_0280218067 (Data calculated from PY V1)
+    int mafDiameter[NUM_MAF_TYPES] = {94, 82, 70}; // MAF diameter in mm
 
-    int mafDiameter[NUM_MAF_TYPES] = {94, 82}; // MAF diameter in mm
+    double mafScaling[NUM_MAF_TYPES] = {0.1f, 0.1f, 0.1f}; // MAF scaling factor
 
-    double mafScaling[NUM_MAF_TYPES] = {0.1f, 0.1f}; // MAF scaling factor
+    int mafOutputType[NUM_MAF_TYPES] = {Voltage, Voltage, Voltage}; // MAF output type
 
-    int mafOutputType[NUM_MAF_TYPES] = {Voltage, Voltage}; // MAF output type
-
-    int mafMaxKGH[NUM_MAF_TYPES] = {1607, 1805}; // MAF kg/h value at 5 volts
+    int mafMaxKGH[NUM_MAF_TYPES] = {1607, 1805, 491}; // MAF kg/h value at 5 volts
 
     String mafType[NUM_MAF_TYPES] = {
         "ACDELCO 92281162",
-        "BOSCH 0280218067"
+        "BOSCH 0280218067",
+        "DELPHI_AF10118"
     };
 
     String mafLink[NUM_MAF_TYPES] = {
         "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/142",
-        "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/138"
+        "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/138",
+        ""
     };
   
     // MafData() : currentMafType(ACDELCO_92281162) {}

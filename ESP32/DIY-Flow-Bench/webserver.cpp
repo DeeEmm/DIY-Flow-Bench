@@ -1687,6 +1687,15 @@ String Webserver::processConfigPageTemplate(const String &var) {
   // MAF Sensor Type dropdown
   if (var == "iMAF_SENS_TYP_0" && config.iMAF_SENS_TYP == 0) return String("selected");
   if (var == "iMAF_SENS_TYP_1" && config.iMAF_SENS_TYP == 1) return String("selected");
+  if (var == "iMAF_SENS_TYP_2" && config.iMAF_SENS_TYP == 2) return String("selected");
+  if (var == "iMAF_SENS_TYP_3" && config.iMAF_SENS_TYP == 3) return String("selected");
+  if (var == "iMAF_SENS_TYP_4" && config.iMAF_SENS_TYP == 4) return String("selected");
+  if (var == "iMAF_SENS_TYP_5" && config.iMAF_SENS_TYP == 5) return String("selected");
+  if (var == "iMAF_SENS_TYP_6" && config.iMAF_SENS_TYP == 6) return String("selected");
+  if (var == "iMAF_SENS_TYP_7" && config.iMAF_SENS_TYP == 7) return String("selected");
+  if (var == "iMAF_SENS_TYP_8" && config.iMAF_SENS_TYP == 8) return String("selected");
+  if (var == "iMAF_SENS_TYP_9" && config.iMAF_SENS_TYP == 9) return String("selected");
+  if (var == "iMAF_SENS_TYP_10" && config.iMAF_SENS_TYP == 10) return String("selected");
 
   if (var == "dMAF_MV_TRIM" ) return String(config.dMAF_MV_TRIM);
 

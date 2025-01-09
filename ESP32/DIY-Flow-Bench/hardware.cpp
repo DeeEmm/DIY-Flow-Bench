@@ -41,7 +41,9 @@
 uint64_t reg_b;              // Used to store ADC2 control register
 int sensorValue = 0;         // variable to store the value coming from the sensor
 
-ADS1115_lite adc(ADS1115_DEFAULT_ADDRESS);
+extern struct Configuration config;
+
+ADS1115_lite adc(config.iADC_I2C_ADDR);
 
 /***********************************************************
  * @brief CONSTRUCTOR
@@ -99,7 +101,6 @@ void Hardware::begin () {
   Messages _message;
 
   _message.serialPrintf("Initialising Hardware \n");
-
 
   this->getI2CList(); // Scan and print I2C device list to serial monitor
 
@@ -574,8 +575,6 @@ int32_t Hardware::getADCRawData(int channel) {
   extern struct Configuration config;
   extern struct SensorData sensorVal;
 
-  
-
   int32_t rawADCval = 0;
 
   if (config.iADC_TYPE != SENSOR_DISABLED){
@@ -682,7 +681,7 @@ double Hardware::get5vSupplyVolts() {
     return vcc5vSupplyVolts; 
   } else {
     // long rawVoltageValue = readAnalog(pins.VCC_5V);  // Uses custom function to fix ADC2 + WiFi issue
-    long rawVoltageValue = analogRead(pins.VCC_5V);  // Uses custom function to fix ADC2 + WiFi issue
+    long rawVoltageValue = analogRead(pins.VCC_5V);  
     vcc5vSupplyVolts = (2 * static_cast<double>(rawVoltageValue) * 0.805860805860806F) ;
     return vcc5vSupplyVolts + config.dVCC_5V_TRIM;
   }
@@ -752,6 +751,7 @@ bool Hardware::benchIsRunning() {
 	  return false;
   }
 }
+
 
 
 /***********************************************************

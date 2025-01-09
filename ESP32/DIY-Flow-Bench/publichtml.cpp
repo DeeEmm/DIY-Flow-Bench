@@ -23,7 +23,7 @@
 #define MINIZ_NO_TIME
 #include "miniz.h"
 
-#include "html_data.h"
+#include "htmldata.h"
 
 uint8_t decompBuffer[21000]; 
 
