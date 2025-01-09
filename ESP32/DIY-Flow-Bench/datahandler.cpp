@@ -401,7 +401,7 @@ void DataHandler::beginSerial(void) {
 
 /***********************************************************
 * @brief initaliseConfiguration
-* @details define settings in NVM
+* @details initialise configiration settings in NVM
 * @note Replaces pre-compile macros in original config.h file
 * @note Preferences Key can not exceed 15 chars long
 * @note Datatype prefix allows for reduced save method
@@ -416,7 +416,9 @@ void DataHandler::initialiseConfig () {
 
   _prefs.begin("config");
 
-  if (_prefs.isKey("bSWIRL_ENBLD")) { // we've already initialised _prefs
+  // Check if last key exists in NVM
+  if (_prefs.isKey("bSWIRL_ENBLD")) {
+    // key already exists
     _prefs.end();
     return;
   }
@@ -494,6 +496,8 @@ void DataHandler::initialiseConfig () {
   if (!_prefs.isKey("dRELH_MV_TRIM")) _prefs.putDouble("dRELH_MV_TRIM", 1.0);
   if (!_prefs.isKey("dRELH_FINE_TUNE")) _prefs.putDouble("dRELH_FINE_TUNE", 1.0);
   if (!_prefs.isKey("bSWIRL_ENBLD")) _prefs.putBool("bSWIRL_ENBLD", false);
+
+  // Add additional / new keys to bottom of list and update the key check
 
   _prefs.end();
 
@@ -609,7 +613,7 @@ void DataHandler::loadConfig () {
 
 /***********************************************************
 * @brief initialiseSettings
-* @note - Initialise settings in NVM if they do not exist
+* @note Initialise settings in NVM if they do not exist
 * @note Key must be 15 chars or shorter.
 * @note Datatype prefix allows for reduced save method
 * @note b = bool, i = int, d = double, s = string***/ 
@@ -621,9 +625,16 @@ void DataHandler::initialiseSettings () {
   Messages _message;
   Preferences _prefs;
 
-  _message.serialPrintf("Loading Bench Settings \n");    
+  _message.serialPrintf("Initialising Bench Settings \n");    
   
   _prefs.begin("settings");
+
+    // Check if last key exists in NVM
+  if (_prefs.isKey("dORIFICE6_PRESS")) {
+    // key already exists
+    _prefs.end();
+    return;
+  }
 
   // _prefs.remove("iDATA_FLTR_TYP"); // remove individual key
   // _prefs.remove("iTEMP_UNIT"); // remove individual key
@@ -637,7 +648,7 @@ void DataHandler::initialiseSettings () {
   if (!_prefs.isKey("iWIFI_TIMEOUT")) _prefs.putInt("iWIFI_TIMEOUT", 4000);
   if (!_prefs.isKey("iMAF_DIAMETER")) _prefs.putInt("iMAF_DIAMETER", 0);
   if (!_prefs.isKey("iREFRESH_RATE")) _prefs.putInt("iREFRESH_RATE", 500);
-  if (!_prefs.isKey("iMIN_PRESSURE")) _prefs.putInt("iMIN_PRESSURE", 1);
+  if (!_prefs.isKey("iMIN_PRESSURE")) _prefs.putDouble("iMIN_PRESSURE", 1);
   if (!_prefs.isKey("iMIN_FLOW_RATE")) _prefs.putInt("iMIN_FLOW_RATE", 1);
 
   if (!_prefs.isKey("iDATA_FLTR_TYP")) _prefs.putInt("iDATA_FLTR_TYP", NONE);
@@ -674,6 +685,8 @@ void DataHandler::initialiseSettings () {
   if (!_prefs.isKey("dORIFICE5_PRESS")) _prefs.putDouble("dORIFICE5_PRESS", 0.0F);
   if (!_prefs.isKey("dORIFICE6_FLOW")) _prefs.putDouble("dORIFICE6_FLOW", 0.0F);
   if (!_prefs.isKey("dORIFICE6_PRESS")) _prefs.putDouble("dORIFICE6_PRESS", 0.0F);
+
+  // Add additional / new keys to bottom of list and update the key check
 
   _prefs.end();
 
@@ -716,7 +729,7 @@ void DataHandler::loadSettings () {
   settings.wifi_timeout = _prefs.getInt("iWIFI_TIMEOUT", 4000 );
   settings.maf_housing_diameter = _prefs.getInt("iMAF_DIAMETER", 0 );
   settings.refresh_rate = _prefs.getInt("iREFRESH_RATE", 500 );
-  settings.min_bench_pressure  = _prefs.getInt("iMIN_PRESSURE", 1 );
+  settings.min_bench_pressure  = _prefs.getDouble("iMIN_PRESSURE", 1 );
   settings.min_flow_rate = _prefs.getInt("iMIN_FLOW_RATE", 1 );
   settings.data_filter_type = _prefs.getInt("iDATA_FLTR_TYP", NONE );
   settings.rounding_type = _prefs.getInt("iROUNDING_TYP", NONE );

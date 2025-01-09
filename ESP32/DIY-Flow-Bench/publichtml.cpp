@@ -199,6 +199,10 @@ String PublicHTML::mimicJs() {
     return decompress(mimic_js, mimic_js_len);
 }
 
+String PublicHTML::dataJs() {
+    return decompress(data_js, data_js_len);
+}
+
 // String PublicHTML::pinsJs() {
 //     return decompress(pins_js, pins_js_len);
 // }

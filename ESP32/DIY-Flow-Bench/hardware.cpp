@@ -732,17 +732,17 @@ bool Hardware::benchIsRunning() {
   extern struct Language language;
   extern struct SensorData sensorVal;
 
-  double refPressure;
+  double refPressureH2O;
   double mafFlowRateCFM; 
  
   // TODO: Check scope of these...
-  refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
+  refPressureH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
   mafFlowRateCFM = _calculations.convertFlow(_sensors.getMafFlow());
 
   // comvert negative value into posotive
-  refPressure = fabs(refPressure); 
+  refPressureH2O = fabs(refPressureH2O); 
 
-  if ((refPressure > settings.min_bench_pressure))
+  if ((refPressureH2O > settings.min_bench_pressure))
   {
 	  _message.Handler(language.LANG_BENCH_RUNNING);
 	  return true;

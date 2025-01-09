@@ -1,4 +1,6 @@
 
+window.addEventListener('load', onLoad);
+
 /***********************************************************
 * Initialise buttons
 ***/
@@ -42,7 +44,6 @@ function initialiseButtons() {
     });
   
 }
-
 
 
 
@@ -153,3 +154,17 @@ window.onclick = function(event) {
     saveGraphDataModal.style.display = "none";
   }
   
+
+
+
+
+  /***********************************************************
+* onLoad event handler
+***/
+function onLoad(event) {
+  
+  initialiseButtons();
+  
+  console.log('Data page Loaded');
+  
+}

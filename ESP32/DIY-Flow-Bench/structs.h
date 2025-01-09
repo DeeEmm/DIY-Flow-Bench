@@ -38,8 +38,8 @@ struct BenchSettings {
   long serial_baud_rate = 115200;                 // Default baud rate 
   unsigned long wifi_timeout = 4000;              // Duration of Wifi connection attempt in millisec's
   unsigned long wifi_retries = 10;                // Number of attempts to connect to Wifi before creating AP
-  int min_flow_rate = 1;                          // Flow rate at which bench is considered running in cfm
-  int min_bench_pressure = 1;                     // Min bench pressure where bench is considered running (inches/h2o)
+  double min_flow_rate = 1;                       // Flow rate at which bench is considered running in cfm
+  double min_bench_pressure = 1;                  // Min bench pressure where bench is considered running (inches/h2o)
   double maf_min_volts = 0.1;                     // Filter out results less than this
   int refresh_rate = 500;                         // Screen refresh rate in milliseconds (>180)
   int adj_flow_depression = 28;                   // Adjusted flow depression in inches of water
@@ -169,6 +169,7 @@ struct Configuration {
   double dRELH_MV_TRIM = 0.0f;
   double dRELH_FINE_TUNE = 0.0f;
   bool bSWIRL_ENBLD = false;
+
 };
 
 

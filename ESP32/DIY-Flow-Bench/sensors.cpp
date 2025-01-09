@@ -626,6 +626,7 @@ double Sensors::getPRefValue() {
 
 	Hardware _hardware;
 	Messages _message;
+	Calculations _calculations;
 
 	extern struct BenchSettings settings;
 	extern struct Configuration config;
@@ -672,8 +673,11 @@ double Sensors::getPRefValue() {
 		break;
 	}
 
-	// Flip negative values
-	double pRefComp = fabs(returnVal);
+	// Flip negative value 
+	returnVal = fabs(returnVal);
+	
+	// Convert to INH2O
+	double pRefComp = _calculations.convertPressure(returnVal, INH2O);
 
 	// Lets make sure we have a valid value to return
 	if (pRefComp > settings.min_bench_pressure) {
@@ -749,6 +753,7 @@ double Sensors::getPDiffValue() {
 	extern struct SensorData sensorVal;
 
 	Hardware _hardware;
+	Calculations _calculations;
 
 	double returnVal = 0.0;
 	sensorVal.PDiffVolts = this->getPDiffVolts();
@@ -791,8 +796,11 @@ double Sensors::getPDiffValue() {
 			break;
 		}
 
-	// Flip negative values
-	double pDiffComp = fabs(returnVal);
+	// Flip negative value 
+	returnVal = fabs(returnVal);
+	
+	// Convert to INH2O
+	double pDiffComp = _calculations.convertPressure(returnVal, INH2O);
 
 	// Lets make sure we have a valid value to return - check it is above minimum threshold
 	if (pDiffComp > settings.min_bench_pressure) { 
@@ -921,9 +929,11 @@ double Sensors::getPitotValue() {
 		break;
 	}
 
-
-	// Flip negative values
-	double pitotComp = fabs(returnVal); 
+	// Flip negative value 
+	returnVal = fabs(returnVal);
+	
+	// Convert to INH2O
+	double pitotComp = _calculations.convertPressure(returnVal, INH2O);
 
 	// Lets make sure we have a valid value to return - check it is above minimum threshold
 	if (pitotComp > settings.min_bench_pressure) { 
@@ -968,9 +978,12 @@ double Sensors::getPitotVelocity() {
 	// airVelocity = sqrt(2 * (pitotPressure - sensorVal.PRefKPA) / airDensity );
 	airVelocity = sqrt(2 * (pitotPressure) / airDensity );
 
+	airVelocity = fabs(airVelocity);
+
 	// Lets make sure we have a valid value to return - check it is above minimum threshold 
-	// TODO - 'borrowing' min_bench_pressure
-	double pitotComp = fabs(airVelocity);
+	// Convert to INH2O
+	double pitotComp = _calculations.convertPressure(sensorVal.PitotKPA, INH2O);
+
 	if (pitotComp > settings.min_bench_pressure) { 
 		return pitotComp;
 	} else { 

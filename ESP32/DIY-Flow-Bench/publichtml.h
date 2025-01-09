@@ -30,4 +30,5 @@ public:
     String configJs();
     String pinsJs();
     String mimicJs();
+    String dataJs();
 };

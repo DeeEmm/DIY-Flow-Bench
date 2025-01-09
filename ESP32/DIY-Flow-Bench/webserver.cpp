@@ -381,6 +381,13 @@ void Webserver::begin()
         request->send(response);
       });
   
+  server->on("/data.js", HTTP_ANY, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        AsyncResponseStream *response = request->beginResponseStream("text/javascript");
+        response->print(_public_html.dataJs().c_str());
+        request->send(response);
+      });
+  
   // Settings page request handler
   server->on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;

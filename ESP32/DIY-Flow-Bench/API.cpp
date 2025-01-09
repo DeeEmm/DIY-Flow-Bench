@@ -69,7 +69,7 @@ String API::getConfigJSON() {
   
   // Can add more settings as required
   dataJson["iMIN_FLOW_RATE"] = settings.min_flow_rate;
-  dataJson["iMIN_PRESSUREURE"] = settings.min_bench_pressure;
+  dataJson["iMIN_PRESSURE"] = settings.min_bench_pressure;
   dataJson["iREFRESH_RATE"] = settings.refresh_rate;
 
   
