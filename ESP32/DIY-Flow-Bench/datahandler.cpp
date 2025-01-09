@@ -1104,11 +1104,14 @@ String DataHandler::buildIndexSSEJsonData()
  ***/
 String DataHandler::buildMimicSSEJsonData() {
 
-  // extern struct DeviceStatus status;
+  extern struct DeviceStatus status;
   // extern struct BenchSettings settings;
   extern struct SensorData sensorVal;
   // extern struct CalibrationData calVal;
   extern struct Configuration config;
+
+  extern TaskHandle_t sensorDataTask;
+  extern TaskHandle_t enviroDataTask;
 
   Hardware _hardware;
   Calculations _calculations;
@@ -1136,6 +1139,12 @@ String DataHandler::buildMimicSSEJsonData() {
   dataJson["FLOW_CFM"] = sensorVal.FlowCFM;
   dataJson["FLOW_LPM"] = _calculations.convertVolumetricFlowUnits(sensorVal.FlowCFM, CFM, LPM);
 
+  dataJson["BME_SCAN_FREQ"] = status.bmeScanTime;
+  dataJson["ADC_SCAN_FREQ"] = status.adcScanTime;
+  dataJson["FREE_HEAP"] = _calculations.byteDecode(ESP.getFreeHeap());
+  dataJson["FREE_STACK"] = _calculations.byteDecode(ESP.getMaxAllocHeap());
+  dataJson["BME_TASK_HWM"] = _calculations.byteDecode(uxTaskGetStackHighWaterMark(enviroDataTask));
+  dataJson["ADC_TASK_HWM"] = _calculations.byteDecode(uxTaskGetStackHighWaterMark(sensorDataTask));
 
   serializeJson(dataJson, jsonString);
 

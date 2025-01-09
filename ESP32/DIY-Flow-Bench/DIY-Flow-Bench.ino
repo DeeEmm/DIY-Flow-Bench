@@ -91,6 +91,9 @@ TaskHandle_t enviroDataTask = NULL;
 char charDataJSON[256];
 String jsonString;
 
+// set up task timers to measure task frequency
+int adcStartTime =  micros();
+int bmeStartTime =  micros();
 
 
 
@@ -119,6 +122,7 @@ void TASKgetSensorData( void * parameter ){
 
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
+        status.adcScanTime = (micros() - adcStartTime); // how long since we started the timer? 
         status.adcPollTimer = millis() + config.iADC_SCAN_DLY; // Only reset timer when task executes
 
         sensorVal.VCC_5V_BUS = _hardware.get5vSupplyVolts();
@@ -262,6 +266,7 @@ void TASKgetSensorData( void * parameter ){
         }
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore        
+        adcStartTime = micros(); // start the timer as we leave task
       }   
     }
   }
@@ -289,6 +294,7 @@ void TASKgetEnviroData( void * parameter ){
     if (millis() > status.bmePollTimer){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
+        status.bmeScanTime = (micros() - bmeStartTime); // how long since we started the timer? 
         status.bmePollTimer = millis() + config.iBME_SCAN_MS; // Only reset timer when task executes
         
         sensorVal.TempDegC = _sensors.getTempValue();
@@ -305,6 +311,7 @@ void TASKgetEnviroData( void * parameter ){
         sensorVal.PitotVelocity = _sensors.getPitotVelocity();
         sensorVal.PitotDelta = _calculations.convertPressure(_sensors.getPitotValue(),KPA, INH2O);
         xSemaphoreGive(i2c_task_mutex); // Release semaphore
+        bmeStartTime = micros(); // start the timer as we leave task
       }
     }
     vTaskDelay( VTASK_DELAY_BME ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
@@ -388,6 +395,7 @@ void loop () {
   if (settings.api_enabled) {        
     if (millis() > status.apiPollTimer) {
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
+
         status.apiPollTimer = millis() + API_SCAN_DELAY_MS; 
 
         if (Serial.available() > 0) {
@@ -395,6 +403,7 @@ void loop () {
           _api.ParseMessage(status.serialData);
         }
         xSemaphoreGive(i2c_task_mutex); // Release semaphore
+
       }
     }                            
   }

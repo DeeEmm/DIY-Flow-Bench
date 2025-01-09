@@ -85,7 +85,7 @@
    "LANG_GUI_DATA_FILTERS" : "Data Filters",
    "LANG_GUI_DATA_FLTR_TYP" : "Data Filter Type",
    "LANG_GUI_MIN_FLOW_RATE" : "Min Flow Rate (cfm)",
-   "LANG_GUI_MIN_PRESSUREURE" : "Min Bench Pressure (in/H2O)",
+   "LANG_GUI_MIN_PRESSURE" : "Min Bench Pressure (in/H2O)",
    "LANG_GUI_MAF_MIN_VOLTS" : "MAF Min volts",
    "LANG_GUI_CYCLIC_AVERAGE_BUFFER" : "Cyclical Average Buffer",
    "LANG_GUI_CONVERSION_SETTINGS" : "Conversion Settings",

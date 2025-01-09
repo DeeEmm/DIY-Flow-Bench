@@ -1082,7 +1082,7 @@ String Webserver::processLanguageTemplateVars(const String &var) {
   if (var == "LANG_GUI_DATA_FILTERS") return language.LANG_GUI_DATA_FILTERS;
   if (var == "LANG_GUI_DATA_FLTR_TYP") return language.LANG_GUI_DATA_FLTR_TYP;
   if (var == "LANG_GUI_MIN_FLOW_RATE") return language.LANG_GUI_MIN_FLOW_RATE;
-  if (var == "LANG_GUI_MIN_PRESSUREURE") return language.LANG_GUI_MIN_PRESSUREURE;
+  if (var == "LANG_GUI_MIN_PRESSURE") return language.LANG_GUI_MIN_PRESSURE;
   if (var == "LANG_GUI_MAF_MIN_VOLTS") return language.LANG_GUI_MAF_MIN_VOLTS;
   if (var == "LANG_GUI_CYCLIC_AVERAGE_BUFFER") return language.LANG_GUI_CYCLIC_AVERAGE_BUFFER;
   if (var == "LANG_GUI_CONVERSION_SETTINGS") return language.LANG_GUI_CONVERSION_SETTINGS;

@@ -15,11 +15,11 @@
                 </div>
                 <div class="input-group">
                     <label for="iMIN_PRESS_PCT">Minimum Pressure Percent</label>
-                    <input type="number" id="iMIN_PRESS_PCT" name="iMIN_PRESS_PCT" value="80">
+                    <input type="number" id="iMIN_PRESS_PCT" name="iMIN_PRESS_PCT" value="~iMIN_PRESS_PCT~">
                 </div>
                 <div class="input-group">
                     <label for="dPIPE_RAD_FT">Pipe Radius (ft)</label>
-                    <input type="number" id="dPIPE_RAD_FT" name="dPIPE_RAD_FT" step="0.000001" value="0.328084">
+                    <input type="number" id="dPIPE_RAD_FT" name="dPIPE_RAD_FT" step="0.000001" value="~dPIPE_RAD_FT~">
                 </div>
             </fieldset>
 
@@ -35,7 +35,7 @@
                 </div>
                 <div class="input-group">
                     <label for="dVCC_3V3_TRIM">3.3V Trim</label>
-                    <input type="number" id="dVCC_3V3_TRIM" name="dVCC_3V3_TRIM" step="0.1" value="0.0">
+                    <input type="number" id="dVCC_3V3_TRIM" name="dVCC_3V3_TRIM" step="0.001" value="~dVCC_3V3_TRIM~">
                 </div>
                 <div class="input-group">
                     <label for="bFIXED_5V">Fixed 5V Value</label>
@@ -46,7 +46,7 @@
                  </div>
                  <div class="input-group">
                     <label for="dVCC_5V_TRIM">5V Trim</label>
-                    <input type="number" id="dVCC_5V_TRIM" name="dVCC_5V_TRIM" step="0.1" value="0.0">
+                    <input type="number" id="dVCC_5V_TRIM" name="dVCC_5V_TRIM" step="0.001" value="~dVCC_5V_TRIM~">
                 </div>
             </fieldset>
 
@@ -63,11 +63,11 @@
                 </div>
                 <div class="input-group">
                     <label for="iBME_ADDR">I2C Address</label>
-                    <input type="number" id="iBME_ADDR" name="iBME_ADDR" value="118">
+                    <input type="number" id="iBME_ADDR" name="iBME_ADDR" value="~iBME_ADDR~">
                 </div>
                 <div class="input-group">
                     <label for="iBME_SCAN_MS">Scan Interval (ms)</label>
-                    <input type="number" id="iBME_SCAN_MS" name="iBME_SCAN_MS" value="1000">
+                    <input type="number" id="iBME_SCAN_MS" name="iBME_SCAN_MS" value="~iBME_SCAN_MS~">
                 </div>
             </fieldset>
 
@@ -116,7 +116,7 @@
                 </div>
                 <div class="input-group">
                     <label for="dMAF_MV_TRIM">mV Trim</label>
-                    <input type="number" id="dMAF_MV_TRIM" name="dMAF_MV_TRIM" step="0.1" value="0.0">
+                    <input type="number" id="dMAF_MV_TRIM" name="dMAF_MV_TRIM" step="0.001" value="~dMAF_MV_TRIM~">
                 </div>
                 <hr class="fieldset-divider">
                 <div class="input-group">
@@ -142,7 +142,7 @@
                 <legend>Reference Pressure Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
                     <label for="iPREF_SENS_TYP">Sensor Type</label>
-                    <select name='iPREF_SENS_TYP' class='config-select'>
+                    <select name='iPREF_SENS_TYP' class='config-select-long'>
                         <option value='1' ~iPREF_SENS_TYP_1~>Disabled</option>
                         <option value='2' ~iPREF_SENS_TYP_2~>Use Baro</option>
                         <option value='3' ~iPREF_SENS_TYP_3~>Fixed Value</option>
@@ -158,7 +158,7 @@
                 </div>
                 <div class="input-group">
                     <label for="dPREF_MV_TRIM">mV Trim</label>
-                    <input type="number" id="dPREF_MV_TRIM" name="dPREF_MV_TRIM" step="0.1" value="0.0">
+                    <input type="number" id="dPREF_MV_TRIM" name="dPREF_MV_TRIM" step="0.001" value="~dPREF_MV_TRIM~">
                 </div>
                 <hr class="fieldset-divider">
                 <div class="input-group">
@@ -179,11 +179,11 @@
                 </div>
                 <div class="input-group">
                     <label for="iFIXED_PREF_VAL">Fixed Value</label>
-                    <input type="number" id="iFIXED_PREF_VAL" name="iFIXED_PREF_VAL" value="1">
+                    <input type="number" id="iFIXED_PREF_VAL" name="iFIXED_PREF_VAL" value="~iFIXED_PREF_VAL~">
                 </div>
                 <div class="input-group">
                     <label for="dPREF_ALG_SCALE">Analog Scale</label>
-                    <input type="number" id="dPREF_ALG_SCALE" name="dPREF_ALG_SCALE" step="0.1" value="1.0">
+                    <input type="number" id="dPREF_ALG_SCALE" name="dPREF_ALG_SCALE" step="0.001" value="~dPREF_ALG_SCALE~">
                 </div>
             </fieldset>
 
@@ -192,7 +192,7 @@
                 <legend>Differential Pressure Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
                     <label for="iPDIFF_SENS_TYP">Sensor Type</label>
-                    <select name='iPDIFF_SENS_TYP' class='config-select'>
+                    <select name='iPDIFF_SENS_TYP' class='config-select-long'>
                         <option value='1' ~iPDIFF_SENS_TYP_1~>Disabled</option>
                         <option value='3' ~iPDIFF_SENS_TYP_3~>Fixed Value</option>
                         <option value='4' ~iPDIFF_SENS_TYP_4~>MPXV7007</option>
@@ -207,7 +207,7 @@
                 </div>
                 <div class="input-group">
                     <label for="dPDIFF_MV_TRIM">mV Trim</label>
-                    <input type="number" id="dPDIFF_MV_TRIM" name="dPDIFF_MV_TRIM" step="0.1" value="0.0">
+                    <input type="number" id="dPDIFF_MV_TRIM" name="dPDIFF_MV_TRIM" step="0.001" value="~dPDIFF_MV_TRIM~">
                 </div>
                 <hr class="fieldset-divider">
                 <div class="input-group">
@@ -228,11 +228,11 @@
                 </div>
                 <div class="input-group">
                     <label for="iFIXD_PDIFF_VAL">Fixed Value</label>
-                    <input type="number" id="iFIXD_PDIFF_VAL" name="iFIXD_PDIFF_VAL" value="1">
+                    <input type="number" id="iFIXD_PDIFF_VAL" name="iFIXD_PDIFF_VAL" value="~iFIXD_PDIFF_VAL~">
                 </div>
                 <div class="input-group">
                     <label for="dPDIFF_SCALE">Analog Scale</label>
-                    <input type="number" id="dPDIFF_SCALE" name="dPDIFF_SCALE" step="0.1" value="1.0">
+                    <input type="number" id="dPDIFF_SCALE" name="dPDIFF_SCALE" step="0.001" value="~dPDIFF_SCALE~">
                 </div>
             </fieldset>
 
@@ -241,7 +241,7 @@
                 <legend>Pitot Sensor Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
                     <label for="iPITOT_SENS_TYP">Sensor Type</label>
-                    <select name='iPITOT_SENS_TYP' class='config-select'>
+                    <select name='iPITOT_SENS_TYP' class='config-select-long'>
                         <option value='1' ~iPITOT_SENS_TYP_1~>Disabled</option>
                         <option value='4' ~iPITOT_SENS_TYP_4~>MPXV7007</option>
                         <option value='5' ~iPITOT_SENS_TYP_5~>MPX4250</option>
@@ -254,7 +254,7 @@
                 </div>
                 <div class="input-group">
                     <label for="dPITOT_MV_TRIM">mV Trim</label>
-                    <input type="number" id="dPITOT_MV_TRIM" name="dPITOT_MV_TRIM" step="0.1" value="0.0">
+                    <input type="number" id="dPITOT_MV_TRIM" name="dPITOT_MV_TRIM" step="0.001" value="~dPITOT_MV_TRIM~">
                 </div>
                 <hr class="fieldset-divider">
                 <div class="input-group">
@@ -275,7 +275,7 @@
                 </div>
                 <div class="input-group">
                     <label for="dPITOT_SCALE">Analog Scale</label>
-                    <input type="number" id="dPITOT_SCALE" name="dPITOT_SCALE" step="0.1" value="1.0">
+                    <input type="number" id="dPITOT_SCALE" name="dPITOT_SCALE" step="0.001" value="~dPITOT_SCALE~">
                 </div>
             </fieldset>
 
@@ -284,7 +284,7 @@
                 <legend>Barometric Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
                     <label for="iBARO_SENS_TYP">Sensor Type</label>
-                    <select name='iBARO_SENS_TYP' class='config-select'>
+                    <select name='iBARO_SENS_TYP' class='config-select-long'>
                         <option value='1' ~iBARO_SENS_TYP_1~>Disabled</option>
                         <option value='3' ~iBARO_SENS_TYP_3~>Fixed Value</option>
                         <option value='7' ~iBARO_SENS_TYP_7~>BME280</option>
@@ -294,28 +294,28 @@
                 </div>
                 <div class="input-group">
                     <label for="dBARO_MV_TRIM">mV Trim</label>
-                    <input type="number" id="dBARO_MV_TRIM" name="dBARO_MV_TRIM" step="0.1" value="0.0">
+                    <input type="number" id="dBARO_MV_TRIM" name="dBARO_MV_TRIM" step="0.001" value="~dBARO_MV_TRIM~">
                 </div>
                 <div class="input-group">
                     <label for="dBARO_FINE_TUNE">Fine Tune</label>
-                    <input type="number" id="dBARO_FINE_TUNE" name="dBARO_FINE_TUNE" step="0.1" value="0.0">
+                    <input type="number" id="dBARO_FINE_TUNE" name="dBARO_FINE_TUNE" step="0.001" value="~dBARO_FINE_TUNE~">
                 </div>
                 <hr class="fieldset-divider">
                 <div class="input-group">
                     <label for="dFIXD_BARO_VAL">Fixed Value (kPa)</label>
-                    <input type="number" id="dFIXD_BARO_VAL" name="dFIXD_BARO_VAL" step="0.0001" value="101.3529">
+                    <input type="number" id="dFIXD_BARO_VAL" name="dFIXD_BARO_VAL" step="0.0001" value="~dFIXD_BARO_VAL~">
                 </div>
                 <div class="input-group">
                     <label for="dBARO_ALG_SCALE">Analog Scale</label>
-                    <input type="number" id="dBARO_ALG_SCALE" name="dBARO_ALG_SCALE" step="0.1" value="1.0">
+                    <input type="number" id="dBARO_ALG_SCALE" name="dBARO_ALG_SCALE" step="0.001" value="~dBARO_ALG_SCALE~">
                 </div>
                 <div class="input-group">
                     <label for="dBARO_SCALE">Scale</label>
-                    <input type="number" id="dBARO_SCALE" name="dBARO_SCALE" step="0.1" value="1.0">
+                    <input type="number" id="dBARO_SCALE" name="dBARO_SCALE" step="0.001" value="~dBARO_SCALE~">
                 </div>
                 <div class="input-group">
                     <label for="dBARO_OFFSET">Offset</label>
-                    <input type="number" id="dBARO_OFFSET" name="dBARO_OFFSET" step="0.1" value="0.0">
+                    <input type="number" id="dBARO_OFFSET" name="dBARO_OFFSET" step="0.001" value="~dBARO_OFFSET~">
                 </div>
             </fieldset>
 
@@ -324,7 +324,7 @@
                 <legend>Temperature Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
                     <label for="iTEMP_SENS_TYP">Sensor Type</label>
-                    <select name='iTEMP_SENS_TYP' class='config-select'>
+                    <select name='iTEMP_SENS_TYP' class='config-select-long'>
                         <option value='1' ~iTEMP_SENS_TYP_1~>Disabled</option>
                         <option value='3' ~iTEMP_SENS_TYP_3~>Fixed Value</option>
                         <option value='7' ~iTEMP_SENS_TYP_7~>BME280</option>
@@ -334,20 +334,20 @@
                 </div>
                 <div class="input-group">
                     <label for="dTEMP_MV_TRIM">mV Trim</label>
-                    <input type="number" id="dTEMP_MV_TRIM" name="dTEMP_MV_TRIM" step="0.1" value="0.0">
+                    <input type="number" id="dTEMP_MV_TRIM" name="dTEMP_MV_TRIM" step="0.001" value="~dTEMP_MV_TRIM~">
                 </div>
                 <div class="input-group">
                     <label for="dTEMP_FINE_TUNE">Fine Tune</label>
-                    <input type="number" id="dTEMP_FINE_TUNE" name="dTEMP_FINE_TUNE" step="0.1" value="0.0">
+                    <input type="number" id="dTEMP_FINE_TUNE" name="dTEMP_FINE_TUNE" step="0.001" value="~dTEMP_FINE_TUNE~">
                 </div>
                 <hr class="fieldset-divider">
                 <div class="input-group">
                     <label for="dFIXED_TEMP_VAL">Fixed Value (&deg;C)</label>
-                    <input type="number" id="dFIXED_TEMP_VAL" name="dFIXED_TEMP_VAL" step="0.1" value="21.0">
+                    <input type="number" id="dFIXED_TEMP_VAL" name="dFIXED_TEMP_VAL" step="0.001" value="~dFIXED_TEMP_VAL~">
                 </div>
                 <div class="input-group">
                     <label for="dTEMP_ALG_SCALE">Analog Scale</label>
-                    <input type="number" id="dTEMP_ALG_SCALE" name="dTEMP_ALG_SCALE" step="0.1" value="1.0">
+                    <input type="number" id="dTEMP_ALG_SCALE" name="dTEMP_ALG_SCALE" step="0.001" value="~dTEMP_ALG_SCALE~">
                 </div>
             </fieldset>
 
@@ -356,7 +356,7 @@
                 <legend>Relative Humidity Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
                 <div class="input-group">
                     <label for="iRELH_SENS_TYP">Sensor Type</label>
-                    <select name='iRELH_SENS_TYP' class='config-select'>
+                    <select name='iRELH_SENS_TYP' class='config-select-long'>
                         <option value='1' ~iRELH_SENS_TYP_1~>Disabled</option>
                         <option value='3' ~iRELH_SENS_TYP_3~>Fixed Value</option>
                         <option value='12' ~iRELH_SENS_TYP_12~>Analog Pin</option>
@@ -366,20 +366,20 @@
                 </div>
                 <div class="input-group">
                     <label for="dRELH_MV_TRIM">mV Trim</label>
-                    <input type="number" id="dRELH_MV_TRIM" name="dRELH_MV_TRIM" step="0.1" value="0.0">
+                    <input type="number" id="dRELH_MV_TRIM" name="dRELH_MV_TRIM" step="0.001" value="~dRELH_MV_TRIM~">
                 </div>
                 <div class="input-group">
                     <label for="dRELH_FINE_TUNE">Fine Tune</label>
-                    <input type="number" id="dRELH_FINE_TUNE" name="dRELH_FINE_TUNE" step="0.1" value="0.0">
+                    <input type="number" id="dRELH_FINE_TUNE" name="dRELH_FINE_TUNE" step="0.001" value="~dRELH_FINE_TUNE~">
                 </div>
                 <hr class="fieldset-divider"> 
                 <div class="input-group">
                     <label for="dFIXED_RELH_VAL">Fixed Value (%)</label>
-                    <input type="number" id="dFIXED_RELH_VAL" name="dFIXED_RELH_VAL" step="0.1" value="36.0">
+                    <input type="number" id="dFIXED_RELH_VAL" name="dFIXED_RELH_VAL" step="0.001" value="~dFIXED_RELH_VAL~">
                 </div>
                 <div class="input-group">
                     <label for="dRELH_ALG_SCALE">Analog Scale</label>
-                    <input type="number" id="dRELH_ALG_SCALE" name="dRELH_ALG_SCALE" step="0.1" value="1.0">
+                    <input type="number" id="dRELH_ALG_SCALE" name="dRELH_ALG_SCALE" step="0.001" value="~dRELH_ALG_SCALE~">
                 </div>
             </fieldset>
 
