@@ -41,9 +41,11 @@
 uint64_t reg_b;              // Used to store ADC2 control register
 int sensorValue = 0;         // variable to store the value coming from the sensor
 
-extern struct Configuration config;
+// extern struct Configuration config;
+// ADS1115_lite adc(config.iADC_I2C_ADDR);
 
-ADS1115_lite adc(config.iADC_I2C_ADDR);
+// ADS1115_lite adc;
+
 
 /***********************************************************
  * @brief CONSTRUCTOR
@@ -106,17 +108,19 @@ void Hardware::begin () {
 
   if (config.iADC_TYPE != SENSOR_DISABLED) {
 
-    _message.serialPrintf("Initialising ADS1115 ( Address: %u ) \n", config.iADC_I2C_ADDR);
+    // ADS1115_lite adc(config.iADC_I2C_ADDR);
 
-    adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
-    adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 8 SPS
+    // _message.serialPrintf("Initialising ADS1115 ( Address: %u ) \n", config.iADC_I2C_ADDR);
+
+    // adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
+    // adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 8 SPS
     
-    if (!adc.testConnection()) {
-      _message.serialPrintf("ADS1115 Connection failed");
-      while(1); // Freeze
-    } else {
-      _message.serialPrintf("ADS1115 Initialised\n");
-    }
+    // if (!adc.testConnection()) {
+    //   _message.serialPrintf("ADS1115 Connection failed");
+    //   while(1); // Freeze
+    // } else {
+    //   _message.serialPrintf("ADS1115 Initialised\n");
+    // }
   }
 
   _message.serialPrintf("Hardware Initialised \n");
@@ -575,16 +579,21 @@ int32_t Hardware::getADCRawData(int channel) {
   extern struct Configuration config;
   extern struct SensorData sensorVal;
 
+  ADS1115_lite adc(config.iADC_I2C_ADDR);
+
+  adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
+  adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 8 SPS
+
   int32_t rawADCval = 0;
 
-  if (config.iADC_TYPE != SENSOR_DISABLED){
+  if (config.iADC_TYPE != SENSOR_DISABLED) {
 
     if (channel > 3) {
       return 0;
     }
 
-    switch (channel) // MUX - Multiplex channel
-    {
+    switch (channel) { // MUX - Multiplex channel
+
       case (0):
           adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_0); // 0x4000
       break;
