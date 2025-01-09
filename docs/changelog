@@ -29,6 +29,9 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501090027      - Added MCU Data to mimic page
+2501090012      - #311 Save config values
+                - Changed config number fields resolution
 2501090012      - ADC initialisation change
 2501090003      - #307 - Validated BOSCH_0280218067 transfer function
 2501080013      - Added float flag to conf var initalisation

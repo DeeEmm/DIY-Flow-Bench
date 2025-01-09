@@ -258,6 +258,8 @@ struct DeviceStatus {
   size_t nvmPins = 0;
   size_t nvmConfig = 0;
   size_t nvmSettings = 0;
+  int bmeScanTime = 0;
+  int adcScanTime = 0;
 };
 
 
@@ -503,7 +505,7 @@ struct Language {
     char LANG_GUI_DATA_FILTERS[50] = "Data Filters";
     char LANG_GUI_DATA_FLTR_TYP[50] = "Data Filter Type";
     char LANG_GUI_MIN_FLOW_RATE[50] = "Min Flow Rate (cfm)";
-    char LANG_GUI_MIN_PRESSUREURE[50] = "Min Pressure (in/H2O)";
+    char LANG_GUI_MIN_PRESSURE[50] = "Min Pressure (in/H2O)";
     char LANG_GUI_MAF_MIN_VOLTS[50] = "MAF Min volts";
     char LANG_GUI_CYCLIC_AVERAGE_BUFFER[50] = "Cyclical Average Buffer";
     char LANG_GUI_CONVERSION_SETTINGS[50] = "Conversion Settings";
