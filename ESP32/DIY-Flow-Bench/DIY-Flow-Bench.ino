@@ -394,7 +394,7 @@ void loop () {
   // Process API comms
   if (settings.api_enabled) {        
     if (millis() > status.apiPollTimer) {
-      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
+      // if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
 
         status.apiPollTimer = millis() + API_SCAN_DELAY_MS; 
 
@@ -402,9 +402,9 @@ void loop () {
           status.serialData = Serial.read();
           _api.ParseMessage(status.serialData);
         }
-        xSemaphoreGive(i2c_task_mutex); // Release semaphore
+      //   xSemaphoreGive(i2c_task_mutex); // Release semaphore
 
-      }
+      // }
     }                            
   }
   
@@ -415,8 +415,8 @@ void loop () {
   #ifdef WEBSERVER_ENABLED
     if (millis() > status.browserUpdateTimer) {      
 
-        // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE){ // Check if semaphore available
-        if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
+        // // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE){ // Check if semaphore available
+        // if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
           status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes
           
           // Build Server Side Events (SSE) data
@@ -434,8 +434,8 @@ void loop () {
           _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); 
  
           // Release semaphore
-          xSemaphoreGive(i2c_task_mutex); 
-        }
+        //   xSemaphoreGive(i2c_task_mutex); 
+        // }
     }
   #endif
 
