@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501100018      - #307 BUG NVM data type for MAF type
 2501100007      - Moved ADS Call into getADCRawData
 2501090031      - #268 increased resolution and converted to INH2O
 2501090027      - Added MCU Data to mimic page

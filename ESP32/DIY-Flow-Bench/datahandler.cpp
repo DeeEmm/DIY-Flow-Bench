@@ -449,8 +449,8 @@ void DataHandler::initialiseConfig () {
   if (!_prefs.isKey("iADC_RANGE")) _prefs.putInt("iADC_RANGE", 32767);
   if (!_prefs.isKey("dADC_GAIN")) _prefs.putDouble("dADC_GAIN", 6.144);
 
+  if (!_prefs.isKey("iMAF_SENS_TYP")) _prefs.putInt("iMAF_SENS_TYP", SENSOR_DISABLED);
   if (!_prefs.isKey("iMAF_SRC_TYP")) _prefs.putInt("iMAF_SRC_TYP", ADS1115);
-  if (!_prefs.isKey("iMAF_SENS_TYP")) _prefs.putString("iMAF_SENS_TYP", 0);
   if (!_prefs.isKey("dMAF_MV_TRIM")) _prefs.putDouble("dMAF_MV_TRIM", 0.0);
   if (!_prefs.isKey("iMAF_ADC_CHAN")) _prefs.putInt("iMAF_ADC_CHAN", 0);
 
@@ -477,8 +477,8 @@ void DataHandler::initialiseConfig () {
   if (!_prefs.isKey("iBARO_SENS_TYP")) _prefs.putInt("iBARO_SENS_TYP", BOSCH_BME280);
   if (!_prefs.isKey("dFIXD_BARO_VAL")) _prefs.putDouble("dFIXD_BARO_VAL", 101.3529);
   if (!_prefs.isKey("dBARO_ALG_SCALE")) _prefs.putDouble("dBARO_ALG_SCALE", 1.0);
-  if (!_prefs.isKey("dBARO_MV_TRIM")) _prefs.putDouble("dBARO_MV_TRIM", 1.0);
-  if (!_prefs.isKey("dBARO_FINE_TUNE")) _prefs.putDouble("dBARO_FINE_TUNE", 1.0);
+  if (!_prefs.isKey("dBARO_MV_TRIM")) _prefs.putDouble("dBARO_MV_TRIM", 0.0);
+  if (!_prefs.isKey("dBARO_FINE_TUNE")) _prefs.putDouble("dBARO_FINE_TUNE", 0.0);
   if (!_prefs.isKey("dBARO_SCALE")) _prefs.putDouble("dBARO_SCALE", 1.0);
   if (!_prefs.isKey("dBARO_OFFSET")) _prefs.putDouble("dBARO_OFFSET", 1.0);
   if (!_prefs.isKey("dSEALEVEL_PRESS")) _prefs.putDouble("dSEALEVEL_PRESS", 0.0);
@@ -487,14 +487,14 @@ void DataHandler::initialiseConfig () {
   if (!_prefs.isKey("iTEMP_SENS_TYP")) _prefs.putInt("iTEMP_SENS_TYP", BOSCH_BME280);
   if (!_prefs.isKey("dFIXED_TEMP_VAL")) _prefs.putDouble("dFIXED_TEMP_VAL", 21.0);
   if (!_prefs.isKey("dTEMP_ALG_SCALE")) _prefs.putDouble("dTEMP_ALG_SCALE", 1.0);
-  if (!_prefs.isKey("dTEMP_MV_TRIM")) _prefs.putDouble("dTEMP_MV_TRIM", 1.0);
-  if (!_prefs.isKey("dTEMP_FINE_TUNE")) _prefs.putDouble("dTEMP_FINE_TUNE", 1.0);
+  if (!_prefs.isKey("dTEMP_MV_TRIM")) _prefs.putDouble("dTEMP_MV_TRIM", 0.0);
+  if (!_prefs.isKey("dTEMP_FINE_TUNE")) _prefs.putDouble("dTEMP_FINE_TUNE", 0.0);
 
   if (!_prefs.isKey("iRELH_SENS_TYP")) _prefs.putInt("iRELH_SENS_TYP", BOSCH_BME280);
   if (!_prefs.isKey("dFIXED_RELH_VAL")) _prefs.putDouble("dFIXED_RELH_VAL", 36.0);
   if (!_prefs.isKey("dRELH_ALG_SCALE")) _prefs.putDouble("dRELH_ALG_SCALE", 1.0);
-  if (!_prefs.isKey("dRELH_MV_TRIM")) _prefs.putDouble("dRELH_MV_TRIM", 1.0);
-  if (!_prefs.isKey("dRELH_FINE_TUNE")) _prefs.putDouble("dRELH_FINE_TUNE", 1.0);
+  if (!_prefs.isKey("dRELH_MV_TRIM")) _prefs.putDouble("dRELH_MV_TRIM", 0.0);
+  if (!_prefs.isKey("dRELH_FINE_TUNE")) _prefs.putDouble("dRELH_FINE_TUNE", 0.0);
   if (!_prefs.isKey("bSWIRL_ENBLD")) _prefs.putBool("bSWIRL_ENBLD", false);
 
   // Add additional / new keys to bottom of list and update the key check
@@ -547,8 +547,8 @@ void DataHandler::loadConfig () {
   config.iADC_RANGE = _prefs.getInt("iADC_RANGE", 32767);
   config.dADC_GAIN = _prefs.getDouble("dADC_GAIN", 6.144);
 
+  config.iMAF_SENS_TYP = _prefs.getInt("iMAF_SENS_TYP", SENSOR_DISABLED);
   config.iMAF_SRC_TYP = _prefs.getInt("iMAF_SRC_TYP", ADS1115);
-  config.iMAF_SENS_TYP = _prefs.getInt("iMAF_SENS_TYP", 0);
   config.dMAF_MV_TRIM = _prefs.getDouble("dMAF_MV_TRIM", 0.0);
   config.iMAF_ADC_CHAN = _prefs.getInt("iMAF_ADC_CHAN", 0);
 
