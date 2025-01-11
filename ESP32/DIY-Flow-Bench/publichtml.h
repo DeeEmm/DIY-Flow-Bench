@@ -24,6 +24,7 @@ public:
     String settings();
     String pins();
     String css();
+    
     String mainJs();
     String indexJs();
     String settingsJs();

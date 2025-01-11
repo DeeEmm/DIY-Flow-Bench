@@ -23,7 +23,7 @@
 class Hardware {
 	
 	friend class Messages;
-	friend class Maths;
+	
 
 	protected:
 		uint8_t		_i2cAddress;

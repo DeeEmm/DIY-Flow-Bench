@@ -24,7 +24,7 @@
 class Calibration {
 
 	friend class Sensors;
-	friend class Maths;
+	
 
 	public:
 		Calibration();

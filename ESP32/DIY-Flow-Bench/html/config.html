@@ -90,10 +90,6 @@
                     <input type="number" id="iADC_SCAN_DLY" name="iADC_SCAN_DLY" value="250">
                 </div>
                 <div class="input-group">
-                    <label for="iADC_MAX_RETRY">Max Retries</label>
-                    <input type="number" id="iADC_MAX_RETRY" name="iADC_MAX_RETRY" value="10">
-                </div>
-                <div class="input-group">
                     <label for="iADC_RANGE">ADC Range</label>
                     <input type="number" id="iADC_RANGE" name="iADC_RANGE" value="32767">
                 </div>
@@ -124,15 +120,7 @@
                     <select name='iMAF_SRC_TYP' class='config-select'>
                         <option value='1' ~iMAF_SRC_TYP_1~>Disabled</option>
                         <option value='12' ~iMAF_SRC_TYP_12~>Analog Pin</option>
-                        <option value='18' ~iMAF_SRC_TYP_18~>ADC</option>                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="iMAF_ADC_CHAN">ADC Channel</label>
-                    <select name='iMAF_ADC_CHAN' class='config-select'>
-                        <option value='0' ~iMAF_ADC_CHAN_0~>Chan 0</option>
-                        <option value='1' ~iMAF_ADC_CHAN_1~>Chan 1</option>
-                        <option value='2' ~iMAF_ADC_CHAN_2~>Chan 2</option>
-                        <option value='3' ~iMAF_ADC_CHAN_3~>Chan 3</option>
+                        <option value='18' ~iMAF_SRC_TYP_18~>ADC</option>                    
                     </select>
                 </div>
             </fieldset>
@@ -168,23 +156,6 @@
                         <option value='18' ~iPREF_SRC_TYP_18~>ADC</option>
                     </select>
                 </div>
-                <div class="input-group">
-                    <label for="iPREF_ADC_CHAN">ADC Channel</label>
-                    <select name='iPREF_ADC_CHAN' class='config-select'>
-                        <option value='1' ~iPREF_ADC_CHAN_1~>Chan 1</option>
-                        <option value='2' ~iPREF_ADC_CHAN_2~>Chan 2</option>
-                        <option value='3' ~iPREF_ADC_CHAN_3~>Chan 3</option>
-                        <option value='4' ~iPREF_ADC_CHAN_4~>Chan 4</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="iFIXED_PREF_VAL">Fixed Value</label>
-                    <input type="number" id="iFIXED_PREF_VAL" name="iFIXED_PREF_VAL" value="~iFIXED_PREF_VAL~">
-                </div>
-                <div class="input-group">
-                    <label for="dPREF_ALG_SCALE">Analog Scale</label>
-                    <input type="number" id="dPREF_ALG_SCALE" name="dPREF_ALG_SCALE" step="0.001" value="~dPREF_ALG_SCALE~">
-                </div>
             </fieldset>
 
             <!-- Differential Pressure Settings -->
@@ -217,23 +188,6 @@
                         <option value='18' ~iPDIFF_SRC_TYP_18~>ADC</option>
                     </select>
                 </div>
-                <div class="input-group">
-                    <label for="iPDIFF_ADC_CHAN">ADC Channel</label>
-                    <select name='iPDIFF_ADC_CHAN' class='config-select'>
-                        <option value='1' ~iPDIFF_ADC_CHAN_1~>Chan 1</option>
-                        <option value='2' ~iPDIFF_ADC_CHAN_2~>Chan 2</option>
-                        <option value='3' ~iPDIFF_ADC_CHAN_3~>Chan 3</option>
-                        <option value='4' ~iPDIFF_ADC_CHAN_4~>Chan 4</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="iFIXD_PDIFF_VAL">Fixed Value</label>
-                    <input type="number" id="iFIXD_PDIFF_VAL" name="iFIXD_PDIFF_VAL" value="~iFIXD_PDIFF_VAL~">
-                </div>
-                <div class="input-group">
-                    <label for="dPDIFF_SCALE">Analog Scale</label>
-                    <input type="number" id="dPDIFF_SCALE" name="dPDIFF_SCALE" step="0.001" value="~dPDIFF_SCALE~">
-                </div>
             </fieldset>
 
             <!-- Pitot Sensor Settings -->
@@ -264,19 +218,6 @@
                         <option value='18' ~iPITOT_SRC_TYP_18~>ADC</option>
                     </select>
                 </div>
-                <div class="input-group">
-                    <label for="iPITOT_ADC_CHAN">ADC Channel</label>
-                    <select name='iPITOT_ADC_CHAN' class='config-select'>
-                        <option value='1' ~iPITOT_ADC_CHAN_1~>Chan 1</option>
-                        <option value='2' ~iPITOT_ADC_CHAN_2~>Chan 2</option>
-                        <option value='3' ~iPITOT_ADC_CHAN_3~>Chan 3</option>
-                        <option value='4' ~iPITOT_ADC_CHAN_4~>Chan 4</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="dPITOT_SCALE">Analog Scale</label>
-                    <input type="number" id="dPITOT_SCALE" name="dPITOT_SCALE" step="0.001" value="~dPITOT_SCALE~">
-                </div>
             </fieldset>
 
             <!-- Barometric Settings -->
@@ -299,23 +240,6 @@
                 <div class="input-group">
                     <label for="dBARO_FINE_TUNE">Fine Tune</label>
                     <input type="number" id="dBARO_FINE_TUNE" name="dBARO_FINE_TUNE" step="0.001" value="~dBARO_FINE_TUNE~">
-                </div>
-                <hr class="fieldset-divider">
-                <div class="input-group">
-                    <label for="dFIXD_BARO_VAL">Fixed Value (kPa)</label>
-                    <input type="number" id="dFIXD_BARO_VAL" name="dFIXD_BARO_VAL" step="0.0001" value="~dFIXD_BARO_VAL~">
-                </div>
-                <div class="input-group">
-                    <label for="dBARO_ALG_SCALE">Analog Scale</label>
-                    <input type="number" id="dBARO_ALG_SCALE" name="dBARO_ALG_SCALE" step="0.001" value="~dBARO_ALG_SCALE~">
-                </div>
-                <div class="input-group">
-                    <label for="dBARO_SCALE">Scale</label>
-                    <input type="number" id="dBARO_SCALE" name="dBARO_SCALE" step="0.001" value="~dBARO_SCALE~">
-                </div>
-                <div class="input-group">
-                    <label for="dBARO_OFFSET">Offset</label>
-                    <input type="number" id="dBARO_OFFSET" name="dBARO_OFFSET" step="0.001" value="~dBARO_OFFSET~">
                 </div>
             </fieldset>
 
@@ -340,15 +264,6 @@
                     <label for="dTEMP_FINE_TUNE">Fine Tune</label>
                     <input type="number" id="dTEMP_FINE_TUNE" name="dTEMP_FINE_TUNE" step="0.001" value="~dTEMP_FINE_TUNE~">
                 </div>
-                <hr class="fieldset-divider">
-                <div class="input-group">
-                    <label for="dFIXED_TEMP_VAL">Fixed Value (&deg;C)</label>
-                    <input type="number" id="dFIXED_TEMP_VAL" name="dFIXED_TEMP_VAL" step="0.001" value="~dFIXED_TEMP_VAL~">
-                </div>
-                <div class="input-group">
-                    <label for="dTEMP_ALG_SCALE">Analog Scale</label>
-                    <input type="number" id="dTEMP_ALG_SCALE" name="dTEMP_ALG_SCALE" step="0.001" value="~dTEMP_ALG_SCALE~">
-                </div>
             </fieldset>
 
             <!-- Relative Humidity Settings -->
@@ -371,15 +286,6 @@
                 <div class="input-group">
                     <label for="dRELH_FINE_TUNE">Fine Tune</label>
                     <input type="number" id="dRELH_FINE_TUNE" name="dRELH_FINE_TUNE" step="0.001" value="~dRELH_FINE_TUNE~">
-                </div>
-                <hr class="fieldset-divider"> 
-                <div class="input-group">
-                    <label for="dFIXED_RELH_VAL">Fixed Value (%)</label>
-                    <input type="number" id="dFIXED_RELH_VAL" name="dFIXED_RELH_VAL" step="0.001" value="~dFIXED_RELH_VAL~">
-                </div>
-                <div class="input-group">
-                    <label for="dRELH_ALG_SCALE">Analog Scale</label>
-                    <input type="number" id="dRELH_ALG_SCALE" name="dRELH_ALG_SCALE" step="0.001" value="~dRELH_ALG_SCALE~">
                 </div>
             </fieldset>
 

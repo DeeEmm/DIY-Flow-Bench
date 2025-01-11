@@ -166,37 +166,6 @@ double Calibration::getLeakOffsetReverse() {
 
 
 
-// TODO - #205 convert from pre-compile to post-compile 
-// /***********************************************************
-// * @brief createCalibration File
-// * @details Create configuration json file
-// * @note Called from Webserver::Initialise() if config.json not found
-// ***/
-// void Calibration::createCalibrationFile () {
-
-//   extern struct CalibrationData calVal;
-//   Webserver _webserver;
-//   Messages _message;
-//   String jsonString;
-//   StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
-  
-//   _message.debugPrintf("Creating cal.json file... \n"); 
-  
-//   calData["FLOW_OFFSET"] = calVal.flow_offset;
-//   calData["USER_OFFSET"] = calVal.user_offset;
-//   calData["LEAK_BASE"] = calVal.leak_cal_baseline;
-//   calData["LEAK_BASE_REV"] = calVal.leak_cal_baseline_rev;
-//   calData["LEAK_OFFSET"] = calVal.leak_cal_offset;
-//   calData["LEAK_OFFSET_REV"] = calVal.leak_cal_offset_rev;
-
-//   serializeJsonPretty(calData, jsonString);
-
-//   File outputFile = SPIFFS.open("/cal.json", FILE_WRITE);
-//   serializeJsonPretty(calData, outputFile);
-//   outputFile.close();
-  
-// }
-
 
 
 

@@ -28,10 +28,9 @@
 
 class DataHandler {
 
-	friend class Maths;
+	
 	friend class Messages;
 	friend class Hardware;
-	friend class Settings;
 	friend class Sensors;
 	friend class AsyncWebServer;
 	friend class AsyncWebSocket;

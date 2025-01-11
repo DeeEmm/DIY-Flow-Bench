@@ -174,18 +174,16 @@ void Comms::wifiReconnect ( void ) {
  ***/
 int Comms::getWifiConnection(){
 
-  Messages _message;
   extern struct BenchSettings settings;
+
+  Messages _message;
   
   uint8_t wifiConnectionAttempt = 1;
   uint8_t wifiConnectionStatus;
 
-  std::string wifi_SSID = settings.wifi_ap_ssid.c_str();
-  std::string wifi_PSWD = settings.wifi_ap_pswd.c_str();
-
   for(;;) {
           
-    WiFi.begin(wifi_SSID.c_str(), wifi_PSWD.c_str()); 
+    WiFi.begin(settings.wifi_ssid.c_str(), settings.wifi_pswd.c_str()); 
     wifiConnectionStatus = WiFi.waitForConnectResult(settings.wifi_timeout);
     if (wifiConnectionStatus == WL_CONNECTED || wifiConnectionAttempt > settings.wifi_retries){
       break;

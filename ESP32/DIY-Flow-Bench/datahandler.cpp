@@ -445,54 +445,54 @@ void DataHandler::initialiseConfig () {
   if (!_prefs.isKey("iADC_TYPE")) _prefs.putInt("iADC_TYPE", ADS1115);
   if (!_prefs.isKey("iADC_I2C_ADDR")) _prefs.putInt("iADC_I2C_ADDR", 72);
   if (!_prefs.isKey("iADC_SCAN_DLY")) _prefs.putInt("iADC_SCAN_DLY", 1000);
-  if (!_prefs.isKey("iADC_MAX_RETRY")) _prefs.putInt("iADC_MAX_RETRY", 10);
+  // if (!_prefs.isKey("iADC_MAX_RETRY")) _prefs.putInt("iADC_MAX_RETRY", 10);
   if (!_prefs.isKey("iADC_RANGE")) _prefs.putInt("iADC_RANGE", 32767);
   if (!_prefs.isKey("dADC_GAIN")) _prefs.putDouble("dADC_GAIN", 6.144);
 
   if (!_prefs.isKey("iMAF_SENS_TYP")) _prefs.putInt("iMAF_SENS_TYP", SENSOR_DISABLED);
   if (!_prefs.isKey("iMAF_SRC_TYP")) _prefs.putInt("iMAF_SRC_TYP", ADS1115);
   if (!_prefs.isKey("dMAF_MV_TRIM")) _prefs.putDouble("dMAF_MV_TRIM", 0.0);
-  if (!_prefs.isKey("iMAF_ADC_CHAN")) _prefs.putInt("iMAF_ADC_CHAN", 0);
+  // if (!_prefs.isKey("iMAF_ADC_CHAN")) _prefs.putInt("iMAF_ADC_CHAN", 0);
 
   if (!_prefs.isKey("iPREF_SENS_TYP")) _prefs.putInt("iPREF_SENS_TYP", MPXV7007);
   if (!_prefs.isKey("iPREF_SRC_TYP")) _prefs.putInt("iPREF_SRC_TYP", ADS_ADC);
-  if (!_prefs.isKey("iFIXED_PREF_VAL")) _prefs.putInt("iFIXED_PREF_VAL", 1);
+  // if (!_prefs.isKey("iFIXED_PREF_VAL")) _prefs.putInt("iFIXED_PREF_VAL", 1);
   if (!_prefs.isKey("dPREF_MV_TRIM")) _prefs.putDouble("dPREF_MV_TRIM", 0.0);
-  if (!_prefs.isKey("dPREF_ALG_SCALE")) _prefs.putDouble("dPREF_ALG_SCALE", 0.0);
-  if (!_prefs.isKey("iPREF_ADC_CHAN")) _prefs.putInt("iPREF_ADC_CHAN", 1);
+  // if (!_prefs.isKey("dPREF_ALG_SCALE")) _prefs.putDouble("dPREF_ALG_SCALE", 0.0);
+  // if (!_prefs.isKey("iPREF_ADC_CHAN")) _prefs.putInt("iPREF_ADC_CHAN", 1);
 
   if (!_prefs.isKey("iPDIFF_SENS_TYP")) _prefs.putInt("iPDIFF_SENS_TYP", MPXV7007);
   if (!_prefs.isKey("iPDIFF_SRC_TYP")) _prefs.putInt("iPDIFF_SRC_TYP", ADS_ADC);
-  if (!_prefs.isKey("iFIXD_PDIFF_VAL")) _prefs.putInt("iFIXD_PDIFF_VAL", 1);
+  // if (!_prefs.isKey("iFIXD_PDIFF_VAL")) _prefs.putInt("iFIXD_PDIFF_VAL", 1);
   if (!_prefs.isKey("dPDIFF_MV_TRIM")) _prefs.putDouble("dPDIFF_MV_TRIM", 0.0);
-  if (!_prefs.isKey("dPDIFF_SCALE")) _prefs.putDouble("dPDIFF_SCALE", 0.0);
-  if (!_prefs.isKey("iPDIFF_ADC_CHAN")) _prefs.putInt("iPDIFF_ADC_CHAN", 2);
+  // if (!_prefs.isKey("dPDIFF_SCALE")) _prefs.putDouble("dPDIFF_SCALE", 0.0);
+  // if (!_prefs.isKey("iPDIFF_ADC_CHAN")) _prefs.putInt("iPDIFF_ADC_CHAN", 2);
 
   if (!_prefs.isKey("iPITOT_SENS_TYP")) _prefs.putInt("iPITOT_SENS_TYP", MPXV7007);
   if (!_prefs.isKey("iPITOT_SRC_TYP")) _prefs.putInt("iPITOT_SRC_TYP", ADS_ADC);
   if (!_prefs.isKey("dPITOT_MV_TRIM")) _prefs.putDouble("dPITOT_MV_TRIM", 0.0);
-  if (!_prefs.isKey("dPITOT_SCALE")) _prefs.putDouble("dPITOT_SCALE", 0.0);
-  if (!_prefs.isKey("iPITOT_ADC_CHAN")) _prefs.putInt("iPITOT_ADC_CHAN", 3);
+  // if (!_prefs.isKey("dPITOT_SCALE")) _prefs.putDouble("dPITOT_SCALE", 0.0);
+  // if (!_prefs.isKey("iPITOT_ADC_CHAN")) _prefs.putInt("iPITOT_ADC_CHAN", 3);
 
   if (!_prefs.isKey("iBARO_SENS_TYP")) _prefs.putInt("iBARO_SENS_TYP", BOSCH_BME280);
-  if (!_prefs.isKey("dFIXD_BARO_VAL")) _prefs.putDouble("dFIXD_BARO_VAL", 101.3529);
-  if (!_prefs.isKey("dBARO_ALG_SCALE")) _prefs.putDouble("dBARO_ALG_SCALE", 1.0);
+  // if (!_prefs.isKey("dFIXD_BARO_VAL")) _prefs.putDouble("dFIXD_BARO_VAL", 101.3529);
+  // if (!_prefs.isKey("dBARO_ALG_SCALE")) _prefs.putDouble("dBARO_ALG_SCALE", 1.0);
   if (!_prefs.isKey("dBARO_MV_TRIM")) _prefs.putDouble("dBARO_MV_TRIM", 0.0);
   if (!_prefs.isKey("dBARO_FINE_TUNE")) _prefs.putDouble("dBARO_FINE_TUNE", 0.0);
-  if (!_prefs.isKey("dBARO_SCALE")) _prefs.putDouble("dBARO_SCALE", 1.0);
-  if (!_prefs.isKey("dBARO_OFFSET")) _prefs.putDouble("dBARO_OFFSET", 1.0);
+  // if (!_prefs.isKey("dBARO_SCALE")) _prefs.putDouble("dBARO_SCALE", 1.0);
+  // if (!_prefs.isKey("dBARO_OFFSET")) _prefs.putDouble("dBARO_OFFSET", 1.0);
   if (!_prefs.isKey("dSEALEVEL_PRESS")) _prefs.putDouble("dSEALEVEL_PRESS", 0.0);
   if (!_prefs.isKey("iBARO_ADC_CHAN")) _prefs.putInt("iBARO_ADC_CHAN", 4);
 
   if (!_prefs.isKey("iTEMP_SENS_TYP")) _prefs.putInt("iTEMP_SENS_TYP", BOSCH_BME280);
-  if (!_prefs.isKey("dFIXED_TEMP_VAL")) _prefs.putDouble("dFIXED_TEMP_VAL", 21.0);
-  if (!_prefs.isKey("dTEMP_ALG_SCALE")) _prefs.putDouble("dTEMP_ALG_SCALE", 1.0);
+  // if (!_prefs.isKey("dFIXED_TEMP_VAL")) _prefs.putDouble("dFIXED_TEMP_VAL", 21.0);
+  // if (!_prefs.isKey("dTEMP_ALG_SCALE")) _prefs.putDouble("dTEMP_ALG_SCALE", 1.0);
   if (!_prefs.isKey("dTEMP_MV_TRIM")) _prefs.putDouble("dTEMP_MV_TRIM", 0.0);
   if (!_prefs.isKey("dTEMP_FINE_TUNE")) _prefs.putDouble("dTEMP_FINE_TUNE", 0.0);
 
   if (!_prefs.isKey("iRELH_SENS_TYP")) _prefs.putInt("iRELH_SENS_TYP", BOSCH_BME280);
-  if (!_prefs.isKey("dFIXED_RELH_VAL")) _prefs.putDouble("dFIXED_RELH_VAL", 36.0);
-  if (!_prefs.isKey("dRELH_ALG_SCALE")) _prefs.putDouble("dRELH_ALG_SCALE", 1.0);
+  // if (!_prefs.isKey("dFIXED_RELH_VAL")) _prefs.putDouble("dFIXED_RELH_VAL", 36.0);
+  // if (!_prefs.isKey("dRELH_ALG_SCALE")) _prefs.putDouble("dRELH_ALG_SCALE", 1.0);
   if (!_prefs.isKey("dRELH_MV_TRIM")) _prefs.putDouble("dRELH_MV_TRIM", 0.0);
   if (!_prefs.isKey("dRELH_FINE_TUNE")) _prefs.putDouble("dRELH_FINE_TUNE", 0.0);
   if (!_prefs.isKey("bSWIRL_ENBLD")) _prefs.putBool("bSWIRL_ENBLD", false);
@@ -543,54 +543,54 @@ void DataHandler::loadConfig () {
   config.iADC_TYPE = _prefs.getInt("iADC_TYPE", ADS1115);
   config.iADC_I2C_ADDR = _prefs.getInt("iADC_I2C_ADDR", 72);
   config.iADC_SCAN_DLY = _prefs.getInt("iADC_SCAN_DLY", 1000);
-  config.iADC_MAX_RETRY  = _prefs.getInt("iADC_MAX_RETRY", 10);
+  // config.iADC_MAX_RETRY  = _prefs.getInt("iADC_MAX_RETRY", 10);
   config.iADC_RANGE = _prefs.getInt("iADC_RANGE", 32767);
   config.dADC_GAIN = _prefs.getDouble("dADC_GAIN", 6.144);
 
   config.iMAF_SENS_TYP = _prefs.getInt("iMAF_SENS_TYP", SENSOR_DISABLED);
   config.iMAF_SRC_TYP = _prefs.getInt("iMAF_SRC_TYP", ADS1115);
   config.dMAF_MV_TRIM = _prefs.getDouble("dMAF_MV_TRIM", 0.0);
-  config.iMAF_ADC_CHAN = _prefs.getInt("iMAF_ADC_CHAN", 0);
+  // config.iMAF_ADC_CHAN = _prefs.getInt("iMAF_ADC_CHAN", 0);
 
   config.iPREF_SENS_TYP = _prefs.getInt("iPREF_SENS_TYP", MPXV7007);
   config.iPREF_SRC_TYP = _prefs.getInt("iPREF_SRC_TYP", ADS_ADC);
-  config.iFIXED_PREF_VAL = _prefs.getInt("iFIXED_PREF_VAL", 1);
+  // config.iFIXED_PREF_VAL = _prefs.getInt("iFIXED_PREF_VAL", 1);
   config.dPREF_MV_TRIM = _prefs.getDouble("dPREF_MV_TRIM", 0.0);
-  config.dPREF_ALG_SCALE = _prefs.getDouble("dPREF_ALG_SCALE", 1.0);
-  config.iPREF_ADC_CHAN = _prefs.getInt("iPREF_ADC_CHAN", 1);
+  // config.dPREF_ALG_SCALE = _prefs.getDouble("dPREF_ALG_SCALE", 1.0);
+  // config.iPREF_ADC_CHAN = _prefs.getInt("iPREF_ADC_CHAN", 1);
 
   config.iPDIFF_SENS_TYP = _prefs.getInt("iPDIFF_SENS_TYP", MPXV7007);
   config.iPDIFF_SRC_TYP = _prefs.getInt("iPDIFF_SRC_TYP", ADS_ADC);
-  config.iFIXD_PDIFF_VAL = _prefs.getInt("iFIXD_PDIFF_VAL", 1);
+  // config.iFIXD_PDIFF_VAL = _prefs.getInt("iFIXD_PDIFF_VAL", 1);
   config.dPDIFF_MV_TRIM = _prefs.getDouble("dPDIFF_MV_TRIM", 0.0);
-  config.dPDIFF_SCALE = _prefs.getDouble("dPDIFF_SCALE", 1.0);
-  config.iPDIFF_ADC_CHAN = _prefs.getInt("iPDIFF_ADC_CHAN", 2);
+  // config.dPDIFF_SCALE = _prefs.getDouble("dPDIFF_SCALE", 1.0);
+  // config.iPDIFF_ADC_CHAN = _prefs.getInt("iPDIFF_ADC_CHAN", 2);
  
   config.iPITOT_SENS_TYP = _prefs.getInt("iPITOT_SENS_TYP", MPXV7007);
   config.iPITOT_SRC_TYP = _prefs.getInt("iPITOT_SRC_TYP", ADS_ADC);
   config.dPITOT_MV_TRIM = _prefs.getDouble("dPITOT_MV_TRIM", 0.0);
-  config.dPITOT_SCALE = _prefs.getDouble("dPITOT_SCALE", 1.0);
-  config.iPITOT_ADC_CHAN = _prefs.getInt("iPITOT_ADC_CHAN", 3);
+  // config.dPITOT_SCALE = _prefs.getDouble("dPITOT_SCALE", 1.0);
+  // config.iPITOT_ADC_CHAN = _prefs.getInt("iPITOT_ADC_CHAN", 3);
 
   config.iBARO_SENS_TYP = _prefs.getInt("iBARO_SENS_TYP", BOSCH_BME280);
-  config.dFIXD_BARO_VAL = _prefs.getDouble("dFIXD_BARO_VAL", 101.3529);
-  config.dBARO_ALG_SCALE =_prefs.getDouble("dBARO_ALG_SCALE", 1.0);
+  // config.dFIXD_BARO_VAL = _prefs.getDouble("dFIXD_BARO_VAL", 101.3529);
+  // config.dBARO_ALG_SCALE =_prefs.getDouble("dBARO_ALG_SCALE", 1.0);
   config.dBARO_MV_TRIM = _prefs.getDouble("dBARO_MV_TRIM", 1.0);
   config.dBARO_FINE_TUNE = _prefs.getDouble("dBARO_FINE_TUNE", 1.0);
-  config.dBARO_SCALE = _prefs.getDouble("dBARO_SCALE", 100);
-  config.dBARO_OFFSET = _prefs.getDouble("dBARO_OFFSET", 100);
+  // config.dBARO_SCALE = _prefs.getDouble("dBARO_SCALE", 100);
+  // config.dBARO_OFFSET = _prefs.getDouble("dBARO_OFFSET", 100);
   config.dSEALEVEL_PRESS = _prefs.getDouble("dSEALEVEL_PRESS", 1016.90);
   config.iBARO_ADC_CHAN = _prefs.getInt("iBARO_ADC_CHAN", 4);
 
   config.iTEMP_SENS_TYP = _prefs.getInt("iTEMP_SENS_TYP", BOSCH_BME280);
-  config.dFIXED_TEMP_VAL = _prefs.getDouble("dFIXED_TEMP_VAL", 21.0);
-  config.dTEMP_ALG_SCALE = _prefs.getDouble("dTEMP_ALG_SCALE", 1.0);
+  // config.dFIXED_TEMP_VAL = _prefs.getDouble("dFIXED_TEMP_VAL", 21.0);
+  // config.dTEMP_ALG_SCALE = _prefs.getDouble("dTEMP_ALG_SCALE", 1.0);
   config.dTEMP_MV_TRIM = _prefs.getDouble("dTEMP_MV_TRIM", 0.0);
   config.dTEMP_FINE_TUNE = _prefs.getDouble("dTEMP_FINE_TUNE", 0.0);
 
   config.iRELH_SENS_TYP = _prefs.getInt("iRELH_SENS_TYP", BOSCH_BME280);
-  config.dFIXED_RELH_VAL = _prefs.getDouble("dFIXED_RELH_VAL", 36.0);
-  config.dRELH_ALG_SCALE = _prefs.getDouble("dRELH_ALG_SCALE", 1.0);
+  // config.dFIXED_RELH_VAL = _prefs.getDouble("dFIXED_RELH_VAL", 36.0);
+  // config.dRELH_ALG_SCALE = _prefs.getDouble("dRELH_ALG_SCALE", 1.0);
   config.dRELH_MV_TRIM = _prefs.getDouble("dRELH_MV_TRIM", 0.0);
   config.dRELH_FINE_TUNE = _prefs.getDouble("dRELH_FINE_TUNE", 0.0);
   config.bSWIRL_ENBLD = _prefs.getBool("bSWIRL_ENBLD", false);
@@ -710,10 +710,10 @@ void DataHandler::initialiseSettings () {
 ***/ 
 void DataHandler::loadSettings () {
 
-  extern struct BenchSettings settings;
+  extern struct BenchSettings settings; 
   extern struct DeviceStatus status;
 
-  DataHandler _data;
+  // DataHandler _data;
   Messages _message;
   Preferences _prefs;
 
@@ -721,10 +721,11 @@ void DataHandler::loadSettings () {
   
   _prefs.begin("settings");
 
-  settings.wifi_ssid = _prefs.getString("sWIFI_SSID", "WIFI-SSID");
-  settings.wifi_pswd = _prefs.getString("sWIFI_PSWD", "PASSWORD");
-  settings.wifi_ap_ssid = _prefs.getString("sWIFI_AP_SSID", "DIYFB" );
-  settings.wifi_ap_pswd =_prefs.getString("sWIFI_AP_PSWD", "123456789" );
+  settings.wifi_ssid = _prefs.getString("sWIFI_SSID");
+  settings.wifi_pswd = _prefs.getString("sWIFI_PSWD");
+    _message.serialPrintf("wifi_ssid: %s \n", settings.wifi_ssid );  
+  settings.wifi_ap_ssid = _prefs.getString("sWIFI_AP_SSID");
+  settings.wifi_ap_pswd =_prefs.getString("sWIFI_AP_PSWD");
   settings.hostname = _prefs.getString("sHOSTNAME", "diyfb" );
   settings.wifi_timeout = _prefs.getInt("iWIFI_TIMEOUT", 4000 );
   settings.maf_housing_diameter = _prefs.getInt("iMAF_DIAMETER", 0 );

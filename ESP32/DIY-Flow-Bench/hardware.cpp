@@ -36,11 +36,16 @@
 
 #include <ADS1115_lite.h>
 
+extern struct Configuration config;
+ADS1115_lite adc(config.iADC_I2C_ADDR);
 
-// Kludge to fix ADC2 + WiFi - Source: https://forum.arduino.cc/t/interesting-esp32-issue-cant-use-analogread-in-esp_wifimanager-library/679348/2
-#include "soc/sens_reg.h"    // needed for manipulating ADC2 control register
-uint64_t reg_b;              // Used to store ADC2 control register
-int sensorValue = 0;         // variable to store the value coming from the sensor
+
+
+
+// // Kludge to fix ADC2 + WiFi - Source: https://forum.arduino.cc/t/interesting-esp32-issue-cant-use-analogread-in-esp_wifimanager-library/679348/2
+// #include "soc/sens_reg.h"    // needed for manipulating ADC2 control register
+// uint64_t reg_b;              // Used to store ADC2 control register
+// int sensorValue = 0;         // variable to store the value coming from the sensor
 
 
 
@@ -50,6 +55,9 @@ int sensorValue = 0;         // variable to store the value coming from the sens
  ***/
 Hardware::Hardware() {
 }
+
+
+
 
 // /***********************************************************
 //  * @brief save_ADC_Reg - Kludge to fix ADC2 + WiFi 
@@ -97,7 +105,7 @@ Hardware::Hardware() {
  **/
 void Hardware::begin () {
 
-  extern struct Configuration config;
+  // extern struct Configuration config;
 
   Hardware _hardware;
   Messages _message;
@@ -105,6 +113,23 @@ void Hardware::begin () {
   _message.serialPrintf("Initialising Hardware \n");
 
   this->getI2CList(); // Scan and print I2C device list to serial monitor
+
+
+  if (config.iADC_TYPE != SENSOR_DISABLED) {
+
+      _message.serialPrintf("Initialising ADS1115 ( Address: %u ) \n", config.iADC_I2C_ADDR);
+
+      adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
+      adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 8 SPS
+      
+      if (!adc.testConnection()) {
+        _message.serialPrintf("ADS1115 Connection failed");
+        while(1); // Freeze
+      } else {
+        _message.serialPrintf("ADS1115 Initialised\n");
+      }
+  }
+
 
   _message.serialPrintf("Hardware Initialised \n");
 
@@ -559,17 +584,8 @@ void Hardware::getI2CList() {
  ***/
 int32_t Hardware::getADCRawData(int channel) {
 
-  extern struct Configuration config;
+  // extern struct Configuration config;
   extern struct SensorData sensorVal;
-
-  // set up ADC instance
-  ADS1115_lite adc(config.iADC_I2C_ADDR);
-
-  // ADS1115_lite adc;
-
-  // configure ADC 
-  adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
-  adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 8 SPS
 
   int32_t rawADCval = 0;
 
@@ -648,7 +664,6 @@ int32_t Hardware::getADCRawData(int channel) {
     break;
 
   }
-  
   
   return volts;
 }

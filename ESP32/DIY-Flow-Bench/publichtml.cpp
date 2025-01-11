@@ -148,6 +148,7 @@ String PublicHTML::configPage() {
     return decompressMultipleToStream(arrays, lengths, 3);
 }
 
+
 String PublicHTML::mimicPage() {
     const uint8_t* arrays[] = {header_html, mimic_html, footer_html};
     const size_t lengths[] = {header_html_len, mimic_html_len, footer_html_len};

@@ -190,7 +190,7 @@ void Webserver::begin()
   // Firmware update handler
   server->on("/api/update", HTTP_POST, [](AsyncWebServerRequest *request){
     status.shouldReboot = !Update.hasError();
-    AsyncWebServerResponse *response = request->beginResponse(200, "text/html", status.shouldReboot?"<meta http-equiv=\"refresh\" content=\"3; url=/\" />Rebooting... If the page does not automatically refresh, pleae click <a href=\"/\">HERE</a>":"FIRMWARE UPDATE FAILED!");
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/html", status.shouldReboot?"<meta http-equiv=\"refresh\" content=\"3; url=/\" />Rebooting... If the page does not automatically refresh, please click <a href=\"/\">HERE</a>":"FIRMWARE UPDATE FAILED!");
     response->addHeader("Connection", "close");
     request->send(response);
   },[](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final){
@@ -1648,7 +1648,6 @@ String Webserver::processConfigPageTemplate(const String &var) {
 
   extern struct Configuration config;
 
-
   // Process language vars
   String langVar = processLanguageTemplateVars(var);
   if ( langVar != var) return langVar;
@@ -1687,7 +1686,7 @@ String Webserver::processConfigPageTemplate(const String &var) {
 
   if (var == "iADC_I2C_ADDR" ) return String(config.iADC_I2C_ADDR);
   if (var == "iADC_SCAN_DLY" ) return String(config.iADC_SCAN_DLY);
-  if (var == "iADC_MAX_RETRY" ) return String(config.iADC_MAX_RETRY);
+  // if (var == "iADC_MAX_RETRY" ) return String(config.iADC_MAX_RETRY);
   if (var == "iADC_RANGE" ) return String(config.iADC_RANGE);
   if (var == "dADC_GAIN" ) return String(config.dADC_GAIN);
 
@@ -1714,10 +1713,10 @@ String Webserver::processConfigPageTemplate(const String &var) {
   if (var == "iMAF_SRC_TYP_18" && config.iMAF_SRC_TYP == 18) return String("selected");
 
   // MAF ADC Channel dropdown
-  if (var == "iMAF_ADC_CHAN_0" && config.iMAF_ADC_CHAN == 0) return String("selected");
-  if (var == "iMAF_ADC_CHAN_1" && config.iMAF_ADC_CHAN == 1) return String("selected");
-  if (var == "iMAF_ADC_CHAN_2" && config.iMAF_ADC_CHAN == 2) return String("selected");
-  if (var == "iMAF_ADC_CHAN_3" && config.iMAF_ADC_CHAN == 3) return String("selected");
+  // if (var == "iMAF_ADC_CHAN_0" && config.iMAF_ADC_CHAN == 0) return String("selected");
+  // if (var == "iMAF_ADC_CHAN_1" && config.iMAF_ADC_CHAN == 1) return String("selected");
+  // if (var == "iMAF_ADC_CHAN_2" && config.iMAF_ADC_CHAN == 2) return String("selected");
+  // if (var == "iMAF_ADC_CHAN_3" && config.iMAF_ADC_CHAN == 3) return String("selected");
 
   // pRef Sensor type dropdown
   if (var == "iPREF_SENS_TYP_1" && config.iPREF_SENS_TYP == 1) return String("selected");
@@ -1737,13 +1736,13 @@ String Webserver::processConfigPageTemplate(const String &var) {
   if (var == "iPREF_SRC_TYP_18" && config.iPREF_SRC_TYP == 18) return String("selected");
 
   // pRef ADC channel Dropdown
-  if (var == "iPREF_ADC_CHAN_1" && config.iPREF_ADC_CHAN == 1) return String("selected");
-  if (var == "iPREF_ADC_CHAN_2" && config.iPREF_ADC_CHAN == 2) return String("selected");
-  if (var == "iPREF_ADC_CHAN_3" && config.iPREF_ADC_CHAN == 3) return String("selected");
-  if (var == "iPREF_ADC_CHAN_4" && config.iPREF_ADC_CHAN == 4) return String("selected");
+  // if (var == "iPREF_ADC_CHAN_1" && config.iPREF_ADC_CHAN == 1) return String("selected");
+  // if (var == "iPREF_ADC_CHAN_2" && config.iPREF_ADC_CHAN == 2) return String("selected");
+  // if (var == "iPREF_ADC_CHAN_3" && config.iPREF_ADC_CHAN == 3) return String("selected");
+  // if (var == "iPREF_ADC_CHAN_4" && config.iPREF_ADC_CHAN == 4) return String("selected");
 
-  if (var == "iFIXED_PREF_VAL" ) return String(config.iFIXED_PREF_VAL);
-  if (var == "dPREF_ALG_SCALE" ) return String(config.dPREF_ALG_SCALE);
+  // if (var == "iFIXED_PREF_VAL" ) return String(config.iFIXED_PREF_VAL);
+  // if (var == "dPREF_ALG_SCALE" ) return String(config.dPREF_ALG_SCALE);
   if (var == "dPREF_MV_TRIM" ) return String(config.dPREF_MV_TRIM);
 
 
@@ -1766,13 +1765,13 @@ String Webserver::processConfigPageTemplate(const String &var) {
   if (var == "iPDIFF_SRC_TYP_18" && config.iPDIFF_SRC_TYP == 18) return String("selected");
 
   //pDiff ADC channel Dropdown
-  if (var == "iPDIFF_ADC_CHAN_1" && config.iPDIFF_ADC_CHAN == 1) return String("selected");
-  if (var == "iPDIFF_ADC_CHAN_2" && config.iPDIFF_ADC_CHAN == 2) return String("selected");
-  if (var == "iPDIFF_ADC_CHAN_3" && config.iPDIFF_ADC_CHAN == 3) return String("selected");
-  if (var == "iPDIFF_ADC_CHAN_4" && config.iPDIFF_ADC_CHAN == 4) return String("selected");
+  // if (var == "iPDIFF_ADC_CHAN_1" && config.iPDIFF_ADC_CHAN == 1) return String("selected");
+  // if (var == "iPDIFF_ADC_CHAN_2" && config.iPDIFF_ADC_CHAN == 2) return String("selected");
+  // if (var == "iPDIFF_ADC_CHAN_3" && config.iPDIFF_ADC_CHAN == 3) return String("selected");
+  // if (var == "iPDIFF_ADC_CHAN_4" && config.iPDIFF_ADC_CHAN == 4) return String("selected");
 
-  if (var == "iFIXD_PDIFF_VAL" ) return String(config.iFIXD_PDIFF_VAL);
-  if (var == "dPDIFF_SCALE" ) return String(config.dPDIFF_SCALE);
+  // if (var == "iFIXD_PDIFF_VAL" ) return String(config.iFIXD_PDIFF_VAL);
+  // if (var == "dPDIFF_SCALE" ) return String(config.dPDIFF_SCALE);
 
   // Pitot Semnsor type dropdown
   if (var == "iPITOT_SENS_TYP_1" && config.iPITOT_SENS_TYP == 1) return String("selected");
@@ -1793,12 +1792,12 @@ String Webserver::processConfigPageTemplate(const String &var) {
   if (var == "iPITOT_SRC_TYP_18" && config.iPITOT_SRC_TYP == 18) return String("selected");
 
   //Pitot ADC channel Dropdown
-  if (var == "iPITOT_ADC_CHAN_1" && config.iPITOT_ADC_CHAN == 1) return String("selected");
-  if (var == "iPITOT_ADC_CHAN_2" && config.iPITOT_ADC_CHAN == 2) return String("selected");
-  if (var == "iPITOT_ADC_CHAN_3" && config.iPITOT_ADC_CHAN == 3) return String("selected");
-  if (var == "iPITOT_ADC_CHAN_4" && config.iPITOT_ADC_CHAN == 4) return String("selected");
+  // if (var == "iPITOT_ADC_CHAN_1" && config.iPITOT_ADC_CHAN == 1) return String("selected");
+  // if (var == "iPITOT_ADC_CHAN_2" && config.iPITOT_ADC_CHAN == 2) return String("selected");
+  // if (var == "iPITOT_ADC_CHAN_3" && config.iPITOT_ADC_CHAN == 3) return String("selected");
+  // if (var == "iPITOT_ADC_CHAN_4" && config.iPITOT_ADC_CHAN == 4) return String("selected");
 
-  if (var == "dPITOT_SCALE" ) return String(config.dPITOT_SCALE);
+  // if (var == "dPITOT_SCALE" ) return String(config.dPITOT_SCALE);
 
   // Baro Sensor type dropdown
   if (var == "iBARO_SENS_TYP_1" && config.iBARO_SENS_TYP == 1) return String("selected");
@@ -1810,10 +1809,10 @@ String Webserver::processConfigPageTemplate(const String &var) {
   if (var == "dBARO_MV_TRIM" ) return String(config.dBARO_MV_TRIM);
   if (var == "dBARO_FINE_TUNE" ) return String(config.dBARO_FINE_TUNE);
 
-  if (var == "dFIXD_BARO_VAL" ) return String(config.dFIXD_BARO_VAL);
-  if (var == "dBARO_ALG_SCALE" ) return String(config.dBARO_ALG_SCALE);
-  if (var == "dBARO_SCALE" ) return String(config.dBARO_SCALE);
-  if (var == "dBARO_OFFSET" ) return String(config.dBARO_OFFSET);
+  // if (var == "dFIXD_BARO_VAL" ) return String(config.dFIXD_BARO_VAL);
+  // if (var == "dBARO_ALG_SCALE" ) return String(config.dBARO_ALG_SCALE);
+  // if (var == "dBARO_SCALE" ) return String(config.dBARO_SCALE);
+  // if (var == "dBARO_OFFSET" ) return String(config.dBARO_OFFSET);
 
   // Temp Sensor type dropdown
   if (var == "iTEMP_SENS_TYP_1" && config.iTEMP_SENS_TYP == 1) return String("selected");
@@ -1824,8 +1823,8 @@ String Webserver::processConfigPageTemplate(const String &var) {
 
   if (var == "dTEMP_MV_TRIM" ) return String(config.dTEMP_MV_TRIM);
   if (var == "dTEMP_FINE_TUNE" ) return String(config.dTEMP_FINE_TUNE);
-  if (var == "dFIXED_TEMP_VAL" ) return String(config.dFIXED_TEMP_VAL);
-  if (var == "dTEMP_ALG_SCALE" ) return String(config.dTEMP_ALG_SCALE);
+  // if (var == "dFIXED_TEMP_VAL" ) return String(config.dFIXED_TEMP_VAL);
+  // if (var == "dTEMP_ALG_SCALE" ) return String(config.dTEMP_ALG_SCALE);
 
   // Humidity Sensor type dropdown
   if (var == "iRELH_SENS_TYP_1" && config.iRELH_SENS_TYP == 1) return String("selected");
@@ -1836,10 +1835,10 @@ String Webserver::processConfigPageTemplate(const String &var) {
 
   if (var == "dRELH_MV_TRIM" ) return String(config.dRELH_MV_TRIM);
   if (var == "dRELH_FINE_TUNE" ) return String(config.dRELH_FINE_TUNE);
-  if (var == "dFIXED_RELH_VAL" ) return String(config.dFIXED_RELH_VAL);
-  if (var == "dRELH_ALG_SCALE" ) return String(config.dRELH_ALG_SCALE);
+  // if (var == "dFIXED_RELH_VAL" ) return String(config.dFIXED_RELH_VAL);
+  // if (var == "dRELH_ALG_SCALE" ) return String(config.dRELH_ALG_SCALE);
   
-  
+
   return "";
 }
 

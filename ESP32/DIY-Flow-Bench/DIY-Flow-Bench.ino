@@ -61,7 +61,6 @@
 #include "Wire.h"
 
 #include <ADS1115_lite.h>
-ADS1115_lite adc;
 
 // Initiate Structs
 BenchSettings settings;
@@ -90,7 +89,7 @@ TaskHandle_t sensorDataTask = NULL;
 TaskHandle_t enviroDataTask = NULL;
 // portMUX_TYPE mmux = portMUX_INITIALIZER_UNLOCKED;
 
-char charDataJSON[256];
+// char charDataJSON[256];
 String jsonString;
 
 // set up task timers to measure task frequency
