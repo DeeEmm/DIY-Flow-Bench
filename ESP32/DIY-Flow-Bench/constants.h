@@ -127,6 +127,18 @@ enum VolumetricUnits {
 #define BOSCH_BME680 17
 #define ADS_ADC 18
 
+
+/***********************************************************
+ * Flow Tile types
+ ***/
+#define MAFFLOW_TILE 1
+#define ACFM_TILE 2
+#define ADJCFM_TILE 3
+#define SCFM_TILE 4
+#define KGH_TILE 5
+
+
+
 /***********************************************************
  * Flow Differential types
  ***/

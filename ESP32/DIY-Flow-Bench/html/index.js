@@ -47,6 +47,12 @@ if (!!window.EventSource) {
 
       for (key in myObj) {
         try {
+
+          if (key === 'FLOW_DECIMAL_ACCURACY' || key === 'GEN_DECIMAL_ACCURACY' ) {
+            continue;
+          } 
+
+
           if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
           // We've got a string...
             if (key === 'PITOT_COLOUR' || key === 'PDIFF_COLOUR' ) {
@@ -297,24 +303,32 @@ function initialiseButtons() {
     document.getElementById('flow-tile-title').addEventListener('click', function(){
       document.getElementById('flow-tile').style.display='none';
       document.getElementById('aflow-tile').style.display='block';
+      xhr.open('GET', '/api/flow/aflow');
+      xhr.send();
       setCookie("flow-tile","aflow","365")    
     });
   
     document.getElementById('aflow-tile-title').addEventListener('click', function(){
       document.getElementById('aflow-tile').style.display='none';
       document.getElementById('sflow-tile').style.display='block';
+      xhr.open('GET', '/api/flow/sflow');
+      xhr.send();
       setCookie("flow-tile","sflow","365")    
     });
   
     document.getElementById('sflow-tile-title').addEventListener('click', function(){
       document.getElementById('sflow-tile').style.display='none';
       document.getElementById('maf-tile').style.display='block';
+      xhr.open('GET', '/api/flow/mafflow');
+      xhr.send();
       setCookie("flow-tile","maf","365")    
     });
   
     document.getElementById('maf-tile-title').addEventListener('click', function(){
       document.getElementById('maf-tile').style.display='none';
       document.getElementById('flow-tile').style.display='block';
+      xhr.open('GET', '/api/flow/flow');
+      xhr.send();
       setCookie("flow-tile","flow","365")    
     });
   

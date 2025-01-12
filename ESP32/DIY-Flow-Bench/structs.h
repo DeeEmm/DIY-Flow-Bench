@@ -261,6 +261,13 @@ struct DeviceStatus {
   size_t nvmSettings = 0;
   int bmeScanTime = 0;
   int adcScanTime = 0;
+  int bmeScanCountAverage = 1;
+  int adcScanCountAverage = 1;
+  int bmeScanCount = 1;
+  int adcScanCount = 1;
+  double bmeScanAlpha = 0.5;
+  double adcScanAlpha = 0.5;
+
 };
 
 
@@ -306,6 +313,7 @@ struct SensorData {
   double FDiff = 0.0;
   int FDiffType = 1;
   char FDiffTypeDesc[32] = "BASELINE";
+  int flowtile = 1;
   int32_t test = 0;
 };
 

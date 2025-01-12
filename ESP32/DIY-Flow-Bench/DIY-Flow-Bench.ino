@@ -123,7 +123,13 @@ void TASKgetSensorData( void * parameter ){
 
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
+
         status.adcScanTime = (micros() - adcStartTime); // how long since we started the timer? 
+        
+        status.bmeScanCount = 0;
+        status.adcScanCount += 1;
+        status.adcScanCountAverage = (status.adcScanAlpha * status.adcScanCount) + (1.0 - status.adcScanAlpha) * status.adcScanCountAverage;   // calculate Exponential moving average     
+
         status.adcPollTimer = millis() + config.iADC_SCAN_DLY; // Only reset timer when task executes
 
         sensorVal.VCC_5V_BUS = _hardware.get5vSupplyVolts();
@@ -202,10 +208,38 @@ void TASKgetSensorData( void * parameter ){
         // Create Flow differential values
         switch (sensorVal.FDiffType) {
 
-          case USERTARGET:
+          case USERTARGET:{
+
+              switch (sensorVal.flowtile) {
+                case MAFFLOW_TILE:
+                  sensorVal.FDiff = sensorVal.FlowKGH - calVal.user_offset;
+                  strcpy(sensorVal.FDiffTypeDesc, "User Target (kgh)");
+                break;
+
+                case ACFM_TILE:
+                  sensorVal.FDiff = sensorVal.FlowCFM - calVal.user_offset;
+                  strcpy(sensorVal.FDiffTypeDesc, "User Target (acfm)");
+                break;
+
+                case ADJCFM_TILE:
+                  sensorVal.FDiff = sensorVal.FlowADJ - calVal.user_offset;
+                  strcpy(sensorVal.FDiffTypeDesc, "User Target (ajd-cfm)");
+                break;
+
+                case SCFM_TILE:
+                  sensorVal.FDiff = sensorVal.FlowSCFM - calVal.user_offset;
+                  strcpy(sensorVal.FDiffTypeDesc, "User Target (scfm)");
+                break;
+
+              }
+
+
             sensorVal.FDiff = sensorVal.FlowCFM - calVal.user_offset;
             strcpy(sensorVal.FDiffTypeDesc, "User Target (cfm)");
+  
             break;
+          }
+            
 
           case BASELINE:
             sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline;
@@ -296,6 +330,11 @@ void TASKgetEnviroData( void * parameter ){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
         status.bmeScanTime = (micros() - bmeStartTime); // how long since we started the timer? 
+
+        status.adcScanCount = 0;
+        status.bmeScanCount += 1;
+        status.bmeScanCountAverage = (status.bmeScanAlpha * status.bmeScanCount) + (1.0 - status.bmeScanAlpha) * status.bmeScanCountAverage;  // calculate Exponential moving average
+
         status.bmePollTimer = millis() + config.iBME_SCAN_MS; // Only reset timer when task executes
         
         sensorVal.TempDegC = _sensors.getTempValue();

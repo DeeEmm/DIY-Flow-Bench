@@ -723,7 +723,6 @@ void DataHandler::loadSettings () {
 
   settings.wifi_ssid = _prefs.getString("sWIFI_SSID");
   settings.wifi_pswd = _prefs.getString("sWIFI_PSWD");
-    _message.serialPrintf("wifi_ssid: %s \n", settings.wifi_ssid );  
   settings.wifi_ap_ssid = _prefs.getString("sWIFI_AP_SSID");
   settings.wifi_ap_pswd =_prefs.getString("sWIFI_AP_PSWD");
   settings.hostname = _prefs.getString("sHOSTNAME", "diyfb" );
@@ -1051,8 +1050,6 @@ String DataHandler::buildIndexSSEJsonData()
   }
 
 
-
-
   dataJson["BARO"] = sensorVal.BaroHPA; // GUI  displays mbar (hPa)
   dataJson["RELH"] = sensorVal.RelH;
 
@@ -1079,9 +1076,13 @@ String DataHandler::buildIndexSSEJsonData()
   // Swirl (+/- rpm)
   dataJson["SWIRL"] = sensorVal.Swirl;
 
-  // Flow Differential
+  // // Flow Differential
   dataJson["FDIFF"] = sensorVal.FDiff;
   dataJson["FDIFFTYPEDESC"] = sensorVal.FDiffTypeDesc;
+  // Also need to update USER_OFFSET modal value
+
+  // sensorVal.FDiffType = 2;
+
 
   if (1!=1) {  // TODO if message handler is active display the active message
     dataJson["STATUS_MESSAGE"] = status.statusMessage;
@@ -1153,6 +1154,8 @@ String DataHandler::buildMimicSSEJsonData() {
   dataJson["FLOW_CFM"] = sensorVal.FlowCFM;
   dataJson["FLOW_LPM"] = _calculations.convertVolumetricFlowUnits(sensorVal.FlowCFM, CFM, LPM);
 
+  dataJson["BME_SCAN_COUNT"] = status.bmeScanCountAverage;
+  dataJson["ADC_SCAN_COUNT"] = status.adcScanCountAverage;
   dataJson["BME_SCAN_FREQ"] = status.bmeScanTime;
   dataJson["ADC_SCAN_FREQ"] = status.adcScanTime;
   dataJson["FREE_HEAP"] = _calculations.byteDecode(ESP.getFreeHeap());

@@ -263,6 +263,43 @@ void Webserver::begin()
   });
 
 
+  // Set flow to MAF flow
+  server->on("/api/flow/mafflow", HTTP_GET, [](AsyncWebServerRequest *request){
+    extern struct SensorData sensorVal;
+    Messages _message;
+    _message.debugPrintf("/api/flow/mafflow \n");
+    sensorVal.flowtile = MAFFLOW_TILE;
+    request->send(200);
+  });
+
+  // Set flow to flow
+  server->on("/api/flow/flow", HTTP_GET, [](AsyncWebServerRequest *request){
+    extern struct SensorData sensorVal;
+    Messages _message;
+    _message.debugPrintf("/api/flow/flow \n");
+    sensorVal.flowtile = ACFM_TILE;
+    request->send(200);
+  });
+
+  // Set flow to Aflow
+  server->on("/api/flow/aflow", HTTP_GET, [](AsyncWebServerRequest *request){
+    extern struct SensorData sensorVal;
+    Messages _message;
+    _message.debugPrintf("/api/flow/aflow \n");
+    sensorVal.flowtile = ADJCFM_TILE;
+    request->send(200);
+  });
+
+  // Set flow to Standard flow
+  server->on("/api/flow/sflow", HTTP_GET, [](AsyncWebServerRequest *request){
+    extern struct SensorData sensorVal;
+    Messages _message;
+    _message.debugPrintf("/api/flow/sflow \n");
+    sensorVal.flowtile = SCFM_TILE;
+    request->send(200);
+  });
+
+
   // Zero pDiff value
   server->on("/api/pdiff/zero", HTTP_GET, [](AsyncWebServerRequest *request){
     Messages _message;
