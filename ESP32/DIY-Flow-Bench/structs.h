@@ -117,7 +117,7 @@ struct Configuration {
 
   int iADC_TYPE = ADS1115;
   int iADC_I2C_ADDR = 72; 
-  int iADC_SCAN_DLY = 250;
+  int iADC_SCAN_MS = 250;
   int iADC_MAX_RETRY = 10;
   int iADC_RANGE = 32767;
   double dADC_GAIN = 6.144f;
@@ -265,8 +265,8 @@ struct DeviceStatus {
   int adcScanCountAverage = 1;
   int bmeScanCount = 1;
   int adcScanCount = 1;
-  double bmeScanAlpha = 0.5;
-  double adcScanAlpha = 0.5;
+  double bmeScanAlpha = 0.45;
+  double adcScanAlpha = 0.45;
 
 };
 

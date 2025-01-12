@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501120017      - #316 Assign sensor tasks to core 2
 2501120007      - #316 Addded scan counters to mimic page
 2501110021      - #315 Wifi STA Mode Login issue fixed
                 - Added Accesskey Navigation to GUI

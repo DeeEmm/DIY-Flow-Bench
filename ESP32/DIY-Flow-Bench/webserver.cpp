@@ -1722,7 +1722,7 @@ String Webserver::processConfigPageTemplate(const String &var) {
   if (var == "iADC_TYPE_11" && config.iADC_TYPE == 11) return String("selected");
 
   if (var == "iADC_I2C_ADDR" ) return String(config.iADC_I2C_ADDR);
-  if (var == "iADC_SCAN_DLY" ) return String(config.iADC_SCAN_DLY);
+  if (var == "iADC_SCAN_MS" ) return String(config.iADC_SCAN_MS);
   // if (var == "iADC_MAX_RETRY" ) return String(config.iADC_MAX_RETRY);
   if (var == "iADC_RANGE" ) return String(config.iADC_RANGE);
   if (var == "dADC_GAIN" ) return String(config.dADC_GAIN);

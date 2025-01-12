@@ -18,7 +18,7 @@
     
     "iADC_TYPE": 11,
     "iADC_I2C_ADDR" : 72, 
-    "iADC_SCAN_DLY" : 250,
+    "iADC_SCAN_MS" : 250,
     "iADC_MAX_RETRY" : 10,
     "iADC_RANGE" : 32767,
     "dADC_GAIN" : 6.144,

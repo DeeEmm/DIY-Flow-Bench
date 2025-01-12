@@ -444,7 +444,7 @@ void DataHandler::initialiseConfig () {
 
   if (!_prefs.isKey("iADC_TYPE")) _prefs.putInt("iADC_TYPE", ADS1115);
   if (!_prefs.isKey("iADC_I2C_ADDR")) _prefs.putInt("iADC_I2C_ADDR", 72);
-  if (!_prefs.isKey("iADC_SCAN_DLY")) _prefs.putInt("iADC_SCAN_DLY", 1000);
+  if (!_prefs.isKey("iADC_SCAN_MS")) _prefs.putInt("iADC_SCAN_MS", 1000);
   // if (!_prefs.isKey("iADC_MAX_RETRY")) _prefs.putInt("iADC_MAX_RETRY", 10);
   if (!_prefs.isKey("iADC_RANGE")) _prefs.putInt("iADC_RANGE", 32767);
   if (!_prefs.isKey("dADC_GAIN")) _prefs.putDouble("dADC_GAIN", 6.144);
@@ -542,7 +542,7 @@ void DataHandler::loadConfig () {
 
   config.iADC_TYPE = _prefs.getInt("iADC_TYPE", ADS1115);
   config.iADC_I2C_ADDR = _prefs.getInt("iADC_I2C_ADDR", 72);
-  config.iADC_SCAN_DLY = _prefs.getInt("iADC_SCAN_DLY", 1000);
+  config.iADC_SCAN_MS = _prefs.getInt("iADC_SCAN_MS", 1000);
   // config.iADC_MAX_RETRY  = _prefs.getInt("iADC_MAX_RETRY", 10);
   config.iADC_RANGE = _prefs.getInt("iADC_RANGE", 32767);
   config.dADC_GAIN = _prefs.getDouble("dADC_GAIN", 6.144);

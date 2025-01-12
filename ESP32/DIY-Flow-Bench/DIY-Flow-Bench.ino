@@ -126,11 +126,12 @@ void TASKgetSensorData( void * parameter ){
 
         status.adcScanTime = (micros() - adcStartTime); // how long since we started the timer? 
         
+        status.bmeScanCountAverage = (status.bmeScanAlpha * status.bmeScanCount) + (1.0 - status.bmeScanAlpha) * status.bmeScanCountAverage;  // calculate Exponential moving average
         status.bmeScanCount = 0;
-        status.adcScanCount += 1;
-        status.adcScanCountAverage = (status.adcScanAlpha * status.adcScanCount) + (1.0 - status.adcScanAlpha) * status.adcScanCountAverage;   // calculate Exponential moving average     
 
-        status.adcPollTimer = millis() + config.iADC_SCAN_DLY; // Only reset timer when task executes
+        status.adcScanCount += 1;
+        
+        status.adcPollTimer = millis() + config.iADC_SCAN_MS; // Only reset timer when task executes
 
         sensorVal.VCC_5V_BUS = _hardware.get5vSupplyVolts();
         sensorVal.VCC_3V3_BUS = _hardware.get3v3SupplyVolts();
@@ -176,17 +177,14 @@ void TASKgetSensorData( void * parameter ){
             sensorVal.FlowCFM = sensorVal.MedianCFM;
           break;
 
-          case AVERAGE:
-            //TODO - Cyclic average
-            // create array / stack of 'Cyclical Average Buffer' length
-            // push value to stack - repeat this for size of stack 
-            
-            // calculate average of values on stack
-            // average results with current value - this is our displayed value
-            // push current (raw) value on to stack, remove oldest value
-            // repeat
-            sensorVal.FlowCFM = sensorVal.FlowCFM;
+          case AVERAGE:{
+            // calculate Exponential moving average
+            double alphaVal = 0.65; // tune alphaVal to set recordset 
+            sensorVal.AverageCFM = (alphaVal * sensorVal.FlowCFM) + (1.0f - alphaVal) * sensorVal.AverageCFM; 
+
+            sensorVal.FlowCFM = sensorVal.AverageCFM;
           break;
+          }
 
           case MODE:
             //TODO - Mode
@@ -331,9 +329,10 @@ void TASKgetEnviroData( void * parameter ){
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
         status.bmeScanTime = (micros() - bmeStartTime); // how long since we started the timer? 
 
+        status.adcScanCountAverage = (status.adcScanAlpha * status.adcScanCount) + (1.0 - status.adcScanAlpha) * status.adcScanCountAverage;   // calculate Exponential moving average     
         status.adcScanCount = 0;
+
         status.bmeScanCount += 1;
-        status.bmeScanCountAverage = (status.bmeScanAlpha * status.bmeScanCount) + (1.0 - status.bmeScanAlpha) * status.bmeScanCountAverage;  // calculate Exponential moving average
 
         status.bmePollTimer = millis() + config.iBME_SCAN_MS; // Only reset timer when task executes
         
@@ -402,11 +401,11 @@ void setup(void) {
     _webserver.begin();
   #endif
 
-  // xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
-  xTaskCreate(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask); 
+  xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
+  // xTaskCreate(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask); 
 
-  // xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
-  xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask); 
+  xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
+  // xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask); 
 
   if (config.bSWIRL_ENBLD){
     // TODO #227
