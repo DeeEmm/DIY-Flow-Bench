@@ -170,6 +170,13 @@ struct Configuration {
   double dRELH_FINE_TUNE = 0.0f;
   bool bSWIRL_ENBLD = false;
 
+  double mafCoeff0 = 0.0f;
+  double mafCoeff1 = 0.0f;
+	double mafCoeff2 = 0.0f;
+	double mafCoeff3 = 0.0f;
+	double mafCoeff4 = 0.0f;
+	double mafCoeff5 = 0.0f;
+	double mafCoeff6 = 0.0f;
 };
 
 
@@ -254,7 +261,6 @@ struct DeviceStatus {
   char mafSensorType[30];
   char mafOutputType[10];
   char mafLink[100];
-  std::vector<std::vector<u_int>> mafLookupTable;  
   int GUIpage = 0;
   size_t nvmPins = 0;
   size_t nvmConfig = 0;

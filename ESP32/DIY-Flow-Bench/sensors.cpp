@@ -70,7 +70,32 @@ void Sensors::begin () {
 	extern struct Pins pins;
 	extern int mafOutputType;
 
+    // Set status values for GUI
+	status.baroSensor = getSensorType(config.iBARO_SENS_TYP);
+	status.tempSensor  = getSensorType(config.iTEMP_SENS_TYP);
+	status.relhSensor = getSensorType(config.iRELH_SENS_TYP);
+	status.prefSensor = getSensorType(config.iPREF_SENS_TYP);
+	status.pdiffSensor = getSensorType(config.iPDIFF_SENS_TYP);
+	status.pitotSensor = getSensorType(config.iPITOT_SENS_TYP);
+	
 	MafData _maf(config.iMAF_SENS_TYP);
+
+	// Initialise MAF
+	// if (config.iMAF_SENS_TYP > SENSOR_DISABLED) {
+		
+		config.mafCoeff0 = _maf.getCoefficient(0);
+		config.mafCoeff1 = _maf.getCoefficient(1);
+		config.mafCoeff2 = _maf.getCoefficient(2);
+		config.mafCoeff3 = _maf.getCoefficient(3);
+		config.mafCoeff4 = _maf.getCoefficient(4);
+		config.mafCoeff5 = _maf.getCoefficient(5);
+		config.mafCoeff6 = _maf.getCoefficient(6);
+
+		status.mafDiameter = _maf.getDiameter();
+
+		status.mafSensor = _maf.getCurrentType();
+
+	// }
 
 	//initialise BME280
 	if (config.iBME_TYP == BOSCH_BME280) {
@@ -145,16 +170,7 @@ void Sensors::begin () {
 */	
 
 
-	// Set status values for GUI
-	status.mafSensor = _maf.getCurrentType();
-	status.baroSensor = getSensorType(config.iBARO_SENS_TYP);
-	status.tempSensor  = getSensorType(config.iTEMP_SENS_TYP);
-	status.relhSensor = getSensorType(config.iRELH_SENS_TYP);
-	status.prefSensor = getSensorType(config.iPREF_SENS_TYP);
-	status.pdiffSensor = getSensorType(config.iPDIFF_SENS_TYP);
-	status.pitotSensor = getSensorType(config.iPITOT_SENS_TYP);
 
-	// END System status definitions
 
 	_message.serialPrintf("Sensors Initialised \n");
 
@@ -380,32 +396,22 @@ double Sensors::getMafFlow(int units) {
 	Hardware _hardware;
 	Messages _message;
 	Calculations _calculations;
-	MafData _maf(config.iMAF_SENS_TYP);
+	// MafData _maf(config.iMAF_SENS_TYP); // we only really need to read this once at startup so lets remove it from here
 
-	double flowRateCFM = 0.0;
-	double flowRateMGS = 0.0;
+	// double flowRateCFM = 0.0;
+	// double flowRateMGS = 0.0;
 	double flowRateKGH = 0.0;
-	double lookupValue = 0.0;
+	// double lookupValue = 0.0;
 	double oldMafArea = 0.0;
 	double newMafArea = 0.0;
-	double velocity1 = 0.0;
-	double velocity2 = 0.0;
-	double mafVelocity = 0.0;
+	// double velocity1 = 0.0;
+	// double velocity2 = 0.0;
+	// double mafVelocity = 0.0;
 	double transposedflowRateKGH = 0.0;
 	double mafVolts = 0.0;
 	u_int mafMilliVolts = 0;
 	double MafFlow = 0.0f;
     double vPower = 1.0f;
-
-
-	// get MAF Coefficients
-	double mafCoeff0 = _maf.getCoefficient(0);
-    double mafCoeff1 = _maf.getCoefficient(1);
-	double mafCoeff2 = _maf.getCoefficient(2);
-	double mafCoeff3 = _maf.getCoefficient(3);
-	double mafCoeff4 = _maf.getCoefficient(4);
-	double mafCoeff5 = _maf.getCoefficient(5);
-	double mafCoeff6 = _maf.getCoefficient(6);
 
 	// Get MAF Volts
 	sensorVal.MafVolts = this->getMafVolts();
@@ -416,7 +422,7 @@ double Sensors::getMafFlow(int units) {
 	mafMilliVolts = mafVolts * 1000;
 
 	// 6th degree polynomial calculation (Coefficients stored in mafData class)
-	// flowRateKGH = mafCoeff0 + (mafCoeff1 * mafMilliVolts) + (mafCoeff2 * pow(mafMilliVolts, 2)) + (mafCoeff3 * pow(mafMilliVolts, 3)) + (mafCoeff4 * pow(mafMilliVolts, 4)) + (mafCoeff5 * pow(mafMilliVolts, 5)) + (mafCoeff6 * pow(mafMilliVolts, 6));
+	flowRateKGH = config.mafCoeff0 + (config.mafCoeff1 * mafMilliVolts) + (config.mafCoeff2 * pow(mafMilliVolts, 2)) + (config.mafCoeff3 * pow(mafMilliVolts, 3)) + (config.mafCoeff4 * pow(mafMilliVolts, 4)) + (config.mafCoeff5 * pow(mafMilliVolts, 5)) + (config.mafCoeff6 * pow(mafMilliVolts, 6));
 
 	// flowRateKGH = _maf.calculateFlow(mafMilliVolts);
 
@@ -424,17 +430,13 @@ double Sensors::getMafFlow(int units) {
 
 	// Alternate method
 	// 6th degree polynomial calculation (Coefficients stored in mafData class)
-    for(int i = 0; i < 7; i++) {
-        flowRateKGH += _maf.getCoefficient(i) * vPower;
-        vPower *= mafMilliVolts;
-    }
+    // for(int i = 0; i < 7; i++) {
+    //     flowRateKGH += _maf.getCoefficient(i) * vPower;
+    //     vPower *= mafMilliVolts;
+    // }
 
 	flowRateKGH = fabs(flowRateKGH);  // Flip negative value
 	
-
-	status.mafDiameter = _maf.getDiameter();
-
-
 
 	// Now that we have a converted flow value we can translate it for different housing diameters
 	if (settings.maf_housing_diameter > 0 && status.mafDiameter > 0 && settings.maf_housing_diameter != status.mafDiameter) { 

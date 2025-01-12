@@ -450,7 +450,7 @@ void DataHandler::initialiseConfig () {
   if (!_prefs.isKey("dADC_GAIN")) _prefs.putDouble("dADC_GAIN", 6.144);
 
   if (!_prefs.isKey("iMAF_SENS_TYP")) _prefs.putInt("iMAF_SENS_TYP", SENSOR_DISABLED);
-  if (!_prefs.isKey("iMAF_SRC_TYP")) _prefs.putInt("iMAF_SRC_TYP", ADS1115);
+  if (!_prefs.isKey("iMAF_SRC_TYP")) _prefs.putInt("iMAF_SRC_TYP", ADS_ADC);
   if (!_prefs.isKey("dMAF_MV_TRIM")) _prefs.putDouble("dMAF_MV_TRIM", 0.0);
   // if (!_prefs.isKey("iMAF_ADC_CHAN")) _prefs.putInt("iMAF_ADC_CHAN", 0);
 
@@ -548,7 +548,7 @@ void DataHandler::loadConfig () {
   config.dADC_GAIN = _prefs.getDouble("dADC_GAIN", 6.144);
 
   config.iMAF_SENS_TYP = _prefs.getInt("iMAF_SENS_TYP", SENSOR_DISABLED);
-  config.iMAF_SRC_TYP = _prefs.getInt("iMAF_SRC_TYP", ADS1115);
+  config.iMAF_SRC_TYP = _prefs.getInt("iMAF_SRC_TYP", ADS_ADC);
   config.dMAF_MV_TRIM = _prefs.getDouble("dMAF_MV_TRIM", 0.0);
   // config.iMAF_ADC_CHAN = _prefs.getInt("iMAF_ADC_CHAN", 0);
 

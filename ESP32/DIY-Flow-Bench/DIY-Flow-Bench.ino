@@ -279,6 +279,9 @@ void TASKgetSensorData( void * parameter ){
           sensorVal.PitotKPA = _sensors.getPitotValue() - calVal.pitot_cal_offset;
           sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O) ;
           sensorVal.PitotVelocity = _sensors.getPitotVelocity();
+          sensorVal.PitotVelocity = _sensors.getPitotVelocity();
+          sensorVal.PitotDelta = _calculations.convertPressure(_sensors.getPitotValue(),KPA, INH2O);
+
         } else {
           sensorVal.PitotKPA = 0.0f;
           sensorVal.PitotH2O = 0.0f;
@@ -347,8 +350,7 @@ void TASKgetEnviroData( void * parameter ){
         sensorVal.BaroPA = sensorVal.BaroHPA * 100.00F;
         sensorVal.BaroKPA = sensorVal.BaroPA * 0.001F;
         sensorVal.RelH = _sensors.getRelHValue();
-        sensorVal.PitotVelocity = _sensors.getPitotVelocity();
-        sensorVal.PitotDelta = _calculations.convertPressure(_sensors.getPitotValue(),KPA, INH2O);
+
         xSemaphoreGive(i2c_task_mutex); // Release semaphore
         bmeStartTime = micros(); // start the timer as we leave task
       }
