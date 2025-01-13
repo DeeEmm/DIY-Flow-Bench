@@ -29,6 +29,10 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+
+2501130048      - #275 - Set flow offset for all flow types
+2501130047      - Moved data filter alpha values into system.h
+                - Removed iMAF_MIN_VOLTS from GUI
 2501130047      - #316 Reset loop delays to 1ms
 2501130046      - Default ADC / BME scan count changed
                 - Moved poll timer resets to end of tasks

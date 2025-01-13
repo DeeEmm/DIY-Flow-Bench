@@ -73,6 +73,10 @@ using namespace std;
 #define VTASK_DELAY_BME 1
 #define VTASK_DELAY_SSE 1
 
+// MAF Data Filters
+#define ALPHA_MEDIAN 0.01f
+#define ALPHA_AVERAGE 0.65f
+#define ALPHA_MEAN 0.1f
 
 /***********************************************************
 * WEBUI SETTINGS

@@ -657,7 +657,7 @@ void DataHandler::initialiseSettings () {
   if (!_prefs.isKey("iFLOW_DECI_ACC")) _prefs.putInt("iFLOW_DECI_ACC", 1);
   if (!_prefs.isKey("iGEN_DECI_ACC")) _prefs.putInt("iGEN_DECI_ACC", 2);
   if (!_prefs.isKey("iCYC_AV_BUFF")) _prefs.putInt("iCYC_AV_BUFF", 5);
-  if (!_prefs.isKey("iMAF_MIN_VOLTS")) _prefs.putInt("iMAF_MIN_VOLTS", 1);
+  // if (!_prefs.isKey("iMAF_MIN_VOLTS")) _prefs.putInt("iMAF_MIN_VOLTS", 1);
 
   if (!_prefs.isKey("sAPI_DELIM")) _prefs.putString("sAPI_DELIM", ":");
   if (!_prefs.isKey("iSERIAL_BAUD")) _prefs.putInt("iSERIAL_BAUD", 115200);
@@ -666,7 +666,7 @@ void DataHandler::initialiseSettings () {
   if (!_prefs.isKey("iSTD_REF")) _prefs.putInt("iSTD_REF", 1);
   if (!_prefs.isKey("iSTD_ADJ_FLOW")) _prefs.putInt("iSTD_ADJ_FLOW", 1);
   if (!_prefs.isKey("iDATAGRAPH_MAX")) _prefs.putInt("iDATAGRAPH_MAX", 0);
-  if (!_prefs.isKey("iMAF_MIN_VOLTS")) _prefs.putInt("iMAF_MIN_VOLTS", 1);
+  // if (!_prefs.isKey("iMAF_MIN_VOLTS")) _prefs.putInt("iMAF_MIN_VOLTS", 1);
   if (!_prefs.isKey("iTEMP_UNIT")) _prefs.putInt("iTEMP_UNIT", CELCIUS);
 
   if (!_prefs.isKey("dLIFT_INTERVAL")) _prefs.putDouble("dLIFT_INTERVAL", 1.5F);
@@ -736,7 +736,7 @@ void DataHandler::loadSettings () {
   settings.flow_decimal_length = _prefs.getInt("iFLOW_DECI_ACC", 1 );
   settings.gen_decimal_length = _prefs.getInt("iGEN_DECI_ACC", 2 );
   settings.cyc_av_buffer  = _prefs.getInt("iCYC_AV_BUFF", 5 );
-  settings.maf_min_volts  = _prefs.getInt("iMAF_MIN_VOLTS", 0.1F );
+  // settings.maf_min_volts  = _prefs.getInt("iMAF_MIN_VOLTS", 0.1F );
   settings.api_delim = _prefs.getString("sAPI_DELIM", ":" );
   settings.serial_baud_rate = _prefs.getInt("iSERIAL_BAUD",  115200 );
   settings.show_alarms = _prefs.getInt("iSHOW_ALARMS",  true  );
@@ -1130,7 +1130,6 @@ String DataHandler::buildMimicSSEJsonData() {
 
   Hardware _hardware;
   Calculations _calculations;
-  // Messages _message;
 
   String jsonString;
 

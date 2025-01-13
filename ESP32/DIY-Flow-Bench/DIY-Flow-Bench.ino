@@ -179,16 +179,13 @@ void TASKgetSensorData( void * parameter ){
             // sensorVal.AverageCFM += ( sensorVal.FlowCFM - sensorVal.AverageCFM ) * 0.1f; // rough running average.
             // sensorVal.MedianCFM += copysign( sensorVal.AverageCFM * 0.01, sensorVal.FlowCFM - sensorVal.MedianCFM );
 
-            sensorVal.MedianCFM += 0.01f * sgn(sensorVal.FlowCFM - sensorVal.MedianCFM);
-
+            sensorVal.MedianCFM += ALPHA_MEDIAN * sgn(sensorVal.FlowCFM - sensorVal.MedianCFM);
             sensorVal.FlowCFM = sensorVal.MedianCFM;
           break;
 
           case AVERAGE:{
             // calculate Exponential moving average
-            double alphaVal = 0.65; // tune alphaVal to set recordset 
-            sensorVal.AverageCFM = (alphaVal * sensorVal.FlowCFM) + (1.0f - alphaVal) * sensorVal.AverageCFM; 
-
+            sensorVal.AverageCFM = (ALPHA_AVERAGE * sensorVal.FlowCFM) + (1.0f - ALPHA_AVERAGE) * sensorVal.AverageCFM; 
             sensorVal.FlowCFM = sensorVal.AverageCFM;
           break;
           }
@@ -198,8 +195,7 @@ void TASKgetSensorData( void * parameter ){
             // return most common value over x number of cycles (requested by @black-top)
 
             // Mean
-            sensorVal.MeanCFM += 0.1f * (sensorVal.FlowCFM - sensorVal.MeanCFM);
-
+            sensorVal.MeanCFM += ALPHA_MEAN * (sensorVal.FlowCFM - sensorVal.MeanCFM);
             sensorVal.FlowCFM = sensorVal.MeanCFM;
           break;
 

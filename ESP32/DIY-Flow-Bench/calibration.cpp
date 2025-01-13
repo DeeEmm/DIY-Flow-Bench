@@ -57,9 +57,32 @@ bool Calibration::setFlowOffset() {
   Sensors _sensors; 
   Calculations _calculations;
   Messages _message;
+
+  double flowVal = 0.0f;
+
+  // Get flow type based on currently visible tile
+  switch (sensorVal.flowtile) {
+    case MAFFLOW_TILE:
+      flowVal = sensorVal.FlowCFM;
+      // TODO ADD SYSTEM Warning !!!
+    break;
+
+    case ACFM_TILE:
+      flowVal = sensorVal.FlowCFM;
+    break;
+
+    case ADJCFM_TILE:
+      flowVal = sensorVal.FlowADJ;
+    break;
+
+    case SCFM_TILE:
+      flowVal = sensorVal.FlowSCFM;
+    break;
+
+  }
  
   // update config var
-  calVal.flow_offset = sensorVal.FlowCFM - settings.cal_flow_rate;
+  calVal.flow_offset = flowVal - settings.cal_flow_rate;
   
   _message.debugPrintf("Calibration::setFlowOffset $ \n", calVal.flow_offset);
 

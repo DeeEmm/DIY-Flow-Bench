@@ -1558,7 +1558,7 @@ String Webserver::processSettingsPageTemplate(const String &var) {
   // Data Filter Settings
   if (var == "iMIN_FLOW_RATE") return String(settings.min_flow_rate);
   if (var == "iMIN_PRESSURE") return String(settings.min_bench_pressure);
-  if (var == "iMAF_MIN_VOLTS") return String(settings.maf_min_volts);
+  // if (var == "iMAF_MIN_VOLTS") return String(settings.maf_min_volts);
   if (var == "iCYC_AV_BUFF") return String(settings.cyc_av_buffer);
 
   // Bench Settings
