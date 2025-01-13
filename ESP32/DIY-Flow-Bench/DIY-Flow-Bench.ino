@@ -6,34 +6,30 @@
  * 
  * @file DIY-Flow-Bench.ino
  * 
- * @brief define variables and configure hardware
+ * @brief define variables, configure hardware + main program loop
  * 
  * @remarks For more information please visit the WIKI on our GitHub project page: https://github.com/DeeEmm/DIY-Flow-Bench/wiki
  * Or join our support forums: https://github.com/DeeEmm/DIY-Flow-Bench/discussions
  * You can also visit our Facebook community: https://www.facebook.com/groups/diyflowbench/
  * 
- * @license This project and all associated files are provided for use under the GNU GPL3 license:
- * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
- * 
- * Except where noted this project and all associated files are provided for use under the GNU GPL3 license:
+ * @license Except where noted this project and all associated files are provided for use under the GNU GPL3 license:
  * https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/LICENSE
  * 
  * The standard project board is the ESP32DUINO used in conjunction with the DIY-Flow-Bnch shield
  * Other ESP32 based boards and custom shields can be made to work. 
- * You can define custom pin definitions to suit your project in pins.h
+ * You can define custom pin definitions to suit your project in the GUI
  * 
  * Default Temperature / Barometric Pressure / Relative Humidity uses a BME280 device connected via I2C
  * The generic I2C address for the BME280 is 0x77 / 0x76 (NOTE: BME NOT BMP!!)
  *
- * Default MAF / Reference Pressure / Pitot / Differential Pressure sensors use ADS1115 (recommended) or ADS1015 ADCs via I2C
+ * Default MAF / Reference Pressure / Pitot / Differential Pressure sensors use ADS1115 Analog to digital converter via I2C
  * The generic I2C address for the ADS is 0x48 but can also be set to 0x49 / 0x4A / 0x4B by pin linking at the device
  *
- * Default MAF unit recommended is the GM LS2 MAF (ACDELCO_ 92281162.h) This will measure up to approx 277cfm
- * Other MAF sensors are supported by creation of MAF Data file - See mafDATA/ for examples
- * Note that currently only MAF style benches are supported. D/P Orifice and Pitot support to come.
+ * Default MAF unit recommended is the AUDI RS4 (BOSCH 0280218067) This will measure up to approx 860cfm
+ * Other MAF sensors are supported by creation and inclusion of MAF transfer function coefficients within the code
  *
  * DEPENDENCIES
- * This program has a number of core libraries that must be available for it to work. Please refer to platformio.ini
+ * This program has a number of core libraries that must be available for it to work. Please refer to platformio.ini > lib_deps
  * 
  *
  **/

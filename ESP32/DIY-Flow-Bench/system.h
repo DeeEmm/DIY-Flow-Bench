@@ -69,9 +69,9 @@ using namespace std;
 // https://arduinojson.org/v6/assistant
 
 // Loop Delays
-#define VTASK_DELAY_ADC 500
-#define VTASK_DELAY_BME 500
-#define VTASK_DELAY_SSE 500
+#define VTASK_DELAY_ADC 1
+#define VTASK_DELAY_BME 1
+#define VTASK_DELAY_SSE 1
 
 
 /***********************************************************
