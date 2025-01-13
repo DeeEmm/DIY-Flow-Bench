@@ -59,6 +59,7 @@ struct BenchSettings {
   bool status_print_mode = false;                 // Stream status data to serial
   bool verbose_print_mode = false;                // Stream verbose data to serial
   bool api_enabled = true;                        // Can disable serial API if required
+  char AB_test = 'A';                             // A / B / C testing
   int bench_type = MAF_BENCH;                     // Default bench type
   int maf_housing_diameter = 0;                   // MAF Housing diameter
   int tatltuae = 42;
@@ -117,7 +118,7 @@ struct Configuration {
 
   int iADC_TYPE = ADS1115;
   int iADC_I2C_ADDR = 72; 
-  int iADC_SCAN_MS = 250;
+  int iADC_SCAN_MS = 500;
   int iADC_MAX_RETRY = 10;
   int iADC_RANGE = 32767;
   double dADC_GAIN = 6.144f;
@@ -265,6 +266,7 @@ struct DeviceStatus {
   size_t nvmPins = 0;
   size_t nvmConfig = 0;
   size_t nvmSettings = 0;
+  int loopScanTime = 0;
   int bmeScanTime = 0;
   int adcScanTime = 0;
   int bmeScanCountAverage = 1;
@@ -289,6 +291,8 @@ struct SensorData {
   long MafRAW = 0;
   long MafLookup = 0;
   double MedianCFM = 0.0;
+  double ModeCFM = 0.0;
+  double MeanCFM = 0.0;
   double AverageCFM = 0.0;
   double FlowKGH = 0.0;
   double FlowCFMraw = 0.0;

@@ -29,6 +29,9 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501130038      - ADC/BME scan timers include execution time
+2501130034      - Added Loop() scan time to mimic
+2501130032      - Added A/B tests to API
 2501120020      - #316 Optimised MAF flow calcs
                 - Deleted configuration.json (deprecated)
 2501120017      - #316 Assign sensor tasks to core 2

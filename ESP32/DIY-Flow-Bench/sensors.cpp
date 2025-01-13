@@ -396,17 +396,9 @@ double Sensors::getMafFlow(int units) {
 	Hardware _hardware;
 	Messages _message;
 	Calculations _calculations;
-	// MafData _maf(config.iMAF_SENS_TYP); // we only really need to read this once at startup so lets remove it from here
-
-	// double flowRateCFM = 0.0;
-	// double flowRateMGS = 0.0;
 	double flowRateKGH = 0.0;
-	// double lookupValue = 0.0;
 	double oldMafArea = 0.0;
 	double newMafArea = 0.0;
-	// double velocity1 = 0.0;
-	// double velocity2 = 0.0;
-	// double mafVelocity = 0.0;
 	double transposedflowRateKGH = 0.0;
 	double mafVolts = 0.0;
 	u_int mafMilliVolts = 0;
@@ -421,10 +413,22 @@ double Sensors::getMafFlow(int units) {
 	
 	mafMilliVolts = mafVolts * 1000;
 
-	// 6th degree polynomial calculation (Coefficients stored in mafData class)
-	flowRateKGH = config.mafCoeff0 + (config.mafCoeff1 * mafMilliVolts) + (config.mafCoeff2 * pow(mafMilliVolts, 2)) + (config.mafCoeff3 * pow(mafMilliVolts, 3)) + (config.mafCoeff4 * pow(mafMilliVolts, 4)) + (config.mafCoeff5 * pow(mafMilliVolts, 5)) + (config.mafCoeff6 * pow(mafMilliVolts, 6));
+	// 6th degree polynomial calculation
+	if (settings.AB_test == 'A') { // TEST A/B 
+		flowRateKGH = config.mafCoeff0 + (config.mafCoeff1 * mafMilliVolts) + (config.mafCoeff2 * pow(mafMilliVolts, 2)) + (config.mafCoeff3 * pow(mafMilliVolts, 3)) + (config.mafCoeff4 * pow(mafMilliVolts, 4)) + (config.mafCoeff5 * pow(mafMilliVolts, 5)) + (config.mafCoeff6 * pow(mafMilliVolts, 6));
+	} else if (settings.AB_test == 'B') {
+		flowRateKGH = config.mafCoeff0;
+		flowRateKGH += (config.mafCoeff1 * mafMilliVolts);
+		flowRateKGH += (config.mafCoeff2 * pow(mafMilliVolts, 2));
+		flowRateKGH += (config.mafCoeff3 * pow(mafMilliVolts, 3));
+		flowRateKGH += (config.mafCoeff4 * pow(mafMilliVolts, 4));
+		flowRateKGH += (config.mafCoeff5 * pow(mafMilliVolts, 5));
+		flowRateKGH += (config.mafCoeff6 * pow(mafMilliVolts, 6));
+	} else if (settings.AB_test == 'C') {
+	    MafData _maf(config.iMAF_SENS_TYP);
+		flowRateKGH = _maf.calculateFlow(mafMilliVolts);
+	}
 
-	// flowRateKGH = _maf.calculateFlow(mafMilliVolts);
 
 	// y = 3E-18x6 - 5E-14x5 + 3E-10x4 - 7E-07x3 + 0.001x2 - 0.3517x - 172.08 // Coefficients data from Excel for Bosch
 

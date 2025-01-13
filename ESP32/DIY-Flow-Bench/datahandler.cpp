@@ -444,7 +444,7 @@ void DataHandler::initialiseConfig () {
 
   if (!_prefs.isKey("iADC_TYPE")) _prefs.putInt("iADC_TYPE", ADS1115);
   if (!_prefs.isKey("iADC_I2C_ADDR")) _prefs.putInt("iADC_I2C_ADDR", 72);
-  if (!_prefs.isKey("iADC_SCAN_MS")) _prefs.putInt("iADC_SCAN_MS", 1000);
+  if (!_prefs.isKey("iADC_SCAN_MS")) _prefs.putInt("iADC_SCAN_MS", 500);
   // if (!_prefs.isKey("iADC_MAX_RETRY")) _prefs.putInt("iADC_MAX_RETRY", 10);
   if (!_prefs.isKey("iADC_RANGE")) _prefs.putInt("iADC_RANGE", 32767);
   if (!_prefs.isKey("dADC_GAIN")) _prefs.putDouble("dADC_GAIN", 6.144);
@@ -538,11 +538,11 @@ void DataHandler::loadConfig () {
 
   config.iBME_TYP = _prefs.getInt("bBME_TYPE", BOSCH_BME280);
   config.iBME_ADDR = _prefs.getInt("iBME_ADDR", 118);
-  config.iBME_SCAN_MS = _prefs.getInt("iBME_SCN_MS", 1000);
+  config.iBME_SCAN_MS = _prefs.getInt("iBME_SCAN_MS", 1000);
 
   config.iADC_TYPE = _prefs.getInt("iADC_TYPE", ADS1115);
   config.iADC_I2C_ADDR = _prefs.getInt("iADC_I2C_ADDR", 72);
-  config.iADC_SCAN_MS = _prefs.getInt("iADC_SCAN_MS", 1000);
+  config.iADC_SCAN_MS = _prefs.getInt("iADC_SCAN_MS", 500);
   // config.iADC_MAX_RETRY  = _prefs.getInt("iADC_MAX_RETRY", 10);
   config.iADC_RANGE = _prefs.getInt("iADC_RANGE", 32767);
   config.dADC_GAIN = _prefs.getDouble("dADC_GAIN", 6.144);
@@ -1154,6 +1154,7 @@ String DataHandler::buildMimicSSEJsonData() {
   dataJson["FLOW_CFM"] = sensorVal.FlowCFM;
   dataJson["FLOW_LPM"] = _calculations.convertVolumetricFlowUnits(sensorVal.FlowCFM, CFM, LPM);
 
+  dataJson["LOOP_SCAN_TIME"] = status.loopScanTime;
   dataJson["BME_SCAN_COUNT"] = status.bmeScanCountAverage;
   dataJson["ADC_SCAN_COUNT"] = status.adcScanCountAverage;
   dataJson["BME_SCAN_FREQ"] = status.bmeScanTime;

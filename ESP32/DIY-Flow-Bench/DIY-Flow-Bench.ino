@@ -89,13 +89,18 @@ TaskHandle_t sensorDataTask = NULL;
 TaskHandle_t enviroDataTask = NULL;
 // portMUX_TYPE mmux = portMUX_INITIALIZER_UNLOCKED;
 
+// Custom sign function
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
+
 // char charDataJSON[256];
 String jsonString;
 
 // set up task timers to measure task frequency
 int adcStartTime =  micros();
 int bmeStartTime =  micros();
-
+int loopStartTime = micros();
 
 
 /***********************************************************
@@ -125,6 +130,7 @@ void TASKgetSensorData( void * parameter ){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
 
         status.adcScanTime = (micros() - adcStartTime); // how long since we started the timer? 
+        adcStartTime = micros(); // start the timer
         
         status.bmeScanCountAverage = (status.bmeScanAlpha * status.bmeScanCount) + (1.0 - status.bmeScanAlpha) * status.bmeScanCountAverage;  // calculate Exponential moving average
         status.bmeScanCount = 0;
@@ -172,8 +178,11 @@ void TASKgetSensorData( void * parameter ){
 
           case MEDIAN:
             // Rolling Median      
-            sensorVal.AverageCFM += ( sensorVal.FlowCFM - sensorVal.AverageCFM ) * 0.1f; // rough running average.
-            sensorVal.MedianCFM += copysign( sensorVal.AverageCFM * 0.01, sensorVal.FlowCFM - sensorVal.MedianCFM );
+            // sensorVal.AverageCFM += ( sensorVal.FlowCFM - sensorVal.AverageCFM ) * 0.1f; // rough running average.
+            // sensorVal.MedianCFM += copysign( sensorVal.AverageCFM * 0.01, sensorVal.FlowCFM - sensorVal.MedianCFM );
+
+            sensorVal.MedianCFM += 0.01f * sgn(sensorVal.FlowCFM - sensorVal.MedianCFM);
+
             sensorVal.FlowCFM = sensorVal.MedianCFM;
           break;
 
@@ -189,7 +198,11 @@ void TASKgetSensorData( void * parameter ){
           case MODE:
             //TODO - Mode
             // return most common value over x number of cycles (requested by @black-top)
-            sensorVal.FlowCFM = sensorVal.FlowCFM;
+
+            // Mean
+            sensorVal.MeanCFM += 0.1f * (sensorVal.FlowCFM - sensorVal.MeanCFM);
+
+            sensorVal.FlowCFM = sensorVal.MeanCFM;
           break;
 
           case NONE:
@@ -302,7 +315,6 @@ void TASKgetSensorData( void * parameter ){
         }
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore        
-        adcStartTime = micros(); // start the timer as we leave task
       }   
     }
   }
@@ -330,7 +342,9 @@ void TASKgetEnviroData( void * parameter ){
     if (millis() > status.bmePollTimer){
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
+
         status.bmeScanTime = (micros() - bmeStartTime); // how long since we started the timer? 
+        bmeStartTime = micros(); // start the timer
 
         status.adcScanCountAverage = (status.adcScanAlpha * status.adcScanCount) + (1.0 - status.adcScanAlpha) * status.adcScanCountAverage;   // calculate Exponential moving average     
         status.adcScanCount = 0;
@@ -352,7 +366,6 @@ void TASKgetEnviroData( void * parameter ){
         sensorVal.RelH = _sensors.getRelHValue();
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore
-        bmeStartTime = micros(); // start the timer as we leave task
       }
     }
     vTaskDelay( VTASK_DELAY_BME ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
@@ -431,6 +444,8 @@ void setup(void) {
  * @note Use non-breaking delays for throttling events
  ***/
 void loop () {
+
+  
   
   // Process API comms
   if (settings.api_enabled) {        
@@ -487,5 +502,9 @@ void loop () {
   }
 
   vTaskDelay( 1 );  //mSec delay to prevent Watch Dog Timer (WDT) triggering for empty task
+
+  // Measure scan time
+  status.loopScanTime = (micros() - loopStartTime); 
+  loopStartTime = micros(); // start the timer
   
 }

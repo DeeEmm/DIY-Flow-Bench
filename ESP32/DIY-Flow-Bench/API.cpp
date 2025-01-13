@@ -683,8 +683,18 @@ void API::ParseMessage(char apiMessage) {
       }
 
 
-
-
+      case '\\': { //AB_test
+        if (settings.AB_test == 'A') {
+          settings.AB_test = 'B';
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "A/B test B" ); 
+        } else if (settings.AB_test == 'B'){
+          settings.AB_test = 'C';
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "A/B test C" ); 
+        } else if (settings.AB_test == 'C'){
+          settings.AB_test = 'A';
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "#%s%s", settings.api_delim, "A/B test A" ); 
+        }
+      }
 
       case ' ': // <<<<(TEST [space] exclude from API listing)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 
            
