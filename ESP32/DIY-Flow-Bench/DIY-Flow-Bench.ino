@@ -122,26 +122,28 @@ void TASKgetSensorData( void * parameter ){
 
   int sensorINT;
 
-  for( ;; ) {
+  for( ;; ) { // Infinite loop
+
     // Check if semaphore available
     if (millis() > status.adcPollTimer){
 
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
 
+        // Set / reset scan timers
         status.adcScanTime = (micros() - adcStartTime); // how long since we started the timer? 
         adcStartTime = micros(); // start the timer
-        
         status.bmeScanCountAverage = (status.bmeScanAlpha * status.bmeScanCount) + (1.0 - status.bmeScanAlpha) * status.bmeScanCountAverage;  // calculate Exponential moving average
-        status.bmeScanCount = 0;
-
+        status.bmeScanCount = 1; // reset to 1 so first scan value in GUI is valid
         status.adcScanCount += 1;
         
-        status.adcPollTimer = millis() + config.iADC_SCAN_MS; // Only reset timer when task executes
 
+        // Get reference voltages
         sensorVal.VCC_5V_BUS = _hardware.get5vSupplyVolts();
         sensorVal.VCC_3V3_BUS = _hardware.get3v3SupplyVolts();
 
+
+        // Get MAF / Orifice / Venturi / Pitot flow data
         switch (settings.bench_type){
 
           case MAF_BENCH:
@@ -216,7 +218,8 @@ void TASKgetSensorData( void * parameter ){
         // convert to standard flow
         sensorVal.FlowSCFM = _calculations.convertToSCFM(sensorVal.FlowCFM, settings.standardReference);
 
-        // Create Flow differential values
+
+        // Get Flow differential values
         switch (sensorVal.FDiffType) {
 
           case USERTARGET:{
@@ -244,28 +247,28 @@ void TASKgetSensorData( void * parameter ){
 
               }
 
-
             sensorVal.FDiff = sensorVal.FlowCFM - calVal.user_offset;
             strcpy(sensorVal.FDiffTypeDesc, "User Target (cfm)");
   
             break;
           }
             
-
           case BASELINE:
             sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline;
             strcpy(sensorVal.FDiffTypeDesc, "Baseline (cfm)");
-            break;
+          break;
           
           case BASELINE_LEAK :
             sensorVal.FDiff = sensorVal.FlowCFMraw - calVal.flow_offset - calVal.leak_cal_baseline - calVal.leak_cal_offset;
             strcpy(sensorVal.FDiffTypeDesc, "Offset (cfm)");
-            break;
+          break;
                   
           default:
-            break;
+          break;
         }
           
+
+        // Get pRef sensor data
         if (config.iPREF_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PRefKPA = _sensors.getPRefValue();
           sensorVal.PRefH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
@@ -280,6 +283,8 @@ void TASKgetSensorData( void * parameter ){
           sensorVal.PRefH2O = 0.0f;         
         }
 
+
+        // Get pDiff sensor data
         if (config.iPDIFF_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PDiffKPA = _sensors.getPDiffValue();
           sensorVal.PDiffH2O = _calculations.convertPressure(sensorVal.PDiffKPA, INH2O) - calVal.pdiff_cal_offset;
@@ -288,18 +293,20 @@ void TASKgetSensorData( void * parameter ){
           sensorVal.PDiffH2O = 0.0f;
         }
 
+
+        // Get Pitot sensor data
         if (config.iPITOT_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PitotKPA = _sensors.getPitotValue() - calVal.pitot_cal_offset;
           sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O) ;
           sensorVal.PitotVelocity = _sensors.getPitotVelocity();
           sensorVal.PitotVelocity = _sensors.getPitotVelocity();
           sensorVal.PitotDelta = _calculations.convertPressure(_sensors.getPitotValue(),KPA, INH2O);
-
         } else {
           sensorVal.PitotKPA = 0.0f;
           sensorVal.PitotH2O = 0.0f;
           sensorVal.PitotVelocity = 0.0f;
         }
+
 
         if (config.bSWIRL_ENBLD) {
           // TODO #227
@@ -316,6 +323,7 @@ void TASKgetSensorData( void * parameter ){
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore        
       }   
+      status.adcPollTimer = millis() + config.iADC_SCAN_MS; // Only reset timer when task has been executed
     }
     vTaskDelay( VTASK_DELAY_ADC );  // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
   }
@@ -338,35 +346,36 @@ void TASKgetEnviroData( void * parameter ){
 
   Calculations _calculations;
 
-  for( ;; ) {
-    if (millis() > status.bmePollTimer){
+  for( ;; ) { // Infinite loop
+
+    if (millis() > status.bmePollTimer) {
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
 
+        // Set / reset scan timers
         status.bmeScanTime = (micros() - bmeStartTime); // how long since we started the timer? 
         bmeStartTime = micros(); // start the timer
-
         status.adcScanCountAverage = (status.adcScanAlpha * status.adcScanCount) + (1.0 - status.adcScanAlpha) * status.adcScanCountAverage;   // calculate Exponential moving average     
-        status.adcScanCount = 0;
-
+        status.adcScanCount = 1;
         status.bmeScanCount += 1;
-
-        status.bmePollTimer = millis() + config.iBME_SCAN_MS; // Only reset timer when task executes
         
-        sensorVal.TempDegC = _sensors.getTempValue();
 
-        // TEST BME commissioning
-        // _message.debugPrintf("BME680 refTempDegC_INT: %d",sensorVal.test );
-        // REMEMBER NO BREAKING TASKS WITHIN INTTERUPT ROUTINES (LIKE SERIAL PRINT)
-        
+        // Get temp sensor data
+        sensorVal.TempDegC = _sensors.getTempValue();        
         sensorVal.TempDegF = _calculations.convertTemperature(_sensors.getTempValue(), DEGF);
+
+        // Get bara sensor data
         sensorVal.BaroHPA = _sensors.getBaroValue();
         sensorVal.BaroPA = sensorVal.BaroHPA * 100.00F;
         sensorVal.BaroKPA = sensorVal.BaroPA * 0.001F;
+
+        // Get humidity sensor data
         sensorVal.RelH = _sensors.getRelHValue();
 
-        xSemaphoreGive(i2c_task_mutex); // Release semaphore
+        // Release semaphore
+        xSemaphoreGive(i2c_task_mutex); 
       }
+      status.bmePollTimer = millis() + config.iBME_SCAN_MS; // Only reset timer when task has been executed
     }
     vTaskDelay( VTASK_DELAY_BME ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
 	}

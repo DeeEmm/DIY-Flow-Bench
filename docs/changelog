@@ -29,6 +29,9 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501130046      - Default ADC / BME scan count changed
+                - Moved poll timer resets to end of tasks
+                - Removed tasks from core 2
 2501130045      - #316 Moved ADC scan delay inside task loop
 2501130038      - ADC/BME scan timers include execution time
 2501130034      - Added Loop() scan time to mimic
