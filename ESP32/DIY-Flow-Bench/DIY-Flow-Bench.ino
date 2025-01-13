@@ -317,8 +317,8 @@ void TASKgetSensorData( void * parameter ){
         xSemaphoreGive(i2c_task_mutex); // Release semaphore        
       }   
     }
-  }
     vTaskDelay( VTASK_DELAY_ADC );  // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
+  }
 }
 
 
@@ -416,11 +416,11 @@ void setup(void) {
     _webserver.begin();
   #endif
 
-  xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
-  // xTaskCreate(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask); 
+  // xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
+  xTaskCreate(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask); 
 
-  xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
-  // xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask); 
+  // xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
+  xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask); 
 
   if (config.bSWIRL_ENBLD){
     // TODO #227

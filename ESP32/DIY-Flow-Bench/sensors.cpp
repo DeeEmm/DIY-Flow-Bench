@@ -80,22 +80,17 @@ void Sensors::begin () {
 	
 	MafData _maf(config.iMAF_SENS_TYP);
 
-	// Initialise MAF
-	// if (config.iMAF_SENS_TYP > SENSOR_DISABLED) {
-		
-		config.mafCoeff0 = _maf.getCoefficient(0);
-		config.mafCoeff1 = _maf.getCoefficient(1);
-		config.mafCoeff2 = _maf.getCoefficient(2);
-		config.mafCoeff3 = _maf.getCoefficient(3);
-		config.mafCoeff4 = _maf.getCoefficient(4);
-		config.mafCoeff5 = _maf.getCoefficient(5);
-		config.mafCoeff6 = _maf.getCoefficient(6);
+	config.mafCoeff0 = _maf.getCoefficient(0);
+	config.mafCoeff1 = _maf.getCoefficient(1);
+	config.mafCoeff2 = _maf.getCoefficient(2);
+	config.mafCoeff3 = _maf.getCoefficient(3);
+	config.mafCoeff4 = _maf.getCoefficient(4);
+	config.mafCoeff5 = _maf.getCoefficient(5);
+	config.mafCoeff6 = _maf.getCoefficient(6);
 
-		status.mafDiameter = _maf.getDiameter();
+	status.mafDiameter = _maf.getDiameter();
 
-		status.mafSensor = _maf.getCurrentType();
-
-	// }
+	status.mafSensor = _maf.getCurrentType();
 
 	//initialise BME280
 	if (config.iBME_TYP == BOSCH_BME280) {
