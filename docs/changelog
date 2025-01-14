@@ -30,6 +30,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 Build #         - Description of Change
 
 
+2501140002      - #316 changed benchIsRunning to use stored value of MAF flow
 2501130048      - #275 - Set flow offset for all flow types
 2501130047      - Moved data filter alpha values into system.h
                 - Removed iMAF_MIN_VOLTS from GUI

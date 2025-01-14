@@ -748,7 +748,7 @@ bool Hardware::benchIsRunning() {
  
   // TODO: Check scope of these...
   refPressureH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
-  mafFlowRateCFM = _calculations.convertFlow(_sensors.getMafFlow());
+  mafFlowRateCFM = _calculations.convertFlow(sensorVal.FlowCFM);
 
   // comvert negative value into posotive
   refPressureH2O = fabs(refPressureH2O); 
