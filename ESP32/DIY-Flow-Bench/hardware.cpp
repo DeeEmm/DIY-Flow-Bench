@@ -742,23 +742,28 @@ bool Hardware::benchIsRunning() {
   extern struct BenchSettings settings;
   extern struct Language language;
   extern struct SensorData sensorVal;
+  extern struct Configuration config;
 
   double refPressureH2O;
   double mafFlowRateCFM; 
+  bool pressureTest = true;
  
-  // TODO: Check scope of these...
   refPressureH2O = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
-  mafFlowRateCFM = _calculations.convertFlow(sensorVal.FlowCFM);
+  mafFlowRateCFM = sensorVal.FlowCFM;
 
-  // comvert negative value into posotive
+  // convert negative value into positive
   refPressureH2O = fabs(refPressureH2O); 
 
-  if ((refPressureH2O > settings.min_bench_pressure))
-  {
-	  _message.Handler(language.LANG_BENCH_RUNNING);
+  // Check if min flow and pRef are acheived...
+  if ((config.iPREF_SENS_TYP > 1) && (mafFlowRateCFM > settings.min_flow_rate) && (mafFlowRateCFM > settings.min_flow_rate) )  {
+    // ...pRef is enabled so we check both pRef and flow
+	  _message.Handler(language.LANG_BENCH_RUNNING); // REVIEW do we need to inform user that bench is running via GUI??? 
+	  return true;
+  } else if (( config.iPREF_SENS_TYP < 1) && (mafFlowRateCFM > settings.min_flow_rate){
+    // ...pRef is disabled so we only check flow
+	  _message.Handler(language.LANG_BENCH_RUNNING); 
 	  return true;
   } else {
-    _message.Handler(language.LANG_NO_ERROR);
 	  return false;
   }
 }
