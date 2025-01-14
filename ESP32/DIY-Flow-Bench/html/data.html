@@ -1,161 +1,162 @@
 
     <!-- Datalog tab -->
     <div id="datalog">
+      <div class="config-panel">
+        <h2>Data Graph</h2>
+          <!-- lift graph -->
+          <!-- NOTE: Inline styling is required for SVG Download-->
+          <div class="graph-container">        
+            <svg class="graph" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="dataGraph" style="background-color: #fff; padding-top: 100px;">
+            
+              <!--Grid-->
+              <g class="grid x-grid" id="xGrid" style="stroke: grey; stroke-dasharray: 1 2; stroke-width: 1;">
+                <line x1="100" x2="100" y1="0" y2="510"></line>
+                <line x1="150" x2="150" y1="0" y2="510"></line>
+                <line x1="200" x2="200" y1="0" y2="510"></line>
+                <line x1="250" x2="250" y1="0" y2="510"></line>
+                <line x1="300" x2="300" y1="0" y2="510"></line>
+                <line x1="350" x2="350" y1="0" y2="510"></line>
+                <line x1="400" x2="400" y1="0" y2="510"></line>
+                <line x1="450" x2="450" y1="0" y2="510"></line>
+                <line x1="500" x2="500" y1="0" y2="510"></line>
+                <line x1="550" x2="550" y1="0" y2="510"></line>
+                <line x1="600" x2="600" y1="0" y2="510"></line>
+                <line x1="650" x2="650" y1="0" y2="510"></line>
+                <line x1="700" x2="700" y1="0" y2="510"></line>
+              </g>
 
-        <!-- lift graph -->
-        <!-- NOTE: Inline styling is required for SVG Download-->
-        <div class="graph-container">        
-          <svg class="graph" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="dataGraph" style="background-color: #fff; padding-top: 100px;">
-          
-            <!--Grid-->
-            <g class="grid x-grid" id="xGrid" style="stroke: grey; stroke-dasharray: 1 2; stroke-width: 1;">
-              <line x1="100" x2="100" y1="0" y2="510"></line>
-              <line x1="150" x2="150" y1="0" y2="510"></line>
-              <line x1="200" x2="200" y1="0" y2="510"></line>
-              <line x1="250" x2="250" y1="0" y2="510"></line>
-              <line x1="300" x2="300" y1="0" y2="510"></line>
-              <line x1="350" x2="350" y1="0" y2="510"></line>
-              <line x1="400" x2="400" y1="0" y2="510"></line>
-              <line x1="450" x2="450" y1="0" y2="510"></line>
-              <line x1="500" x2="500" y1="0" y2="510"></line>
-              <line x1="550" x2="550" y1="0" y2="510"></line>
-              <line x1="600" x2="600" y1="0" y2="510"></line>
-              <line x1="650" x2="650" y1="0" y2="510"></line>
-              <line x1="700" x2="700" y1="0" y2="510"></line>
-            </g>
+              <g class="grid y-grid" id="yGrid" style="stroke: grey; stroke-dasharray: 1 2; stroke-width: 1;">
+                <line x1="90" x2="700" y1="0" y2="0"></line>
+                <line x1="90" x2="700" y1="50" y2="50"></line>
+                <line x1="90" x2="700" y1="100" y2="100"></line>
+                <line x1="90" x2="700" y1="150" y2="150"></line>
+                <line x1="90" x2="700" y1="200" y2="200"></line>
+                <line x1="90" x2="700" y1="250" y2="250"></line>
+                <line x1="90" x2="700" y1="300" y2="300"></line>
+                <line x1="90" x2="700" y1="350" y2="350"></line>
+                <line x1="90" x2="700" y1="400" y2="400"></line>
+                <line x1="90" x2="700" y1="450" y2="450"></line>
+                <line x1="90" x2="700" y1="500" y2="500"></line>
+              </g>
 
-            <g class="grid y-grid" id="yGrid" style="stroke: grey; stroke-dasharray: 1 2; stroke-width: 1;">
-              <line x1="90" x2="700" y1="0" y2="0"></line>
-              <line x1="90" x2="700" y1="50" y2="50"></line>
-              <line x1="90" x2="700" y1="100" y2="100"></line>
-              <line x1="90" x2="700" y1="150" y2="150"></line>
-              <line x1="90" x2="700" y1="200" y2="200"></line>
-              <line x1="90" x2="700" y1="250" y2="250"></line>
-              <line x1="90" x2="700" y1="300" y2="300"></line>
-              <line x1="90" x2="700" y1="350" y2="350"></line>
-              <line x1="90" x2="700" y1="400" y2="400"></line>
-              <line x1="90" x2="700" y1="450" y2="450"></line>
-              <line x1="90" x2="700" y1="500" y2="500"></line>
-            </g>
-
-            <!--Grid Labels-->
-            <g class="labels x-labels">
-              <text x="100" y="550">Lift:</text>
-              <text x="150" y="550">~lift1~</text>
-              <text x="200" y="550">~lift2~</text>
-              <text x="250" y="550">~lift3~</text>
-              <text x="300" y="550">~lift4~</text>
-              <text x="350" y="550">~lift5~</text>
-              <text x="400" y="550">~lift6~</text>
-              <text x="450" y="550">~lift7~</text>
-              <text x="500" y="550">~lift8~</text>
-              <text x="550" y="550">~lift9~</text>
-              <text x="600" y="550">~lift10~</text>
-              <text x="650" y="550">~lift11~</text>
-              <text x="700" y="550">~lift12~</text>
-          </g>
-          
-          <g class="labels y-labels">
-            <text x="80" y="10">~flow10~</text>
-            <text x="80" y="60">~flow9~</text>
-            <text x="80" y="110">~flow8~</text>
-            <text x="80" y="160">~flow7~</text>
-            <text x="80" y="210">~flow6~</text>
-            <text x="80" y="260">~flow5~</text>
-            <text x="80" y="310">~flow4~</text>
-            <text x="80" y="360">~flow3~</text>
-            <text x="80" y="410">~flow2~</text>
-            <text x="80" y="460">~flow1~</text>
-            <text x="80" y="510">Flow (cfm)</text>
-          </g>
-
-            <!--Graph Key-->
-            <g class="labels key-labels">
-              <!--
-              <text x="625" y="25" id="default-key-text">Current Data</text>
-              <line x1="550" y1="20" x2="620" y2="20"  id="default-key" style="stroke:#000;stroke-width:1;stroke-dasharray:4,1;opacity:0.5;" /> 
-              
-              <line x1="550" y1="35" x2="620" y2="35"  style="stroke:#f50808;stroke-width:2;opacity:0.5;" /> 
-              <text x="625" y="40">Exhaust</text>
-              -->
-            </g>
-
-            <!--Data Points - css classes to display value on hover - NOTE text value is displayed above dataPoint-->
-            <!--
-            <g class="first_set points" data-setname="Our first data set" id="dataPlot">
-              <circle class="dataCircle" cx="150" cy="340" data-value="7.2" r="4"></circle><text class="dataValue hide" x="150" y="310">7.2</text>
-              <circle class="dataCircle" cx="200" cy="315" data-value="8.1" r="4"></circle><text class="dataValue hide" x="200" y="285">4.2</text>
-              <circle class="dataCircle" cx="250" cy="301" data-value="7.7" r="4"></circle><text class="dataValue hide" x="250" y="271">5.2</text> 
-              <circle class="dataCircle" cx="300" cy="280" data-value="6.8" r="4"></circle><text class="dataValue hide" x="300" y="270">23.2</text>
-              <circle class="dataCircle" cx="350" cy="249" data-value="6.7" r="4"></circle><text class="dataValue hide" x="350" y="239">32</text>  
-              <circle class="dataCircle" cx="400" cy="245" data-value="5.7" r="4"></circle><text class="dataValue hide" x="400" y="235">7.2</text> 
-              <circle class="dataCircle" cx="450" cy="242" data-value="6.7" r="4"></circle><text class="dataValue hide" x="450" y="232">8.2</text> 
-              <circle class="dataCircle" cx="500" cy="238" data-value="6.8" r="4"></circle><text class="dataValue hide" x="500" y="228">752</text> 
-              <circle class="dataCircle" cx="550" cy="230" data-value="4.7" r="4"></circle><text class="dataValue hide" x="550" y="220">22</text>  
-              <circle class="dataCircle" cx="600" cy="222" data-value="5.7" r="4"></circle><text class="dataValue hide" x="600" y="212">7</text>   
-              <circle class="dataCircle" cx="650" cy="220" data-value="2.7" r="4"></circle><text class="dataValue hide" x="650" y="210">7542</text>
-              <circle class="dataCircle" cx="700" cy="218" data-value="6.9" r="4"></circle><text class="dataValue hide" x="700" y="208">42</text>  
-            </g>
-            -->
-
-            <!--Hard coded Graph Line Data-->
-            <g class="surfaces" id="lineData">
-                <!--Line data-->
-                <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1"
-                points="100,500 150,~LINE_DATA1~ 200,~LINE_DATA2~ 250,~LINE_DATA3~ 300,~LINE_DATA4~ 350,~LINE_DATA5~ 400,~LINE_DATA6~ 450,~LINE_DATA7~ 500,~LINE_DATA8~ 550,~LINE_DATA9~ 600,~LINE_DATA10~ 650,~LINE_DATA11~ 700,~LINE_DATA12~"/>
-
+              <!--Grid Labels-->
+              <g class="labels x-labels">
+                <text x="100" y="550">Lift:</text>
+                <text x="150" y="550">~lift1~</text>
+                <text x="200" y="550">~lift2~</text>
+                <text x="250" y="550">~lift3~</text>
+                <text x="300" y="550">~lift4~</text>
+                <text x="350" y="550">~lift5~</text>
+                <text x="400" y="550">~lift6~</text>
+                <text x="450" y="550">~lift7~</text>
+                <text x="500" y="550">~lift8~</text>
+                <text x="550" y="550">~lift9~</text>
+                <text x="600" y="550">~lift10~</text>
+                <text x="650" y="550">~lift11~</text>
+                <text x="700" y="550">~lift12~</text>
             </g>
             
-            <use class="grid double" xlink:href="#xGrid" ></use>
-            <use class="grid double" xlink:href="#yGrid" ></use>
-            
-          </svg>
+            <g class="labels y-labels">
+              <text x="80" y="10">~flow10~</text>
+              <text x="80" y="60">~flow9~</text>
+              <text x="80" y="110">~flow8~</text>
+              <text x="80" y="160">~flow7~</text>
+              <text x="80" y="210">~flow6~</text>
+              <text x="80" y="260">~flow5~</text>
+              <text x="80" y="310">~flow4~</text>
+              <text x="80" y="360">~flow3~</text>
+              <text x="80" y="410">~flow2~</text>
+              <text x="80" y="460">~flow1~</text>
+              <text x="80" y="510">Flow (cfm)</text>
+            </g>
 
-
-          <!-- ARRAY TO SVG - Appends data to graph container -->
-
-          <!-- <coords-svg stroke="gold" stroke-dasharray="4, 1" coords="[[100,330],[ 150,332],[ 200,332],[ 250,335],[ 300,275],[ 350,281],[ 400,250],[ 450,241],[ 500,251],[ 550,133],[ 600,199],[ 650,172],[ 700,177]]"></coords-svg> -->
-          <!-- <coords-svg stroke="green" coords="[[2, 15],[57, 58],[5, 57]]"></coords-svg> -->
-
-          <!-- Converts custom <coord-svg> elements into valid polyline and appends to dataPlot. Next stage is to use JSON -->
-          <!-- <script>
-            customElements.define("coords-svg", class extends HTMLElement{
-              connectedCallback(){
-                let arr = JSON.parse(this.getAttribute("coords"));
-                let dPath = arr.flat().join(" ");
-                let stroke = this.getAttribute("stroke");
-                this.style.display = "inline-block";
+              <!--Graph Key-->
+              <g class="labels key-labels">
+                <!--
+                <text x="625" y="25" id="default-key-text">Current Data</text>
+                <line x1="550" y1="20" x2="620" y2="20"  id="default-key" style="stroke:#000;stroke-width:1;stroke-dasharray:4,1;opacity:0.5;" /> 
                 
-                var svgNS = "http://www.w3.org/2000/svg";
-                let polyline = document.createElementNS(svgNS, "polyline");
-                polyline.classList.add("dataLine");
+                <line x1="550" y1="35" x2="620" y2="35"  style="stroke:#f50808;stroke-width:2;opacity:0.5;" /> 
+                <text x="625" y="40">Exhaust</text>
+                -->
+              </g>
 
-                polyline.setAttribute("points", dPath);
-                polyline.setAttribute("stroke", stroke);
-                polyline.setAttribute("stroke-width", 1);
-                polyline.setAttribute("fill", "none");
+              <!--Data Points - css classes to display value on hover - NOTE text value is displayed above dataPoint-->
+              <!--
+              <g class="first_set points" data-setname="Our first data set" id="dataPlot">
+                <circle class="dataCircle" cx="150" cy="340" data-value="7.2" r="4"></circle><text class="dataValue hide" x="150" y="310">7.2</text>
+                <circle class="dataCircle" cx="200" cy="315" data-value="8.1" r="4"></circle><text class="dataValue hide" x="200" y="285">4.2</text>
+                <circle class="dataCircle" cx="250" cy="301" data-value="7.7" r="4"></circle><text class="dataValue hide" x="250" y="271">5.2</text> 
+                <circle class="dataCircle" cx="300" cy="280" data-value="6.8" r="4"></circle><text class="dataValue hide" x="300" y="270">23.2</text>
+                <circle class="dataCircle" cx="350" cy="249" data-value="6.7" r="4"></circle><text class="dataValue hide" x="350" y="239">32</text>  
+                <circle class="dataCircle" cx="400" cy="245" data-value="5.7" r="4"></circle><text class="dataValue hide" x="400" y="235">7.2</text> 
+                <circle class="dataCircle" cx="450" cy="242" data-value="6.7" r="4"></circle><text class="dataValue hide" x="450" y="232">8.2</text> 
+                <circle class="dataCircle" cx="500" cy="238" data-value="6.8" r="4"></circle><text class="dataValue hide" x="500" y="228">752</text> 
+                <circle class="dataCircle" cx="550" cy="230" data-value="4.7" r="4"></circle><text class="dataValue hide" x="550" y="220">22</text>  
+                <circle class="dataCircle" cx="600" cy="222" data-value="5.7" r="4"></circle><text class="dataValue hide" x="600" y="212">7</text>   
+                <circle class="dataCircle" cx="650" cy="220" data-value="2.7" r="4"></circle><text class="dataValue hide" x="650" y="210">7542</text>
+                <circle class="dataCircle" cx="700" cy="218" data-value="6.9" r="4"></circle><text class="dataValue hide" x="700" y="208">42</text>  
+              </g>
+              -->
 
-                document.getElementById("dataPlot").appendChild(polyline);
-              }
-            });
-          </script> -->
-         
-          <!-- ARRAY TO SVG -->
+              <!--Hard coded Graph Line Data-->
+              <g class="surfaces" id="lineData">
+                  <!--Line data-->
+                  <polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1"
+                  points="100,500 150,~LINE_DATA1~ 200,~LINE_DATA2~ 250,~LINE_DATA3~ 300,~LINE_DATA4~ 350,~LINE_DATA5~ 400,~LINE_DATA6~ 450,~LINE_DATA7~ 500,~LINE_DATA8~ 550,~LINE_DATA9~ 600,~LINE_DATA10~ 650,~LINE_DATA11~ 700,~LINE_DATA12~"/>
 
-        </div>  
-    
-        <!-- end lift graph -->
+              </g>
+              
+              <use class="grid double" xlink:href="#xGrid" ></use>
+              <use class="grid double" xlink:href="#yGrid" ></use>
+              
+            </svg>
 
 
-        <div class="align-center">
-          <br>
-          <button id="clear-graph-data-button" class="control-button">~LANG_GUI_CLEAR~</button> 
-          <button id="export-graph-data-button" class="control-button">~LANG_GUI_EXPORT~</button> 
-          <button id="export-graph-image-button" class="control-button">~LANG_GUI_IMAGE~</button> 
-          <!-- Export button fires javascript function to click link below forcing the download-->
-          <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
+            <!-- ARRAY TO SVG - Appends data to graph container -->
+
+            <!-- <coords-svg stroke="gold" stroke-dasharray="4, 1" coords="[[100,330],[ 150,332],[ 200,332],[ 250,335],[ 300,275],[ 350,281],[ 400,250],[ 450,241],[ 500,251],[ 550,133],[ 600,199],[ 650,172],[ 700,177]]"></coords-svg> -->
+            <!-- <coords-svg stroke="green" coords="[[2, 15],[57, 58],[5, 57]]"></coords-svg> -->
+
+            <!-- Converts custom <coord-svg> elements into valid polyline and appends to dataPlot. Next stage is to use JSON -->
+            <!-- <script>
+              customElements.define("coords-svg", class extends HTMLElement{
+                connectedCallback(){
+                  let arr = JSON.parse(this.getAttribute("coords"));
+                  let dPath = arr.flat().join(" ");
+                  let stroke = this.getAttribute("stroke");
+                  this.style.display = "inline-block";
+                  
+                  var svgNS = "http://www.w3.org/2000/svg";
+                  let polyline = document.createElementNS(svgNS, "polyline");
+                  polyline.classList.add("dataLine");
+
+                  polyline.setAttribute("points", dPath);
+                  polyline.setAttribute("stroke", stroke);
+                  polyline.setAttribute("stroke-width", 1);
+                  polyline.setAttribute("fill", "none");
+
+                  document.getElementById("dataPlot").appendChild(polyline);
+                }
+              });
+            </script> -->
+          
+            <!-- ARRAY TO SVG -->
+
+          </div>  
+      
+          <!-- end lift graph -->
+
+
+          <div class="align-center">
+            <br>
+            <button id="clear-graph-data-button" class="control-button">~LANG_GUI_CLEAR~</button> 
+            <button id="export-graph-data-button" class="control-button">~LANG_GUI_EXPORT~</button> 
+            <button id="export-graph-image-button" class="control-button">~LANG_GUI_IMAGE~</button> 
+            <!-- Export button fires javascript function to click link below forcing the download-->
+            <a href="/api/file/download/liftdata.json" download id="file-data-download" hidden></a>
+          </div>
         </div>
-
     </div>
 
 

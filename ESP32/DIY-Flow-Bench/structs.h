@@ -495,10 +495,10 @@ struct Language {
     char LANG_GUI_CLEAR_ALARM[1302] = "Clear Alarm";
     char LANG_GUI_CAPTURE[50] = "Capture";
     char LANG_GUI_DASHBOARD[50] = "Dashboard";
-    char LANG_GUI_DATA[50] = "Data";
+    char LANG_GUI_DATAGRAPH[50] = "Graph";
     char LANG_GUI_HARDWARE_CONFIG[50] = "Hardware Configuration";
-    char LANG_GUI_CONFIG[50] = "Configuration";
-    char LANG_GUI_SETTINGS[50] = "Settings";
+    char LANG_GUI_HARDWARE[50] = "Hardware";
+    char LANG_GUI_SYSTEM[50] = "System";
     char LANG_GUI_PINS[50] = "Pins";
     char LANG_GUI_CLEAR[50] = "Clear";
     char LANG_GUI_EXPORT[50] = "Export";

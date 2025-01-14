@@ -759,7 +759,7 @@ bool Hardware::benchIsRunning() {
     // ...pRef is enabled so we check both pRef and flow
 	  _message.Handler(language.LANG_BENCH_RUNNING); // REVIEW do we need to inform user that bench is running via GUI??? 
 	  return true;
-  } else if (( config.iPREF_SENS_TYP < 1) && (mafFlowRateCFM > settings.min_flow_rate){
+  } else if (( config.iPREF_SENS_TYP < 1) && (mafFlowRateCFM > settings.min_flow_rate)) {
     // ...pRef is disabled so we only check flow
 	  _message.Handler(language.LANG_BENCH_RUNNING); 
 	  return true;

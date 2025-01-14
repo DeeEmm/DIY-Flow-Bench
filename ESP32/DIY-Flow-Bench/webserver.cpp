@@ -1096,9 +1096,9 @@ String Webserver::processLanguageTemplateVars(const String &var) {
   if (var == "LANG_GUI_CLEAR_ALARM") return language.LANG_GUI_CLEAR_ALARM;
   if (var == "LANG_GUI_CAPTURE") return language.LANG_GUI_CAPTURE;
   if (var == "LANG_GUI_DASHBOARD") return language.LANG_GUI_DASHBOARD;
-  if (var == "LANG_GUI_DATA") return language.LANG_GUI_DATA;
-  if (var == "LANG_GUI_CONFIG") return language.LANG_GUI_CONFIG;
-  if (var == "LANG_GUI_SETTINGS") return language.LANG_GUI_SETTINGS;
+  if (var == "LANG_GUI_DATA") return language.LANG_GUI_DATAGRAPH;
+  if (var == "LANG_GUI_HARDWARE") return language.LANG_GUI_HARDWARE;
+  if (var == "LANG_GUI_SYSTEM") return language.LANG_GUI_SYSTEM;
   if (var == "LANG_GUI_PINS") return language.LANG_GUI_PINS;
   if (var == "LANG_GUI_CLEAR") return language.LANG_GUI_CLEAR;
   if (var == "LANG_GUI_EXPORT") return language.LANG_GUI_EXPORT;

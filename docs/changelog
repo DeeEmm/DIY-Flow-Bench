@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501140006      - Update labels / terminology in GUI
 2501140003      - #316 benchIsRunning ignores pRef if disabled
 2501140002      - #316 changed benchIsRunning to use stored value of MAF flow
 2501130048      - #275 - Set flow offset for all flow types
