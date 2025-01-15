@@ -451,7 +451,7 @@ void API::ParseMessage(char apiMessage) {
   //         _message.serialPrintf("adcPollTimer = %lu\n", status.adcPollTimer);
   //         _message.serialPrintf("bmePollTimer = %lu\n", status.bmePollTimer);
   //         _message.serialPrintf("apiPollTimer = %lu\n", status.apiPollTimer);
-  //         _message.serialPrintf("browserUpdateTimer = %lu\n", status.browserUpdateTimer);
+  //         _message.serialPrintf("ssePollTimer = %lu\n", status.ssePollTimer);
   //         _message.serialPrintf("wsCLeanPollTimer = %lu\n", status.wsCLeanPollTimer);
   //         _message.serialPrintf("pollTimer = %i\n", status.pollTimer);
   //         _message.serialPrintf("serialData = %i\n", status.serialData);;

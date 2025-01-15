@@ -20,16 +20,16 @@ using namespace std;
 *
 ***/
 
-#define SERIAL0_ENABLED                                     // Default serial comms (API & status)
-// #define SERIAL2_ENABLED                                  // Digital guage serial protocol
+#define SERIAL0_ENABLED                                         // Default serial comms (API & status)
+// #define SERIAL2_ENABLED                                      // Digital guage serial protocol
 
 #define SERIAL0_BAUD 115200
 #define SERIAL2_BAUD 9600
 // #define MAC_ADDRESS {0x32, 0xAE, 0xA4, 0x07, 0x0D, 0x00}    // MAC Address (uncomment to enable)
 // #define STATIC_IP {192,168,1,222}                           // Static IP address (uncomment to enable)
-#define SUBNET {192,168,1,1}                                // Subnet (For static IP)
-#define GATEWAY {255,255,0,0}                               // Default gateway (For static IP)
-#define WEBSERVER_ENABLED                                   // Disable to run headless
+#define SUBNET {192,168,1,1}                                    // Subnet (For static IP)
+#define GATEWAY {255,255,0,0}                                   // Default gateway (For static IP)
+#define WEBSERVER_ENABLED                                       // Disable to run headless
 
 
 /***********************************************************
@@ -58,30 +58,32 @@ using namespace std;
 
 // JSON memory allocation
 #define DATA_JSON_SIZE 768
-#define SETTINGS_JSON_SIZE 2048 
 #define LANGUAGE_JSON_SIZE 8192 // TODO Need to test language override (mem size could be an issue)
-#define CONFIG_JSON_SIZE 2600  
 #define CAL_DATA_JSON_SIZE 348
 #define LIFT_DATA_JSON_SIZE 384
-#define MAF_JSON_SIZE 28000 // 6k for Bosch file 25k for Delphi // DEPRECATED = MAF data now uses transfer function
 #define JSON_FILE_SIZE 6000 // 2800
 // NOTE: Use ArduinJSON memory assistant to determine size requirements
 // https://arduinojson.org/v6/assistant
 
+// MAF Data Filters
+#define ALPHA_MEDIAN 0.75f
+#define ALPHA_AVERAGE 0.75f
+#define ALPHA_MEAN 0.75f
+
+
 // Loop Delays
-#define VTASK_DELAY_ADC 1
+#define VTASK_DELAY_ADC 1   
 #define VTASK_DELAY_BME 1
 #define VTASK_DELAY_SSE 1
 
-// MAF Data Filters
-#define ALPHA_MEDIAN 0.01f
-#define ALPHA_AVERAGE 0.65f
-#define ALPHA_MEAN 0.1f
+// Poll timers
+#define ADC_UPDATE_RATE 821  //401 // time between ADC read events in milliseconds / 821 ? - Value from #316. Seems excessively long
+#define BME_UPDATE_RATE 199  //1009 // time between BME read events in milliseconds / 199 ? - - Value from #316. This is too fast. Specs state 1sec update.
+#define SSE_UPDATE_RATE 503  //683 // time between SSE push in milliseconds / 503 - arbitrary value for GUI update. Limited by SSE speed.
 
 /***********************************************************
 * WEBUI SETTINGS
 ***/
-#define STATUS_UPDATE_RATE 500 // time between SSE push in milliseconds
 
 #define GUI_COLOUR_UNSET "pink"
 #define GUI_COLOUR_SET "#44b112"

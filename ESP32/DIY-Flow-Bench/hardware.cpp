@@ -39,7 +39,11 @@
 extern struct Configuration config;
 ADS1115_lite adc(config.iADC_I2C_ADDR);
 
+// #include "ADS1X15.h"
+// ADS_1115 ADS(config.iADC_I2C_ADDR);
 
+int ADC_RANGE = 32767;
+double ADC_GAIN = 6.144f;
 
 
 // // Kludge to fix ADC2 + WiFi - Source: https://forum.arduino.cc/t/interesting-esp32-issue-cant-use-analogread-in-esp_wifimanager-library/679348/2
@@ -120,7 +124,8 @@ void Hardware::begin () {
       _message.serialPrintf("Initialising ADS1115 ( Address: %u ) \n", config.iADC_I2C_ADDR);
 
       adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
-      adc.setSampleRate(ADS1115_REG_CONFIG_DR_8SPS); // Set ADC Sample Rate - 8 SPS
+      adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate. NOTE: minimum of 128SPS.
+
       
       if (!adc.testConnection()) {
         _message.serialPrintf("ADS1115 Connection failed");
@@ -128,6 +133,11 @@ void Hardware::begin () {
       } else {
         _message.serialPrintf("ADS1115 Initialised\n");
       }
+
+      // ADS.begin();
+      // ADS.setGain(0);
+      // ADS.setMode(0); // continuous
+
   }
 
 
@@ -578,7 +588,7 @@ void Hardware::getI2CList() {
 
 
 /***********************************************************
- * @brief GET ADS1015 ADC value
+ * @brief GET ADS1115 ADC value
  * @note uses ADC1115-lite library - https://github.com/terryjmyers/ADS1115-Lite
  *
  ***/
@@ -615,7 +625,11 @@ int32_t Hardware::getADCRawData(int channel) {
     }
     
     adc.triggerConversion(); // Start a conversion. This immediately returns
+    while (!adc.isConversionDone());
     rawADCval = adc.getConversion(); // This polls the ADS1115 and wait for conversion to finish, THEN returns the value
+
+    // rawADCval = ADS.readADC(channel);
+
 
   }
 
@@ -630,14 +644,13 @@ int32_t Hardware::getADCRawData(int channel) {
  * @brief Get ADC channel Voltage
  * @param channel ADC channel (0-3)
  * @note 1115: 16 bits less sign bit = 15 bits mantissa = 32767 | 6.144v = max voltage (gain) of ADC | 187.5 uV / LSB
- * @note 1015: 12 bits less sign bit = 11 bit mantissa = 2047 | 6.144v = max voltage (gain) of ADC
- * int iADC_RANGE = 32767;
- * double dADC_GAIN = 6.144;
+ * @note 1015: 12 bits less sign bit = 11 bit mantissa = 2047 | 6.144v = max voltage (gain) of ADC [NOT RECOMMENDED! - USE THE 1115 !!!!]
+ * int ADC_RANGE = 32767;
+ * double ADC_GAIN = 6.144;
  ***/
  double Hardware::getADCVolts(int channel) {
 
   extern struct Configuration config;
-  
   
   double volts;
 
@@ -650,12 +663,12 @@ int32_t Hardware::getADCRawData(int channel) {
     break;
 
     case ADS1115:
-      volts = rawADCval * config.dADC_GAIN / config.iADC_RANGE;
+      volts = rawADCval * ADC_GAIN / ADC_RANGE;
       // volts = rawADCval * 6.144F / 32767;
     break;
 
     case ADS1015:
-      volts = rawADCval * config.dADC_GAIN / 2047.00F; 
+      volts = rawADCval * ADC_GAIN / 2047.00F; 
       // volts = rawADCval * 32767 / 2047.00F; 
     break;
 

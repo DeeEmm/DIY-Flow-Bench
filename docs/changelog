@@ -29,6 +29,12 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501150016      - #316 Updated ADC library
+                - Moved ADC + BME poll timers into system.h
+                - Calibrated poll timer values
+                - Updated ADS read frequency
+                - Removed critical settings from GUI
+                - Moved ADC / BME xTasks to core 2
 2501140006      - Update labels / terminology in GUI
 2501140003      - #316 benchIsRunning ignores pRef if disabled
 2501140002      - #316 changed benchIsRunning to use stored value of MAF flow

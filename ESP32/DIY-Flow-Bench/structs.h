@@ -114,14 +114,10 @@ struct Configuration {
 
   int iBME_TYP = BOSCH_BME280;
   int iBME_ADDR = 118;
-  int iBME_SCAN_MS =  1000;
 
   int iADC_TYPE = ADS1115;
   int iADC_I2C_ADDR = 72; 
-  int iADC_SCAN_MS = 500;
   int iADC_MAX_RETRY = 10;
-  int iADC_RANGE = 32767;
-  double dADC_GAIN = 6.144f;
 
   int iMAF_SRC_TYP = ADS_ADC;
   int iMAF_SENS_TYP = 0;
@@ -230,7 +226,7 @@ struct DeviceStatus {
   long adcPollTimer = 0;
   long bmePollTimer = 0;
   long apiPollTimer = 0;
-  long browserUpdateTimer = 0;
+  long ssePollTimer = 0;
   long wsCLeanPollTimer = 0;
   int pollTimer = 0;
   int serialData = 0;

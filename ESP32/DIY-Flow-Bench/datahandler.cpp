@@ -258,77 +258,11 @@ void DataHandler::writeJSONFile(String data, String filename, int dataSize){
 
 
 
-// /***********************************************************
-// * @brief createLiftDataFile
-// * @details Create blank lift data json file
-// * @note Called from DataHandler::begin() if liftdata.json not found
-// ***/
-// void DataHandler::createLiftDataFile () {
-
-//   Messages _message;
-//   String jsonString;  
-//   StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
-
-//   _message.serialPrintf("Creating liftdata.json file... \n"); 
-
-//   liftData["LIFTDATA1"] = 0.0;
-//   liftData["LIFTDATA2"] = 0.0;
-//   liftData["LIFTDATA3"] = 0.0;
-//   liftData["LIFTDATA4"] = 0.0;
-//   liftData["LIFTDATA5"] = 0.0;
-//   liftData["LIFTDATA6"] = 0.0;
-//   liftData["LIFTDATA7"] = 0.0;
-//   liftData["LIFTDATA8"] = 0.0;
-//   liftData["LIFTDATA9"] = 0.0;
-//   liftData["LIFTDATA10"] = 0.0;
-//   liftData["LIFTDATA11"] = 0.0;
-//   liftData["LIFTDATA12"] = 0.0;
-
-//   serializeJsonPretty(liftData, jsonString);
-//   writeJSONFile(jsonString, "/liftdata.json", LIFT_DATA_JSON_SIZE);
-
-// }
-
-
-
-
-// /***********************************************************
-// * @brief createCalibration File
-// * @details Create configuration json file
-// * @note Called from DataHandler::begin() if cal.json not found
-// ***/
-// void DataHandler::createCalibrationFile () {
-
-//   extern struct CalibrationData calVal;
-//   Messages _message;
-//   String jsonString;
-//   StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
-  
-//   _message.debugPrintf("Creating cal.json file... \n"); 
-  
-//   calData["FLOW_OFFSET"] = calVal.flow_offset;
-//   calData["USER_OFFSET"] = calVal.user_offset;
-//   calData["LEAK_BASE"] = calVal.leak_cal_baseline;
-//   calData["LEAK_BASE_REV"] = calVal.leak_cal_baseline_rev;
-//   calData["LEAK_OFFSET"] = calVal.leak_cal_offset;
-//   calData["LEAK_OFFSET_REV"] = calVal.leak_cal_offset_rev;
-
-//   serializeJsonPretty(calData, jsonString);
-
-//   File outputFile = SPIFFS.open("/cal.json", FILE_WRITE);
-//   serializeJsonPretty(calData, outputFile);
-//   outputFile.close();
-  
-// }
-
-
-
 
 
 /***********************************************************
  * @brief loadJSONFile
  * @details Loads JSON data from file
- * @note uses MAF_JSON_SIZE - largest possible file size
  ***/
 StaticJsonDocument<JSON_FILE_SIZE> DataHandler::loadJSONFile(String filename) {
 
@@ -444,10 +378,7 @@ void DataHandler::initialiseConfig () {
 
   if (!_prefs.isKey("iADC_TYPE")) _prefs.putInt("iADC_TYPE", ADS1115);
   if (!_prefs.isKey("iADC_I2C_ADDR")) _prefs.putInt("iADC_I2C_ADDR", 72);
-  if (!_prefs.isKey("iADC_SCAN_MS")) _prefs.putInt("iADC_SCAN_MS", 500);
   // if (!_prefs.isKey("iADC_MAX_RETRY")) _prefs.putInt("iADC_MAX_RETRY", 10);
-  if (!_prefs.isKey("iADC_RANGE")) _prefs.putInt("iADC_RANGE", 32767);
-  if (!_prefs.isKey("dADC_GAIN")) _prefs.putDouble("dADC_GAIN", 6.144);
 
   if (!_prefs.isKey("iMAF_SENS_TYP")) _prefs.putInt("iMAF_SENS_TYP", SENSOR_DISABLED);
   if (!_prefs.isKey("iMAF_SRC_TYP")) _prefs.putInt("iMAF_SRC_TYP", ADS_ADC);
@@ -538,14 +469,10 @@ void DataHandler::loadConfig () {
 
   config.iBME_TYP = _prefs.getInt("bBME_TYPE", BOSCH_BME280);
   config.iBME_ADDR = _prefs.getInt("iBME_ADDR", 118);
-  config.iBME_SCAN_MS = _prefs.getInt("iBME_SCAN_MS", 1000);
 
   config.iADC_TYPE = _prefs.getInt("iADC_TYPE", ADS1115);
   config.iADC_I2C_ADDR = _prefs.getInt("iADC_I2C_ADDR", 72);
-  config.iADC_SCAN_MS = _prefs.getInt("iADC_SCAN_MS", 500);
   // config.iADC_MAX_RETRY  = _prefs.getInt("iADC_MAX_RETRY", 10);
-  config.iADC_RANGE = _prefs.getInt("iADC_RANGE", 32767);
-  config.dADC_GAIN = _prefs.getDouble("dADC_GAIN", 6.144);
 
   config.iMAF_SENS_TYP = _prefs.getInt("iMAF_SENS_TYP", SENSOR_DISABLED);
   config.iMAF_SRC_TYP = _prefs.getInt("iMAF_SRC_TYP", ADS_ADC);

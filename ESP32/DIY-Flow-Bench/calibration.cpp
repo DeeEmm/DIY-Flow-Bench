@@ -349,10 +349,6 @@ void Calibration::loadCalibrationData() {
   Messages _message;
   Preferences _prefs;
 
-  DataHandler _data;
-  String jsonString;
-  StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
-
   extern struct CalibrationData calVal;
   extern struct Language language;
 

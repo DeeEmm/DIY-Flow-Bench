@@ -1715,17 +1715,13 @@ String Webserver::processConfigPageTemplate(const String &var) {
   if (var == "iBME_TYP_17" && config.iBME_TYP == BOSCH_BME680) return String("selected");
 
   if (var == "iBME_ADDR" ) return String(config.iBME_ADDR);
-  if (var == "iBME_SCAN_MS" ) return String(config.iBME_SCAN_MS);
 
   // ADC dropdown
   if (var == "iADC_TYPE_10" && config.iADC_TYPE == 10) return String("selected");
   if (var == "iADC_TYPE_11" && config.iADC_TYPE == 11) return String("selected");
 
   if (var == "iADC_I2C_ADDR" ) return String(config.iADC_I2C_ADDR);
-  if (var == "iADC_SCAN_MS" ) return String(config.iADC_SCAN_MS);
   // if (var == "iADC_MAX_RETRY" ) return String(config.iADC_MAX_RETRY);
-  if (var == "iADC_RANGE" ) return String(config.iADC_RANGE);
-  if (var == "dADC_GAIN" ) return String(config.dADC_GAIN);
 
   // MAF Sensor Type dropdown
   if (var == "iMAF_SENS_TYP_0" && config.iMAF_SENS_TYP == 0) return String("selected");

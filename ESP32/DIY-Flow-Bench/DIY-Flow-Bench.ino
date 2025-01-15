@@ -57,6 +57,7 @@
 #include "Wire.h"
 
 #include <ADS1115_lite.h>
+// #include "ADS1X15.h"
 
 // Initiate Structs
 BenchSettings settings;
@@ -120,9 +121,10 @@ void TASKgetSensorData( void * parameter ){
 
   for( ;; ) { // Infinite loop
 
-    // Check if semaphore available
+    // Check ADC poll timer
     if (millis() > status.adcPollTimer){
 
+      // Check if semaphore available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
 
@@ -315,7 +317,7 @@ void TASKgetSensorData( void * parameter ){
 
         xSemaphoreGive(i2c_task_mutex); // Release semaphore        
       }   
-      status.adcPollTimer = millis() + config.iADC_SCAN_MS; // Only reset timer when task has been executed
+      status.adcPollTimer = millis() + ADC_UPDATE_RATE; // Only reset timer when task has been executed
     }
     vTaskDelay( VTASK_DELAY_ADC );  // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
   }
@@ -340,9 +342,12 @@ void TASKgetEnviroData( void * parameter ){
 
   for( ;; ) { // Infinite loop
 
+    // Check BME poll timer
     if (millis() > status.bmePollTimer) {
-      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
+
+      // Check if semaphore is available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
+      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
 
         // Set / reset scan timers
         status.bmeScanTime = (micros() - bmeStartTime); // how long since we started the timer? 
@@ -351,7 +356,6 @@ void TASKgetEnviroData( void * parameter ){
         status.adcScanCount = 1;
         status.bmeScanCount += 1;
         
-
         // Get temp sensor data
         sensorVal.TempDegC = _sensors.getTempValue();        
         sensorVal.TempDegF = _calculations.convertTemperature(_sensors.getTempValue(), DEGF);
@@ -367,7 +371,7 @@ void TASKgetEnviroData( void * parameter ){
         // Release semaphore
         xSemaphoreGive(i2c_task_mutex); 
       }
-      status.bmePollTimer = millis() + config.iBME_SCAN_MS; // Only reset timer when task has been executed
+      status.bmePollTimer = millis() + BME_UPDATE_RATE; // Only reset timer when task has been executed
     }
     vTaskDelay( VTASK_DELAY_BME ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
 	}
@@ -417,11 +421,11 @@ void setup(void) {
     _webserver.begin();
   #endif
 
-  // xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
-  xTaskCreate(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask); 
+  xTaskCreatePinnedToCore(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask, secondaryCore); 
+  // xTaskCreate(TASKgetSensorData, "GET_SENS_DATA", SENSOR_TASK_MEM_STACK, NULL, 2, &sensorDataTask); 
 
-  // xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
-  xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask); 
+  xTaskCreatePinnedToCore(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask, secondaryCore); 
+  // xTaskCreate(TASKgetEnviroData, "GET_ENVIRO_DATA", ENVIRO_TASK_MEM_STACK, NULL, 2, &enviroDataTask); 
 
   if (config.bSWIRL_ENBLD){
     // TODO #227
@@ -447,7 +451,6 @@ void setup(void) {
 void loop () {
 
   
-  
   // Process API comms
   if (settings.api_enabled) {        
     if (millis() > status.apiPollTimer) {
@@ -464,17 +467,20 @@ void loop () {
       }
     }                            
   }
+
   
   // TODO: PID Vac source Analog VFD control [if PREF not within limits]
   // _hardware.setVFDRef();
   // _hardware.setBleedValveRef();
   
+
   #ifdef WEBSERVER_ENABLED
-    if (millis() > status.browserUpdateTimer) {      
+  
+    if (millis() > status.ssePollTimer) {      
 
         // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE){ // Check if semaphore available
         if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
-          status.browserUpdateTimer = millis() + STATUS_UPDATE_RATE; // Only reset timer when task executes
+          status.ssePollTimer = millis() + SSE_UPDATE_RATE; // Only reset timer when task executes
           
           // Build Server Side Events (SSE) data
           switch (status.GUIpage) {
@@ -495,6 +501,7 @@ void loop () {
         }
     }
   #endif
+
 
   if (status.shouldReboot) {
     _message.serialPrintf("Rebooting...");
