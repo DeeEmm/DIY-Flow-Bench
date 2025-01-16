@@ -137,7 +137,6 @@ void Hardware::begin () {
 
       ADS.begin();
       ADS.setGain(0);
-      ADS.setMode(0); // continuous
 
   }
 

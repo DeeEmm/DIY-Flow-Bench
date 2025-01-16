@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501170002      - #316 Disable ADC continuous mode
 2501170001      - #238 updated wiki links in GUI
 2501160023      - #316 Updated ADC-Lite-Test to DEV level
 2501160017      - #316 Updated Poll timers
