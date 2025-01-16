@@ -56,8 +56,8 @@
 #include "API.h"
 #include "Wire.h"
 
-#include <ADS1115_lite.h>
-// #include "ADS1X15.h"
+// #include <ADS1115_lite.h>
+#include "ADS1X15.h" // DM 'Lite' Library
 
 // Initiate Structs
 BenchSettings settings;
