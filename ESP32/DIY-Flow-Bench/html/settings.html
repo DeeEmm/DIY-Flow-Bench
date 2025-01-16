@@ -1,231 +1,232 @@
-    <!-- settings tab -->
-    <div id="settings">
-      <div class="config-panel">
-        <h2>~LANG_GUI_SYS_SETTINGS~</h2>
-        <p style="text-align:center"><button id="file-manager-button" class="button">Files</button> <button id="info-button" class="button">Info</button> <button id="support-button" class="button" onclick="window.open('https://github.com/DeeEmm/DIY-Flow-Bench/wiki','_blank')">Support</button> <button id="restart-button" class="button" >Reboot</button> <button id="update-button" class="button">Update</button></p>        
-        <form method="POST" action="/api/savesettings">
-          <div class="config-container">
-            <fieldset>
-              <legend>~LANG_GUI_WIFI_INFO~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#wifi-info" target="_blank">&#9432;</a></legend>        
-              <label class="config-label">~LANG_GUI_WIFI_SSID~:</label>
-              <input type="text" id="sWIFI_SSID"  name="sWIFI_SSID" value="~sWIFI_SSID~" class="config-text-long" >
-              <br>
-              <label class="config-label">~LANG_GUI_WIFI_PASS~:</label>
-              <input type="text" id="sWIFI_PSWD" name="sWIFI_PSWD" value="~sWIFI_PSWD~" class="config-text-long">
-              <br>
-              <label class="config-label">~LANG_GUI_WIFI_AP_SSID~:</label>
-              <input type="text" id="sWIFI_AP_SSID" name="sWIFI_AP_SSID" value="~sWIFI_AP_SSID~" class="config-text-long" >
-              <br>
-              <label class="config-label">~LANG_GUI_WIFI_AP_PASS~:</label>
-              <input type="text" id="sWIFI_AP_PSWD" name="sWIFI_AP_PSWD" value="~sWIFI_AP_PSWD~" class="config-text-long">
-              <br>
-              <label class="config-label">~LANG_GUI_HOSTNAME~:</label>
-              <input type="text" id="sHOSTNAME" name="sHOSTNAME" value="~sHOSTNAME~" class="config-text-long">
-              <br>
-              <label class="config-label">~LANG_GUI_WIFI_TIMEOUT~:</label>
-              <input type="text" id="iWIFI_TIMEOUT" name="iWIFI_TIMEOUT" value="~iWIFI_TIMEOUT~" class="config-text-long">
-            </fieldset>
-         
-            <fieldset>
-              <legend>~LANG_GUI_GENERAL_SETTINGS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#bench-settings" target="_blank">&#9432;</a></legend>
-              <label class="config-label">~LANG_GUI_BENCH_TYPE~:</label>
-              <span>~iBENCH_TYPE_DROPDOWN~</span>
-              <br>
-              <label class="config-label">~LANG_GUI_MAF_DIAMETER~:</label>
-              <input type="number" id="iMAF_DIAMETER" name="iMAF_DIAMETER" value="~iMAF_DIAMETER~" step="1" class="config-text">
-              <br>
-              <label class="config-label">~LANG_GUI_REFRESH_RATE~:</label>
-              <input type="number" id="iREFRESH_RATE" name="iREFRESH_RATE" value="~iREFRESH_RATE~" step="1" class="config-text">
-              <br>
-              <label class="config-label">~LANG_GUI_TEMPERATURE_UNIT~:</label>
-              <span>~TEMPERATURE_DROPDOWN~</span>
-              <br>
-              <label class="config-label">~LANG_GUI_LIFT_INTERVAL~:</label>
-              <input type="number" id="dLIFT_INTERVAL" name="dLIFT_INTERVAL" value="~dLIFT_INTERVAL~" step="0.1" class="config-text">
-            </fieldset>
-        
-            <fieldset>
-              <legend>~LANG_GUI_RESOLUTION_AND_ACCURACY~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
-                <label class="config-label">~LANG_GUI_GEN_DECIMAL_ACCURACY~:</label>
-                <span>
-                  <select name='iGEN_DECI_ACC' class='config-select'>
-                    <option value='0' ~iGEN_DECI_ACC_0~>1 Whole</option>
-                    <option value='1' ~iGEN_DECI_ACC_1~>0.1 Tenths</option>
-                    <option value='2' ~iGEN_DECI_ACC_2~>0.01 Hundredths </option>
-                  </select>
-                </span>
-                <br>
-                <label class="config-label">~LANG_GUI_FLOW_DECIMAL_ACCURACY~:</label>
-                <span>
-                  <select name='iFLOW_DECI_ACC' class='config-select'>
-                    <option value='0' ~iFLOW_DECI_ACC_0~>1 Whole</option>
-                    <option value='1' ~iFLOW_DECI_ACC_1~>0.1 Tenths</option>
-                    <option value='2' ~iFLOW_DECI_ACC_2~>0.01 Hundredths </option>
-                  </select>
-                </span>
-                <br>
-                <label class="config-label">~LANG_GUI_FLOW_VAL_ROUNDING~:</label>
-                <span>
-                    <select name='iROUNDING_TYP' class='config-select'>
-                      <option value='1' ~iROUNDING_TYP_1~>No Rounding</option>
-                      <option value='2' ~iROUNDING_TYP_2~>Integer</option>
-                      <option value='3' ~iROUNDING_TYP_3~>Half</option>
+
+        <!-- settings tab -->
+        <div id="settings">
+          <div class="config-panel">
+            <h2>~LANG_GUI_SYS_SETTINGS~</h2>
+            <p style="text-align:center"><button id="file-manager-button" class="button">Files</button> <button id="info-button" class="button">Info</button> <button id="support-button" class="button" onclick="window.open('https://github.com/DeeEmm/DIY-Flow-Bench/wiki','_blank')">Support</button> <button id="restart-button" class="button" >Reboot</button> <button id="update-button" class="button">Update</button></p>        
+            <form method="POST" action="/api/savesettings">
+              <div class="config-container">
+                <fieldset>
+                  <legend>~LANG_GUI_WIFI_INFO~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#wifi-info" target="_blank">&#9432;</a></legend>        
+                  <label class="config-label">~LANG_GUI_WIFI_SSID~:</label>
+                  <input type="text" id="sWIFI_SSID"  name="sWIFI_SSID" value="~sWIFI_SSID~" class="config-text-long" >
+                  <br>
+                  <label class="config-label">~LANG_GUI_WIFI_PASS~:</label>
+                  <input type="text" id="sWIFI_PSWD" name="sWIFI_PSWD" value="~sWIFI_PSWD~" class="config-text-long">
+                  <br>
+                  <label class="config-label">~LANG_GUI_WIFI_AP_SSID~:</label>
+                  <input type="text" id="sWIFI_AP_SSID" name="sWIFI_AP_SSID" value="~sWIFI_AP_SSID~" class="config-text-long" >
+                  <br>
+                  <label class="config-label">~LANG_GUI_WIFI_AP_PASS~:</label>
+                  <input type="text" id="sWIFI_AP_PSWD" name="sWIFI_AP_PSWD" value="~sWIFI_AP_PSWD~" class="config-text-long">
+                  <br>
+                  <label class="config-label">~LANG_GUI_HOSTNAME~:</label>
+                  <input type="text" id="sHOSTNAME" name="sHOSTNAME" value="~sHOSTNAME~" class="config-text-long">
+                  <br>
+                  <label class="config-label">~LANG_GUI_WIFI_TIMEOUT~:</label>
+                  <input type="text" id="iWIFI_TIMEOUT" name="iWIFI_TIMEOUT" value="~iWIFI_TIMEOUT~" class="config-text-long">
+                </fieldset>
+             
+                <fieldset>
+                  <legend>~LANG_GUI_GENERAL_SETTINGS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#bench-settings" target="_blank">&#9432;</a></legend>
+                  <label class="config-label">~LANG_GUI_BENCH_TYPE~:</label>
+                  <span>~iBENCH_TYPE_DROPDOWN~</span>
+                  <br>
+                  <label class="config-label">~LANG_GUI_MAF_DIAMETER~:</label>
+                  <input type="number" id="iMAF_DIAMETER" name="iMAF_DIAMETER" value="~iMAF_DIAMETER~" step="1" class="config-text">
+                  <br>
+                  <label class="config-label">~LANG_GUI_REFRESH_RATE~:</label>
+                  <input type="number" id="iREFRESH_RATE" name="iREFRESH_RATE" value="~iREFRESH_RATE~" step="1" class="config-text">
+                  <br>
+                  <label class="config-label">~LANG_GUI_TEMPERATURE_UNIT~:</label>
+                  <span>~TEMPERATURE_DROPDOWN~</span>
+                  <br>
+                  <label class="config-label">~LANG_GUI_LIFT_INTERVAL~:</label>
+                  <input type="number" id="dLIFT_INTERVAL" name="dLIFT_INTERVAL" value="~dLIFT_INTERVAL~" step="0.1" class="config-text">
+                </fieldset>
+            
+                <fieldset>
+                  <legend>~LANG_GUI_RESOLUTION_AND_ACCURACY~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#resolution-and-accuracy" target="_blank">&#9432;</a></legend>
+                    <label class="config-label">~LANG_GUI_GEN_DECIMAL_ACCURACY~:</label>
+                    <span>
+                      <select name='iGEN_DECI_ACC' class='config-select'>
+                        <option value='0' ~iGEN_DECI_ACC_0~>1 Whole</option>
+                        <option value='1' ~iGEN_DECI_ACC_1~>0.1 Tenths</option>
+                        <option value='2' ~iGEN_DECI_ACC_2~>0.01 Hundredths </option>
+                      </select>
+                    </span>
+                    <br>
+                    <label class="config-label">~LANG_GUI_FLOW_DECIMAL_ACCURACY~:</label>
+                    <span>
+                      <select name='iFLOW_DECI_ACC' class='config-select'>
+                        <option value='0' ~iFLOW_DECI_ACC_0~>1 Whole</option>
+                        <option value='1' ~iFLOW_DECI_ACC_1~>0.1 Tenths</option>
+                        <option value='2' ~iFLOW_DECI_ACC_2~>0.01 Hundredths </option>
+                      </select>
+                    </span>
+                    <br>
+                    <label class="config-label">~LANG_GUI_FLOW_VAL_ROUNDING~:</label>
+                    <span>
+                        <select name='iROUNDING_TYP' class='config-select'>
+                          <option value='1' ~iROUNDING_TYP_1~>No Rounding</option>
+                          <option value='2' ~iROUNDING_TYP_2~>Integer</option>
+                          <option value='3' ~iROUNDING_TYP_3~>Half</option>
+                        </select>
+                    </span>               
+                </fieldset>
+              
+                <fieldset>
+                  <legend>~LANG_GUI_DATA_FILTERS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#data-filters" target="_blank">&#9432;</a></legend>
+                    <label class="config-label">~LANG_GUI_DATA_FLTR_TYP~:</label>
+                    <span>
+                      <select name='iDATA_FLTR_TYP' class='config-select'>
+                        <option value='1' ~iDATA_FLTR_TYP_1~>None</option>
+                        <option value='2' ~iDATA_FLTR_TYP_2~>Rolling Median</option>
+                        <option value='3' ~iDATA_FLTR_TYP_3~>Cyclic Average </option>
+                        <option value='4' ~iDATA_FLTR_TYP_4~>Mode</option></select>
+                    </span>
+    
+                    <br>
+                    <label class="config-label">~LANG_GUI_MIN_FLOW_RATE~:</label>
+                    <input type="number" id="iMIN_FLOW_RATE" name="iMIN_FLOW_RATE" value="~iMIN_FLOW_RATE~" step="0.1" class="config-text">
+                    <br>
+                    <label class="config-label">~LANG_GUI_MIN_PRESSURE~:</label>
+                    <input type="number" id="iMIN_PRESSURE" name="iMIN_PRESSURE" value="~iMIN_PRESSURE~" step="0.1" class="config-text">
+                    <br>
+                    <!-- <label class="config-label">~LANG_GUI_MAF_MIN_VOLTS~:</label>
+                    <input type="number" id="iMAF_MIN_VOLTS" name="iMAF_MIN_VOLTS" value="~iMAF_MIN_VOLTS~" step="0.1" class="config-text">
+                    <br> -->
+                    <label class="config-label">~LANG_GUI_CYCLIC_AVERAGE_BUFFER~:</label>
+                    <input type="number" id="iCYC_AV_BUFF" name="iCYC_AV_BUFF" value="~iCYC_AV_BUFF~" step="1" class="config-text">
+                </fieldset>
+            
+                <fieldset>
+                  <legend>~LANG_GUI_CONVERSION_SETTINGS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#conversion-settings" target="_blank">&#9432;</a></legend>
+                    <label class="config-label">~LANG_GUI_ADJ_FLOW_DEP~:</label>
+                    <input type="number" id="iADJ_FLOW_DEP" name="iADJ_FLOW_DEP" value="~iADJ_FLOW_DEP~" step="1" class="config-text">
+                    <br>
+                    <label class="config-label">~LANG_GUI_STANDARD_REF_CONDITIONS~:</label>
+                    <select name='iSTD_REF' class='config-select'>
+                      <option value='1' ~iSTD_REF_1~>ISO 5011 (20&degC(68&degF) 1atm(101.3kPa) 50%RH)</option>
+                      <option value='2' ~iSTD_REF_2~>ISO 1585 (25&degC(68&degF) 100kPa  0%RH)</option>
+                      <option value='3' ~iSTD_REF_3~>ISA (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
+                      <option value='4' ~iSTD_REF_4~>ISO 13443 (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
+                      <option value='5' ~iSTD_REF_5~>ISO 2533 (15&degC(59&degF) 1atm(101.325kPa)  0% RH)</option>
+                      <!--<option value='6'>NIST / EPA (20&degC(68&degF) 1atm(101.325kPa)  --RH(unspecified))</option>-->
                     </select>
-                </span>               
-            </fieldset>
+                    <br>
+                    <label class="config-label">~LANG_GUI_STANDARDISED_ADJ_FLOW~:</label>
+                    <select name='iSTD_ADJ_FLOW' class='config-select'>
+                      <option value='1' ~iSTD_ADJ_FLOW_1~>Adjusted Flow uses ACFM</option>
+                      <option value='2' ~iSTD_ADJ_FLOW_2~>Adjusted Flow uses SCFM</option>
+                    </select>
+                </fieldset>
           
-            <fieldset>
-              <legend>~LANG_GUI_DATA_FILTERS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
-                <label class="config-label">~LANG_GUI_DATA_FLTR_TYP~:</label>
-                <span>
-                  <select name='iDATA_FLTR_TYP' class='config-select'>
-                    <option value='1' ~iDATA_FLTR_TYP_1~>None</option>
-                    <option value='2' ~iDATA_FLTR_TYP_2~>Rolling Median</option>
-                    <option value='3' ~iDATA_FLTR_TYP_3~>Cyclic Average </option>
-                    <option value='4' ~iDATA_FLTR_TYP_4~>Mode</option></select>
-                </span>
-
-                <br>
-                <label class="config-label">~LANG_GUI_MIN_FLOW_RATE~:</label>
-                <input type="number" id="iMIN_FLOW_RATE" name="iMIN_FLOW_RATE" value="~iMIN_FLOW_RATE~" step="0.1" class="config-text">
-                <br>
-                <label class="config-label">~LANG_GUI_MIN_PRESSURE~:</label>
-                <input type="number" id="iMIN_PRESSURE" name="iMIN_PRESSURE" value="~iMIN_PRESSURE~" step="0.1" class="config-text">
-                <br>
-                <!-- <label class="config-label">~LANG_GUI_MAF_MIN_VOLTS~:</label>
-                <input type="number" id="iMAF_MIN_VOLTS" name="iMAF_MIN_VOLTS" value="~iMAF_MIN_VOLTS~" step="0.1" class="config-text">
-                <br> -->
-                <label class="config-label">~LANG_GUI_CYCLIC_AVERAGE_BUFFER~:</label>
-                <input type="number" id="iCYC_AV_BUFF" name="iCYC_AV_BUFF" value="~iCYC_AV_BUFF~" step="1" class="config-text">
-            </fieldset>
-        
-            <fieldset>
-              <legend>~LANG_GUI_CONVERSION_SETTINGS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
-                <label class="config-label">~LANG_GUI_ADJ_FLOW_DEP~:</label>
-                <input type="number" id="iADJ_FLOW_DEP" name="iADJ_FLOW_DEP" value="~iADJ_FLOW_DEP~" step="1" class="config-text">
-                <br>
-                <label class="config-label">~LANG_GUI_STANDARD_REF_CONDITIONS~:</label>
-                <select name='iSTD_REF' class='config-select'>
-                  <option value='1' ~iSTD_REF_1~>ISO 5011 (20&degC(68&degF) 1atm(101.3kPa) 50%RH)</option>
-                  <option value='2' ~iSTD_REF_2~>ISO 1585 (25&degC(68&degF) 100kPa  0%RH)</option>
-                  <option value='3' ~iSTD_REF_3~>ISA (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
-                  <option value='4' ~iSTD_REF_4~>ISO 13443 (15&degC(59&degF) 1atm(101.325kPa)  0%RH)</option>
-                  <option value='5' ~iSTD_REF_5~>ISO 2533 (15&degC(59&degF) 1atm(101.325kPa)  0% RH)</option>
-                  <!--<option value='6'>NIST / EPA (20&degC(68&degF) 1atm(101.325kPa)  --RH(unspecified))</option>-->
-                </select>
-                <br>
-                <label class="config-label">~LANG_GUI_STANDARDISED_ADJ_FLOW~:</label>
-                <select name='iSTD_ADJ_FLOW' class='config-select'>
-                  <option value='1' ~iSTD_ADJ_FLOW_1~>Adjusted Flow uses ACFM</option>
-                  <option value='2' ~iSTD_ADJ_FLOW_2~>Adjusted Flow uses SCFM</option>
-                </select>
-            </fieldset>
-      
-            <fieldset>
-              <legend>~LANG_GUI_DATA_CAPTURE_SETTINGS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
-                
-              <label class="config-label">~LANG_GUI_CAPTURE_DATATYPE~:</label>
-              <select name='DATACAP_STD' class='config-select'>
-                <option value='1' ~CAP_MODE_1~>Flow (ACFM)</option>
-                <option value='1' ~CAP_MODE_2~>Standard Flow (ACFM - ~STANDARD_FLOW~)</option>
-                <option value='2' ~CAP_MODE_3~>Adjusted Flow (ACFM @ ~iADJ_FLOW_DEP~ in/H2O)</option>
-                <option value='3' ~CAP_MODE_4~>Adjusted Standard Flow (ACFM - ~STANDARD_FLOW~ @ ~iADJ_FLOW_DEP~ in/H2O)</option>
-                <option value='4' ~CAP_MODE_5~>MAF Flow (~MAF_FLOW_UNIT~)</option>
-              </select>
-              <br>
-              <label class="config-label">~LANG_GUI_DATA_GRAPH_MAX_VAL~:</label>
-              <select name='iDATAGRAPH_MAX' class='config-select'>
-                <option value='0' ~iDATAGRAPH_MAX_0~>~LANG_GUI_AUTO~</option>
-                <option value='1' ~iDATAGRAPH_MAX_1~>250 cfm</option>
-                <option value='2' ~iDATAGRAPH_MAX_2~>500 cfm</option>
-                <option value='3' ~iDATAGRAPH_MAX_3~>1000 cfm</option>
-              </select>
-            </fieldset>
-      
-            <fieldset>
-              <legend>~LANG_GUI_CAL_ORIFICE_SETTINGS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
-                  <label class="config-label">~LANG_GUI_CAL_ORIFICE_FLOW_RATE~:</label>
-                  <input type="number" id="dCAL_FLW_RATE" name="dCAL_FLW_RATE" value="~dCAL_FLW_RATE~" step="0.01" class="config-text">
+                <fieldset>
+                  <legend>~LANG_GUI_DATA_CAPTURE_SETTINGS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#datagraph-setting" target="_blank">&#9432;</a></legend>
+                    
+                  <label class="config-label">~LANG_GUI_CAPTURE_DATATYPE~:</label>
+                  <select name='DATACAP_STD' class='config-select'>
+                    <option value='1' ~CAP_MODE_1~>Flow (ACFM)</option>
+                    <option value='1' ~CAP_MODE_2~>Standard Flow (ACFM - ~STANDARD_FLOW~)</option>
+                    <option value='2' ~CAP_MODE_3~>Adjusted Flow (ACFM @ ~iADJ_FLOW_DEP~ in/H2O)</option>
+                    <option value='3' ~CAP_MODE_4~>Adjusted Standard Flow (ACFM - ~STANDARD_FLOW~ @ ~iADJ_FLOW_DEP~ in/H2O)</option>
+                    <option value='4' ~CAP_MODE_5~>MAF Flow (~MAF_FLOW_UNIT~)</option>
+                  </select>
                   <br>
-                  <label class="config-label">~LANG_GUI_CAL_ORIFICE_TEST_PRESS~:</label>
-                  <input type="number" id="dCAL_REF_PRESS" name="dCAL_REF_PRESS" value="~dCAL_REF_PRESS~" step="0.01" class="config-text">
-            </fieldset>
-       
-            <div id="orificeData">
-              <fieldset>
-                <legend>~LANG_GUI_ORIFICE_DATA~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
-                  <label class="config-label">~LANG_GUI_ORIFICE1_FLOW~:</label>
-                  <input type="number" id="dORIFICE1_FLOW" name="dORIFICE1_FLOW" value="~dORIFICE1_FLOW~" step="0.01" class="config-text">
-                  <br>
-                  <label class="config-label">~LANG_GUI_ORIFICE1_PRESSURE~:</label>
-                  <input type="number" id="dORIFICE1_PRESS" name="dORIFICE1_PRESS" value="~dORIFICE1_PRESS~" step="0.01" class="config-text">
-                  <br>
-                  <label class="config-label">~LANG_GUI_ORIFICE2_FLOW~:</label>
-                  <input type="number" id="dORIFICE2_FLOW" name="dORIFICE2_FLOW" value="~dORIFICE2_FLOW~" step="0.01" class="config-text">
-                  <br>
-                  <label class="config-label">~LANG_GUI_ORIFICE2_PRESSURE~:</label>
-                  <input type="number" id="dORIFICE2_PRESS" name="dORIFICE2_PRESS" value="~dORIFICE2_PRESS~" step="0.01" class="config-text">
-                  <br>
-                  <label class="config-label">~LANG_GUI_ORIFICE3_FLOW~:</label>
-                  <input type="number" id="dORIFICE3_FLOW" name="dORIFICE3_FLOW" value="~dORIFICE3_FLOW~" step="0.01" class="config-text">
-                  <br>
-                  <label class="config-label">~LANG_GUI_ORIFICE3_PRESSURE~:</label>
-                  <input type="number" id="dORIFICE3_PRESS" name="dORIFICE3_PRESS" value="~dORIFICE3_PRESS~" step="0.01" class="config-text">
-                  <br>
-                  <label class="config-label">~LANG_GUI_ORIFICE4_FLOW~:</label>
-                  <input type="number" id="dORIFICE4_FLOW" name="dORIFICE4_FLOW" value="~dORIFICE4_FLOW~" step="0.01" class="config-text">
-                  <br>
-                  <label class="config-label">~LANG_GUI_ORIFICE4_PRESSURE~:</label>
-                  <input type="number" id="dORIFICE4_PRESS" name="dORIFICE4_PRESS" value="~dORIFICE4_PRESS~" step="0.01" class="config-text">
-                  <br>
-                  <label class="config-label">~LANG_GUI_ORIFICE5_FLOW~:</label>
-                  <input type="number" id="dORIFICE5_FLOW" name="dORIFICE5_FLOW" value="~dORIFICE5_FLOW~" step="0.01" class="config-text">
-                  <br>
-                  <label class="config-label">~LANG_GUI_ORIFICE5_PRESSURE~:</label>
-                  <input type="number" id="dORIFICE5_PRESS" name="dORIFICE5_PRESS" value="~dORIFICE5_PRESS~" step="0.01" class="config-text">
-                  <br>
-                  <label class="config-label">~LANG_GUI_ORIFICE6_FLOW~:</label>
-                  <input type="number" id="dORIFICE6_FLOW" name="dORIFICE6_FLOW" value="~dORIFICE6_FLOW~" step="0.01" class="config-text">
-                  <br>
-                  <label class="config-label">~LANG_GUI_ORIFICE6_PRESSURE~:</label>
-                  <input type="number" id="dORIFICE6_PRESS" name="dORIFICE6_PRESS" value="~dORIFICE6_PRESS~" step="0.01" class="config-text">
-              </fieldset>
-            </div>
-
-            <fieldset>
-              <legend>~LANG_GUI_API_SETTINGS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
-                  <label class="config-label">~LANG_GUI_API_DELIMITER~:</label>
-                  <input type="text" id="sAPI_DELIM" name="sAPI_DELIM" value="~sAPI_DELIM~" class="config-text">
-                  <br>
-                  <label class="config-label">~LANG_GUI_SERIAL_BAUD~:</label>
-                  <input type="text" id="iSERIAL_BAUD" name="iSERIAL_BAUD" value="~iSERIAL_BAUD~" class="config-text">
-            </fieldset>
+                  <label class="config-label">~LANG_GUI_DATA_GRAPH_MAX_VAL~:</label>
+                  <select name='iDATAGRAPH_MAX' class='config-select'>
+                    <option value='0' ~iDATAGRAPH_MAX_0~>~LANG_GUI_AUTO~</option>
+                    <option value='1' ~iDATAGRAPH_MAX_1~>250 cfm</option>
+                    <option value='2' ~iDATAGRAPH_MAX_2~>500 cfm</option>
+                    <option value='3' ~iDATAGRAPH_MAX_3~>1000 cfm</option>
+                  </select>
+                </fieldset>
+          
+                <fieldset>
+                  <legend>~LANG_GUI_CAL_ORIFICE_SETTINGS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#calibration-orifice-settings" target="_blank">&#9432;</a></legend>
+                      <label class="config-label">~LANG_GUI_CAL_ORIFICE_FLOW_RATE~:</label>
+                      <input type="number" id="dCAL_FLW_RATE" name="dCAL_FLW_RATE" value="~dCAL_FLW_RATE~" step="0.01" class="config-text">
+                      <br>
+                      <label class="config-label">~LANG_GUI_CAL_ORIFICE_TEST_PRESS~:</label>
+                      <input type="number" id="dCAL_REF_PRESS" name="dCAL_REF_PRESS" value="~dCAL_REF_PRESS~" step="0.01" class="config-text">
+                </fieldset>
+           
+                <div id="orificeData">
+                  <fieldset>
+                    <legend>~LANG_GUI_ORIFICE_DATA~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#orifice-data" target="_blank">&#9432;</a></legend>
+                      <label class="config-label">~LANG_GUI_ORIFICE1_FLOW~:</label>
+                      <input type="number" id="dORIFICE1_FLOW" name="dORIFICE1_FLOW" value="~dORIFICE1_FLOW~" step="0.01" class="config-text">
+                      <br>
+                      <label class="config-label">~LANG_GUI_ORIFICE1_PRESSURE~:</label>
+                      <input type="number" id="dORIFICE1_PRESS" name="dORIFICE1_PRESS" value="~dORIFICE1_PRESS~" step="0.01" class="config-text">
+                      <br>
+                      <label class="config-label">~LANG_GUI_ORIFICE2_FLOW~:</label>
+                      <input type="number" id="dORIFICE2_FLOW" name="dORIFICE2_FLOW" value="~dORIFICE2_FLOW~" step="0.01" class="config-text">
+                      <br>
+                      <label class="config-label">~LANG_GUI_ORIFICE2_PRESSURE~:</label>
+                      <input type="number" id="dORIFICE2_PRESS" name="dORIFICE2_PRESS" value="~dORIFICE2_PRESS~" step="0.01" class="config-text">
+                      <br>
+                      <label class="config-label">~LANG_GUI_ORIFICE3_FLOW~:</label>
+                      <input type="number" id="dORIFICE3_FLOW" name="dORIFICE3_FLOW" value="~dORIFICE3_FLOW~" step="0.01" class="config-text">
+                      <br>
+                      <label class="config-label">~LANG_GUI_ORIFICE3_PRESSURE~:</label>
+                      <input type="number" id="dORIFICE3_PRESS" name="dORIFICE3_PRESS" value="~dORIFICE3_PRESS~" step="0.01" class="config-text">
+                      <br>
+                      <label class="config-label">~LANG_GUI_ORIFICE4_FLOW~:</label>
+                      <input type="number" id="dORIFICE4_FLOW" name="dORIFICE4_FLOW" value="~dORIFICE4_FLOW~" step="0.01" class="config-text">
+                      <br>
+                      <label class="config-label">~LANG_GUI_ORIFICE4_PRESSURE~:</label>
+                      <input type="number" id="dORIFICE4_PRESS" name="dORIFICE4_PRESS" value="~dORIFICE4_PRESS~" step="0.01" class="config-text">
+                      <br>
+                      <label class="config-label">~LANG_GUI_ORIFICE5_FLOW~:</label>
+                      <input type="number" id="dORIFICE5_FLOW" name="dORIFICE5_FLOW" value="~dORIFICE5_FLOW~" step="0.01" class="config-text">
+                      <br>
+                      <label class="config-label">~LANG_GUI_ORIFICE5_PRESSURE~:</label>
+                      <input type="number" id="dORIFICE5_PRESS" name="dORIFICE5_PRESS" value="~dORIFICE5_PRESS~" step="0.01" class="config-text">
+                      <br>
+                      <label class="config-label">~LANG_GUI_ORIFICE6_FLOW~:</label>
+                      <input type="number" id="dORIFICE6_FLOW" name="dORIFICE6_FLOW" value="~dORIFICE6_FLOW~" step="0.01" class="config-text">
+                      <br>
+                      <label class="config-label">~LANG_GUI_ORIFICE6_PRESSURE~:</label>
+                      <input type="number" id="dORIFICE6_PRESS" name="dORIFICE6_PRESS" value="~dORIFICE6_PRESS~" step="0.01" class="config-text">
+                  </fieldset>
+                </div>
+    
+                <fieldset>
+                  <legend>~LANG_GUI_API_SETTINGS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#api-settings" target="_blank">&#9432;</a></legend>
+                      <label class="config-label">~LANG_GUI_API_DELIMITER~:</label>
+                      <input type="text" id="sAPI_DELIM" name="sAPI_DELIM" value="~sAPI_DELIM~" class="config-text">
+                      <br>
+                      <label class="config-label">~LANG_GUI_SERIAL_BAUD~:</label>
+                      <input type="text" id="iSERIAL_BAUD" name="iSERIAL_BAUD" value="~iSERIAL_BAUD~" class="config-text">
+                </fieldset>
+              </div>
+              <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
+            </form>
+            <br>
+            <br>
+              <form method="POST" action="/api/savecalibration">
+                <fieldset>
+                  <legend>~LANG_GUI_CALIBRATION_DATA~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#calibration-data" target="_blank">&#9432;</a></legend>
+                    <label class="config-label">~LANG_GUI_CAL_OFFSET~:</label>
+                    <input type="number" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" step="0.01" class="config-text">
+                    <br>
+                    <label class="config-label">~LANG_GUI_LEAK_TEST_BASELINE~:</label>
+                    <input  type="number" id="LEAK_BASE" name="LEAK_BASE" value="~LEAK_BASE~" step="0.01" class="config-text">
+                    <br>
+                    <label class="config-label">~LANG_GUI_LEAK_TEST_OFFSET~:</label>
+                    <input  type="number" id="LEAK_OFFSET" name="LEAK_OFFSET" value="~LEAK_OFFSET~" step="0.01" class="config-text">
+                    <br>
+                    <label class="config-label">~LANG_GUI_LEAK_TEST_BASELINE_REV~:</label>
+                    <input  type="number" id="LEAK_BASE_REV" name="LEAK_BASE_REV" value="~LEAK_BASE_REV~" step="0.01" class="config-text">
+                    <br>
+                    <label class="config-label">~LANG_GUI_LEAK_TEST_OFFSET_REV~:</label>
+                    <input type="number" id="LEAK_OFFSET_REV" name="LEAK_OFFSET_REV" value="~LEAK_OFFSET_REV~" step="0.01" class="config-text">
+                    <br>
+                  </fieldset>
+                  <div class="float-right"><input id="save-config-button" type="submit" class="button" value="~LANG_GUI_OVERWRITE~"></div>
+              </form>    
           </div>
-          <div class="float-right"><input id="save-config-button" type="submit" class="button" value="Save"></div>
-        </form>
-        <br>
-        <br>
-          <form method="POST" action="/api/savecalibration">
-            <fieldset>
-              <legend>~LANG_GUI_CALIBRATION_DATA~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/" target="_blank">&#9432;</a></legend>
-                <label class="config-label">~LANG_GUI_CAL_OFFSET~:</label>
-                <input type="number" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" step="0.01" class="config-text">
-                <br>
-                <label class="config-label">~LANG_GUI_LEAK_TEST_BASELINE~:</label>
-                <input  type="number" id="LEAK_BASE" name="LEAK_BASE" value="~LEAK_BASE~" step="0.01" class="config-text">
-                <br>
-                <label class="config-label">~LANG_GUI_LEAK_TEST_OFFSET~:</label>
-                <input  type="number" id="LEAK_OFFSET" name="LEAK_OFFSET" value="~LEAK_OFFSET~" step="0.01" class="config-text">
-                <br>
-                <label class="config-label">~LANG_GUI_LEAK_TEST_BASELINE_REV~:</label>
-                <input  type="number" id="LEAK_BASE_REV" name="LEAK_BASE_REV" value="~LEAK_BASE_REV~" step="0.01" class="config-text">
-                <br>
-                <label class="config-label">~LANG_GUI_LEAK_TEST_OFFSET_REV~:</label>
-                <input type="number" id="LEAK_OFFSET_REV" name="LEAK_OFFSET_REV" value="~LEAK_OFFSET_REV~" step="0.01" class="config-text">
-                <br>
-              </fieldset>
-              <div class="float-right"><input id="save-config-button" type="submit" class="button" value="~LANG_GUI_OVERWRITE~"></div>
-          </form>    
-      </div>
-    </div>
-    <script type="text/javascript" src="settings.js"></script>
+        </div>
+        <script type="text/javascript" src="settings.js"></script>
