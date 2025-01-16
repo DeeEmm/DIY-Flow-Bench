@@ -34,13 +34,13 @@
 #include "messages.h"
 #include "system.h"
 
-#include <ADS1115_lite.h>
+// #include <ADS1115_lite.h>
 
 extern struct Configuration config;
-ADS1115_lite adc(config.iADC_I2C_ADDR);
+// ADS1115_lite adc(config.iADC_I2C_ADDR);
 
-// #include "ADS1X15.h"
-// ADS_1115 ADS(config.iADC_I2C_ADDR);
+#include "ADS1X15.h"
+ADS_1115 ADS(config.iADC_I2C_ADDR);
 
 int ADC_RANGE = 32767;
 double ADC_GAIN = 6.144f;
@@ -123,21 +123,20 @@ void Hardware::begin () {
 
       _message.serialPrintf("Initialising ADS1115 ( Address: %u ) \n", config.iADC_I2C_ADDR);
 
-      adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
-      adc.setSampleRate(ADS1115_REG_CONFIG_DR_16SPS); // Set ADC Sample Rate. NOTE: minimum of 128SPS.
-      // adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate. NOTE: minimum of 128SPS.
+      // adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
+      // adc.setSampleRate(ADS1115_REG_CONFIG_DR_16SPS); // Set ADC Sample Rate. NOTE: minimum of 128SPS.
+      // // adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate. NOTE: minimum of 128SPS.
 
       
-      if (!adc.testConnection()) {
-        _message.serialPrintf("ADS1115 Connection failed");
-        while(1); // Freeze
-      } else {
-        _message.serialPrintf("ADS1115 Initialised\n");
-      }
+      // if (!adc.testConnection()) {
+      //   _message.serialPrintf("ADS1115 Connection failed");
+      //   while(1); // Freeze
+      // } else {
+      //   _message.serialPrintf("ADS1115 Initialised\n");
+      // }
 
-      // ADS.begin();
-      // ADS.setGain(0);
-      // ADS.setMode(0); // continuous
+      ADS.begin();
+      ADS.setGain(0);
 
   }
 
@@ -606,30 +605,30 @@ int32_t Hardware::getADCRawData(int channel) {
       return 0;
     }
 
-    switch (channel) { // MUX - Multiplex channel
+    // switch (channel) { // MUX - Multiplex channel
 
-      case (0):
-          adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_0); // 0x4000
-      break;
+    //   case (0):
+    //       adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_0); // 0x4000
+    //   break;
 
-      case (1):
-          adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_1); // 0x5000
-      break;
+    //   case (1):
+    //       adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_1); // 0x5000
+    //   break;
 
-      case (2):
-          adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_2); // 0x6000
-      break;
+    //   case (2):
+    //       adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_2); // 0x6000
+    //   break;
 
-      case (3):
-          adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_3); // 0x7000
-      break;
-    }
+    //   case (3):
+    //       adc.setMux(ADS1115_REG_CONFIG_MUX_SINGLE_3); // 0x7000
+    //   break;
+    // }
     
-    adc.triggerConversion(); // Start a conversion. This immediately returns
-    while (!adc.isConversionDone());
-    rawADCval = adc.getConversion(); // This polls the ADS1115 and wait for conversion to finish, THEN returns the value
+    // adc.triggerConversion(); // Start a conversion. This immediately returns
+    // while (!adc.isConversionDone());
+    // rawADCval = adc.getConversion(); // This polls the ADS1115 and wait for conversion to finish, THEN returns the value
 
-    // rawADCval = ADS.readADC(channel);
+    rawADCval = ADS.readADC(channel);
 
 
   }

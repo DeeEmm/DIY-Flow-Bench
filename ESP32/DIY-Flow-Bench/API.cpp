@@ -224,6 +224,7 @@ void API::ParseMessage(char apiMessage) {
   ~ : Restart ESP
   $ : Reset WiFi
   % : Reset WiFi AP SSID & Password
+  & : Reset Pins
   @ : Stream Status
   ! : Debug Mode
   + : Verbose Mode
