@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501160017      - #316 Updated Poll timers
 2501150016      - #316 Updated ADC library
                 - Moved ADC + BME poll timers into system.h
                 - Calibrated poll timer values

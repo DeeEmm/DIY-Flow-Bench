@@ -124,7 +124,8 @@ void Hardware::begin () {
       _message.serialPrintf("Initialising ADS1115 ( Address: %u ) \n", config.iADC_I2C_ADDR);
 
       adc.setGain(ADS1115_REG_CONFIG_PGA_6_144V); // Set ADC Gain +/-6.144V range = Gain 2/3
-      adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate. NOTE: minimum of 128SPS.
+      adc.setSampleRate(ADS1115_REG_CONFIG_DR_16SPS); // Set ADC Sample Rate. NOTE: minimum of 128SPS.
+      // adc.setSampleRate(ADS1115_REG_CONFIG_DR_128SPS); // Set ADC Sample Rate. NOTE: minimum of 128SPS.
 
       
       if (!adc.testConnection()) {

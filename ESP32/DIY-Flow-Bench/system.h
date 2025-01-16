@@ -77,9 +77,9 @@ using namespace std;
 #define VTASK_DELAY_SSE 1
 
 // Poll timers
-#define ADC_UPDATE_RATE 821  //401 // time between ADC read events in milliseconds / 821 ? - Value from #316. Seems excessively long
-#define BME_UPDATE_RATE 199  //1009 // time between BME read events in milliseconds / 199 ? - - Value from #316. This is too fast. Specs state 1sec update.
-#define SSE_UPDATE_RATE 503  //683 // time between SSE push in milliseconds / 503 - arbitrary value for GUI update. Limited by SSE speed.
+#define ADC_UPDATE_RATE 401 // time between ADC read events in milliseconds 
+#define BME_UPDATE_RATE 1009 // time between BME read events in milliseconds 
+#define SSE_UPDATE_RATE 683 // time between SSE push in milliseconds 
 
 /***********************************************************
 * WEBUI SETTINGS
