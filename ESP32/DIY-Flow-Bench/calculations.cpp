@@ -239,11 +239,11 @@ double Calculations::convertMassFlowUnits(double refFlow, int unitsIn, int units
   switch (unitsIn) {
 
     case MG_S:
-      massFlowKGH = refFlow * 277.778;
+      massFlowKGH = refFlow * 0.0036;
       break;
 
     case GM_M:
-      massFlowKGH = refFlow * 16.6667;
+      massFlowKGH = refFlow * 0.06;
       break;
 
     case KG_H:
@@ -256,11 +256,11 @@ double Calculations::convertMassFlowUnits(double refFlow, int unitsIn, int units
   switch (unitsOut) {
 
     case MG_S:
-      convertedFlow = massFlowKGH * 0.0036;
+      convertedFlow = massFlowKGH * 277.778;
       break;
 
     case GM_M:
-      convertedFlow = massFlowKGH * 0.06;
+      convertedFlow = massFlowKGH * 16.6667;
       break;
 
     case KG_H:

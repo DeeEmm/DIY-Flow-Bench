@@ -66,7 +66,7 @@ public:
     String mafLink[NUM_MAF_TYPES] = {
         "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/142",
         "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/138",
-        ""
+        "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/319"
     };
   
     // MafData() : currentMafType(ACDELCO_92281162) {}

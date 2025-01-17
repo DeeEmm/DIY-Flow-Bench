@@ -1293,6 +1293,39 @@ String Webserver::processIndexPageTemplate(const String &var) {
   // }
 
 
+  // Lift Profile
+  if (floor(settings.valveLiftInterval) == settings.valveLiftInterval) {
+
+    // it's an integer so lets truncate fractional part
+    int liftInterval = settings.valveLiftInterval;
+    if (var == "lift1") return String(1 * liftInterval);
+    if (var == "lift2") return String(2 * liftInterval);
+    if (var == "lift3") return String(3 * liftInterval);
+    if (var == "lift4") return String(4 * liftInterval);
+    if (var == "lift5") return String(5 * liftInterval);
+    if (var == "lift6") return String(6 * liftInterval);
+    if (var == "lift7") return String(7 * liftInterval);
+    if (var == "lift8") return String(8 * liftInterval);
+    if (var == "lift9") return String(9 * liftInterval);
+    if (var == "lift10") return String(10 * liftInterval);
+    if (var == "lift11") return String(11 * liftInterval);
+    if (var == "lift12") return String(12 * liftInterval);
+
+  } else {
+    // Display the double
+    if (var == "lift1") return String(1 * settings.valveLiftInterval);
+    if (var == "lift2") return String(2 * settings.valveLiftInterval);
+    if (var == "lift3") return String(3 * settings.valveLiftInterval);
+    if (var == "lift4") return String(4 * settings.valveLiftInterval);
+    if (var == "lift5") return String(5 * settings.valveLiftInterval);
+    if (var == "lift6") return String(6 * settings.valveLiftInterval);
+    if (var == "lift7") return String(7 * settings.valveLiftInterval);
+    if (var == "lift8") return String(8 * settings.valveLiftInterval);
+    if (var == "lift9") return String(9 * settings.valveLiftInterval);
+    if (var == "lift10") return String(10 * settings.valveLiftInterval);
+    if (var == "lift11") return String(11 * settings.valveLiftInterval);
+    if (var == "lift12") return String(12 * settings.valveLiftInterval);
+  }
 
 
   return "";
@@ -1949,39 +1982,6 @@ String Webserver::processDatagraphPageTemplate(const String &var) {
   if (var == "LINE_DATA12") return String(500 - (valveData.LiftData12 * scaleFactor));
 
 
-  // Lift Profile
-  if (floor(settings.valveLiftInterval) == settings.valveLiftInterval) {
-
-    // it's an integer so lets truncate fractional part
-    int liftInterval = settings.valveLiftInterval;
-    if (var == "lift1") return String(1 * liftInterval);
-    if (var == "lift2") return String(2 * liftInterval);
-    if (var == "lift3") return String(3 * liftInterval);
-    if (var == "lift4") return String(4 * liftInterval);
-    if (var == "lift5") return String(5 * liftInterval);
-    if (var == "lift6") return String(6 * liftInterval);
-    if (var == "lift7") return String(7 * liftInterval);
-    if (var == "lift8") return String(8 * liftInterval);
-    if (var == "lift9") return String(9 * liftInterval);
-    if (var == "lift10") return String(10 * liftInterval);
-    if (var == "lift11") return String(11 * liftInterval);
-    if (var == "lift12") return String(12 * liftInterval);
-
-  } else {
-    // Display the double
-    if (var == "lift1") return String(1 * settings.valveLiftInterval);
-    if (var == "lift2") return String(2 * settings.valveLiftInterval);
-    if (var == "lift3") return String(3 * settings.valveLiftInterval);
-    if (var == "lift4") return String(4 * settings.valveLiftInterval);
-    if (var == "lift5") return String(5 * settings.valveLiftInterval);
-    if (var == "lift6") return String(6 * settings.valveLiftInterval);
-    if (var == "lift7") return String(7 * settings.valveLiftInterval);
-    if (var == "lift8") return String(8 * settings.valveLiftInterval);
-    if (var == "lift9") return String(9 * settings.valveLiftInterval);
-    if (var == "lift10") return String(10 * settings.valveLiftInterval);
-    if (var == "lift11") return String(11 * settings.valveLiftInterval);
-    if (var == "lift12") return String(12 * settings.valveLiftInterval);
-  }
 
   return "";
 

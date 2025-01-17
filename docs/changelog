@@ -29,7 +29,12 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-
+2501170010      - #316 Updated poll timer values
+                - Removed redundant calls to old ADS1115_lite library
+                - #320 Fixed templating issue
+                - Changed opacity of capture modal on hover (obscured flow tile)
+                - Added htmlToBytes.py to compiler pre-tasks
+                - Fixed Mg/sec conversion for mimic page
 2501170004      - Removed refresh rate from GUI
 2501170002      - #316 Disable ADC continuous mode
 2501170001      - #238 updated wiki links in GUI

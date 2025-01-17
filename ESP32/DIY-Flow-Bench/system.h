@@ -77,9 +77,9 @@ using namespace std;
 #define VTASK_DELAY_SSE 1
 
 // Poll timers
-#define ADC_UPDATE_RATE 401 // time between ADC read events in milliseconds 
-#define BME_UPDATE_RATE 1009 // time between BME read events in milliseconds 
-#define SSE_UPDATE_RATE 683 // time between SSE push in milliseconds 
+#define ADC_UPDATE_RATE 347 // time between ADC read events in milliseconds 
+#define BME_UPDATE_RATE 1168 // time between BME read events in milliseconds 
+#define SSE_UPDATE_RATE 640 // time between SSE push in milliseconds 
 
 /***********************************************************
 * WEBUI SETTINGS
@@ -104,9 +104,6 @@ using namespace std;
 #endif
 #ifndef RELEASE 
 #error RELEASE UNDEFINED 
-#endif
-#ifndef GUI_BUILD_NUMBER
-#error GUI_BUILD_NUMBER UNDEFINED
 #endif
 #ifndef DEV_BRANCH
 #error DEV_BRANCH UNDEFINED

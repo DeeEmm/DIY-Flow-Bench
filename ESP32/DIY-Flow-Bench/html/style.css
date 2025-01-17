@@ -405,6 +405,10 @@ flowTargetValInput {
   position:absolute;
 }
 
+[draggable=true] {
+  cursor: move;
+}
+
 /* Modal Dialogs */
 .modal {
   display: none; /* Hidden by default */
@@ -446,6 +450,22 @@ flowTargetValInput {
 .info-modal {
   font-size: 18px;
 }
+
+.capture-data-modal {
+  margin: 1px auto; /* 15pcnt from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 850px; 
+  height:230;
+  border-radius: 5px;
+  overflow-y:scroll;
+  background: rgba(255, 255, 255, 1);
+}
+
+.capture-data-modal:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
 
 /* two column layout */
 .column {
@@ -510,6 +530,10 @@ flowTargetValInput {
   padding: 6px 6px;
   background-color: #125ab1;
   float: right;
+}
+
+#capture-lift-data-button {
+  float:none;
 }
 
 #capture-lift-data-button:active {

@@ -5,18 +5,24 @@ import datetime
 import re
 import shutil
 from SCons.Script import Import
+from subprocess import run
 
 Import("env")
-
 
 # stop the current script execution if called from external script
 if env.IsIntegrationDump():
     Return()
 
 print("Pre-Build tasks")
-print("Loading version.json")
+
+print("Build htmldata.h")
+
+# convert HTML to byte data and store in htmldata.h
+run(["python3", "ESP32/DIY-Flow-Bench/tools/htmlToBytes.py"])
 
 release_path = env.subst("$PROJECT_DIR/ESP32/DIY-Flow-Bench/release/")
+
+print("Loading version.json")
 
 # read json file into var
 file_path = 'ESP32/DIY-Flow-Bench/version.json'

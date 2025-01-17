@@ -173,7 +173,6 @@ void API::ParseMessage(char apiMessage) {
   U : Uptime in hhhh.mm
   V : Version
   v : GUI Version
-  v : Valve lift data in JSON format
   W : WiFi SSID
   X : xTask memory usage   
   x : Heap memory usage   
@@ -510,9 +509,6 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "V%s%s.%s.%s", settings.api_delim , MAJOR_VERSION, MINOR_VERSION, BUILD_NUMBER);
       break;
 
-      case 'v': // Get GUI Version 'VMmYYMMDDXX\r\n'          
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "v%s%s", settings.api_delim , GUI_BUILD_NUMBER );
-      break;
 
 
       
