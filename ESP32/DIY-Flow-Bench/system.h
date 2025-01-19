@@ -77,9 +77,9 @@ using namespace std;
 #define VTASK_DELAY_SSE 1
 
 // Poll timers
-#define ADC_UPDATE_RATE 396 // 1 ms read time, time between ADC read events in milliseconds 
-#define BME_UPDATE_RATE 1103 // 3 ms read time, time between BME read events in milliseconds 
-#define SSE_UPDATE_RATE 599 // time between SSE push in milliseconds 
+#define ADC_UPDATE_RATE 501 // 72 ms data read time, 501ms time between ADC read events in milliseconds 
+#define BME_UPDATE_RATE 1006 // 3 ms data read time, 1006ms time between BME read events in milliseconds 
+#define SSE_UPDATE_RATE 554 // 129 ms data read time, 554ms time between SSE push in milliseconds 
 
 /***********************************************************
 * WEBUI SETTINGS
