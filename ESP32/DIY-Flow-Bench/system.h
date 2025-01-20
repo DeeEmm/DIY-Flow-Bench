@@ -55,7 +55,7 @@ using namespace std;
 // Memory assignment
 #define SENSOR_TASK_MEM_STACK 2800 // Free 776
 #define ENVIRO_TASK_MEM_STACK 2000 // Free 640
-#define LOOP_TASK_STACK_SIZE 5120 // SET_LOOP_TASK_STACK_SIZE( LOOP_TASK_STACK_SIZE )
+#define LOOP_TASK_STACK_SIZE 4500 // 15000 // SET_LOOP_TASK_STACK_SIZE( LOOP_TASK_STACK_SIZE )
 
 // JSON memory allocation
 #define DATA_JSON_SIZE 768
@@ -78,9 +78,9 @@ using namespace std;
 #define VTASK_DELAY_SSE 1
 
 // Poll timers
-#define ADC_UPDATE_RATE 501 // 72 ms data read time, 501ms time between ADC read events in milliseconds 
-#define BME_UPDATE_RATE 1006 // 3 ms data read time, 1006ms time between BME read events in milliseconds 
-#define SSE_UPDATE_RATE 554 // 129 ms data read time, 554ms time between SSE push in milliseconds 
+#define ADC_UPDATE_RATE 396 
+#define BME_UPDATE_RATE 1103 
+#define SSE_UPDATE_RATE 559 
 
 /***********************************************************
 * WEBUI SETTINGS

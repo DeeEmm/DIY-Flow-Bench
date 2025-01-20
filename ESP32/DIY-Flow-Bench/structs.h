@@ -330,18 +330,18 @@ struct SensorData {
  * Valve Lift data
  ***/
 struct ValveLiftData {
-  double LiftData1 = 0.0;
-  double LiftData2 = 0.0;
-  double LiftData3 = 0.0;
-  double LiftData4 = 0.0;
-  double LiftData5 = 0.0;
-  double LiftData6 = 0.0;
-  double LiftData7 = 0.0;
-  double LiftData8 = 0.0;
-  double LiftData9 = 0.0;
-  double LiftData10 = 0.0;
-  double LiftData11 = 0.0;
-  double LiftData12 = 0.0;
+  double_t LiftData1 = 0.0;
+  double_t LiftData2 = 0.0;
+  double_t LiftData3 = 0.0;
+  double_t LiftData4 = 0.0;
+  double_t LiftData5 = 0.0;
+  double_t LiftData6 = 0.0;
+  double_t LiftData7 = 0.0;
+  double_t LiftData8 = 0.0;
+  double_t LiftData9 = 0.0;
+  double_t LiftData10 = 0.0;
+  double_t LiftData11 = 0.0;
+  double_t LiftData12 = 0.0;
 };
 
 

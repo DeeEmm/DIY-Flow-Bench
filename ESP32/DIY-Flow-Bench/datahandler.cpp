@@ -598,6 +598,7 @@ void DataHandler::initialiseSettings () {
 
   if (!_prefs.isKey("dLIFT_INTERVAL")) _prefs.putDouble("dLIFT_INTERVAL", 1.5F);
   if (!_prefs.isKey("iBENCH_TYPE")) _prefs.putInt("iBENCH_TYPE", MAF_BENCH);
+
   if (!_prefs.isKey("dCAL_FLW_RATE")) _prefs.putDouble("dCAL_FLW_RATE", 14.4F);
   if (!_prefs.isKey("dCAL_REF_PRESS")) _prefs.putDouble("dCAL_REF_PRESS", 10.0F);
   if (!_prefs.isKey("dORIFICE1_FLOW")) _prefs.putDouble("dORIFICE1_FLOW", 0.0F);
@@ -708,8 +709,6 @@ void DataHandler::loadSettings () {
 ***/ 
 void DataHandler::initialiseLiftData () {
 
-  extern struct BenchSettings settings;
-
   Messages _message;
   Preferences _prefs;
 
@@ -752,7 +751,6 @@ void DataHandler::loadLiftData () {
   Preferences _prefs;
 
   _message.serialPrintf("Loading Lift Data \n");     
-
 
   _prefs.begin("liftData");
 

@@ -29,6 +29,9 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501210019      - Loop size tuning
+2501200054      - #323 Revert timing changes
+2501200051      - Removed GUI_BUILD_NUMBER
 2501200041      - Loop stack size set in system.h
                 - Loop stack watermark reported on boot
 2501200030      - #321 Datagraph clear fixed

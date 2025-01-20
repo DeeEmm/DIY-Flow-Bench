@@ -8,15 +8,8 @@ function initialiseButtons() {
   
     var xhr = new XMLHttpRequest();
   
-    document.getElementById('clear-graph-data-button').addEventListener('click', function(){
+    document.getElementById('clear-graph-data-button').addEventListener('click', function() {
           
-      // clear data points from graph
-      // var p = document.getElementById('dataPlot');
-      // var child = p.lastElementChild; 
-      // while (child) {
-      //     p.removeChild(child);
-      //     child = p.lastElementChild;
-      // }
       // clear line data from graph
       var l = document.getElementById('lineData');
       var child = l.lastElementChild; 
@@ -25,10 +18,13 @@ function initialiseButtons() {
           child = l.lastElementChild;
       }
       
-      console.log('XHR: /api/clearLiftData');
+      // console.log('XHR: /api/clearLiftData');
+
       xhr.open('POST', '/api/clearLiftData');
       xhr.onload = function() {
-        if (xhr.status === 200) window.location.href = '/?view=graph';
+        if (xhr.status === 200) {
+           window.location.href = '/data';
+        }
       };
       xhr.send();
   

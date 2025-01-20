@@ -826,6 +826,7 @@ void Webserver::saveLiftDataForm(AsyncWebServerRequest *request){
   Messages _message;
   DataHandler _data;
   Webserver _webserver;
+  Preferences _prefs;
 
   // StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
   extern struct SensorData sensorVal;
@@ -942,7 +943,7 @@ void Webserver::saveLiftDataForm(AsyncWebServerRequest *request){
       break;
   }
 
-  Preferences _prefs;
+  
   _prefs.begin("liftData");
 
   _prefs.putDouble("LIFTDATA1", valveData.LiftData1);
@@ -1010,10 +1011,10 @@ String Webserver::getLiftDataJSON()
 ***/ 
 void Webserver::clearLiftData (AsyncWebServerRequest *request) {
 
-  Messages _message;
+  // Messages _message;
   Preferences _prefs;
 
-  _message.serialPrintf("Clearing Lift Data \n");    
+  // _message.serialPrintf("Clearing Lift Data \n");    
   
   _prefs.begin("liftData");
 
@@ -1426,7 +1427,6 @@ String Webserver::processSettingsPageTemplate(const String &var) {
   // NOTE Build Vars are added to environment by user_actions.py at compile time
   if (var == "RELEASE") return RELEASE;
   if (var == "BUILD_NUMBER") return BUILD_NUMBER;
-  if (var == "GUI_BUILD_NUMBER") return GUI_BUILD_NUMBER; 
 
   // Config Info
   if (var == "SPIFFS_MEM_SIZE") return String(_calculations.byteDecode(status.spiffs_mem_size));
