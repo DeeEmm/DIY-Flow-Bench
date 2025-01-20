@@ -20,7 +20,7 @@ def convert_file(filepath):
     extension = os.path.splitext(filepath)[1][1:]
     
     return f"""
-// {filepath}
+// DIY-Flow-Bench/ESP32/DIY-Flow-Bench/html/{basename}.{extension} 
 const uint8_t {basename}_{extension}[] PROGMEM = {{{bytes_str}}};
 const uint16_t {basename}_{extension}_len = {len(compressed)};
 """

@@ -79,7 +79,7 @@ class Webserver {
 		void begin();
 		void sendWebSocketMessage(String jsonValues);
 		void createSettingsFile ();
-		String getValveDataJSON();
+		String getLiftDataJSON();
 		
 		StaticJsonDocument<1024> getSDFile(String filename);
 		StaticJsonDocument<1024> getSDFileList(String filename);
@@ -96,11 +96,12 @@ class Webserver {
 		void renameFile(fs::FS &fs, const char * path1, const char * path2);
 		void deleteFile(fs::FS &fs, const char *path);
 		void testFileIO(fs::FS &fs, const char * path);
+		
 
-		static void parseLiftDataForm(AsyncWebServerRequest *request);
+		static void saveLiftDataForm(AsyncWebServerRequest *request);
 		static void parseUserFlowTargetForm(AsyncWebServerRequest *request);
 
-
+		static void clearLiftData(AsyncWebServerRequest *request);
 
 		static void toggleFlowDiffTile (); 
 		static void fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);

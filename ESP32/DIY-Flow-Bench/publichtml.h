@@ -6,6 +6,8 @@
 class PublicHTML {
 private:
     String decompress(const uint8_t* data, size_t len);
+    String decompressToStream(const uint8_t* data, size_t len);
+    
     String decompressMultiple(const uint8_t** arrays, const size_t* lengths, int count);
     String decompressMultipleToStream(const uint8_t** arrays, const size_t* lengths, int count);
 

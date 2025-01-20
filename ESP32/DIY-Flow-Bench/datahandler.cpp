@@ -710,7 +710,6 @@ void DataHandler::initialiseLiftData () {
 
   extern struct BenchSettings settings;
 
-  DataHandler _data;
   Messages _message;
   Preferences _prefs;
 
@@ -775,28 +774,6 @@ void DataHandler::loadLiftData () {
 }
 
 
-
-
-
-/***********************************************************
-* @brief clearLiftDataFile
-* @details Delete and recreate default lift data file
-***/
-void DataHandler::clearLiftDataFile(AsyncWebServerRequest *request){
-
-  DataHandler _data;
-  
-  if (SPIFFS.exists("/liftdata.json"))  {
-    SPIFFS.remove("/liftdata.json");
-  }
-  
-  _data.createLiftDataFile();
-
-  _data.loadLiftData();
-
-  request->redirect("/?view=graph");
-
-}
 
 
 

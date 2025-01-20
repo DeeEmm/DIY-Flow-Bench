@@ -374,7 +374,7 @@ void API::ParseMessage(char apiMessage) {
 
       case 'l': // Valve lift Data
           if (status.doBootLoop) break;
-          jsonString = _webserver.getValveDataJSON();
+          jsonString = _webserver.getLiftDataJSON();
           // snprintf(apiResponseBlob, API_BLOB_LENGTH, "l%s%s", settings.api_delim, String(jsonString).c_str()); // TODO: Fix this - not working
       break;
       

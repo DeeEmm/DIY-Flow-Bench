@@ -345,16 +345,16 @@ void Webserver::begin()
   server->on("/api/savecalibration", HTTP_POST, saveCalibrationForm);
 
   // Save Lift Data Form
-  server->on("/api/saveliftdata", HTTP_POST, parseLiftDataForm);
+  server->on("/api/saveliftdata", HTTP_POST, saveLiftDataForm);
 
   // Parse Orifice Form
   server->on("/api/saveorifice", HTTP_POST, parseOrificeForm);
 
   // Clear Lift Data
-  server->on("/api/clearLiftData", HTTP_POST, [](AsyncWebServerRequest *request) {
-    DataHandler _data;
-    _data.clearLiftDataFile;
-  });  
+  server->on("/api/clearLiftData", HTTP_POST,  clearLiftData);
+  
+
+
 
 
   // HTML server responses
@@ -821,18 +821,18 @@ void Webserver::toggleFlowDiffTile () {
  * @details captures lift data to working memory
  * 
  ***/
-void Webserver::parseLiftDataForm(AsyncWebServerRequest *request){
+void Webserver::saveLiftDataForm(AsyncWebServerRequest *request){
 
   Messages _message;
   DataHandler _data;
   Webserver _webserver;
 
-  StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
+  // StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
   extern struct SensorData sensorVal;
   extern struct ValveLiftData valveData;
   extern struct BenchSettings settings;
   
-  String jsonString;
+  // String jsonString;
   String liftPoint;
   int switchval;
   char *end;
@@ -967,10 +967,10 @@ void Webserver::parseLiftDataForm(AsyncWebServerRequest *request){
 
 
 /***********************************************************
- * @brief getValveDataJSON
+ * @brief getLiftDataJSON
  * @details Package up current bench data into JSON string
  ***/
-String Webserver::getValveDataJSON()
+String Webserver::getLiftDataJSON()
 {
   extern struct ValveLiftData valveData;
 
@@ -996,6 +996,46 @@ String Webserver::getValveDataJSON()
   return jsonString;
 
 }
+
+
+
+
+
+
+
+/***********************************************************
+* @brief initialiseLiftData
+* @note - Initialise settings in NVM if they do not exist
+* @note Key must be 15 chars or shorter.
+***/ 
+void Webserver::clearLiftData (AsyncWebServerRequest *request) {
+
+  Messages _message;
+  Preferences _prefs;
+
+  _message.serialPrintf("Clearing Lift Data \n");    
+  
+  _prefs.begin("liftData");
+
+  _prefs.putDouble("LIFTDATA1", 0.0);
+  _prefs.putDouble("LIFTDATA2", 0.0);
+  _prefs.putDouble("LIFTDATA3", 0.0);
+  _prefs.putDouble("LIFTDATA4", 0.0);
+  _prefs.putDouble("LIFTDATA5", 0.0);
+  _prefs.putDouble("LIFTDATA6", 0.0);
+  _prefs.putDouble("LIFTDATA7", 0.0);
+  _prefs.putDouble("LIFTDATA8", 0.0);
+  _prefs.putDouble("LIFTDATA9", 0.0);
+  _prefs.putDouble("LIFTDATA10", 0.0);
+  _prefs.putDouble("LIFTDATA11", 0.0);
+  _prefs.putDouble("LIFTDATA12", 0.0);
+
+  _prefs.end();
+
+  request->send(200);
+
+}
+
 
 
 
@@ -1258,41 +1298,6 @@ String Webserver::processIndexPageTemplate(const String &var) {
 
 
 
-  // if (var == "LINE_DATA") {
-
-  //   extern struct ValveLiftData valveData;
-  //   String attribs;
-  //   char* lineData;
-
-  //   attribs =  R"END(
-  //     fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4,1" opacity="0.5"
-  //   )END" ;
-
-  //   int point1 = 350-valveData.LiftData1;
-  //   int point2 = 350-valveData.LiftData2;
-  //   int point3 = 350-valveData.LiftData3;
-  //   int point4 = 350-valveData.LiftData4;
-  //   int point5 = 350-valveData.LiftData5;
-  //   int point6 = 350-valveData.LiftData6;
-  //   int point7 = 350-valveData.LiftData7;
-  //   int point8 = 350-valveData.LiftData8;
-  //   int point9 = 350-valveData.LiftData9;
-  //   int point10 = 350-valveData.LiftData10;
-  //   int point11 = 350-valveData.LiftData11;
-  //   int point12 = 350-valveData.LiftData12;
-
-
-  //   // sprintf (lineData, "<polyline %s points=\"100,0 150, %d 200,%d 250,%d 300,%d 350,%d 400,%d 450,%d 500,%d 550,%d 600,%d 650,%d 700,%d\"  />", attribs, point1,  point2,  point3,  point4,  point5,  point6,  point7,  point8,  point9,  point10,  point11,  point12 );
-  //   sprintf (lineData, "<polyline %s points=\"100,0 150,%d 200,%d \"  />", attribs, point1, point2);
-
-
-  //   return '<polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1" points="100,350 150,340 200,315 250,301 300,280 350,249 400,245 450,242 500,238 550,230 600,222 650,220 700,218" />';
-
-
-  //   // return String(lineData).c_str();
-  // }
-
-
   // Lift Profile
   if (floor(settings.valveLiftInterval) == settings.valveLiftInterval) {
 
@@ -1326,6 +1331,7 @@ String Webserver::processIndexPageTemplate(const String &var) {
     if (var == "lift11") return String(11 * settings.valveLiftInterval);
     if (var == "lift12") return String(12 * settings.valveLiftInterval);
   }
+
 
 
   return "";
@@ -1980,6 +1986,78 @@ String Webserver::processDatagraphPageTemplate(const String &var) {
   if (var == "LINE_DATA10") return String(500 - (valveData.LiftData10 * scaleFactor));
   if (var == "LINE_DATA11") return String(500 - (valveData.LiftData11 * scaleFactor));
   if (var == "LINE_DATA12") return String(500 - (valveData.LiftData12 * scaleFactor));
+
+
+
+  // if (var == "LINE_DATA") {
+
+  //   extern struct ValveLiftData valveData;
+  //   String attribs;
+  //   char* lineData;
+
+  //   attribs =  R"END(
+  //     fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4,1" opacity="0.5"
+  //   )END" ;
+
+  //   int point1 = 350-valveData.LiftData1;
+  //   int point2 = 350-valveData.LiftData2;
+  //   int point3 = 350-valveData.LiftData3;
+  //   int point4 = 350-valveData.LiftData4;
+  //   int point5 = 350-valveData.LiftData5;
+  //   int point6 = 350-valveData.LiftData6;
+  //   int point7 = 350-valveData.LiftData7;
+  //   int point8 = 350-valveData.LiftData8;
+  //   int point9 = 350-valveData.LiftData9;
+  //   int point10 = 350-valveData.LiftData10;
+  //   int point11 = 350-valveData.LiftData11;
+  //   int point12 = 350-valveData.LiftData12;
+
+
+  //   // sprintf (lineData, "<polyline %s points=\"100,0 150, %d 200,%d 250,%d 300,%d 350,%d 400,%d 450,%d 500,%d 550,%d 600,%d 650,%d 700,%d\"  />", attribs, point1,  point2,  point3,  point4,  point5,  point6,  point7,  point8,  point9,  point10,  point11,  point12 );
+  //   sprintf (lineData, "<polyline %s points=\"100,0 150,%d 200,%d \"  />", attribs, point1, point2);
+
+
+  //   return '<polyline fill="none" stroke="#000" stroke-width="1" stroke-dasharray="4, 1" points="100,350 150,340 200,315 250,301 300,280 350,249 400,245 450,242 500,238 550,230 600,222 650,220 700,218" />';
+
+
+  //   // return String(lineData).c_str();
+  // }
+
+
+  // Lift Profile
+  if (floor(settings.valveLiftInterval) == settings.valveLiftInterval) {
+
+    // it's an integer so lets truncate fractional part
+    int liftInterval = settings.valveLiftInterval;
+    if (var == "lift1") return String(1 * liftInterval);
+    if (var == "lift2") return String(2 * liftInterval);
+    if (var == "lift3") return String(3 * liftInterval);
+    if (var == "lift4") return String(4 * liftInterval);
+    if (var == "lift5") return String(5 * liftInterval);
+    if (var == "lift6") return String(6 * liftInterval);
+    if (var == "lift7") return String(7 * liftInterval);
+    if (var == "lift8") return String(8 * liftInterval);
+    if (var == "lift9") return String(9 * liftInterval);
+    if (var == "lift10") return String(10 * liftInterval);
+    if (var == "lift11") return String(11 * liftInterval);
+    if (var == "lift12") return String(12 * liftInterval);
+
+  } else {
+    // Display the double
+    if (var == "lift1") return String(1 * settings.valveLiftInterval);
+    if (var == "lift2") return String(2 * settings.valveLiftInterval);
+    if (var == "lift3") return String(3 * settings.valveLiftInterval);
+    if (var == "lift4") return String(4 * settings.valveLiftInterval);
+    if (var == "lift5") return String(5 * settings.valveLiftInterval);
+    if (var == "lift6") return String(6 * settings.valveLiftInterval);
+    if (var == "lift7") return String(7 * settings.valveLiftInterval);
+    if (var == "lift8") return String(8 * settings.valveLiftInterval);
+    if (var == "lift9") return String(9 * settings.valveLiftInterval);
+    if (var == "lift10") return String(10 * settings.valveLiftInterval);
+    if (var == "lift11") return String(11 * settings.valveLiftInterval);
+    if (var == "lift12") return String(12 * settings.valveLiftInterval);
+  }
+
 
 
 

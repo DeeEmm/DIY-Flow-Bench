@@ -24,7 +24,8 @@ function initialiseButtons() {
           l.removeChild(child);
           child = l.lastElementChild;
       }
-  
+      
+      console.log('XHR: /api/clearLiftData');
       xhr.open('POST', '/api/clearLiftData');
       xhr.onload = function() {
         if (xhr.status === 200) window.location.href = '/?view=graph';
@@ -99,61 +100,6 @@ function exportSVGAsImage() {
 
   
 
-
-
-/***********************************************************
-* Close modal dialogs on lose focus
-***/
-window.onclick = function(event) {
-    if (event.target == fileModal || event.target == dataModal || event.target == serialModal || event.target == infoModal || event.target == captureLiftDataModal || event.target == loadGraphDataModal || event.target == saveGraphDataModal || event.target == calibrationModal || event.target == updateModal || event.target == flowTargetModal  ){
-      fileModal.style.display = "none";
-      infoModal.style.display = "none";
-      captureLiftDataModal.style.display = "none";
-      loadGraphDataModal.style.display = "none";
-      saveGraphDataModal.style.display = "none";
-      calibrationModal.style.display = "none";
-      dataModal.style.display = "none";
-      serialModal.style.display = "none";
-      updateModal.style.display = "none";
-      flowTargetModal.style.display = "none";
-    }
-  }
-  
-  
-  /***********************************************************
-  * Close modal dialogs on esc button
-  ***/
-  document.addEventListener("keydown", ({key}) => {
-    if (key === "Escape") {
-      fileModal.style.display = "none";
-      infoModal.style.display = "none";
-      captureLiftDataModal.style.display = "none";
-      loadGraphDataModal.style.display = "none";
-      saveGraphDataModal.style.display = "none";
-      calibrationModal.style.display = "none";
-      dataModal.style.display = "none";
-      serialModal.style.display = "none";
-      updateModal.style.display = "none";
-      flowTargetModal.style.display = "none";
-    }
-  })
-   
-  
-  /***********************************************************
-  * Close Load Data modal dialog
-  ***/
-  closeLoadGraphDataModalButton.onclick = function() {
-    loadGraphDataModal.style.display = "none";
-  }
-  
-  
-  /***********************************************************
-  * Close Save Data modal dialog
-  ***/
-  closeSaveGraphDataModalButton.onclick = function() {
-    saveGraphDataModal.style.display = "none";
-  }
-  
 
 
 

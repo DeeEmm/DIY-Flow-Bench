@@ -56,6 +56,54 @@ String PublicHTML::decompress(const uint8_t* data, size_t len) {
 }
 
 
+
+
+
+String PublicHTML::decompressToStream(const uint8_t* data, size_t len) {
+    z_stream stream;
+    memset(decompBuffer, 0, sizeof(decompBuffer));
+    String result;
+    
+    stream.zalloc = Z_NULL;
+    stream.zfree = Z_NULL;
+    stream.opaque = Z_NULL;
+    
+    if (inflateInit(&stream) != Z_OK) {
+        return  "Decompression error [Init]";
+    }
+    
+    stream.next_in = (uint8_t*)data;
+    stream.avail_in = len;
+    
+    do {
+        stream.next_out = decompBuffer;
+        stream.avail_out = sizeof(decompBuffer);
+        
+        int ret = inflate(&stream, Z_NO_FLUSH);
+        
+        if (ret != Z_OK && ret != Z_STREAM_END) {
+            inflateEnd(&stream);
+            return "Decompression error [NOK]";
+        }
+        
+        size_t bytesToWrite = sizeof(decompBuffer) - stream.avail_out;
+
+        // if (bytesToWrite > 0) {
+        //     output->write(buffer, bytesToWrite);
+        // }
+
+        result += String((char*)decompBuffer, bytesToWrite);
+        
+    } while (stream.avail_out == 0);
+    
+    inflateEnd(&stream);
+    return result;
+}
+
+
+
+
+
 String PublicHTML::decompressMultiple(const uint8_t** arrays, const size_t* lengths, int count) {
   size_t totalLen = 0;
   for(int i = 0; i < count; i++) {
@@ -74,6 +122,7 @@ String PublicHTML::decompressMultiple(const uint8_t** arrays, const size_t* leng
   delete[] combined;
   return result;
 }
+
 
 
 String PublicHTML::decompressMultipleToStream(const uint8_t** arrays, const size_t* lengths, int count) {
@@ -105,8 +154,8 @@ String PublicHTML::decompressMultipleToStream(const uint8_t** arrays, const size
         return "Decompression error [NOK]";
       }
       
-      size_t have = sizeof(decompBuffer) - stream.avail_out;
-      result += String((char*)decompBuffer, have);
+      size_t bytesToWrite = sizeof(decompBuffer) - stream.avail_out;
+      result += String((char*)decompBuffer, bytesToWrite);
       
     } while (stream.avail_out == 0);
     
@@ -157,51 +206,51 @@ String PublicHTML::mimicPage() {
 
 
 String PublicHTML::header() {
-    return decompress(header_html, header_html_len);
+    return decompressToStream(header_html, header_html_len);
 }
 
 String PublicHTML::footer() {
-    return decompress(footer_html, footer_html_len);
+    return decompressToStream(footer_html, footer_html_len);
 }
 
 String PublicHTML::index() {
-    return decompress(index_html, index_html_len);
+    return decompressToStream(index_html, index_html_len);
 }
 
 String PublicHTML::data() {
-    return decompress(data_html, data_html_len);
+    return decompressToStream(data_html, data_html_len);
 }
 
 String PublicHTML::settings() {
-    return decompress(settings_html, settings_html_len);
+    return decompressToStream(settings_html, settings_html_len);
 }
 
 String PublicHTML::pins() {
-    return decompress(pins_html, pins_html_len);
+    return decompressToStream(pins_html, pins_html_len);
 }
 
 String PublicHTML::css() {
-    return decompress(style_css, style_css_len);
+    return decompressToStream(style_css, style_css_len);
 }
 
 String PublicHTML::indexJs() {
-    return decompress(index_js, index_js_len);
+    return decompressToStream(index_js, index_js_len);
 }
 
 String PublicHTML::settingsJs() {
-    return decompress(settings_js, settings_js_len);
+    return decompressToStream(settings_js, settings_js_len);
 }
 
 String PublicHTML::configJs() {
-    return decompress(config_js, config_js_len);
+    return decompressToStream(config_js, config_js_len);
 }
 
 String PublicHTML::mimicJs() {
-    return decompress(mimic_js, mimic_js_len);
+    return decompressToStream(mimic_js, mimic_js_len);
 }
 
 String PublicHTML::dataJs() {
-    return decompress(data_js, data_js_len);
+    return decompressToStream(data_js, data_js_len);
 }
 
 // String PublicHTML::pinsJs() {

@@ -29,6 +29,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501200030      - #321 Datagraph clear fixed
+2501200001      - Removed fullpath from generated comment in htmlToBytes.py
 2501170010      - #316 Updated poll timer values
                 - Removed redundant calls to old ADS1115_lite library
                 - #320 Fixed templating issue
