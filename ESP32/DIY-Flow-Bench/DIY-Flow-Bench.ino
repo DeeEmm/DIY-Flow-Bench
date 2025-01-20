@@ -58,6 +58,9 @@
 
 #include "ADS1X15.h" // DM 'Lite' Library
 
+SET_LOOP_TASK_STACK_SIZE( LOOP_TASK_STACK_SIZE );
+
+
 // Initiate Structs
 BenchSettings settings;
 DeviceStatus status;
@@ -432,7 +435,9 @@ void setup(void) {
   }
 
   // Report free stack and heap to serial monitor
-  _message.serialPrintf("Stack Free Memory: EnviroTask=%s / SensorTask=%s \n", _calculations.byteDecode(uxTaskGetStackHighWaterMark(enviroDataTask)), _calculations.byteDecode(uxTaskGetStackHighWaterMark(sensorDataTask))); 
+  _message.serialPrintf("Free Stack: EnviroTask=%s  \n", _calculations.byteDecode(uxTaskGetStackHighWaterMark(enviroDataTask))); 
+  _message.serialPrintf("Free Stack: SensorTask=%s  \n", _calculations.byteDecode(uxTaskGetStackHighWaterMark(sensorDataTask))); 
+  _message.serialPrintf("Free Stack: LoopTask=%s    \n", _calculations.byteDecode(uxTaskGetStackHighWaterMark(NULL))); 
   _message.serialPrintf("Free Heap=%s / Max Allocated Heap=%s \n", _calculations.byteDecode(ESP.getFreeHeap()), _calculations.byteDecode(ESP.getMaxAllocHeap())); 
 
 }

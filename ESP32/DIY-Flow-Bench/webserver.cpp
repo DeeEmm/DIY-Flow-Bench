@@ -1231,9 +1231,7 @@ String Webserver::processIndexPageTemplate(const String &var) {
   extern struct CalibrationData calVal;
   extern struct Language language;
   extern struct Configuration config;
-  extern struct ValveLiftData valveData;
 
-  Calculations _calculations;
   Messages _message;
 
   MafData _maf(config.iMAF_SENS_TYP);

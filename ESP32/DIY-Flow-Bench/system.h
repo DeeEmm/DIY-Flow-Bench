@@ -55,6 +55,7 @@ using namespace std;
 // Memory assignment
 #define SENSOR_TASK_MEM_STACK 2800 // Free 776
 #define ENVIRO_TASK_MEM_STACK 2000 // Free 640
+#define LOOP_TASK_STACK_SIZE 5120 // SET_LOOP_TASK_STACK_SIZE( LOOP_TASK_STACK_SIZE )
 
 // JSON memory allocation
 #define DATA_JSON_SIZE 768

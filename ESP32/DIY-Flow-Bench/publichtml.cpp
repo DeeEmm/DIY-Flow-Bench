@@ -35,9 +35,14 @@ uint8_t* combineArrays(const uint8_t* arr1, size_t len1, const uint8_t* arr2, si
     return result;
 }
 
-// Add decompression method
+
+
+// Decompress Byte data
 String PublicHTML::decompress(const uint8_t* data, size_t len) {
+
     memset(decompBuffer, 0, sizeof(decompBuffer));
+    // uint8_t buffer[1024];
+
     z_stream stream;
     stream.zalloc = Z_NULL;
     stream.zfree = Z_NULL;
@@ -126,7 +131,9 @@ String PublicHTML::decompressMultiple(const uint8_t** arrays, const size_t* leng
 
 
 String PublicHTML::decompressMultipleToStream(const uint8_t** arrays, const size_t* lengths, int count) {
+  
   memset(decompBuffer, 0, sizeof(decompBuffer));
+
   z_stream stream;
   String result;
 
@@ -206,51 +213,51 @@ String PublicHTML::mimicPage() {
 
 
 String PublicHTML::header() {
-    return decompressToStream(header_html, header_html_len);
+    return decompress(header_html, header_html_len);
 }
 
 String PublicHTML::footer() {
-    return decompressToStream(footer_html, footer_html_len);
+    return decompress(footer_html, footer_html_len);
 }
 
 String PublicHTML::index() {
-    return decompressToStream(index_html, index_html_len);
+    return decompress(index_html, index_html_len);
 }
 
 String PublicHTML::data() {
-    return decompressToStream(data_html, data_html_len);
+    return decompress(data_html, data_html_len);
 }
 
 String PublicHTML::settings() {
-    return decompressToStream(settings_html, settings_html_len);
+    return decompress(settings_html, settings_html_len);
 }
 
 String PublicHTML::pins() {
-    return decompressToStream(pins_html, pins_html_len);
+    return decompress(pins_html, pins_html_len);
 }
 
 String PublicHTML::css() {
-    return decompressToStream(style_css, style_css_len);
+    return decompress(style_css, style_css_len);
 }
 
 String PublicHTML::indexJs() {
-    return decompressToStream(index_js, index_js_len);
+    return decompress(index_js, index_js_len);
 }
 
 String PublicHTML::settingsJs() {
-    return decompressToStream(settings_js, settings_js_len);
+    return decompress(settings_js, settings_js_len);
 }
 
 String PublicHTML::configJs() {
-    return decompressToStream(config_js, config_js_len);
+    return decompress(config_js, config_js_len);
 }
 
 String PublicHTML::mimicJs() {
-    return decompressToStream(mimic_js, mimic_js_len);
+    return decompress(mimic_js, mimic_js_len);
 }
 
 String PublicHTML::dataJs() {
-    return decompressToStream(data_js, data_js_len);
+    return decompress(data_js, data_js_len);
 }
 
 // String PublicHTML::pinsJs() {
