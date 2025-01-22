@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501220001      - #321 Zero Datagraph data
 2501210019      - Loop size tuning
 2501200054      - #323 Revert timing changes
 2501200051      - Removed GUI_BUILD_NUMBER

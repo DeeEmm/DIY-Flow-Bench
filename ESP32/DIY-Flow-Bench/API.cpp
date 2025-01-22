@@ -122,13 +122,13 @@ void API::ParseMessage(char apiMessage) {
   // define char arrays for response strings
   char apiResponse[API_RESPONSE_LENGTH];  //64
   char apiResponseBlob[API_BLOB_LENGTH];  //1024
-  char charDataJSON[API_JSON_LENGTH];     //1020
+  // char charDataJSON[API_JSON_LENGTH];     //1020
   char fileListBlob[1024];
 
   // Initialise arrays
   apiResponse[0] = 0;
   apiResponseBlob[0] = 0;
-  charDataJSON[0] = 0;
+  // charDataJSON[0] = 0;
   fileListBlob[0] = 0;
   
 
@@ -525,7 +525,10 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'x': // Print Heap memory usage to serial monitor 
-          snprintf(apiResponse, API_RESPONSE_LENGTH,"x%sFree Heap=%s / Max Allocated Heap=%s ", settings.api_delim , _calculations.byteDecode(ESP.getFreeHeap()), _calculations.byteDecode(ESP.getMaxAllocHeap())); 
+          // snprintf(apiResponse, API_RESPONSE_LENGTH,"x%sFree Heap=%s / Max Allocated Heap=%s ", settings.api_delim , _calculations.byteDecode(ESP.getFreeHeap()), _calculations.byteDecode(ESP.getMaxAllocHeap())); 
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "Free Stack: EnviroTask=%s  \n", _calculations.byteDecode(uxTaskGetStackHighWaterMark(enviroDataTask))); 
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "Free Stack: SensorTask=%s  \n", _calculations.byteDecode(uxTaskGetStackHighWaterMark(sensorDataTask))); 
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "Free Stack: LoopTask=%s    \n", _calculations.byteDecode(uxTaskGetStackHighWaterMark(NULL))); 
       break;
 
       

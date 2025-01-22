@@ -40,6 +40,8 @@ uint8_t* combineArrays(const uint8_t* arr1, size_t len1, const uint8_t* arr2, si
 // Decompress Byte data
 String PublicHTML::decompress(const uint8_t* data, size_t len) {
 
+    // int level = 9; //miniz 
+
     memset(decompBuffer, 0, sizeof(decompBuffer));
     // uint8_t buffer[1024];
 
@@ -132,6 +134,8 @@ String PublicHTML::decompressMultiple(const uint8_t** arrays, const size_t* leng
 
 String PublicHTML::decompressMultipleToStream(const uint8_t** arrays, const size_t* lengths, int count) {
   
+//   int level = 9;
+
   memset(decompBuffer, 0, sizeof(decompBuffer));
 
   z_stream stream;

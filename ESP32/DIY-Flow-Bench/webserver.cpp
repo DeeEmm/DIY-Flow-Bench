@@ -1013,6 +1013,7 @@ void Webserver::clearLiftData (AsyncWebServerRequest *request) {
 
   // Messages _message;
   Preferences _prefs;
+  extern struct ValveLiftData valveData;
 
   // _message.serialPrintf("Clearing Lift Data \n");    
   
@@ -1030,6 +1031,19 @@ void Webserver::clearLiftData (AsyncWebServerRequest *request) {
   _prefs.putDouble("LIFTDATA10", 0.0);
   _prefs.putDouble("LIFTDATA11", 0.0);
   _prefs.putDouble("LIFTDATA12", 0.0);
+
+  valveData.LiftData1 = 0.0;
+  valveData.LiftData2 = 0.0;
+  valveData.LiftData3 = 0.0;
+  valveData.LiftData4 = 0.0;
+  valveData.LiftData5 = 0.0;
+  valveData.LiftData6 = 0.0;
+  valveData.LiftData7 = 0.0;
+  valveData.LiftData8 = 0.0;
+  valveData.LiftData9 = 0.0;
+  valveData.LiftData10 = 0.0;
+  valveData.LiftData11 = 0.0;
+  valveData.LiftData12 = 0.0;
 
   _prefs.end();
 
