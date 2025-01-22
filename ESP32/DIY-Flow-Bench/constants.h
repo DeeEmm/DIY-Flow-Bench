@@ -35,6 +35,10 @@ enum VolumetricUnits {
 #define MAFFILE 2
 #define INDEXFILE 3
 #define CONFIGFILE 4
+#define NO_TASK 0
+#define ADC_TASK 1
+#define BME_TASK 2
+#define SSE_TASK 3
 
 
 /***********************************************************

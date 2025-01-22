@@ -101,6 +101,9 @@ int adcStartTime =  micros();
 int bmeStartTime =  micros();
 int loopStartTime = micros();
 
+int runTask = SSE_TASK;
+int adcTaskCount = 0;
+
 
 /***********************************************************
  * @brief TASK: Get bench sensor data (ADS1115 - MAF/RefP/DiffP/Pitot)
@@ -124,11 +127,13 @@ void TASKgetSensorData( void * parameter ){
   for( ;; ) { // Infinite loop
 
     // Check ADC poll timer
-    if (millis() > status.adcPollTimer){
+    // if (millis() > status.adcPollTimer){
+if (runTask == ADC_TASK) {
 
       // Check if semaphore available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
+
 
         // Set / reset scan timers
         status.adcScanTime = (micros() - adcStartTime); // how long since we started the timer? 
@@ -320,8 +325,14 @@ void TASKgetSensorData( void * parameter ){
         xSemaphoreGive(i2c_task_mutex); // Release semaphore        
       }   
       status.adcPollTimer = millis() + ADC_UPDATE_RATE; // Only reset timer when task has been executed
+
+      adcTaskCount += 1;
+      runTask = SSE_TASK;
+
     }
+
     vTaskDelay( VTASK_DELAY_ADC );  // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
+
   }
 }
 
@@ -345,7 +356,8 @@ void TASKgetEnviroData( void * parameter ){
   for( ;; ) { // Infinite loop
 
     // Check BME poll timer
-    if (millis() > status.bmePollTimer) {
+    // if (millis() > status.bmePollTimer) {
+if (runTask == BME_TASK) {
 
       // Check if semaphore is available
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
@@ -374,8 +386,13 @@ void TASKgetEnviroData( void * parameter ){
         xSemaphoreGive(i2c_task_mutex); 
       }
       status.bmePollTimer = millis() + BME_UPDATE_RATE; // Only reset timer when task has been executed
+
+      runTask = SSE_TASK;
+
     }
+
     vTaskDelay( VTASK_DELAY_BME ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
+
 	}
 }
 
@@ -457,7 +474,8 @@ void loop () {
   
   // Process API comms
   if (settings.api_enabled) {        
-    if (millis() > status.apiPollTimer) {
+    if (millis() > status.apiPollTimer && runTask == SSE_TASK) {
+
       if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
 
         status.apiPollTimer = millis() + API_SCAN_DELAY_MS; 
@@ -480,7 +498,7 @@ void loop () {
 
   #ifdef WEBSERVER_ENABLED
   
-    if (millis() > status.ssePollTimer) {      
+    if (millis() > status.ssePollTimer && runTask == SSE_TASK) {      
 
         // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE){ // Check if semaphore available
         if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
@@ -502,6 +520,13 @@ void loop () {
  
           // Release semaphore
           xSemaphoreGive(i2c_task_mutex); 
+
+          if (adcTaskCount == 2) {
+            runTask = BME_TASK;
+            adcTaskCount = 0;
+          } else {
+            runTask = ADC_TASK;
+          }
         }
     }
   #endif
