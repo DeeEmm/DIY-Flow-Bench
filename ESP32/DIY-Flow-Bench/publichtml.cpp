@@ -26,6 +26,7 @@
 #include "htmldata.h"
 
 uint8_t decompBuffer[21000]; 
+// uint8_t decompBuffer[26000]; 
 
 // Combine arrays
 uint8_t* combineArrays(const uint8_t* arr1, size_t len1, const uint8_t* arr2, size_t len2) {
