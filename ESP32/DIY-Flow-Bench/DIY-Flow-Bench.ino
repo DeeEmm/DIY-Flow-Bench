@@ -131,12 +131,12 @@ void TASKgetSensorData( void * parameter ){
 if (runTask == ADC_TASK) {
 
       // Check if semaphore available
-      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
+      // if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
 
 
         // Set / reset scan timers
-        status.adcScanTime = (micros() - adcStartTime); // how long since we started the timer? 
+        status.adcScanTime = (micros() - adcStartTime);  
         adcStartTime = micros(); // start the timer
         status.bmeScanCountAverage = (status.bmeScanAlpha * status.bmeScanCount) + (1.0 - status.bmeScanAlpha) * status.bmeScanCountAverage;  // calculate Exponential moving average
         status.bmeScanCount = 1; // reset to 1 so first scan value in GUI is valid
@@ -322,8 +322,8 @@ if (runTask == ADC_TASK) {
           sensorVal.Swirl = 0;
         }
 
-        xSemaphoreGive(i2c_task_mutex); // Release semaphore        
-      }   
+        // xSemaphoreGive(i2c_task_mutex); // Release semaphore        
+      // }   
       status.adcPollTimer = millis() + ADC_UPDATE_RATE; // Only reset timer when task has been executed
 
       adcTaskCount += 1;
@@ -360,7 +360,7 @@ void TASKgetEnviroData( void * parameter ){
 if (runTask == BME_TASK) {
 
       // Check if semaphore is available
-      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
+      // if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
       // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
 
         // Set / reset scan timers
@@ -383,8 +383,8 @@ if (runTask == BME_TASK) {
         sensorVal.RelH = _sensors.getRelHValue();
 
         // Release semaphore
-        xSemaphoreGive(i2c_task_mutex); 
-      }
+        // xSemaphoreGive(i2c_task_mutex); 
+      // }
       status.bmePollTimer = millis() + BME_UPDATE_RATE; // Only reset timer when task has been executed
 
       runTask = SSE_TASK;
@@ -476,7 +476,7 @@ void loop () {
   if (settings.api_enabled) {        
     if (millis() > status.apiPollTimer && runTask == SSE_TASK) {
 
-      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
+      // if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
 
         status.apiPollTimer = millis() + API_SCAN_DELAY_MS; 
 
@@ -484,9 +484,9 @@ void loop () {
           status.serialData = Serial.read();
           _api.ParseMessage(status.serialData);
         }
-        xSemaphoreGive(i2c_task_mutex); // Release semaphore
+        // xSemaphoreGive(i2c_task_mutex); // Release semaphore
 
-      }
+      // }
     }                            
   }
 
@@ -501,7 +501,7 @@ void loop () {
     if (millis() > status.ssePollTimer && runTask == SSE_TASK) {      
 
         // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE){ // Check if semaphore available
-        if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
+        // if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
           status.ssePollTimer = millis() + SSE_UPDATE_RATE; // Only reset timer when task executes
           
           // Build Server Side Events (SSE) data
@@ -519,15 +519,15 @@ void loop () {
           _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); 
  
           // Release semaphore
-          xSemaphoreGive(i2c_task_mutex); 
+          // xSemaphoreGive(i2c_task_mutex); 
 
-          if (adcTaskCount == 2) {
+          if (adcTaskCount > 2) {
             runTask = BME_TASK;
             adcTaskCount = 0;
           } else {
             runTask = ADC_TASK;
           }
-        }
+        // }
     }
   #endif
 
