@@ -74,20 +74,6 @@ struct BenchSettings {
   int temp_unit = CELCIUS;                        // Defalt display unit of temperature
   bool ap_mode = false;                           // Default WiFi connection mode is accesspoint mode
   double valveLiftInterval = 1.5;                 // Distance between valve lift data points (can be metric or imperial)
-  double cal_ref_press = 10;                      // Calibration orifice ref pressure
-  double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
-  double orificeOneFlow = 0.0;
-  double orificeOneDepression = 0.0;
-  double orificeTwoFlow = 0.0;
-  double orificeTwoDepression = 0.0;
-  double orificeThreeFlow = 0.0;
-  double orificeThreeDepression = 0.0;
-  double orificeFourFlow = 0.0;
-  double orificeFourDepression = 0.0;
-  double orificeFiveFlow = 0.0;
-  double orificeFiveDepression = 0.0;
-  double orificeSixFlow = 0.0;
-  double orificeSixDepression = 0.0;
 };
 
 
@@ -194,6 +180,21 @@ struct CalibrationData {
   double leak_cal_offset_rev = 0.0;  
   double pdiff_cal_offset = 0.0;
   double pitot_cal_offset = 0.0;
+  
+  double cal_ref_press = 10;                      // Calibration orifice ref pressure
+  double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
+  double orificeOneFlow = 0.0;
+  double orificeOneDepression = 0.0;
+  double orificeTwoFlow = 0.0;
+  double orificeTwoDepression = 0.0;
+  double orificeThreeFlow = 0.0;
+  double orificeThreeDepression = 0.0;
+  double orificeFourFlow = 0.0;
+  double orificeFourDepression = 0.0;
+  double orificeFiveFlow = 0.0;
+  double orificeFiveDepression = 0.0;
+  double orificeSixFlow = 0.0;
+  double orificeSixDepression = 0.0;
 };
 
 
@@ -561,5 +562,6 @@ struct Language {
     char LANG_GUI_PITOT_VOLTS[50] = "Pitot Volts";
     char LANG_GUI_MAF_TYPE[50] = "MAF Type";
     char LANG_GUI_MIMIC[50] = "Mimic";
+    char LANG_GUI_CALIBRATION[50] = "Calibration";
 };
 

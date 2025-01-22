@@ -51,6 +51,8 @@ using namespace std;
 #define API_STATUS_LENGTH 128
 #define API_JSON_LENGTH 1024
 #define API_SCAN_DELAY_MS 250
+#define API_DELIMITER ":"
+#define API_SERIAL_BAUD 115200
 
 // Memory assignment
 #define SENSOR_TASK_MEM_STACK 2800 // Free 776

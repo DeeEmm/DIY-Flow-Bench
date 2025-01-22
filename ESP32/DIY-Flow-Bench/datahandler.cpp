@@ -587,7 +587,7 @@ void DataHandler::initialiseSettings () {
   // if (!_prefs.isKey("iMAF_MIN_VOLTS")) _prefs.putInt("iMAF_MIN_VOLTS", 1);
 
   if (!_prefs.isKey("sAPI_DELIM")) _prefs.putString("sAPI_DELIM", ":");
-  if (!_prefs.isKey("iSERIAL_BAUD")) _prefs.putInt("iSERIAL_BAUD", 115200);
+  // if (!_prefs.isKey("iSERIAL_BAUD")) _prefs.putInt("iSERIAL_BAUD", 115200);
   if (!_prefs.isKey("iSHOW_ALARMS")) _prefs.putInt("iSHOW_ALARMS", true);
   if (!_prefs.isKey("iADJ_FLOW_DEP")) _prefs.putInt("iADJ_FLOW_DEP", 28);
   if (!_prefs.isKey("iSTD_REF")) _prefs.putInt("iSTD_REF", 1);
@@ -598,21 +598,6 @@ void DataHandler::initialiseSettings () {
 
   if (!_prefs.isKey("dLIFT_INTERVAL")) _prefs.putDouble("dLIFT_INTERVAL", 1.5F);
   if (!_prefs.isKey("iBENCH_TYPE")) _prefs.putInt("iBENCH_TYPE", MAF_BENCH);
-
-  if (!_prefs.isKey("dCAL_FLW_RATE")) _prefs.putDouble("dCAL_FLW_RATE", 14.4F);
-  if (!_prefs.isKey("dCAL_REF_PRESS")) _prefs.putDouble("dCAL_REF_PRESS", 10.0F);
-  if (!_prefs.isKey("dORIFICE1_FLOW")) _prefs.putDouble("dORIFICE1_FLOW", 0.0F);
-  if (!_prefs.isKey("dORIFICE1_PRESS")) _prefs.putDouble("dORIFICE1_PRESS", 0.0F);
-  if (!_prefs.isKey("dORIFICE2_FLOW")) _prefs.putDouble("dORIFICE2_FLOW", 0.0F);
-  if (!_prefs.isKey("dORIFICE2_PRESS")) _prefs.putDouble("dORIFICE2_PRESS", 0.0F);
-  if (!_prefs.isKey("dORIFICE3_FLOW")) _prefs.putDouble("dORIFICE3_FLOW", 0.0F);
-  if (!_prefs.isKey("dORIFICE3_PRESS")) _prefs.putDouble("dORIFICE3_PRESS", 0.0F);
-  if (!_prefs.isKey("dORIFICE4_FLOW")) _prefs.putDouble("dORIFICE4_FLOW", 0.0F);
-  if (!_prefs.isKey("dORIFICE4_PRESS")) _prefs.putDouble("dORIFICE4_PRESS", 0.0F);
-  if (!_prefs.isKey("dORIFICE5_FLOW")) _prefs.putDouble("dORIFICE5_FLOW", 0.0F);
-  if (!_prefs.isKey("dORIFICE5_PRESS")) _prefs.putDouble("dORIFICE5_PRESS", 0.0F);
-  if (!_prefs.isKey("dORIFICE6_FLOW")) _prefs.putDouble("dORIFICE6_FLOW", 0.0F);
-  if (!_prefs.isKey("dORIFICE6_PRESS")) _prefs.putDouble("dORIFICE6_PRESS", 0.0F);
 
   // Add additional / new keys to bottom of list and update the key check
 
@@ -665,8 +650,8 @@ void DataHandler::loadSettings () {
   settings.gen_decimal_length = _prefs.getInt("iGEN_DECI_ACC", 2 );
   settings.cyc_av_buffer  = _prefs.getInt("iCYC_AV_BUFF", 5 );
   // settings.maf_min_volts  = _prefs.getInt("iMAF_MIN_VOLTS", 0.1F );
-  settings.api_delim = _prefs.getString("sAPI_DELIM", ":" );
-  settings.serial_baud_rate = _prefs.getInt("iSERIAL_BAUD",  115200 );
+  // settings.api_delim = _prefs.getString("sAPI_DELIM", ":" );
+  // settings.serial_baud_rate = _prefs.getInt("iSERIAL_BAUD",  115200 );
   settings.show_alarms = _prefs.getInt("iSHOW_ALARMS",  true  );
   settings.adj_flow_depression = _prefs.getInt("iADJ_FLOW_DEP",  28  );
   settings.standardReference = _prefs.getInt("iSTD_REF", 1  );
@@ -675,20 +660,7 @@ void DataHandler::loadSettings () {
   settings.temp_unit = _prefs.getInt("iTEMP_UNIT", CELCIUS );
   settings.valveLiftInterval = _prefs.getDouble("dLIFT_INTERVAL", 1.5F  );
   settings.bench_type = _prefs.getInt("iBENCH_TYPE", MAF_BENCH );
-  settings.cal_flow_rate = _prefs.getDouble("dCAL_FLW_RATE", 14.4F );
-  settings.cal_ref_press = _prefs.getDouble("dCAL_REF_PRESS", 10.0F );
-  settings.orificeOneFlow = _prefs.getDouble("dORIFICE1_FLOW", 0.0F );
-  settings.orificeOneDepression = _prefs.getDouble("dORIFICE1_PRESS", 0.0F );
-  settings.orificeTwoFlow = _prefs.getDouble("dORIFICE2_FLOW", 0.0F );
-  settings.orificeTwoDepression = _prefs.getDouble("dORIFICE2_PRESS", 0.0F );
-  settings.orificeThreeFlow = _prefs.getDouble("dORIFICE3_FLOW", 0.0F );
-  settings.orificeThreeDepression = _prefs.getDouble("dORIFICE3_PRESS", 0.0F );
-  settings.orificeFourFlow = _prefs.getDouble("dORIFICE4_FLOW", 0.0F );
-  settings.orificeFourDepression = _prefs.getDouble("dORIFICE4_PRESS", 0.0F );
-  settings.orificeFiveFlow = _prefs.getDouble("dORIFICE5_FLOW", 0.0F );
-  settings.orificeFiveDepression = _prefs.getDouble("dORIFICE5_PRESS", 0.0F );
-  settings.orificeSixFlow = _prefs.getDouble("dORIFICE6_FLOW", 0.0F );
-  settings.orificeSixDepression = _prefs.getDouble("dORIFICE6_PRESS",  0.0F);
+
 
   status.nvmSettings = _prefs.freeEntries();
   _message.debugPrintf("Settings NVM Free Entries: %u \n", status.nvmSettings); 

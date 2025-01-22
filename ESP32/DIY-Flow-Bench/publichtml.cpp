@@ -197,6 +197,12 @@ String PublicHTML::dataPage() {
     return decompressMultipleToStream(arrays, lengths, 3);
 }
 
+String PublicHTML::calibrationPage() {
+    const uint8_t* arrays[] = {header_html, calibration_html, footer_html};
+    const size_t lengths[] = {header_html_len, calibration_html_len, footer_html_len};
+    return decompressMultipleToStream(arrays, lengths, 3);
+}
+
 String PublicHTML::pinsPage() {
     const uint8_t* arrays[] = {header_html, pins_html, footer_html};
     const size_t lengths[] = {header_html_len, pins_html_len, footer_html_len};

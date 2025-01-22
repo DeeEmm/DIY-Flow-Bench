@@ -757,6 +757,8 @@ void Hardware::checkRefPressure() {
   extern struct BenchSettings settings;
   extern struct Language language;
   extern struct Configuration config;
+  extern struct CalibrationData calVal;
+
   
   double refPressure = _calculations.convertPressure(sensorVal.PRefKPA, INH2O);
     
@@ -764,7 +766,7 @@ void Hardware::checkRefPressure() {
   // Check that pressure does not fall below limit set by iMIN_PRESS_PCT when bench is running
   // note alarm commented out in alarm function as 'nag' can get quite annoying
   // Is this a redundant check? Maybe a different alert would be more appropriate
-  if ((refPressure < (settings.cal_ref_press * (config.iMIN_PRESS_PCT / 100))) && (Hardware::benchIsRunning()))
+  if ((refPressure < (calVal.cal_ref_press * (config.iMIN_PRESS_PCT / 100))) && (Hardware::benchIsRunning()))
   {
     _message.Handler(language.LANG_REF_PRESS_LOW);
   }

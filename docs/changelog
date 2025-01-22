@@ -29,6 +29,9 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+
+2501220008      - #322 Moved API settings to system.h
+                - Moved calibration settings to dedicted page
 2501220004      - #322 Removed calibration fields from settings page
 2501220001      - #321 Zero Datagraph data
 2501210019      - Loop size tuning

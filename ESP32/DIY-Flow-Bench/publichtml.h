@@ -16,6 +16,7 @@ public:
     String settingsPage();
     String configPage();
     String dataPage();
+    String calibrationPage();
     String pinsPage();
     String mimicPage();
 

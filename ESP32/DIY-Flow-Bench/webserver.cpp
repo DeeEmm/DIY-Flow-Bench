@@ -446,6 +446,13 @@ void Webserver::begin()
         request->send_P(200, "text/html", _public_html.configPage().c_str(), processConfigPageTemplate); 
       });
 
+  // calibration page request handler
+  server->on("/calibration", HTTP_GET, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        status.GUIpage = CALIBRATION_PAGE;
+        request->send_P(200, "text/html", _public_html.calibrationPage().c_str(), processCalibrationPageTemplate); 
+      });
+
   // Pins page request handler
   server->on("/pins", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
@@ -1205,7 +1212,7 @@ String Webserver::processLanguageTemplateVars(const String &var) {
   if (var == "LANG_GUI_ORIFICE6_FLOW") return language.LANG_GUI_ORIFICE6_FLOW;
   if (var == "LANG_GUI_ORIFICE6_PRESSURE") return language.LANG_GUI_ORIFICE6_PRESSURE;
   if (var == "LANG_GUI_API_SETTINGS") return language.LANG_GUI_API_SETTINGS;
-  if (var == "LANG_GUI_API_DELIMITER") return language.LANG_GUI_API_DELIMITER;
+  // if (var == "LANG_GUI_API_DELIMITER") return language.LANG_GUI_API_DELIMITER;
   if (var == "LANG_GUI_SERIAL_BAUD") return language.LANG_GUI_SERIAL_BAUD;
   if (var == "LANG_GUI_CALIBRATION_DATA") return language.LANG_GUI_CALIBRATION_DATA;
   if (var == "LANG_GUI_CAL_OFFSET") return language.LANG_GUI_CAL_OFFSET;
@@ -1222,6 +1229,8 @@ String Webserver::processLanguageTemplateVars(const String &var) {
   if (var == "LANG_GUI_PITOT_VOLTS") return language.LANG_GUI_PITOT_VOLTS;
   if (var == "LANG_GUI_MAF_TYPE") return language.LANG_GUI_MAF_TYPE;
   if (var == "LANG_GUI_MIMIC") return language.LANG_GUI_MIMIC;
+  if (var == "LANG_GUI_CALIBRATION") return language.LANG_GUI_CALIBRATION;
+  
 
   return var;
   
@@ -1472,19 +1481,7 @@ String Webserver::processSettingsPageTemplate(const String &var) {
   if (var == "iDATAGRAPH_MAX_3" && settings.dataGraphMax == 3) return String("selected");
 
 
-  // Orifice plates
-  if (var == "dORIFICE1_FLOW") return String(settings.orificeOneFlow);
-  if (var == "dORIFICE1_PRESS") return String(settings.orificeOneDepression);
-  if (var == "dORIFICE2_FLOW") return String(settings.orificeTwoFlow);
-  if (var == "dORIFICE2_PRESS") return String(settings.orificeTwoDepression);
-  if (var == "dORIFICE3_FLOW") return String(settings.orificeThreeFlow);
-  if (var == "dORIFICE3_PRESS") return String(settings.orificeThreeDepression);
-  if (var == "dORIFICE4_FLOW") return String(settings.orificeFourFlow);
-  if (var == "dORIFICE4_PRESS") return String(settings.orificeFourDepression);
-  if (var == "dORIFICE5_FLOW") return String(settings.orificeFiveFlow);
-  if (var == "dORIFICE5_PRESS") return String(settings.orificeFiveDepression);
-  if (var == "dORIFICE6_FLOW") return String(settings.orificeSixFlow);
-  if (var == "dORIFICE6_PRESS") return String(settings.orificeSixDepression);
+
 
 
    // Wifi Settings
@@ -1496,8 +1493,8 @@ String Webserver::processSettingsPageTemplate(const String &var) {
   if (var == "iWIFI_TIMEOUT") return String(settings.wifi_timeout);
 
   // API Settings
-  if (var == "sAPI_DELIM") return settings.api_delim;
-  if (var == "iSERIAL_BAUD") return String(settings.serial_baud_rate);
+  // if (var == "sAPI_DELIM") return settings.api_delim;
+  // if (var == "iSERIAL_BAUD") return String(settings.serial_baud_rate);
 
   // Decinal accuracy
   if (var == "iFLOW_DECI_ACC") return String(settings.flow_decimal_length);
@@ -1673,10 +1670,6 @@ String Webserver::processSettingsPageTemplate(const String &var) {
   }
 
 
-
-
-
-
   // Generate file list HTML code
   if (var == "FILE_LIST"){
 
@@ -1704,17 +1697,7 @@ String Webserver::processSettingsPageTemplate(const String &var) {
 
 
 
-  // Calibration Settings
-  if (var == "dCAL_FLW_RATE") return String(settings.cal_flow_rate);
-  if (var == "dCAL_REF_PRESS") return String(settings.cal_ref_press);
 
-  // Calibration Data
-  if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
-  if (var == "USER_OFFSET") return String(calVal.user_offset);
-  if (var == "LEAK_BASE") return String(calVal.leak_cal_baseline);
-  if (var == "LEAK_OFFSET") return String(calVal.leak_cal_offset);
-  if (var == "LEAK_BASE_REV") return String(calVal.leak_cal_baseline_rev);
-  if (var == "LEAK_OFFSET_REV") return String(calVal.leak_cal_offset_rev);
 
   return "";
 }
@@ -2157,6 +2140,60 @@ String Webserver::processMimicPageTemplate(const String &var) {
 
   if (var == "VAC_SPEED") return String(pins.VAC_SPEED);
   if (var == "VAC_BLEED_VALVE") return String(pins.VAC_BLEED_VALVE);
+
+
+  return "";
+
+}
+
+
+
+
+
+
+
+
+/***********************************************************
+ * @brief processCalibrationPage
+ * @details Replaces template placeholders with variable values
+ * @param &var HTML payload 
+ * @note ~PLACEHOLDER_FORMAT~
+ ***/
+String Webserver::processCalibrationPageTemplate(const String &var) {
+
+  extern struct Pins pins;
+  extern struct BenchSettings settings;
+  extern struct CalibrationData calVal;
+
+  // Process language vars
+  String langVar = processLanguageTemplateVars(var);
+  if (langVar != var) return langVar;
+
+  // Calibration Orifice Settings
+  if (var == "dCAL_FLW_RATE") return String(calVal.cal_flow_rate);
+  if (var == "dCAL_REF_PRESS") return String(calVal.cal_ref_press);
+
+  // Calibration Data
+  if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
+  if (var == "USER_OFFSET") return String(calVal.user_offset);
+  if (var == "LEAK_BASE") return String(calVal.leak_cal_baseline);
+  if (var == "LEAK_OFFSET") return String(calVal.leak_cal_offset);
+  if (var == "LEAK_BASE_REV") return String(calVal.leak_cal_baseline_rev);
+  if (var == "LEAK_OFFSET_REV") return String(calVal.leak_cal_offset_rev);
+
+  // Orifice plates
+  if (var == "dORIFICE1_FLOW") return String(calVal.orificeOneFlow);
+  if (var == "dORIFICE1_PRESS") return String(calVal.orificeOneDepression);
+  if (var == "dORIFICE2_FLOW") return String(calVal.orificeTwoFlow);
+  if (var == "dORIFICE2_PRESS") return String(calVal.orificeTwoDepression);
+  if (var == "dORIFICE3_FLOW") return String(calVal.orificeThreeFlow);
+  if (var == "dORIFICE3_PRESS") return String(calVal.orificeThreeDepression);
+  if (var == "dORIFICE4_FLOW") return String(calVal.orificeFourFlow);
+  if (var == "dORIFICE4_PRESS") return String(calVal.orificeFourDepression);
+  if (var == "dORIFICE5_FLOW") return String(calVal.orificeFiveFlow);
+  if (var == "dORIFICE5_PRESS") return String(calVal.orificeFiveDepression);
+  if (var == "dORIFICE6_FLOW") return String(calVal.orificeSixFlow);
+  if (var == "dORIFICE6_PRESS") return String(calVal.orificeSixDepression);
 
 
   return "";
