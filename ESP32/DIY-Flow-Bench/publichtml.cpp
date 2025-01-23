@@ -26,6 +26,7 @@
 #include "htmldata.h"
 
 uint8_t decompBuffer[21000]; 
+// uint8_t decompBuffer[26000]; 
 
 // Combine arrays
 uint8_t* combineArrays(const uint8_t* arr1, size_t len1, const uint8_t* arr2, size_t len2) {
@@ -39,6 +40,8 @@ uint8_t* combineArrays(const uint8_t* arr1, size_t len1, const uint8_t* arr2, si
 
 // Decompress Byte data
 String PublicHTML::decompress(const uint8_t* data, size_t len) {
+
+    // int level = 9; //miniz 
 
     memset(decompBuffer, 0, sizeof(decompBuffer));
     // uint8_t buffer[1024];
@@ -132,6 +135,8 @@ String PublicHTML::decompressMultiple(const uint8_t** arrays, const size_t* leng
 
 String PublicHTML::decompressMultipleToStream(const uint8_t** arrays, const size_t* lengths, int count) {
   
+//   int level = 9;
+
   memset(decompBuffer, 0, sizeof(decompBuffer));
 
   z_stream stream;
@@ -189,6 +194,12 @@ String PublicHTML::settingsPage() {
 String PublicHTML::dataPage() {
     const uint8_t* arrays[] = {header_html, data_html, footer_html};
     const size_t lengths[] = {header_html_len, data_html_len, footer_html_len};
+    return decompressMultipleToStream(arrays, lengths, 3);
+}
+
+String PublicHTML::calibrationPage() {
+    const uint8_t* arrays[] = {header_html, calibration_html, footer_html};
+    const size_t lengths[] = {header_html_len, calibration_html_len, footer_html_len};
     return decompressMultipleToStream(arrays, lengths, 3);
 }
 
@@ -258,6 +269,10 @@ String PublicHTML::mimicJs() {
 
 String PublicHTML::dataJs() {
     return decompress(data_js, data_js_len);
+}
+
+String PublicHTML::calibrationJs() {
+    return decompress(calibration_js, calibration_js_len);
 }
 
 // String PublicHTML::pinsJs() {

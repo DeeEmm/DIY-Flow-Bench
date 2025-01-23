@@ -58,6 +58,10 @@
 
 #include "ADS1X15.h" // DM 'Lite' Library
 
+// #ifndef SET_LOOP_TASK_STACK_SIZE
+// #define SET_LOOP_TASK_STACK_SIZE( LOOP_TASK_STACK_SIZE );
+// #endif
+
 SET_LOOP_TASK_STACK_SIZE( LOOP_TASK_STACK_SIZE );
 
 

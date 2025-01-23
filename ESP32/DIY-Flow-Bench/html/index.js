@@ -33,6 +33,9 @@ var closeLoadGraphDataModalButton = document.getElementsByClassName("closeLoadGr
 var closeSaveGraphDataModalButton = document.getElementsByClassName("closeSaveGraphDataModalButton")[0];
 var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
 
+
+
+
 // Set up Server Side Events (SSE)
 if (!!window.EventSource) {
   var source = new EventSource('/events');
@@ -404,7 +407,7 @@ function initialiseButtons() {
       console.log('Calibrate FLow Offset');
       xhr.open('GET', '/api/bench/calibrate');
       xhr.onload = function() {
-        if (xhr.status === 200) window.location.href = '/?view=config';
+        if (xhr.status === 200) window.location.href = '/';
       };
       xhr.send();
     });
@@ -413,7 +416,7 @@ function initialiseButtons() {
       console.log('Leak Test Calibration');
       xhr.open('GET', '/api/bench/leakcal');
       xhr.onload = function() {
-        if (xhr.status === 200) window.location.href = '/?view=config';
+        if (xhr.status === 200) window.location.href = '/';
       };
       xhr.send();
     });

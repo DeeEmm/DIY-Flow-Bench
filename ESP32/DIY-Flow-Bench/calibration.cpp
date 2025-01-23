@@ -82,9 +82,9 @@ bool Calibration::setFlowOffset() {
   }
  
   // update config var
-  calVal.flow_offset = flowVal - settings.cal_flow_rate;
+  calVal.flow_offset = flowVal - calVal.cal_flow_rate;
   
-  _message.debugPrintf("Calibration::setFlowOffset $ \n", calVal.flow_offset);
+  _message.debugPrintf("Calibration::setFlowOffset %d \n", calVal.flow_offset);
 
   saveCalibrationData();    
 
@@ -333,6 +333,21 @@ void Calibration::initialiseCalibrationData () {
   if (!_prefs.isKey("PDIFF_OFFSET")) _prefs.putDouble("PDIFF_OFFSET", 0.0);
   if (!_prefs.isKey("PITOT_OFFSET")) _prefs.putDouble("PITOT_OFFSET", 0.0);
 
+  if (!_prefs.isKey("dCAL_FLW_RATE")) _prefs.putDouble("dCAL_FLW_RATE", 14.4F);
+  if (!_prefs.isKey("dCAL_REF_PRESS")) _prefs.putDouble("dCAL_REF_PRESS", 10.0F);
+  if (!_prefs.isKey("dORIFICE1_FLOW")) _prefs.putDouble("dORIFICE1_FLOW", 0.0F);
+  if (!_prefs.isKey("dORIFICE1_PRESS")) _prefs.putDouble("dORIFICE1_PRESS", 0.0F);
+  if (!_prefs.isKey("dORIFICE2_FLOW")) _prefs.putDouble("dORIFICE2_FLOW", 0.0F);
+  if (!_prefs.isKey("dORIFICE2_PRESS")) _prefs.putDouble("dORIFICE2_PRESS", 0.0F);
+  if (!_prefs.isKey("dORIFICE3_FLOW")) _prefs.putDouble("dORIFICE3_FLOW", 0.0F);
+  if (!_prefs.isKey("dORIFICE3_PRESS")) _prefs.putDouble("dORIFICE3_PRESS", 0.0F);
+  if (!_prefs.isKey("dORIFICE4_FLOW")) _prefs.putDouble("dORIFICE4_FLOW", 0.0F);
+  if (!_prefs.isKey("dORIFICE4_PRESS")) _prefs.putDouble("dORIFICE4_PRESS", 0.0F);
+  if (!_prefs.isKey("dORIFICE5_FLOW")) _prefs.putDouble("dORIFICE5_FLOW", 0.0F);
+  if (!_prefs.isKey("dORIFICE5_PRESS")) _prefs.putDouble("dORIFICE5_PRESS", 0.0F);
+  if (!_prefs.isKey("dORIFICE6_FLOW")) _prefs.putDouble("dORIFICE6_FLOW", 0.0F);
+  if (!_prefs.isKey("dORIFICE6_PRESS")) _prefs.putDouble("dORIFICE6_PRESS", 0.0F);
+
   _prefs.end();
 }
 
@@ -365,6 +380,21 @@ void Calibration::loadCalibrationData() {
   calVal.pdiff_cal_offset = _prefs.getDouble("PDIFF_OFFSET", 0.0);
   calVal.pitot_cal_offset = _prefs.getDouble("PITOT_OFFSET", 0.0);
 
+  calVal.cal_flow_rate = _prefs.getDouble("dCAL_FLW_RATE", 14.4F );
+  calVal.cal_ref_press = _prefs.getDouble("dCAL_REF_PRESS", 10.0F );
+  calVal.orificeOneFlow = _prefs.getDouble("dORIFICE1_FLOW", 0.0F );
+  calVal.orificeOneDepression = _prefs.getDouble("dORIFICE1_PRESS", 0.0F );
+  calVal.orificeTwoFlow = _prefs.getDouble("dORIFICE2_FLOW", 0.0F );
+  calVal.orificeTwoDepression = _prefs.getDouble("dORIFICE2_PRESS", 0.0F );
+  calVal.orificeThreeFlow = _prefs.getDouble("dORIFICE3_FLOW", 0.0F );
+  calVal.orificeThreeDepression = _prefs.getDouble("dORIFICE3_PRESS", 0.0F );
+  calVal.orificeFourFlow = _prefs.getDouble("dORIFICE4_FLOW", 0.0F );
+  calVal.orificeFourDepression = _prefs.getDouble("dORIFICE4_PRESS", 0.0F );
+  calVal.orificeFiveFlow = _prefs.getDouble("dORIFICE5_FLOW", 0.0F );
+  calVal.orificeFiveDepression = _prefs.getDouble("dORIFICE5_PRESS", 0.0F );
+  calVal.orificeSixFlow = _prefs.getDouble("dORIFICE6_FLOW", 0.0F );
+  calVal.orificeSixDepression = _prefs.getDouble("dORIFICE6_PRESS",  0.0F);
+
   _prefs.end();
 }
 
@@ -383,8 +413,6 @@ void Calibration::saveCalibrationData() {
   extern struct CalibrationData calVal;
   extern struct Language language;
 
-  _message.Handler(language.LANG_SAVING_CALIBRATION);
-
   _prefs.begin("calibration");
 
   _prefs.putDouble("FLOW_OFFSET", calVal.flow_offset);
@@ -397,6 +425,8 @@ void Calibration::saveCalibrationData() {
   _prefs.putDouble("PITOT_OFFSET", calVal.pitot_cal_offset);
     
   _prefs.end();
+
+  _message.Handler(language.LANG_SAVING_CALIBRATION);
 
 }
 
