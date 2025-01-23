@@ -48,8 +48,9 @@ using namespace std;
 // #define API_CHECKSUM_IS_ENABLED                       
 #define API_BLOB_LENGTH 1300
 #define API_RESPONSE_LENGTH 64
+
 #define API_STATUS_LENGTH 128
-#define API_JSON_LENGTH 1024
+// #define API_JSON_LENGTH 1024
 #define API_SCAN_DELAY_MS 250
 #define API_DELIMITER ":"
 #define API_SERIAL_BAUD 115200
@@ -57,7 +58,7 @@ using namespace std;
 // Memory assignment
 #define SENSOR_TASK_MEM_STACK 2800 // Free 776
 #define ENVIRO_TASK_MEM_STACK 2200 // Free 640
-#define LOOP_TASK_STACK_SIZE 7000 // 15000 // SET_LOOP_TASK_STACK_SIZE( LOOP_TASK_STACK_SIZE )
+#define LOOP_TASK_STACK_SIZE 9000 // 7000 // 15000 // SET_LOOP_TASK_STACK_SIZE( LOOP_TASK_STACK_SIZE )
 
 // MAF Data Filters
 #define ALPHA_MEDIAN 0.75f

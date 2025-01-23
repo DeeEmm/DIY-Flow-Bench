@@ -148,13 +148,13 @@ void Webserver::begin()
       if (_hardware.benchIsRunning()) {
         _message.Handler(language.LANG_CALIBRATING);
         _message.debugPrintf("Calibrating Flow...\n");
-        request->send(200, "text/html", "{\"calibrate\":\"true\"}");
         _calibrate.setFlowOffset();         
+        request->send(200, "text/html", "{\"calibrate\":\"true\"}");
       } else {
         _message.Handler(language.LANG_RUN_BENCH_TO_CALIBRATE);
         request->send(200, "text/html", "{\"calibrate\":\"false\"}");
       }  
-      request->redirect("/");
+      // request->redirect("/");
       });
 
   server->on("/api/bench/leakcal", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -164,13 +164,14 @@ void Webserver::begin()
       if (_hardware.benchIsRunning()) {
         _message.Handler(language.LANG_LEAK_CALIBRATING);
         _message.debugPrintf("Calibrating Leak Test...\n");
-        request->send(200, "text/html", "{\"leakcal\":\"true\"}");
         _calibrate.setLeakOffset();
+        request->send(200, "text/html", "{\"leakcal\":\"true\"}");
       } else {
         _message.Handler(language.LANG_RUN_BENCH_TO_CALIBRATE);
         request->send(200, "text/html", "{\"leakcal\":\"false\"}");
       } 
-      request->redirect("/"); });
+      // request->redirect("/"); 
+      });
 
   // Upload request handler
   server->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
@@ -341,7 +342,7 @@ void Webserver::begin()
   // Save Pins Form
   server->on("/api/savepins", HTTP_POST, savePinsForm);
 
-  // Save Calibration Form
+  // Save Calibration Settings
   server->on("/api/savecalibration", HTTP_POST, saveCalibrationForm);
 
   // Save Lift Data Form
@@ -422,6 +423,13 @@ void Webserver::begin()
         PublicHTML _public_html;
         AsyncResponseStream *response = request->beginResponseStream("text/javascript");
         response->print(_public_html.dataJs().c_str());
+        request->send(response);
+      });
+  
+  server->on("/calibration.js", HTTP_ANY, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        AsyncResponseStream *response = request->beginResponseStream("text/javascript");
+        response->print(_public_html.calibrationJs().c_str());
         request->send(response);
       });
   
@@ -692,10 +700,9 @@ void Webserver::savePinsForm(AsyncWebServerRequest *request)
 
 
 /***********************************************************
- * @brief saveCalibration
- * @details Saves calibration data to cal.json file
- * @note Creates file if it does not exist
- * @note Redirects browser to configuration tab
+ * @brief saveCalibration Data
+ * @details Saves calibration data to NVM
+ * @note Redirects browser to calibration tab
  * @note duplicates _calibration.saveCalibrationData whjich is unable to be called from server->on directive
  * 
  ***/
@@ -723,7 +730,7 @@ void Webserver::saveCalibrationForm(AsyncWebServerRequest *request)
 
   _prefs.end();
   _calibrate.loadCalibrationData();
-  request->redirect("/");
+  request->redirect("/calibration");
 
 }
 
@@ -732,10 +739,12 @@ void Webserver::saveCalibrationForm(AsyncWebServerRequest *request)
 
 
 
+
+
+
 /***********************************************************
- * @brief saveCalibration
- * @details Saves calibration data to cal.json file
- * @note Creates file if it does not exist
+ * @brief parseUserFlowTargetForm
+ * @details Saves Flow targets to NVM
  * @note Redirects browser to configuration tab
  * @note duplicates _calibration.saveCalibrationData whjich is unable to be called from server->on directive
  * 
@@ -769,7 +778,7 @@ void Webserver::parseUserFlowTargetForm(AsyncWebServerRequest *request)
   // calVal.leak_cal_baseline= calData["LEAK_BASE"].as<double>();
   // calVal.leak_cal_baseline_rev = calData["LEAK_BASE_REV"].as<double>();
 
-  _message.debugPrintf("sUer Flow Target Form Data parsed \n");
+  _message.debugPrintf("User Flow Target Form Data parsed \n");
 
   _calibrate.saveCalibrationData();
 
@@ -1111,7 +1120,7 @@ String Webserver::processLanguageTemplateVars(const String &var) {
   if (var == "LANG_GUI_UPLOAD_FIRMWARE_BINARY") return language.LANG_GUI_UPLOAD_FIRMWARE_BINARY;
   if (var == "LANG_GUI_FIRMWARE_UPDATE") return language.LANG_GUI_FIRMWARE_UPDATE;
   if (var == "LANG_GUI_USER_FLOW_TARGET_VAL") return language.LANG_GUI_USER_FLOW_TARGET_VAL;
-  if (var == "LANG_GUI_USER_FLOW_TARGET_SAVE") return language.LANG_GUI_USER_FLOW_TARGET_SAVE;
+  if (var == "LANG_GUI_SAVE") return language.LANG_GUI_SAVE;
   if (var == "LANG_GUI_CAL_FLOW_OFFSET") return language.LANG_GUI_CAL_FLOW_OFFSET;
   if (var == "LANG_GUI_CAL_LEAK_TEST") return language.LANG_GUI_CAL_LEAK_TEST;
   if (var == "LANG_GUI_LOAD_LIFT_PROFILE") return language.LANG_GUI_LOAD_LIFT_PROFILE;
@@ -1215,6 +1224,7 @@ String Webserver::processLanguageTemplateVars(const String &var) {
   // if (var == "LANG_GUI_API_DELIMITER") return language.LANG_GUI_API_DELIMITER;
   if (var == "LANG_GUI_SERIAL_BAUD") return language.LANG_GUI_SERIAL_BAUD;
   if (var == "LANG_GUI_CALIBRATION_DATA") return language.LANG_GUI_CALIBRATION_DATA;
+  if (var == "LANG_GUI_CALIBRATE") return language.LANG_GUI_CALIBRATE;
   if (var == "LANG_GUI_CAL_OFFSET") return language.LANG_GUI_CAL_OFFSET;
   if (var == "LANG_GUI_LEAK_TEST_BASELINE") return language.LANG_GUI_LEAK_TEST_BASELINE;
   if (var == "LANG_GUI_LEAK_TEST_OFFSET") return language.LANG_GUI_LEAK_TEST_OFFSET;
@@ -2164,6 +2174,7 @@ String Webserver::processCalibrationPageTemplate(const String &var) {
   extern struct Pins pins;
   extern struct BenchSettings settings;
   extern struct CalibrationData calVal;
+  extern struct SensorData sensorVal;
 
   // Process language vars
   String langVar = processLanguageTemplateVars(var);
@@ -2195,6 +2206,29 @@ String Webserver::processCalibrationPageTemplate(const String &var) {
   if (var == "dORIFICE6_FLOW") return String(calVal.orificeSixFlow);
   if (var == "dORIFICE6_PRESS") return String(calVal.orificeSixDepression);
 
+  if (var == "FLOW_CONVERSION_TYPE") {
+
+    // Get flow type based on currently visible tile
+    switch (sensorVal.flowtile) {
+      case MAFFLOW_TILE:
+        return String("!! MAF flow selected !!");
+      break;
+
+      case ACFM_TILE:
+        return String("Actual CFM");
+      break;
+
+      case ADJCFM_TILE:
+        return String("Adjusted CFM");
+      break;
+
+      case SCFM_TILE:
+        return String("Standard CFM");
+      break;
+
+    }
+
+  }
 
   return "";
 

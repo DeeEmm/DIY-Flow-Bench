@@ -11,7 +11,7 @@
    "LANG_ERROR_LOADING_CONFIG" : "Error loading config file",
    "LANG_ERROR_SAVING_CONFIG" : "Error saving config file",
    "LANG_SAVING_CONFIG" : "Saving config file",
-   "LANG_SAVING_CALIBRATION" : "Error saving calibration file",
+   "LANG_SAVING_CALIBRATION" : "Saving calibration file",
    "LANG_ERROR_LOADING_FILE" : "Error loading file",
    "LANG_DHT11_READ_FAIL" : "DHT11 Read fail",
    "LANG_BME280_READ_FAIL" : "BME280 Read fail",
@@ -115,9 +115,9 @@
    "LANG_GUI_CAL_OFFSET" : "Calibration Offset (cfm)",
    "LANG_GUI_LEAK_TEST_BASELINE" : "Leak Test Baseline (cfm)",
    "LANG_GUI_LEAK_TEST_OFFSET" : "Leak Test Offset (cfm)",
-   "LANG_GUI_LEAK_TEST_BASELINE_REV" : "Leak Test Baseline (Reverse) (cfm)",
-   "LANG_GUI_LEAK_TEST_OFFSET_REV" : "Leak Test Offset (Reverse) (cfm)",
+   "LANG_GUI_LEAK_TEST_BASELINE_REV" : "Leak Test Baseline Rev (cfm)",
+   "LANG_GUI_LEAK_TEST_OFFSET_REV" : "Leak Test Offset Rev (cfm)",
    "LANG_GUI_MAF_TYPE" : "MAF Type",
-   "LANG_GUI_OVERWRITE" : "Overwrite"
-   "LANG_GUI_MIMIC" : "MIMIC";
+   "LANG_GUI_OVERWRITE" : "Overwrite",
+   "LANG_GUI_MIMIC" : "MIMIC"
 }

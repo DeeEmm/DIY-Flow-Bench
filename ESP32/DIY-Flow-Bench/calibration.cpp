@@ -84,7 +84,7 @@ bool Calibration::setFlowOffset() {
   // update config var
   calVal.flow_offset = flowVal - calVal.cal_flow_rate;
   
-  _message.debugPrintf("Calibration::setFlowOffset $ \n", calVal.flow_offset);
+  _message.debugPrintf("Calibration::setFlowOffset %d \n", calVal.flow_offset);
 
   saveCalibrationData();    
 
@@ -413,8 +413,6 @@ void Calibration::saveCalibrationData() {
   extern struct CalibrationData calVal;
   extern struct Language language;
 
-  _message.Handler(language.LANG_SAVING_CALIBRATION);
-
   _prefs.begin("calibration");
 
   _prefs.putDouble("FLOW_OFFSET", calVal.flow_offset);
@@ -427,6 +425,8 @@ void Calibration::saveCalibrationData() {
   _prefs.putDouble("PITOT_OFFSET", calVal.pitot_cal_offset);
     
   _prefs.end();
+
+  _message.Handler(language.LANG_SAVING_CALIBRATION);
 
 }
 

@@ -124,6 +124,7 @@ void API::ParseMessage(char apiMessage) {
   char apiResponseBlob[API_BLOB_LENGTH];  //1024
   // char charDataJSON[API_JSON_LENGTH];     //1020
   char fileListBlob[1024];
+  
 
   // Initialise arrays
   apiResponse[0] = 0;
@@ -131,6 +132,9 @@ void API::ParseMessage(char apiMessage) {
   // charDataJSON[0] = 0;
   fileListBlob[0] = 0;
   
+  String envTaskMem;
+  String sensTaskMem;
+  String loopTaskMem;
 
   String jsonString;
   long refValue;
@@ -525,10 +529,12 @@ void API::ParseMessage(char apiMessage) {
       break;
       
       case 'x': // Print Heap memory usage to serial monitor 
+          envTaskMem = _calculations.byteDecode(uxTaskGetStackHighWaterMark(enviroDataTask));
+          sensTaskMem = _calculations.byteDecode(uxTaskGetStackHighWaterMark(sensorDataTask));
+          loopTaskMem = _calculations.byteDecode(uxTaskGetStackHighWaterMark(NULL));
+
           // snprintf(apiResponse, API_RESPONSE_LENGTH,"x%sFree Heap=%s / Max Allocated Heap=%s ", API_DELIMITER , _calculations.byteDecode(ESP.getFreeHeap()), _calculations.byteDecode(ESP.getMaxAllocHeap())); 
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "Free Stack: EnviroTask=%s  \n", _calculations.byteDecode(uxTaskGetStackHighWaterMark(enviroDataTask))); 
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "Free Stack: SensorTask=%s  \n", _calculations.byteDecode(uxTaskGetStackHighWaterMark(sensorDataTask))); 
-          snprintf(apiResponse, API_RESPONSE_LENGTH, "Free Stack: LoopTask=%s    \n", _calculations.byteDecode(uxTaskGetStackHighWaterMark(NULL))); 
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "EnviroTask=%s  \nSensorTask=%s \nLoopTask=%s", envTaskMem, sensTaskMem, loopTaskMem); 
       break;
 
       
@@ -743,7 +749,7 @@ void API::ParseMessage(char apiMessage) {
 
       // We've got here without a valid API request so lets get outta here before we send garbage to the serial comms
       default:
-          return;
+          // return;
       break;
 
       

@@ -271,6 +271,10 @@ String PublicHTML::dataJs() {
     return decompress(data_js, data_js_len);
 }
 
+String PublicHTML::calibrationJs() {
+    return decompress(calibration_js, calibration_js_len);
+}
+
 // String PublicHTML::pinsJs() {
 //     return decompress(pins_js, pins_js_len);
 // }

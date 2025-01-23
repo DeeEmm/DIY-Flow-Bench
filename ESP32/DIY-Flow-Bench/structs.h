@@ -180,7 +180,7 @@ struct CalibrationData {
   double leak_cal_offset_rev = 0.0;  
   double pdiff_cal_offset = 0.0;
   double pitot_cal_offset = 0.0;
-  
+
   double cal_ref_press = 10;                      // Calibration orifice ref pressure
   double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
   double orificeOneFlow = 0.0;
@@ -407,7 +407,8 @@ struct Language {
     char LANG_GUI_UPLOAD_FIRMWARE_BINARY[50] = "Upload Firmware Binary (firmware_update.bin)";
     char LANG_GUI_FIRMWARE_UPDATE[50] = "Update";
     char LANG_GUI_USER_FLOW_TARGET_VAL[50] = "User Flow Target Value";
-    char LANG_GUI_USER_FLOW_TARGET_SAVE[50] = "Save";
+    char LANG_GUI_SAVE[50] = "Save";
+    char LANG_GUI_CALIBRATE[50] = "Calibrate";
     char LANG_GUI_CAL_FLOW_OFFSET[50] = "Calibrate Flow Offset";
     char LANG_GUI_CAL_LEAK_TEST[50] = "Calibrate Leak Test";
     char LANG_GUI_LOAD_LIFT_PROFILE[50] = "Load Lift Profile";
@@ -445,10 +446,10 @@ struct Language {
     char LANG_REF_PRESS_LOW[50] = "Warning! Low Reference Pressure";
     char LANG_LEAK_TEST_PASS[50] = "Leak test OK";
     char LANG_LEAK_TEST_FAILED[50] = "Leak test fail";
-    char LANG_ERROR_LOADING_CONFIG[50] = "Error loading config file";
-    char LANG_ERROR_SAVING_CONFIG[50] = "Error saving config file";
-    char LANG_SAVING_CONFIG[50] = "Saving config file";
-    char LANG_SAVING_CALIBRATION[50] = "Error saving calibration file";
+    char LANG_ERROR_LOADING_CONFIG[50] = "Error loading config data";
+    char LANG_ERROR_SAVING_CONFIG[50] = "Error saving config data";
+    char LANG_SAVING_CONFIG[50] = "Saving config data";
+    char LANG_SAVING_CALIBRATION[50] = "Saving calibration data";
     char LANG_ERROR_LOADING_FILE[50] = "Error loading file";
     char LANG_DHT11_READ_FAIL[50] = "DHT11 Read fail";
     char LANG_BME280_READ_FAIL[50] = "BME280 Read fail";
@@ -551,8 +552,8 @@ struct Language {
     char LANG_GUI_CAL_OFFSET[50] = "Calibration Offset (cfm)";
     char LANG_GUI_LEAK_TEST_BASELINE[50] = "Leak Test Baseline (cfm)";
     char LANG_GUI_LEAK_TEST_OFFSET[50] = "Leak Test Offset (cfm)";
-    char LANG_GUI_LEAK_TEST_BASELINE_REV[50] = "Leak Test Baseline (Rev) (cfm)";
-    char LANG_GUI_LEAK_TEST_OFFSET_REV[50] = "Leak Test Offset (Rev) (cfm)";
+    char LANG_GUI_LEAK_TEST_BASELINE_REV[50] = "Leak Test Baseline Rev (cfm)";
+    char LANG_GUI_LEAK_TEST_OFFSET_REV[50] = "Leak Test Offset Rev (cfm)";
     char LANG_GUI_OVERWRITE[50] = "Overwrite";  
     char LANG_GUI_DATA_CAPTURE_SETTINGS[50] = "DataGraph Settings";
     char LANG_GUI_CAPTURE_DATATYPE[50] = "Datatype";

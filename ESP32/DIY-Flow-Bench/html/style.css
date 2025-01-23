@@ -118,10 +118,6 @@ hr {
   width: 95%;
 }
 
-.fieldset-divider {
-  border-top: 1px dashed #DDD;
-}
-
 .content {
 	padding: 30px;
 }
@@ -842,6 +838,10 @@ fieldset {
     padding: 15px; 
     border: 1px solid #ccc;
     font-size: 18px;
+}
+
+.fieldset-divider {
+  border-top: 1px dashed #DDD;
 }
 
 legend {

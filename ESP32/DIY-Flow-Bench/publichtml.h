@@ -35,4 +35,5 @@ public:
     String pinsJs();
     String mimicJs();
     String dataJs();
+    String calibrationJs();
 };

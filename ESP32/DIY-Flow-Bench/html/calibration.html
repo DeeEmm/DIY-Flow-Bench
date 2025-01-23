@@ -1,78 +1,96 @@
+    <div id="calibration-settings">
+      <div class="config-panel">
+        <h2>~LANG_GUI_CALIBRATION~</h2>
+        <form method="POST" action="/api/savecalibration">
+          <div class="config-container">
+            <fieldset>
+              <legend>~LANG_GUI_CAL_ORIFICE_SETTINGS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#calibration-orifice-settings" target="_blank">&#9432;</a></legend>
+                  <label class="config-label">~LANG_GUI_CAL_ORIFICE_FLOW_RATE~:</label>
+                  <input type="number" id="dCAL_FLW_RATE" name="dCAL_FLW_RATE" value="~dCAL_FLW_RATE~" step="0.01" class="config-text">
+                  <br>
+                  <label class="config-label">~LANG_GUI_CAL_ORIFICE_TEST_PRESS~:</label>
+                  <input type="number" id="dCAL_REF_PRESS" name="dCAL_REF_PRESS" value="~dCAL_REF_PRESS~" step="0.01" class="config-text">
+            </fieldset>
 
-<fieldset>
-  <legend>~LANG_GUI_CAL_ORIFICE_SETTINGS~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#calibration-orifice-settings" target="_blank">&#9432;</a></legend>
-      <label class="config-label">~LANG_GUI_CAL_ORIFICE_FLOW_RATE~:</label>
-      <input type="number" id="dCAL_FLW_RATE" name="dCAL_FLW_RATE" value="~dCAL_FLW_RATE~" step="0.01" class="config-text">
-      <br>
-      <label class="config-label">~LANG_GUI_CAL_ORIFICE_TEST_PRESS~:</label>
-      <input type="number" id="dCAL_REF_PRESS" name="dCAL_REF_PRESS" value="~dCAL_REF_PRESS~" step="0.01" class="config-text">
-</fieldset>
+            
+            <fieldset>
+              <legend>~LANG_GUI_ORIFICE_DATA~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#orifice-data" target="_blank">&#9432;</a></legend>
+                <label class="config-label">~LANG_GUI_ORIFICE1_FLOW~:</label>
+                <input type="number" id="dORIFICE1_FLOW" name="dORIFICE1_FLOW" value="~dORIFICE1_FLOW~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_ORIFICE1_PRESSURE~:</label>
+                <input type="number" id="dORIFICE1_PRESS" name="dORIFICE1_PRESS" value="~dORIFICE1_PRESS~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_ORIFICE2_FLOW~:</label>
+                <input type="number" id="dORIFICE2_FLOW" name="dORIFICE2_FLOW" value="~dORIFICE2_FLOW~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_ORIFICE2_PRESSURE~:</label>
+                <input type="number" id="dORIFICE2_PRESS" name="dORIFICE2_PRESS" value="~dORIFICE2_PRESS~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_ORIFICE3_FLOW~:</label>
+                <input type="number" id="dORIFICE3_FLOW" name="dORIFICE3_FLOW" value="~dORIFICE3_FLOW~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_ORIFICE3_PRESSURE~:</label>
+                <input type="number" id="dORIFICE3_PRESS" name="dORIFICE3_PRESS" value="~dORIFICE3_PRESS~" step="0.01" class="config-text">
+            </fieldset>
 
-<div id="orificeData">
-    <fieldset>
-      <legend>~LANG_GUI_ORIFICE_DATA~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#orifice-data" target="_blank">&#9432;</a></legend>
-        <label class="config-label">~LANG_GUI_ORIFICE1_FLOW~:</label>
-        <input type="number" id="dORIFICE1_FLOW" name="dORIFICE1_FLOW" value="~dORIFICE1_FLOW~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_ORIFICE1_PRESSURE~:</label>
-        <input type="number" id="dORIFICE1_PRESS" name="dORIFICE1_PRESS" value="~dORIFICE1_PRESS~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_ORIFICE2_FLOW~:</label>
-        <input type="number" id="dORIFICE2_FLOW" name="dORIFICE2_FLOW" value="~dORIFICE2_FLOW~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_ORIFICE2_PRESSURE~:</label>
-        <input type="number" id="dORIFICE2_PRESS" name="dORIFICE2_PRESS" value="~dORIFICE2_PRESS~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_ORIFICE3_FLOW~:</label>
-        <input type="number" id="dORIFICE3_FLOW" name="dORIFICE3_FLOW" value="~dORIFICE3_FLOW~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_ORIFICE3_PRESSURE~:</label>
-        <input type="number" id="dORIFICE3_PRESS" name="dORIFICE3_PRESS" value="~dORIFICE3_PRESS~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_ORIFICE4_FLOW~:</label>
-        <input type="number" id="dORIFICE4_FLOW" name="dORIFICE4_FLOW" value="~dORIFICE4_FLOW~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_ORIFICE4_PRESSURE~:</label>
-        <input type="number" id="dORIFICE4_PRESS" name="dORIFICE4_PRESS" value="~dORIFICE4_PRESS~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_ORIFICE5_FLOW~:</label>
-        <input type="number" id="dORIFICE5_FLOW" name="dORIFICE5_FLOW" value="~dORIFICE5_FLOW~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_ORIFICE5_PRESSURE~:</label>
-        <input type="number" id="dORIFICE5_PRESS" name="dORIFICE5_PRESS" value="~dORIFICE5_PRESS~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_ORIFICE6_FLOW~:</label>
-        <input type="number" id="dORIFICE6_FLOW" name="dORIFICE6_FLOW" value="~dORIFICE6_FLOW~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_ORIFICE6_PRESSURE~:</label>
-        <input type="number" id="dORIFICE6_PRESS" name="dORIFICE6_PRESS" value="~dORIFICE6_PRESS~" step="0.01" class="config-text">
-    </fieldset>
-  </div>
+            <fieldset>
+              <legend>&nbsp;</legend>
+                <label class="config-label">~LANG_GUI_ORIFICE4_FLOW~:</label>
+                <input type="number" id="dORIFICE4_FLOW" name="dORIFICE4_FLOW" value="~dORIFICE4_FLOW~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_ORIFICE4_PRESSURE~:</label>
+                <input type="number" id="dORIFICE4_PRESS" name="dORIFICE4_PRESS" value="~dORIFICE4_PRESS~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_ORIFICE5_FLOW~:</label>
+                <input type="number" id="dORIFICE5_FLOW" name="dORIFICE5_FLOW" value="~dORIFICE5_FLOW~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_ORIFICE5_PRESSURE~:</label>
+                <input type="number" id="dORIFICE5_PRESS" name="dORIFICE5_PRESS" value="~dORIFICE5_PRESS~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_ORIFICE6_FLOW~:</label>
+                <input type="number" id="dORIFICE6_FLOW" name="dORIFICE6_FLOW" value="~dORIFICE6_FLOW~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_ORIFICE6_PRESSURE~:</label>
+                <input type="number" id="dORIFICE6_PRESS" name="dORIFICE6_PRESS" value="~dORIFICE6_PRESS~" step="0.01" class="config-text">
+            </fieldset>
+
+            <fieldset style="border-color: #F00;">
+              <legend>~LANG_GUI_CALIBRATION_DATA~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#calibration-data" target="_blank">&#9432;</a></legend>
+                <label class="config-label">~LANG_GUI_CAL_OFFSET~:</label>
+                <input type="number" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_LEAK_TEST_BASELINE~:</label>
+                <input  type="number" id="LEAK_BASE" name="LEAK_BASE" value="~LEAK_BASE~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_LEAK_TEST_OFFSET~:</label>
+                <input  type="number" id="LEAK_OFFSET" name="LEAK_OFFSET" value="~LEAK_OFFSET~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_LEAK_TEST_BASELINE_REV~:</label>
+                <input  type="number" id="LEAK_BASE_REV" name="LEAK_BASE_REV" value="~LEAK_BASE_REV~" step="0.01" class="config-text">
+                <br>
+                <label class="config-label">~LANG_GUI_LEAK_TEST_OFFSET_REV~:</label>
+                <input type="number" id="LEAK_OFFSET_REV" name="LEAK_OFFSET_REV" value="~LEAK_OFFSET_REV~" step="0.01" class="config-text">
+                <br>
+            </fieldset>
+
+            <fieldset style="border-color: #F00;">
+              <legend>~LANG_GUI_CALIBRATE~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#calibration-data" target="_blank">&#9432;</a></legend>
+              <div class="align-center">
+                <button id="calibrate-button" class="button">~LANG_GUI_CAL_FLOW_OFFSET~</button>
+                <button id="leak-cal-button" class="button">~LANG_GUI_CAL_LEAK_TEST~</button>
+                <h4>~FLOW_CONVERSION_TYPE~</h4>
+              </div>      
+            </fieldset>
+          </div>
+          <div class="float-right"><input id="save-config-button" type="submit" class="button" value="~LANG_GUI_SAVE~"></div>
+        </form>    
+      </div>
 
 
+    </div>
 
-<form method="POST" action="/api/savecalibration">
-    <fieldset>
-      <legend>~LANG_GUI_CALIBRATION_DATA~&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/System-Settings#calibration-data" target="_blank">&#9432;</a></legend>
-        <label class="config-label">~LANG_GUI_CAL_OFFSET~:</label>
-        <input type="number" id="FLOW_OFFSET" name="FLOW_OFFSET" value="~FLOW_OFFSET~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_LEAK_TEST_BASELINE~:</label>
-        <input  type="number" id="LEAK_BASE" name="LEAK_BASE" value="~LEAK_BASE~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_LEAK_TEST_OFFSET~:</label>
-        <input  type="number" id="LEAK_OFFSET" name="LEAK_OFFSET" value="~LEAK_OFFSET~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_LEAK_TEST_BASELINE_REV~:</label>
-        <input  type="number" id="LEAK_BASE_REV" name="LEAK_BASE_REV" value="~LEAK_BASE_REV~" step="0.01" class="config-text">
-        <br>
-        <label class="config-label">~LANG_GUI_LEAK_TEST_OFFSET_REV~:</label>
-        <input type="number" id="LEAK_OFFSET_REV" name="LEAK_OFFSET_REV" value="~LEAK_OFFSET_REV~" step="0.01" class="config-text">
-        <br>
-      </fieldset>
-      <div class="float-right"><input id="save-config-button" type="submit" class="button" value="~LANG_GUI_OVERWRITE~"></div>
-  </form>    
-</div>
+    <script type="text/javascript" src="calibration.js"></script>
 
 
 
