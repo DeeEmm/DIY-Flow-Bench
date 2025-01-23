@@ -299,9 +299,8 @@ if (runTask == ADC_TASK) {
         if (config.iPITOT_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PitotKPA = _sensors.getPitotValue() - calVal.pitot_cal_offset;
           sensorVal.PitotH2O = _calculations.convertPressure(sensorVal.PitotKPA, INH2O) ;
-          sensorVal.PitotVelocity = _sensors.getPitotVelocity();
-          sensorVal.PitotVelocity = _sensors.getPitotVelocity();
-          sensorVal.PitotDelta = _calculations.convertPressure(_sensors.getPitotValue(),KPA, INH2O);
+          sensorVal.PitotVelocity = _sensors.getPitotVelocity(sensorVal.PitotKPA);
+          sensorVal.PitotDelta = sensorVal.PitotH2O;
         } else {
           sensorVal.PitotKPA = 0.0f;
           sensorVal.PitotH2O = 0.0f;

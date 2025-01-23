@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501240002      - Optimised Pitot code
 2501220014      - #325 Disable Semaphore
 2501220006      - #325 Added ADC / BME / SSE task sequencing
 2501200041      - Loop stack size set in system.h
