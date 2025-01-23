@@ -954,9 +954,10 @@ double Sensors::getPitotValue() {
 /***********************************************************
  * @brief get Pitot velocity in m/sec
  * @returns Pitot velocity in metres per second
+ * @param PitotPressure - Optinal parameter to pass in Pitot pressure value
  * @note Default sensor MPXV7007DP - Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
  ***/
-double Sensors::getPitotVelocity() {
+double Sensors::getPitotVelocity(double pitotPressure = 0.0) {
 	
 	extern struct BenchSettings settings;
 	extern struct SensorData sensorVal;
@@ -964,14 +965,12 @@ double Sensors::getPitotVelocity() {
 
 	Calculations _calculations;
 
-	double pitotPressure = 0.0;
-	double sensorVolts = this->getPitotVolts();
 	double airDensity = 0.0;
 	double airVelocity = 0.0;
 	double totalPressure = 0.0;
 	double staticPressure = 0.0;	
 	
-	pitotPressure = sensorVal.PitotKPA;
+	if (pitotPressure == 0.0) pitotPressure = sensorVal.PitotKPA;
 
 	// get air density
 	airDensity = _calculations.calculateAirDensity(sensorVal.TempDegC, sensorVal.BaroKPA, sensorVal.RelH);
