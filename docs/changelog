@@ -29,6 +29,8 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501240004      - #325 Removed Semaphore
+                - #325 Added ADC / BME / SSE task sequencing
 2501240002      - Optimised Pitot sensor reading 
 2501230049      - #324 MAF Dropdown restart warning
 2501230048      - #322 Calibration page finalised

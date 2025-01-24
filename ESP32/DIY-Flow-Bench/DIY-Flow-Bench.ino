@@ -64,7 +64,6 @@
 
 SET_LOOP_TASK_STACK_SIZE( LOOP_TASK_STACK_SIZE );
 
-
 // Initiate Structs
 BenchSettings settings;
 DeviceStatus status;
@@ -86,8 +85,7 @@ Sensors _sensors;
 Webserver _webserver;
 PublicHTML _public_html;
 
-// Set up semaphore signalling between tasks
-SemaphoreHandle_t i2c_task_mutex;
+// Initiate Variables
 TaskHandle_t sensorDataTask = NULL;
 TaskHandle_t enviroDataTask = NULL;
 // portMUX_TYPE mmux = portMUX_INITIALIZER_UNLOCKED;
@@ -105,14 +103,15 @@ int adcStartTime =  micros();
 int bmeStartTime =  micros();
 int loopStartTime = micros();
 
+int runTask = SSE_TASK;
+int adcTaskCount = 0;
 
 /***********************************************************
  * @brief TASK: Get bench sensor data (ADS1115 - MAF/RefP/DiffP/Pitot)
- * @param i2c_task_mutex Semaphore handshake with TASKpushData / TASKgetEnviroData
  * @struct sensorVal global struct containing sensor values
  * @remarks Interrogates ADS1115 ADC and saves sensor values to struct
  * */	
-void TASKgetSensorData( void * parameter ){
+  void TASKgetSensorData( void * parameter ){
 
   extern struct DeviceStatus status;
   extern struct SensorData sensorVal;
@@ -127,12 +126,8 @@ void TASKgetSensorData( void * parameter ){
 
   for( ;; ) { // Infinite loop
 
-    // Check ADC poll timer
-    if (millis() > status.adcPollTimer){
-
-      // Check if semaphore available
-      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) {
-      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) {
+      // Can we run??
+      if (runTask == ADC_TASK) {
 
         // Set / reset scan timers
         status.adcScanTime = (micros() - adcStartTime); // how long since we started the timer? 
@@ -141,11 +136,9 @@ void TASKgetSensorData( void * parameter ){
         status.bmeScanCount = 1; // reset to 1 so first scan value in GUI is valid
         status.adcScanCount += 1;
         
-
         // Get reference voltages
         sensorVal.VCC_5V_BUS = _hardware.get5vSupplyVolts();
         sensorVal.VCC_3V3_BUS = _hardware.get3v3SupplyVolts();
-
 
         // Get MAF / Orifice / Venturi / Pitot flow data
         switch (settings.bench_type){
@@ -218,7 +211,6 @@ void TASKgetSensorData( void * parameter ){
         // convert to standard flow
         sensorVal.FlowSCFM = _calculations.convertToSCFM(sensorVal.FlowCFM, settings.standardReference);
 
-
         // Get Flow differential values
         switch (sensorVal.FDiffType) {
 
@@ -267,7 +259,6 @@ void TASKgetSensorData( void * parameter ){
           break;
         }
           
-
         // Get pRef sensor data
         if (config.iPREF_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PRefKPA = _sensors.getPRefValue();
@@ -283,7 +274,6 @@ void TASKgetSensorData( void * parameter ){
           sensorVal.PRefH2O = 0.0f;         
         }
 
-
         // Get pDiff sensor data
         if (config.iPDIFF_SENS_TYP != SENSOR_DISABLED) {
           sensorVal.PDiffKPA = _sensors.getPDiffValue();
@@ -292,7 +282,6 @@ void TASKgetSensorData( void * parameter ){
           sensorVal.PDiffKPA = 0.0f;
           sensorVal.PDiffH2O = 0.0f;
         }
-
 
         // Get Pitot sensor data
         if (config.iPITOT_SENS_TYP != SENSOR_DISABLED) {
@@ -319,10 +308,10 @@ void TASKgetSensorData( void * parameter ){
         } else {
           sensorVal.Swirl = 0;
         }
-
-        xSemaphoreGive(i2c_task_mutex); // Release semaphore        
-      }   
+ 
       status.adcPollTimer = millis() + ADC_UPDATE_RATE; // Only reset timer when task has been executed
+      adcTaskCount += 1;
+      runTask = SSE_TASK;
     }
     vTaskDelay( VTASK_DELAY_ADC );  // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
   }
@@ -332,7 +321,6 @@ void TASKgetSensorData( void * parameter ){
 
 /***********************************************************
  * @brief TASK: Get environental sensor data (BME280 - Temp/Baro/RelH)
- * @param i2c_task_mutex Semaphore handshake with TASKpushData / TASKgetSensorData
  * @struct sensorVal global struct containing sensor values
  * @struct status global struct containing system status values
  * @remarks Interrogates BME280 and saves sensor data to struct
@@ -347,12 +335,8 @@ void TASKgetEnviroData( void * parameter ){
 
   for( ;; ) { // Infinite loop
 
-    // Check BME poll timer
-    if (millis() > status.bmePollTimer) {
-
-      // Check if semaphore is available
-      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
-      // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE) { // Check if semaphore available
+    // Can we run ??
+    if (runTask == BME_TASK) {  
 
         // Set / reset scan timers
         status.bmeScanTime = (micros() - bmeStartTime); // how long since we started the timer? 
@@ -373,10 +357,8 @@ void TASKgetEnviroData( void * parameter ){
         // Get humidity sensor data
         sensorVal.RelH = _sensors.getRelHValue();
 
-        // Release semaphore
-        xSemaphoreGive(i2c_task_mutex); 
-      }
       status.bmePollTimer = millis() + BME_UPDATE_RATE; // Only reset timer when task has been executed
+      runTask = SSE_TASK;
     }
     vTaskDelay( VTASK_DELAY_BME ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required
 	}
@@ -419,9 +401,6 @@ void setup(void) {
   uint8_t defaultCore = xPortGetCoreID();                   // This core (1)
   uint8_t secondaryCore = (defaultCore > 0 ? 0 : 1);        // Secondary core (0)
 
-  // Set up semaphore handshaking
-  i2c_task_mutex = xSemaphoreCreateMutex();
-
   #ifdef WEBSERVER_ENABLED  
     _webserver.begin();
   #endif
@@ -460,8 +439,7 @@ void loop () {
   
   // Process API comms
   if (settings.api_enabled) {        
-    if (millis() > status.apiPollTimer) {
-      if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE){ // Check if semaphore available
+    if (millis() > status.apiPollTimer && runTask == SSE_TASK) {
 
         status.apiPollTimer = millis() + API_SCAN_DELAY_MS; 
 
@@ -469,9 +447,6 @@ void loop () {
           status.serialData = Serial.read();
           _api.ParseMessage(status.serialData);
         }
-        xSemaphoreGive(i2c_task_mutex); // Release semaphore
-
-      }
     }                            
   }
 
@@ -482,30 +457,30 @@ void loop () {
   
 
   #ifdef WEBSERVER_ENABLED
-  
-    if (millis() > status.ssePollTimer) {      
+    if (millis() > status.ssePollTimer && runTask == SSE_TASK) {      
 
-        // if (xSemaphoreTake(i2c_task_mutex,portMAX_DELAY)==pdTRUE){ // Check if semaphore available
-        if (xSemaphoreTake(i2c_task_mutex, 50 / portTICK_PERIOD_MS)==pdTRUE) { // Check if semaphore available
-          status.ssePollTimer = millis() + SSE_UPDATE_RATE; // Only reset timer when task executes
-          
-          // Build Server Side Events (SSE) data
-          switch (status.GUIpage) {
-            case INDEX_PAGE:{
-              jsonString = _data.buildIndexSSEJsonData();
-              break;
-            }
-            case MIMIC_PAGE:{
-              jsonString = _data.buildMimicSSEJsonData();
-              break;
-            }
-          }
-          // Push SSE data to client
-          _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); 
- 
-          // Release semaphore
-          xSemaphoreGive(i2c_task_mutex); 
+      status.ssePollTimer = millis() + SSE_UPDATE_RATE; // Only reset timer when task executes
+      
+      // Build Server Side Events (SSE) data
+      switch (status.GUIpage) {
+        case INDEX_PAGE:{
+          jsonString = _data.buildIndexSSEJsonData();
+          break;
         }
+        case MIMIC_PAGE:{
+          jsonString = _data.buildMimicSSEJsonData();
+          break;
+        }
+      }
+      // Push SSE data to client
+      _webserver.events->send(String(jsonString).c_str(),"JSON_DATA",millis()); 
+
+      if (adcTaskCount > 2) {
+        runTask = BME_TASK;
+        adcTaskCount = 0;
+      } else {
+        runTask = ADC_TASK;
+      }
     }
   #endif
 
