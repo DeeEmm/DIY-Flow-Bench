@@ -309,7 +309,6 @@ int adcTaskCount = 0;
           sensorVal.Swirl = 0;
         }
  
-      status.adcPollTimer = millis() + ADC_UPDATE_RATE; // Only reset timer when task has been executed
       adcTaskCount += 1;
       runTask = SSE_TASK;
     }
@@ -357,7 +356,6 @@ void TASKgetEnviroData( void * parameter ){
         // Get humidity sensor data
         sensorVal.RelH = _sensors.getRelHValue();
 
-      status.bmePollTimer = millis() + BME_UPDATE_RATE; // Only reset timer when task has been executed
       runTask = SSE_TASK;
     }
     vTaskDelay( VTASK_DELAY_BME ); // mSec delay to prevent Watch Dog Timer (WDT) triggering and yield if required

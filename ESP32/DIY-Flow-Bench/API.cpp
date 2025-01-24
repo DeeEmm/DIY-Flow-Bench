@@ -151,7 +151,6 @@ void API::ParseMessage(char apiMessage) {
   A : ADC Voltage Values Maf:pRef:pDiff:Pitot
   a : ADC Raw Values Maf:pRef:pDiff:Pitot
   B : Barometric Pressure
-  C : configuration.json
   D : Differential Pressure value inH2O
   E : Enum1 Flow:Ref:Temp:Humidity:Baro
   e : Enum2 Pitot:Swirl
@@ -160,23 +159,16 @@ void API::ParseMessage(char apiMessage) {
   H : Humidity Value (%)
   I : IP Address
   J : JSON Status Data
-  j : JSON Configuration Data
-  K : MAF Data Key Value
-  k : MAF Data Lookup Value
-  l : Lift Data
-  M : MAF.json
+  j : JSON Mimic Data
   N : Hostname
   o : Active Orifice
   P : Pitot Value inH2O
-  Q : MAF Data Max Value
-  q : MAF Data Key Max Value
   R : Reference Pressure Value inH2O
   S : Status
   T : Temperature in Celcius
   t : Temperature in Fahrenheit
   U : Uptime in hhhh.mm
   V : Version
-  v : GUI Version
   W : WiFi SSID
   X : xTask memory usage   
   x : Heap memory usage   
@@ -213,8 +205,7 @@ void API::ParseMessage(char apiMessage) {
   C : configuration.json
   I : IP Address
   J : JSON Status Data
-  j : JSON Configuration Data
-  M : MAF.json
+  j : JSON Mimic Data
   N : Hostname
   S : Status
   U : Uptime in hhhh.mm
@@ -355,13 +346,15 @@ void API::ParseMessage(char apiMessage) {
       break;}
 
 
-      // DEPRECATED - config no longer in JSON file
-      case 'j': // Current configuration in JSON
-          // if (status.doBootLoop) break;
-          // jsonString = this->getConfigJSON();
-          // jsonString.toCharArray(charDataJSON, API_JSON_LENGTH);
-          // snprintf(apiResponseBlob, API_BLOB_LENGTH, "C%s%s", API_DELIMITER, charDataJSON);
-      break;
+      case 'j':{ // JSON SSE Data (Mimic)
+          if (status.doBootLoop) break;
+          StaticJsonDocument <DATA_JSON_SIZE> jsondoc;
+          jsonString = _data.buildMimicSSEJsonData();
+          deserializeJson(jsondoc, jsonString);
+          serializeJsonPretty(jsondoc, Serial);
+          // snprintf(apiResponseBlob, API_BLOB_LENGTH, "J%s%s", API_DELIMITER, String(jsonString).c_str());
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
+      break;}
       
       // DEPRECATED MAF Data now uses transfer function
       case 'K': // MAF Data Key Value A
@@ -432,62 +425,59 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "R%s%f", API_DELIMITER , _calculations.convertPressure(sensorVal.PRefKPA, INH2O));
       break;
       
-  //     case 'S': { // Status  'S.123.45\r\n'
+      case 'S': { // Status  'S.123.45\r\n'
 
-  //         _message.serialPrintf("debug = %d\n",status.debug ? "true" : "false");
-  //         _message.serialPrintf("spiffs_mem_size = %i\n", status.spiffs_mem_size);
-  //         _message.serialPrintf("spiffs_mem_used = %i\n", status.spiffs_mem_used);
-  //         _message.serialPrintf("pageSize = %i\n", status.pageSize);
-  //         _message.serialPrintf("local_ip_address = %s\n", status.local_ip_address);
-  //         _message.serialPrintf("hostname = %s\n", status.hostname);
-  //         _message.serialPrintf("boardType = %s\n", status.boardType);
-  //         _message.serialPrintf("benchType = %s\n", status.benchType);
-  //         _message.serialPrintf("mafSensor = %s\n", status.mafSensor);
-  //         _message.serialPrintf("mafLink = %s \n", status.mafLink);
-  //         _message.serialPrintf("prefSensor = %s\n", status.prefSensor);
-  //         _message.serialPrintf("pdiffSensor = %s\n", status.pdiffSensor);
-  //         _message.serialPrintf("tempSensor = %s\n", status.tempSensor);
-  //         _message.serialPrintf("relhSensor = %s\n", status.relhSensor);
-  //         _message.serialPrintf("baroSensor = %s\n", status.baroSensor);
-  //         _message.serialPrintf("pitotSensor = %s\n", status.pitotSensor);
-  //         _message.serialPrintf("boot_time = %i\n", status.boot_time);
-  //         _message.serialPrintf("liveStream = %s\n", status.liveStream ? "true" : "false");
-  //         _message.serialPrintf("adcPollTimer = %lu\n", status.adcPollTimer);
-  //         _message.serialPrintf("bmePollTimer = %lu\n", status.bmePollTimer);
-  //         _message.serialPrintf("apiPollTimer = %lu\n", status.apiPollTimer);
-  //         _message.serialPrintf("ssePollTimer = %lu\n", status.ssePollTimer);
-  //         _message.serialPrintf("wsCLeanPollTimer = %lu\n", status.wsCLeanPollTimer);
-  //         _message.serialPrintf("pollTimer = %i\n", status.pollTimer);
-  //         _message.serialPrintf("serialData = %i\n", status.serialData);;
-  //         _message.serialPrintf("statusMessage = %s\n", status.statusMessage);
-  //         _message.serialPrintf("apMode = %s\n",status.apMode ? "true" : "false");
-  //         _message.serialPrintf("HWMBME = %d\n",status.HWMBME);
-  //         _message.serialPrintf("HWMADC = %d\n",status.HWMADC);
-  //         _message.serialPrintf("HWMSSE = %d\n",status.HWMSSE);
-  //         _message.serialPrintf("activeOrifice =  %s\n", status.activeOrifice);
+          _message.serialPrintf("debug = %d\n",status.debug ? "true" : "false");
+          _message.serialPrintf("spiffs_mem_size = %i\n", status.spiffs_mem_size);
+          _message.serialPrintf("spiffs_mem_used = %i\n", status.spiffs_mem_used);
+          _message.serialPrintf("pageSize = %i\n", status.pageSize);
+          _message.serialPrintf("local_ip_address = %s\n", status.local_ip_address);
+          _message.serialPrintf("hostname = %s\n", status.hostname);
+          _message.serialPrintf("boardType = %s\n", status.boardType);
+          _message.serialPrintf("benchType = %s\n", status.benchType);
+          _message.serialPrintf("mafSensor = %s\n", status.mafSensor);
+          _message.serialPrintf("mafLink = %s \n", status.mafLink);
+          _message.serialPrintf("prefSensor = %s\n", status.prefSensor);
+          _message.serialPrintf("pdiffSensor = %s\n", status.pdiffSensor);
+          _message.serialPrintf("tempSensor = %s\n", status.tempSensor);
+          _message.serialPrintf("relhSensor = %s\n", status.relhSensor);
+          _message.serialPrintf("baroSensor = %s\n", status.baroSensor);
+          _message.serialPrintf("pitotSensor = %s\n", status.pitotSensor);
+          _message.serialPrintf("boot_time = %i\n", status.boot_time);
+          _message.serialPrintf("liveStream = %s\n", status.liveStream ? "true" : "false");
+          _message.serialPrintf("ssePollTimer = %lu\n", status.ssePollTimer);
+          _message.serialPrintf("wsCLeanPollTimer = %lu\n", status.wsCLeanPollTimer);
+          _message.serialPrintf("pollTimer = %i\n", status.pollTimer);
+          _message.serialPrintf("serialData = %i\n", status.serialData);;
+          _message.serialPrintf("statusMessage = %s\n", status.statusMessage);
+          _message.serialPrintf("apMode = %s\n",status.apMode ? "true" : "false");
+          _message.serialPrintf("HWMBME = %d\n",status.HWMBME);
+          _message.serialPrintf("HWMADC = %d\n",status.HWMADC);
+          _message.serialPrintf("HWMSSE = %d\n",status.HWMSSE);
+          _message.serialPrintf("activeOrifice =  %s\n", status.activeOrifice);
 
-  //         _message.serialPrintf("activeOrificeFlowRate =  %d\n", status.activeOrifice);
-  //         _message.serialPrintf("activeOrificeTestPressure =  %d\n", status.activeOrifice);
-  //         _message.serialPrintf("shouldReboot  =  %s\n", status.activeOrifice ? "true" : "false");
-  //         _message.serialPrintf("pinsLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
-  //         _message.serialPrintf("mafLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
-  //         _message.serialPrintf("configLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
-  //         _message.serialPrintf("GUIexists  =  %s", status.GUIexists ? "true" : "false");
-  //         _message.serialPrintf("pinsFilename =  %s\n", status.pinsFilename);
-  //         _message.serialPrintf("mafFilename =  %s\n", status.mafFilename);
-  //         _message.serialPrintf("indexFilename =  %s\n", status.indexFilename);
-  //         _message.serialPrintf("doBootLoop =  %s\n", status.doBootLoop ? "true" : "false");
-  //         _message.serialPrintf("webserverIsRunning  =  %s\n", status.webserverIsRunning ? "true" : "false");
-  //         _message.serialPrintf("mafDataTableRows  =  %i\n", status.mafDataTableRows);
-  //         _message.serialPrintf("mafDataValMax  =  %s\n", status.mafDataValMax ? "true" : "false");
-  //         _message.serialPrintf("mafDataKeyMax  =  %s\n", status.mafDataKeyMax ? "true" : "false");
-  //         _message.serialPrintf("mafUnits =  %s\n", status.mafUnits);
-  //         _message.serialPrintf("mafScaling  =  %d\n", status.mafScaling);
-  //         _message.serialPrintf("mafDiameter  =  %i\n", status.mafDiameter);
-  //         _message.serialPrintf("mafSensorType=  %s\n", status.mafSensorType);
-  //         _message.serialPrintf("mafOutputType =  %s\n", status.mafOutputType);
-  //         snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
-  //     break;}
+          _message.serialPrintf("activeOrificeFlowRate =  %d\n", status.activeOrifice);
+          _message.serialPrintf("activeOrificeTestPressure =  %d\n", status.activeOrifice);
+          _message.serialPrintf("shouldReboot  =  %s\n", status.activeOrifice ? "true" : "false");
+          _message.serialPrintf("pinsLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
+          _message.serialPrintf("mafLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
+          _message.serialPrintf("configLoaded  =  %s\n", status.activeOrifice ? "true" : "false");
+          _message.serialPrintf("GUIexists  =  %s\n", status.GUIexists ? "true" : "false");
+          _message.serialPrintf("pinsFilename =  %s\n", status.pinsFilename);
+          _message.serialPrintf("mafFilename =  %s\n", status.mafFilename);
+          _message.serialPrintf("indexFilename =  %s\n", status.indexFilename);
+          _message.serialPrintf("doBootLoop =  %s\n", status.doBootLoop ? "true" : "false");
+          _message.serialPrintf("webserverIsRunning  =  %s\n", status.webserverIsRunning ? "true" : "false");
+          _message.serialPrintf("mafDataTableRows  =  %i\n", status.mafDataTableRows);
+          _message.serialPrintf("mafDataValMax  =  %s\n", status.mafDataValMax ? "true" : "false");
+          _message.serialPrintf("mafDataKeyMax  =  %s\n", status.mafDataKeyMax ? "true" : "false");
+          _message.serialPrintf("mafUnits =  %s\n", status.mafUnits);
+          _message.serialPrintf("mafScaling  =  %d\n", status.mafScaling);
+          _message.serialPrintf("mafDiameter  =  %i\n", status.mafDiameter);
+          _message.serialPrintf("mafSensorType=  %s\n", status.mafSensorType);
+          _message.serialPrintf("mafOutputType =  %s\n", status.mafOutputType);
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
+      break;}
       
       case 't': // Get measured Temperature in Fahrenheit 'F.123.45\r\n'
           if (status.doBootLoop) break;

@@ -58,7 +58,7 @@ using namespace std;
 // Memory assignment
 #define SENSOR_TASK_MEM_STACK 2800 
 #define ENVIRO_TASK_MEM_STACK 2200 
-#define LOOP_TASK_STACK_SIZE 9000 // SET_LOOP_TASK_STACK_SIZE( LOOP_TASK_STACK_SIZE )
+#define LOOP_TASK_STACK_SIZE 11000
 
 // MAF Data Filters
 #define ALPHA_MEDIAN 0.75f
@@ -73,9 +73,7 @@ using namespace std;
 
 
 // Poll timers
-#define ADC_UPDATE_RATE 501 // 72 ms data read time, 501ms time between ADC read events in milliseconds | Previous 396
-#define BME_UPDATE_RATE 1006 // 3 ms data read time, 1006ms time between BME read events in milliseconds | Previous 1103
-#define SSE_UPDATE_RATE 554 // 129 ms data read time, 554ms time between SSE push in milliseconds  | Previous 559
+#define SSE_UPDATE_RATE 400
 
 
 // JSON memory allocation
@@ -84,8 +82,6 @@ using namespace std;
 #define CAL_DATA_JSON_SIZE 348
 #define LIFT_DATA_JSON_SIZE 384
 #define JSON_FILE_SIZE 6000 // 2800
-// NOTE: Use ArduinJSON memory assistant to determine size requirements
-// https://arduinojson.org/v6/assistant
 
 /***********************************************************
 * WEBUI SETTINGS
