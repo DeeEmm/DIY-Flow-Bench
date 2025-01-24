@@ -29,9 +29,18 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-2501240002      - Optimised Pitot code
+2501240002      - Optimised Pitot sensor reading 
+2501230049      - #324 MAF Dropdown restart warning
+2501230048      - #322 Calibration page finalised
+2501220008      - #322 Moved API settings to system.h
+                - Moved calibration settings to dedicated page
 2501220014      - #325 Disable Semaphore
 2501220006      - #325 Added ADC / BME / SSE task sequencing
+2501220004      - #322 Removed calibration fields from settings page
+2501220001      - #321 Zero Datagraph data
+2501210019      - Loop size tuning
+2501200054      - #323 Revert timing changes
+2501200051      - Removed GUI_BUILD_NUMBER
 2501200041      - Loop stack size set in system.h
                 - Loop stack watermark reported on boot
 2501200030      - #321 Datagraph clear fixed

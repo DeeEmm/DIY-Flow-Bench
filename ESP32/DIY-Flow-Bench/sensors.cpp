@@ -486,6 +486,7 @@ double Sensors::getDifferentialFlow() {
 	extern struct SensorData sensorVal;
 	extern struct BenchSettings settings;
 	extern struct Language language;
+	extern struct CalibrationData calVal;
 
 	Hardware _hardware;
     Messages _message;  
@@ -509,39 +510,39 @@ double Sensors::getDifferentialFlow() {
 	switch (orifice)   {
 
 		case '1': 
-			orificeFlowRate = settings.orificeOneFlow;
-			orificeDepression = settings.orificeOneDepression;
+			orificeFlowRate = calVal.orificeOneFlow;
+			orificeDepression = calVal.orificeOneDepression;
 		break;
 
 		case '2': 
-			orificeFlowRate = settings.orificeTwoFlow;
-			orificeDepression = settings.orificeTwoDepression;
+			orificeFlowRate = calVal.orificeTwoFlow;
+			orificeDepression = calVal.orificeTwoDepression;
 		break;
 
 		case '3': 
-			orificeFlowRate = settings.orificeThreeFlow;
-			orificeDepression = settings.orificeThreeDepression;
+			orificeFlowRate = calVal.orificeThreeFlow;
+			orificeDepression = calVal.orificeThreeDepression;
 		break;
 
 		case '4': 
-			orificeFlowRate = settings.orificeFourFlow;
-			orificeDepression = settings.orificeFourDepression;
+			orificeFlowRate = calVal.orificeFourFlow;
+			orificeDepression = calVal.orificeFourDepression;
 		break;
 
 		case '5': 
-			orificeFlowRate = settings.orificeFiveFlow;
-			orificeDepression = settings.orificeFiveDepression;
+			orificeFlowRate = calVal.orificeFiveFlow;
+			orificeDepression = calVal.orificeFiveDepression;
 		break;
 
 		case '6': 
-			orificeFlowRate = settings.orificeSixFlow;
-			orificeDepression = settings.orificeSixDepression;
+			orificeFlowRate = calVal.orificeSixFlow;
+			orificeDepression = calVal.orificeSixDepression;
 		break;
 
 		// We've got here without a valid active orifice so lets set something and send an error message
         default:
-			orificeFlowRate = settings.orificeOneFlow;
-			orificeDepression = settings.orificeOneDepression;
+			orificeFlowRate = calVal.orificeOneFlow;
+			orificeDepression = calVal.orificeOneDepression;
 			_message.serialPrintf("%s\n", "Invalid Orifice Data");
 			String statusMessage = language.LANG_INVALID_ORIFICE_SELECTED;
         break;
@@ -953,7 +954,7 @@ double Sensors::getPitotValue() {
 /***********************************************************
  * @brief get Pitot velocity in m/sec
  * @returns Pitot velocity in metres per second
- * @param PitotPressure - optional parameter to pass in pitot pressure
+ * @param PitotPressure - Optinal parameter to pass in Pitot pressure value
  * @note Default sensor MPXV7007DP - Datasheet - https://www.nxp.com/docs/en/data-sheet/MPXV7007.pdf
  ***/
 double Sensors::getPitotVelocity(double pitotPressure = 0.0) {

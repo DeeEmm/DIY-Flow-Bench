@@ -158,7 +158,8 @@ enum VolumetricUnits {
 #define SETTINGS_PAGE 3
 #define CONFIG_PAGE 4
 #define PINS_PAGE 5
-#define MIMIC_PAGE 5
+#define CALIBRATION_PAGE 6
+#define MIMIC_PAGE 7
 
 
 /***********************************************************

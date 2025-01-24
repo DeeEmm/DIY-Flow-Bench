@@ -16,6 +16,7 @@ public:
     String settingsPage();
     String configPage();
     String dataPage();
+    String calibrationPage();
     String pinsPage();
     String mimicPage();
 
@@ -34,4 +35,5 @@ public:
     String pinsJs();
     String mimicJs();
     String dataJs();
+    String calibrationJs();
 };

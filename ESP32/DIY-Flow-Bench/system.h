@@ -48,23 +48,17 @@ using namespace std;
 // #define API_CHECKSUM_IS_ENABLED                       
 #define API_BLOB_LENGTH 1300
 #define API_RESPONSE_LENGTH 64
+
 #define API_STATUS_LENGTH 128
-#define API_JSON_LENGTH 1024
+// #define API_JSON_LENGTH 1024
 #define API_SCAN_DELAY_MS 250
+#define API_DELIMITER ":"
+#define API_SERIAL_BAUD 115200
 
 // Memory assignment
-#define SENSOR_TASK_MEM_STACK 2800 // Free 776
-#define ENVIRO_TASK_MEM_STACK 2000 // Free 640
-#define LOOP_TASK_STACK_SIZE 5120 // SET_LOOP_TASK_STACK_SIZE( LOOP_TASK_STACK_SIZE )
-
-// JSON memory allocation
-#define DATA_JSON_SIZE 768
-#define LANGUAGE_JSON_SIZE 8192 // TODO Need to test language override (mem size could be an issue)
-#define CAL_DATA_JSON_SIZE 348
-#define LIFT_DATA_JSON_SIZE 384
-#define JSON_FILE_SIZE 6000 // 2800
-// NOTE: Use ArduinJSON memory assistant to determine size requirements
-// https://arduinojson.org/v6/assistant
+#define SENSOR_TASK_MEM_STACK 2800 
+#define ENVIRO_TASK_MEM_STACK 2200 
+#define LOOP_TASK_STACK_SIZE 9000 // SET_LOOP_TASK_STACK_SIZE( LOOP_TASK_STACK_SIZE )
 
 // MAF Data Filters
 #define ALPHA_MEDIAN 0.75f
@@ -77,10 +71,21 @@ using namespace std;
 #define VTASK_DELAY_BME 1
 #define VTASK_DELAY_SSE 1
 
+
 // Poll timers
-#define ADC_UPDATE_RATE 501 // 72 ms data read time, 501ms time between ADC read events in milliseconds 
-#define BME_UPDATE_RATE 1006 // 3 ms data read time, 1006ms time between BME read events in milliseconds 
-#define SSE_UPDATE_RATE 554 // 129 ms data read time, 554ms time between SSE push in milliseconds 
+#define ADC_UPDATE_RATE 501 // 72 ms data read time, 501ms time between ADC read events in milliseconds | Previous 396
+#define BME_UPDATE_RATE 1006 // 3 ms data read time, 1006ms time between BME read events in milliseconds | Previous 1103
+#define SSE_UPDATE_RATE 554 // 129 ms data read time, 554ms time between SSE push in milliseconds  | Previous 559
+
+
+// JSON memory allocation
+#define DATA_JSON_SIZE 768
+#define LANGUAGE_JSON_SIZE 8192 // TODO Need to test language override (mem size could be an issue)
+#define CAL_DATA_JSON_SIZE 348
+#define LIFT_DATA_JSON_SIZE 384
+#define JSON_FILE_SIZE 6000 // 2800
+// NOTE: Use ArduinJSON memory assistant to determine size requirements
+// https://arduinojson.org/v6/assistant
 
 /***********************************************************
 * WEBUI SETTINGS

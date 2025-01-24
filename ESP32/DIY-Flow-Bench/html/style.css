@@ -36,7 +36,7 @@ h4 {
   cursor: pointer;
   padding: 18px 16px;
   font-size: 22px;
-  width: 16.666%;
+  width: 14.285%;
 }
 
 .tablink:active {
@@ -116,10 +116,6 @@ a:hover {
 hr {
   clear: both;
   width: 95%;
-}
-
-.fieldset-divider {
-  border-top: 1px dashed #DDD;
 }
 
 .content {
@@ -842,6 +838,10 @@ fieldset {
     padding: 15px; 
     border: 1px solid #ccc;
     font-size: 18px;
+}
+
+.fieldset-divider {
+  border-top: 1px dashed #DDD;
 }
 
 legend {

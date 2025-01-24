@@ -74,20 +74,6 @@ struct BenchSettings {
   int temp_unit = CELCIUS;                        // Defalt display unit of temperature
   bool ap_mode = false;                           // Default WiFi connection mode is accesspoint mode
   double valveLiftInterval = 1.5;                 // Distance between valve lift data points (can be metric or imperial)
-  double cal_ref_press = 10;                      // Calibration orifice ref pressure
-  double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
-  double orificeOneFlow = 0.0;
-  double orificeOneDepression = 0.0;
-  double orificeTwoFlow = 0.0;
-  double orificeTwoDepression = 0.0;
-  double orificeThreeFlow = 0.0;
-  double orificeThreeDepression = 0.0;
-  double orificeFourFlow = 0.0;
-  double orificeFourDepression = 0.0;
-  double orificeFiveFlow = 0.0;
-  double orificeFiveDepression = 0.0;
-  double orificeSixFlow = 0.0;
-  double orificeSixDepression = 0.0;
 };
 
 
@@ -194,6 +180,21 @@ struct CalibrationData {
   double leak_cal_offset_rev = 0.0;  
   double pdiff_cal_offset = 0.0;
   double pitot_cal_offset = 0.0;
+
+  double cal_ref_press = 10;                      // Calibration orifice ref pressure
+  double cal_flow_rate = 14.4;                    // Calibration orifica flow rate
+  double orificeOneFlow = 0.0;
+  double orificeOneDepression = 0.0;
+  double orificeTwoFlow = 0.0;
+  double orificeTwoDepression = 0.0;
+  double orificeThreeFlow = 0.0;
+  double orificeThreeDepression = 0.0;
+  double orificeFourFlow = 0.0;
+  double orificeFourDepression = 0.0;
+  double orificeFiveFlow = 0.0;
+  double orificeFiveDepression = 0.0;
+  double orificeSixFlow = 0.0;
+  double orificeSixDepression = 0.0;
 };
 
 
@@ -330,18 +331,18 @@ struct SensorData {
  * Valve Lift data
  ***/
 struct ValveLiftData {
-  double LiftData1 = 0.0;
-  double LiftData2 = 0.0;
-  double LiftData3 = 0.0;
-  double LiftData4 = 0.0;
-  double LiftData5 = 0.0;
-  double LiftData6 = 0.0;
-  double LiftData7 = 0.0;
-  double LiftData8 = 0.0;
-  double LiftData9 = 0.0;
-  double LiftData10 = 0.0;
-  double LiftData11 = 0.0;
-  double LiftData12 = 0.0;
+  double_t LiftData1 = 0.0;
+  double_t LiftData2 = 0.0;
+  double_t LiftData3 = 0.0;
+  double_t LiftData4 = 0.0;
+  double_t LiftData5 = 0.0;
+  double_t LiftData6 = 0.0;
+  double_t LiftData7 = 0.0;
+  double_t LiftData8 = 0.0;
+  double_t LiftData9 = 0.0;
+  double_t LiftData10 = 0.0;
+  double_t LiftData11 = 0.0;
+  double_t LiftData12 = 0.0;
 };
 
 
@@ -406,7 +407,8 @@ struct Language {
     char LANG_GUI_UPLOAD_FIRMWARE_BINARY[50] = "Upload Firmware Binary (firmware_update.bin)";
     char LANG_GUI_FIRMWARE_UPDATE[50] = "Update";
     char LANG_GUI_USER_FLOW_TARGET_VAL[50] = "User Flow Target Value";
-    char LANG_GUI_USER_FLOW_TARGET_SAVE[50] = "Save";
+    char LANG_GUI_SAVE[50] = "Save";
+    char LANG_GUI_CALIBRATE[50] = "Calibrate";
     char LANG_GUI_CAL_FLOW_OFFSET[50] = "Calibrate Flow Offset";
     char LANG_GUI_CAL_LEAK_TEST[50] = "Calibrate Leak Test";
     char LANG_GUI_LOAD_LIFT_PROFILE[50] = "Load Lift Profile";
@@ -444,10 +446,10 @@ struct Language {
     char LANG_REF_PRESS_LOW[50] = "Warning! Low Reference Pressure";
     char LANG_LEAK_TEST_PASS[50] = "Leak test OK";
     char LANG_LEAK_TEST_FAILED[50] = "Leak test fail";
-    char LANG_ERROR_LOADING_CONFIG[50] = "Error loading config file";
-    char LANG_ERROR_SAVING_CONFIG[50] = "Error saving config file";
-    char LANG_SAVING_CONFIG[50] = "Saving config file";
-    char LANG_SAVING_CALIBRATION[50] = "Error saving calibration file";
+    char LANG_ERROR_LOADING_CONFIG[50] = "Error loading config data";
+    char LANG_ERROR_SAVING_CONFIG[50] = "Error saving config data";
+    char LANG_SAVING_CONFIG[50] = "Saving config data";
+    char LANG_SAVING_CALIBRATION[50] = "Saving calibration data";
     char LANG_ERROR_LOADING_FILE[50] = "Error loading file";
     char LANG_DHT11_READ_FAIL[50] = "DHT11 Read fail";
     char LANG_BME280_READ_FAIL[50] = "BME280 Read fail";
@@ -550,8 +552,8 @@ struct Language {
     char LANG_GUI_CAL_OFFSET[50] = "Calibration Offset (cfm)";
     char LANG_GUI_LEAK_TEST_BASELINE[50] = "Leak Test Baseline (cfm)";
     char LANG_GUI_LEAK_TEST_OFFSET[50] = "Leak Test Offset (cfm)";
-    char LANG_GUI_LEAK_TEST_BASELINE_REV[50] = "Leak Test Baseline (Rev) (cfm)";
-    char LANG_GUI_LEAK_TEST_OFFSET_REV[50] = "Leak Test Offset (Rev) (cfm)";
+    char LANG_GUI_LEAK_TEST_BASELINE_REV[50] = "Leak Test Baseline Rev (cfm)";
+    char LANG_GUI_LEAK_TEST_OFFSET_REV[50] = "Leak Test Offset Rev (cfm)";
     char LANG_GUI_OVERWRITE[50] = "Overwrite";  
     char LANG_GUI_DATA_CAPTURE_SETTINGS[50] = "DataGraph Settings";
     char LANG_GUI_CAPTURE_DATATYPE[50] = "Datatype";
@@ -561,5 +563,6 @@ struct Language {
     char LANG_GUI_PITOT_VOLTS[50] = "Pitot Volts";
     char LANG_GUI_MAF_TYPE[50] = "MAF Type";
     char LANG_GUI_MIMIC[50] = "Mimic";
+    char LANG_GUI_CALIBRATION[50] = "Calibration";
 };
 

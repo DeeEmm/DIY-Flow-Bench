@@ -148,13 +148,13 @@ void Webserver::begin()
       if (_hardware.benchIsRunning()) {
         _message.Handler(language.LANG_CALIBRATING);
         _message.debugPrintf("Calibrating Flow...\n");
-        request->send(200, "text/html", "{\"calibrate\":\"true\"}");
         _calibrate.setFlowOffset();         
+        request->send(200, "text/html", "{\"calibrate\":\"true\"}");
       } else {
         _message.Handler(language.LANG_RUN_BENCH_TO_CALIBRATE);
         request->send(200, "text/html", "{\"calibrate\":\"false\"}");
       }  
-      request->redirect("/");
+      // request->redirect("/");
       });
 
   server->on("/api/bench/leakcal", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -164,13 +164,14 @@ void Webserver::begin()
       if (_hardware.benchIsRunning()) {
         _message.Handler(language.LANG_LEAK_CALIBRATING);
         _message.debugPrintf("Calibrating Leak Test...\n");
-        request->send(200, "text/html", "{\"leakcal\":\"true\"}");
         _calibrate.setLeakOffset();
+        request->send(200, "text/html", "{\"leakcal\":\"true\"}");
       } else {
         _message.Handler(language.LANG_RUN_BENCH_TO_CALIBRATE);
         request->send(200, "text/html", "{\"leakcal\":\"false\"}");
       } 
-      request->redirect("/"); });
+      // request->redirect("/"); 
+      });
 
   // Upload request handler
   server->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
@@ -341,7 +342,7 @@ void Webserver::begin()
   // Save Pins Form
   server->on("/api/savepins", HTTP_POST, savePinsForm);
 
-  // Save Calibration Form
+  // Save Calibration Settings
   server->on("/api/savecalibration", HTTP_POST, saveCalibrationForm);
 
   // Save Lift Data Form
@@ -425,6 +426,13 @@ void Webserver::begin()
         request->send(response);
       });
   
+  server->on("/calibration.js", HTTP_ANY, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        AsyncResponseStream *response = request->beginResponseStream("text/javascript");
+        response->print(_public_html.calibrationJs().c_str());
+        request->send(response);
+      });
+  
   // Settings page request handler
   server->on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
@@ -444,6 +452,13 @@ void Webserver::begin()
         PublicHTML _public_html;
         status.GUIpage = CONFIG_PAGE;
         request->send_P(200, "text/html", _public_html.configPage().c_str(), processConfigPageTemplate); 
+      });
+
+  // calibration page request handler
+  server->on("/calibration", HTTP_GET, [](AsyncWebServerRequest *request){
+        PublicHTML _public_html;
+        status.GUIpage = CALIBRATION_PAGE;
+        request->send_P(200, "text/html", _public_html.calibrationPage().c_str(), processCalibrationPageTemplate); 
       });
 
   // Pins page request handler
@@ -685,10 +700,9 @@ void Webserver::savePinsForm(AsyncWebServerRequest *request)
 
 
 /***********************************************************
- * @brief saveCalibration
- * @details Saves calibration data to cal.json file
- * @note Creates file if it does not exist
- * @note Redirects browser to configuration tab
+ * @brief saveCalibration Data
+ * @details Saves calibration data to NVM
+ * @note Redirects browser to calibration tab
  * @note duplicates _calibration.saveCalibrationData whjich is unable to be called from server->on directive
  * 
  ***/
@@ -716,7 +730,7 @@ void Webserver::saveCalibrationForm(AsyncWebServerRequest *request)
 
   _prefs.end();
   _calibrate.loadCalibrationData();
-  request->redirect("/");
+  request->redirect("/calibration");
 
 }
 
@@ -725,10 +739,12 @@ void Webserver::saveCalibrationForm(AsyncWebServerRequest *request)
 
 
 
+
+
+
 /***********************************************************
- * @brief saveCalibration
- * @details Saves calibration data to cal.json file
- * @note Creates file if it does not exist
+ * @brief parseUserFlowTargetForm
+ * @details Saves Flow targets to NVM
  * @note Redirects browser to configuration tab
  * @note duplicates _calibration.saveCalibrationData whjich is unable to be called from server->on directive
  * 
@@ -762,7 +778,7 @@ void Webserver::parseUserFlowTargetForm(AsyncWebServerRequest *request)
   // calVal.leak_cal_baseline= calData["LEAK_BASE"].as<double>();
   // calVal.leak_cal_baseline_rev = calData["LEAK_BASE_REV"].as<double>();
 
-  _message.debugPrintf("sUer Flow Target Form Data parsed \n");
+  _message.debugPrintf("User Flow Target Form Data parsed \n");
 
   _calibrate.saveCalibrationData();
 
@@ -826,6 +842,7 @@ void Webserver::saveLiftDataForm(AsyncWebServerRequest *request){
   Messages _message;
   DataHandler _data;
   Webserver _webserver;
+  Preferences _prefs;
 
   // StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData;
   extern struct SensorData sensorVal;
@@ -942,7 +959,7 @@ void Webserver::saveLiftDataForm(AsyncWebServerRequest *request){
       break;
   }
 
-  Preferences _prefs;
+  
   _prefs.begin("liftData");
 
   _prefs.putDouble("LIFTDATA1", valveData.LiftData1);
@@ -1010,10 +1027,11 @@ String Webserver::getLiftDataJSON()
 ***/ 
 void Webserver::clearLiftData (AsyncWebServerRequest *request) {
 
-  Messages _message;
+  // Messages _message;
   Preferences _prefs;
+  extern struct ValveLiftData valveData;
 
-  _message.serialPrintf("Clearing Lift Data \n");    
+  // _message.serialPrintf("Clearing Lift Data \n");    
   
   _prefs.begin("liftData");
 
@@ -1029,6 +1047,19 @@ void Webserver::clearLiftData (AsyncWebServerRequest *request) {
   _prefs.putDouble("LIFTDATA10", 0.0);
   _prefs.putDouble("LIFTDATA11", 0.0);
   _prefs.putDouble("LIFTDATA12", 0.0);
+
+  valveData.LiftData1 = 0.0;
+  valveData.LiftData2 = 0.0;
+  valveData.LiftData3 = 0.0;
+  valveData.LiftData4 = 0.0;
+  valveData.LiftData5 = 0.0;
+  valveData.LiftData6 = 0.0;
+  valveData.LiftData7 = 0.0;
+  valveData.LiftData8 = 0.0;
+  valveData.LiftData9 = 0.0;
+  valveData.LiftData10 = 0.0;
+  valveData.LiftData11 = 0.0;
+  valveData.LiftData12 = 0.0;
 
   _prefs.end();
 
@@ -1089,7 +1120,7 @@ String Webserver::processLanguageTemplateVars(const String &var) {
   if (var == "LANG_GUI_UPLOAD_FIRMWARE_BINARY") return language.LANG_GUI_UPLOAD_FIRMWARE_BINARY;
   if (var == "LANG_GUI_FIRMWARE_UPDATE") return language.LANG_GUI_FIRMWARE_UPDATE;
   if (var == "LANG_GUI_USER_FLOW_TARGET_VAL") return language.LANG_GUI_USER_FLOW_TARGET_VAL;
-  if (var == "LANG_GUI_USER_FLOW_TARGET_SAVE") return language.LANG_GUI_USER_FLOW_TARGET_SAVE;
+  if (var == "LANG_GUI_SAVE") return language.LANG_GUI_SAVE;
   if (var == "LANG_GUI_CAL_FLOW_OFFSET") return language.LANG_GUI_CAL_FLOW_OFFSET;
   if (var == "LANG_GUI_CAL_LEAK_TEST") return language.LANG_GUI_CAL_LEAK_TEST;
   if (var == "LANG_GUI_LOAD_LIFT_PROFILE") return language.LANG_GUI_LOAD_LIFT_PROFILE;
@@ -1190,9 +1221,10 @@ String Webserver::processLanguageTemplateVars(const String &var) {
   if (var == "LANG_GUI_ORIFICE6_FLOW") return language.LANG_GUI_ORIFICE6_FLOW;
   if (var == "LANG_GUI_ORIFICE6_PRESSURE") return language.LANG_GUI_ORIFICE6_PRESSURE;
   if (var == "LANG_GUI_API_SETTINGS") return language.LANG_GUI_API_SETTINGS;
-  if (var == "LANG_GUI_API_DELIMITER") return language.LANG_GUI_API_DELIMITER;
+  // if (var == "LANG_GUI_API_DELIMITER") return language.LANG_GUI_API_DELIMITER;
   if (var == "LANG_GUI_SERIAL_BAUD") return language.LANG_GUI_SERIAL_BAUD;
   if (var == "LANG_GUI_CALIBRATION_DATA") return language.LANG_GUI_CALIBRATION_DATA;
+  if (var == "LANG_GUI_CALIBRATE") return language.LANG_GUI_CALIBRATE;
   if (var == "LANG_GUI_CAL_OFFSET") return language.LANG_GUI_CAL_OFFSET;
   if (var == "LANG_GUI_LEAK_TEST_BASELINE") return language.LANG_GUI_LEAK_TEST_BASELINE;
   if (var == "LANG_GUI_LEAK_TEST_OFFSET") return language.LANG_GUI_LEAK_TEST_OFFSET;
@@ -1207,6 +1239,8 @@ String Webserver::processLanguageTemplateVars(const String &var) {
   if (var == "LANG_GUI_PITOT_VOLTS") return language.LANG_GUI_PITOT_VOLTS;
   if (var == "LANG_GUI_MAF_TYPE") return language.LANG_GUI_MAF_TYPE;
   if (var == "LANG_GUI_MIMIC") return language.LANG_GUI_MIMIC;
+  if (var == "LANG_GUI_CALIBRATION") return language.LANG_GUI_CALIBRATION;
+  
 
   return var;
   
@@ -1426,7 +1460,6 @@ String Webserver::processSettingsPageTemplate(const String &var) {
   // NOTE Build Vars are added to environment by user_actions.py at compile time
   if (var == "RELEASE") return RELEASE;
   if (var == "BUILD_NUMBER") return BUILD_NUMBER;
-  if (var == "GUI_BUILD_NUMBER") return GUI_BUILD_NUMBER; 
 
   // Config Info
   if (var == "SPIFFS_MEM_SIZE") return String(_calculations.byteDecode(status.spiffs_mem_size));
@@ -1458,19 +1491,7 @@ String Webserver::processSettingsPageTemplate(const String &var) {
   if (var == "iDATAGRAPH_MAX_3" && settings.dataGraphMax == 3) return String("selected");
 
 
-  // Orifice plates
-  if (var == "dORIFICE1_FLOW") return String(settings.orificeOneFlow);
-  if (var == "dORIFICE1_PRESS") return String(settings.orificeOneDepression);
-  if (var == "dORIFICE2_FLOW") return String(settings.orificeTwoFlow);
-  if (var == "dORIFICE2_PRESS") return String(settings.orificeTwoDepression);
-  if (var == "dORIFICE3_FLOW") return String(settings.orificeThreeFlow);
-  if (var == "dORIFICE3_PRESS") return String(settings.orificeThreeDepression);
-  if (var == "dORIFICE4_FLOW") return String(settings.orificeFourFlow);
-  if (var == "dORIFICE4_PRESS") return String(settings.orificeFourDepression);
-  if (var == "dORIFICE5_FLOW") return String(settings.orificeFiveFlow);
-  if (var == "dORIFICE5_PRESS") return String(settings.orificeFiveDepression);
-  if (var == "dORIFICE6_FLOW") return String(settings.orificeSixFlow);
-  if (var == "dORIFICE6_PRESS") return String(settings.orificeSixDepression);
+
 
 
    // Wifi Settings
@@ -1482,8 +1503,8 @@ String Webserver::processSettingsPageTemplate(const String &var) {
   if (var == "iWIFI_TIMEOUT") return String(settings.wifi_timeout);
 
   // API Settings
-  if (var == "sAPI_DELIM") return settings.api_delim;
-  if (var == "iSERIAL_BAUD") return String(settings.serial_baud_rate);
+  // if (var == "sAPI_DELIM") return settings.api_delim;
+  // if (var == "iSERIAL_BAUD") return String(settings.serial_baud_rate);
 
   // Decinal accuracy
   if (var == "iFLOW_DECI_ACC") return String(settings.flow_decimal_length);
@@ -1659,10 +1680,6 @@ String Webserver::processSettingsPageTemplate(const String &var) {
   }
 
 
-
-
-
-
   // Generate file list HTML code
   if (var == "FILE_LIST"){
 
@@ -1690,17 +1707,7 @@ String Webserver::processSettingsPageTemplate(const String &var) {
 
 
 
-  // Calibration Settings
-  if (var == "dCAL_FLW_RATE") return String(settings.cal_flow_rate);
-  if (var == "dCAL_REF_PRESS") return String(settings.cal_ref_press);
 
-  // Calibration Data
-  if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
-  if (var == "USER_OFFSET") return String(calVal.user_offset);
-  if (var == "LEAK_BASE") return String(calVal.leak_cal_baseline);
-  if (var == "LEAK_OFFSET") return String(calVal.leak_cal_offset);
-  if (var == "LEAK_BASE_REV") return String(calVal.leak_cal_baseline_rev);
-  if (var == "LEAK_OFFSET_REV") return String(calVal.leak_cal_offset_rev);
 
   return "";
 }
@@ -2144,6 +2151,84 @@ String Webserver::processMimicPageTemplate(const String &var) {
   if (var == "VAC_SPEED") return String(pins.VAC_SPEED);
   if (var == "VAC_BLEED_VALVE") return String(pins.VAC_BLEED_VALVE);
 
+
+  return "";
+
+}
+
+
+
+
+
+
+
+
+/***********************************************************
+ * @brief processCalibrationPage
+ * @details Replaces template placeholders with variable values
+ * @param &var HTML payload 
+ * @note ~PLACEHOLDER_FORMAT~
+ ***/
+String Webserver::processCalibrationPageTemplate(const String &var) {
+
+  extern struct Pins pins;
+  extern struct BenchSettings settings;
+  extern struct CalibrationData calVal;
+  extern struct SensorData sensorVal;
+
+  // Process language vars
+  String langVar = processLanguageTemplateVars(var);
+  if (langVar != var) return langVar;
+
+  // Calibration Orifice Settings
+  if (var == "dCAL_FLW_RATE") return String(calVal.cal_flow_rate);
+  if (var == "dCAL_REF_PRESS") return String(calVal.cal_ref_press);
+
+  // Calibration Data
+  if (var == "FLOW_OFFSET") return String(calVal.flow_offset);
+  if (var == "USER_OFFSET") return String(calVal.user_offset);
+  if (var == "LEAK_BASE") return String(calVal.leak_cal_baseline);
+  if (var == "LEAK_OFFSET") return String(calVal.leak_cal_offset);
+  if (var == "LEAK_BASE_REV") return String(calVal.leak_cal_baseline_rev);
+  if (var == "LEAK_OFFSET_REV") return String(calVal.leak_cal_offset_rev);
+
+  // Orifice plates
+  if (var == "dORIFICE1_FLOW") return String(calVal.orificeOneFlow);
+  if (var == "dORIFICE1_PRESS") return String(calVal.orificeOneDepression);
+  if (var == "dORIFICE2_FLOW") return String(calVal.orificeTwoFlow);
+  if (var == "dORIFICE2_PRESS") return String(calVal.orificeTwoDepression);
+  if (var == "dORIFICE3_FLOW") return String(calVal.orificeThreeFlow);
+  if (var == "dORIFICE3_PRESS") return String(calVal.orificeThreeDepression);
+  if (var == "dORIFICE4_FLOW") return String(calVal.orificeFourFlow);
+  if (var == "dORIFICE4_PRESS") return String(calVal.orificeFourDepression);
+  if (var == "dORIFICE5_FLOW") return String(calVal.orificeFiveFlow);
+  if (var == "dORIFICE5_PRESS") return String(calVal.orificeFiveDepression);
+  if (var == "dORIFICE6_FLOW") return String(calVal.orificeSixFlow);
+  if (var == "dORIFICE6_PRESS") return String(calVal.orificeSixDepression);
+
+  if (var == "FLOW_CONVERSION_TYPE") {
+
+    // Get flow type based on currently visible tile
+    switch (sensorVal.flowtile) {
+      case MAFFLOW_TILE:
+        return String("!! MAF flow selected !!");
+      break;
+
+      case ACFM_TILE:
+        return String("Actual CFM");
+      break;
+
+      case ADJCFM_TILE:
+        return String("Adjusted CFM");
+      break;
+
+      case SCFM_TILE:
+        return String("Standard CFM");
+      break;
+
+    }
+
+  }
 
   return "";
 
