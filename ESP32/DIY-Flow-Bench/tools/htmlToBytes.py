@@ -1,48 +1,57 @@
 import os
 import zlib
-import json
+import gzip
 from pathlib import Path
 
-def convert_file(filepath):
+# Compress uzing ZLIB - we will later decompress and serve the content
+def convert_to_byte_array(filepath):
     with open(filepath, 'r') as f:
         content = f.read()
     
-    # Compress content    
     compressed = zlib.compress(content.encode())
-    
-    # Convert to byte array
     bytes_str = ','.join([f"0x{b:02x}" for b in compressed])
-    
-    # Get filename without extension
-    basename = os.path.splitext(os.path.basename(filepath))[0]
-    
-    # Get file extension without the dot
-    extension = os.path.splitext(filepath)[1][1:]
+    basename = filepath.stem
+    extension = filepath.suffix[1:]
     
     return f"""
-// DIY-Flow-Bench/ESP32/DIY-Flow-Bench/html/{basename}.{extension} 
+// {filepath.relative_to(Path(__file__).parent.parent)}
+const uint8_t {basename}_{extension}[] PROGMEM = {{{bytes_str}}};
+const uint16_t {basename}_{extension}_len = {len(compressed)};
+"""
+
+# Compress using GZIP - we will later serve the content directly to the browser
+def convert_to_gzip(filepath):
+    with open(filepath, 'r') as f:
+        content = f.read()
+    
+    compressed = gzip.compress(content.encode())
+    bytes_str = ','.join([f"0x{b:02x}" for b in compressed])
+    basename = filepath.stem
+    extension = filepath.suffix[1:]
+    
+    return f"""
+// {filepath.relative_to(Path(__file__).parent.parent)}
 const uint8_t {basename}_{extension}[] PROGMEM = {{{bytes_str}}};
 const uint16_t {basename}_{extension}_len = {len(compressed)};
 """
 
 def main():
-    output = """#pragma once
+    src_dir = Path(__file__).parent.parent / 'html'
+    
+    header_content = """#pragma once
 #include <pgmspace.h>
 
 // Auto-generated file - do not edit
 """
     
-    # Process all files in html dir
-    src_dir = Path(__file__).parent.parent / 'html'
-    for file in os.listdir(src_dir):
-        if file.endswith(('.html', '.js', '.css')):
-            filepath = os.path.join(src_dir, file)
-            output += convert_file(filepath)
-
-    # Write header file
-    output_path = Path(__file__).parent.parent / 'htmldata.h'
-    with open(output_path, 'w') as f:
-        f.write(output)
+    for file in src_dir.glob('*.*'):
+        if file.suffix.lower() in ['.js', '.css']:
+            header_content += convert_to_gzip(file)
+        elif file.suffix.lower() == '.html':
+            header_content += convert_to_byte_array(file)
+    
+    header_file = Path(__file__).parent.parent / 'htmldata.h'
+    header_file.write_text(header_content)
 
 if __name__ == "__main__":
     main()
