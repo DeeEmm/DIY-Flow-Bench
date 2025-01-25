@@ -226,7 +226,7 @@ void Webserver::begin()
       Messages _message;
       String fileToDelete;
       DataHandler _data;
-      AsyncWebParameter *p = request->getParam("filename", true);
+      const AsyncWebParameter *p = request->getParam("filename", true);
       fileToDelete = p->value();      
       // Don't delete index.html (you can overwrite it!!)
       // if (fileToDelete != "/index.html"){
@@ -243,7 +243,7 @@ void Webserver::begin()
         // if (fileToDelete == "/index.html"){
         // If we delete a system file, send user back to boot loop to upload missing file
         if (fileToDelete == status.indexFilename || fileToDelete == status.pinsFilename || fileToDelete == status.mafFilename){
-          request->send_P(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
+          request->send(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
           _data.bootLoop();
           // request->redirect("/");
         } else {
@@ -371,13 +371,13 @@ void Webserver::begin()
 
   // Simple Firmware Update Form - does not require working GUI)
   server->on("/update", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
+    request->send(200, "text/html", language.LANG_INDEX_HTML, processLandingPageTemplate); 
     request->send(200, "text/html", "<form method='POST' action='/api/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>");
   });
 
   // Favicon request handler (icon hex dump is in constants.h)
   server->on("/favicon.ico", HTTP_ANY, [](AsyncWebServerRequest *request){
-    AsyncWebServerResponse *response = request->beginResponse_P(200, "image/x-icon", favicon_ico_gz, favicon_ico_gz_len);
+    AsyncWebServerResponse *response = request->beginResponse(200, "image/x-icon", favicon_ico_gz, favicon_ico_gz_len);
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   });
@@ -437,48 +437,48 @@ void Webserver::begin()
   server->on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         status.GUIpage = SETTINGS_PAGE;
-        request->send_P(200, "text/html", _public_html.settingsPage().c_str(), processSettingsPageTemplate); 
+        request->send(200, "text/html", _public_html.settingsPage().c_str(), processSettingsPageTemplate); 
       });
 
   // Data page request handler
   server->on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         status.GUIpage = DATA_PAGE;
-        request->send_P(200, "text/html", _public_html.dataPage().c_str(), processDatagraphPageTemplate); 
+        request->send(200, "text/html", _public_html.dataPage().c_str(), processDatagraphPageTemplate); 
       });
 
   // Configuration page request handler
   server->on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         status.GUIpage = CONFIG_PAGE;
-        request->send_P(200, "text/html", _public_html.configPage().c_str(), processConfigPageTemplate); 
+        request->send(200, "text/html", _public_html.configPage().c_str(), processConfigPageTemplate); 
       });
 
   // calibration page request handler
   server->on("/calibration", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         status.GUIpage = CALIBRATION_PAGE;
-        request->send_P(200, "text/html", _public_html.calibrationPage().c_str(), processCalibrationPageTemplate); 
+        request->send(200, "text/html", _public_html.calibrationPage().c_str(), processCalibrationPageTemplate); 
       });
 
   // Pins page request handler
   server->on("/pins", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         status.GUIpage = PINS_PAGE;
-        request->send_P(200, "text/html", _public_html.pinsPage().c_str(), processPinsPageTemplate); 
+        request->send(200, "text/html", _public_html.pinsPage().c_str(), processPinsPageTemplate); 
       });
 
   // Mimic page request handler
   server->on("/mimic", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         status.GUIpage = MIMIC_PAGE;
-        request->send_P(200, "text/html", _public_html.mimicPage().c_str(), processMimicPageTemplate); 
+        request->send(200, "text/html", _public_html.mimicPage().c_str(), processMimicPageTemplate); 
       });
 
   // // Index page request handler
   // server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
   //       PublicHTML _public_html;
-  //       request->send_P(200, "text/html", _public_html.indexPage().c_str(), processIndexPageTemplate); 
+  //       request->send(200, "text/html", _public_html.indexPage().c_str(), processIndexPageTemplate); 
   //     });
 
 
@@ -486,7 +486,7 @@ void Webserver::begin()
   server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
         status.GUIpage = INDEX_PAGE;
-        request->send_P(200, "text/html", _public_html.indexPage().c_str(),  processIndexPageTemplate);
+        request->send(200, "text/html", _public_html.indexPage().c_str(),  processIndexPageTemplate);
       });
 
 
@@ -577,7 +577,7 @@ void Webserver::saveConfigurationForm(AsyncWebServerRequest *request)
   DataHandler _data;
   Preferences _prefs;
 
-  AsyncWebParameter* p;
+  const AsyncWebParameter* p;
 
   _prefs.begin("config");
 
@@ -622,7 +622,7 @@ void Webserver::saveSettingsForm(AsyncWebServerRequest *request)
   DataHandler _data;
   Preferences _prefs;
 
-  AsyncWebParameter* p;
+  const AsyncWebParameter* p;
 
   _prefs.begin("settings");
 
@@ -673,7 +673,7 @@ void Webserver::savePinsForm(AsyncWebServerRequest *request)
   Hardware _hardware;
   Preferences _prefs;
 
-  AsyncWebParameter* p;
+  const AsyncWebParameter* p;
 
   _prefs.begin("pins");
 
@@ -713,7 +713,7 @@ void Webserver::saveCalibrationForm(AsyncWebServerRequest *request)
   Messages _message;
   Preferences _prefs;
 
-  AsyncWebParameter* p;
+  const AsyncWebParameter* p;
 
   extern struct CalibrationData calVal;
 
@@ -760,14 +760,16 @@ void Webserver::parseUserFlowTargetForm(AsyncWebServerRequest *request)
   extern struct CalibrationData calVal;
   // String jsonString;
 
+  const AsyncWebParameter* p;
+
   int params = request->params();
 
   _message.debugPrintf("Parsing User Flow Target Form Data... \n");
 
   // Convert POST vars to JSON 
   for(int i=0;i<params;i++){
-    AsyncWebParameter* p = request->getParam(i);
-      calData[p->name().c_str()] = p->value().c_str();
+    p = request->getParam(i);
+    calData[p->name().c_str()] = p->value().c_str();
   }
 
   // Update global Config Vars
@@ -857,11 +859,13 @@ void Webserver::saveLiftDataForm(AsyncWebServerRequest *request){
   const char* PARAM_INPUT = "lift-data";
   double flowValue;
 
+  const AsyncWebParameter* p;
+
   _message.debugPrintf("Saving Lift Data....\n");
 
   // TEST - Print POST vars to serial
   // for(int i=0;i<params;i++){
-  //   AsyncWebParameter* p = request->getParam(i);
+  //   const AsyncWebParameter* p = request->getParam(i);
   //   if(p->isFile()){ //p->isPost() is also true
   //     Serial.printf("FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
   //   } else if(p->isPost()){
@@ -873,7 +877,7 @@ void Webserver::saveLiftDataForm(AsyncWebServerRequest *request){
 
   // Convert POST vars to JSON 
   for(int i=0;i<params;i++){
-    AsyncWebParameter* p = request->getParam(i);
+    p = request->getParam(i);
         // get selected radio button and store it (radio button example from https://www.electrorules.com/esp32-web-server-control-stepper-motor-html-form/)
         if (p->name() == PARAM_INPUT) {
           liftPoint = p->value();
@@ -1082,6 +1086,8 @@ void Webserver::parseOrificeForm(AsyncWebServerRequest *request)
   Messages _message;
   Webserver _webserver;
 
+  const AsyncWebParameter* p;
+
   int params = request->params();
 
   // Convert POST vars to JSON 
@@ -1089,7 +1095,7 @@ void Webserver::parseOrificeForm(AsyncWebServerRequest *request)
 
     // Test to see which radio is selected
     
-    AsyncWebParameter* p = request->getParam(i);
+    p = request->getParam(i);
       // configData[p->name().c_str()] = p->value().c_str();
 
     // Then load orifice data into memory 

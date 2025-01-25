@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501250004      - Updated ESPAsyncWebServer Library
 2501240012      - Review / Update API
 2501240006      - Removed Poll Timers
 2501240004      - #325 Removed Semaphore
