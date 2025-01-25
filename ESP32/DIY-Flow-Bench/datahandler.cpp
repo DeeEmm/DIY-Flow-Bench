@@ -1141,7 +1141,7 @@ void DataHandler::bootLoop()
           Webserver _webserver;
           extern struct Language language;
           _message.debugPrintf("/api/file \n");
-          request->send_P(200, "text/html", language.LANG_INDEX_HTML, _webserver.processLandingPageTemplate); 
+          request->send(200, "text/html", language.LANG_INDEX_HTML, _webserver.processLandingPageTemplate); 
           }); 
 
       // save file upload
@@ -1158,7 +1158,7 @@ void DataHandler::bootLoop()
           Webserver _webserver;
           extern struct Language language;
           _message.debugPrintf("/pins \n");
-          request->send_P(200, "text/html", language.LANG_INDEX_HTML, _webserver.processLandingPageTemplate); 
+          request->send(200, "text/html", language.LANG_INDEX_HTML, _webserver.processLandingPageTemplate); 
           }); 
 
       // Save pins form
@@ -1179,7 +1179,7 @@ void DataHandler::bootLoop()
           Webserver _webserver;
               // We should store the upload page in PROGMEM and all it from there.
               // SAME thing for the io config page
-              request->send_P(200, "text/html", language.LANG_INDEX_HTML, _webserver.processLandingPageTemplate); 
+              request->send(200, "text/html", language.LANG_INDEX_HTML, _webserver.processLandingPageTemplate); 
           });
 
       tempServer->onFileUpload(_webserver.fileUpload);

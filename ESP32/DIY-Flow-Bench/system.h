@@ -58,7 +58,7 @@ using namespace std;
 // Memory assignment
 #define SENSOR_TASK_MEM_STACK 2800 
 #define ENVIRO_TASK_MEM_STACK 2200 
-#define LOOP_TASK_STACK_SIZE 11000
+#define LOOP_TASK_STACK_SIZE 12288
 
 // MAF Data Filters
 #define ALPHA_MEDIAN 0.75f

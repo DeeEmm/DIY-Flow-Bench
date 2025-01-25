@@ -295,7 +295,6 @@ int adcTaskCount = 0;
           sensorVal.PitotVelocity = 0.0f;
         }
 
-
         if (config.bSWIRL_ENBLD) {
           // TODO #227
             // uint8_t Swirl = Encoder.read();
@@ -348,7 +347,7 @@ void TASKgetEnviroData( void * parameter ){
         sensorVal.TempDegC = _sensors.getTempValue();        
         sensorVal.TempDegF = _calculations.convertTemperature(_sensors.getTempValue(), DEGF);
 
-        // Get bara sensor data
+        // Get baro sensor data
         sensorVal.BaroHPA = _sensors.getBaroValue();
         sensorVal.BaroPA = sensorVal.BaroHPA * 100.00F;
         sensorVal.BaroKPA = sensorVal.BaroPA * 0.001F;

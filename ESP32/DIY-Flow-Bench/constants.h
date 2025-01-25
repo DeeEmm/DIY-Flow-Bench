@@ -20,6 +20,11 @@
 
 #include <stdint.h>
 
+// AsynWebServer literals from: literals.h
+// much more efficient to just load those literals that we need
+static constexpr const char* T_text_html = "text/html";
+static constexpr const char* T_Content_Encoding = "content-encoding";
+static constexpr const char* T_gzip = "gzip";
 
 enum VolumetricUnits {
     CFM,    // Cubic feet per minute
