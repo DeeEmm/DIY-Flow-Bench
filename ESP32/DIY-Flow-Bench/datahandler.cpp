@@ -761,6 +761,7 @@ String DataHandler::buildIndexSSEJsonData()
   extern struct BenchSettings settings;
   extern struct SensorData sensorVal;
   extern struct CalibrationData calVal;
+  extern struct Configuration config;
 
   Hardware _hardware;
   Calculations _calculations;
@@ -898,6 +899,7 @@ String DataHandler::buildIndexSSEJsonData()
 
   // Differential pressure
   dataJson["PDIFF"] = sensorVal.PDiffH2O;
+  dataJson["iPDIFF_SENS_TYP"] = config.iPDIFF_SENS_TYP;
   
   if (calVal.pdiff_cal_offset == 0) {
     dataJson["PDIFF_COLOUR"] =  GUI_COLOUR_UNSET;
@@ -907,6 +909,7 @@ String DataHandler::buildIndexSSEJsonData()
 
   // Swirl (+/- rpm)
   dataJson["SWIRL"] = sensorVal.Swirl;
+  dataJson["bSWIRL_ENBLD"] = config.bSWIRL_ENBLD;
 
   // // Flow Differential
   dataJson["FDIFF"] = sensorVal.FDiff;

@@ -29,7 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
-
+2501260023      - #332 Hide Disabled tiles
 2501260012      - #329 Rewrote liftdata.json download request handler
                 - Update ArduinoJSON From V6 to V7
 2501250016      - Changed static js/css files to be served as gzip

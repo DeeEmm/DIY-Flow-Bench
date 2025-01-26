@@ -33,8 +33,8 @@ var closeLoadGraphDataModalButton = document.getElementsByClassName("closeLoadGr
 var closeSaveGraphDataModalButton = document.getElementsByClassName("closeSaveGraphDataModalButton")[0];
 var closeCalibrationModalButton = document.getElementsByClassName("closeCalibrationModalButton")[0];
 
-
-
+var bSWIRL_ENBLD;
+var iPDIFF_SENS_TYP;
 
 // Set up Server Side Events (SSE)
 if (!!window.EventSource) {
@@ -96,23 +96,28 @@ if (!!window.EventSource) {
 
       switch (benchType) {
     
-        case "MAF_BENCH":
+        case "MAF":
           document.getElementById('orificeRadio').style.display='none';
         break;
     
-        case "ORIFICE_BENCH":
+        case "ORIFICE":
           document.getElementById('orificeRadio').style.display='block';
         break;
           
-        case "VENTURI_BENCH":
+        case "VENTURI":
           document.getElementById('orificeData').style.display='block';
         break;
           
-        case "PITOT_BENCH":
+        case "PITOT":
           document.getElementById('orificeData').style.display='block';
         break;
           
       }
+
+      // Get swirl status
+      bSWIRL_ENBLD = myObj["bSWIRL_ENBLD"]; 
+
+      iPDIFF_SENS_TYP = myObj["iPDIFF_SENS_TYP"];
 
       // Get data filter type
       var dataFilterType = myObj["iDATA_FLTR_TYP"];
@@ -291,9 +296,11 @@ function initialiseButtons() {
   
     // Pressure tile
     document.getElementById('tile-pref-title').addEventListener('click', function(){
-      document.getElementById('tile-pref').style.display='none';
-      document.getElementById('tile-pdiff').style.display='block';
-      setCookie("pressure-tile","pdiff","365")    
+      if (iPDIFF_SENS_TYP > 1){
+        document.getElementById('tile-pref').style.display='none';
+        document.getElementById('tile-pdiff').style.display='block';
+        setCookie("pressure-tile","pdiff","365")      
+      }
     });
   
     document.getElementById('tile-pdiff-title').addEventListener('click', function(){
@@ -337,9 +344,15 @@ function initialiseButtons() {
   
     // Tool tile
     document.getElementById('tile-pitot-title').addEventListener('click', function(){
-      document.getElementById('tile-pitot').style.display='none';
-      document.getElementById('tile-swirl').style.display='block';
-      setCookie("tool-tile","swirl","365")    
+      if (bSWIRL_ENBLD == true) {
+        document.getElementById('tile-pitot').style.display='none';
+        document.getElementById('tile-swirl').style.display='block';
+        setCookie("tool-tile","swirl","365")      
+      } else {
+        document.getElementById('tile-pitot').style.display='none';
+        document.getElementById('tile-fdiff').style.display='block';
+        setCookie("tool-tile","fdiff","365")      
+      }
     });
   
     document.getElementById('tile-swirl-title').addEventListener('click', function(){
