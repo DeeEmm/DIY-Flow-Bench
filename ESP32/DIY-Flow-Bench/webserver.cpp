@@ -779,7 +779,7 @@ void Webserver::parseUserFlowTargetForm(AsyncWebServerRequest *request)
   Messages _message;
   // Webserver _webserver;
 
-  StaticJsonDocument<CAL_DATA_JSON_SIZE> calData;
+  JsonDocument calData;
   extern struct CalibrationData calVal;
   // String jsonString;
 
