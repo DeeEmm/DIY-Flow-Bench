@@ -69,7 +69,7 @@ void DataHandler::begin() {
     Calibration _calibration;
     Calculations _calculations;
 
-    StaticJsonDocument<1024> pinData;
+    JsonDocument pinData;
 
     // Start serial comms
     this->beginSerial(); 
@@ -243,7 +243,7 @@ void DataHandler::writeJSONFile(String data, String filename, int dataSize){
   Messages _message;
 
   // StaticJsonDocument<dataSize> jsonData;
-  DynamicJsonDocument jsonData(dataSize);
+  JsonDocument jsonData;
   DeserializationError error = deserializeJson(jsonData, data);
   if (!error)  {
     _message.debugPrintf("Writing JSON file... \n");
@@ -264,7 +264,7 @@ void DataHandler::writeJSONFile(String data, String filename, int dataSize){
  * @brief loadJSONFile
  * @details Loads JSON data from file
  ***/
-StaticJsonDocument<JSON_FILE_SIZE> DataHandler::loadJSONFile(String filename) {
+JsonDocument DataHandler::loadJSONFile(String filename) {
 
   Messages _message;
 
@@ -272,7 +272,7 @@ StaticJsonDocument<JSON_FILE_SIZE> DataHandler::loadJSONFile(String filename) {
 
   // Allocate the memory pool on the stack.
   // Use arduinojson.org/assistant to compute the capacity.
-  StaticJsonDocument <JSON_FILE_SIZE> jsonData;
+  JsonDocument jsonData;
 
   if (SPIFFS.exists(filename))  {
     File jsonFile = SPIFFS.open(filename, FILE_READ);
@@ -726,7 +726,7 @@ String DataHandler::getFileListJSON()
   String fileName;
   size_t fileSize;
 
-  StaticJsonDocument<1024> dataJson;
+  JsonDocument dataJson;
 
   Messages _message;
   Calculations _calculations;
@@ -768,7 +768,7 @@ String DataHandler::buildIndexSSEJsonData()
 
   String jsonString;
 
-  StaticJsonDocument<DATA_JSON_SIZE> dataJson;
+  JsonDocument dataJson;
 
   // Reference pressure
   dataJson["PREF"] = sensorVal.PRefH2O;
@@ -965,7 +965,7 @@ String DataHandler::buildMimicSSEJsonData() {
 
   String jsonString;
 
-  StaticJsonDocument<DATA_JSON_SIZE> dataJson;
+  JsonDocument dataJson;
 
   dataJson["MAF_ADC"] = _hardware.getADCRawData(config.iMAF_ADC_CHAN);
   dataJson["PREF_ADC"] = _hardware.getADCRawData(config.iPREF_ADC_CHAN);

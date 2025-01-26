@@ -41,8 +41,8 @@ class Webserver {
 		void loop();
 
     	AsyncWebServer *server;
-		StaticJsonDocument<1024> dataJson; 
-		StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftDataJson; 
+		JsonDocument dataJson; 
+		JsonDocument liftDataJson; 
 
 		String getSystemStatusJSON();		
 		void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
@@ -65,7 +65,7 @@ class Webserver {
 		void sendIndexPage();
 		// void uploadFile();
 		String index_html;
-		void parseLiftData(StaticJsonDocument<LIFT_DATA_JSON_SIZE> liftData);
+		void parseLiftData(JsonDocument liftData);
 		
 	public:
 	
@@ -81,8 +81,8 @@ class Webserver {
 		void createSettingsFile ();
 		String getLiftDataJSON();
 		
-		StaticJsonDocument<1024> getSDFile(String filename);
-		StaticJsonDocument<1024> getSDFileList(String filename);
+		JsonDocument getSDFile(String filename);
+		JsonDocument getSDFileList(String filename);
 		bool writeToSDFile(const char* filePath, const char* data);
 		bool appendToSDFile(const char* filePath, const char* data);
 		const char* readSDFile(const char* filePath);

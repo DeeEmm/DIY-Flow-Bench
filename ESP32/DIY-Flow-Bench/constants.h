@@ -25,6 +25,7 @@
 static constexpr const char* T_text_html = "text/html";
 static constexpr const char* T_Content_Encoding = "content-encoding";
 static constexpr const char* T_gzip = "gzip";
+static constexpr const char* T_application_json = "application/json";
 
 enum VolumetricUnits {
     CFM,    // Cubic feet per minute
