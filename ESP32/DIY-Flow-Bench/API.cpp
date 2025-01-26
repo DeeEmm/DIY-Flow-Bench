@@ -65,7 +65,7 @@ String API::getConfigJSON() {
   
   extern struct BenchSettings settings;
   String jsonString;
-  StaticJsonDocument<1024> dataJson;    
+  JsonDocument dataJson;    
   
   // Can add more settings as required
   dataJson["iMIN_FLOW_RATE"] = settings.min_flow_rate;
@@ -337,7 +337,7 @@ void API::ParseMessage(char apiMessage) {
 
       case 'J':{ // JSON SSE Data
           if (status.doBootLoop) break;
-          StaticJsonDocument <DATA_JSON_SIZE> jsondoc;
+          JsonDocument jsondoc;
           jsonString = _data.buildIndexSSEJsonData();
           deserializeJson(jsondoc, jsonString);
           serializeJsonPretty(jsondoc, Serial);
@@ -348,7 +348,7 @@ void API::ParseMessage(char apiMessage) {
 
       case 'j':{ // JSON SSE Data (Mimic)
           if (status.doBootLoop) break;
-          StaticJsonDocument <DATA_JSON_SIZE> jsondoc;
+          JsonDocument jsondoc;
           jsonString = _data.buildMimicSSEJsonData();
           deserializeJson(jsondoc, jsonString);
           serializeJsonPretty(jsondoc, Serial);

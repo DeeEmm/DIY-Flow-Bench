@@ -32,7 +32,7 @@ function initialiseButtons() {
     
     document.getElementById('export-graph-data-button').addEventListener('click', function(){
       // initiate JSON Data download from browser
-      document.getElementById('file-data-download').click();
+      document.getElementById('graph-data-download').click();
     });
   
     document.getElementById('export-graph-image-button').addEventListener('click', function(){

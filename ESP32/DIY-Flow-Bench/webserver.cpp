@@ -35,6 +35,7 @@
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
+#include "AsyncJson.h"
 #include "webserver.h"
 
 #include "calibration.h"
@@ -57,14 +58,16 @@ using namespace std;
 // RTC_DATA_ATTR int bootCount; // flash mem
 
 
+/***********************************************************
+ * @brief Webserver begin
+ * @note Setup event handlers for web server
+ ***/
 void Webserver::begin()
 {
   extern struct BenchSettings settings;
   extern struct Language language;
   extern struct DeviceStatus status;
   
-  
-
   int wifiStatusCode;
 
   server = new AsyncWebServer(80);
@@ -75,8 +78,12 @@ void Webserver::begin()
   DataHandler _data;
   PublicHTML _public_html;
 
-  // API request handlers [JSON confirmation response]
 
+
+  // API request handlers [JSON confirmation response]
+  ///////////
+
+  // bench on
   server->on("/api/bench/on", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Hardware _hardware;
@@ -86,6 +93,7 @@ void Webserver::begin()
       request->send(200, asyncsrv::T_text_html, "{\"bench\":\"on\"}"); 
       });
 
+  // bench off
   server->on("/api/bench/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Hardware _hardware;
@@ -95,6 +103,7 @@ void Webserver::begin()
       request->send(200, asyncsrv::T_text_html, "{\"bench\":\"off\"}"); 
       });
 
+  // debug on
   server->on("/api/debug/on", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       _message.Handler(language.LANG_DEBUG_MODE);
@@ -102,6 +111,7 @@ void Webserver::begin()
       settings.debug_mode = true;
       request->send(200, asyncsrv::T_text_html, "{\"debug\":\"on\"}"); });
 
+  // debug off
   server->on("/api/debug/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       _message.Handler(language.LANG_BLANK);
@@ -109,6 +119,7 @@ void Webserver::begin()
       settings.debug_mode = false;
       request->send(200, asyncsrv::T_text_html, "{\"debug\":\"off\"}"); });
 
+  // dev mode on
   server->on("/api/dev/on", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
       _message.Handler(language.LANG_DEV_MODE);
@@ -116,6 +127,7 @@ void Webserver::begin()
       settings.dev_mode = true;
       request->send(200, asyncsrv::T_text_html, "{\"dev\":\"on\"}"); });
 
+  // dev mode off
   server->on("/api/dev/off", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       _message.Handler(language.LANG_BLANK);
@@ -123,6 +135,7 @@ void Webserver::begin()
       settings.dev_mode = false;
       request->send(200, asyncsrv::T_text_html, "{\"dev\":\"off\"}"); });
 
+  // clear message
   server->on("/api/clear-message", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
       status.statusMessage = "";
@@ -130,13 +143,15 @@ void Webserver::begin()
       _message.debugPrintf("Clearing messages...\n");
        });
 
-    server->on("/api/orifice-change", HTTP_GET, [](AsyncWebServerRequest *request){
-      Messages _message;
-      _message.Handler(language.LANG_ORIFICE_CHANGE);
-      _message.debugPrintf("Active Orifice Changed\n");
-      status.activeOrifice = request->arg("orifice");
-      request->send(200, asyncsrv::T_text_html, "{\"orifice\":changed\"\"}"); });
+  // orifice change
+  server->on("/api/orifice-change", HTTP_GET, [](AsyncWebServerRequest *request){
+    Messages _message;
+    _message.Handler(language.LANG_ORIFICE_CHANGE);
+    _message.debugPrintf("Active Orifice Changed\n");
+    status.activeOrifice = request->arg("orifice");
+    request->send(200, asyncsrv::T_text_html, "{\"orifice\":changed\"\"}"); });
 
+  // reboot
   server->on("/api/bench/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
       Messages _message;
       _message.Handler(language.LANG_SYSTEM_REBOOTING);
@@ -144,6 +159,7 @@ void Webserver::begin()
       ESP.restart(); 
       request->redirect("/"); });
 
+  // calibration
   server->on("/api/bench/calibrate", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Calibration _calibrate;
@@ -160,6 +176,7 @@ void Webserver::begin()
       // request->redirect("/");
       });
 
+  // Leak calibration
   server->on("/api/bench/leakcal", HTTP_GET, [](AsyncWebServerRequest *request){
       Messages _message;
       Calibration _calibrate;
@@ -176,12 +193,23 @@ void Webserver::begin()
       // request->redirect("/"); 
       });
 
+
   // Upload request handler
   server->on("/api/file/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
       // request->send(200);
       // request->redirect("/?view=upload"); 
       },
       fileUpload);
+
+  // Graph Download request handler
+  server->on("/api/graph/download/liftdata.json", HTTP_GET, [](AsyncWebServerRequest *request){              
+      Webserver _webserver;
+
+      AsyncWebServerResponse *response = request->beginResponse(200, T_application_json, _webserver.getLiftDataJSON());
+      response->addHeader("Content-Disposition", "attachment");
+      request->send(response);
+ 
+  });
 
   // Download request handler
   server->on("/api/file/download", HTTP_GET, [](AsyncWebServerRequest *request){              
@@ -231,8 +259,6 @@ void Webserver::begin()
       DataHandler _data;
       const AsyncWebParameter *p = request->getParam("filename", true);
       fileToDelete = p->value();      
-      // Don't delete index.html (you can overwrite it!!)
-      // if (fileToDelete != "/index.html"){
         if(SPIFFS.exists(fileToDelete)){
           _message.debugPrintf("Deleting File: %s\n", fileToDelete.c_str());  
           SPIFFS.remove(fileToDelete);
@@ -240,21 +266,8 @@ void Webserver::begin()
           _message.debugPrintf("Delete Failed: %s\n", fileToDelete.c_str());  
           _message.Handler(language.LANG_DELETE_FAILED);    
         } 
-        if (_data.checkSubstring(fileToDelete.c_str(), status.pinsFilename.c_str())) status.pinsLoaded = false;
-        if (_data.checkSubstring(fileToDelete.c_str(), status.mafFilename.c_str())) status.mafLoaded = false;
-        // if (_data.checkSubstring(fileToDelete.c_str(), status.indexFilename.c_str())) status.GUIexists = false;
-        // if (fileToDelete == "/index.html"){
-        // If we delete a system file, send user back to boot loop to upload missing file
-        if (fileToDelete == status.indexFilename || fileToDelete == status.pinsFilename || fileToDelete == status.mafFilename){
-          request->send(200, asyncsrv::T_text_html, language.LANG_INDEX_HTML, processLandingPageTemplate); 
-          _data.bootLoop();
-          // request->redirect("/");
-        } else {
-          request->redirect("/?view=upload");
-        }
-      
+        request->redirect("/?view=upload");
        });
-
 
   // Toggle Flow Dif Tile
   server->on("/api/fdiff", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -265,7 +278,6 @@ void Webserver::begin()
     request->send(200);
     // request->send(200, asyncsrv::T_text_html, "{\"fdiff\":\"changed\"}"); 
   });
-
 
   // Set flow to MAF flow
   server->on("/api/flow/mafflow", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -303,7 +315,6 @@ void Webserver::begin()
     request->send(200);
   });
 
-
   // Zero pDiff value
   server->on("/api/pdiff/zero", HTTP_GET, [](AsyncWebServerRequest *request){
     Messages _message;
@@ -314,7 +325,6 @@ void Webserver::begin()
     // request->send(200, asyncsrv::T_text_html, "{\"fdiff\":\"changed\"}"); 
   });
 
-  
   // Zero Pitot value
   server->on("/api/pitot/zero", HTTP_GET, [](AsyncWebServerRequest *request){
     Messages _message;
@@ -325,13 +335,11 @@ void Webserver::begin()
     // request->send(200, asyncsrv::T_text_html, "{\"fdiff\":\"changed\"}"); 
   });
 
-  
   // Send JSON Data
   server->on("/api/json", HTTP_GET, [](AsyncWebServerRequest *request){
     DataHandler _data;
     request->send(200, asyncsrv::T_text_html, String(_data.buildIndexSSEJsonData()).c_str());
   });
-
 
   // Save user Flow Diff target
   server->on("/api/saveflowtarget", HTTP_POST, parseUserFlowTargetForm);
@@ -359,12 +367,14 @@ void Webserver::begin()
   
 
 
-
-
   // HTML server responses
+  ///////////
 
-  // index.html
+  // Rewrite rules
   server->rewrite("/index.html", "/");
+
+  // Upload handlers
+  ///////////
 
   // Basic Upload Page (in case of file error - does not require working GUI)
   server->on("/upload", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -377,6 +387,12 @@ void Webserver::begin()
     request->send(200, asyncsrv::T_text_html, language.LANG_INDEX_HTML, processLandingPageTemplate); 
     request->send(200, asyncsrv::T_text_html, "<form method='POST' action='/api/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>");
   });
+
+
+
+
+  // Static file handlers
+  ///////////
 
   // Favicon request handler (icon hex dump is in constants.h)
   server->on("/favicon.ico", HTTP_ANY, [](AsyncWebServerRequest *request){
@@ -436,7 +452,11 @@ void Webserver::begin()
         response->addHeader(asyncsrv::T_Content_Encoding, asyncsrv::T_gzip);
         request->send(response);
       });
-  
+
+
+  // Template Handlers
+  ///////////
+
   // Settings page request handler
   server->on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
         PublicHTML _public_html;
@@ -492,7 +512,6 @@ void Webserver::begin()
         status.GUIpage = INDEX_PAGE;
         request->send(200, asyncsrv::T_text_html, _public_html.indexPage().c_str(),  processIndexPageTemplate);
       });
-
 
   server->onFileUpload(fileUpload);
   server->addHandler(events);
@@ -1001,7 +1020,7 @@ String Webserver::getLiftDataJSON()
 
   String jsonString;
 
-  StaticJsonDocument<DATA_JSON_SIZE> liftData;
+  JsonDocument liftData;
 
   liftData["LIFTDATA1"] = valveData.LiftData1;
   liftData["LIFTDATA2"] = valveData.LiftData2;
@@ -1016,11 +1035,13 @@ String Webserver::getLiftDataJSON()
   liftData["LIFTDATA11"] = valveData.LiftData11;
   liftData["LIFTDATA12"] = valveData.LiftData12;
 
-  serializeJson(liftData, jsonString);
+  // serializeJson(liftData, jsonString);
+  serializeJsonPretty(liftData, jsonString);
 
   return jsonString;
 
 }
+
 
 
 
