@@ -550,10 +550,11 @@ void Hardware::getI2CList() {
   Messages _message;
 
   _message.serialPrintf("Scanning for I2C devices...\n");
-  byte count = 0;
-  byte error;
+  uint8_t count = 0;
+  uint8_t error;
+  uint8_t address;
 
-  for (byte address = 1; address < 127; address++)   {
+  for (address = 1; address < 127; address++)   {
     Wire.beginTransmission (address);          
     // if (Wire.endTransmission () == 0)  {  
     error = Wire.endTransmission ();
