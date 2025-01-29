@@ -23,6 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
+ * https://github.com/richgel999/miniz
+ * https://richg42.blogspot.com/2014/05/miniz.html
  **************************************************************************/
 
 

@@ -151,6 +151,7 @@ void API::ParseMessage(char apiMessage) {
   A : ADC Voltage Values Maf:pRef:pDiff:Pitot
   a : ADC Raw Values Maf:pRef:pDiff:Pitot
   B : Barometric Pressure
+  C : MAF Coefficients
   D : Differential Pressure value inH2O
   E : Enum1 Flow:Ref:Temp:Humidity:Baro
   e : Enum2 Pitot:Swirl
@@ -202,7 +203,7 @@ void API::ParseMessage(char apiMessage) {
   API Response Format
   Command : Value : Checksum
   ==============================
-  C : configuration.json
+  C : MAF Coefficients
   I : IP Address
   J : JSON Status Data
   j : JSON Mimic Data
@@ -280,14 +281,10 @@ void API::ParseMessage(char apiMessage) {
           snprintf(apiResponse, API_RESPONSE_LENGTH, "B%s%f", API_DELIMITER , sensorVal.BaroHPA);
       break;
 
-      // DEPRECATED - Configuration no longer in JSON file
-      case 'C': { // Show configuration.json  'C\r\n'        
-          // StaticJsonDocument<CONFIG_JSON_SIZE> configurationJSON;
-          // if (SPIFFS.exists("/configuration.json"))  {
-          //   configurationJSON = _data.loadJSONFile("/configuration.json");
-          // }
-          // serializeJsonPretty(configurationJSON, Serial);
-          // snprintf(apiResponse, API_RESPONSE_LENGTH, "%s", " "); // send an empty string to prevent Invalid Response
+      // MAF Coefficients
+      case 'C': { // MAF Coefficients  'C\r\n'        
+
+          snprintf(apiResponse, API_RESPONSE_LENGTH, "C%s%s, %s, %s, %s, %s,%s", API_DELIMITER , String(config.mafCoeff0, 6), String(config.mafCoeff1, 6), String(config.mafCoeff2, 6), String(config.mafCoeff3, 6), String(config.mafCoeff4, 6), String(config.mafCoeff5, 6));
       break; }
 
       case 'D': // Differential Pressure value

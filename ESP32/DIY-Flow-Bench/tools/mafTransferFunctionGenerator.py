@@ -22,6 +22,7 @@ def load_maf_data(filename):
         data = json.load(f)
     x = np.array([float(k) for k in data.keys()])
     y = np.array([float(v) for v in data.values()])
+    
     return x, y
 
 def polynomial_fit(x, y, degree):
@@ -64,8 +65,8 @@ def main():
     x, y = load_maf_data('/Users/mick/Documents/ESP32 Projects/DIY-Flow-Bench/ESP32/DIY-Flow-Bench/tools/mafData.json')
     
     # Remove zero values
-    mask = (x != 0) & (y != 0)
-    x, y = x[mask], y[mask]
+    # mask = (x != 0) & (y != 0)
+    # x, y = x[mask], y[mask]
     
     # Try different fits
     fits = {}

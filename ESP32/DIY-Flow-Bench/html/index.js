@@ -55,10 +55,9 @@ if (!!window.EventSource) {
             continue;
           } 
 
-
           if (typeof myObj[key] === 'string' || myObj[key] instanceof String) {
           // We've got a string...
-            if (key === 'PITOT_COLOUR' || key === 'PDIFF_COLOUR' ) {
+            if (key === 'PITOT_COLOUR' || key === 'PDIFF_COLOUR') {
             } else {
               // it' a template variable
               document.getElementById(key).innerHTML = myObj[key];
@@ -72,8 +71,13 @@ if (!!window.EventSource) {
               
             } else if (key === 'PREF' || key === 'PDIFF' || key === 'PITOT' || key === 'PITOT_DELTA' || key === 'SWIRL' || key === 'TEMP' || key === 'BARO' || key === 'RELH') {
               document.getElementById(key).innerHTML = myObj[key].toFixed(GEN_DECIMAL_ACCURACY); 
-            //} else if (key === '') {
+            
+            } else if (key === 'bSWIRL_ENBLD' || key === 'iPDIFF_SENS_TYP' || key === 'iPITOT_SENS_TYP') {
+              // To avoid error, capture anything we don't want to specifically process as a template var
+              continue;
+
             } else {
+              // Lets try to process it as a template var
               document.getElementById(key).innerHTML = myObj[key];
             }
           }
@@ -117,7 +121,9 @@ if (!!window.EventSource) {
       // Get swirl status
       bSWIRL_ENBLD = myObj["bSWIRL_ENBLD"]; 
 
+      // Get pressure sensor types
       iPDIFF_SENS_TYP = myObj["iPDIFF_SENS_TYP"];
+      iPITOT_SENS_TYP = myObj["iPITOT_SENS_TYP"];
 
       // Get data filter type
       var dataFilterType = myObj["iDATA_FLTR_TYP"];
@@ -264,13 +270,18 @@ function onLoad(event) {
 function initialiseButtons() {
   
     var xhr = new XMLHttpRequest();
+    var differentialType;
   
     document.getElementById('show-capture-modal-button').addEventListener('click', function(){
       document.getElementById('captureLiftDataModal').style.display='block';
     });
   
     document.getElementById('FDIFF').addEventListener('click', function(){
-      document.getElementById('flowTargetModal').style.display='block';
+      // Only display User flow differential dialog if User Target tile is showing
+      differentialType = document.getElementById('FDIFFTYPEDESC').innerText;
+      if (differentialType.indexOf('User Target') !== -1 ) {
+        document.getElementById('flowTargetModal').style.display='block';
+      }
     });
   
   
@@ -350,6 +361,7 @@ function initialiseButtons() {
         setCookie("tool-tile","swirl","365")      
       } else {
         document.getElementById('tile-pitot').style.display='none';
+        document.getElementById('tile-swirl').style.display='none';
         document.getElementById('tile-fdiff').style.display='block';
         setCookie("tool-tile","fdiff","365")      
       }
@@ -362,9 +374,20 @@ function initialiseButtons() {
     });
   
     document.getElementById('tile-fdiff-title').addEventListener('click', function(){
-      document.getElementById('tile-fdiff').style.display='none';
-      document.getElementById('tile-pitot').style.display='block';
-      setCookie("tool-tile","pitot","365")    
+      if (iPITOT_SENS_TYP > 1) {
+        document.getElementById('tile-fdiff').style.display='none';
+        document.getElementById('tile-pitot').style.display='block';
+        setCookie("tool-tile","pitot","365")    
+      } else if (bSWIRL_ENBLD == true) {
+        document.getElementById('tile-fdiff').style.display='none';
+        document.getElementById('tile-pitot').style.display='none';
+        document.getElementById('tile-swirl').style.display='block';
+        setCookie("tool-tile","pitot","365")            
+      } else {
+        document.getElementById('tile-pitot').style.display='none';
+        document.getElementById('tile-swirl').style.display='none';
+        document.getElementById('tile-fdiff').style.display='block';        
+      }
     });
   
   

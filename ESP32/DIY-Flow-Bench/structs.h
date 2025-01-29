@@ -256,9 +256,9 @@ struct DeviceStatus {
   char mafUnits[5];
   double mafScaling = 1;
   int mafDiameter = 0;
-  char mafSensorType[30];
+  String mafSensorType;
   char mafOutputType[10];
-  char mafLink[100];
+  String mafLink;
   int GUIpage = 0;
   size_t nvmPins = 0;
   size_t nvmConfig = 0;
@@ -272,7 +272,18 @@ struct DeviceStatus {
   int adcScanCount = 1;
   double bmeScanAlpha = 0.45;
   double adcScanAlpha = 0.45;
-
+  String mafTypeDesc0 = "Spare";
+  String mafTypeDesc1 = "Spare";
+  String mafTypeDesc2 = "Spare";
+  String mafTypeDesc3 = "Spare";
+  String mafTypeDesc4 = "Spare";
+  String mafTypeDesc5 = "Spare";
+  String mafTypeDesc6 = "Spare";
+  String mafTypeDesc7 = "Spare";
+  String mafTypeDesc8 = "Spare";
+  String mafTypeDesc9 = "Spare";
+  String mafTypeDesc10 = "Spare";
+  int mafStatus;
 };
 
 

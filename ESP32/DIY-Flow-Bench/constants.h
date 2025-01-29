@@ -170,8 +170,8 @@ enum VolumetricUnits {
 /***********************************************************
  * International Standards
  ***/
-#define ISO_5011 1
-#define ISO_1585 2
+#define ISO_1585 1
+#define ISO_5011 2
 #define ISA 3
 #define ISO_13443 4
 #define ISO_2533 5

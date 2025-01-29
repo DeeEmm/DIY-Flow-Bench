@@ -29,6 +29,11 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2501280078      - Improvements to GUI tile handling
+2501280059      - Added coefficients to Mimic page
+2501280022      - Improved MAF sensor integration
+2501280013      - #341 Change default reference standard to ISO 1585
+2501270053      - #338 Reconfigure / optimise miniz library
 2501270051      - Upgrade to espressif32 @ 6.10.0 
                 - Increase flash partition size
 2501270023      - Update for pioarduino compatibility

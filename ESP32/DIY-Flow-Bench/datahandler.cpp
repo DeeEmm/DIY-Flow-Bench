@@ -834,16 +834,16 @@ String DataHandler::buildIndexSSEJsonData()
       dataJson["iSTD_REF"] = "ISO-1585";
     break;
 
+    case ISO_5011:
+      dataJson["iSTD_REF"] = "ISO-5011";
+    break;
+
     case ISA :
       dataJson["iSTD_REF"] = "ISA";
     break;
 
     case ISO_13443:
       dataJson["iSTD_REF"] = "ISO-13443";
-    break;
-
-    case ISO_5011:
-      dataJson["iSTD_REF"] = "ISO-5011";
     break;
 
     case ISO_2533:
@@ -887,6 +887,9 @@ String DataHandler::buildIndexSSEJsonData()
   dataJson["RELH"] = sensorVal.RelH;
 
   // Pitot
+
+  dataJson["iPITOT_SENS_TYP"] = config.iPITOT_SENS_TYP;
+
   dataJson["PITOT"] = sensorVal.PitotVelocity;
   // dataJson["PITOT_DELTA"] = fabs(round(sensorVal.PitotDelta));
   dataJson["PITOT_DELTA"] = sensorVal.PitotH2O;
@@ -896,6 +899,8 @@ String DataHandler::buildIndexSSEJsonData()
   } else {
     dataJson["PITOT_COLOUR"] = GUI_COLOUR_SET;
   }
+
+
 
   // Differential pressure
   dataJson["PDIFF"] = sensorVal.PDiffH2O;

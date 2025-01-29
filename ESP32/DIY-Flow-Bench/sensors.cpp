@@ -78,9 +78,16 @@ void Sensors::begin () {
 	status.pdiffSensor = getSensorType(config.iPDIFF_SENS_TYP);
 	status.pitotSensor = getSensorType(config.iPITOT_SENS_TYP);
 	
+	// Set up MAF sensor
 	MafData _maf(config.iMAF_SENS_TYP);
 
-	config.mafCoeff0 = _maf.getCoefficient(0);
+	status.mafDiameter = _maf.getDiameter();
+	status.mafSensor = _maf.getCurrentType();
+	status.mafSensorType = _maf.getType(); 
+	status.mafLink = _maf.getMafLink();
+	status.mafStatus = _maf.getStatus();
+
+ 	config.mafCoeff0 = _maf.getCoefficient(0);
 	config.mafCoeff1 = _maf.getCoefficient(1);
 	config.mafCoeff2 = _maf.getCoefficient(2);
 	config.mafCoeff3 = _maf.getCoefficient(3);
@@ -88,9 +95,7 @@ void Sensors::begin () {
 	config.mafCoeff5 = _maf.getCoefficient(5);
 	config.mafCoeff6 = _maf.getCoefficient(6);
 
-	status.mafDiameter = _maf.getDiameter();
 
-	status.mafSensor = _maf.getCurrentType();
 
 	//initialise BME280
 	if (config.iBME_TYP == BOSCH_BME280) {
@@ -391,6 +396,9 @@ double Sensors::getMafFlow(int units) {
 	Hardware _hardware;
 	Messages _message;
 	Calculations _calculations;
+
+	MafData _maf(config.iMAF_SENS_TYP); // TEST A/B
+
 	double flowRateKGH = 0.0;
 	double oldMafArea = 0.0;
 	double newMafArea = 0.0;
@@ -412,31 +420,19 @@ double Sensors::getMafFlow(int units) {
 	if (settings.AB_test == 'A') { // TEST A/B 
 		flowRateKGH = config.mafCoeff0 + (config.mafCoeff1 * mafMilliVolts) + (config.mafCoeff2 * pow(mafMilliVolts, 2)) + (config.mafCoeff3 * pow(mafMilliVolts, 3)) + (config.mafCoeff4 * pow(mafMilliVolts, 4)) + (config.mafCoeff5 * pow(mafMilliVolts, 5)) + (config.mafCoeff6 * pow(mafMilliVolts, 6));
 	} else if (settings.AB_test == 'B') {
-		flowRateKGH = config.mafCoeff0;
-		flowRateKGH += (config.mafCoeff1 * mafMilliVolts);
-		flowRateKGH += (config.mafCoeff2 * pow(mafMilliVolts, 2));
-		flowRateKGH += (config.mafCoeff3 * pow(mafMilliVolts, 3));
-		flowRateKGH += (config.mafCoeff4 * pow(mafMilliVolts, 4));
-		flowRateKGH += (config.mafCoeff5 * pow(mafMilliVolts, 5));
-		flowRateKGH += (config.mafCoeff6 * pow(mafMilliVolts, 6));
+		// Alternate method
+		// 6th degree polynomial calculation (Coefficients stored in mafData class)
+		for(int i = 0; i < 7; i++) {
+			flowRateKGH += _maf.getCoefficient(i) * vPower;
+			vPower *= mafMilliVolts;
+		}
 	} else if (settings.AB_test == 'C') {
 	    MafData _maf(config.iMAF_SENS_TYP);
 		flowRateKGH = _maf.calculateFlow(mafMilliVolts);
 	}
 
-
-	// y = 3E-18x6 - 5E-14x5 + 3E-10x4 - 7E-07x3 + 0.001x2 - 0.3517x - 172.08 // Coefficients data from Excel for Bosch
-
-	// Alternate method
-	// 6th degree polynomial calculation (Coefficients stored in mafData class)
-    // for(int i = 0; i < 7; i++) {
-    //     flowRateKGH += _maf.getCoefficient(i) * vPower;
-    //     vPower *= mafMilliVolts;
-    // }
-
 	flowRateKGH = fabs(flowRateKGH);  // Flip negative value
 	
-
 	// Now that we have a converted flow value we can translate it for different housing diameters
 	if (settings.maf_housing_diameter > 0 && status.mafDiameter > 0 && settings.maf_housing_diameter != status.mafDiameter) { 
 		// We are running a custom MAF Housing, lets translate the flow rates to the new diameter

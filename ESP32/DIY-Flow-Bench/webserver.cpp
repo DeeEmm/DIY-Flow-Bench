@@ -1339,12 +1339,10 @@ String Webserver::processIndexPageTemplate(const String &var) {
     }
   }
 
-
   // Current orifice data
   if (var == "ACTIVE_ORIFICE") return String(status.activeOrifice);
   if (var == "ORIFICE_MAX_FLOW") return String(status.activeOrificeFlowRate);
   if (var == "ORIFICE_CALIBRATED_DEPRESSION") return String(status.activeOrificeTestPressure);
-
 
   // Temp Unit
   if (var == "iTEMP_UNIT") {
@@ -1358,8 +1356,6 @@ String Webserver::processIndexPageTemplate(const String &var) {
   // Adj Flow Unit
   if (var == "AFLOW_UNITS" && settings.std_adj_flow == 1) return String("ACFM");
   if (var == "AFLOW_UNITS" && settings.std_adj_flow == 2) return String("SCFM");
-
-
 
   // Lift Profile
   if (floor(settings.valveLiftInterval) == settings.valveLiftInterval) {
@@ -1395,7 +1391,8 @@ String Webserver::processIndexPageTemplate(const String &var) {
     if (var == "lift12") return String(12 * settings.valveLiftInterval);
   }
 
-
+  // User flow target value
+  if (var == "USER_OFFSET") return String(calVal.user_offset);
 
   return "";
 }
@@ -1504,8 +1501,31 @@ String Webserver::processSettingsPageTemplate(const String &var) {
 
   // Sensor Values
   if (var == "MAF_SENSOR") return String(status.mafSensor);
-  if (var == "MAF_LINK") return _maf.getMafLink();
-  if (var == "MAF_TYPE") return _maf.getType();
+  if (var == "MAF_LINK") return String(status.mafLink);
+  if (var == "MAF_STATUS") {   
+
+    switch (status.mafStatus) {
+
+      case 0:
+        return "UNTESTED";
+      break;
+
+      case 1:
+        return "TESTED";
+      break;
+
+      case 2:
+        return "VALIDATED";
+      break;
+
+      case 3:
+        return "INVALID";
+      break;
+    
+    }
+  }
+
+  if (var == "MAF_TYPE") return String(status.mafSensorType);
   if (var == "PREF_SENSOR") return String(status.prefSensor);
   if (var == "TEMP_SENSOR") return String(status.tempSensor);
   if (var == "RELH_SENSOR") return String(status.relhSensor);
@@ -1561,16 +1581,16 @@ String Webserver::processSettingsPageTemplate(const String &var) {
         return String("ISO-1585");
       break;
 
+      case ISO_5011:
+        return String("ISO-5011");
+      break;
+
       case ISA :
         return String("ISA");
       break;
 
       case ISO_13443:
         return String("ISO-13443");
-      break;
-
-      case ISO_5011:
-        return String("ISO-5011");
       break;
 
       case ISO_2533:
@@ -1759,11 +1779,11 @@ String Webserver::processSettingsPageTemplate(const String &var) {
 String Webserver::processConfigPageTemplate(const String &var) {
 
   extern struct Configuration config;
+  extern struct DeviceStatus status;
 
   // Process language vars
   String langVar = processLanguageTemplateVars(var);
   if ( langVar != var) return langVar;
-
 
   //SD Dropdown
   if (var == "bSD_ENABLED_0" && config.bSD_ENABLED == 0) return String("selected");
@@ -1810,6 +1830,8 @@ String Webserver::processConfigPageTemplate(const String &var) {
   if (var == "iMAF_SENS_TYP_8" && config.iMAF_SENS_TYP == 8) return String("selected");
   if (var == "iMAF_SENS_TYP_9" && config.iMAF_SENS_TYP == 9) return String("selected");
   if (var == "iMAF_SENS_TYP_10" && config.iMAF_SENS_TYP == 10) return String("selected");
+
+  if (var == "MAF_LINK") return String(status.mafLink);
 
   if (var == "dMAF_MV_TRIM" ) return String(config.dMAF_MV_TRIM);
 
@@ -2174,6 +2196,9 @@ String Webserver::processPinsPageTemplate(const String &var) {
 String Webserver::processMimicPageTemplate(const String &var) {
 
   extern struct Pins pins;
+  extern Configuration config;
+
+  Messages _msg;
 
   // Process language vars
   String langVar = processLanguageTemplateVars(var);
@@ -2182,7 +2207,14 @@ String Webserver::processMimicPageTemplate(const String &var) {
   if (var == "VAC_SPEED") return String(pins.VAC_SPEED);
   if (var == "VAC_BLEED_VALVE") return String(pins.VAC_BLEED_VALVE);
 
-
+  if (var == "COEFF_0") return String(config.mafCoeff0, 6);
+  if (var == "COEFF_1") return String(config.mafCoeff1, 6);
+  if (var == "COEFF_2") return String(config.mafCoeff2, 6);
+  if (var == "COEFF_3") return String(config.mafCoeff3, 6);
+  if (var == "COEFF_4") return String(config.mafCoeff4, 6);
+  if (var == "COEFF_5") return String(config.mafCoeff5, 6);
+  if (var == "COEFF_6") return String(config.mafCoeff6, 6);
+  
   return "";
 
 }

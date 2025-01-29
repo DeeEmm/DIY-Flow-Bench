@@ -188,8 +188,10 @@ hr {
   cursor: pointer;
 }
 
-flowTargetValInput {
+#flowTargetValInput {
   font-size: 22px;
+  height: 32px;
+  width: 125px;
 }
 
 #tile-pdiff, #aflow-tile, #maf-tile, #tile-swirl, #tile-fdiff, #sflow-tile  {

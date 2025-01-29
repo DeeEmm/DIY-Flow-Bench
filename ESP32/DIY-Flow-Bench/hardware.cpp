@@ -575,7 +575,6 @@ void Hardware::getI2CList() {
 
 /***********************************************************
  * @brief GET ADS1115 ADC value
- * @note uses ADC1115-lite library - https://github.com/terryjmyers/ADS1115-Lite
  *
  ***/
 int32_t Hardware::getADCRawData(int channel) {
@@ -625,8 +624,7 @@ int32_t Hardware::getADCRawData(int channel) {
     break;
 
     case ADS1115:
-      volts = rawADCval * ADC_GAIN / ADC_RANGE;
-      // volts = rawADCval * 6.144F / 32767;
+      volts = rawADCval * 0.00018751f; // ADC_GAIN / ADC_RANGE
     break;
 
     case ADS1015:

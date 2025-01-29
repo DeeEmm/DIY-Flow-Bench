@@ -27,46 +27,63 @@ class MafData {
     
 private:
     static const int NUM_COEFFICIENTS = 7;
-    static const int NUM_MAF_TYPES = 3;
+    static const int NUM_MAF_TYPES = 4;
     int currentMafType;
 
 public:
-    enum MafType {
-        ACDELCO_92281162 = 0,
-        BOSCH_0280218067 = 1,
-        DELPHI_AF10118 = 2
-    };
 
     enum MafOutputType {
         Voltage = 0,
         Frequency = 1
     };
 
-    float mafCoeff[NUM_MAF_TYPES][NUM_COEFFICIENTS] = {
-        {0.762518f, 0.001883f, 0.000005f, 0.000000035f, 0.000000f, -0.000000f, 0.000000f}, // ACDELCO_92281162 (Data calculated from PY V1)
-        {81.792561f, -0.152376f, 0.000091f, -0.000000f, -0.000000f, 0.000000f, -0.000000f}, // BOSCH_0280218067 (Data calculated from PY V1)
-        {-147.198775f, 0.544108f, -0.000725f, 0.000000f, -0.000000f, 0.000000f, -0.000000f} // DELPHI_AF10118
+    enum MafType {
+        ACDELCO_92281162 = 0,
+        BOSCH_0280218067 = 1,
+        DELPHI_AF10118 = 2,
+        BOSCH_0280002421 = 3
+    };
+
+    enum MafStatus {
+        Untested = 0,
+        Tested = 1,
+        Validated = 2,
+        Invalid = 3
     };
 
 
-    int mafDiameter[NUM_MAF_TYPES] = {94, 82, 70}; // MAF diameter in mm
+    float mafCoeff[NUM_MAF_TYPES][NUM_COEFFICIENTS] = {
+        {0.762518f, 0.001883f, 0.000005f, 0.000000035f, 0.000000f, -0.000000f, 0.000000f}, // ACDELCO_92281162 (Data calculated from PY V1)
+        {81.792561f, -0.152376f, 0.000091f, -0.000000f, -0.000000f, 0.000000f, -0.000000f}, // BOSCH_0280218067 (Data calculated from PY V1)
+        {-147.198775f, 0.544108f, -0.000725f, 0.000000f, -0.000000f, 0.000000f, -0.000000f}, // DELPHI_AF10118
+        {18.539247f, -0.094665f, 0.000123f, -0.000000f, 0.000000f, -0.000000f, 0.000000f} // BOSCH_0280002421 (HFM5 plugin 82mm) 
+    };
 
-    double mafScaling[NUM_MAF_TYPES] = {0.1f, 0.1f, 0.1f}; // MAF scaling factor
+    // dont forget to add sensor to iMAF_SENS_TYP dropdown in config.html
 
-    int mafOutputType[NUM_MAF_TYPES] = {Voltage, Voltage, Voltage}; // MAF output type
 
-    int mafMaxKGH[NUM_MAF_TYPES] = {1607, 1805, 491}; // MAF kg/h value at 5 volts
+    int mafStatus[NUM_MAF_TYPES] = {Untested, Tested, Untested, Untested }; // MAF Status
+
+    int mafDiameter[NUM_MAF_TYPES] = {94, 82, 70, 82 }; // Original MAF diameter in mm
+
+    double mafScaling[NUM_MAF_TYPES] = {1.0f, 1.0f, 1.0f, 1.0f}; // MAF scaling factor
+
+    int mafOutputType[NUM_MAF_TYPES] = {Voltage, Voltage, Voltage, Voltage}; // MAF output type
+
+    int mafMaxKGH[NUM_MAF_TYPES] = {1607, 1805, 491, 1000}; // MAX MAF kg/h value
 
     String mafType[NUM_MAF_TYPES] = {
         "ACDELCO 92281162",
         "BOSCH 0280218067",
-        "DELPHI_AF10118"
+        "DELPHI_AF10118",
+        "BOSCH_0280002421"
     };
 
     String mafLink[NUM_MAF_TYPES] = {
         "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/142",
         "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/138",
-        "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/319"
+        "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/319",
+        "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/339"
     };
   
     // MafData() : currentMafType(ACDELCO_92281162) {}
@@ -80,13 +97,13 @@ public:
 
     // Constructor with int parameter
     MafData(int type) : currentMafType(type) {
-        if (type >= NUM_MAF_TYPES) {
-            currentMafType = ACDELCO_92281162; // Set default if invalid
+        if (type > NUM_MAF_TYPES) {
+            currentMafType = BOSCH_0280218067; // Set default if invalid
         }
     }
 
     void setMafType(MafType type) {
-        if (type < NUM_MAF_TYPES) {
+        if (type <= NUM_MAF_TYPES) {
             currentMafType = type;
         }
     }
@@ -104,6 +121,14 @@ public:
 
     String getType() const {
         return mafType[currentMafType];
+    }
+
+    int getNumSensors() const {
+        return NUM_MAF_TYPES;
+    }
+
+    int getStatus() const {
+        return mafStatus[currentMafType];
     }
 
     double getScaling() const {
@@ -133,7 +158,7 @@ public:
         // Calculate polynomial using coefficients
         for(int i = 0; i < NUM_COEFFICIENTS; i++) {
             flow += mafCoeff[currentMafType][i] * v_power;
-            v_power *= mafVolts;  // Increment power for next term
+            v_power *= mafVolts;  // Increment power for next scan
         }
         
         return flow;
