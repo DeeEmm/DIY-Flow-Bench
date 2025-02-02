@@ -361,15 +361,16 @@ struct ValveLiftData {
 
 /***********************************************************
  * Pin Data
+ * @note DEfault pin status is disabled to prevent issues on initial firmware flashing
  ***/
 struct Pins {
   // Inputs
   int VCC_5V = -1;
   int VCC_3V3 = -1;
-  int SPEED_SENS = 15;
-  int ORIFICE_BCD_1 = 34;
-  int ORIFICE_BCD_2 = 36;
-  int ORIFICE_BCD_3 = 39;
+  int SPEED_SENS = -1;
+  int ORIFICE_BCD_1 = -1;
+  int ORIFICE_BCD_2 = -1;
+  int ORIFICE_BCD_3 = -1;
   int MAF = -1;
   int PREF = -1;
   int PDIFF = -1;
@@ -379,29 +380,71 @@ struct Pins {
   int REF_BARO = -1;
   int SWIRL_ENCODER_A = -1;
   int SWIRL_ENCODER_B = -1;
-  int SERIAL0_RX = 3;
-  int SERIAL2_RX = 17;
-  int SDA = 21;
-  int SCL = 22;
-  int SD_CS = 5;
-  int SD_MISO = 19;             
-  int SD_SCK = 18;
+  int SERIAL0_RX = -1;
+  int SERIAL2_RX = -1;
+  int SDA = -1;
+  int SCL = -1;
+  int SD_CS = -1;
+  int SD_MISO = -1;             
+  int SD_SCK = -1;
   int SPARE_PIN_1 = -1;
   int SPARE_PIN_2 = -1;
   // Outputs
-  int VAC_SPEED = 25;
-  int VAC_BANK_1 = 13;
-  int VAC_BANK_2 = 12; 
-  int VAC_BANK_3 = 14;
-  int VAC_BLEED_VALVE = 26;
-  int AVO_STEP = 32;
-  int AVO_DIR = 33;
-  int FLOW_VALVE_STEP = 27;
-  int FLOW_VALVE_DIR = 4;
-  int SD_MOSI = 23;
-  int SERIAL0_TX = 1;
-  int SERIAL2_TX = 16;
+  int VAC_SPEED = -1;
+  int VAC_BANK_1 = -1;
+  int VAC_BANK_2 = -1; 
+  int VAC_BANK_3 = -1;
+  int VAC_BLEED_VALVE = -1;
+  int AVO_STEP = -1;
+  int AVO_DIR = -1;
+  int FLOW_VALVE_STEP = -1;
+  int FLOW_VALVE_DIR = -1;
+  int SD_MOSI = -1;
+  int SERIAL0_TX = -1;
+  int SERIAL2_TX = -1;
 };
+
+// DEPRECATED Original pin assignemnt for wemos / official Shield
+// struct Pins {
+//   // Inputs
+//   int VCC_5V = -1;
+//   int VCC_3V3 = -1;
+//   int SPEED_SENS = 15;
+//   int ORIFICE_BCD_1 = 34;
+//   int ORIFICE_BCD_2 = 36;
+//   int ORIFICE_BCD_3 = 39;
+//   int MAF = -1;
+//   int PREF = -1;
+//   int PDIFF = -1;
+//   int PITOT = -1;
+//   int TEMPERATURE = -1;
+//   int HUMIDITY = -1;
+//   int REF_BARO = -1;
+//   int SWIRL_ENCODER_A = -1;
+//   int SWIRL_ENCODER_B = -1;
+//   int SERIAL0_RX = 3;
+//   int SERIAL2_RX = 17;
+//   int SDA = 21;
+//   int SCL = 22;
+//   int SD_CS = 5;
+//   int SD_MISO = 19;             
+//   int SD_SCK = 18;
+//   int SPARE_PIN_1 = -1;
+//   int SPARE_PIN_2 = -1;
+//   // Outputs
+//   int VAC_SPEED = 25;
+//   int VAC_BANK_1 = 13;
+//   int VAC_BANK_2 = 12; 
+//   int VAC_BANK_3 = 14;
+//   int VAC_BLEED_VALVE = 26;
+//   int AVO_STEP = 32;
+//   int AVO_DIR = 33;
+//   int FLOW_VALVE_STEP = 27;
+//   int FLOW_VALVE_DIR = 4;
+//   int SD_MOSI = 23;
+//   int SERIAL0_TX = 1;
+//   int SERIAL2_TX = 16;
+// };
 
 
 

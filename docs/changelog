@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+2502020001      - Default pin value set to disabled
 2501280078      - Improvements to GUI tile handling
 2501280059      - Added coefficients to Mimic page
 2501280022      - Improved MAF sensor integration
