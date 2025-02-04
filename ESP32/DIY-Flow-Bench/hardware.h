@@ -21,10 +21,9 @@
 #include <ArduinoJson.h>
 
 class Hardware {
-
 	
 	friend class Messages;
-	friend class Maths;
+	
 
 	protected:
 		uint8_t		_i2cAddress;
@@ -33,12 +32,17 @@ class Hardware {
 		uint8_t		_rate;			  
         uint32_t 	_config;
 
+
+
 	public:
 		Hardware();
 		void begin ();
 		void getI2CList();
 		void getI2CDeviceList();
-		void initaliseIO ();
+		void loadPinsData ();
+		void initialisePins ();
+		int setPinMode ();
+		void resetPins ();
 		
 		int32_t getADCRawData(int channel);
 		double get3v3SupplyVolts();
@@ -54,10 +58,13 @@ class Hardware {
 		float uptime();
 
 		void stepperTest();
+		long readAnalog(int sensorPin);
+		void save_ADC_Reg(void);
 
 
 	private:
 		// void configurePins ();
+		void restore_ADC_Reg(void);
 
 
 };

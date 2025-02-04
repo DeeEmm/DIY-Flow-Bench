@@ -36,6 +36,7 @@ class Messages {
 		size_t serialPrintf(const std::string format, ...);
 		size_t blobPrintf(std::string format, ...);
 		size_t debugPrintf(const std::string format, ...);
+		size_t verbosePrintf(const std::string format, ...);
 		size_t statusPrintf(const std::string format, ...);
 		
 		// void * ICACHE_FLASH_ATTR Messages::serialPrintf(const char *s, ...);

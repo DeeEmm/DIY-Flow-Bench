@@ -28,13 +28,6 @@ class Sensors {
 		int _mafDataUnit;
 		int mafFlowRaw;
 
-		String _mafSensorType;
-		String _tempSensorType;
-		String _baroSensorType;
-		String _relhSensorType;
-		String _prefSensorType;
-		String _pdiffSensorType;
-		String _pitotSensorType;    
 
 	public:
 		Sensors();
@@ -56,9 +49,10 @@ class Sensors {
 		double getPDiffValue();
 		double getPitotVolts();
 		double getPitotValue();
-		double getPitotVelocity();
+		double getPitotVelocity(double pitotPressure);
 		void mafFreqCountISR();
 		void mafSetupISR(uint8_t irq_pin, void (*ISR_callback)(void), int value);
+		String getSensorType(int sensorType);
 
 	
 		double startupBaroPressure;
@@ -70,5 +64,4 @@ class Sensors {
 		double baroPressureHpa;
 		double baroPressurePa;
 		double relativeHumidity;
-  
 };

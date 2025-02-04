@@ -10,10 +10,15 @@
 General Version V2.0-RC.X
 
 
-[Download the latest official release](https://github.com/DeeEmm/DIY-Flow-Bench/releases)
+[Download the latest official stable release](https://github.com/DeeEmm/DIY-Flow-Bench/releases)
 
+[Download current development version](https://github.com/DeeEmm/DIY-Flow-Bench/tree/DEV)
 
-NOTE: This project is still in active development and is currently at Release Candidate stage. We are working towards a stable software and hardware release. 
+NOTE: This project is still in active development and is currently at Release Candidate stage. The codebase is stable and functional and we are working towards a final software and hardware release "Version 2".
+
+It should be noted that the development [DEV] branch contains all current changes and is the most up to date but may contain unvalidated changes.
+
+The [Master] branch is level with the current stable release but will always be behind the [DEV] branch.
 
 If you are interested in contributing with testing please head over to our [discussion forums](https://github.com/DeeEmm/DIY-Flow-Bench/discussions) or [Discord](https://discord.gg/eAbktJj) channel.
 
@@ -72,9 +77,15 @@ The DIYFB system can be used on any flow bench and makes an ideal retrofit for o
 
 ## Development Info
 
-This branch contains the current release candidate and is based on the ESP32 port of the original project.
+The [MASTER branch](https://github.com/DeeEmm/DIY-Flow-Bench/tree/master) contains the current release. 
 
-After unit and peer testing is concluded and all bugs are resolved, this version will become the official DIYFB V2 release.
+
+The [DEV branch](https://github.com/DeeEmm/DIY-Flow-Bench/tree/DEV) contains the most up to date code, but may still be undergoing testing and development. Generally the code is stable, but may include unvalidated changes.
+
+As changes are validated, the DEV branch is pushed to master and new releases are created from master.
+
+
+## Reporting Issues
 
 If you use this code and have found issues or have comments relating to the release, please raise an issue in the bugtracker, comment in the support thread for the current version or hit us up at our Discord channel.
 
@@ -93,11 +104,27 @@ If you get stuck, feel free to create a [discussion](https://github.com/DeeEmm/D
 
 If you find a bug, or have a feature request, please [raise an issue](https://github.com/DeeEmm/DIY-Flow-Bench/issues)
 
+**PLEASE NOTE that support is NOT provided via Facebook.**
+
 
 ## License
 ###
 
-This software is released under the GPLV3 license. For details on usage please refer to the license file included with this project
+The software is released under the GPLV3 license. For details on usage please refer to the license file included with this project.
+
+The PCB design and all associated files are provided for use under the CERN–OHL–W license which allows people to make their own derivative designs provided that attribution is provided and that any derivative design is also made publicly available. 
+
+
+## Statement of Intent
+
+The DIYFB project is released under an open source license to allow the end user to build and operate a flow bench without the cost of purchasing commercial equipment. The project is not-for-profit and is run by volunteers. All code development and contributions have been made with the intent of providing DIYFB at no financial cost to the community. It is the intent of the developers that the DIYFB project should remain free. 
+
+
+## Sharing is Caring
+
+Community projects completely rely on community contributions. If you use the DIYFB project, and have made improvements or changes that you think might benefit the community, please consider sharing those changes so that everyone in the community can benefit. Likewise, if you have something to say about the project, how it works, or how it can be improved, please share your thoughts. 
+
+
 
 ## Demo
 ###

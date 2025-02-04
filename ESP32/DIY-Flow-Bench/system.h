@@ -20,16 +20,16 @@ using namespace std;
 *
 ***/
 
-#define SERIAL0_ENABLED                                     // Default serial comms (API & status)
-// #define SERIAL2_ENABLED                                  // Digital guage serial protocol
+#define SERIAL0_ENABLED                                         // Default serial comms (API & status)
+// #define SERIAL2_ENABLED                                      // Digital guage serial protocol
 
 #define SERIAL0_BAUD 115200
 #define SERIAL2_BAUD 9600
 // #define MAC_ADDRESS {0x32, 0xAE, 0xA4, 0x07, 0x0D, 0x00}    // MAC Address (uncomment to enable)
 // #define STATIC_IP {192,168,1,222}                           // Static IP address (uncomment to enable)
-#define SUBNET {192,168,1,1}                                // Subnet (For static IP)
-#define GATEWAY {255,255,0,0}                               // Default gateway (For static IP)
-#define WEBSERVER_ENABLED                                   // Disable to run headless
+#define SUBNET {192,168,1,1}                                    // Subnet (For static IP)
+#define GATEWAY {255,255,0,0}                                   // Default gateway (For static IP)
+#define WEBSERVER_ENABLED                                       // Disable to run headless
 
 
 /***********************************************************
@@ -38,42 +38,63 @@ using namespace std;
  ***/
 #define BOOT_MESSAGE "May the flow be with you..."
 #define PAGE_TITLE "DIY Flow Bench"
-#define SHOW_ALARMS true
-#define MIN_REFRESH_RATE 250
-#define API_IS_ENABLED                                  
-#define API_BLOB_LENGTH 1024
-#define API_RESPONSE_LENGTH 64
-#define API_STATUS_LENGTH 128
-#define API_JSON_LENGTH 1020
-#define API_SCAN_DELAY_MS 250
-#define PRINT_BUFFER_LENGTH 128
-// #define API_CHECKSUM_IS_ENABLED                       
 #define FILESYSTEM SPIFFS
-#define SENSOR_TASK_MEM_STACK 2400 // 2200
-#define ENVIRO_TASK_MEM_STACK 2000 // 1800
-#define DATA_JSON_SIZE 1500
-#define SETTINGS_JSON_SIZE 1536 //1200 
-#define LANGUAGE_JSON_SIZE 1200
-#define CONFIG_JSON_SIZE 1700 //1536 //1200 
-#define CAL_DATA_JSON_SIZE 128
-#define LIFT_DATA_JSON_SIZE 384
-#define MAF_JSON_SIZE 1500
-#define VTASK_DELAY_ADC 500
-#define VTASK_DELAY_BME 500
-#define VTASK_DELAY_SSE 500
+#define PRINT_BUFFER_LENGTH 128
+#define iSHOW_ALARMS true
+#define MIN_iREFRESH_RATE 250
 
+// API data
+#define API_IS_ENABLED                                  
+// #define API_CHECKSUM_IS_ENABLED                       
+#define API_BLOB_LENGTH 1300
+#define API_RESPONSE_LENGTH 64
+
+#define API_STATUS_LENGTH 128
+// #define API_JSON_LENGTH 1024
+#define API_SCAN_DELAY_MS 250
+#define API_DELIMITER ":"
+#define API_SERIAL_BAUD 115200
+
+// Memory assignment
+#define SENSOR_TASK_MEM_STACK 4000 
+#define ENVIRO_TASK_MEM_STACK 2200 
+#define LOOP_TASK_STACK_SIZE 12288
+
+// MAF Data Filters
+#define ALPHA_MEDIAN 0.75f
+#define ALPHA_AVERAGE 0.75f
+#define ALPHA_MEAN 0.75f
+
+
+// Loop Delays
+#define VTASK_DELAY_ADC 1   
+#define VTASK_DELAY_BME 1
+#define VTASK_DELAY_SSE 1
+
+
+// Poll timers
+#define SSE_UPDATE_RATE 400
+
+
+// JSON memory allocation
+#define DATA_JSON_SIZE 768
+#define LANGUAGE_JSON_SIZE 8192 // TODO Need to test language override (mem size could be an issue)
+#define CAL_DATA_JSON_SIZE 348
+#define LIFT_DATA_JSON_SIZE 384
+#define JSON_FILE_SIZE 6000 // 2800
 
 /***********************************************************
 * WEBUI SETTINGS
 ***/
-#define STATUS_UPDATE_RATE 500                              // time between SSE push in milliseconds
 
 #define GUI_COLOUR_UNSET "pink"
 #define GUI_COLOUR_SET "#44b112"
 #define GUI_COLOUR_ERROR "red"
 
 
-
+/***********************************************************
+* Precompile macro error flags
+***/
 #ifndef MAJOR_VERSION 
 #error MAJOR_VERSION UNDEFINED
 #endif
@@ -88,4 +109,7 @@ using namespace std;
 #endif
 #ifndef DEV_BRANCH
 #error DEV_BRANCH UNDEFINED
+#endif
+#ifndef UPDATE_SERVER
+#error UPDATE_SERVER UNDEFINED
 #endif

@@ -20,6 +20,18 @@
 
 #include <stdint.h>
 
+// AsynWebServer literals from: literals.h
+// much more efficient to just load those literals that we need
+static constexpr const char* T_text_html = "text/html";
+static constexpr const char* T_Content_Encoding = "content-encoding";
+static constexpr const char* T_gzip = "gzip";
+static constexpr const char* T_application_json = "application/json";
+
+enum VolumetricUnits {
+    CFM,    // Cubic feet per minute
+    LPM,    // Liters per minute
+    M3H     // Cubic meters per hour
+};
 
 /***********************************************************
  * General
@@ -27,7 +39,12 @@
 #define ARDUINOJSON_ENABLE_STD_STRING 1 // allow support for std::string
 #define PINSFILE 1
 #define MAFFILE 2
-
+#define INDEXFILE 3
+#define CONFIGFILE 4
+#define NO_TASK 0
+#define ADC_TASK 1
+#define BME_TASK 2
+#define SSE_TASK 3
 
 /***********************************************************
  * Physical constants
@@ -77,7 +94,7 @@
 
 #define  VOLTAGE 1
 #define  FREQUENCY 2
-#define  KEY_VALUE 1
+#define  KEY_VAL 1
 #define  RAW_ANALOG 2
 #define  KG_H 1
 #define  MG_S 2
@@ -85,17 +102,51 @@
 
 
 /***********************************************************
+ * MAF Data Coefficients
+ ***/
+
+#define COEFF_0 0
+#define COEFF_1 1
+#define COEFF_2 2
+#define COEFF_3 3
+#define COEFF_4 4
+#define COEFF_5 5
+#define COEFF_6 6
+
+
+/***********************************************************
  * Sensor types
  ***/
-#define NOT_USED 1
+#define SENSOR_DISABLED 1
 #define REF_PRESS_AS_BARO 2
-#define FIXED_VALUE 3
+#define FIXED_VAL 3
 #define MPXV7007 4
 #define MPX4250 5
 #define MPXV7007DP 6
-#define SPARKFUN_BME280 7
+#define BOSCH_BME280 7
 #define MPX4115 8
 #define SIMPLE_TEMP_DHT11 9
+#define ADS1015 10
+#define ADS1115 11
+#define LINEAR_ANALOG 12
+#define MPXV7025 13
+#define XGZP6899A007KPDPN 14
+#define XGZP6899A010KPDPN 15
+#define M5STACK_TubePressure 16
+#define BOSCH_BME680 17
+#define ADS_ADC 18
+
+
+/***********************************************************
+ * Flow Tile types
+ ***/
+#define MAFFLOW_TILE 1
+#define ACFM_TILE 2
+#define ADJCFM_TILE 3
+#define SCFM_TILE 4
+#define KGH_TILE 5
+
+
 
 /***********************************************************
  * Flow Differential types
@@ -105,10 +156,22 @@
 #define BASELINE_LEAK 3
 
 /***********************************************************
+ * Currnt GUI page
+ ***/
+#define INDEX_PAGE 1
+#define DATA_PAGE 2
+#define SETTINGS_PAGE 3
+#define CONFIG_PAGE 4
+#define PINS_PAGE 5
+#define CALIBRATION_PAGE 6
+#define MIMIC_PAGE 7
+
+
+/***********************************************************
  * International Standards
  ***/
-#define ISO_5011 1
-#define ISO_1585 2
+#define ISO_1585 1
+#define ISO_5011 2
 #define ISA 3
 #define ISO_13443 4
 #define ISO_2533 5
@@ -120,7 +183,51 @@
 #define STD_ACFM 2
 #define ADJ_ACFM 3
 #define ADJ_STD_ACFM 4
-#define MAF 5
+#define RAW_MASS 5
+
+
+/***********************************************************
+ * Bench Types
+ ***/
+
+#define MAF_BENCH 1
+#define ORIFICE_BENCH 2
+#define VENTURI_BENCH 3
+#define PITOT_BENCH 4
+
+
+
+/***********************************************************
+ * Data Filter Types
+ ***/
+
+#define NONE 1
+#define MEDIAN 2
+#define AVERAGE 3
+#define MODE 4
+
+
+
+/***********************************************************
+ * Data Rounding Types
+ ***/
+#define INTEGER 2
+#define HALF 3
+
+
+/***********************************************************
+ * Decimal Accuracy
+ ***/
+#define TENTHS 2
+#define HUNDREDTHS 3
+#define THOUSANDTHS 4
+
+
+/***********************************************************
+ * Temperature
+ ***/
+#define CELCIUS 1
+#define FARENHEIT 2
 
 
 /***********************************************************

@@ -38,12 +38,16 @@ class Calculations {
 		double convertFlow(double massFlowKgh);
 		double convertMassFlowToVolumetric(double massFlowKgh);
 		double convertVelocityToVolumetric(double velocityFpm, double pipeRadiusFt);
+		double convertFlowToVelocity(double flowCFM, double pipeDiameterMM);
+		double convertVolumetricFlowUnits(double refFlow, int unitsIn, int unitsOut);
 
-		double convertMassFlowUnits(double refFlow, int unitsOut = MG_S, int unitsIn = KG_H);
+		double convertMassFlowUnits(double refFlow,  int unitsIn = KG_H, int unitsOut = MG_S);
 		double convertKGHtoCFM(double massFlowKGH);
 		double calculateAirDensity(double TempC, double baroKPA, double RelHumidity);
 		double convertToSCFM(double flow, int standard);
-
+        double calculateMafFlow(double mafVolts);
 		double startupBaroPressure;
+
+		String byteDecode(size_t bytes);
 
 };

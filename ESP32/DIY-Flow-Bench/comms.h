@@ -17,15 +17,12 @@
  * 
  ***/
 #pragma once
+
 #include <Arduino.h>
 
 class Comms {
 
-
     private:
-
-   		int getWifiConnection();
-
 
 
 	public:
@@ -34,6 +31,6 @@ class Comms {
 		void resetWifi ( void );
  		void wifiReconnect ( void );
 
-
+		int getWifiConnection();
     
 };

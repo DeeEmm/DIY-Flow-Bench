@@ -23,13 +23,11 @@
 
 #include "constants.h"
 #include "structs.h"
-// #include "pins.h"
 
 #include "calculations.h"
 #include "sensors.h"
 #include "hardware.h"
 #include "messages.h"
-
 
 
 
@@ -233,7 +231,7 @@ double Calculations::convertRelativeHumidity(double relativeHumidity, int units)
  * 1g/m = 277.778mg/s
  * 1g/m = 0.06kg/h
  ***/
-double Calculations::convertMassFlowUnits(double refFlow, int unitsOut, int unitsIn) {
+double Calculations::convertMassFlowUnits(double refFlow, int unitsIn, int unitsOut) {
 
   double massFlowKGH = 0.0;
   double convertedFlow = 0.0;
@@ -241,11 +239,11 @@ double Calculations::convertMassFlowUnits(double refFlow, int unitsOut, int unit
   switch (unitsIn) {
 
     case MG_S:
-      massFlowKGH = refFlow * 277.778;
+      massFlowKGH = refFlow * 0.0036;
       break;
 
     case GM_M:
-      massFlowKGH = refFlow * 16.6667;
+      massFlowKGH = refFlow * 0.06;
       break;
 
     case KG_H:
@@ -258,11 +256,11 @@ double Calculations::convertMassFlowUnits(double refFlow, int unitsOut, int unit
   switch (unitsOut) {
 
     case MG_S:
-      convertedFlow = massFlowKGH * 0.0036;
+      convertedFlow = massFlowKGH * 277.778;
       break;
 
     case GM_M:
-      convertedFlow = massFlowKGH * 0.06;
+      convertedFlow = massFlowKGH * 16.6667;
       break;
 
     case KG_H:
@@ -274,6 +272,62 @@ double Calculations::convertMassFlowUnits(double refFlow, int unitsOut, int unit
 
   return convertedFlow;
 
+}
+
+
+
+
+
+/***********************************************************
+ * @brief Convert between volumetric flow units
+ * @param refFlow Input flow value
+ * @param unitsIn Input units (CFM, LPM, M3H)
+ * @param unitsOut Output units (CFM, LPM, M3H)
+ * @return Converted flow value
+ * 
+ * 1 CFM = 1.699 m³/h
+ * 1 LPM = 0.06 m³/h
+ ***/
+double Calculations::convertVolumetricFlowUnits(double refFlow, int unitsIn, int unitsOut) {
+    
+    double flowM3H = 0.0;
+    double convertedFlow = 0.0;
+
+    // Convert input to M3H
+    switch (unitsIn) {
+     
+        case CFM:
+            flowM3H = refFlow * 1.699;
+            break;
+     
+        case LPM:
+            flowM3H = refFlow * 0.06;
+            break;
+     
+        case M3H:
+        default:
+            flowM3H = refFlow;
+            break;
+    }
+
+    // Convert M3H to output units
+    switch (unitsOut) {
+     
+        case CFM:
+            convertedFlow = flowM3H * 0.589;
+            break;
+     
+        case LPM:
+            convertedFlow = flowM3H * 16.667;
+            break;
+     
+        case M3H:
+        default:
+            convertedFlow = flowM3H;
+            break;
+    }
+
+    return convertedFlow;
 }
 
 
@@ -293,12 +347,12 @@ double Calculations::convertFlow(double massFlowKGH) {
 
   extern struct SensorData sensorVal;
 
-  double airDensity = 0.0; // kg/m3
-  double waterVaporDensity = 0.0; // kg/m3
-  double waterVaporPressure = 0.0; // kg/m3
-  double dryAirPressure = 0.0; // kg/m3
-  double flowM3H = 0.0; // m3/hr
-  double flowCFM = 0.0;
+  double airDensity = 0.0f; // kg/m3
+  double waterVaporDensity = 0.0f; // kg/m3
+  double waterVaporPressure = 0.0f; // kg/m3
+  double dryAirPressure = 0.0f; // kg/m3
+  double flowM3H = 0.0f; // m3/hr
+  double flowCFM = 0.0f;
 
   // TODO validate reference pressure adjustment - do we add it or subtract it? Should be baro pressure less vac amount
   double refPressurePascals = sensorVal.BaroPA - this->convertPressure(sensorVal.PRefKPA, PASCALS) ;
@@ -309,7 +363,7 @@ double Calculations::convertFlow(double massFlowKGH) {
   flowM3H = massFlowKGH / airDensity; 
 
   // Convert to CFM
-  flowCFM = flowM3H * 0.58858;
+  flowCFM = flowM3H * 0.58857833F;
 
   // only return value if valid posotive value received
   if ( massFlowKGH > 0 ) {
@@ -359,6 +413,34 @@ double Calculations::convertFlowDepression(double oldPressure, double newPressur
   }
   
 }
+
+
+
+
+
+/***********************************************************
+ * @brief Convert volumetric flow to velocity
+ * @param flowCFM Flow rate in cubic feet per minute
+ * @param pipeDiameterMM Pipe diameter in millimeters
+ * @return Velocity in feet per minute
+ ***/
+double Calculations::convertFlowToVelocity(double flowCFM, double pipeDiameterMM) {
+    // Convert mm to ft
+    double pipeRadiusFt = (pipeDiameterMM / 2.0) * 0.00328084;
+    
+    // Calculate pipe area in sq ft
+    double pipeArea = PI * pow(pipeRadiusFt, 2);
+    
+    // Check for zero area
+    if (pipeArea <= 0.0) {
+        return 0.0;
+    }
+    
+    // Calculate velocity in ft/min
+    return flowCFM / pipeArea;
+}
+
+
 
 
 
@@ -418,7 +500,7 @@ double Calculations::calculateAirDensity(double TempC, double refPressurePascals
 /***********************************************************
  * @brief Convert flow to standard CFM (SCFM)
  * @note Translates current flow to standardised flow based on international standards
- * @note Default standard for project is ISO 1585 - Automotive engine testing
+ * @note Default standard for project is ISO 5011
  ***/
 
 double Calculations::convertToSCFM(double flowCFM, int standard) {
@@ -464,10 +546,10 @@ double Calculations::convertToSCFM(double flowCFM, int standard) {
       rhStd = 0;
     break;
 
-    default: // ISO_1585
-      tStd = 25;
-      pStd = 100;
-      rhStd = 0;
+    default: // ISO_5011
+      tStd = 20;
+      pStd = 100.3;
+      rhStd = 50;
     break;
 
   }
@@ -486,3 +568,26 @@ double Calculations::convertToSCFM(double flowCFM, int standard) {
   
 }
 
+
+
+
+
+
+
+
+/***********************************************************
+ * @brief byteDecode
+ * @param bytes size to be decoded
+ * @details Byte Decode (returns string i.e '52 GB')
+ ***/
+String Calculations::byteDecode(size_t bytes)
+{
+  if (bytes < 1024)
+    return String(bytes) + " B";
+  else if (bytes < (1024 * 1024))
+    return String(bytes / 1024.0) + " KB";
+  else if (bytes < (1024 * 1024 * 1024))
+    return String(bytes / 1024.0 / 1024.0) + " MB";
+  else
+    return String(bytes / 1024.0 / 1024.0 / 1024.0) + " GB";
+}

@@ -1,0 +1,298 @@
+
+
+<div id="configuration">
+    <div class="config-panel">
+    <h2>Hardware Configuration</h2>
+    <form id="configForm" action="/api/saveconfig" method="POST">
+        <div class="config-container">
+            <!-- System Settings -->
+            <fieldset>
+                <legend>System Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration#system-settings/" target="_blank">&#9432;</a></legend>
+                <div class="input-group">
+                    <label for="bSD_ENABLED">SD Card</label>
+                    <select name='bSD_ENABLED' class='config-select'>
+                        <option value='0' ~bSD_ENABLED_0~>Disabled</option>
+                        <option value='1' ~bSD_ENABLED_1~>Enabled</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="iMIN_PRESS_PCT">Minimum Pressure Percent</label>
+                    <input type="number" id="iMIN_PRESS_PCT" name="iMIN_PRESS_PCT" value="~iMIN_PRESS_PCT~">
+                </div>
+                <div class="input-group">
+                    <label for="dPIPE_RAD_FT">Pipe Radius (ft)</label>
+                    <input type="number" id="dPIPE_RAD_FT" name="dPIPE_RAD_FT" step="0.000001" value="~dPIPE_RAD_FT~">
+                </div>
+            </fieldset>
+
+            <!-- Power Settings -->
+            <fieldset>
+                <legend>Power Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration#power-settings" target="_blank">&#9432;</a></legend>
+                <div class="input-group">
+                    <label for="bFIXED_3_3V">Fixed 3.3V Value</label>
+                    <select name='bFIXED_3_3V' class='config-select'>
+                        <option value='0' ~bFIXED_3_3V_0~>Disabled</option>
+                        <option value='1' ~bFIXED_3_3V_1~>Enabled</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="dVCC_3V3_TRIM">3.3V Trim</label>
+                    <input type="number" id="dVCC_3V3_TRIM" name="dVCC_3V3_TRIM" step="0.001" value="~dVCC_3V3_TRIM~">
+                </div>
+                <div class="input-group">
+                    <label for="bFIXED_5V">Fixed 5V Value</label>
+                    <select name='bFIXED_5V' class='config-select'>
+                        <option value='0' ~bFIXED_5V_0~>Disabled</option>
+                        <option value='1' ~bFIXED_5V_1~>Enabled</option>
+                    </select>               
+                 </div>
+                 <div class="input-group">
+                    <label for="dVCC_5V_TRIM">5V Trim</label>
+                    <input type="number" id="dVCC_5V_TRIM" name="dVCC_5V_TRIM" step="0.001" value="~dVCC_5V_TRIM~">
+                </div>
+            </fieldset>
+
+            <!-- BME Settings -->
+            <fieldset>
+                <legend>BME Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration#bme-settings" target="_blank">&#9432;</a></legend>
+                <div class="input-group">
+                    <label for="iBME_TYP">BME Type</label>
+                    <select name='iBME_TYP' class='config-select'>
+                        <option value='1' ~iBME_TYP_1~>Disabled</option>
+                        <option value='7' ~iBME_TYP_7~>BME 280</option>
+                        <option value='17' ~iBME_TYP_17~>BME 680</option>
+                    </select>                    
+                </div>
+                <div class="input-group">
+                    <label for="iBME_ADDR">I2C Address</label>
+                    <input type="number" id="iBME_ADDR" name="iBME_ADDR" value="~iBME_ADDR~">
+                </div>
+            </fieldset>
+
+            <!-- ADC Settings -->
+            <fieldset>
+                <legend>ADC Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration#adc-settings" target="_blank">&#9432;</a></legend>
+                <div class="input-group">
+                    <label for="iADC_TYPE">ADC Type</label>
+                    <select name='iADC_TYPE' class='config-select'>
+                        <option value='10' ~iADC_TYPE_10~>ADS1015</option>
+                        <option value='11' ~iADC_TYPE_11~>ADS1115</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="iADC_I2C_ADDR">I2C Address</label>
+                    <input type="number" id="iADC_I2C_ADDR" name="iADC_I2C_ADDR" value="~iADC_I2C_ADDR~">
+                </div>
+            </fieldset>
+
+            <!-- MAF Settings -->
+            <fieldset>
+                <legend>MAF Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration#maf-settings" target="_blank">&#9432;</a></legend>
+                <div class="input-group">
+                    <label for="iMAF_SENS_TYP">Sensor Type &nbsp; <a href="~MAF_LINK~" target="new">&nbsp;&nbsp;&#9432;</a><span class="config-value" id="MAF_SENSOR">~MAF_TYPE~</span></label>
+                    <select name='iMAF_SENS_TYP' id='iMAF_SENS_TYP' class='config-select-long'>
+                        <option value='0' ~iMAF_SENS_TYP_0~>ACDELCO 92281162</option>
+                        <option value='1' ~iMAF_SENS_TYP_1~>BOSCH 0280218067</option>
+                        <option value='2' ~iMAF_SENS_TYP_2~>DELPHI AF10118</option>
+                        <option value='3' ~iMAF_SENS_TYP_3~>BOSCH 0280002421</option>
+                        <option value='4' ~iMAF_SENS_TYP_4~>BOSCH 0280218008</option>
+                        <option value='5' ~iMAF_SENS_TYP_5~>BOSCH 0280217531</option>
+                        <option value='6' ~iMAF_SENS_TYP_6~>BOSCH 0280218019</option>
+                        <option value='7' ~iMAF_SENS_TYP_7~>BOSCH 0280217123</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="dMAF_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dMAF_MV_TRIM" name="dMAF_MV_TRIM" step="0.001" value="~dMAF_MV_TRIM~">
+                </div>
+                <hr class="fieldset-divider">
+                <div class="input-group">
+                    <label for="iMAF_SRC_TYP">Source</label>
+                    <select name='iMAF_SRC_TYP' class='config-select'>
+                        <option value='1' ~iMAF_SRC_TYP_1~>Disabled</option>
+                        <option value='12' ~iMAF_SRC_TYP_12~>Analog Pin</option>
+                        <option value='18' ~iMAF_SRC_TYP_18~>ADC</option>                    
+                    </select>
+                </div>
+            </fieldset>
+
+            <!-- Reference Pressure Settings -->
+            <fieldset>
+                <legend>Reference Pressure Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration#reference-pressure-settings" target="_blank">&#9432;</a></legend>
+                <div class="input-group">
+                    <label for="iPREF_SENS_TYP">Sensor Type</label>
+                    <select name='iPREF_SENS_TYP' class='config-select-long'>
+                        <option value='1' ~iPREF_SENS_TYP_1~>Disabled</option>
+                        <option value='2' ~iPREF_SENS_TYP_2~>Use Baro</option>
+                        <option value='3' ~iPREF_SENS_TYP_3~>Fixed Value</option>
+                        <option value='4' ~iPREF_SENS_TYP_4~>MPXV7007</option>
+                        <option value='5' ~iPREF_SENS_TYP_5~>MPX4250</option>
+                        <option value='8' ~iPREF_SENS_TYP_8~>MPX4115</option>
+                        <option value='12' ~iPREF_SENS_TYP_12~>Analog Pin</option>
+                        <option value='13' ~iPREF_SENS_TYP_13~>MPXV7025</option>
+                        <option value='14' ~iPREF_SENS_TYP_14~>XGZP6899A007KPDPN</option>
+                        <option value='15' ~iPREF_SENS_TYP_15~>XGZP6899A010KPDPN</option>
+                        <option value='16' ~iPREF_SENS_TYP_16~>M5STACK_TubePressure</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="dPREF_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dPREF_MV_TRIM" name="dPREF_MV_TRIM" step="0.001" value="~dPREF_MV_TRIM~">
+                </div>
+                <hr class="fieldset-divider">
+                <div class="input-group">
+                    <label for="iPREF_SRC_TYP">Source</label>
+                    <select name='iPREF_SRC_TYP' class='config-select'>
+                        <option value='12' ~iPREF_SRC_TYP_12~>Analog Pin</option>
+                        <option value='18' ~iPREF_SRC_TYP_18~>ADC</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <!-- Differential Pressure Settings -->
+            <fieldset>
+                <legend>Differential Pressure Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration#differential-pressure-sensor-settings" target="_blank">&#9432;</a></legend>
+                <div class="input-group">
+                    <label for="iPDIFF_SENS_TYP">Sensor Type</label>
+                    <select name='iPDIFF_SENS_TYP' class='config-select-long'>
+                        <option value='1' ~iPDIFF_SENS_TYP_1~>Disabled</option>
+                        <option value='3' ~iPDIFF_SENS_TYP_3~>Fixed Value</option>
+                        <option value='4' ~iPDIFF_SENS_TYP_4~>MPXV7007</option>
+                        <option value='5' ~iPDIFF_SENS_TYP_5~>MPX4250</option>
+                        <option value='8' ~iPDIFF_SENS_TYP_8~>MPX4115</option>
+                        <option value='12' ~iPDIFF_SENS_TYP_12~>Analog Pin</option>
+                        <option value='13' ~iPDIFF_SENS_TYP_13~>MPXV7025</option>
+                        <option value='14' ~iPDIFF_SENS_TYP_14~>XGZP6899A007KPDPN</option>
+                        <option value='15' ~iPDIFF_SENS_TYP_15~>XGZP6899A010KPDPN</option>
+                        <option value='16' ~iPDIFF_SENS_TYP_16~>M5STACK_TubePressure</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="dPDIFF_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dPDIFF_MV_TRIM" name="dPDIFF_MV_TRIM" step="0.001" value="~dPDIFF_MV_TRIM~">
+                </div>
+                <hr class="fieldset-divider">
+                <div class="input-group">
+                    <label for="iPDIFF_SRC_TYP">Source</label>
+                    <select name='iPDIFF_SRC_TYP' class='config-select'>
+                        <option value='12' ~iPDIFF_SRC_TYP_12~>Analog Pin</option>
+                        <option value='18' ~iPDIFF_SRC_TYP_18~>ADC</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <!-- Pitot Sensor Settings -->
+            <fieldset>
+                <legend>Pitot Sensor Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration#differential-pressure-sensor-settings" target="_blank">&#9432;</a></legend>
+                <div class="input-group">
+                    <label for="iPITOT_SENS_TYP">Sensor Type</label>
+                    <select name='iPITOT_SENS_TYP' class='config-select-long'>
+                        <option value='1' ~iPITOT_SENS_TYP_1~>Disabled</option>
+                        <option value='4' ~iPITOT_SENS_TYP_4~>MPXV7007</option>
+                        <option value='5' ~iPITOT_SENS_TYP_5~>MPX4250</option>
+                        <option value='8' ~iPITOT_SENS_TYP_8~>MPX4115</option>
+                        <option value='13' ~iPITOT_SENS_TYP_13~>MPXV7025</option>
+                        <option value='14' ~iPITOT_SENS_TYP_14~>XGZP6899A007KPDPN</option>
+                        <option value='15' ~iPITOT_SENS_TYP_15~>XGZP6899A010KPDPN</option>
+                        <option value='16' ~iPITOT_SENS_TYP_16~>M5STACK_TubePressure</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="dPITOT_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dPITOT_MV_TRIM" name="dPITOT_MV_TRIM" step="0.001" value="~dPITOT_MV_TRIM~">
+                </div>
+                <hr class="fieldset-divider">
+                <div class="input-group">
+                    <label for="iPITOT_SRC_TYP">Source</label>
+                    <select name='iPITOT_SRC_TYP' class='config-select'>
+                        <option value='12' ~iPITOT_SRC_TYP_12~>Analog Pin</option>
+                        <option value='18' ~iPITOT_SRC_TYP_18~>ADC</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <!-- Barometric Settings -->
+            <fieldset>
+                <legend>Barometric Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration#barometric-settings" target="_blank">&#9432;</a></legend>
+                <div class="input-group">
+                    <label for="iBARO_SENS_TYP">Sensor Type</label>
+                    <select name='iBARO_SENS_TYP' class='config-select-long'>
+                        <option value='1' ~iBARO_SENS_TYP_1~>Disabled</option>
+                        <option value='3' ~iBARO_SENS_TYP_3~>Fixed Value</option>
+                        <option value='7' ~iBARO_SENS_TYP_7~>BME280</option>
+                        <option value='12' ~iBARO_SENS_TYP_12~>Analog Pin</option>
+                        <option value='17' ~iBARO_SENS_TYP_17~>BME680</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="dBARO_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dBARO_MV_TRIM" name="dBARO_MV_TRIM" step="0.001" value="~dBARO_MV_TRIM~">
+                </div>
+                <div class="input-group">
+                    <label for="dBARO_FINE_TUNE">Fine Tune</label>
+                    <input type="number" id="dBARO_FINE_TUNE" name="dBARO_FINE_TUNE" step="0.001" value="~dBARO_FINE_TUNE~">
+                </div>
+            </fieldset>
+
+            <!-- Temperature Settings -->
+            <fieldset>
+                <legend>Temperature Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration#temperature-settings" target="_blank">&#9432;</a></legend>
+                <div class="input-group">
+                    <label for="iTEMP_SENS_TYP">Sensor Type</label>
+                    <select name='iTEMP_SENS_TYP' class='config-select-long'>
+                        <option value='1' ~iTEMP_SENS_TYP_1~>Disabled</option>
+                        <option value='3' ~iTEMP_SENS_TYP_3~>Fixed Value</option>
+                        <option value='7' ~iTEMP_SENS_TYP_7~>BME280</option>
+                        <option value='12' ~iTEMP_SENS_TYP_12~>Analog Pin</option>
+                        <option value='17' ~iTEMP_SENS_TYP_17~>BME680</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="dTEMP_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dTEMP_MV_TRIM" name="dTEMP_MV_TRIM" step="0.001" value="~dTEMP_MV_TRIM~">
+                </div>
+                <div class="input-group">
+                    <label for="dTEMP_FINE_TUNE">Fine Tune</label>
+                    <input type="number" id="dTEMP_FINE_TUNE" name="dTEMP_FINE_TUNE" step="0.001" value="~dTEMP_FINE_TUNE~">
+                </div>
+            </fieldset>
+
+            <!-- Relative Humidity Settings -->
+            <fieldset>
+                <legend>Relative Humidity Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration#relative-humidity-settings" target="_blank">&#9432;</a></legend>
+                <div class="input-group">
+                    <label for="iRELH_SENS_TYP">Sensor Type</label>
+                    <select name='iRELH_SENS_TYP' class='config-select-long'>
+                        <option value='1' ~iRELH_SENS_TYP_1~>Disabled</option>
+                        <option value='3' ~iRELH_SENS_TYP_3~>Fixed Value</option>
+                        <option value='12' ~iRELH_SENS_TYP_12~>Analog Pin</option>
+                        <option value='7' ~iRELH_SENS_TYP_7~>BME280</option>
+                        <option value='17' ~iRELH_SENS_TYP_17~>BME680</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="dRELH_MV_TRIM">mV Trim</label>
+                    <input type="number" id="dRELH_MV_TRIM" name="dRELH_MV_TRIM" step="0.001" value="~dRELH_MV_TRIM~">
+                </div>
+                <div class="input-group">
+                    <label for="dRELH_FINE_TUNE">Fine Tune</label>
+                    <input type="number" id="dRELH_FINE_TUNE" name="dRELH_FINE_TUNE" step="0.001" value="~dRELH_FINE_TUNE~">
+                </div>
+            </fieldset>
+
+            <!-- Swirl Settings -->
+            <fieldset>
+                <legend>Swirl Settings&nbsp;&nbsp;&nbsp;<a class="wiki-link" href="https://github.com/DeeEmm/DIY-Flow-Bench/wiki/Configuration#swirl-settings" target="_blank">&#9432;</a></legend>
+                <div class="input-group">
+                    <label for="bSWIRL_ENBLD">Enable Swirl</label>
+                    <select name='bSWIRL_ENBLD' class='config-select'>
+                        <option value='0' ~bSWIRL_ENBLD_0~>Disabled</option>
+                        <option value='1' ~bSWIRL_ENBLD_1~>Enabled</option>
+                    </select>                   
+                </div>
+            </fieldset>
+        </div>
+        <button type="submit" id="save-config-button" class="button">Save</button>
+    </form>
+
+    <script type="text/javascript" src="config.js"></script>

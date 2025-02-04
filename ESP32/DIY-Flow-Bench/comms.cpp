@@ -42,7 +42,7 @@
  ***/
 void Comms::initaliseWifi() {
 
-  extern struct ConfigSettings config;
+  extern struct BenchSettings settings;
   // extern struct Language language;
   extern struct DeviceStatus status;
 
@@ -52,12 +52,12 @@ void Comms::initaliseWifi() {
   DataHandler _data;
 
   // if WiFi password is unedited or blank force AP mode
-  if ((strstr(String(config.wifi_pswd).c_str(), String("PASSWORD").c_str())) || (String(config.wifi_pswd).c_str() == "")) {
-    config.ap_mode = true;
+  if (settings.wifi_pswd.indexOf("PASSWORD") > -1 || settings.wifi_pswd == "" ) {
+    settings.ap_mode = true;
   } 
   
   // Connect to WiFi
-  if (config.ap_mode == false)  {
+  if (settings.ap_mode == false)  {
 
     // WiFi.useStaticBuffers(true);   
     this->resetWifi();
@@ -82,16 +82,17 @@ void Comms::initaliseWifi() {
   }
 
   // Test for connection success else create an accesspoint
-  if (wifiStatusCode == 3 && config.ap_mode == false) { 
+  if (wifiStatusCode == 3 && settings.ap_mode == false) { 
     // STA Connection success
-    _message.serialPrintf("Connected to %s \n", config.wifi_ssid);
+    _message.serialPrintf("Connected to %s \n", settings.wifi_ssid);
     status.local_ip_address = WiFi.localIP().toString().c_str();
     _message.serialPrintf("IP address: %s \n", WiFi.localIP().toString().c_str());
     WiFi.setAutoReconnect(true);
     WiFi.persistent(true);
+    esp_wifi_set_ps(WIFI_PS_NONE); // ADC2 / Wifi STA fix - https://github.com/espressif/esp-idf/issues/3714
     
   }  else  { // Go into AP Mode
-    if (config.ap_mode == true) { // AP mode is Default
+    if (settings.ap_mode == true) { // AP mode is Default
       _message.serialPrintf("Defaulting to AP Mode \n");
     } else { // AP mode is Fallback
       _message.serialPrintf("Failed to connect to Wifi \n");
@@ -100,19 +101,21 @@ void Comms::initaliseWifi() {
       _message.serialPrintf("\n");
     }
 
-    _message.serialPrintf("Creating WiFi Access Point:  %s  \n", config.wifi_ap_ssid); // NOTE: Default AP SSID / PW = DIYFB / 123456789
+    _message.serialPrintf("Creating WiFi Access Point:  %s  \n", settings.wifi_ap_ssid); // NOTE: Default AP SSID / PW = DIYFB / 123456789
     WiFi.mode(WIFI_AP);
-    WiFi.softAP(config.wifi_ap_ssid, config.wifi_ap_pswd);
+    std::string ap_SSID = settings.wifi_ap_ssid.c_str();
+    std::string ap_PSWD = settings.wifi_ap_pswd.c_str();
+    WiFi.softAP(ap_SSID.c_str(), ap_PSWD.c_str());
     status.local_ip_address = WiFi.softAPIP().toString().c_str();
     _message.serialPrintf("Access Point IP address: %s \n", WiFi.softAPIP().toString().c_str());
     status.apMode = true;
   }
 
   // Set up Multicast DNS
-  if (!MDNS.begin(config.hostname))  {
+  if (!MDNS.begin(settings.hostname.c_str()))  {
     _message.serialPrintf("Error starting mDNS \n");
   }  else  {
-    status.hostname = config.hostname;
+    status.hostname = settings.hostname;
     _message.serialPrintf("Multicast: http://%s.local \n", status.hostname);
   }
 
@@ -171,17 +174,18 @@ void Comms::wifiReconnect ( void ) {
  ***/
 int Comms::getWifiConnection(){
 
+  extern struct BenchSettings settings;
+
   Messages _message;
-  extern struct ConfigSettings config;
   
   uint8_t wifiConnectionAttempt = 1;
   uint8_t wifiConnectionStatus;
 
   for(;;) {
           
-    WiFi.begin(config.wifi_ssid, config.wifi_pswd); 
-    wifiConnectionStatus = WiFi.waitForConnectResult(config.wifi_timeout);
-    if (wifiConnectionStatus == WL_CONNECTED || wifiConnectionAttempt > config.wifi_retries){
+    WiFi.begin(settings.wifi_ssid.c_str(), settings.wifi_pswd.c_str()); 
+    wifiConnectionStatus = WiFi.waitForConnectResult(settings.wifi_timeout);
+    if (wifiConnectionStatus == WL_CONNECTED || wifiConnectionAttempt > settings.wifi_retries){
       break;
     } else if (wifiConnectionStatus != WL_DISCONNECTED) {
       resetWifi();

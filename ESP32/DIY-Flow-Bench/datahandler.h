@@ -21,17 +21,16 @@
 #include <Arduino.h>
 #include "system.h"
 #include <ArduinoJson.h>
-#include <AsyncTCP.h>
+// #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 #include "constants.h"
 
 class DataHandler {
 
-	friend class Maths;
+	
 	friend class Messages;
 	friend class Hardware;
-	friend class Settings;
 	friend class Sensors;
 	friend class AsyncWebServer;
 	friend class AsyncWebSocket;
@@ -42,8 +41,7 @@ class DataHandler {
 
     protected:
 
-		String byteDecode(size_t bytes);
-    	AsyncWebServer *tempServer;
+		AsyncWebServer *tempServer;
 
     private:
 
@@ -60,24 +58,27 @@ class DataHandler {
 		AsyncEventSource *tempServerEvents;
 
 		void begin();
-		void createConfigFile ();
+		void createSettingsFile ();
 		void writeJSONFile(String data, String filename, int dataSize);
 		void createLiftDataFile();
 		void createCalibrationFile ();
-		StaticJsonDocument<CONFIG_JSON_SIZE> loadJSONFile(String filename);
+		JsonDocument loadJSONFile(String filename); 
 		void beginSerial(void);
-		StaticJsonDocument<CONFIG_JSON_SIZE> loadConfig ();
-		StaticJsonDocument<LIFT_DATA_JSON_SIZE> loadLiftData ();
+		void loadMAFData();
+		void loadMAFCoefficients();
+		void initialiseConfig();
+		void loadConfig();
+		void initialiseSettings ();
+		void initialiseLiftData ();
+		void loadSettings ();
+		void loadLiftData ();
 		static void clearLiftDataFile(AsyncWebServerRequest *request);
-		StaticJsonDocument<1024> loadCalibrationData ();
-		void parseCalibrationData(StaticJsonDocument<1024> calibrationData);
-		String getDataJSON();
+		String buildIndexSSEJsonData();
+		String buildMimicSSEJsonData();
 		static void fileUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 		void bootLoop();
 		String getRemote(const char* serverName);
 		bool checkUserFile(int filetype = PINSFILE); 
 		bool checkSubstring(std::string firstString, std::string secondString);
-		void loadPinsData ();
-		void parsePinsData(StaticJsonDocument<1024> pinData);
 
 };

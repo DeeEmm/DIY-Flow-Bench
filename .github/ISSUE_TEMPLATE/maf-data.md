@@ -16,7 +16,7 @@ NOTE: Both can be found in configuration.h or by pressing the 'Info' button on t
 Please cut and paste your MAF data file below.
 
 A MAF data file template is available that you can use as a basis
-https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/ESP32/DIY-Flow-Bench/mafData/exampleMafData.cpp
+https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/ESP32/DIY-Flow-Bench/mafData/exampleMafData.json
 
 Support can be found in the discussion forums under the following topic
 https://github.com/DeeEmm/DIY-Flow-Bench/discussions/51

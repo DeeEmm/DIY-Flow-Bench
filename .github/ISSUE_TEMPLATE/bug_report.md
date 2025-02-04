@@ -11,7 +11,7 @@ assignees: ''
 - RELEASE (e.g. V.2.0-RC.4) 
 - BUILD_NUMBER (e.g. Build 31012301)
 
-NOTE: Both can be found in configuration.h or by pressing the 'Info' button on the configuration page in the GUI
+NOTE: Both can be found in version.h or by pressing the 'Info' button on the configuration page in the GUI
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -25,7 +25,7 @@ Outline the steps to reproduce the behavior:
 2. Do this '....'
 3. See error
 
-**ESP32 (please complete the following information):**
+**ESP32 (please include additional information as required):**
  - Hardware Type [e.g. Wemos D1 R32]
  - ESP Firmware Version (if known): [e.g. 1.0.20042001]
 

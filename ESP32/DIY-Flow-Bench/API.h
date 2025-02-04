@@ -25,7 +25,7 @@ class API {
 
 	friend class Hardware;
 	friend class Sensors;
-	friend class Maths;
+	
 	friend class Messages;
 	friend class Webserver;
 
