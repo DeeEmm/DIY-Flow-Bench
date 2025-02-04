@@ -29,6 +29,7 @@ Build numbers follow format YY MM DD VV Where VV is the incremental daily versio
 
 Build #         - Description of Change
 
+
 2502040029      - Updated Wiki links for calibration and mimic pages
 2502040028      - Added MAF data for BOSCH 0280217531, 0280218019 and 0280217123
 2502040017      - Added MAF data for BOSCH_0280218008
@@ -207,7 +208,7 @@ Build #         - Description of Change
 24112503        - #213 Pitot offset error
 24112502        - #157 Updated datagraph settings
                 - Capture radio retains selection
-24112501        - Update API
+24112501        - #239 Update API
 24112402        - #213 Pitot / differential zeroing
                 - #254 Report sensor voltage to API
                 - Cookie to remember tile status
