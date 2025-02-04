@@ -1,3 +1,6 @@
+# user_emerge_firmware.py
+# This file is part of the DIY FLow Bench Project. https//github.com/DeeEmm/DIY-Flow-Bench
+# Author: DeeEmm
 Import("env")
 import os
 import re
