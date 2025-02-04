@@ -153,13 +153,13 @@ struct Configuration {
   double dRELH_FINE_TUNE = 0.0f;
   bool bSWIRL_ENBLD = false;
 
-  double mafCoeff0 = 0.0f;
-  double mafCoeff1 = 0.0f;
-	double mafCoeff2 = 0.0f;
-	double mafCoeff3 = 0.0f;
-	double mafCoeff4 = 0.0f;
-	double mafCoeff5 = 0.0f;
-	double mafCoeff6 = 0.0f;
+  float mafCoeff0 = 0.0f;
+  float mafCoeff1 = 0.0f;
+	float mafCoeff2 = 0.0f;
+	float mafCoeff3 = 0.0f;
+	float mafCoeff4 = 0.0f;
+	float mafCoeff5 = 0.0f;
+	float mafCoeff6 = 0.0f;
 };
 
 

@@ -399,7 +399,7 @@ double Sensors::getMafFlow(int units) {
 
 	MafData _maf(config.iMAF_SENS_TYP); // TEST A/B
 
-	double flowRateKGH = 0.0;
+	float flowRateKGH = 0.0f;
 	double oldMafArea = 0.0;
 	double newMafArea = 0.0;
 	double transposedflowRateKGH = 0.0;
@@ -418,7 +418,8 @@ double Sensors::getMafFlow(int units) {
 
 	// 6th degree polynomial calculation
 	if (settings.AB_test == 'A') { // TEST A/B 
-		flowRateKGH = config.mafCoeff0 + (config.mafCoeff1 * mafMilliVolts) + (config.mafCoeff2 * pow(mafMilliVolts, 2)) + (config.mafCoeff3 * pow(mafMilliVolts, 3)) + (config.mafCoeff4 * pow(mafMilliVolts, 4)) + (config.mafCoeff5 * pow(mafMilliVolts, 5)) + (config.mafCoeff6 * pow(mafMilliVolts, 6));
+		// flowRateKGH = config.mafCoeff0 + (config.mafCoeff1 * mafMilliVolts) + (config.mafCoeff2 * pow(mafMilliVolts, 2)) + (config.mafCoeff3 * pow(mafMilliVolts, 3)) + (config.mafCoeff4 * pow(mafMilliVolts, 4)) + (config.mafCoeff5 * pow(mafMilliVolts, 5)) + (config.mafCoeff6 * pow(mafMilliVolts, 6));
+		flowRateKGH = config.mafCoeff6 * pow(mafMilliVolts, 6) + config.mafCoeff5 * pow(mafMilliVolts, 5) + config.mafCoeff4 * pow(mafMilliVolts, 4) + config.mafCoeff3 * pow(mafMilliVolts, 3) + config.mafCoeff2 * pow(mafMilliVolts, 2) + config.mafCoeff1 * mafMilliVolts + config.mafCoeff0;
 	} else if (settings.AB_test == 'B') {
 		// Alternate method
 		// 6th degree polynomial calculation (Coefficients stored in mafData class)
