@@ -5,7 +5,7 @@
 
 DIYFB is built using VScode and platformIO. Dependencies are automatically pulled in as part of the supplied platfformio.ini file. Whilst it is possible to compile using the Arduino IDE, VScode is the recommended build environment
 
-In addition to setting up platformIO, you will also need to install python as this is used to manage the versioning. If you cannot or do not wish to install python, then you can manually update the versioning by uncommenting the build_flags in the [common] section and commenting out the call to user-actions.py
+In addition to setting up platformIO, you will also need to install python as this is used to manage the versioning. If you cannot or do not wish to install python, or you are using the Arduino IDE, then you can manually update the versioning by uncommenting the build_flags in the [common] section and commenting out the call to user-actions.py
 
 ### Default Build Environment
 ---
