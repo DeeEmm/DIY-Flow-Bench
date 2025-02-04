@@ -1,7 +1,7 @@
 {
   "MAJOR_VERSION": "V2",
   "MINOR_VERSION": "0",
-  "BUILD_NUMBER": "2502040029",
+  "BUILD_NUMBER": "2502050002",
   "RELEASE": "V2.0-RC8",
   "DEV_BRANCH": "https://github.com/DeeEmm/DIY-Flow-Bench/tree/DEV",
   "UPDATE_SERVER": "https://raw.githubusercontent.com/DeeEmm/DIY-Flow-Bench/refs/heads/DEV/ESP32/DIY-Flow-Bench/version.json"

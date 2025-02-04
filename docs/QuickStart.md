@@ -23,21 +23,11 @@ Altenratively you can also upload the pre-compiled binary firmware.bin directly 
 
 Once uploaded you will then need to upload the GUI and confguration files.
 
-### Compiling the GUI file
+
+### Setting up your pin configuration 
 ---
 
-The GUI is contained within the index.html file found in the /data folder and project releases. This is a single monlithic file that contains a minified, compressed concatenated version of the index.html, style.css and javascript.js files
-
-You can also compile your own index.html version using GULP. A gulpfile.js file is included which contains various gulp tasks. 
-
-NPN and GULP will need to be installed for this to work
-
-### Setting up your pin configuration - pins.json
----
-
-Before you can use the device the I/O configuration also needs to be uploaded. This is defined in a 'pins' file. You will find several files within the 'pins' directory of the project.
-
-If you do not find one for your specific board, simply copy and rename an existing file to use as the basis for your new file. Then change the input and output pin numbers to suit your hardware.
+Before you can use the device the I/O configuration needs to be set. Pins are defined on the 'pins' page of the GUI. There you can change the input and output pin numbers to suit your hardware.
 
 Note that the default recommended board is the Wemos ESP32 D1. This is the board that the DIYFB shield is designed for. Generic versions are available very cheaply online.
 
