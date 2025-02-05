@@ -25,6 +25,7 @@ https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/CONTRIBUTING.md
 
 Build Number    | Description of Change
 -- | --
+2502050009      | #289 Fixed Datagraph data type
 2502050006      | Update README
 2502050005      | #340 added back data folder
 2502050002      | Code Tidy / Formatting / headers

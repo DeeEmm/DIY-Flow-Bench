@@ -554,6 +554,7 @@ void DataHandler::initialiseSettings () {
   if (!_prefs.isKey("iADJ_FLOW_DEP")) _prefs.putInt("iADJ_FLOW_DEP", 28);
   if (!_prefs.isKey("iSTD_REF")) _prefs.putInt("iSTD_REF", 1);
   if (!_prefs.isKey("iSTD_ADJ_FLOW")) _prefs.putInt("iSTD_ADJ_FLOW", 1);
+  if (!_prefs.isKey("iDATACAP_STD")) _prefs.putInt("iDATACAP_STD", 1);
   if (!_prefs.isKey("iDATAGRAPH_MAX")) _prefs.putInt("iDATAGRAPH_MAX", 0);
   if (!_prefs.isKey("iTEMP_UNIT")) _prefs.putInt("iTEMP_UNIT", CELCIUS);
 
@@ -615,6 +616,7 @@ void DataHandler::loadSettings () {
   settings.standardReference = _prefs.getInt("iSTD_REF", 1  );
   settings.std_adj_flow = _prefs.getInt("iSTD_ADJ_FLOW",  1 );
   settings.dataGraphMax = _prefs.getInt("iDATAGRAPH_MAX", 0 );
+  settings.data_capture_datatype = _prefs.getInt("iDATACAP_STD", 0 );
   settings.temp_unit = _prefs.getInt("iTEMP_UNIT", CELCIUS );
   settings.valveLiftInterval = _prefs.getDouble("dLIFT_INTERVAL", 1.5F  );
   settings.bench_type = _prefs.getInt("iBENCH_TYPE", MAF_BENCH );
