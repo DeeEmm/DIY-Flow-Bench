@@ -1535,6 +1535,15 @@ String Webserver::processSettingsPageTemplate(const String &var) {
   if (var == "STATUS_MESSAGE") return String(status.statusMessage);
 
 
+  // Datagraph capture standard
+  if (var == "iDATACAP_MODE_1" && settings.data_capture_datatype == 1) return String("selected");
+  if (var == "iDATACAP_MODE_2" && settings.data_capture_datatype == 2) return String("selected");
+  if (var == "iDATACAP_MODE_3" && settings.data_capture_datatype == 3) return String("selected");
+  if (var == "iDATACAP_MODE_4" && settings.data_capture_datatype == 4) return String("selected");
+  if (var == "iDATACAP_MODE_5" && settings.data_capture_datatype == 5) return String("selected");
+
+
+
   //Datagraph Max Val selected item
   if (var == "iDATAGRAPH_MAX_0" && settings.dataGraphMax == 0) return String("selected");
   if (var == "iDATAGRAPH_MAX_1" && settings.dataGraphMax == 1) return String("selected");

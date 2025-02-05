@@ -56,7 +56,7 @@ using namespace std;
 #define API_SERIAL_BAUD 115200
 
 // Memory assignment
-#define SENSOR_TASK_MEM_STACK 4000 
+#define SENSOR_TASK_MEM_STACK 4200 
 #define ENVIRO_TASK_MEM_STACK 2200 
 #define LOOP_TASK_STACK_SIZE 12288
 
