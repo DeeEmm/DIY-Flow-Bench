@@ -58,6 +58,16 @@ enum VolumetricUnits {
 
 
 /***********************************************************
+ * Conversion factors
+ ***/
+#define ISO1585_CFM_PER_KGH 0.49710961
+#define ISO1585_KGH_PER_CFM 2.01162879
+ 
+#define ISO5011_CFM_PER_KGH 0.488851967
+#define ISO5011_KGH_PER_CFM 2.045609 
+
+
+/***********************************************************
  * Standard Units
  ***/
 #define  RAW 0

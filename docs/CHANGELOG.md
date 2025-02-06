@@ -25,6 +25,7 @@ https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/CONTRIBUTING.md
 
 Build Number    | Description of Change
 -- | --
+2502060001      | #138 Updated BOSCH 0280218067 polynomials
 2502050009      | #289 Fixed Datagraph data type
 2502050006      | Update README
 2502050005      | #340 added back data folder
