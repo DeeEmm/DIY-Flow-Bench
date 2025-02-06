@@ -60,7 +60,7 @@ public:
     // Enter data in exponential notation as it is generated in excel sheet (e.g. 1.2345e-05)
     double mafCoeff[NUM_MAF_TYPES][NUM_COEFFICIENTS] = {
         {1.734046571f, 0.007062544f, 1.01476E-05, 6.3883E-09, 9.63923E-13, -3.24416E-17, 1.11433E-21}, // ACDELCO_92281162 (Data calculated from PY V1)
-        {81.92836845f, -0.15294752f, 9.09249E-05, -6.47644E-09, -2.68628E-12, 1.00601E-15, -2.73618E-20}, // BOSCH_0280218067 (Excel data)
+        {0.970294436f, -0.078166434f, 0.000138556f, -8.51019E-08, 3.12389E-11, -5.15648E-15, 3.82478E-19}, // BOSCH_0280218067 (Excel data positive flow only)
         {-1.006588218f, 0.080079937f, -0.000180578, 1.68028E-07, -6.82173E-11, 1.31768E-14, -9.55601E-19}, // DELPHI_AF10118 (Excel data)
         {18.5392475f, -0.094665483f, 0.000123116f, -5.85313e-08, 1.82179e-11, -2.42405e-15, 1.69842E-19}, // BOSCH_0280002421 (HFM5 plugin 82mm) (Excel data)
         {215.8330171f, -0.526769493f, 0.00048859f, -2.15008E-07, 5.33313E-11, -6.74228E-15, 3.87965E-19}, // BOSCH_0280218008 (HFM5 plugin 78mm) (Excel data)
