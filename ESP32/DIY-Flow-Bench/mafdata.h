@@ -27,7 +27,7 @@ class MafData {
     
 private:
     static const int NUM_COEFFICIENTS = 7;
-    static const int NUM_MAF_TYPES = 8;
+    static const int NUM_MAF_TYPES = 10;
     int currentMafType;
 
 public:
@@ -45,7 +45,9 @@ public:
         BOSCH_0280218008 = 4,
         BOSCH_0280217531 = 5,
         BOSCH_0280218019 = 6,
-        BOSCH_0280217123 = 7     
+        BOSCH_0280217123 = 7,
+        BOSCH_0280218038 = 8,
+        VDO_5WK96132Z = 9
     };
 
     enum MafStatus {
@@ -66,21 +68,23 @@ public:
         {215.8330171f, -0.526769493f, 0.00048859f, -2.15008E-07, 5.33313E-11, -6.74228E-15, 3.87965E-19}, // BOSCH_0280218008 (HFM5 plugin 78mm) (Excel data)
         {58.36807578f, -0.164211479f, 0.00016265f, -6.89421E-08, 1.76501E-11, -2.26324E-15, 1.45971E-19}, // BOSCH_0280217531 (HFM5 plugin 71mm) (Excel data)
         {146.5075402f, -0.344050939f, 0.000308055f, -1.30212E-07, 3.06369E-11, -3.58939E-15, 1.91244E-19}, // BOSCH_0280218019 (HFM5 plugin 62mm) (Excel data)
-        {-0.00047495f, -0.005188161f, 4.25563E-06, 2.94949E-09, -8.80773E-13, 1.35382E-16, 4.28461E-21} // BOSCH_0280217123 (HFM5 plugin 50mm) (Excel data)
+        {-0.00047495f, -0.005188161f, 4.25563E-06, 2.94949E-09, -8.80773E-13, 1.35382E-16, 4.28461E-21}, // BOSCH_0280217123 (HFM5 plugin 50mm) (Excel data)
+        {60.01224693f, -0.168837155f, 0.000167232f, -7.08842E-08, 1.81473E-11, -2.32699E-15, 1.50083E-19}, //  BOSCH_0280218038 (HFM5 plugin 73mm) (Excel data)
+        {-1.095527704f, 0.059430983f, -0.000100137f, 9.78512E-08, -3.88608E-11, 7.41299E-15, -5.03733E-19} // VDO_5WK96132Z (BMW 72mm)
     };
 
     // When adding a sensor, dont forget to add it to the iMAF_SENS_TYP dropdown in config.html
 
 
-    int mafStatus[NUM_MAF_TYPES] = {Untested, Tested, Tested, Tested, Tested ,Tested ,Tested ,Tested}; // MAF Status
+    int mafStatus[NUM_MAF_TYPES] = {Untested, Tested, Tested, Tested, Tested ,Tested ,Tested ,Untested, Untested}; // MAF Status
 
-    int mafDiameter[NUM_MAF_TYPES] = {94, 82, 70, 82, 78, 71, 62, 50 }; // Original MAF diameter in mm
+    int mafDiameter[NUM_MAF_TYPES] = {94, 82, 70, 82, 78, 71, 62, 50, 73, 72}; // Original MAF diameter in mm
 
-    double mafScaling[NUM_MAF_TYPES] = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}; // MAF scaling factor
+    double mafScaling[NUM_MAF_TYPES] = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}; // MAF scaling factor
 
-    int mafOutputType[NUM_MAF_TYPES] = {Voltage, Voltage, Voltage, Voltage, Voltage, Voltage, Voltage, Voltage}; // MAF output type
+    int mafOutputType[NUM_MAF_TYPES] = {Voltage, Voltage, Voltage, Voltage, Voltage, Voltage, Voltage, Voltage, Voltage, Voltage}; // MAF output type
 
-    int mafMaxKGH[NUM_MAF_TYPES] = {1607, 1805, 491, 1000, 850, 640, 480, 370}; // MAX MAF kg/h value
+    int mafMaxKGH[NUM_MAF_TYPES] = {1607, 1805, 491, 1000, 850, 640, 480, 370, 658, 1024}; // MAX MAF kg/h value
 
     String mafType[NUM_MAF_TYPES] = {
         "ACDELCO 92281162",
@@ -90,7 +94,9 @@ public:
         "BOSCH 0280218008",
         "BOSCH 0280217531",
         "BOSCH 0280218019",
-        "BOSCH 0280217123"
+        "BOSCH 0280217123",
+        "BOSCH 0280218038",
+        "VDO 5WK96132Z"
 
     };
 
@@ -102,7 +108,9 @@ public:
         "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/346",
         "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/347",
         "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/348",
-        "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/349"
+        "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/349",
+        "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/357",
+        "https://github.com/DeeEmm/DIY-Flow-Bench/discussions/141"
     };
   
     // MafData() : currentMafType(ACDELCO_92281162) {}
