@@ -83,6 +83,18 @@ The [DEV branch](https://github.com/DeeEmm/DIY-Flow-Bench/tree/DEV) contains the
 
 When appropriate. The changes on DEV are validated and then the DEV branch is pushed to master to create a new release.
 
+## Installation
+
+Binaries can be uploaded to the ESP32 directly using the [DIYFB Firmware Flashing Tool](https://github.com/DeeEmm/DIYFB-firmware-flasher/releases/). Versions are available for both Mac and Windows...
+
+[DIYFB-Firmware-Flasher.dmg](https://github.com/DeeEmm/DIYFB-firmware-flasher/releases/download/V1.0.1/DIYFB-Firmware-Flasher.dmg)
+
+[DIYFB-Firmware-Flasher.exe](https://github.com/DeeEmm/DIYFB-firmware-flasher/releases/download/V1.0.1/DIYFB-Firmware-Flasher.exe)
+
+(_Tested on Mac OS 15.0.1 Sequoia / Windows 10._)
+
+Current Firmware binaries can be downloaded from the [Releases](https://github.com/DeeEmm/DIY-Flow-Bench/releases) section of the repo
+
 
 ## Reporting Issues
 
