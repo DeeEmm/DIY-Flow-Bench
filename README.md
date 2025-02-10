@@ -138,6 +138,8 @@ The DIYFB project is released under an open source license to allow the end user
 
 Community projects completely rely on community contributions. If you use the DIYFB project, and have made improvements or changes that you think might benefit the community, please consider sharing those changes so that everyone in the community can benefit. Likewise, if you have something to say about the project, how it works, or how it can be improved, please share your thoughts. 
 
+For more information on contributing to the project please see the [Contribution Guidelines](https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/.github/CONTRIBUTING.md)
+
 
 
 ## Demo
@@ -146,6 +148,7 @@ Community projects completely rely on community contributions. If you use the DI
 You can view an online demo of the Web UI at the followng link
 
 [https://diyflowbench.com/demo/](https://diyflowbench.com/demo/)
+
 
 
 ## Further Information
