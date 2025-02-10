@@ -13,14 +13,14 @@ https://github.com/DeeEmm/DIY-Flow-Bench/issues
 
 ## Contribution Guidelines
 
-https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/CONTRIBUTING.md
+https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/.github/CONTRIBUTING.md
 
 
 
 ## Changelog
 
 - Build numbers follow format YY MM DD VV Where VV is the incremental daily version
-- Don't forget to update the build number in version.json !!
+- Build number is automatically created in version.json at compile time
 - Most recent entry at top !!
 
 Build Number    | Description of Change
