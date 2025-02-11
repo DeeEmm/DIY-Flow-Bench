@@ -19,12 +19,15 @@ https://github.com/DeeEmm/DIY-Flow-Bench/blob/master/.github/CONTRIBUTING.md
 
 ## Changelog
 
-- Build numbers follow format YY MM DD VV Where VV is the incremental daily version
-- Build number is automatically created in version.json at compile time
 - Most recent entry at top !!
+- Build numbers follow format YY MM DD VVVV Where VVVV is the incremental daily version
+- Build number is automatically created in version.json at compile time
 
 Build Number    | Description of Change
 -- | --
+2502110001      | Up-rev to RC9
+                | Graph download link fallback to target="_blank"
+                | Update Documentation
 2502060003      | Added VDO 5WK96132Z MAF (BMW M54B30)
 2502060002      | Added Bosch 0280218038 MAF (Audi S4)
 2502060001      | #138 Updated BOSCH 0280218067 polynomials

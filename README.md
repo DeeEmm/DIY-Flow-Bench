@@ -37,18 +37,7 @@ Modern flow benches use sensors to measure flow and reference pressures and then
 ## What is the DIY Flow Bench Project?
 ###
 
-The DIY Flow Bench project (DIYFB) is a professional quality flow bench controller that produces results comparable with, and in some cases exceeding commercial grade systems.
-
-The project comprises of two distinct aspects.
-
-
-**Software**
-
-The software code is developed in C++ and runs on an ESP32 microprocessor. The ESP processes sensor data and uses this data to calculate the volumetric air flow, which is then displayed via web browser on any web enabled device.
-
-**Hardware**
-
-The hardware aspect of the project comprises of a PCB (commonly known as a 'shield') which connects to the ESP processor. The PCB includes environmental sensors to measure temperature, humidity and barometric pressure along with pressure sensors to measure the reference depression from the vacuum source. It also interfaces to a MAF sensor or additional differential pressure sensors. This sensor data allows the software to accurately measure and calculate volumetric flow for any given environmental conditions.
+The DIY Flow Bench project (DIYFB) is a professional quality flow bench controller that produces results comparable with, and in some cases exceeding commercial grade system. 
 
 The DIYFB project aims to bring professional grade results to the DIYer without the price tag associated with owning a professional bench.
 
@@ -62,6 +51,18 @@ Support is included for the following systems architectures.
 - Venturi style benches (In Development for V3 release)
 
 The DIYFB system can be used on any flow bench and makes an ideal retrofit for older manometer based benches as well as being the perfect choice for new builds. We include basic DIY hardware plans so you can build a simple MAF based flow bench that uses a shop vac for the vacuum source. This is a great entry level 'floating reference' bench and perfect for most shops and hobbyists. We also provide support for larger and more complex bench designs.
+
+## Project Overview
+
+The project comprises of two distinct aspects.
+
+### Software
+
+The software code is developed in C++ and runs on an ESP32 microprocessor. The ESP processes sensor data and uses this data to calculate the volumetric air flow, which is then displayed via web browser on any web enabled device.
+
+### Hardware
+
+The hardware aspect of the project comprises of a PCB (commonly known as a 'shield') which connects to the ESP processor. The PCB includes environmental sensors to measure temperature, humidity and barometric pressure along with pressure sensors to measure the reference depression from the vacuum source. It also interfaces to a MAF sensor or additional differential pressure sensors. This sensor data allows the software to accurately measure and calculate volumetric flow for any given environmental conditions.
 
 
 ## Project Goals
@@ -79,9 +80,12 @@ The DIYFB system can be used on any flow bench and makes an ideal retrofit for o
 The [MASTER branch](https://github.com/DeeEmm/DIY-Flow-Bench/tree/master) contains the current release. 
 
 
-The [DEV branch](https://github.com/DeeEmm/DIY-Flow-Bench/tree/DEV) contains the most up to date code, but may still be undergoing testing and development. Generally the code is stable, but may include unvalidated changes. Use with caution. It is advisable to be up-to-date with current development discussions on the forums to understand the current DEV branch status
+The [DEV branch](https://github.com/DeeEmm/DIY-Flow-Bench/tree/DEV) contains the most up to date code, but may still be undergoing testing and development. 
 
-When appropriate. The changes on DEV are validated and then the DEV branch is pushed to master to create a new release.
+Generally the code inthe DEV branch is stable, but may it include unvalidated changes, so use with caution. It is advisable to be up-to-date with current development discussions on the forums to understand the current DEV branch status
+
+When appropriate. The changes on DEV are validated and then the DEV branch are pulled into master to create a new release.
+
 
 ## Installation
 
@@ -91,14 +95,18 @@ Binaries can be uploaded to the ESP32 directly using the [DIYFB Firmware Flashin
 
 [DIYFB-Firmware-Flasher.exe](https://github.com/DeeEmm/DIYFB-firmware-flasher/releases/download/V1.0.1/DIYFB-Firmware-Flasher.exe)
 
-(_Tested on Mac OS 15.0.1 Sequoia / Windows 10._)
+(_Tested on Mac OS 15.0.1 Sequoia / Windows 10/11._)
 
 Current Firmware binaries can be downloaded from the [Releases](https://github.com/DeeEmm/DIY-Flow-Bench/releases) section of the repo
 
 
 ## Reporting Issues
 
-If you use this code and have found issues or have comments relating to the release, please raise an issue in the bugtracker, comment in the support thread for the current version, vreate a discussion or hit us up at our Discord channel.
+If you use this code and have found issues or have comments relating to the release, you can report an issue in the following ways:
+
+- Raise an issue in the bugtracker
+- Comment in the support thread for the current release version
+- Create a discussion or hit us up at our Discord channel.
 
 - [Bugtracker](https://github.com/DeeEmm/DIY-Flow-Bench/issues)
 - [Discussion for current version](https://github.com/DeeEmm/DIY-Flow-Bench/discussions) (Pinned to top of page)
